@@ -1,24 +1,21 @@
-import React, { PropsWithChildren, ReactElement } from "react";
+import React from "react";
 import { View } from "react-native";
 import { TextInput, HelperText, Text } from "react-native-paper";
 
-type Props = PropsWithChildren<{
-  headerImage?: ReactElement;
-  headerBackgroundColor: { dark: string; light: string };
+interface InputProps {
   placeholder?: string;
   label?: string;
   error?: boolean;
   errorMessage?: string;
   value: string;
   handleChange: (text: string) => void;
-  handleBlur: () => void;
+  handleBlur?: () => void;
   hint?: string;
   mode?: "outlined" | "flat";
-}>;
+  lefticon?:string;
+};
 
-const Inputs: React.FC<Props> = ({
-  headerImage,
-  headerBackgroundColor,
+const Inputs: React.FC<InputProps> = ({
   placeholder,
   label,
   error,
@@ -28,6 +25,7 @@ const Inputs: React.FC<Props> = ({
   handleBlur,
   hint,
   mode,
+  lefticon
 }) => {
   console.log("Input");
 
