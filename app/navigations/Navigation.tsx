@@ -6,7 +6,7 @@ import {
   HomeScreen,
   LoginScreen,
   AdminScreen,
-  GuestScreen,
+  SuperAdminScreen,
   UserScreen,
   MachineGroupScreen
 } from "@/app/screens";
@@ -45,13 +45,13 @@ const Navigation: React.FC = () => {
             />
             {user && (
               <>
-                {role === "admin" && (
+                {role === "SuperAdmin" && (
                   <>
                     <Drawer.Screen
-                      name="Admin"
-                      component={AdminScreen}
+                      name="SuperAdmin"
+                      component={SuperAdminScreen}
                       options={{
-                        title: "Admin",
+                        title: "SuperAdmin",
                         drawerIcon: ({ color }) => (
                           <TabBarIcon name="home" color={color} />
                         ),
@@ -69,29 +69,43 @@ const Navigation: React.FC = () => {
                     />
                   </>
                 )}
-                {role === "user" && (
-                  <Drawer.Screen
-                    name="User"
-                    component={UserScreen}
-                    options={{
-                      title: "User",
-                      drawerIcon: ({ color }) => (
-                        <TabBarIcon name="code-slash" color={color} />
-                      ),
-                    }}
-                  />
+                {role === "Admin" && (
+                  <>
+                    <Drawer.Screen
+                      name="Admin"
+                      component={AdminScreen}
+                      options={{
+                        title: "Admin",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="code-slash" color={color} />
+                        ),
+                      }}
+                    />
+                    <Drawer.Screen
+                      name="Macine_group"
+                      component={MachineGroupScreen}
+                      options={{
+                        title: "Machine Group",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                  </>
                 )}
-                {role === "guest" && (
-                  <Drawer.Screen
-                    name="Guest"
-                    component={GuestScreen}
-                    options={{
-                      title: "Guest",
-                      drawerIcon: ({ color }) => (
-                        <TabBarIcon name="code-slash" color={color} />
-                      ),
-                    }}
-                  />
+                {role === "GeneralUser" && (
+                  <>
+                    <Drawer.Screen
+                      name="User"
+                      component={UserScreen}
+                      options={{
+                        title: "User",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="code-slash" color={color} />
+                        ),
+                      }}
+                    />
+                  </>
                 )}
                 <Drawer.Screen
                   name="Logout"

@@ -2,10 +2,10 @@ import React from "react";
 import { Text } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 
-export default function GuestScreen() {
+export default function SuperAdminScreen() {
   return (
     <AccessibleView>
-      <Text>Welcome Guest</Text>
+      <Text>Welcome SuperAdminScreen</Text>
     </AccessibleView>
   );
 }

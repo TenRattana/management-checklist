@@ -3,12 +3,12 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 interface User {
   username: string;
-  role: string;
+  role: 'SuperAdmin' | 'Admin' | 'GeneralUser';
 }
 
 interface AuthContextType {
   user: string | null;
-  role: string | null;
+  role: 'SuperAdmin' | 'Admin' | 'GeneralUser' | null;
   loading: boolean;
   login: (values: { username: string }) => { success: boolean; role: string | null };
   logout: () => void;
@@ -22,13 +22,13 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [data] = useState<User[]>([
-    { username: "Ten", role: "admin" },
-    { username: "1", role: "user" },
-    { username: "2", role: "guest" },
+    { username: "Ten", role: "SuperAdmin" },
+    { username: "1", role: "Admin" },
+    { username: "2", role: "GeneralUser" },
   ]);
 
   const [user, setUser] = useState<string | null>(null);
-  const [role, setRole] = useState<string | null>(null);
+  const [role, setRole] = useState<'SuperAdmin' | 'Admin' | 'GeneralUser' | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -45,12 +45,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = (values: { username: string }) => {
-    const foundUser = data.find((v) => v.username === values.username);
+    const foundUser = data.find((user) => user.username === values.username);
     const userRole = foundUser ? foundUser.role : null;
 
     if (foundUser) {
-      saveUserData({ username: values.username, role: userRole });
-      setUser(values.username);
+      saveUserData({ username: foundUser.username, role: userRole });
+      setUser(foundUser.username);
       setRole(userRole);
       return { success: true, role: userRole };
     } else {
