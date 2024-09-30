@@ -8,7 +8,10 @@ import {
   AdminScreen,
   SuperAdminScreen,
   UserScreen,
-  MachineGroupScreen
+  MachineGroupScreen,
+  CheckListOptionScreen,
+  CheckListScreen,
+  MachineScreen
 } from "@/app/screens";
 import AccessibleView from "@/components/AccessibleView";
 
@@ -67,6 +70,36 @@ const Navigation: React.FC = () => {
                         ),
                       }}
                     />
+                     <Drawer.Screen
+                      name="Machine"
+                      component={MachineScreen}
+                      options={{
+                        title: "Machine",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                     <Drawer.Screen
+                      name="Checklist"
+                      component={CheckListScreen}
+                      options={{
+                        title: "Checklist",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                     <Drawer.Screen
+                      name="Checklist_option"
+                      component={CheckListOptionScreen}
+                      options={{
+                        title: "Checklist Option",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
                   </>
                 )}
                 {role === "Admin" && (
@@ -86,6 +119,36 @@ const Navigation: React.FC = () => {
                       component={MachineGroupScreen}
                       options={{
                         title: "Machine Group",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                    <Drawer.Screen
+                      name="Machine"
+                      component={MachineScreen}
+                      options={{
+                        title: "Machine",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                     <Drawer.Screen
+                      name="Checklist"
+                      component={CheckListScreen}
+                      options={{
+                        title: "Checklist",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                     <Drawer.Screen
+                      name="Checklist_option"
+                      component={CheckListOptionScreen}
+                      options={{
+                        title: "Checklist Option",
                         drawerIcon: ({ color }) => (
                           <TabBarIcon name="home" color={color} />
                         ),
