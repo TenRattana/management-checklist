@@ -16,8 +16,8 @@ interface Field {
 }
 
 interface Option {
-  label:string;
-  value:string;
+  label: string;
+  value: string;
 }
 
 
@@ -62,11 +62,11 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 
   const renderField = (field: Field, index: number) => {
     const option: Option[] = groupCheckListOption
-    .find((option) => option.GCLOptionID === field.groupCheckListOptionId)
-    ?.CheckListOptions.map((item) => ({
-      label: item.CLOptionName,
-      value: item.CLOptionID,
-    })) || [];
+      .find((option) => option.GCLOptionID === field.groupCheckListOptionId)
+      ?.CheckListOptions.map((item) => ({
+        label: item.CLOptionName,
+        value: item.CLOptionID,
+      })) || [];
 
     switch (field.CheckListTypeName) {
       case "Textinput":
@@ -91,8 +91,8 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
             hint={field.hint}
             label={field.CheckListName}
             value={values.matchCheckListId || `${indexSubForm}-${index}`}
-            handleChange={()=>handleChange("matchCheckListId")}
-            handleBlur={() => handleBlur("matchCheckListId")} 
+            handleChange={() => handleChange("matchCheckListId")}
+            handleBlur={() => handleBlur("matchCheckListId")}
             error={touched.matchCheckListId && Boolean(errors.matchCheckListId)}
             errorMessage={
               touched.matchCheckListId ? errors.matchCheckListId : ""

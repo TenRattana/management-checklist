@@ -8,21 +8,22 @@ import {
   AdminScreen,
   GuestScreen,
   UserScreen,
+  MachineGroupScreen
 } from "@/app/screens";
-import { View } from "react-native";
+import AccessibleView from "@/components/AccessibleView";
+
 import { Button } from "react-native-paper";
-import { ResponsiveProvider } from "@/app/contexts/responsive";
-import { ThemeProvider } from "@/app/contexts/theme";
-import { ToastProvider } from "@/app/contexts/toastify";
+import { ThemeProvider, ToastProvider, ResponsiveProvider } from "@/app/contexts";
 
 const Drawer = createDrawerNavigator();
 
-export default function Navigation() {
+const Navigation: React.FC = () => {
   const { user, role, loading } = useAuth();
 
   if (loading) {
     return null;
   }
+  console.log("createDrawerNavigator");
 
   return (
     <ResponsiveProvider>
@@ -45,16 +46,28 @@ export default function Navigation() {
             {user && (
               <>
                 {role === "admin" && (
-                  <Drawer.Screen
-                    name="Admin"
-                    component={AdminScreen}
-                    options={{
-                      title: "Admin",
-                      drawerIcon: ({ color }) => (
-                        <TabBarIcon name="home" color={color} />
-                      ),
-                    }}
-                  />
+                  <>
+                    <Drawer.Screen
+                      name="Admin"
+                      component={AdminScreen}
+                      options={{
+                        title: "Admin",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                    <Drawer.Screen
+                      name="Macine_group"
+                      component={MachineGroupScreen}
+                      options={{
+                        title: "Machine Group",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                  </>
                 )}
                 {role === "user" && (
                   <Drawer.Screen
@@ -97,9 +110,9 @@ export default function Navigation() {
       </ThemeProvider>
     </ResponsiveProvider>
   );
-}
+};
 
-function LogoutScreen() {
+const LogoutScreen: React.FC = () => {
   const { logout } = useAuth();
 
   useEffect(() => {
@@ -107,10 +120,12 @@ function LogoutScreen() {
   }, [logout]);
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+    <AccessibleView style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <Button mode="contained" disabled>
         Logging out...
       </Button>
-    </View>
+    </AccessibleView>
   );
-}
+};
+
+export default Navigation;

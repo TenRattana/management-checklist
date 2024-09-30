@@ -1,4 +1,4 @@
-const palette = {
+export const palette = {
   main: "#1ec9ff",
   disable: "#d0d0d0",
   primary: "#6200ee",

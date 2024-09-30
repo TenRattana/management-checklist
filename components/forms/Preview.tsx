@@ -7,8 +7,8 @@ import Textareas from "@/components/common/Textareas";
 import Inputs from "@/components/common/Inputs";
 
 interface Option {
-    label:string;
-    value:string;
+  label: string;
+  value: string;
 }
 
 interface Field {
@@ -83,11 +83,11 @@ const Preview: React.FC<PreviewProps> = ({
     const fieldName = field.matchCheckListId;
 
     const option: Option[] = groupCheckListOption
-    .find((option) => option.GCLOptionID === field.groupCheckListOptionId)
-    ?.CheckListOptions.map((item) => ({
-      label: item.CLOptionName,
-      value: item.CLOptionID,
-    })) || [];
+      .find((option) => option.GCLOptionID === field.groupCheckListOptionId)
+      ?.CheckListOptions.map((item) => ({
+        label: item.CLOptionName,
+        value: item.CLOptionID,
+      })) || [];
 
     switch (field.CheckListTypeName) {
       case "Textinput":
@@ -176,7 +176,7 @@ const Preview: React.FC<PreviewProps> = ({
       <Text style={[styles.textHeader, { color: colors.palette.dark }]}>
         {form.formName || "Content Name"}
       </Text>
-     
+
 
       <View>
         {state.subForms.map((subForm, index) => (

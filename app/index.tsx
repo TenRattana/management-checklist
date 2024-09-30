@@ -6,7 +6,9 @@ import { AuthProvider } from "@/app/contexts/auth";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Navigation from "@/app/navigations/Navigation";
 
-export default function App() {
+const App = () => {
+  console.log("App");
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AuthProvider>
@@ -19,3 +21,5 @@ export default function App() {
     </GestureHandlerRootView>
   );
 }
+
+export default App

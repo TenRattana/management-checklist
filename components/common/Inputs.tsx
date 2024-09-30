@@ -1,6 +1,7 @@
 import React from "react";
-import { View } from "react-native";
+import { View, Platform } from "react-native";
 import { TextInput, HelperText, Text } from "react-native-paper";
+import { NativeSyntheticEvent, TextInputFocusEventData } from "react-native";
 
 interface InputProps {
   placeholder?: string;
@@ -9,11 +10,12 @@ interface InputProps {
   errorMessage?: string;
   value: string;
   handleChange: (text: string) => void;
-  handleBlur?: () => void;
+  handleBlur?: (event: NativeSyntheticEvent<TextInputFocusEventData>) => void;
   hint?: string;
   mode?: "outlined" | "flat";
-  lefticon?:string;
-};
+  lefticon?: string;
+  name?: string;
+}
 
 const Inputs: React.FC<InputProps> = ({
   placeholder,
@@ -25,12 +27,15 @@ const Inputs: React.FC<InputProps> = ({
   handleBlur,
   hint,
   mode,
-  lefticon
+  lefticon,
+  name
 }) => {
-  console.log("Input");
-
   return (
-    <View>
+    <View
+      aria-label={Platform.OS === 'web' ? name : undefined}
+      accessible={Platform.OS !== 'web'}
+      accessibilityRole={Platform.OS !== 'web' ? 'text' : undefined}
+    >
       <TextInput
         mode={mode || "outlined"}
         placeholder={placeholder}
@@ -48,6 +53,7 @@ const Inputs: React.FC<InputProps> = ({
         }
         error={error}
         enterKeyHint="done"
+        testID={name}
       />
       {hint && <Text>{hint}</Text>}
       <HelperText type="error" visible={error} style={{ left: -10 }}>

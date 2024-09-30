@@ -1,16 +1,22 @@
 import React, { useRef, useMemo, useState, useEffect } from "react";
-import { View, Text, Pressable, Animated } from "react-native";
+import { Text, Pressable, Animated, StyleSheet } from "react-native";
 import { DataTable, IconButton } from "react-native-paper";
 import Dialogs from "@/components/common/Dialogs";
-
+import { useThemeColor } from "@/hooks/useThemeColor";
+import { useRes } from "@/app/contexts";
+import useMasterdataStyles from "@/styles/common/masterdata";
+import useCustomtableStyles from "@/styles/customtable";
+import AccessibleView from "@/components/AccessibleView";
 interface CustomTableProps {
   Tabledata: (string | number | boolean)[][];
-  Tablehead: string[];
+  Tablehead: { label?: string; align?: string }[];
   flexArr: number[];
   handleAction: (action?: string, data?: string) => void;
   actionIndex: { [key: string]: number }[];
   searchQuery: string;
 }
+
+type justifyContent = 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly' | undefined;
 
 const CustomTable: React.FC<CustomTableProps> = React.memo(
   ({
@@ -24,12 +30,18 @@ const CustomTable: React.FC<CustomTableProps> = React.memo(
     const [page, setPage] = useState<number>(0);
     const [itemsPerPage, setItemsPerPage] = useState<number>(10);
     const [sortColumn, setSortColumn] = useState<number | null>(null);
-    const [sortDirection, setSortDirection] = useState<"ascending" | "descending">("ascending");
+    const [sortDirection, setSortDirection] = useState<"ascending" | "descending" | undefined>(undefined);
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [dialogAction, setDialogAction] = useState<string>("");
     const [dialogMessage, setDialogMessage] = useState<string>("");
     const [dialogTitle, setDialogTitle] = useState<string>("");
     const [dialogData, setDialogData] = useState<string>("");
+
+    const masterdataStyles = useMasterdataStyles();
+    const customtable = useCustomtableStyles();
+
+    const colors = useThemeColor();
+    const { spacing, responsive } = useRes();
 
     const animations = useRef(
       Tabledata.map(() => new Animated.Value(1))
@@ -75,9 +87,9 @@ const CustomTable: React.FC<CustomTableProps> = React.memo(
     };
 
     const renderActionButton = (
-      data: string, 
-      action: string, 
-      row: (string | number | boolean)[], 
+      data: string,
+      action: string,
+      row: (string | number | boolean)[],
       rowIndex: number
     ) => {
       const handlePress = () => {
@@ -95,35 +107,35 @@ const CustomTable: React.FC<CustomTableProps> = React.memo(
       let icon;
       switch (action) {
         case "editIndex":
-          icon = <IconButton icon="pencil-box" size={27} />;
+          icon = <IconButton icon="pencil-box" size={spacing.medium + 5} iconColor={colors.main} />;
           break;
         case "delIndex":
-          icon = <IconButton icon="trash-can" size={28} />;
+          icon = <IconButton icon="trash-can" size={spacing.medium + 5} iconColor={colors.danger} />;
           break;
         case "changeIndex":
-          icon = <IconButton icon="note-edit" size={28} />;
+          icon = <IconButton icon="note-edit" size={spacing.medium + 5} iconColor={colors.dark} />;
           break;
         case "copyIndex":
-          icon = <IconButton icon="content-copy" size={24} />;
+          icon = <IconButton icon="content-copy" size={spacing.medium + 5} iconColor={colors.dark} />;
           break;
         case "preIndex":
-          icon = <IconButton icon="file-find" size={26} />;
+          icon = <IconButton icon="file-find" size={spacing.medium + 5} iconColor={colors.yellow} />;
           break;
         default:
           return null;
       }
 
       return (
-        <Pressable onPress={handlePress} key={`action-${action}`}>
+        <Pressable style={customtable.container} onPress={handlePress} key={`action-${action}`}>
           {icon}
         </Pressable>
       );
     };
 
     const renderCellContent = (
-      cell: string | number | boolean, 
-      cellIndex: number, 
-      row: (string | number | boolean)[], 
+      cell: string | number | boolean,
+      cellIndex: number,
+      row: (string | number | boolean)[],
       rowIndex: number
     ) => {
       if (typeof cell === "boolean") {
@@ -151,17 +163,23 @@ const CustomTable: React.FC<CustomTableProps> = React.memo(
         };
 
         return (
-          <Pressable key={`cell-content-${cellIndex}`} onPress={handlePress}>
+          <Pressable
+            style={responsive === "small"
+              ? { justifyContent: "flex-start" }
+              : { justifyContent: "center" }}
+            key={`cell-content-${cellIndex}`} onPress={handlePress}>
+
             <Animated.View style={{ transform: [{ scale: animations[rowIndex] }] }}>
               <IconButton
                 icon={cell ? "toggle-switch" : "toggle-switch-off-outline"}
-                size={32}
+                size={spacing.medium + 10}
+                iconColor={cell ? colors.succeass : colors.main}
               />
             </Animated.View>
           </Pressable>
         );
       }
-      return <Text key={`cell-content-${cellIndex}`}>{cell}</Text>;
+      return <Text style={[masterdataStyles.text, masterdataStyles.textDark]} key={`cell-content-${cellIndex}`}>{cell}</Text>;
     };
 
     const currentData = useMemo(() => {
@@ -171,27 +189,34 @@ const CustomTable: React.FC<CustomTableProps> = React.memo(
       );
     }, [filteredData, page, itemsPerPage]);
 
-    if ("small") {
-      return currentData.map((rowData, headerIndex) => (
-        <View key={`row-${headerIndex}`}>
-          {Tablehead.map((header, i) => (
-            <View key={`header-${headerIndex}-${i}`}>
-              <Text>{header}:</Text>
-              {renderCellContent(rowData[i], i, rowData, headerIndex)}
-            </View>
-          ))}
-          <View style={{ flexDirection: "row" }}>
-            {Object.entries(actionIndex[0]).map(
-              ([key, value]) =>
-                value >= 0 &&
-                renderActionButton(rowData[value] as string, key, rowData, headerIndex)
-            )}
-          </View>
-        </View>
-      ));
-    } else {
-      return (
-        <View>
+    return (
+      <AccessibleView style={{ marginVertical: 20 }}>
+        {responsive === "small" ? (
+          currentData.map((rowData, rowIndex) => (
+            <AccessibleView key={`row-${rowIndex}`} style={[customtable.cardRow, { alignItems: 'flex-start' }]}>
+              {Tablehead.map((header, colIndex) => (
+                <AccessibleView key={`header-${rowIndex}-${colIndex}`}>
+                  <Text style={[masterdataStyles.text, masterdataStyles.textError]}>
+                    {header.label}:
+                  </Text>
+                  {actionIndex.map((actionItem) => {
+                    const filteredEntries = Object.entries(actionItem).filter(
+                      ([, value]) => value === colIndex
+                    );
+
+                    return filteredEntries.length > 0 ? (
+                      filteredEntries.map(([key]) =>
+                        renderActionButton(rowData[colIndex] as string, key, rowData, rowIndex)
+                      )
+                    ) : (
+                      renderCellContent(rowData[colIndex], colIndex, rowData, rowIndex)
+                    );
+                  })}
+                </AccessibleView>
+              ))}
+            </AccessibleView>
+          ))
+        ) : (
           <DataTable>
             <DataTable.Header>
               {Tablehead.map((header, index) => (
@@ -201,40 +226,53 @@ const CustomTable: React.FC<CustomTableProps> = React.memo(
                     flex: flexArr[index] || 1,
                     justifyContent: "center",
                   }}
-                  sortDirection={sortColumn === index ? sortDirection : "ascending"} 
+                  sortDirection={sortColumn === index ? sortDirection : undefined}
                   onPress={() => handleSort(index)}
                 >
-                  <Text>{header}</Text>
+                  <Text
+                    style={[
+                      masterdataStyles.text,
+                      sortColumn === index ? masterdataStyles.textBold : undefined,
+                    ]}
+                  >
+                    {header.label}
+                  </Text>
                 </DataTable.Title>
               ))}
             </DataTable.Header>
 
             {filteredData.length === 0 ? (
-              <Text>No data found...</Text>
+              <Text style={[masterdataStyles.text, masterdataStyles.textItalic]}>No data found...</Text>
             ) : (
               currentData.map((row, rowIndex) => (
-                <DataTable.Row key={`row-${rowIndex}`}>
-                  {row.map((cell, cellIndex) => (
-                    <DataTable.Cell
-                      key={`cell-${rowIndex}-${cellIndex}`}
-                      style={{
-                        flex: flexArr[cellIndex] || 1,
-                        justifyContent: "center",
-                      }}
-                    >
-                      {actionIndex.map((actionItem) => {
-                        const filteredEntries = Object.entries(actionItem).filter(
-                          ([, value]) => value === cellIndex
-                        );
+                <DataTable.Row key={`row-${rowIndex}`} style={customtable.row}>
+                  {row.map((cell, cellIndex) => {
+                    const Align: justifyContent = Tablehead[cellIndex]?.align as justifyContent;
+                    const justifyContent = {
+                      justifyContent: Align,
+                      paddingLeft: 8,
+                    };
+                    return (
+                      <DataTable.Cell
+                        key={`cell-${rowIndex}-${cellIndex}`}
+                        style={[justifyContent, { flex: flexArr[cellIndex] || 1 }]}
+                      >
+                        {actionIndex.map((actionItem) => {
+                          const filteredEntries = Object.entries(actionItem).filter(
+                            ([, value]) => value === cellIndex
+                          );
 
-                        return filteredEntries.length > 0
-                          ? filteredEntries.map(([key]) =>
+                          return filteredEntries.length > 0 ? (
+                            filteredEntries.map(([key]) =>
                               renderActionButton(cell as string, key, row, rowIndex)
                             )
-                          : renderCellContent(cell, cellIndex, row, rowIndex);
-                      })}
-                    </DataTable.Cell>
-                  ))}
+                          ) : (
+                            renderCellContent(cell, cellIndex, row, rowIndex)
+                          );
+                        })}
+                      </DataTable.Cell>
+                    );
+                  })}
                 </DataTable.Row>
               ))
             )}
@@ -242,28 +280,26 @@ const CustomTable: React.FC<CustomTableProps> = React.memo(
               page={page}
               numberOfPages={Math.ceil(filteredData.length / itemsPerPage)}
               onPageChange={(newPage) => setPage(newPage)}
-              label={`Page ${page + 1} of ${Math.ceil(
-                filteredData.length / itemsPerPage
-              )}`}
+              label={`Page ${page + 1} of ${Math.ceil(filteredData.length / itemsPerPage)}`}
               numberOfItemsPerPage={itemsPerPage}
               onItemsPerPageChange={setItemsPerPage}
               showFastPaginationControls
               selectPageDropdownLabel={"Rows per page"}
             />
           </DataTable>
+        )}
 
-          <Dialogs
-            isVisible={isVisible}
-            title={dialogTitle}
-            setIsVisible={setIsVisible}
-            handleDialog={handleDialog}
-            actions={dialogAction}
-            messages={dialogMessage}
-            data={dialogData}
-          />
-        </View>
-      );
-    }
+        <Dialogs
+          isVisible={isVisible}
+          title={dialogTitle}
+          setIsVisible={setIsVisible}
+          handleDialog={handleDialog}
+          actions={dialogAction}
+          messages={dialogMessage}
+          data={dialogData}
+        />
+      </AccessibleView>
+    );
   }
 );
 
