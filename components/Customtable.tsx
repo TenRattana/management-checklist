@@ -28,7 +28,10 @@ const CustomTable: React.FC<CustomTableProps> = React.memo(
     searchQuery,
   }) => {
     const [page, setPage] = useState<number>(0);
-    const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+    const [numberOfItemsPerPageList] = React.useState([5, 10, 15]);
+    const [itemsPerPage, onItemsPerPageChange] = React.useState(
+      numberOfItemsPerPageList[0]
+    );
     const [sortColumn, setSortColumn] = useState<number | null>(null);
     const [sortDirection, setSortDirection] = useState<"ascending" | "descending" | undefined>(undefined);
     const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -301,7 +304,8 @@ const CustomTable: React.FC<CustomTableProps> = React.memo(
               onPageChange={(newPage) => setPage(newPage)}
               label={`Page ${page + 1} of ${Math.ceil(filteredData.length / itemsPerPage)}`}
               numberOfItemsPerPage={itemsPerPage}
-              onItemsPerPageChange={setItemsPerPage}
+              numberOfItemsPerPageList={numberOfItemsPerPageList}
+              onItemsPerPageChange={onItemsPerPageChange}
               showFastPaginationControls
               selectPageDropdownLabel={"Rows per page"}
             />

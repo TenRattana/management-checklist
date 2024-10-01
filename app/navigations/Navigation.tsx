@@ -17,7 +17,8 @@ import {
   MatchFormMachineScreen,
   ChecklistGroupScreen,
   FormScreen,
-  ExpectedResultScreen
+  ExpectedResultScreen,
+  Preview
 } from "@/app/screens";
 import AccessibleView from "@/components/AccessibleView";
 
@@ -151,6 +152,16 @@ const Navigation: React.FC = () => {
                       component={ExpectedResultScreen}
                       options={{
                         title: "Expected Result",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                    <Drawer.Screen
+                      name="Preview"
+                      component={Preview}
+                      options={{
+                        title: "Preview",
                         drawerIcon: ({ color }) => (
                           <TabBarIcon name="home" color={color} />
                         ),

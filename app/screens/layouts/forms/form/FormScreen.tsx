@@ -67,7 +67,7 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation }) => {
             if (action === "changeIndex") {
                 navigation.navigate("Create Form", { formId: item });
             } else if (action === "preIndex") {
-                navigation.navigate("View Form", { formId: item });
+                navigation.navigate("Preview", { formId: item });
             } else if (action === "copyIndex") {
                 navigation.navigate("Create Form", { formId: item, action: "copy" });
             } else {
