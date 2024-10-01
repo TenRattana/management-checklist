@@ -1,9 +1,9 @@
-import React, { useRef, useMemo, useState, useEffect } from "react";
+import React, { useRef, useMemo, useState, useEffect, useCallback } from "react";
 import { Text, Pressable, Animated, StyleSheet } from "react-native";
-import { DataTable, IconButton } from "react-native-paper";
+import { DataTable, IconButton, Divider } from "react-native-paper";
 import Dialogs from "@/components/common/Dialogs";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { useRes } from "@/app/contexts";
+import { useRes, useToast } from "@/app/contexts";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import useCustomtableStyles from "@/styles/customtable";
 import AccessibleView from "@/components/AccessibleView";
@@ -42,6 +42,19 @@ const CustomTable: React.FC<CustomTableProps> = React.memo(
 
     const colors = useThemeColor();
     const { spacing, responsive } = useRes();
+    const { showSuccess, showError } = useToast();
+
+    const errorMessage = useCallback((error: unknown) => {
+      let errorMessage: string | string[];
+
+      if (error instanceof Error) {
+        errorMessage = [error.message];
+      } else {
+        errorMessage = ["An unknown error occurred!"];
+      }
+
+      showError(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
+    }, [showError]);
 
     const animations = useRef(
       Tabledata.map(() => new Animated.Value(1))
@@ -107,26 +120,26 @@ const CustomTable: React.FC<CustomTableProps> = React.memo(
       let icon;
       switch (action) {
         case "editIndex":
-          icon = <IconButton icon="pencil-box" size={spacing.medium + 5} iconColor={colors.main} />;
+          icon = <IconButton icon="pencil-box" size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium} style={customtable.icon} iconColor={colors.main} />;
           break;
         case "delIndex":
-          icon = <IconButton icon="trash-can" size={spacing.medium + 5} iconColor={colors.danger} />;
+          icon = <IconButton icon="trash-can" size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium} style={customtable.icon} iconColor={colors.danger} />;
           break;
         case "changeIndex":
-          icon = <IconButton icon="note-edit" size={spacing.medium + 5} iconColor={colors.dark} />;
+          icon = <IconButton icon="note-edit" size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium} style={customtable.icon} iconColor={colors.dark} />;
           break;
         case "copyIndex":
-          icon = <IconButton icon="content-copy" size={spacing.medium + 5} iconColor={colors.dark} />;
+          icon = <IconButton icon="content-copy" size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium} style={customtable.icon} iconColor={colors.dark} />;
           break;
         case "preIndex":
-          icon = <IconButton icon="file-find" size={spacing.medium + 5} iconColor={colors.yellow} />;
+          icon = <IconButton icon="file-find" size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium} style={customtable.icon} iconColor={colors.yellow} />;
           break;
         default:
           return null;
       }
 
       return (
-        <Pressable style={customtable.container} onPress={handlePress} key={`action-${action}`}>
+        <Pressable style={[customtable.container, customtable.iconAction]} onPress={handlePress} key={`action-${action}`}>
           {icon}
         </Pressable>
       );
@@ -140,18 +153,23 @@ const CustomTable: React.FC<CustomTableProps> = React.memo(
     ) => {
       if (typeof cell === "boolean") {
         const handlePress = () => {
-          Animated.sequence([
-            Animated.timing(animations[rowIndex], {
-              toValue: 0.8,
-              duration: 100,
-              useNativeDriver: true,
-            }),
-            Animated.timing(animations[rowIndex], {
-              toValue: 1,
-              duration: 100,
-              useNativeDriver: true,
-            }),
-          ]).start();
+
+          try {
+            Animated.sequence([
+              Animated.timing(animations[rowIndex], {
+                toValue: 0.8,
+                duration: 100,
+                useNativeDriver: true,
+              }),
+              Animated.timing(animations[rowIndex], {
+                toValue: 1,
+                duration: 100,
+                useNativeDriver: true,
+              }),
+            ]).start();
+          } catch (error) {
+            errorMessage(error)
+          }
 
           const status = row[cellIndex] ? "In active" : "Active";
 
@@ -172,7 +190,7 @@ const CustomTable: React.FC<CustomTableProps> = React.memo(
             <Animated.View style={{ transform: [{ scale: animations[rowIndex] }] }}>
               <IconButton
                 icon={cell ? "toggle-switch" : "toggle-switch-off-outline"}
-                size={spacing.medium + 10}
+                size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium} style={customtable.icon}
                 iconColor={cell ? colors.succeass : colors.main}
               />
             </Animated.View>
@@ -196,7 +214,7 @@ const CustomTable: React.FC<CustomTableProps> = React.memo(
             <AccessibleView key={`row-${rowIndex}`} style={[customtable.cardRow, { alignItems: 'flex-start' }]}>
               {Tablehead.map((header, colIndex) => (
                 <AccessibleView key={`header-${rowIndex}-${colIndex}`}>
-                  <Text style={[masterdataStyles.text, masterdataStyles.textError]}>
+                  <Text style={[masterdataStyles.text, masterdataStyles.textError, { marginVertical: 5 }]}>
                     {header.label}:
                   </Text>
                   {actionIndex.map((actionItem) => {
@@ -217,7 +235,7 @@ const CustomTable: React.FC<CustomTableProps> = React.memo(
             </AccessibleView>
           ))
         ) : (
-          <DataTable>
+          <DataTable style={{ backgroundColor: colors.light, borderRadius: 8 }}>
             <DataTable.Header>
               {Tablehead.map((header, index) => (
                 <DataTable.Title
@@ -225,6 +243,7 @@ const CustomTable: React.FC<CustomTableProps> = React.memo(
                   style={{
                     flex: flexArr[index] || 1,
                     justifyContent: "center",
+                    marginVertical: 20
                   }}
                   sortDirection={sortColumn === index ? sortDirection : undefined}
                   onPress={() => handleSort(index)}
@@ -242,10 +261,10 @@ const CustomTable: React.FC<CustomTableProps> = React.memo(
             </DataTable.Header>
 
             {filteredData.length === 0 ? (
-              <Text style={[masterdataStyles.text, masterdataStyles.textItalic]}>No data found...</Text>
+              <Text style={[masterdataStyles.text, masterdataStyles.textItalic, { textAlign: 'center', paddingTop: 10 }]}>No data found...</Text>
             ) : (
               currentData.map((row, rowIndex) => (
-                <DataTable.Row key={`row-${rowIndex}`} style={customtable.row}>
+                <DataTable.Row key={`row-${rowIndex}`} style={[customtable.row]}>
                   {row.map((cell, cellIndex) => {
                     const Align: justifyContent = Tablehead[cellIndex]?.align as justifyContent;
                     const justifyContent = {

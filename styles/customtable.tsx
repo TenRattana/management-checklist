@@ -29,6 +29,11 @@ const useCustomtableStyles = () => {
             borderBottomColor: colors.background,
             paddingVertical: responsive === "small" ? 5 : 10,
         },
+        icon: {
+            margin: responsive === "small" ? 0 : 5,
+        },
+        iconAction: { backgroundColor: responsive !== "small" ? colors.light : "rgba(247, 243, 249, 1)" },
+
     });
 };
 

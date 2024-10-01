@@ -11,7 +11,13 @@ import {
   MachineGroupScreen,
   CheckListOptionScreen,
   CheckListScreen,
-  MachineScreen
+  MachineScreen,
+  MatchCheckListOptionScreen,
+  TestScreen,
+  MatchFormMachineScreen,
+  ChecklistGroupScreen,
+  FormScreen,
+  ExpectedResultScreen
 } from "@/app/screens";
 import AccessibleView from "@/components/AccessibleView";
 
@@ -29,9 +35,9 @@ const Navigation: React.FC = () => {
   console.log("createDrawerNavigator");
 
   return (
-    <ResponsiveProvider>
-      <ThemeProvider>
-        <ToastProvider>
+    <ThemeProvider>
+      <ToastProvider>
+        <ResponsiveProvider>
           <Drawer.Navigator>
             <Drawer.Screen
               name={user ? "Home" : "Login"}
@@ -70,7 +76,7 @@ const Navigation: React.FC = () => {
                         ),
                       }}
                     />
-                     <Drawer.Screen
+                    <Drawer.Screen
                       name="Machine"
                       component={MachineScreen}
                       options={{
@@ -80,7 +86,7 @@ const Navigation: React.FC = () => {
                         ),
                       }}
                     />
-                     <Drawer.Screen
+                    <Drawer.Screen
                       name="Checklist"
                       component={CheckListScreen}
                       options={{
@@ -90,11 +96,71 @@ const Navigation: React.FC = () => {
                         ),
                       }}
                     />
-                     <Drawer.Screen
+                    <Drawer.Screen
                       name="Checklist_option"
                       component={CheckListOptionScreen}
                       options={{
                         title: "Checklist Option",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                    <Drawer.Screen
+                      name="Checklist_group"
+                      component={ChecklistGroupScreen}
+                      options={{
+                        title: "Checklist Group",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                    <Drawer.Screen
+                      name="Match_checklist_option"
+                      component={MatchCheckListOptionScreen}
+                      options={{
+                        title: "Match Checklist Option",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                    <Drawer.Screen
+                      name="Match_form_machine"
+                      component={MatchFormMachineScreen}
+                      options={{
+                        title: "Match Form Machine",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                    <Drawer.Screen
+                      name="Form"
+                      component={FormScreen}
+                      options={{
+                        title: "Form",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                    <Drawer.Screen
+                      name="Expected_result"
+                      component={ExpectedResultScreen}
+                      options={{
+                        title: "Expected Result",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                    <Drawer.Screen
+                      name="Test"
+                      component={TestScreen}
+                      options={{
+                        title: "Test",
                         drawerIcon: ({ color }) => (
                           <TabBarIcon name="home" color={color} />
                         ),
@@ -134,7 +200,7 @@ const Navigation: React.FC = () => {
                         ),
                       }}
                     />
-                     <Drawer.Screen
+                    <Drawer.Screen
                       name="Checklist"
                       component={CheckListScreen}
                       options={{
@@ -144,11 +210,61 @@ const Navigation: React.FC = () => {
                         ),
                       }}
                     />
-                     <Drawer.Screen
+                    <Drawer.Screen
                       name="Checklist_option"
                       component={CheckListOptionScreen}
                       options={{
                         title: "Checklist Option",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                    <Drawer.Screen
+                      name="Checklist_group"
+                      component={ChecklistGroupScreen}
+                      options={{
+                        title: "Checklist Group",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                    <Drawer.Screen
+                      name="Match_checklist_option"
+                      component={MatchCheckListOptionScreen}
+                      options={{
+                        title: "Match Checklist Option",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                    <Drawer.Screen
+                      name="Match_form_machine"
+                      component={MatchFormMachineScreen}
+                      options={{
+                        title: "Match Form Machine",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                    <Drawer.Screen
+                      name="Form"
+                      component={FormScreen}
+                      options={{
+                        title: "Form",
+                        drawerIcon: ({ color }) => (
+                          <TabBarIcon name="home" color={color} />
+                        ),
+                      }}
+                    />
+                    <Drawer.Screen
+                      name="Expected_result"
+                      component={ExpectedResultScreen}
+                      options={{
+                        title: "Expected Result",
                         drawerIcon: ({ color }) => (
                           <TabBarIcon name="home" color={color} />
                         ),
@@ -183,9 +299,9 @@ const Navigation: React.FC = () => {
               </>
             )}
           </Drawer.Navigator>
-        </ToastProvider>
-      </ThemeProvider>
-    </ResponsiveProvider>
+        </ResponsiveProvider>
+      </ToastProvider>
+    </ThemeProvider>
   );
 };
 

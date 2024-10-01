@@ -71,6 +71,15 @@ const useMasterdataStyles = () => {
             flexWrap: "wrap",
             alignItems: "center",
             justifyContent: "center",
+        },
+        errorMessage: {
+            textAlign: 'left',
+            writingDirection: "ltr",
+            opacity: 1
+        },
+        containerInput: {
+            marginVertical: 12,
+            marginHorizontal: 12,
         }
     });
 };

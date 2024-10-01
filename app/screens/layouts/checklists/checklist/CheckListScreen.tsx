@@ -3,32 +3,32 @@ import { ScrollView, Pressable, Text } from "react-native";
 import axios from 'axios'
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme } from "@/app/contexts";
-import { Customtable, LoadingSpinner, Inputs, Searchbar, AccessibleView } from "@/components";
-import { Portal, Switch, Dialog, Card } from "react-native-paper";
-import { Formik } from "formik";
-import * as Yup from "yup";
+import { Customtable, LoadingSpinner, Searchbar } from "@/components";
+import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
+import Checklist_dialog from "@/components/screens/Checklist_dialog";
 
-interface FormValues {
+interface InitialValues {
     checkListId: string;
     checkListName: string;
     isActive: boolean;
 }
 
-const validationSchema = Yup.object().shape({
-    checkListName: Yup.string().required("Check list name is required."),
-    isActive: Yup.boolean().required("The active field is required."),
-});
+interface Checklist {
+    CListID: string;
+    CListName: string;
+    IsActive: boolean;
+}
 
 const CheckListScreen = () => {
-    const [checkList, setCheckList] = useState<any[]>([]);
+    const [checkList, setCheckList] = useState<Checklist[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [isLoadingButton, setIsLoadingButton] = useState<boolean>(false);
-    const [initialValues, setInitialValues] = useState<FormValues>({
+    const [initialValues, setInitialValues] = useState<InitialValues>({
         checkListId: "",
         checkListName: "",
         isActive: true,
@@ -36,7 +36,6 @@ const CheckListScreen = () => {
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, showError } = useToast();
-    const { colors } = useTheme();
     const { spacing } = useRes();
 
     const errorMessage = useCallback((error: unknown) => {
@@ -54,6 +53,8 @@ const CheckListScreen = () => {
     }, [showError]);
 
     const fetchData = async () => {
+        setIsLoading(true);
+
         try {
             const response = await axiosInstance.post("CheckList_service.asmx/GetCheckLists");
             setCheckList(response.data.data ?? []);
@@ -68,7 +69,7 @@ const CheckListScreen = () => {
         fetchData();
     }, []);
 
-    const saveData = async (values: FormValues) => {
+    const saveData = async (values: InitialValues) => {
         setIsLoadingButton(true);
         const data = {
             CListId: values.checkListId ?? "",
@@ -181,73 +182,14 @@ const CheckListScreen = () => {
                     )}
                 </Card.Content>
             </Card>
-            <Portal>
-                <Dialog
-                    visible={isVisible}
-                    onDismiss={() => setIsVisible(false)}
-                    style={masterdataStyles.containerDialog}
-                >
-                    <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]}>
-                        {isEditing ? "Edit" : "Create"}
-                    </Dialog.Title>
-                    <Dialog.Content>
-                        {isVisible && (
-                            <Formik
-                                initialValues={initialValues}
-                                validationSchema={validationSchema}
-                                validateOnBlur={false}
-                                validateOnChange={true}
-                                onSubmit={saveData}
-                            >
-                                {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue }) => (
-                                    <AccessibleView>
-                                       
-                                       <Inputs
-                                            placeholder="Enter Check List Name"
-                                            label="Check List Name"
-                                            handleChange={handleChange("checkListName")}
-                                            handleBlur={handleBlur("checkListName")}
-                                            value={values.checkListName}
-                                            error={touched.checkListName && Boolean(errors.checkListName)}
-                                            errorMessage={touched.checkListName ? errors.checkListName : ""}
-                                        />
-                                        <AccessibleView style={masterdataStyles.containerSwitch}>
-                                            <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
-                                                Status: {values.isActive ? "Active" : "Inactive"}
-                                            </Text>
-                                            <Switch
-                                                style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                                color={values.isActive ? colors.succeass : colors.disable}
-                                                value={values.isActive}
-                                                onValueChange={(v: boolean) => {
-                                                    setFieldValue("isActive", v);
-                                                }}
-                                            />
-                                        </AccessibleView>
-                                        <AccessibleView style={masterdataStyles.containerAction}>
-                                            <Pressable
-                                                onPress={() => handleSubmit()}
-                                                disabled={!values.checkListName}
-                                                style={[
-                                                    masterdataStyles.button,
-                                                    values.checkListName ? masterdataStyles.backMain : masterdataStyles.backDis,
-                                                ]}
-                                            >
-                                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>
-                                                    Save
-                                                </Text>
-                                            </Pressable>
-                                            <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]}>
-                                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Cancel</Text>
-                                            </Pressable>
-                                        </AccessibleView>
-                                    </AccessibleView>
-                                )}
-                            </Formik>
-                        )}
-                    </Dialog.Content>
-                </Dialog>
-            </Portal>
+
+            <Checklist_dialog
+                isVisible={isVisible}
+                setIsVisible={setIsVisible}
+                isEditing={isEditing}
+                initialValues={initialValues}
+                saveData={saveData}
+            />
         </ScrollView>
     );
 };

@@ -2,48 +2,53 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ScrollView, Pressable, Text } from "react-native";
 import axios from "axios";
 import axiosInstance from "@/config/axios";
-import { useToast, useTheme } from "@/app/contexts";
+import { useToast } from "@/app/contexts";
 import { Customtable, LoadingSpinner, Searchbar } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
-import Machine_dialog from "@/components/screens/Machine_dialog";
+import Match_form_machine_dialog from "@/components/screens/Match_form_nachine_dialog";
 
-interface MachineGroup {
-    MGroupID: string;
-    MGroupName: string;
-    Description: string;
-    IsActive: boolean;
+interface MatchFormMachineScreenProps {
+    navigation: any;
 }
+
 interface Machine {
-    MGroupID: string;
-    MachineName: string;
-    Description: string;
-    IsActive: boolean;
     MachineID: string;
-}
-interface InitialValues {
-    machineGroupId?: string;
-    machineId: string;
-    machineName: string;
-    description: string;
-    isActive: boolean;
+    MachineName: string;
+    IsActive: boolean;
 }
 
-const MachineGroupScreen = () => {
+interface Form {
+    FormID: string;
+    FormName: string;
+    IsActive: boolean;
+}
+
+interface MatchForm {
+    MachineID: string;
+    FormID: string;
+    MachineName: string;
+    FormName: string;
+}
+
+interface InitialValues {
+    machineId: string;
+    formId: string;
+}
+
+const MatchFormMachineScreen: React.FC<MatchFormMachineScreenProps> = ({ navigation }) => {
+    const [forms, setForm] = useState<Form[]>([]);
     const [machine, setMachine] = useState<Machine[]>([]);
-    const [machineGroup, setMachineGroup] = useState<MachineGroup[]>([]);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [isEditing, setIsEditing] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isVisible, setIsVisible] = useState(false);
-    const [isLoadingButton, setIsLoadingButton] = useState(false);
+    const [matchForm, setMatchForm] = useState<MatchForm[]>([]);
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isVisible, setIsVisible] = useState<boolean>(false);
+    const [isLoadingButton, setIsLoadingButton] = useState<boolean>(false);
     const [initialValues, setInitialValues] = useState<InitialValues>({
         machineId: "",
-        machineGroupId: "",
-        machineName: "",
-        description: "",
-        isActive: true,
+        formId: "",
     });
 
     const masterdataStyles = useMasterdataStyles();
@@ -71,12 +76,14 @@ const MachineGroupScreen = () => {
         setIsLoading(true);
 
         try {
-            const [machineResponse, machineGroupResponse] = await Promise.all([
-                axios.post("Machine_service.asmx/GetMachines"),
-                axios.post("MachineGroup_service.asmx/GetMachineGroups"),
+            const [machineResponse, formResponse, matchFormResponse] = await Promise.all([
+                axiosInstance.post("Machine_service.asmx/GetMachines"),
+                axiosInstance.post("Form_service.asmx/GetForms"),
+                axiosInstance.post("MatchFormMachine_service.asmx/GetMatchFormMachines"),
             ]);
             setMachine(machineResponse.data.data ?? []);
-            setMachineGroup(machineGroupResponse.data.data ?? []);
+            setForm(formResponse.data.data ?? []);
+            setMatchForm(matchFormResponse.data.data ?? []);
         } catch (error) {
             errorMessage(error);
         } finally {
@@ -92,14 +99,11 @@ const MachineGroupScreen = () => {
         setIsLoadingButton(true);
         const data = {
             MachineID: values.machineId,
-            MGroupID: values.machineGroupId ?? "",
-            MachineName: values.machineName,
-            Description: values.description,
-            isActive: values.isActive,
+            FormID: values.formId,
         };
 
         try {
-            const response = await axiosInstance.post("Machine_service.asmx/SaveMachine", data);
+            const response = await axiosInstance.post("MatchFormMachine_service.asmx/SaveMatchFormMachine", data);
             setIsVisible(!response.data.status);
             showSuccess(String(response.data.message));
 
@@ -113,21 +117,26 @@ const MachineGroupScreen = () => {
 
     const handleAction = async (action?: string, item?: string) => {
         try {
-            if (action === "editIndex") {
-                const response = await axiosInstance.post("Machine_service.asmx/GetMachine", { MachineID: item });
+            if (action === "changeIndex") {
+                navigation.navigate("Create Form", { formId: item });
+            } else if (action === "preIndex") {
+                navigation.navigate("View Form", { formId: item });
+            } else if (action === "copyIndex") {
+                navigation.navigate("Create Form", { formId: item, action: "copy" });
+            } else if (action === "editIndex") {
+                const response = await axios.post("MatchFormMachine_service.asmx/GetMatchFormMachine", {
+                    MachineID: item,
+                });
                 const machineData = response.data.data[0] ?? {};
                 setInitialValues({
                     machineId: machineData.MachineID ?? "",
-                    machineGroupId: machineData.MGroupID ?? "",
-                    machineName: machineData.MachineName ?? "",
-                    description: machineData.Description ?? "",
-                    isActive: Boolean(machineData.IsActive),
+                    formId: machineData.FormID ?? "",
                 });
-                setIsEditing(true);
                 setIsVisible(true);
+                setIsEditing(true);
             } else {
-                const endpoint = action === "activeIndex" ? "ChangeMachine" : "DeleteMachine";
-                const response = await axiosInstance.post(`Machine_service.asmx/${endpoint}`, { MachineID: item });
+                const endpoint = action === "activeIndex" ? "ChangeMatchFormMachine" : "DeleteMatchFormMachine";
+                const response = await axiosInstance.post(`MatchFormMachine_service.asmx/${endpoint}`, { MachineID: item });
                 showSuccess(String(response.data.message));
 
                 await fetchData();
@@ -138,58 +147,71 @@ const MachineGroupScreen = () => {
     };
 
     const tableData = useMemo(() => {
-        return machine.map((item) => {
+        return matchForm.map((item) => {
             return [
-                machineGroup.find((group) => group.MGroupID === item.MGroupID)
-                    ?.MGroupName || "",
                 item.MachineName,
-                item.Description,
-                item.IsActive,
+                item.FormName,
+                item.FormID,
+                item.FormID,
+                item.FormID,
                 item.MachineID,
                 item.MachineID,
             ];
         })
-    }, [machine, machineGroup]);
+    }, [machine]);
 
     const tableHead = [
-        { label: "Machine Group Name", align: "flex-start" },
         { label: "Machine Name", align: "flex-start" },
-        { label: "Description", align: "flex-start" },
-        { label: "Change Status", align: "center" },
+        { label: "Form Name", align: "flex-start" },
+        { label: "Change Form", align: "center" },
+        { label: "Copy Template", align: "center" },
+        { label: "Preview", align: "center" },
         { label: "Edit", align: "center" },
         { label: "Delete", align: "center" },
     ];
 
-    const actionIndex = [{ editIndex: 4, delIndex: 5 }];
+    const actionIndex = [
+        {
+            changeIndex: 2,
+            copyIndex: 3,
+            preIndex: 4,
+            editIndex: 5,
+            delIndex: 6,
+        },
+    ];
 
     const handleNewData = useCallback(() => {
         setInitialValues({
-            machineId: "",
-            machineGroupId: "",
-            machineName: "",
-            description: "",
-            isActive: true,
+            machineId: "", formId: ""
         });
         setIsEditing(false);
         setIsVisible(true);
     }, []);
 
+    const dropmachine = useMemo(() => {
+        return Array.isArray(machine)
+            ? machine.filter(
+                (v) => v.IsActive || v.MachineID === initialValues.machineId
+            )
+            : [];
+    }, [machine, initialValues.machineId]);
+
+    const dropform = useMemo(() => {
+        return Array.isArray(forms)
+            ? forms.filter(
+                (v) => v.IsActive || v.FormID === initialValues.formId
+            )
+            : [];
+    }, [forms, initialValues.formId]);
+
     const customtableProps = {
         Tabledata: tableData,
         Tablehead: tableHead,
-        flexArr: [2, 3, 1, 1, 1],
+        flexArr: [2, 2, 1, 1, 1, 1, 1],
         actionIndex,
         handleAction,
         searchQuery,
     };
-
-    const dropmachine = useMemo(() => {
-        return Array.isArray(machineGroup)
-            ? machineGroup.filter(
-                (v) => v.IsActive || v.MGroupID === initialValues.machineGroupId
-            )
-            : [];
-    }, [machineGroup, initialValues.machineGroupId]);
 
     return (
         <ScrollView>
@@ -200,7 +222,7 @@ const MachineGroupScreen = () => {
                         masterdataStyles.textBold,
                         { fontSize: spacing.large, textAlign: "center", marginTop: spacing.small, paddingTop: 10, marginBottom: spacing.small },
                     ]}
-                    title="List Group Machine"
+                    title="Create Match Machine & Form"
                 />
                 <Card.Content>
                     <Searchbar
@@ -216,17 +238,20 @@ const MachineGroupScreen = () => {
                 </Card.Content>
             </Card>
 
-            <Machine_dialog
+            <Match_form_machine_dialog
                 isVisible={isVisible}
                 setIsVisible={setIsVisible}
                 isEditing={isEditing}
                 initialValues={initialValues}
                 saveData={saveData}
+                machine={machine}
                 dropmachine={dropmachine}
-                machineGroup={machineGroup}
+                forms={forms}
+                dropform={dropform}
             />
         </ScrollView>
     );
 };
 
-export default React.memo(MachineGroupScreen);
+export default React.memo(MatchFormMachineScreen);
+

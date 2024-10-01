@@ -1,43 +1,46 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ScrollView, Pressable, Text } from "react-native";
-import axios from "axios";
+import axios from 'axios'
 import axiosInstance from "@/config/axios";
-import { useToast } from "@/app/contexts";
+import { useToast, useTheme } from "@/app/contexts";
 import { Customtable, LoadingSpinner, Searchbar } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
-import Machine_group_dialog from "@/components/screens/Machine_group_dialog";
+import Checklist_group_dialog from "@/components/screens/Checklist_group_dialog";
 
-interface MachineGroup {
-    MGroupID: string;
-    MGroupName: string;
+interface GroupCheckListOption {
+    GCLOptionID: string;
+    GCLOptionName: string;
     Description: string;
     IsActive: boolean;
 }
+
 interface InitialValues {
-    machineGroupId: string;
-    machineGroupName: string;
+    groupCheckListOptionId: string;
+    groupCheckListOptionName: string;
     description: string;
     isActive: boolean;
 }
 
-const MachineGroupScreen = () => {
-    const [machineGroup, setMachineGroup] = useState<MachineGroup[]>([]);
+const ChecklistGroupScreen = () => {
+    const [groupCheckListOption, setGroupCheckListOption] = useState<GroupCheckListOption[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [isLoadingButton, setIsLoadingButton] = useState<boolean>(false);
     const [initialValues, setInitialValues] = useState<InitialValues>({
-        machineGroupId: "",
-        machineGroupName: "",
+        groupCheckListOptionId: "",
+        groupCheckListOptionName: "",
         description: "",
         isActive: true,
     });
+
     const masterdataStyles = useMasterdataStyles();
 
     const { showSuccess, showError } = useToast();
+    const { colors } = useTheme();
     const { spacing } = useRes();
 
     const errorMessage = useCallback((error: unknown) => {
@@ -58,8 +61,8 @@ const MachineGroupScreen = () => {
         setIsLoading(true);
 
         try {
-            const response = await axiosInstance.post("MachineGroup_service.asmx/GetMachineGroups");
-            setMachineGroup(response.data.data ?? []);
+            const response = await axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions");
+            setGroupCheckListOption(response.data.data ?? []);
         } catch (error) {
             errorMessage(error);
         } finally {
@@ -74,14 +77,17 @@ const MachineGroupScreen = () => {
     const saveData = async (values: InitialValues) => {
         setIsLoadingButton(true);
         const data = {
-            MGroupID: values.machineGroupId ?? "",
-            MGroupName: values.machineGroupName,
+            GCLOptionID: values.groupCheckListOptionId,
+            GCLOptionName: values.groupCheckListOptionName,
             Description: values.description,
-            isActive: values.isActive,
+            IsActive: values.isActive,
         };
 
         try {
-            const response = await axiosInstance.post("MachineGroup_service.asmx/SaveMachineGroup", data);
+            const response = await axios.post(
+                "GroupCheckListOption_service.asmx/SaveGroupCheckListOption",
+                data
+            );
             setIsVisible(!response.data.status);
             showSuccess(String(response.data.message));
 
@@ -96,19 +102,24 @@ const MachineGroupScreen = () => {
     const handleAction = async (action?: string, item?: string) => {
         try {
             if (action === "editIndex") {
-                const response = await axiosInstance.post("MachineGroup_service.asmx/GetMachineGroup", { MGroupID: item });
-                const machineGroupData = response.data.data[0] ?? {};
+                const response = await axios.post(
+                    "GroupCheckListOption_service.asmx/GetGroupCheckListOption",
+                    {
+                        GCLOptionID: item,
+                    }
+                );
+                const groupCheckListOptionData = response.data.data[0] ?? {};
                 setInitialValues({
-                    machineGroupId: machineGroupData.MGroupID ?? "",
-                    machineGroupName: machineGroupData.MGroupName ?? "",
-                    description: machineGroupData.Description ?? "",
-                    isActive: Boolean(machineGroupData.IsActive),
+                    groupCheckListOptionId: groupCheckListOptionData.GCLOptionID ?? "",
+                    groupCheckListOptionName: groupCheckListOptionData.GCLOptionName ?? "",
+                    description: groupCheckListOptionData.Description ?? "",
+                    isActive: Boolean(groupCheckListOptionData.IsActive),
                 });
-                setIsEditing(true);
                 setIsVisible(true);
+                setIsEditing(true);
             } else {
-                const endpoint = action === "activeIndex" ? "ChangeMachineGroup" : "DeleteMachineGroup";
-                const response = await axiosInstance.post(`MachineGroup_service.asmx/${endpoint}`, { MGroupID: item });
+                const endpoint = action === "activeIndex" ? "ChangeGroupCheckListOption" : "DeleteGroupCheckListOption";
+                const response = await axiosInstance.post(`GroupCheckListOption_service.asmx/${endpoint}`, { GCLOptionID: item });
                 showSuccess(String(response.data.message));
 
                 await fetchData()
@@ -119,17 +130,17 @@ const MachineGroupScreen = () => {
     };
 
     const tableData = useMemo(() => {
-        return machineGroup.map(item => [
-            item.MGroupName,
+        return groupCheckListOption.map((item) => [
+            item.GCLOptionName,
             item.Description,
             item.IsActive,
-            item.MGroupID,
-            item.MGroupID,
+            item.GCLOptionID,
+            item.GCLOptionID,
         ]);
-    }, [machineGroup]);
+    }, [groupCheckListOption]);
 
     const tableHead = [
-        { label: "Machine Group Name", align: "flex-start" },
+        { label: "Group Option Name", align: "flex-start" },
         { label: "Description", align: "flex-start" },
         { label: "Change Status", align: "center" },
         { label: "Edit", align: "center" },
@@ -140,8 +151,8 @@ const MachineGroupScreen = () => {
 
     const handelNewData = useCallback(() => {
         setInitialValues({
-            machineGroupId: "",
-            machineGroupName: "",
+            groupCheckListOptionId: "",
+            groupCheckListOptionName: "",
             description: "",
             isActive: true,
         });
@@ -152,7 +163,7 @@ const MachineGroupScreen = () => {
     const customtableProps = {
         Tabledata: tableData,
         Tablehead: tableHead,
-        flexArr: [2, 3, 1, 1, 1],
+        flexArr: [3, 5, 1, 1, 1],
         actionIndex,
         handleAction,
         searchQuery,
@@ -162,8 +173,8 @@ const MachineGroupScreen = () => {
         <ScrollView>
             <Card>
                 <Card.Title
-                    titleStyle={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, textAlign: "center", marginTop: 30, paddingTop: 10, marginBottom: 30 }]}
-                    title="List Group Machine"
+                    titleStyle={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, textAlign: "center", marginTop: spacing.small, paddingTop: 10, marginBottom: spacing.small }]}
+                    title="Create Group Option"
                 />
                 <Card.Content>
                     <Searchbar
@@ -186,16 +197,15 @@ const MachineGroupScreen = () => {
                 </Card.Content>
             </Card>
 
-            <Machine_group_dialog
+            <Checklist_group_dialog
                 isVisible={isVisible}
                 setIsVisible={setIsVisible}
                 isEditing={isEditing}
                 initialValues={initialValues}
                 saveData={saveData}
             />
-
         </ScrollView>
     );
 };
 
-export default React.memo(MachineGroupScreen);
+export default React.memo(ChecklistGroupScreen);

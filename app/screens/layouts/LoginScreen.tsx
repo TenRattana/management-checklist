@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import { useFocusEffect } from "@react-navigation/native";
 import { useToast } from "@/app/contexts/toastify";
 import { AccessibleView, Inputs } from "@/components";
+import useMasterdataStyles from "@/styles/common/masterdata";
 
 const validationSchema = Yup.object().shape({
   username: Yup.string().required("The username field is required."),
@@ -40,6 +41,7 @@ const LoginScreen = () => {
       };
     }, [])
   );
+  const masterdataStyles = useMasterdataStyles()
 
   return (
     <AccessibleView name="Login Screen">
@@ -75,16 +77,22 @@ const LoginScreen = () => {
                   name="username"
                 />
 
-                <Pressable
-                  onPress={() => handleSubmit()}
-                  disabled={!isValid || !dirty || loading}
-                >
-                  {loading ? (
-                    <ActivityIndicator />
-                  ) : (
-                    <Text>Login</Text>
-                  )}
-                </Pressable>
+                <AccessibleView>
+                  <Pressable
+                    onPress={() => handleSubmit()}
+                    disabled={!isValid || !dirty || loading}
+                    style={[
+                      masterdataStyles.button,
+                      isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis,
+                    ]}
+                  >
+                    {loading ? (
+                      <ActivityIndicator />
+                    ) : (
+                      <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Login</Text>
+                    )}
+                  </Pressable>
+                </AccessibleView>
               </AccessibleView>
             )}
           </Formik>

@@ -1,7 +1,7 @@
 import React from "react";
-import { View, Platform } from "react-native";
 import { TextInput, HelperText, Text } from "react-native-paper";
-import { NativeSyntheticEvent, TextInputFocusEventData } from "react-native";
+import { NativeSyntheticEvent, TextInputFocusEventData, StyleSheet } from "react-native";
+import AccessibleView from "@/components/AccessibleView";
 
 interface InputProps {
   placeholder?: string;
@@ -30,11 +30,10 @@ const Inputs: React.FC<InputProps> = ({
   lefticon,
   name
 }) => {
+
   return (
-    <View
-      aria-label={Platform.OS === 'web' ? name : undefined}
-      accessible={Platform.OS !== 'web'}
-      accessibilityRole={Platform.OS !== 'web' ? 'text' : undefined}
+    <AccessibleView
+      style={style.containerInput}
     >
       <TextInput
         mode={mode || "outlined"}
@@ -59,8 +58,15 @@ const Inputs: React.FC<InputProps> = ({
       <HelperText type="error" visible={error} style={{ left: -10 }}>
         {errorMessage}
       </HelperText>
-    </View>
+    </AccessibleView>
   );
 };
 
 export default Inputs;
+
+const style = StyleSheet.create({
+  containerInput: {
+    marginVertical: 12,
+    marginHorizontal: 12,
+  }
+})

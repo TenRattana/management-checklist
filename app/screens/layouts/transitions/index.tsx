@@ -1,0 +1,1 @@
+export { default as ExpectedResultScreen } from './expected_result/ExpectedResultScreen'

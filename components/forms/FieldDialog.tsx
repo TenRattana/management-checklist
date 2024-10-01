@@ -7,7 +7,7 @@ import {
     GestureResponderEvent,
 } from "react-native";
 import { Portal, Dialog, Text, Switch } from "react-native-paper";
-import CustomDropdown from "@/components/CustomDropdown";
+import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import Inputs from "@/components/common/Inputs";
 import { Formik, Field } from "formik";
 import * as Yup from "yup";
@@ -166,7 +166,7 @@ const FieldDialog: React.FC<FieldDialogProps> = ({
                                         <Field
                                             name="checkListId"
                                             component={({ field, form }: any) => (
-                                                <CustomDropdown
+                                                <CustomDropdownSingle
                                                     title="Check List"
                                                     labels="CListName"
                                                     values="CListID"
@@ -190,7 +190,7 @@ const FieldDialog: React.FC<FieldDialogProps> = ({
                                         <Field
                                             name="checkListTypeId"
                                             component={({ field, form }: any) => (
-                                                <CustomDropdown
+                                                <CustomDropdownSingle
                                                     title="Check list Type"
                                                     labels="CTypeName"
                                                     values="CTypeID"
@@ -216,7 +216,7 @@ const FieldDialog: React.FC<FieldDialogProps> = ({
                                                     <Field
                                                         name="groupCheckListOptionId"
                                                         component={({ field, form }: any) => (
-                                                            <CustomDropdown
+                                                            <CustomDropdownSingle
                                                                 title="Match Check List Option Group"
                                                                 labels="GCLOptionName"
                                                                 values="GCLOptionID"
@@ -243,7 +243,7 @@ const FieldDialog: React.FC<FieldDialogProps> = ({
                                                     <Field
                                                         name="dataTypeId"
                                                         component={({ field, form }: any) => (
-                                                            <CustomDropdown
+                                                            <CustomDropdownSingle
                                                                 title="Data Type"
                                                                 labels="DTypeName"
                                                                 values="DTypeID"
