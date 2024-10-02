@@ -91,9 +91,7 @@ const Checklist_group_dialog: React.FC<Checklist_group_dialogProps> = ({ isVisib
                                             style={{ transform: [{ scale: 1.1 }], top: 2 }}
                                             color={values.isActive ? colors.succeass : colors.disable}
                                             value={values.isActive}
-                                            onValueChange={(v: boolean) => {
-                                                setFieldValue("isActive", v);
-                                            }}
+                                            onValueChange={(v: boolean) => { setFieldValue("isActive", v); }}
                                         />
                                     </AccessibleView>
                                     <AccessibleView style={masterdataStyles.containerAction}>

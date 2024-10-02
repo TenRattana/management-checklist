@@ -7,7 +7,7 @@ import { Customtable, LoadingSpinner, Searchbar } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
-import Checklist_option_dialog from "@/components/screens/Checklist_option";
+import Checklist_option_dialog from "@/components/screens/Checklist_option_dialog";
 interface checkListOption {
     CLOptionName: string
     IsActive: boolean;

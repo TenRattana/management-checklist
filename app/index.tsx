@@ -5,6 +5,7 @@ import { store } from "@/stores";
 import { AuthProvider } from "@/app/contexts/auth";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Navigation from "@/app/navigations/Navigation";
+import 'react-native-gesture-handler';
 
 const App = () => {
   console.log("App");

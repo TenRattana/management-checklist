@@ -40,6 +40,7 @@ export default {
         foregroundImage: "./assets/images/adaptive-icon.png",
         backgroundColor: "#ffffff",
       },
+      package: "com.m_checklist_test",
     },
     web: {
       bundler: "metro",

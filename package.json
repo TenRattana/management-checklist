@@ -5,8 +5,8 @@
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
     "lint": "expo lint",
@@ -16,6 +16,7 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
     "@expo/vector-icons": "^14.0.2",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/masked-view": "^0.1.11",
@@ -39,6 +40,7 @@
     "react-dom": "18.2.0",
     "react-native": "0.74.5",
     "react-native-dotenv": "^3.4.11",
+    "react-native-draggable-flatlist": "^4.0.1",
     "react-native-dropdown-picker": "^5.4.6",
     "react-native-element-dropdown": "^2.12.1",
     "react-native-gesture-handler": "~2.16.1",

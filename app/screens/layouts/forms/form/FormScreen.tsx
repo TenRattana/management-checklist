@@ -65,11 +65,11 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation }) => {
     const handleAction = async (action?: string, item?: string) => {
         try {
             if (action === "changeIndex") {
-                navigation.navigate("Create Form", { formId: item });
+                navigation.navigate("Create_form", { formId: item });
             } else if (action === "preIndex") {
                 navigation.navigate("Preview", { formId: item });
             } else if (action === "copyIndex") {
-                navigation.navigate("Create Form", { formId: item, action: "copy" });
+                navigation.navigate("Create_form", { formId: item, action: "copy" });
             } else {
                 const endpoint = action === "activeIndex" ? "ChangeForm" : "DeleteForm";
                 const response = await axiosInstance.post(`Form_service.asmx/${endpoint}`, { FormID: item });
@@ -83,7 +83,7 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation }) => {
     };
 
     const handleNewForm = () => {
-        navigation.navigate("Create Form");
+        navigation.navigate("screens/layouts/forms/create/CreateFormScreen");
     };
 
     const tableData = useMemo(() => {

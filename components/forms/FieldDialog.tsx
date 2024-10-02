@@ -1,102 +1,92 @@
 import React, { useRef, useState, useEffect } from "react";
 import {
-    View,
     Pressable,
     Animated,
     ScrollView,
     GestureResponderEvent,
 } from "react-native";
-import { Portal, Dialog, Text, Switch } from "react-native-paper";
+import { Portal, Dialog, Text, Switch, HelperText } from "react-native-paper";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
-import Inputs from "@/components/common/Inputs";
+import { AccessibleView, Inputs } from "@/components";
+import { useTheme } from "@/app/contexts";
 import { Formik, Field } from "formik";
 import * as Yup from "yup";
+import useMasterdataStyles from "@/styles/common/masterdata";
 
-interface FormValues {
-    checkListId: string;
-    groupCheckListOptionId: string;
-    checkListTypeId: string;
-    dataTypeId: string;
-    dataTypeValue: string;
-    subFormId: string;
-    require: boolean;
-    minLength: string;
-    maxLength: string;
-    description: string;
-    placeholder: string;
-    hint: string;
-    displayOrder: string;
+interface FormState {
+    MCListID: string;
+    CListID: string;
+    GCLOptionID: string;
+    CTypeID: string;
+    CListName?: string;
+    CTypeName?: string;
+    DTypeID: string;
+    DTypeValue?: number;
+    SFormID: string;
+    Required: boolean;
+    MinLength?: number;
+    MaxLength?: number;
+    Description: string;
+    Placeholder: string;
+    Hint: string;
+    DisplayOrder?: number;
+    EResult: string;
 }
+interface checkListOption {
+    CLOptionName: string
+    IsActive: boolean;
+    CLOptionID: string;
+}
+
+interface DataType {
+    DTypeID: string;
+    DTypeName: string;
+    IsActive: boolean;
+    Icon: string;
+}
+
+interface Checklist {
+    CListID: string;
+    CListName: string;
+    IsActive: boolean;
+}
+
+interface GroupCheckListOption {
+    GCLOptionID: string;
+    GCLOptionName: string;
+    Description: string;
+    IsActive: boolean;
+}
+
 
 interface FieldDialogProps {
     isVisible: boolean;
-    formState: FormValues;
-    validationSchemaField: Yup.ObjectSchema<FormValues>;
-    checkList: any[];
-    checkListType: any[];
-    dataType: any[];
+    formState: FormState;
+    checkList: Checklist[];
+    checkListType: checkListOption[];
+    dataType: DataType[];
     onDeleteField: (subFormId: string, matchCheckListId: string) => void;
-    style: {
-        styles: any;
-        colors: any;
-        spacing: any;
-    };
     setShowDialogs: () => void;
     editMode: boolean;
-    saveField: (values: any, mode: string) => void;
+    saveField: (values: FormState, mode: string) => void;
     groupCheckListOption: any[];
 }
 
-const FieldDialog: React.FC<FieldDialogProps> = ({
-    isVisible,
-    formState,
-    validationSchemaField,
-    checkList,
-    checkListType,
-    dataType,
-    onDeleteField,
-    style,
-    editMode,
-    saveField,
-    groupCheckListOption,
-    setShowDialogs,
-}) => {
-    const { styles, colors, spacing } = style;
+const validationSchemaField = Yup.object().shape({
+    checkListId: Yup.string().required("Check List is required."),
+    checkListTypeId: Yup.string().required("Check List Type is required."),
+    placeholder: Yup.string().nullable(),
+    hint: Yup.string().nullable(),
+});
+
+const FieldDialog: React.FC<FieldDialogProps> = ({ isVisible, formState, checkList, checkListType, dataType, onDeleteField, editMode, saveField, groupCheckListOption, setShowDialogs, }) => {
+
+    const masterdataStyles = useMasterdataStyles()
+    const { colors } = useTheme()
+
     const [shouldRender, setShouldRender] = useState<string>("");
     const [shouldRenderDT, setShouldRenderDT] = useState<boolean>(false);
 
-    const fadeAnim = useRef(new Animated.Value(0)).current;
-    const fadeAnimDT = useRef(new Animated.Value(0)).current;
-
-    const startAnimation = (anim: Animated.Value) => {
-        Animated.timing(anim, {
-            toValue: 1,
-            duration: 800,
-            useNativeDriver: true,
-        }).start();
-    };
-
-    const resetAnimation = (anim: Animated.Value) => {
-        Animated.timing(anim, {
-            toValue: 0,
-            duration: 0,
-            useNativeDriver: true,
-        }).start();
-    };
-
-    useEffect(() => {
-        if (!editMode) {
-            resetAnimation(fadeAnim);
-            startAnimation(fadeAnim);
-        }
-    }, [shouldRender, editMode]);
-
-    useEffect(() => {
-        if (!editMode) {
-            resetAnimation(fadeAnimDT);
-            startAnimation(fadeAnimDT);
-        }
-    }, [shouldRenderDT, editMode]);
 
     const dropcheckList = checkList.filter(v => v.IsActive);
     const dropcheckListType = checkListType.filter(v => v.IsActive);
@@ -106,58 +96,59 @@ const FieldDialog: React.FC<FieldDialogProps> = ({
     return (
         <Portal>
             <Dialog visible={isVisible} onDismiss={setShowDialogs}>
-                <Dialog.Title style={{ paddingLeft: 8 }}>
+                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]}>
                     {editMode ? "Edit check list" : "Create check list"}
                 </Dialog.Title>
                 <Dialog.Content>
-                    <Text style={[{ marginBottom: 10, paddingLeft: 10 }]}>
+                    <Text
+                        style={[masterdataStyles.text, masterdataStyles.textDark, { marginBottom: 10, paddingLeft: 10 }]}
+                    >
                         {editMode ? "Edit the details of the field." : "Enter the details for the new field."}
                     </Text>
+                    {isVisible && (
+                        <Formik
+                            initialValues={formState}
+                            validationSchema={validationSchemaField}
+                            validateOnBlur={false}
+                            validateOnChange={true}
+                            onSubmit={values => saveField(values, editMode ? "update" : "add")}
+                        >
+                            {({
+                                handleChange,
+                                handleBlur,
+                                setFieldValue,
+                                values,
+                                errors,
+                                touched,
+                                handleSubmit,
+                                isValid,
+                                dirty,
+                            }) => {
+                                // useEffect(() => {
+                                //     const checkListTypeItem = checkListType.find(
+                                //         item => item.CTypeID === values.checkListTypeId
+                                //     )?.CTypeName;
 
-                    <Formik
-                        initialValues={formState}
-                        validationSchema={validationSchemaField}
-                        validateOnBlur={false}
-                        validateOnChange={true}
-                        onSubmit={values => saveField(values, editMode ? "update" : "add")}
-                    >
-                        {({
-                            handleChange,
-                            handleBlur,
-                            setFieldValue,
-                            values,
-                            errors,
-                            touched,
-                            handleSubmit,
-                            isValid,
-                            dirty,
-                        }) => {
-                            useEffect(() => {
-                                const checkListTypeItem = checkListType.find(
-                                    item => item.CTypeID === values.checkListTypeId
-                                )?.CTypeName;
+                                //     const newRender = ["Dropdown", "Radio", "Checkbox"].includes(checkListTypeItem)
+                                //         ? "detail"
+                                //         : ["Textinput", "Textarea"].includes(checkListTypeItem)
+                                //             ? "text"
+                                //             : "";
 
-                                const newRender = ["Dropdown", "Radio", "Checkbox"].includes(checkListTypeItem)
-                                    ? "detail"
-                                    : ["Textinput", "Textarea"].includes(checkListTypeItem)
-                                        ? "text"
-                                        : "";
+                                //     if (newRender !== shouldRender) {
+                                //         setShouldRender(newRender);
+                                //     }
+                                // }, [values.checkListTypeId]);
 
-                                if (newRender !== shouldRender) {
-                                    setShouldRender(newRender);
-                                }
-                            }, [values.checkListTypeId]);
+                                // useEffect(() => {
+                                //     const dataTypeItem = dataType.find(
+                                //         item => item.DTypeID === values.dataTypeId
+                                //     )?.DTypeName;
 
-                            useEffect(() => {
-                                const dataTypeItem = dataType.find(
-                                    item => item.DTypeID === values.dataTypeId
-                                )?.DTypeName;
+                                //     setShouldRenderDT(dataTypeItem === "Number");
+                                // }, [values.dataTypeId]);
 
-                                setShouldRenderDT(dataTypeItem === "Number");
-                            }, [values.dataTypeId]);
-
-                            return (
-                                <View>
+                                return (
                                     <ScrollView
                                         contentContainerStyle={{ paddingBottom: 5, paddingHorizontal: 10 }}
                                         showsVerticalScrollIndicator={false}
@@ -166,26 +157,27 @@ const FieldDialog: React.FC<FieldDialogProps> = ({
                                         <Field
                                             name="checkListId"
                                             component={({ field, form }: any) => (
-                                                <CustomDropdownSingle
-                                                    title="Check List"
-                                                    labels="CListName"
-                                                    values="CListID"
-                                                    data={editMode ? checkList : dropcheckList}
-                                                    selectedValue={values.checkListId}
-                                                    onValueChange={(value: any) => {
-                                                        setFieldValue(field.name, value);
-                                                        form.setTouched({ ...form.touched, [field.name]: true });
-                                                    }}
-                                                    lefticon={"check-all"}
-                                                />
+                                                <AccessibleView style={masterdataStyles.containerInput}>
+                                                    <CustomDropdownSingle
+                                                        title="Check List"
+                                                        labels="CListName"
+                                                        values="CListID"
+                                                        data={editMode ? checkList : dropcheckList}
+                                                        selectedValue={field.checkListId}
+                                                        onValueChange={(value, icon) => {
+
+                                                            form.setFieldValue(field.name, value);
+                                                            form.setTouched({ ...form.touched, [field.name]: true });
+                                                        }}
+                                                    />
+                                                    {touched.checkListId && errors.checkListId && (
+                                                        <HelperText type="error" visible={Boolean(touched.checkListId && errors.checkListId)} style={{ left: -10 }}>
+                                                            {errors.checkListId}
+                                                        </HelperText>
+                                                    )}
+                                                </AccessibleView>
                                             )}
                                         />
-
-                                        {touched.checkListId && errors.checkListId && typeof errors.checkListId === 'string' && (
-                                            <Text style={[styles.text, styles.textError, { marginLeft: spacing.xs, top: -spacing.xxs }]}>
-                                                {errors.checkListId}
-                                            </Text>
-                                        )}
 
                                         <Field
                                             name="checkListTypeId"
@@ -328,10 +320,10 @@ const FieldDialog: React.FC<FieldDialogProps> = ({
                                             )}
                                         />
                                     </ScrollView>
-                                </View>
-                            );
-                        }}
-                    </Formik>
+                                );
+                            }}
+                        </Formik>
+                    )}
                 </Dialog.Content>
             </Dialog>
         </Portal>
