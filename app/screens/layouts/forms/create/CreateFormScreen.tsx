@@ -116,7 +116,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route }) => {
             <ScaleDecorator>
 
                 <DraggableFlatList
-                    data={state.subForms}
+                    data={item.Fields ?? []}
                     renderItem={renderField}
                     keyExtractor={(item) => `SF-${item.SFormID}`}
                     onDragEnd={({ data }) => dispatch(setDragField({ data }))}
