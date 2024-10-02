@@ -1,18 +1,23 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef, useMemo } from "react";
+import {
+    Animated,
+    Pressable,
+    Text,
+    StyleSheet,
+    ScrollView,
+    View,
+} from "react-native";
 import {
     setDragSubForm,
     setDragField,
     deleteSubForm,
 } from "@/slices";
-import { Pressable, Text, StyleSheet } from "react-native";
 import { useForm } from '@/hooks/custom/useForm';
 import { AccessibleView } from "@/components";
 import SubFormDialog from "@/components/forms/SubFormDialog";
 import { useToast } from "@/app/contexts";
-import useMasterdataStyles from "@/styles/common/masterdata";
-import DraggableFlatList, {
-    ScaleDecorator,
-} from "react-native-draggable-flatlist";
+import useCreateformStyle from "@/styles/createform";
+import DraggableFlatList, { ScaleDecorator } from "react-native-draggable-flatlist";
 import { Icon } from "react-native-paper";
 import axiosInstance from "@/config/axios";
 
@@ -57,7 +62,7 @@ interface CreateFormProps {
 }
 
 const CreateFormScreen: React.FC<CreateFormProps> = ({ route }) => {
-    const { state, dispatch } = useForm(route);
+    const { state, dispatch, checkListType } = useForm(route);
     const [initialDialog, setInitialDialog] = useState<{ form: boolean, subform: boolean, save: boolean, field: boolean }>({ form: false, subform: false, save: false, field: false })
     const [initialForm, setInitialForm] = useState<BaseForm>({ FormID: "", FormName: "", Description: "", MachineID: "" });
     const [initialSubForm, setInitialSubForm] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", MachineID: "" });
@@ -65,7 +70,32 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route }) => {
     const [editMode, setEditMode] = useState<boolean>(false)
 
     const { showError } = useToast();
-    const masterdataStyles = useMasterdataStyles();
+    const createform = useCreateformStyle();
+
+    const scaleValues = useRef<{ [key: string]: Animated.Value }>({});
+
+    const getScaleValue = (subFormID: string) => {
+        if (!scaleValues.current[subFormID]) {
+            scaleValues.current[subFormID] = new Animated.Value(1);
+        }
+        return scaleValues.current[subFormID];
+    };
+
+    const animatedDefault = useMemo(() => {
+        return { toValue: 1, useNativeDriver: true };
+    }, []);
+
+    const animatedScale = useMemo(() => {
+        return { toValue: 0.95, useNativeDriver: true };
+    }, []);
+
+    const onPressIn = (subFormID: string) => {
+        Animated.spring(getScaleValue(subFormID), animatedScale).start();
+    };
+
+    const onPressOut = (subFormID: string) => {
+        Animated.spring(getScaleValue(subFormID), animatedDefault).start();
+    };
 
     const handelSetDialog = useCallback(() => {
         setEditMode(false)
@@ -90,114 +120,105 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route }) => {
 
     }, [])
 
-    const renderField = ({ item, drag, isActive }: { item: FormState; drag: () => void; isActive: boolean; }) => {
+    const renderField = ({ item, drag, isActive, subFormID }: { item: FormState; drag: () => void; isActive: boolean; subFormID: string }) => {
         return (
-            <ScaleDecorator>
-                <Pressable
-                    onPress={() => {
-                        setEditMode(true)
-                        setInitialDialog((v) => ({ ...v, field: true }));
-                        handelField(item);
-                    }}
-                    onLongPress={drag}
-                    disabled={isActive}
-                    style={[styles.subFormContainer, isActive ? styles.active : null]}
-                    testID={`dg-SF-${item.SFormID}`}
-                >
-                    <Text style={styles.subFormText}>Sub Form: {item.CListName}</Text>
-                    <Icon source="chevron-right" size={18} />
-                </Pressable>
-            </ScaleDecorator>
-        )
+            <Animated.View style={{ transform: [{ scale: getScaleValue(subFormID) }] }}>
+                <ScaleDecorator>
+                    <Pressable
+                        onPressIn={() => onPressIn(subFormID)}
+                        onPressOut={() => onPressOut(subFormID)}
+                        onPress={() => {
+                            setEditMode(true);
+                            setInitialDialog((v) => ({ ...v, field: true }));
+                        }}
+                        onLongPress={drag}
+                        disabled={isActive}
+                        style={[createform.fieldContainer, isActive ? createform.active : null]}
+                        testID={`dg-SF-${item.SFormID}`}
+                    >
+                        <Icon source={checkListType.find((v) => v.CTypeID === item.CTypeID)?.Icon} size={20} />
+                        <Text style={createform.fieldText}>{item.CListName}</Text>
+                        <Icon source="chevron-right" size={18} />
+                    </Pressable>
+                </ScaleDecorator>
+            </Animated.View>
+        );
     };
 
     const renderSubForm = ({ item, drag, isActive }: { item: BaseSubForm; drag: () => void; isActive: boolean; }) => {
         return (
-            <ScaleDecorator>
+            <Animated.View style={{ transform: [{ scale: getScaleValue(item.SFormID) }] }}>
+                <ScaleDecorator>
+                    <AccessibleView style={{ marginBottom: 30 }}>
+                        <Pressable
+                            onPressIn={() => onPressIn(item.SFormID)}
+                            onPressOut={() => onPressOut(item.SFormID)}
+                            onPress={() => {
+                                setEditMode(true);
+                                setInitialDialog((v) => ({ ...v, subform: true }));
+                            }}
+                            onLongPress={drag}
+                            disabled={isActive}
+                            style={[createform.subFormContainer, isActive ? createform.active : null]}
+                            testID={`dg-SF-${item.SFormID}`}
+                        >
+                            <Text style={createform.subFormText}>{item.SFormName}</Text>
+                            <Icon source="chevron-right" size={18} />
+                        </Pressable>
+
+                        <DraggableFlatList
+                            data={item.Fields ?? []}
+                            renderItem={({ item, drag, isActive }) => renderField({ item, drag, isActive, subFormID: item.SFormID })}
+                            keyExtractor={(item, index) => `SF-${item.SFormID}-${index}`}
+                            onDragEnd={({ data }) => dispatch(setDragField({ data }))}
+                            showsVerticalScrollIndicator={false}
+                            activationDistance={1}
+                        />
+
+                        <Pressable
+                            onPress={() => {
+                                setInitialDialog((v) => ({ ...v, field: true }));
+                            }}
+                            style={[createform.fieldContainer, { justifyContent: "center", opacity: 5 }]}
+                        >
+                            <Icon source="plus" size={16} />
+                            <Text style={createform.addSubFormText}>Add Field</Text>
+                        </Pressable>
+
+                    </AccessibleView>
+                </ScaleDecorator>
+            </Animated.View>
+        );
+    };
+
+    return (
+        <ScrollView>
+            <AccessibleView style={createform.containerL1}>
+                <Pressable
+                    onPress={() => {
+                        setInitialDialog((v) => ({ ...v, subform: true }));
+                    }}
+                    style={[createform.addSubFormButton]}
+                >
+                    <Icon source="plus" size={16} />
+                    <Text style={createform.addSubFormText}>Add Sub Form</Text>
+                </Pressable>
 
                 <DraggableFlatList
-                    data={item.Fields ?? []}
-                    renderItem={renderField}
-                    keyExtractor={(item) => `SF-${item.SFormID}`}
-                    onDragEnd={({ data }) => dispatch(setDragField({ data }))}
+                    data={state.subForms}
+                    renderItem={renderSubForm}
+                    keyExtractor={(item, index) => `SF-${item.SFormID}-${index}`}
+                    onDragEnd={({ data }) => dispatch(setDragSubForm({ data }))}
                     showsVerticalScrollIndicator={false}
                     activationDistance={1}
                 />
 
-                <Pressable
-                    onPress={() => {
-                        setEditMode(true)
-                        setInitialDialog((v) => ({ ...v, subform: true }));
-                        handelSubForm(item);
-                    }}
-                    onLongPress={drag}
-                    disabled={isActive}
-                    style={[styles.subFormContainer, isActive ? styles.active : null]}
-                    testID={`dg-SF-${item.SFormID}`}
-                >
-                    <Text style={styles.subFormText}>Sub Form: {item.SFormName}</Text>
-                    <Icon source="chevron-right" size={18} />
+                <Pressable onPress={() => { /* Handle Save Form */ }} style={createform.saveButton}>
+                    <Text style={createform.saveButtonText}>Save Form</Text>
                 </Pressable>
-            </ScaleDecorator>
-        )
-    };
-
-    return (
-        <AccessibleView style={styles.container}>
-            <Pressable onPress={() => {
-                setInitialDialog((v) => ({ ...v, subform: true }));
-                handelSubForm();
-            }}>
-                <Icon source="plus" size={16} />
-                <Text>Add Sub Form</Text>
-            </Pressable>
-
-            <DraggableFlatList
-                data={state.subForms}
-                renderItem={renderSubForm}
-                keyExtractor={(item) => `SF-${item.SFormID}`}
-                onDragEnd={({ data }) => dispatch(setDragSubForm({ data }))}
-                showsVerticalScrollIndicator={false}
-                activationDistance={1}
-            />
-
-            <Pressable onPress={() => {/* Handle Save Form */ }}>
-                <Text>Save Form</Text>
-            </Pressable>
-
-            <SubFormDialog
-                isVisible={initialDialog.subform}
-                setShowDialogs={handelSetDialog}
-                editMode={editMode}
-                subForm={initialSubForm}
-                saveSubForm={handelSaveSubForm}
-                onDelete={(values: string) => dispatch(deleteSubForm({ values }))}
-            />
-        </AccessibleView>
+            </AccessibleView>
+        </ScrollView>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        padding: 16,
-        flex: 1,
-        backgroundColor: '#fff',
-    },
-    subFormContainer: {
-        padding: 16,
-        marginVertical: 8,
-        backgroundColor: '#f0f0f0',
-        borderRadius: 8,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    active: {
-        backgroundColor: '#d0f0d0',
-    },
-    subFormText: {
-        fontSize: 16,
-    },
-});
 
 export default React.memo(CreateFormScreen);
