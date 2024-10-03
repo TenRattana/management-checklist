@@ -11,7 +11,8 @@ interface CustomDropdownSingleProps {
     data: Array<{ [key: string]: any }>;
     selectedValue?: string;
     onValueChange: (value?: string, icon?: () => JSX.Element) => void;
-    lefticon?: string
+    lefticon?: string,
+    iconRight?: React.ReactNode
 }
 
 const CustomDropdownSingle: React.FC<CustomDropdownSingleProps> = ({
@@ -21,7 +22,8 @@ const CustomDropdownSingle: React.FC<CustomDropdownSingleProps> = ({
     data,
     selectedValue = "",
     onValueChange,
-    lefticon
+    lefticon,
+    iconRight
 }) => {
     const [options, setOptions] = useState<{ label?: string; value?: string; icon?: () => JSX.Element }[]>([]);
     const [currentValue, setCurrentValue] = useState<string | null>(selectedValue || null);
@@ -90,7 +92,7 @@ const CustomDropdownSingle: React.FC<CustomDropdownSingleProps> = ({
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder="Select item"
+                placeholder={`Select ${title}`}
                 searchPlaceholder="Search..."
                 value={currentValue}
                 onChange={newValue => {
@@ -114,7 +116,7 @@ const CustomDropdownSingle: React.FC<CustomDropdownSingleProps> = ({
                     />
                 )}
                 renderRightIcon={() => (
-                    <AccessibleView>
+                    <AccessibleView style={{ flexDirection: "row" }}>
                         {currentValue !== null ? (
                             <IconButton
                                 style={styles.icon}
@@ -132,6 +134,7 @@ const CustomDropdownSingle: React.FC<CustomDropdownSingleProps> = ({
                                 size={30}
                             />
                         )}
+                        {iconRight ?? false}
                     </AccessibleView>
                 )}
             />

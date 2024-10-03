@@ -1,7 +1,8 @@
 import React from "react";
 import { Pressable, Text } from "react-native";
 import { useTheme } from "@/app/contexts";
-import { Inputs, AccessibleView } from "@/components";
+import AccessibleView from "@/components/AccessibleView";
+import { Inputs } from "@/components/common";
 import { Portal, Switch, Dialog } from "react-native-paper";
 import { Formik } from "formik";
 import * as Yup from 'yup'

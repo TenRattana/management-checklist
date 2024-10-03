@@ -28,7 +28,7 @@ const Inputs: React.FC<InputProps> = ({
   hint,
   mode,
   lefticon,
-  name
+  name,
 }) => {
 
   return (

@@ -1,7 +1,8 @@
 import React from "react";
 import { Pressable, Text } from "react-native";
 import { useTheme } from "@/app/contexts";
-import { Inputs, AccessibleView } from "@/components";
+import AccessibleView from "@/components/AccessibleView";
+import { Inputs } from "@/components/common";
 import { Portal, Switch, Dialog } from "react-native-paper";
 import { Formik } from "formik";
 import * as Yup from 'yup'
@@ -16,7 +17,7 @@ interface InitialValues {
 interface Checklist_dialogProps {
     isVisible: boolean;
     setIsVisible: (v: boolean) => void;
-    isEditing: boolean;
+    isEditing?: boolean;
     initialValues: InitialValues;
     saveData: (values: InitialValues) => void;
 }
@@ -26,7 +27,7 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The active field is required."),
 });
 
-const Checklist_dialogProps: React.FC<Checklist_dialogProps> = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }) => {
+const Checklist_dialog: React.FC<Checklist_dialogProps> = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }) => {
 
     const masterdataStyles = useMasterdataStyles()
     const { colors } = useTheme()
@@ -102,4 +103,4 @@ const Checklist_dialogProps: React.FC<Checklist_dialogProps> = ({ isVisible, set
     )
 }
 
-export default Checklist_dialogProps
+export default Checklist_dialog

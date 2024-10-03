@@ -2,11 +2,11 @@ import React, { useEffect } from "react";
 import {
   DarkTheme,
   DefaultTheme,
-  ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { Stack } from "expo-router";
+import { ThemeProvider, ToastProvider, ResponsiveProvider } from "@/app/contexts";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -15,15 +15,15 @@ export default function RootLayout() {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
-  useEffect(() => {
-    const hideSplashScreen = async () => {
-      if (fontsLoaded) {
-        await SplashScreen.hideAsync();
-      }
-    };
+  // useEffect(() => {
+  //   const hideSplashScreen = async () => {
+  //     if (fontsLoaded) {
+  //       await SplashScreen.hideAsync();
+  //     }
+  //   };
 
-    hideSplashScreen();
-  }, [fontsLoaded]);
+  //   hideSplashScreen();
+  // }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;
@@ -31,11 +31,15 @@ export default function RootLayout() {
   console.log("RootLayout");
 
   return (
-    <ThemeProvider value={DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="+not-found" options={{ headerShown: true }} />
-      </Stack>
+    <ThemeProvider>
+      <ToastProvider>
+        <ResponsiveProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="+not-found" options={{ headerShown: true }} />
+          </Stack>
+        </ResponsiveProvider>
+      </ToastProvider>
     </ThemeProvider>
   );
 }

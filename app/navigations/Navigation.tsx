@@ -13,13 +13,14 @@ import {
   ExpectedResultScreen,
   Preview,
   CreateFormScreen,
+  MachineGroupScreen,
+  MachineScreen
 } from "@/app/screens";
 import AccessibleView from "@/components/AccessibleView";
 import { MachineRoute } from "./Machine/MachineRoute";
 import { CheckListRoute } from "./CheckList/CheckListRoute";
 import { MatchRoute } from "./Match/MatchRoute";
 import { Button } from "react-native-paper";
-import { ThemeProvider, ToastProvider, ResponsiveProvider } from "@/app/contexts";
 
 const Drawer = createDrawerNavigator();
 
@@ -31,213 +32,208 @@ const Navigation: React.FC = () => {
   }
 
   return (
-    <ThemeProvider>
-      <ToastProvider>
-        <ResponsiveProvider>
-          <Drawer.Navigator>
-            <Drawer.Screen
-              name={user ? "Home" : "Login"}
-              component={user ? HomeScreen : LoginScreen}
-              options={{
-                title: user ? "Home" : "Login",
-                drawerIcon: ({ color }) => (
-                  <TabBarIcon name={user ? "home-outline" : "log-in"} color={color} />
-                ),
-              }}
-            />
-            {user && (
-              <>
-                {/* SuperAdmin Routes */}
-                {role === "SuperAdmin" && (
-                  <>
-                    <Drawer.Screen
-                      name="SuperAdmin"
-                      component={SuperAdminScreen}
-                      options={{
-                        title: "SuperAdmin",
-                        drawerIcon: ({ color }) => (
-                          <TabBarIcon name="home" color={color} />
-                        ),
-                      }}
-                    />
-                    {/* Machine Group */}
-                    <Drawer.Group>
-                      <Drawer.Screen
-                        name="MachineList"
-                        component={MachineRoute}
-                        options={{
-                          title: "Machine List",
-                          drawerIcon: ({ color }) => (
-                            <TabBarIcon name="home" color={color} />
-                          ),
-                        }}
-                      />
-                    </Drawer.Group>
-                    {/* Checklist Routes */}
-                    <Drawer.Screen
-                      name="CheckListList"
-                      component={CheckListRoute}
-                      options={{
-                        title: "Check List",
-                        drawerIcon: ({ color }) => (
-                          <TabBarIcon name="home" color={color} />
-                        ),
-                      }}
-                    />
-                    {/* Match Routes */}
-                    <Drawer.Screen
-                      name="Match"
-                      component={MatchRoute}
-                      options={{
-                        title: "Match List",
-                        drawerIcon: ({ color }) => (
-                          <TabBarIcon name="home" color={color} />
-                        ),
-                      }}
-                    />
-                    <Drawer.Screen
-                      name="Form"
-                      component={FormScreen}
-                      options={{
-                        title: "Form",
-                        drawerIcon: ({ color }) => (
-                          <TabBarIcon name="home" color={color} />
-                        ),
-                      }}
-                    />
-                    <Drawer.Screen
-                      name="Expected_result"
-                      component={ExpectedResultScreen}
-                      options={{
-                        title: "Expected Result",
-                        drawerIcon: ({ color }) => (
-                          <TabBarIcon name="home" color={color} />
-                        ),
-                      }}
-                    />
-                    <Drawer.Screen
-                      name="Preview"
-                      component={Preview}
-                      options={{
-                        title: "Preview",
-                        drawerIcon: ({ color }) => (
-                          <TabBarIcon name="home" color={color} />
-                        ),
-                      }}
-                    />
-                    <Drawer.Screen
-                      name="Create_form"
-                      component={CreateFormScreen}
-                      options={{
-                        title: "Create Form",
-                        drawerIcon: ({ color }) => (
-                          <TabBarIcon name="home" color={color} />
-                        ),
-                      }}
-                    />
-                    <Drawer.Screen
-                      name="Test"
-                      component={TestScreen}
-                      options={{
-                        title: "Test",
-                        drawerIcon: ({ color }) => (
-                          <TabBarIcon name="home" color={color} />
-                        ),
-                      }}
-                    />
-                  </>
-                )}
 
-                {/* Admin Routes */}
-                {role === "Admin" && (
-                  <>
-                    <Drawer.Screen
-                      name="Admin"
-                      component={AdminScreen}
-                      options={{
-                        title: "Admin",
-                        drawerIcon: ({ color }) => (
-                          <TabBarIcon name="code-slash" color={color} />
-                        ),
-                      }}
-                    />
-                    {/* Machine Group */}
-                    <Drawer.Group>
-                      <Drawer.Screen
-                        name="MachineList"
-                        component={MachineRoute}
-                        options={{
-                          title: "Machine List",
-                          drawerIcon: ({ color }) => (
-                            <TabBarIcon name="home" color={color} />
-                          ),
-                        }}
-                      />
-                    </Drawer.Group>
-
-                    <Drawer.Screen
-                      name="Form"
-                      component={FormScreen}
-                      options={{
-                        title: "Form",
-                        drawerIcon: ({ color }) => (
-                          <TabBarIcon name="home" color={color} />
-                        ),
-                      }}
-                    />
-                    <Drawer.Screen
-                      name="Expected_result"
-                      component={ExpectedResultScreen}
-                      options={{
-                        title: "Expected Result",
-                        drawerIcon: ({ color }) => (
-                          <TabBarIcon name="home" color={color} />
-                        ),
-                      }}
-                    />
-                    <Drawer.Screen
-                      name="Create_form"
-                      component={CreateFormScreen}
-                      options={{
-                        title: "Create Form",
-                        drawerIcon: ({ color }) => (
-                          <TabBarIcon name="home" color={color} />
-                        ),
-                      }}
-                    />
-                  </>
-                )}
-
-                {/* GeneralUser Routes */}
-                {role === "GeneralUser" && (
-                  <Drawer.Screen
-                    name="User"
-                    component={UserScreen}
-                    options={{
-                      title: "User",
-                      drawerIcon: ({ color }) => (
-                        <TabBarIcon name="code-slash" color={color} />
-                      ),
-                    }}
-                  />
-                )}
-
+    <Drawer.Navigator>
+      <Drawer.Screen
+        name={user ? "Home" : "Login"}
+        component={user ? HomeScreen : LoginScreen}
+        options={{
+          title: user ? "Home" : "Login",
+          drawerIcon: ({ color }) => (
+            <TabBarIcon name={user ? "home-outline" : "log-in"} color={color} />
+          ),
+        }}
+      />
+      {user && (
+        <>
+          {/* SuperAdmin Routes */}
+          {role === "SuperAdmin" && (
+            <>
+              <Drawer.Screen
+                name="SuperAdmin"
+                component={SuperAdminScreen}
+                options={{
+                  title: "SuperAdmin",
+                  drawerIcon: ({ color }) => (
+                    <TabBarIcon name="home" color={color} />
+                  ),
+                }}
+              />
+              {/* Machine Group */}
+              <Drawer.Group>
                 <Drawer.Screen
-                  name="Logout"
-                  component={LogoutScreen}
+                  name="MachineList"
+                  component={MachineScreen}
                   options={{
-                    title: "Logout",
+                    title: "Machine List",
                     drawerIcon: ({ color }) => (
-                      <TabBarIcon name="log-out" color={color} />
+                      <TabBarIcon name="home" color={color} />
                     ),
                   }}
                 />
-              </>
-            )}
-          </Drawer.Navigator>
-        </ResponsiveProvider>
-      </ToastProvider>
-    </ThemeProvider>
+              </Drawer.Group>
+              {/* Checklist Routes */}
+              <Drawer.Screen
+                name="CheckListList"
+                component={CheckListRoute}
+                options={{
+                  title: "Check List",
+                  drawerIcon: ({ color }) => (
+                    <TabBarIcon name="home" color={color} />
+                  ),
+                }}
+              />
+              {/* Match Routes */}
+              <Drawer.Screen
+                name="Match"
+                component={MatchRoute}
+                options={{
+                  title: "Match List",
+                  drawerIcon: ({ color }) => (
+                    <TabBarIcon name="home" color={color} />
+                  ),
+                }}
+              />
+              <Drawer.Screen
+                name="Form"
+                component={FormScreen}
+                options={{
+                  title: "Form",
+                  drawerIcon: ({ color }) => (
+                    <TabBarIcon name="home" color={color} />
+                  ),
+                }}
+              />
+              <Drawer.Screen
+                name="Expected_result"
+                component={ExpectedResultScreen}
+                options={{
+                  title: "Expected Result",
+                  drawerIcon: ({ color }) => (
+                    <TabBarIcon name="home" color={color} />
+                  ),
+                }}
+              />
+              <Drawer.Screen
+                name="Preview"
+                component={Preview}
+                options={{
+                  title: "Preview",
+                  drawerIcon: ({ color }) => (
+                    <TabBarIcon name="home" color={color} />
+                  ),
+                }}
+              />
+              <Drawer.Screen
+                name="Create_form"
+                component={CreateFormScreen}
+                options={{
+                  title: "Create Form",
+                  drawerIcon: ({ color }) => (
+                    <TabBarIcon name="home" color={color} />
+                  ),
+                }}
+              />
+              <Drawer.Screen
+                name="Test"
+                component={TestScreen}
+                options={{
+                  title: "Test",
+                  drawerIcon: ({ color }) => (
+                    <TabBarIcon name="home" color={color} />
+                  ),
+                }}
+              />
+            </>
+          )}
+
+          {/* Admin Routes */}
+          {role === "Admin" && (
+            <>
+              <Drawer.Screen
+                name="Admin"
+                component={AdminScreen}
+                options={{
+                  title: "Admin",
+                  drawerIcon: ({ color }) => (
+                    <TabBarIcon name="code-slash" color={color} />
+                  ),
+                }}
+              />
+              {/* Machine Group */}
+              <Drawer.Group>
+                <Drawer.Screen
+                  name="MachineList"
+                  component={MachineRoute}
+                  options={{
+                    title: "Machine List",
+                    drawerIcon: ({ color }) => (
+                      <TabBarIcon name="home" color={color} />
+                    ),
+                  }}
+                />
+              </Drawer.Group>
+
+              <Drawer.Screen
+                name="Form"
+                component={FormScreen}
+                options={{
+                  title: "Form",
+                  drawerIcon: ({ color }) => (
+                    <TabBarIcon name="home" color={color} />
+                  ),
+                }}
+              />
+              <Drawer.Screen
+                name="Expected_result"
+                component={ExpectedResultScreen}
+                options={{
+                  title: "Expected Result",
+                  drawerIcon: ({ color }) => (
+                    <TabBarIcon name="home" color={color} />
+                  ),
+                }}
+              />
+              <Drawer.Screen
+                name="Create_form"
+                component={CreateFormScreen}
+                options={{
+                  title: "Create Form",
+                  drawerIcon: ({ color }) => (
+                    <TabBarIcon name="home" color={color} />
+                  ),
+                }}
+              />
+            </>
+          )}
+
+          {/* GeneralUser Routes */}
+          {role === "GeneralUser" && (
+            <Drawer.Screen
+              name="User"
+              component={UserScreen}
+              options={{
+                title: "User",
+                drawerIcon: ({ color }) => (
+                  <TabBarIcon name="code-slash" color={color} />
+                ),
+              }}
+            />
+          )}
+
+          <Drawer.Screen
+            name="Logout"
+            component={LogoutScreen}
+            options={{
+              title: "Logout",
+              drawerIcon: ({ color }) => (
+                <TabBarIcon name="log-out" color={color} />
+              ),
+            }}
+          />
+        </>
+      )}
+    </Drawer.Navigator>
   );
 };
 

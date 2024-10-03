@@ -1,7 +1,9 @@
 import React from "react";
 import { Pressable, Text } from "react-native";
 import { useTheme } from "@/app/contexts";
-import { AccessibleView, CustomDropdownSingle, CustomDropdownMultiple } from "@/components";
+import AccessibleView from "@/components/AccessibleView";
+import CustomDropdownSingle from "@/components/CustomDropdownSingle";
+import CustomDropdownMultiple from "@/components/CustomDropdownMultiple";
 import { Portal, Switch, Dialog, HelperText } from "react-native-paper";
 import { Formik, Field } from "formik";
 import * as Yup from 'yup'

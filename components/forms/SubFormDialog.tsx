@@ -1,7 +1,7 @@
 import React from "react";
 import { Pressable, Text } from "react-native";
-import { useTheme } from "@/app/contexts";
-import { Inputs, AccessibleView } from "@/components";
+import AccessibleView from "@/components/AccessibleView";
+import { Inputs } from "@/components/common";
 import { Portal, Dialog } from "react-native-paper";
 import { Formik } from "formik";
 import * as Yup from 'yup'
@@ -22,20 +22,19 @@ interface SubFormDialogProps {
     editMode: boolean;
     subForm: BaseSubForm;
     saveSubForm: (values: BaseSubForm, mode: string) => void;
-    onDelete: (subFormId: string) => void;
+    onDelete: (SFormID: string) => void;
 }
 
 const validationSchemaSubForm = Yup.object().shape({
-    subFormName: Yup.string().required(
+    SFormName: Yup.string().required(
         "The machine group name field is required."
     ),
-    columns: Yup.number().required("The columns field is required."),
+    Columns: Yup.number().required("The columns field is required."),
 });
 
 const SubFormDialog: React.FC<SubFormDialogProps> = ({ isVisible, setShowDialogs, editMode, subForm, saveSubForm, onDelete }) => {
 
     const masterdataStyles = useMasterdataStyles()
-    const { colors } = useTheme()
 
     return (
         <Portal>
@@ -61,22 +60,14 @@ const SubFormDialog: React.FC<SubFormDialogProps> = ({ isVisible, setShowDialogs
                                 saveSubForm(values, editMode ? "update" : "add");
                             }}
                         >
-                            {({
-                                handleChange,
-                                handleBlur,
-                                values,
-                                errors,
-                                touched,
-                                handleSubmit,
-                                isValid,
-                                dirty,
-                            }) => (
+                            {({ handleChange, handleBlur, values, errors, touched, handleSubmit, isValid, dirty, }) => (
                                 <AccessibleView>
+
                                     <Inputs
                                         placeholder="Enter Sub Form Name"
                                         label="Sub Form Name"
                                         handleChange={handleChange("SFormName")}
-                                        handleBlur={() => handleBlur("SFormName")}
+                                        handleBlur={handleBlur("SFormName")}
                                         value={values.SFormName}
                                         error={touched.SFormName && Boolean(errors.SFormName)}
                                         errorMessage={touched.SFormName ? errors.SFormName : ""}
@@ -86,7 +77,7 @@ const SubFormDialog: React.FC<SubFormDialogProps> = ({ isVisible, setShowDialogs
                                         placeholder="Enter Columns"
                                         label="Columns"
                                         handleChange={handleChange("Columns")}
-                                        handleBlur={() => handleBlur("Columns")}
+                                        handleBlur={handleBlur("Columns")}
                                         value={String(values.Columns ?? "")}
                                         error={touched.Columns && Boolean(errors.Columns)}
                                         errorMessage={touched.Columns ? errors.Columns : ""}
@@ -94,7 +85,7 @@ const SubFormDialog: React.FC<SubFormDialogProps> = ({ isVisible, setShowDialogs
 
                                     <AccessibleView style={masterdataStyles.containerAction}>
                                         <Pressable
-                                            onPress={() => handleSubmit}
+                                            onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}
                                             style={[
                                                 masterdataStyles.button,

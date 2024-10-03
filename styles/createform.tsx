@@ -12,12 +12,13 @@ const useCreateformStyle = () => {
 
         containerL1: {
             padding: 16,
+            paddingRight: 40,
             flex: 1,
             backgroundColor: colors.light,
             width: responsive === "small" ? "100%" : 400,
         },
         addSubFormButton: {
-            padding: 16,
+            margin: 16,
             marginVertical: 8,
             backgroundColor: '#e0f7fa',
             borderRadius: 8,
@@ -31,8 +32,9 @@ const useCreateformStyle = () => {
             marginLeft: 8,
         },
         fieldContainer: {
-            padding: 16,
-            marginVertical: 8,
+            paddingHorizontal: 10,
+            height: 60,
+            marginVertical: 3,
             backgroundColor: '#fafafa',
             borderRadius: 8,
             flexDirection: 'row',

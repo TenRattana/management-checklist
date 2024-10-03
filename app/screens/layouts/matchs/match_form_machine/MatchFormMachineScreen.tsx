@@ -7,7 +7,7 @@ import { Customtable, LoadingSpinner, Searchbar } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
-import Match_form_machine_dialog from "@/components/screens/Match_form_nachine_dialog";
+import Match_form_machine_dialog from "@/components/screens/Match_form_machine_dialog";
 
 interface MatchFormMachineScreenProps {
     navigation: any;

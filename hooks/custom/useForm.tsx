@@ -1,11 +1,10 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "@/config/axios";
 import axios from "axios";
-import { setForm, setSubForm, setField, reset } from "@/slices";
-import { useToast, useTheme, useRes } from "@/app/contexts";
+import { setForm, setSubForm, setField } from "@/slices";
+import { useToast, useRes } from "@/app/contexts";
 import { useFocusEffect } from "@react-navigation/native";
-import { TextInput } from "react-native-paper";
 
 interface BaseForm {
     FormID: string;
@@ -18,8 +17,8 @@ interface BaseSubForm {
     SFormID: string;
     SFormName: string;
     FormID: string;
-    Columns: number;
-    DisplayOrder: number;
+    Columns?: number;
+    DisplayOrder?: number;
     MachineID: string;
 }
 
@@ -45,7 +44,7 @@ interface BaseFormState {
     Description: string;
     Placeholder: string;
     Hint: string;
-    DisplayOrder: number;
+    DisplayOrder?: number;
     EResult: string;
 }
 
@@ -53,10 +52,11 @@ interface CheckListType {
     CTypeID: string;
     CTypeName: string;
     Icon: string;
+    IsActive: boolean;
 }
 
-interface checkListOption {
-    CLOptionName: string
+interface CheckListOption {
+    CLOptionName: string;
     IsActive: boolean;
     CLOptionID: string;
 }
@@ -65,6 +65,7 @@ interface DataType {
     DTypeID: string;
     DTypeName: string;
     Icon: string;
+    IsActive: boolean;
 }
 
 interface Checklist {
@@ -80,45 +81,37 @@ interface GroupCheckListOption {
     IsActive: boolean;
 }
 
-
-export const useForm = (route: any) => {
+const useForm = (route: any) => {
     const dispatch = useDispatch();
     const state = useSelector((state: any) => state.form);
 
     const [checkList, setCheckList] = useState<Checklist[]>([]);
-    const [checkListOption, setCheckListOption] = useState<checkListOption[]>([]);
+    const [checkListOption, setCheckListOption] = useState<CheckListOption[]>([]);
     const [groupCheckListOption, setGroupCheckListOption] = useState<GroupCheckListOption[]>([]);
     const [checkListType, setCheckListType] = useState<CheckListType[]>([]);
     const [dataType, setDataType] = useState<DataType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const { formId, action } = route.params || {};
-    const { spacing } = useRes();
-    const { showSuccess, showError } = useToast();
+    const { showError } = useToast();
 
     const errorMessage = useCallback((error: unknown) => {
-        let errorMessage: string | string[];
+        let errorMsg: string | string[];
 
         if (axios.isAxiosError(error)) {
-            errorMessage = error.response?.data?.errors ?? ["Something went wrong!"];
+            errorMsg = error.response?.data?.errors ?? ["Something went wrong!"];
         } else if (error instanceof Error) {
-            errorMessage = [error.message];
+            errorMsg = [error.message];
         } else {
-            errorMessage = ["An unknown error occurred!"];
+            errorMsg = ["An unknown error occurred!"];
         }
 
-        showError(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
+        showError(Array.isArray(errorMsg) ? errorMsg : [errorMsg]);
     }, [showError]);
 
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            const [
-                checkListResponse,
-                checkListOptionResponse,
-                groupCheckListOptionResponse,
-                checkListTypeResponse,
-                dataTypeResponse,
-            ] = await Promise.all([
+            const responses = await Promise.all([
                 axiosInstance.post("CheckList_service.asmx/GetCheckLists"),
                 axiosInstance.post("CheckListOption_service.asmx/GetCheckListOptions"),
                 axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions"),
@@ -126,11 +119,11 @@ export const useForm = (route: any) => {
                 axiosInstance.post("DataType_service.asmx/GetDataTypes"),
             ]);
 
-            setCheckList(checkListResponse.data.data ?? []);
-            setCheckListOption(checkListOptionResponse.data.data ?? []);
-            setGroupCheckListOption(groupCheckListOptionResponse.data.data ?? []);
-            setCheckListType(checkListTypeResponse.data?.data ?? []);
-            setDataType(dataTypeResponse.data?.data ?? []);
+            setCheckList(responses[0].data.data ?? []);
+            setCheckListOption(responses[1].data.data ?? []);
+            setGroupCheckListOption(responses[2].data.data ?? []);
+            setCheckListType(responses[3].data.data ?? []);
+            setDataType(responses[4].data.data ?? []);
         } catch (error) {
             errorMessage(error);
         } finally {
@@ -138,24 +131,12 @@ export const useForm = (route: any) => {
         }
     };
 
-    const fetchForm = async (formId: string, action: string) => {
-        if (!formId && !action) return;
-
-        const requests = [];
-
-        if (formId) {
-            requests.push(axios.post("Form_service.asmx/GetForm", { FormID: formId }));
-        }
+    const fetchForm = async (formId: string) => {
+        if (!formId) return null;
 
         try {
-            const responses = await Promise.all(requests);
-            const formData: FormData = responses[0]?.data?.data[0] || {};
-
-            if (action === "copy" && formData.SubForm) {
-                return formData;
-            }
-
-            return formData;
+            const response = await axios.post("Form_service.asmx/GetForm", { FormID: formId });
+            return response.data?.data[0] || null;
         } catch (error) {
             errorMessage(error);
             return null;
@@ -166,70 +147,60 @@ export const useForm = (route: any) => {
         const subForms: SubForm[] = [];
         const fields: BaseFormState[] = [];
 
-        const form: BaseForm = {
-            FormID: formData.FormID || "",
-            FormName: formData.FormName || "",
-            Description: formData.Description || "",
-            MachineID: formData.MachineID || "",
-        };
+        formData.SubForm?.forEach((item) => {
+            const subForm: SubForm = {
+                SFormID: item.SFormID,
+                SFormName: item.SFormName,
+                FormID: item.FormID,
+                Columns: item.Columns,
+                DisplayOrder: item.DisplayOrder,
+                MachineID: item.MachineID,
+            };
+            subForms.push(subForm);
 
-        if (formData?.SubForm) {
-            formData.SubForm.forEach((item) => {
-                const subForm: SubForm = {
-                    SFormID: item.SFormID || "",
-                    SFormName: item.SFormName || "",
-                    FormID: item.FormID || "",
-                    Columns: item.Columns || -1,
-                    DisplayOrder: item.DisplayOrder || -1,
-                    MachineID: item.MachineID || "",
-                };
-                subForms.push(subForm);
-
-                item.MatchCheckList?.forEach((itemOption) => {
-                    const field: BaseFormState = {
-                        MCListID: itemOption.MCListID || "",
-                        CListID: itemOption.CListID || "",
-                        GCLOptionID: itemOption.GCLOptionID || "",
-                        CTypeID: itemOption.CTypeID || "",
-                        DTypeID: itemOption.DTypeID || "",
-                        DTypeValue: itemOption.DTypeValue,
-                        SFormID: itemOption.SFormID || "",
-                        Required: itemOption.Required || false,
-                        MinLength: itemOption.MinLength,
-                        MaxLength: itemOption.MaxLength,
-                        Description: itemOption.Description || "",
-                        Placeholder: itemOption.Placeholder || "",
-                        Hint: itemOption.Hint || "",
-                        DisplayOrder: itemOption.DisplayOrder || -1,
-                        EResult: itemOption.EResult || "",
-                    };
-                    fields.push(field);
+            item.MatchCheckList?.forEach((itemOption) => {
+                fields.push({
+                    MCListID: itemOption.MCListID,
+                    CListID: itemOption.CListID,
+                    GCLOptionID: itemOption.GCLOptionID,
+                    CTypeID: itemOption.CTypeID,
+                    DTypeID: itemOption.DTypeID,
+                    DTypeValue: itemOption.DTypeValue,
+                    SFormID: itemOption.SFormID,
+                    Required: itemOption.Required,
+                    MinLength: itemOption.MinLength,
+                    MaxLength: itemOption.MaxLength,
+                    Description: itemOption.Description,
+                    Placeholder: itemOption.Placeholder,
+                    Hint: itemOption.Hint,
+                    DisplayOrder: itemOption.DisplayOrder,
+                    EResult: itemOption.EResult,
                 });
             });
-        }
+        });
 
-        return { form, subForms, fields };
+        return { subForms, fields };
     };
 
-    useFocusEffect(
-        useCallback(() => {
-            const fetchDataAndCreateSubForms = async () => {
-                await fetchData();
-                const formData = await fetchForm(formId, action);
-                if (formData) {
-                    const { form, subForms, fields } = createSubFormsAndFields(formData);
+    useEffect(() => {
+        fetchData();
+    }, []);
 
-                    dispatch(setForm({ form }))
-                    dispatch(setSubForm({ subForms, drag: false }));
-                    dispatch(setField({ formState: fields, checkList, checkListType }));
-                }
-            };
+    useEffect(() => {
+        const loadForm = async () => {
+            const formData = await fetchForm(formId);
+            if (formData) {
+                const { subForms, fields } = createSubFormsAndFields(formData);
+                dispatch(setForm({ form: formData }));
+                dispatch(setSubForm({ subForms }));
+                dispatch(setField({ formState: fields, checkList, checkListType }));
+            }
+        };
 
-            fetchDataAndCreateSubForms();
-
-            return () => { };
-        }, [formId, action, dispatch])
-    );
+        if (formId) {
+            loadForm();
+        }
+    }, [formId, checkList, checkListType]);
 
     return {
         state,
@@ -242,6 +213,7 @@ export const useForm = (route: any) => {
         dispatch,
         fetchData,
         errorMessage,
-        showSuccess
     };
 };
+
+export default useForm;

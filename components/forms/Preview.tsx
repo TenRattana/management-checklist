@@ -1,10 +1,6 @@
 import { StyleSheet, Text, View, ScrollView, Pressable } from "react-native";
 import React, { useEffect, useState } from "react";
-import Selects from "@/components/common/Selects";
-import Radios from "@/components/common/Radios";
-import Checkboxs from "@/components/common/Checkboxs";
-import Textareas from "@/components/common/Textareas";
-import Inputs from "@/components/common/Inputs";
+import { Selects, Radios, Checkboxs, Textareas, Inputs } from "@/components/common";
 
 interface Option {
   label: string;
