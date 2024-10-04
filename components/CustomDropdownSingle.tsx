@@ -3,28 +3,9 @@ import { StyleSheet } from "react-native";
 import { IconButton } from "react-native-paper";
 import { Dropdown } from 'react-native-element-dropdown';
 import AccessibleView from "@/components/AccessibleView";
+import { CustomDropdownSingleProps } from '@/typing/tag'
 
-interface CustomDropdownSingleProps {
-    labels: string;
-    values: string;
-    title: string;
-    data: Array<{ [key: string]: any }>;
-    selectedValue?: string;
-    onValueChange: (value?: string, icon?: () => JSX.Element) => void;
-    lefticon?: string,
-    iconRight?: React.ReactNode
-}
-
-const CustomDropdownSingle: React.FC<CustomDropdownSingleProps> = ({
-    labels,
-    values,
-    title,
-    data,
-    selectedValue = "",
-    onValueChange,
-    lefticon,
-    iconRight
-}) => {
+const CustomDropdownSingle = ({ labels, values, title, data, selectedValue = "", onValueChange, lefticon, iconRight, testId }: CustomDropdownSingleProps) => {
     const [options, setOptions] = useState<{ label?: string; value?: string; icon?: () => JSX.Element }[]>([]);
     const [currentValue, setCurrentValue] = useState<string | null>(selectedValue || null);
     const [open, setOpen] = useState<boolean>(false);
@@ -137,6 +118,7 @@ const CustomDropdownSingle: React.FC<CustomDropdownSingleProps> = ({
                         {iconRight ?? false}
                     </AccessibleView>
                 )}
+                testID={testId}
             />
         </AccessibleView>
     );

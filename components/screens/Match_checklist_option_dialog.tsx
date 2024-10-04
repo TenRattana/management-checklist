@@ -8,6 +8,8 @@ import { Portal, Switch, Dialog, HelperText } from "react-native-paper";
 import { Formik, Field } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
+import { CheckListOption, GroupCheckListOption, } from '@/typing/type'
+import { InitialValuesMatchCheckListOption, MatchChecklistOptionProps } from '@/typing/value'
 
 const validationSchema = Yup.object().shape({
     groupCheckListOptionId: Yup.string().required(
@@ -19,50 +21,19 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The active field is required."),
 });
 
-interface InitialValues {
-    matchCheckListOptionId: string;
-    checkListOptionId: string[];
-    groupCheckListOptionId: string;
-    isActive: boolean;
-}
-
-interface GroupCheckListOption {
-    GCLOptionID: string;
-    GCLOptionName: string;
-    IsActive: boolean;
-}
-
-interface CheckListOption {
-    CLOptionID: string;
-    CLOptionName: string;
-    IsActive: boolean;
-}
-
-interface Match_checklist_optionProps {
-    isVisible: boolean;
-    setIsVisible: (v: boolean) => void;
-    isEditing: boolean;
-    initialValues: InitialValues;
-    saveData: (values: InitialValues) => void;
-    checkListOption: CheckListOption[];
-    dropcheckListOption: CheckListOption[];
-    groupCheckListOption: GroupCheckListOption[];
-    dropgroupCheckListOption: GroupCheckListOption[];
-}
-
-const Match_checklist_option: React.FC<Match_checklist_optionProps> = ({ isVisible, setIsVisible, isEditing, initialValues, saveData,
+const Match_checklist_option = ({ isVisible, setIsVisible, isEditing, initialValues, saveData,
     checkListOption,
     dropcheckListOption,
     groupCheckListOption,
-    dropgroupCheckListOption, }) => {
+    dropgroupCheckListOption, }: MatchChecklistOptionProps<InitialValuesMatchCheckListOption, CheckListOption, GroupCheckListOption>) => {
 
     const masterdataStyles = useMasterdataStyles()
     const { colors } = useTheme()
 
     return (
         <Portal>
-            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={masterdataStyles.containerDialog}>
-                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]}>
+            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={masterdataStyles.containerDialog} testID="dialog-mcod">
+                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]} testID="dialog-title-mcod">
                     {isEditing ? "Edit" : "Create"}
                 </Dialog.Title>
                 <Dialog.Content>
@@ -72,7 +43,7 @@ const Match_checklist_option: React.FC<Match_checklist_optionProps> = ({ isVisib
                             validationSchema={validationSchema}
                             validateOnBlur={false}
                             validateOnChange={true}
-                            onSubmit={saveData}
+                            onSubmit={(values: InitialValuesMatchCheckListOption) => saveData(values)}
                         >
                             {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, dirty, isValid }) => (
                                 <AccessibleView>
@@ -95,9 +66,10 @@ const Match_checklist_option: React.FC<Match_checklist_optionProps> = ({ isVisib
                                                         form.setFieldValue(field.name, value);
                                                         form.setTouched({ ...form.touched, [field.name]: true });
                                                     }}
+                                                    testId="groupCheckListOptionId-mcod"
                                                 />
                                                 {touched.groupCheckListOptionId && errors.groupCheckListOptionId && (
-                                                    <HelperText type="error" visible={Boolean(touched.groupCheckListOptionId && errors.groupCheckListOptionId)} style={{ left: -10 }}>
+                                                    <HelperText type="error" visible={Boolean(touched.groupCheckListOptionId && errors.groupCheckListOptionId)} style={{ left: -10 }} testID="error-groupCheckListOptionId-mcod">
                                                         {errors.groupCheckListOptionId}
                                                     </HelperText>
                                                 )}
@@ -123,9 +95,10 @@ const Match_checklist_option: React.FC<Match_checklist_optionProps> = ({ isVisib
                                                         form.setFieldValue(field.name, value);
                                                         form.setTouched({ ...form.touched, [field.name]: true });
                                                     }}
+                                                    testId="checkListOptionId-mcod"
                                                 />
                                                 {touched.checkListOptionId && errors.checkListOptionId && (
-                                                    <HelperText type="error" visible={Boolean(touched.checkListOptionId && errors.groupCheckListOptionId)} style={{ left: -10 }}>
+                                                    <HelperText type="error" visible={Boolean(touched.checkListOptionId && errors.groupCheckListOptionId)} style={{ left: -10 }} testID="error-checkListOptionId-mcod">
                                                         {errors.checkListOptionId}
                                                     </HelperText>
                                                 )}
@@ -144,6 +117,7 @@ const Match_checklist_option: React.FC<Match_checklist_optionProps> = ({ isVisib
                                             onValueChange={(v: boolean) => {
                                                 setFieldValue("isActive", v);
                                             }}
+                                            testID="isActive-mcod"
                                         />
                                     </AccessibleView>
                                     <AccessibleView style={masterdataStyles.containerAction}>
@@ -154,10 +128,11 @@ const Match_checklist_option: React.FC<Match_checklist_optionProps> = ({ isVisib
                                                 masterdataStyles.button,
                                                 isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis,
                                             ]}
+                                            testID="Save-mcod"
                                         >
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Save</Text>
                                         </Pressable>
-                                        <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]}>
+                                        <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-mcod">
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Cancel</Text>
                                         </Pressable>
                                     </AccessibleView>
@@ -171,4 +146,4 @@ const Match_checklist_option: React.FC<Match_checklist_optionProps> = ({ isVisib
     )
 }
 
-export default Match_checklist_option
+export default React.memo(Match_checklist_option)

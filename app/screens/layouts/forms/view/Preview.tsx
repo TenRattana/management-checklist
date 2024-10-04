@@ -1,213 +1,183 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { ScrollView, View, Text } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import {
-    LoadingSpinner,
-    Inputs,
-    Radios,
-    Checkboxs,
-    Textareas,
-    Selects,
-    AccessibleView,
-} from "@/components";
-import axios from "axios";
-import axiosInstance from "@/config/axios";
-import { setSubForm, setField, reset } from "@/slices";
-import { useToast, useTheme, useRes } from "@/app/contexts";
-import { useFocusEffect } from "@react-navigation/native";
-import useMasterdataStyles from "@/styles/common/masterdata";
-import { Divider } from "react-native-paper";
-import { RootState } from "@/stores";
-import { useForm } from '@/hooks/custom/useForm';
+// import React, { useEffect, useState, useCallback } from "react";
+// import { ScrollView, View, Text } from "react-native";
+// import { useDispatch, useSelector } from "react-redux";
+// import {
+//     LoadingSpinner,
+//     Inputs,
+//     Radios,
+//     Checkboxs,
+//     Textareas,
+//     Selects,
+//     AccessibleView,
+// } from "@/components";
+// import axios from "axios";
+// import axiosInstance from "@/config/axios";
+// import { setSubForm, setField, reset } from "@/slices";
+// import { useToast, useTheme, useRes } from "@/app/contexts";
+// import { useFocusEffect } from "@react-navigation/native";
+// import useMasterdataStyles from "@/styles/common/masterdata";
+// import { Divider } from "react-native-paper";
+// import useForm from '@/hooks/custom/useForm';
+// import { BaseFormState, BaseSubForm } from '@/typing/form'
 
-interface FormState {
-    MCListID: string;
-    CListID: string;
-    GCLOptionID: string;
-    CTypeID: string;
-    CListName: string;
-    CTypeName: string;
-    DTypeID: string;
-    DTypeValue?: number;
-    SFormID: string;
-    Required: boolean;
-    MinLength?: number;
-    MaxLength?: number;
-    Description: string;
-    Placeholder: string;
-    Hint: string;
-    DisplayOrder: number;
-    EResult: string;
-}
+// interface PreviewProps {
+//     route: any
+// }
 
-interface BaseSubForm {
-    SFormID: string;
-    SFormName: string;
-    FormID: string;
-    Columns: number;
-    DisplayOrder: number;
-    MachineID: string;
-    Fields?: FormState[];
-}
+// const Preview = ({ route }: any) => {
+//     const { formId, tableId } = route.params || {};
+//     const {
+//         state,
+//         isLoading,
+//         dispatch,
+//         fetchData
+//     } = useForm(route);
+//     const [formValues, setFormValues] = useState<Record<string, any>>({});
 
-interface PreviewProps {
-    route: any
-}
-const Preview: React.FC<PreviewProps> = ({ route }) => {
-    const { formId, tableId } = route.params || {};
-    const {
-        state,
-        isLoading,
-        dispatch,
-        fetchData
-    } = useForm(route);
+//     const masterdataStyles = useMasterdataStyles();
+//     const { showError } = useToast();
+//     const { spacing } = useRes();
 
-    const [formValues, setFormValues] = useState<Record<string, any>>({});
+//     const errorMessage = useCallback((error: unknown) => {
+//         let errorMessage: string | string[];
 
-    const masterdataStyles = useMasterdataStyles();
-    const { showError } = useToast();
-    const { spacing } = useRes();
+//         if (axios.isAxiosError(error)) {
+//             errorMessage = error.response?.data?.errors ?? ["Something went wrong!"];
+//         } else if (error instanceof Error) {
+//             errorMessage = [error.message];
+//         } else {
+//             errorMessage = ["An unknown error occurred!"];
+//         }
 
-    const errorMessage = useCallback((error: unknown) => {
-        let errorMessage: string | string[];
+//         showError(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
+//     }, [showError]);
 
-        if (axios.isAxiosError(error)) {
-            errorMessage = error.response?.data?.errors ?? ["Something went wrong!"];
-        } else if (error instanceof Error) {
-            errorMessage = [error.message];
-        } else {
-            errorMessage = ["An unknown error occurred!"];
-        }
+//     useEffect(() => {
+//         fetchData();
+//     }, [formId]);
 
-        showError(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
-    }, [showError]);
+//     const handleChange = (fieldName: string, value: string) => {
+//         setFormValues((prev) => ({
+//             ...prev,
+//             [fieldName]: value,
+//         }));
+//     };
 
-    useEffect(() => {
-        fetchData();
-    }, [formId]);
+//     const renderField = (field: BaseFormState) => {
+//         const fieldName = field.MCListID;
+//         console.log(field);
 
-    const handleChange = (fieldName: string, value: string) => {
-        setFormValues((prev) => ({
-            ...prev,
-            [fieldName]: value,
-        }));
-    };
+//         switch (field.CTypeName) {
+//             case "Textinput":
+//                 return (
+//                     <Inputs
+//                         placeholder={field.Placeholder}
+//                         hint={field.Hint}
+//                         label={field.CListName}
+//                         value={formValues[fieldName] || ""}
+//                         handleChange={(value) => handleChange(fieldName, value)}
+//                     />
+//                 );
+//             case "Textarea":
+//                 return (
+//                     <Textareas
+//                         placeholder={field.Placeholder}
+//                         hint={field.Hint}
+//                         label={field.CListName}
+//                         value={formValues[fieldName] || ""}
+//                         handleChange={(value) => handleChange(fieldName, value)}
+//                     />
+//                 );
+//             case "Dropdown":
+//                 const options = groupCheckListOption
+//                     ?.find((opt) => opt.GCLOptionID === field.GCLOptionID)
+//                     ?.CheckListOptions.map((item) => ({
+//                         label: item.CLOptionName,
+//                         value: item.CLOptionID,
+//                     }));
+//                 return (
+//                     <Selects
+//                         option={options}
+//                         hint={field.Hint}
+//                         label={field.CheckListName}
+//                         value={formValues[fieldName] || ""}
+//                         handleChange={(value) => handleChange(fieldName, value)}
+//                     />
+//                 );
+//             case "Radio":
+//                 const radioOptions = groupCheckListOption
+//                     ?.find((opt) => opt.GCLOptionID === field.GCLOptionID)
+//                     ?.CheckListOptions.map((item) => ({
+//                         label: item.CLOptionName,
+//                         value: item.CLOptionID,
+//                     }));
+//                 return (
+//                     <Radios
+//                         option={radioOptions}
+//                         hint={field.Hint}
+//                         label={field.CheckListName}
+//                         value={formValues[fieldName] || ""}
+//                         handleChange={(value) => handleChange(fieldName, value)}
+//                     />
+//                 );
+//             case "Checkbox":
+//                 const checkboxOptions = groupCheckListOption
+//                     ?.find((opt) => opt.GCLOptionID === field.GCLOptionID)
+//                     ?.CheckListOptions.map((item) => ({
+//                         label: item.CLOptionName,
+//                         value: item.CLOptionID,
+//                     }));
+//                 return (
+//                     <Checkboxs
+//                         option={checkboxOptions}
+//                         hint={field.Hint}
+//                         label={field.CheckListName}
+//                         value={formValues[fieldName] || ""}
+//                         handleChange={(value) => handleChange(fieldName, value)}
+//                     />
+//                 );
+//             default:
+//                 return null;
+//         }
+//     };
+//     console.log(state);
 
-    const renderField = (field: FormState) => {
-        const fieldName = field.MCListID;
-        console.log(field);
+//     return (
+//         <ScrollView
+//             contentContainerStyle={{
+//                 flexGrow: 1,
+//             }}
+//         >
+//             {isLoading ? (
+//                 <LoadingSpinner />
+//             ) : (
+//                 <>
+//                     <AccessibleView>
+//                         <Text>{state.FormName}</Text>
+//                         <Text>{state.Description}</Text>
+//                     </AccessibleView>
+//                     {state.subForms.map((subForm: BaseSubForm) => (
+//                         <View key={subForm.SFormName}>
+//                             <Divider />
+//                             <AccessibleView>
+//                                 <Text>{subForm.SFormName}</Text>
+//                             </AccessibleView>
+//                             <View style={{ flexDirection: "row" }}>
+//                                 {subForm.Fields?.map((field) => (
+//                                     <View
+//                                         key={field.MCListID}
+//                                         style={{ flex: 1 / subForm.Columns }}
+//                                     >
+//                                         {renderField(field)}
+//                                     </View>
+//                                 ))}
+//                             </View>
+//                         </View>
+//                     ))}
+//                 </>
+//             )}
+//         </ScrollView>
+//     );
+// };
 
-        switch (field.CTypeName) {
-            case "Textinput":
-                return (
-                    <Inputs
-                        placeholder={field.Placeholder}
-                        hint={field.Hint}
-                        label={field.CListName}
-                        value={formValues[fieldName] || ""}
-                        handleChange={(value) => handleChange(fieldName, value)}
-                    />
-                );
-            case "Textarea":
-                return (
-                    <Textareas
-                        placeholder={field.Placeholder}
-                        hint={field.Hint}
-                        label={field.CListName}
-                        value={formValues[fieldName] || ""}
-                        handleChange={(value) => handleChange(fieldName, value)}
-                    />
-                );
-            case "Dropdown":
-                const options = groupCheckListOption
-                    ?.find((opt) => opt.GCLOptionID === field.GCLOptionID)
-                    ?.CheckListOptions.map((item) => ({
-                        label: item.CLOptionName,
-                        value: item.CLOptionID,
-                    }));
-                return (
-                    <Selects
-                        option={options}
-                        hint={field.Hint}
-                        label={field.CheckListName}
-                        value={formValues[fieldName] || ""}
-                        handleChange={(value) => handleChange(fieldName, value)}
-                    />
-                );
-            case "Radio":
-                const radioOptions = groupCheckListOption
-                    ?.find((opt) => opt.GCLOptionID === field.GCLOptionID)
-                    ?.CheckListOptions.map((item) => ({
-                        label: item.CLOptionName,
-                        value: item.CLOptionID,
-                    }));
-                return (
-                    <Radios
-                        option={radioOptions}
-                        hint={field.Hint}
-                        label={field.CheckListName}
-                        value={formValues[fieldName] || ""}
-                        handleChange={(value) => handleChange(fieldName, value)}
-                    />
-                );
-            case "Checkbox":
-                const checkboxOptions = groupCheckListOption
-                    ?.find((opt) => opt.GCLOptionID === field.GCLOptionID)
-                    ?.CheckListOptions.map((item) => ({
-                        label: item.CLOptionName,
-                        value: item.CLOptionID,
-                    }));
-                return (
-                    <Checkboxs
-                        option={checkboxOptions}
-                        hint={field.Hint}
-                        label={field.CheckListName}
-                        value={formValues[fieldName] || ""}
-                        handleChange={(value) => handleChange(fieldName, value)}
-                    />
-                );
-            default:
-                return null;
-        }
-    };
-    console.log(state);
-
-    return (
-        <ScrollView
-            contentContainerStyle={{
-                flexGrow: 1,
-            }}
-        >
-            {isLoading ? (
-                <LoadingSpinner />
-            ) : (
-                <>
-                    <AccessibleView>
-                        <Text>{state.FormName}</Text>
-                        <Text>{state.Description}</Text>
-                    </AccessibleView>
-                    {state.subForms.map((subForm: BaseSubForm) => (
-                        <View key={subForm.SFormName}>
-                            <Divider />
-                            <AccessibleView>
-                                <Text>{subForm.SFormName}</Text>
-                            </AccessibleView>
-                            <View style={{ flexDirection: "row" }}>
-                                {subForm.Fields?.map((field) => (
-                                    <View
-                                        key={field.MCListID}
-                                        style={{ flex: 1 / subForm.Columns }}
-                                    >
-                                        {renderField(field)}
-                                    </View>
-                                ))}
-                            </View>
-                        </View>
-                    ))}
-                </>
-            )}
-        </ScrollView>
-    );
-};
-
-export default React.memo(Preview);
+// export default React.memo(Preview);

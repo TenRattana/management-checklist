@@ -1,24 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Checkbox, HelperText } from "react-native-paper";
 import { View, Text, StyleSheet } from "react-native";
+import { CheckboxsProps } from "@/typing/tag";
 
-interface Option {
-  label:string;
-  value:string;
-}
-
-interface CheckboxsProps {
-  option: Option[];
-  value: string[]; 
-  label?:string;
-  handleChange: (selectedValues: string[]) => void; 
-  hint?: string;
-  handleBlur?: () => void;
-  error?: boolean;
-  errorMessage?: string;
-}
-
-const Checkboxs: React.FC<CheckboxsProps> = ({
+const Checkboxs = ({
   option,
   value,
   handleChange,
@@ -27,11 +12,11 @@ const Checkboxs: React.FC<CheckboxsProps> = ({
   label,
   error,
   errorMessage,
-}) => {
+}: CheckboxsProps) => {
   const [checkedOptions, setCheckedOptions] = useState<string[]>([]);
 
   useEffect(() => {
-    setCheckedOptions(value); 
+    setCheckedOptions(value);
   }, [value]);
 
   const handleCheckBoxChange = (value: string) => {
@@ -40,7 +25,7 @@ const Checkboxs: React.FC<CheckboxsProps> = ({
       : [...checkedOptions, value];
 
     setCheckedOptions(newCheckedOptions);
-    handleChange(newCheckedOptions); 
+    handleChange(newCheckedOptions);
   };
 
   if (!option || option.length === 0) {
@@ -53,15 +38,15 @@ const Checkboxs: React.FC<CheckboxsProps> = ({
         <View key={index}>
           <Checkbox
             status={
-              checkedOptions.includes(item.value || '') ? "checked" : "unchecked" 
+              checkedOptions.includes(item.value || '') ? "checked" : "unchecked"
             }
-            onPress={() => handleCheckBoxChange(item.value || '')} 
+            onPress={() => handleCheckBoxChange(item.value || '')}
           />
           <Text>{item.label}</Text>
         </View>
       ))}
 
-      {hint && <Text>{hint}</Text>} 
+      {hint && <Text>{hint}</Text>}
       <HelperText type="error" visible={error} style={{ left: -10 }}>
         {errorMessage}
       </HelperText>
@@ -69,4 +54,4 @@ const Checkboxs: React.FC<CheckboxsProps> = ({
   );
 };
 
-export default Checkboxs;
+export default React.memo(Checkboxs);

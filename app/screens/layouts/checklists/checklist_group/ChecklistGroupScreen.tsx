@@ -8,20 +8,8 @@ import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Checklist_group_dialog from "@/components/screens/Checklist_group_dialog";
-
-interface GroupCheckListOption {
-    GCLOptionID: string;
-    GCLOptionName: string;
-    Description: string;
-    IsActive: boolean;
-}
-
-interface InitialValues {
-    groupCheckListOptionId: string;
-    groupCheckListOptionName: string;
-    description: string;
-    isActive: boolean;
-}
+import { GroupCheckListOption } from '@/typing/type'
+import { InitialValuesGroupCheckList } from '@/typing/value'
 
 const ChecklistGroupScreen = () => {
     const [groupCheckListOption, setGroupCheckListOption] = useState<GroupCheckListOption[]>([]);
@@ -30,7 +18,7 @@ const ChecklistGroupScreen = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [isLoadingButton, setIsLoadingButton] = useState<boolean>(false);
-    const [initialValues, setInitialValues] = useState<InitialValues>({
+    const [initialValues, setInitialValues] = useState<InitialValuesGroupCheckList>({
         groupCheckListOptionId: "",
         groupCheckListOptionName: "",
         description: "",
@@ -74,7 +62,7 @@ const ChecklistGroupScreen = () => {
         fetchData();
     }, []);
 
-    const saveData = async (values: InitialValues) => {
+    const saveData = async (values: InitialValuesGroupCheckList) => {
         setIsLoadingButton(true);
         const data = {
             GCLOptionID: values.groupCheckListOptionId,

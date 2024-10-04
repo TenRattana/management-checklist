@@ -2,38 +2,13 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ScrollView, Pressable, Text } from "react-native";
 import axios from 'axios'
 import axiosInstance from "@/config/axios";
-import { useToast, useTheme ,useRes } from "@/app/contexts";
+import { useToast, useTheme, useRes } from "@/app/contexts";
 import { Customtable, LoadingSpinner, Searchbar } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Match_checklist_option from "@/components/screens/Match_checklist_option_dialog";
-
-interface MatchCheckListOption {
-    MCLOptionID: string;
-    GCLOptionID: string;
-    CheckListOptions: Array<{ CLOptionID: string }>;
-    IsActive: boolean;
-    GCLOptionName: string;
-}
-
-interface CheckListOption {
-    CLOptionID: string;
-    CLOptionName: string;
-    IsActive: boolean;
-}
-
-interface GroupCheckListOption {
-    GCLOptionID: string;
-    GCLOptionName: string;
-    IsActive: boolean;
-}
-
-interface InitialValues {
-    matchCheckListOptionId: string;
-    checkListOptionId: string[];
-    groupCheckListOptionId: string;
-    isActive: boolean;
-}
+import { CheckListOption, MatchCheckListOption, GroupCheckListOption, } from '@/typing/type'
+import { InitialValuesMatchCheckListOption } from '@/typing/value'
 
 
 const MatchCheckListOptionScreen = () => {
@@ -45,7 +20,7 @@ const MatchCheckListOptionScreen = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [isLoadingButton, setIsLoadingButton] = useState<boolean>(false);
-    const [initialValues, setInitialValues] = useState<InitialValues>({
+    const [initialValues, setInitialValues] = useState<InitialValuesMatchCheckListOption>({
         matchCheckListOptionId: "",
         checkListOptionId: [],
         groupCheckListOptionId: "",
@@ -100,7 +75,7 @@ const MatchCheckListOptionScreen = () => {
         fetchData();
     }, []);
 
-    const saveData = async (values: InitialValues) => {
+    const saveData = async (values: InitialValuesMatchCheckListOption) => {
         setIsLoadingButton(true);
 
         const data = {

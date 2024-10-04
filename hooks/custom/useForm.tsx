@@ -5,81 +5,8 @@ import axios from "axios";
 import { setForm, setSubForm, setField } from "@/slices";
 import { useToast, useRes } from "@/app/contexts";
 import { useFocusEffect } from "@react-navigation/native";
-
-interface BaseForm {
-    FormID: string;
-    FormName: string;
-    Description: string;
-    MachineID: string;
-}
-
-interface BaseSubForm {
-    SFormID: string;
-    SFormName: string;
-    FormID: string;
-    Columns?: number;
-    DisplayOrder?: number;
-    MachineID: string;
-}
-
-interface SubForm extends BaseSubForm {
-    MatchCheckList?: BaseFormState[];
-}
-
-interface FormData extends BaseForm {
-    SubForm?: SubForm[];
-}
-
-interface BaseFormState {
-    MCListID: string;
-    CListID: string;
-    GCLOptionID: string;
-    CTypeID: string;
-    DTypeID: string;
-    DTypeValue?: number;
-    SFormID: string;
-    Required: boolean;
-    MinLength?: number;
-    MaxLength?: number;
-    Description: string;
-    Placeholder: string;
-    Hint: string;
-    DisplayOrder?: number;
-    EResult: string;
-}
-
-interface CheckListType {
-    CTypeID: string;
-    CTypeName: string;
-    Icon: string;
-    IsActive: boolean;
-}
-
-interface CheckListOption {
-    CLOptionName: string;
-    IsActive: boolean;
-    CLOptionID: string;
-}
-
-interface DataType {
-    DTypeID: string;
-    DTypeName: string;
-    Icon: string;
-    IsActive: boolean;
-}
-
-interface Checklist {
-    CListID: string;
-    CListName: string;
-    IsActive: boolean;
-}
-
-interface GroupCheckListOption {
-    GCLOptionID: string;
-    GCLOptionName: string;
-    Description: string;
-    IsActive: boolean;
-}
+import { SubForm, FormData, BaseFormState } from '@/typing/form'
+import { CheckListType, CheckListOption, Checklist, DataType, GroupCheckListOption } from '@/typing/type'
 
 const useForm = (route: any) => {
     const dispatch = useDispatch();

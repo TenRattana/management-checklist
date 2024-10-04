@@ -11,7 +11,7 @@ import axiosInstance from "@/config/axios";
 import axios from "axios";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
-import Animated, { FadeInUp, FadeOutDown, withDelay } from 'react-native-reanimated';
+import Animated, { FadeInUp, FadeOutDown, Easing, useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 interface FormState {
     MCListID: string;
@@ -26,7 +26,6 @@ interface FormState {
     Required: boolean;
     MinLength?: number;
     MaxLength?: number;
-    Description: string;
     Placeholder: string;
     Hint: string;
     DisplayOrder?: number;
@@ -81,12 +80,6 @@ interface FieldDialogProps {
     dropgroupCheckListOption: GroupCheckListOption[];
 }
 
-const validationSchemaField = Yup.object().shape({
-    checkListId: Yup.string().required("Check List is required."),
-    checkListTypeId: Yup.string().required("Check List Type is required."),
-    placeholder: Yup.string().nullable(),
-    hint: Yup.string().nullable(),
-});
 
 const FieldDialog: React.FC<FieldDialogProps> = ({ isVisible, formState, onDeleteField, editMode, saveField, setShowDialogs
     , checkListType, dataType, checkList, groupCheckListOption, dropcheckList, dropcheckListType, dropdataType, dropgroupCheckListOption
@@ -99,6 +92,25 @@ const FieldDialog: React.FC<FieldDialogProps> = ({ isVisible, formState, onDelet
     const [shouldRender, setShouldRender] = useState<string>("");
     const [shouldRenderDT, setShouldRenderDT] = useState<boolean>(false);
     const { colors } = useTheme()
+
+    const validationSchemaField = Yup.object().shape({
+        CListID: Yup.string().required("The checklist field is required."),
+        CTypeID: Yup.string().required("The checklist type field is required."),
+        DTypeID: Yup.string().required("The data type field is required."),
+        // GCLOptionID: Yup.string().when(['shouldRender'], {
+        //     is: (shouldRender: string) => shouldRender === "detail",
+        //     then: Yup.string().required("The group checklist field is required."),
+        //     otherwise: Yup.string().nullable(),
+        // }),
+        Placeholder: Yup.string().nullable(),
+        Hint: Yup.string().nullable(),
+        Required: Yup.boolean().required("The required field is required."),
+
+        // DTypeValue?: number;
+        // MinLength?: number;
+        // MaxLength?: number;
+    });
+
 
     const errorMessage = useCallback((error: unknown) => {
         let errorMessage: string | string[];
@@ -129,6 +141,72 @@ const FieldDialog: React.FC<FieldDialogProps> = ({ isVisible, formState, onDelet
             errorMessage(error);
         }
     };
+
+    const opacityT = useSharedValue(0);
+    const heightT = useSharedValue(0);
+
+    const opacityD = useSharedValue(0);
+    const heightD = useSharedValue(0);
+
+    const opacityN = useSharedValue(0);
+    const heightN = useSharedValue(0);
+
+    const animatedText = useAnimatedStyle(() => ({
+        opacity: opacityT.value,
+        height: heightT.value,
+        overflow: 'hidden',
+    }));
+
+    const animatedDetail = useAnimatedStyle(() => ({
+        opacity: opacityD.value,
+        height: heightD.value,
+        overflow: 'hidden',
+    }));
+
+    const animatedStyleNumber = useAnimatedStyle(() => ({
+        opacity: opacityN.value,
+        height: heightN.value,
+        overflow: 'hidden',
+    }));
+
+    useEffect(() => {
+        opacityT.value = withTiming(0, { duration: 0 });
+        heightT.value = withTiming(0, { duration: 0 });
+        opacityD.value = withTiming(0, { duration: 0 });
+        heightD.value = withTiming(0, { duration: 0 });
+
+        if (shouldRender === "text") {
+            opacityT.value = withTiming(1, { duration: 300 });
+            heightT.value = withTiming(70, { duration: 300 });
+        } else if (shouldRender === "detail") {
+            opacityT.value = withTiming(0, { duration: 200 });
+            heightT.value = withTiming(0, { duration: 200 });
+            setTimeout(() => {
+                opacityD.value = withTiming(1, { duration: 100 });
+                heightD.value = withTiming(70, { duration: 100 });
+            }, 300);
+        } else {
+            opacityT.value = withTiming(0, { duration: 300 });
+            heightT.value = withTiming(0, { duration: 300 });
+            opacityD.value = withTiming(0, { duration: 300 });
+            heightD.value = withTiming(0, { duration: 300 });
+        }
+    }, [shouldRender]);
+
+    useEffect(() => {
+        opacityN.value = withTiming(0, { duration: 0 });
+        heightN.value = withTiming(0, { duration: 0 });
+
+        if (shouldRender) {
+            opacityN.value = withTiming(1, { duration: 300 });
+            heightN.value = withTiming(260, { duration: 300 });
+        } else {
+            setTimeout(() => {
+                opacityN.value = withTiming(0, { duration: 300 });
+                heightN.value = withTiming(0, { duration: 300 });
+            }, 300);
+        }
+    }, [shouldRenderDT]);
 
     return (
         <Portal>
@@ -251,106 +329,122 @@ const FieldDialog: React.FC<FieldDialogProps> = ({ isVisible, formState, onDelet
                                                 )}
                                             />
 
+                                            {shouldRender === "detail" && (
+                                                <Animated.View style={[animatedDetail]}>
+                                                    <Field
+                                                        name="GCLOptionID"
+                                                        component={({ field, form }: any) => (
+                                                            <AccessibleView style={masterdataStyles.containerInput}>
+                                                                <CustomDropdownSingle
+                                                                    title="Match Check List Option Group"
+                                                                    labels="GCLOptionName"
+                                                                    values="GCLOptionID"
+                                                                    data={editMode ? groupCheckListOption : dropgroupCheckListOption}
+                                                                    selectedValue={field.value}
+                                                                    onValueChange={(value) => {
+                                                                        form.setFieldValue(field.name, value);
+                                                                        form.setTouched({ ...form.touched, [field.name]: true });
+                                                                    }}
+                                                                />
+                                                                {touched.GCLOptionID && errors.GCLOptionID && (
+                                                                    <HelperText type="error" visible style={{ left: -10 }}>
+                                                                        {errors.GCLOptionID}
+                                                                    </HelperText>
+                                                                )}
+                                                            </AccessibleView>
+                                                        )}
+                                                    />
+                                                </Animated.View>
+                                            )}
 
-                                            <Animated.View
-                                                entering={FadeInUp}
-                                                exiting={FadeOutDown}
-                                                style={{ display: shouldRender === "detail" ? 'flex' : 'none', opacity: withDelay(300, FadeInUp) }}
-                                            >
-                                                <Field
-                                                    name="GCLOptionID"
-                                                    component={({ field, form }: any) => (
-                                                        <AccessibleView style={masterdataStyles.containerInput}>
-                                                            <CustomDropdownSingle
-                                                                title="Match Check List Option Group"
-                                                                labels="GCLOptionName"
-                                                                values="GCLOptionID"
-                                                                data={editMode ? groupCheckListOption : dropgroupCheckListOption}
-                                                                selectedValue={field.value}
-                                                                onValueChange={(value) => {
-                                                                    form.setFieldValue(field.name, value);
-                                                                    form.setTouched({ ...form.touched, [field.name]: true });
-                                                                }}
-                                                            />
-                                                            {touched.GCLOptionID && errors.GCLOptionID && (
-                                                                <HelperText type="error" visible style={{ left: -10 }}>
-                                                                    {errors.GCLOptionID}
-                                                                </HelperText>
-                                                            )}
-                                                        </AccessibleView>
-                                                    )}
-                                                />
-                                            </Animated.View>
+                                            {shouldRender === "text" && (
+                                                <Animated.View style={[animatedText]}>
+                                                    <Field
+                                                        name="DTypeID"
+                                                        component={({ field, form }: any) => (
+                                                            <AccessibleView style={masterdataStyles.containerInput}>
+                                                                <CustomDropdownSingle
+                                                                    title="Data Type"
+                                                                    labels="DTypeName"
+                                                                    values="DTypeID"
+                                                                    data={editMode ? dataType : dropdataType}
+                                                                    selectedValue={field.value}
+                                                                    onValueChange={(value) => {
 
-                                            <Animated.View
-                                                entering={FadeInUp}
-                                                exiting={FadeOutDown}
-                                                style={{ display: shouldRender === "text" ? 'flex' : 'none', opacity: withDelay(300, FadeInUp) }}
-                                            >
-                                                <Field
-                                                    name="DTypeID"
-                                                    component={({ field, form }: any) => (
-                                                        <AccessibleView style={masterdataStyles.containerInput}>
-                                                            <CustomDropdownSingle
-                                                                title="Data Type"
-                                                                labels="DTypeName"
-                                                                values="DTypeID"
-                                                                data={editMode ? dataType : dropdataType}
-                                                                selectedValue={field.value}
-                                                                onValueChange={(value) => {
-                                                                    console.log(shouldRender);
+                                                                        form.setFieldValue(field.name, value);
+                                                                        form.setTouched({ ...form.touched, [field.name]: true });
+                                                                    }}
+                                                                />
+                                                                {touched.DTypeID && errors.DTypeID && (
+                                                                    <HelperText type="error" visible style={{ left: -10 }}>
+                                                                        {errors.DTypeID}
+                                                                    </HelperText>
+                                                                )}
+                                                            </AccessibleView>
+                                                        )}
+                                                    />
+                                                </Animated.View>
+                                            )}
 
-                                                                    form.setFieldValue(field.name, value);
-                                                                    form.setTouched({ ...form.touched, [field.name]: true });
-                                                                }}
-                                                            />
-                                                            {touched.DTypeID && errors.DTypeID && (
-                                                                <HelperText type="error" visible style={{ left: -10 }}>
-                                                                    {errors.DTypeID}
-                                                                </HelperText>
-                                                            )}
-                                                        </AccessibleView>
-                                                    )}
-                                                />
-                                            </Animated.View>
+                                            {shouldRenderDT && (
+                                                <Animated.View style={[animatedStyleNumber]}>
 
-                                            <Animated.View
-                                                entering={FadeInUp}
-                                                exiting={FadeOutDown}
-                                                style={{ display: shouldRenderDT ? 'flex' : 'none', opacity: withDelay(300, FadeInUp) }}
-                                            >
+                                                    <Inputs
+                                                        placeholder="Digis Value"
+                                                        label="DTypeValue"
+                                                        handleChange={handleChange("DTypeValue")}
+                                                        handleBlur={handleBlur("DTypeValue")}
+                                                        value={String(values.DTypeValue ?? "")}
+                                                        error={touched.DTypeValue && Boolean(errors.DTypeValue)}
+                                                        errorMessage={touched.DTypeValue ? errors.DTypeValue : ""}
+                                                        testId={`DTypeValue-form`}
+                                                    />
 
-                                                <Inputs
-                                                    placeholder="Digis Value"
-                                                    label="DTypeValue"
-                                                    handleChange={handleChange("DTypeValue")}
-                                                    handleBlur={handleBlur("DTypeValue")}
-                                                    value={String(values.DTypeValue ?? "")}
-                                                    error={touched.DTypeValue && Boolean(errors.DTypeValue)}
-                                                    errorMessage={touched.DTypeValue ? errors.DTypeValue : ""}
-                                                />
+                                                    <Inputs
+                                                        placeholder="Min Value"
+                                                        label="MinLength"
+                                                        handleChange={handleChange("MinLength")}
+                                                        handleBlur={handleBlur("MinLength")}
+                                                        value={String(values.MinLength ?? "")}
+                                                        error={touched.MinLength && Boolean(errors.MinLength)}
+                                                        errorMessage={touched.MinLength ? errors.MinLength : ""}
+                                                        testId={`MinLength-form`}
+                                                    />
 
-                                                <Inputs
-                                                    placeholder="Min Value"
-                                                    label="MinLength"
-                                                    handleChange={handleChange("MinLength")}
-                                                    handleBlur={handleBlur("MinLength")}
-                                                    value={String(values.MinLength ?? "")}
-                                                    error={touched.MinLength && Boolean(errors.MinLength)}
-                                                    errorMessage={touched.MinLength ? errors.MinLength : ""}
-                                                />
+                                                    <Inputs
+                                                        placeholder="Max Value"
+                                                        label="MaxLength"
+                                                        handleChange={handleChange("MaxLength")}
+                                                        handleBlur={handleBlur("MaxLength")}
+                                                        value={String(values.MaxLength ?? "")}
+                                                        error={touched.MaxLength && Boolean(errors.MaxLength)}
+                                                        errorMessage={touched.MaxLength ? errors.MaxLength : ""}
+                                                        testId={`MaxLength-form`}
+                                                    />
+                                                </Animated.View>
+                                            )}
 
-                                                <Inputs
-                                                    placeholder="Max Value"
-                                                    label="MaxLength"
-                                                    handleChange={handleChange("MaxLength")}
-                                                    handleBlur={handleBlur("MaxLength")}
-                                                    value={String(values.MaxLength ?? "")}
-                                                    error={touched.MaxLength && Boolean(errors.MaxLength)}
-                                                    errorMessage={touched.MaxLength ? errors.MaxLength : ""}
-                                                />
+                                            <Inputs
+                                                placeholder="Enter Placeholder"
+                                                label="Placeholder"
+                                                handleChange={handleChange("Placeholder")}
+                                                handleBlur={handleBlur("Placeholder")}
+                                                value={values.Placeholder}
+                                                error={touched.Placeholder && Boolean(errors.Placeholder)}
+                                                errorMessage={touched.Placeholder ? errors.Placeholder : ""}
+                                                testId={`Placeholder-form`}
+                                            />
 
-                                            </Animated.View>
+                                            <Inputs
+                                                placeholder="Enter Hint"
+                                                label="Hint"
+                                                handleChange={handleChange("Hint")}
+                                                handleBlur={handleBlur("Hint")}
+                                                value={values.Hint}
+                                                error={touched.Hint && Boolean(errors.Hint)}
+                                                errorMessage={touched.Hint ? errors.Hint : ""}
+                                                testId={`hint-form`}
+                                            />
 
                                             <AccessibleView style={masterdataStyles.containerSwitch}>
                                                 <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>

@@ -1,23 +1,18 @@
 import React from "react";
 import { View, Pressable } from "react-native";
 import { Portal, Dialog, Text } from "react-native-paper";
+import { SaveDialogProps } from "@/typing/value";
 
-interface SaveDialogProps {
-    isVisible: boolean;
-    setShowDialogs: () => void;
-    saveForm: () => void;
-}
-
-const SaveDialog: React.FC<SaveDialogProps> = ({
+const SaveDialog = ({
     isVisible,
-    setShowDialogs,
+    setIsVisible,
     saveForm,
-}) => {
+}: SaveDialogProps) => {
     return (
         <Portal>
             <Dialog
                 visible={isVisible}
-                onDismiss={() => setShowDialogs()}
+                onDismiss={() => setIsVisible(false)}
             >
                 <Dialog.Title style={{ paddingLeft: 8 }}>Save Form</Dialog.Title>
                 <Dialog.Content>
@@ -39,7 +34,7 @@ const SaveDialog: React.FC<SaveDialogProps> = ({
                         </Pressable>
 
                         <Pressable
-                            onPress={() => setShowDialogs()}
+                            onPress={() => setIsVisible(false)}
                         >
                             <Text>
                                 Cancel
@@ -52,4 +47,4 @@ const SaveDialog: React.FC<SaveDialogProps> = ({
     );
 };
 
-export default SaveDialog;
+export default React.memo(SaveDialog);

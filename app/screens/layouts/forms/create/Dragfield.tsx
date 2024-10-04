@@ -2,10 +2,6 @@ import React, { useState, useCallback, useRef, useMemo } from "react";
 import {
     Animated,
     Pressable,
-    StyleSheet,
-    ScrollView,
-    View,
-    TouchableOpacity,
 } from "react-native";
 import {
     addField,
@@ -16,55 +12,45 @@ import {
 import useForm from '@/hooks/custom/useForm';
 import { AccessibleView } from "@/components";
 import FieldDialog from "@/components/forms/FieldDialog";
-import { useToast } from "@/app/contexts";
-import useCreateformStyle from "@/styles/createform";
-import DraggableFlatList, { ScaleDecorator } from "react-native-draggable-flatlist";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { IconButton, Text } from "react-native-paper";
-import axiosInstance from "@/config/axios";
-import {
-    runOnJS,
-} from "react-native-reanimated";
+import DraggableFlatList, { ScaleDecorator } from "react-native-draggable-flatlist";
+import { runOnJS } from "react-native-reanimated";
 import { spacing } from "@/constants/Spacing";
+import useCreateformStyle from "@/styles/createform";
 
 interface FormState {
     MCListID: string;
     CListID: string;
     GCLOptionID: string;
     CTypeID: string;
-    CListName?: string;
-    CTypeName?: string;
-    DTypeID: string;
-    DTypeValue?: number;
     SFormID: string;
     Required: boolean;
-    MinLength?: number;
-    MaxLength?: number;
-    Description: string;
     Placeholder: string;
     Hint: string;
-    DisplayOrder?: number;
     EResult: string;
+    CListName?: string;
+    DTypeID: string;
+    DTypeValue?: number;
+    MinLength?: number;
+    MaxLength?: number;
 }
 
-interface renderFieldProps {
-    item: FormState;
-    drag: () => void;
-    isActive: boolean;
-    subFormID: string;
-}
 interface DragfieldProps {
     route: any;
     data: FormState[];
+    SFormID: string;
 }
-const Dragfield: React.FC<DragfieldProps> = ({ route, data }) => {
+
+const Dragfield: React.FC<DragfieldProps> = ({ route, data, SFormID }) => {
     const { dispatch, checkListType, dataType, checkList, errorMessage, groupCheckListOption } = useForm(route);
-    const [initialDialog, setInitialDialog] = useState<boolean>(false)
-    const [initialField, setInitialField] = useState<FormState>({ MCListID: "", CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: "", Required: false, Description: "", Placeholder: "", Hint: "", EResult: "", CListName: "", CTypeName: "", DTypeValue: undefined, MinLength: undefined, MaxLength: undefined });
-    const [editMode, setEditMode] = useState<boolean>(false)
+    const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+    const [currentField, setCurrentField] = useState<FormState>({
+        MCListID: "", CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: SFormID,
+        Required: false, Placeholder: "", Hint: "", EResult: "", CListName: "", DTypeValue: undefined, MinLength: undefined, MaxLength: undefined
+    });
+    const [isEditing, setIsEditing] = useState<boolean>(false);
 
-    const createform = useCreateformStyle();
-
+    const createformStyles = useCreateformStyle();
     const scaleValues = useRef<{ [key: string]: Animated.Value }>({});
 
     const getScaleValue = (subFormID: string) => {
@@ -74,13 +60,15 @@ const Dragfield: React.FC<DragfieldProps> = ({ route, data }) => {
         return scaleValues.current[subFormID];
     };
 
-    const animatedDefault = useMemo(() => {
-        return { toValue: 1, useNativeDriver: true };
-    }, []);
+    const animatedDefault = useMemo(() => ({
+        toValue: 1,
+        useNativeDriver: true,
+    }), []);
 
-    const animatedScale = useMemo(() => {
-        return { toValue: 0.95, useNativeDriver: true };
-    }, []);
+    const animatedScale = useMemo(() => ({
+        toValue: 0.95,
+        useNativeDriver: true,
+    }), []);
 
     const handleDropField = (data: Omit<FormState, 'DisplayOrder'>[]) => {
         runOnJS(dispatch)(setDragField({ data }));
@@ -94,18 +82,20 @@ const Dragfield: React.FC<DragfieldProps> = ({ route, data }) => {
         Animated.spring(getScaleValue(subFormID), animatedDefault).start();
     };
 
-    const handelSetDialog = useCallback(() => {
-        setEditMode(false)
-        setInitialDialog(false)
-    }, [])
+    const handleDialogToggle = useCallback(() => {
+        setIsEditing(false);
+        setDialogVisible(prev => !prev);
+    }, []);
 
-    const handelField = useCallback((item?: FormState) => {
-        item ? setInitialField(item) :
-            setInitialField({ MCListID: "", CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: "", Required: false, Description: "", Placeholder: "", Hint: "", EResult: "", CListName: "", CTypeName: "", DTypeValue: undefined, MinLength: undefined, MaxLength: undefined })
-    }, [])
+    const handleField = useCallback((item?: FormState) => {
+        setCurrentField(item || {
+            MCListID: "", CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: SFormID,
+            Required: false, Placeholder: "", Hint: "", EResult: "", CListName: "", DTypeValue: undefined, MinLength: undefined, MaxLength: undefined
+        });
+    }, []);
 
-    const handelSaveField = useCallback((values: FormState, mode: string) => {
-        const payload = { formState: values, checkList, checkListType, dataType, };
+    const handleSaveField = useCallback((values: FormState, mode: string) => {
+        const payload = { formState: values, checkList, checkListType, dataType };
 
         try {
             if (mode === "add") {
@@ -114,38 +104,37 @@ const Dragfield: React.FC<DragfieldProps> = ({ route, data }) => {
                 dispatch(updateField(payload));
             }
         } catch (error) {
-            errorMessage(error)
+            errorMessage(error);
         } finally {
-            handelSetDialog()
+            handleDialogToggle();
         }
-    }, [])
-
+    }, []);
 
     const dropcheckList = checkList.filter(v => v.IsActive);
     const dropcheckListType = checkListType.filter(v => v.IsActive);
     const dropdataType = dataType.filter(v => v.IsActive);
     const dropgroupCheckListOption = groupCheckListOption.filter(v => v.IsActive);
-
-    const renderField = ({ item, drag, isActive, subFormID }: { item: FormState; drag: () => void; isActive: boolean; subFormID: string; }) => {
+    const renderField = ({ item, drag, isActive }: { item: FormState; drag: () => void; isActive: boolean; }) => {
         return (
-            <Animated.View style={{ transform: [{ scale: getScaleValue(subFormID) }] }}>
+            <Animated.View style={{ transform: [{ scale: getScaleValue(item.SFormID) }] }}>
                 <ScaleDecorator>
                     <Pressable
-                        onPressIn={() => onPressIn(subFormID)}
-                        onPressOut={() => onPressOut(subFormID)}
+                        onPressIn={() => onPressIn(item.SFormID)}
+                        onPressOut={() => onPressOut(item.SFormID)}
                         onPress={() => {
-                            setEditMode(true);
-                            setInitialDialog(true);
-                            handelField(item)
+                            setIsEditing(true);
+                            handleDialogToggle();
+                            handleField(item);
                         }}
                         onLongPress={drag}
                         disabled={isActive}
-                        style={[createform.fieldContainer, isActive ? createform.active : null]}
-                        testID={`dg-SF-${item.SFormID}`}
+                        style={[createformStyles.fieldContainer, isActive && createformStyles.active]}
+                        testID={`dg-FD-${item.SFormID}`}
                     >
                         <IconButton icon={checkListType.find((v) => v.CTypeID === item.CTypeID)?.Icon ?? "camera"} size={spacing.large + 5} animated />
-                        <Text style={[createform.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
-                            {item.CListName}</Text>
+                        <Text style={[createformStyles.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
+                            {item.CListName}
+                        </Text>
                         <IconButton icon="chevron-right" size={18} />
                     </Pressable>
                 </ScaleDecorator>
@@ -157,40 +146,30 @@ const Dragfield: React.FC<DragfieldProps> = ({ route, data }) => {
         <>
             <DraggableFlatList
                 data={data}
-                renderItem={({ item, drag, isActive }) => {
-                    const fieldProps: renderFieldProps = {
-                        item,
-                        drag,
-                        isActive,
-                        subFormID: item.SFormID,
-                    };
-                    return (renderField)(fieldProps);
-                }}
-                keyExtractor={(item, index) => `SF-${item.SFormID}-${index}`}
+                renderItem={({ item, drag, isActive }) => renderField({ item, drag, isActive })}
+                keyExtractor={(item, index) => `FD-${item.SFormID}-${index}`}
                 onDragEnd={({ data }) => handleDropField(data)}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: 10 }}
-                nestedScrollEnabled={true}
+                nestedScrollEnabled
                 activationDistance={1}
                 autoscrollSpeed={30}
             />
             <Pressable
-                onPress={() => {
-                    setInitialDialog(true)
-                }}
-                style={[createform.fieldContainer, { justifyContent: "center", opacity: 5 }]}
+                onPress={handleDialogToggle}
+                style={[createformStyles.fieldContainer, { justifyContent: "center", opacity: 0.5 }]}
             >
                 <IconButton icon="plus" size={16} />
-                <Text style={createform.addSubFormText}>Add Field</Text>
+                <Text style={createformStyles.addSubFormText}>Add Field</Text>
             </Pressable>
 
             <FieldDialog
-                isVisible={initialDialog}
-                formState={initialField}
+                isVisible={dialogVisible}
+                formState={currentField}
                 onDeleteField={(SFormID, MCListID) => runOnJS(dispatch)(deleteField({ SFormID, MCListID }))}
-                setShowDialogs={handelSetDialog}
-                editMode={editMode}
-                saveField={handelSaveField}
+                setShowDialogs={handleDialogToggle}
+                editMode={isEditing}
+                saveField={handleSaveField}
                 checkListType={checkListType}
                 dataType={dataType}
                 checkList={checkList}
@@ -198,10 +177,9 @@ const Dragfield: React.FC<DragfieldProps> = ({ route, data }) => {
                 dropcheckList={dropcheckList}
                 dropcheckListType={dropcheckListType}
                 dropdataType={dropdataType}
-                dropgroupCheckListOption={dropgroupCheckListOption}
-            />
+                dropgroupCheckListOption={dropgroupCheckListOption} />
         </>
-    )
+    );
 }
 
-export default Dragfield
+export default Dragfield;

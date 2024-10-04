@@ -7,6 +7,7 @@ import { Portal, Switch, Dialog } from "react-native-paper";
 import { Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
+import { MachineGroupDialogProps, InitialValuesMachineGroup } from '@/typing/value'
 
 const validationSchema = Yup.object().shape({
     machineGroupName: Yup.string().required("The machine group name field is required."),
@@ -14,23 +15,7 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The active field is required."),
 });
 
-interface InitialValues {
-    machineGroupId: string;
-    machineGroupName: string;
-    description: string;
-    isActive: boolean;
-}
-
-interface Machine_group_dialogProps {
-    isVisible: boolean;
-    setIsVisible: (v: boolean) => void;
-    isEditing: boolean;
-    initialValues: InitialValues;
-    saveData: (values: InitialValues) => void;
-}
-
-const Machine_group_dialog: React.FC<Machine_group_dialogProps> = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }) => {
-
+const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }: MachineGroupDialogProps<InitialValuesMachineGroup>) => {
     const masterdataStyles = useMasterdataStyles()
     const { colors } = useTheme()
 
@@ -40,8 +25,9 @@ const Machine_group_dialog: React.FC<Machine_group_dialogProps> = ({ isVisible, 
                 visible={isVisible}
                 onDismiss={() => setIsVisible(false)}
                 style={masterdataStyles.containerDialog}
+                testID="dialog-mgd"
             >
-                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]}>
+                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]} testID="dialog-title-mgd">
                     {isEditing ? "Edit" : "Create"}
                 </Dialog.Title>
                 <Dialog.Content>
@@ -51,7 +37,7 @@ const Machine_group_dialog: React.FC<Machine_group_dialogProps> = ({ isVisible, 
                             validationSchema={validationSchema}
                             validateOnBlur={false}
                             validateOnChange={true}
-                            onSubmit={saveData}
+                            onSubmit={(values: InitialValuesMachineGroup) => saveData(values)}
                         >
                             {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, isValid, dirty }) => (
                                 <AccessibleView>
@@ -63,6 +49,7 @@ const Machine_group_dialog: React.FC<Machine_group_dialogProps> = ({ isVisible, 
                                         value={values.machineGroupName}
                                         error={touched.machineGroupName && Boolean(errors.machineGroupName)}
                                         errorMessage={touched.machineGroupName ? errors.machineGroupName : ""}
+                                        testId="machineGroupName-mgd"
                                     />
                                     <Inputs
                                         placeholder="Enter Description"
@@ -72,6 +59,7 @@ const Machine_group_dialog: React.FC<Machine_group_dialogProps> = ({ isVisible, 
                                         value={values.description}
                                         error={touched.description && Boolean(errors.description)}
                                         errorMessage={touched.description ? errors.description : ""}
+                                        testId="description-mgd"
                                     />
                                     <AccessibleView style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
@@ -84,6 +72,7 @@ const Machine_group_dialog: React.FC<Machine_group_dialogProps> = ({ isVisible, 
                                             onValueChange={(v: boolean) => {
                                                 setFieldValue("isActive", v);
                                             }}
+                                            testID="isActive-mgd"
                                         />
                                     </AccessibleView>
                                     <AccessibleView style={masterdataStyles.containerAction}>
@@ -94,10 +83,11 @@ const Machine_group_dialog: React.FC<Machine_group_dialogProps> = ({ isVisible, 
                                                 masterdataStyles.button,
                                                 isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis,
                                             ]}
+                                            testID="Save-mgd"
                                         >
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Save</Text>
                                         </Pressable>
-                                        <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]}>
+                                        <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-mgd">
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Cancel</Text>
                                         </Pressable>
                                     </AccessibleView>
@@ -111,4 +101,4 @@ const Machine_group_dialog: React.FC<Machine_group_dialogProps> = ({ isVisible, 
     )
 }
 
-export default Machine_group_dialog
+export default React.memo(Machine_group_dialog)

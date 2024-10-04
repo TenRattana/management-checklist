@@ -15,6 +15,7 @@ interface InputProps {
   mode?: "outlined" | "flat";
   lefticon?: string;
   name?: string;
+  testId?: string;
 }
 
 const Inputs: React.FC<InputProps> = ({
@@ -28,7 +29,7 @@ const Inputs: React.FC<InputProps> = ({
   hint,
   mode,
   lefticon,
-  name,
+  testId
 }) => {
 
   return (
@@ -52,7 +53,7 @@ const Inputs: React.FC<InputProps> = ({
         }
         error={error}
         enterKeyHint="done"
-        testID={name}
+        testID={testId}
       />
       {hint && <Text>{hint}</Text>}
       <HelperText type="error" visible={error} style={{ left: -10 }}>

@@ -4,16 +4,7 @@ import { IconButton } from "react-native-paper";
 import { MultiSelect } from 'react-native-element-dropdown';
 import AccessibleView from "@/components/AccessibleView";
 import { Chip } from "react-native-paper";
-
-interface CustomDropdownMultiProps {
-  labels: string;
-  values: string;
-  title: string;
-  data: { [key: string]: any }[];
-  selectedValue?: string[];
-  onValueChange: (value: string[], icon?: () => JSX.Element) => void;
-  lefticon?: string;
-}
+import { CustomDropdownMultiProps } from '@/typing/tag'
 
 const CustomDropdownMulti = forwardRef<HTMLDivElement, CustomDropdownMultiProps>(({
   labels,
@@ -22,7 +13,8 @@ const CustomDropdownMulti = forwardRef<HTMLDivElement, CustomDropdownMultiProps>
   data,
   selectedValue = [],
   onValueChange,
-  lefticon
+  lefticon,
+  testId
 }, ref) => {
   const [options, setOptions] = useState<{ label: string; value: string }[]>([]);
   const [currentValue, setCurrentValue] = useState<string[]>(selectedValue);
@@ -132,9 +124,10 @@ const CustomDropdownMulti = forwardRef<HTMLDivElement, CustomDropdownMultiProps>
             {item.label}
           </Chip>
         )}
+        testID={testId}
       />
     </AccessibleView>
   );
 });
 
-export default CustomDropdownMulti;
+export default React.memo(CustomDropdownMulti);

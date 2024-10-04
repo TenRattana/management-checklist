@@ -7,20 +7,7 @@ import { Portal, Switch, Dialog } from "react-native-paper";
 import { Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
-
-interface InitialValues {
-    checkListOptionId: string;
-    checkListOptionName: string;
-    isActive: boolean;
-}
-
-interface Checklist_option_dialogProps {
-    isVisible: boolean;
-    setIsVisible: (v: boolean) => void;
-    isEditing: boolean;
-    initialValues: InitialValues;
-    saveData: (values: InitialValues) => void;
-}
+import { InitialValuesCheckListOption, CheckListOptionProps } from '@/typing/value'
 
 const validationSchema = Yup.object().shape({
     checkListOptionName: Yup.string().required(
@@ -29,8 +16,7 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The active field is required."),
 });
 
-const Checklist_option_dialog: React.FC<Checklist_option_dialogProps> = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }) => {
-
+const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }: CheckListOptionProps<InitialValuesCheckListOption>) => {
     const masterdataStyles = useMasterdataStyles()
     const { colors } = useTheme()
 
@@ -40,8 +26,9 @@ const Checklist_option_dialog: React.FC<Checklist_option_dialogProps> = ({ isVis
                 visible={isVisible}
                 onDismiss={() => setIsVisible(false)}
                 style={masterdataStyles.containerDialog}
+                testID="dialog-cod"
             >
-                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]}>
+                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]} testID="dialog-cod">
                     {isEditing ? "Edit" : "Create"}
                 </Dialog.Title>
                 <Dialog.Content>
@@ -51,7 +38,7 @@ const Checklist_option_dialog: React.FC<Checklist_option_dialogProps> = ({ isVis
                             validationSchema={validationSchema}
                             validateOnBlur={false}
                             validateOnChange={true}
-                            onSubmit={saveData}
+                            onSubmit={(values: InitialValuesCheckListOption) => saveData(values)}
                         >
                             {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, dirty, isValid }) => (
                                 <AccessibleView>
@@ -64,6 +51,7 @@ const Checklist_option_dialog: React.FC<Checklist_option_dialogProps> = ({ isVis
                                         value={values.checkListOptionName}
                                         error={touched.checkListOptionName && Boolean(errors.checkListOptionName)}
                                         errorMessage={touched.checkListOptionName ? errors.checkListOptionName : ""}
+                                        testId="checkListOptionName-cod"
                                     />
 
                                     <AccessibleView style={masterdataStyles.containerSwitch}>
@@ -77,6 +65,7 @@ const Checklist_option_dialog: React.FC<Checklist_option_dialogProps> = ({ isVis
                                             onValueChange={(v: boolean) => {
                                                 setFieldValue("isActive", v);
                                             }}
+                                            testID="isActive-cod"
                                         />
                                     </AccessibleView>
                                     <AccessibleView style={masterdataStyles.containerAction}>
@@ -87,12 +76,13 @@ const Checklist_option_dialog: React.FC<Checklist_option_dialogProps> = ({ isVis
                                                 masterdataStyles.button,
                                                 isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis,
                                             ]}
+                                            testID="Save-cod"
                                         >
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>
                                                 Save
                                             </Text>
                                         </Pressable>
-                                        <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]}>
+                                        <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-cod">
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Cancel</Text>
                                         </Pressable>
                                     </AccessibleView>
@@ -106,4 +96,4 @@ const Checklist_option_dialog: React.FC<Checklist_option_dialogProps> = ({ isVis
     )
 }
 
-export default Checklist_option_dialog
+export default React.memo(Checklist_option_dialog)

@@ -8,27 +8,8 @@ import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Machine_dialog from "@/components/screens/Machine_dialog";
-
-interface MachineGroup {
-    MGroupID: string;
-    MGroupName: string;
-    Description: string;
-    IsActive: boolean;
-}
-interface Machine {
-    MGroupID: string;
-    MachineName: string;
-    Description: string;
-    IsActive: boolean;
-    MachineID: string;
-}
-interface InitialValues {
-    machineGroupId?: string;
-    machineId: string;
-    machineName: string;
-    description: string;
-    isActive: boolean;
-}
+import { Machine, MachineGroup } from '@/typing/type'
+import { InitialValuesMachine } from '@/typing/value'
 
 const MachineGroupScreen = () => {
     const [machine, setMachine] = useState<Machine[]>([]);
@@ -38,7 +19,7 @@ const MachineGroupScreen = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isVisible, setIsVisible] = useState(false);
     const [isLoadingButton, setIsLoadingButton] = useState(false);
-    const [initialValues, setInitialValues] = useState<InitialValues>({
+    const [initialValues, setInitialValues] = useState<InitialValuesMachine>({
         machineId: "",
         machineGroupId: "",
         machineName: "",
@@ -88,7 +69,7 @@ const MachineGroupScreen = () => {
         fetchData();
     }, []);
 
-    const saveData = async (values: InitialValues) => {
+    const saveData = async (values: InitialValuesMachine) => {
         setIsLoadingButton(true);
         const data = {
             MachineID: values.machineId,

@@ -4,65 +4,71 @@ import AccessibleView from "@/components/AccessibleView";
 import { Inputs } from "@/components/common";
 import { Portal, Dialog } from "react-native-paper";
 import { Formik } from "formik";
-import * as Yup from 'yup'
+import * as Yup from "yup";
 import useMasterdataStyles from "@/styles/common/masterdata";
-
-interface BaseSubForm {
-    SFormID: string;
-    SFormName: string;
-    FormID: string;
-    Columns?: number;
-    DisplayOrder?: number;
-    MachineID: string;
-}
-
-interface SubFormDialogProps {
-    isVisible: boolean;
-    setShowDialogs: () => void;
-    editMode: boolean;
-    subForm: BaseSubForm;
-    saveSubForm: (values: BaseSubForm, mode: string) => void;
-    onDelete: (SFormID: string) => void;
-}
+import { SubFormDialogProps } from "@/typing/value";
+import { BaseSubForm } from "@/typing/form";
 
 const validationSchemaSubForm = Yup.object().shape({
-    SFormName: Yup.string().required(
-        "The machine group name field is required."
-    ),
+    SFormName: Yup.string().required("The machine group name field is required."),
     Columns: Yup.number().required("The columns field is required."),
 });
 
-const SubFormDialog: React.FC<SubFormDialogProps> = ({ isVisible, setShowDialogs, editMode, subForm, saveSubForm, onDelete }) => {
-
-    const masterdataStyles = useMasterdataStyles()
+const SubFormDialog = ({
+    isVisible,
+    setIsVisible,
+    isEditing,
+    initialValues,
+    saveData,
+    onDelete,
+}: SubFormDialogProps<BaseSubForm>) => {
+    const masterdataStyles = useMasterdataStyles();
 
     return (
         <Portal>
-            <Dialog visible={isVisible} onDismiss={setShowDialogs}>
-                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]}>
-                    {editMode ? "Edit Subform Detail" : "Create Subform Detail"}
+            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)}>
+                <Dialog.Title
+                    style={[
+                        masterdataStyles.text,
+                        masterdataStyles.textBold,
+                        { paddingLeft: 8 },
+                    ]}
+                >
+                    {isEditing ? "Edit Subform Detail" : "Create Subform Detail"}
                 </Dialog.Title>
                 <Dialog.Content>
                     <Text
-                        style={[masterdataStyles.text, masterdataStyles.textDark, { marginBottom: 10, paddingLeft: 10 }]}
+                        style={[
+                            masterdataStyles.text,
+                            masterdataStyles.textDark,
+                            { marginBottom: 10, paddingLeft: 10 },
+                        ]}
                     >
-                        {editMode
+                        {isEditing
                             ? "Edit the details of the sub form."
                             : "Enter the details for the new sub form."}
                     </Text>
                     {isVisible && (
                         <Formik
-                            initialValues={subForm}
+                            initialValues={initialValues}
                             validationSchema={validationSchemaSubForm}
                             validateOnBlur={false}
                             validateOnChange={true}
                             onSubmit={(values) => {
-                                saveSubForm(values, editMode ? "update" : "add");
+                                saveData(values, isEditing ? "update" : "add");
                             }}
                         >
-                            {({ handleChange, handleBlur, values, errors, touched, handleSubmit, isValid, dirty, }) => (
+                            {({
+                                handleChange,
+                                handleBlur,
+                                values,
+                                errors,
+                                touched,
+                                handleSubmit,
+                                isValid,
+                                dirty,
+                            }) => (
                                 <AccessibleView>
-
                                     <Inputs
                                         placeholder="Enter Sub Form Name"
                                         label="Sub Form Name"
@@ -89,30 +95,56 @@ const SubFormDialog: React.FC<SubFormDialogProps> = ({ isVisible, setShowDialogs
                                             disabled={!isValid || !dirty}
                                             style={[
                                                 masterdataStyles.button,
-                                                isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis,
+                                                isValid && dirty
+                                                    ? masterdataStyles.backMain
+                                                    : masterdataStyles.backDis,
                                             ]}
                                         >
-                                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>
-                                                {editMode ? "Update SubForm" : "Add SubForm"}
+                                            <Text
+                                                style={[
+                                                    masterdataStyles.text,
+                                                    masterdataStyles.textBold,
+                                                    masterdataStyles.textLight,
+                                                ]}
+                                            >
+                                                {isEditing ? "Update SubForm" : "Add SubForm"}
                                             </Text>
                                         </Pressable>
 
-                                        {editMode && (
+                                        {isEditing && (
                                             <Pressable
-                                                onPress={() => onDelete(values.SFormID!)}
-                                                style={[masterdataStyles.button, masterdataStyles.backMain]}
+                                                onPress={() => onDelete(values.SFormID)}
+                                                style={[
+                                                    masterdataStyles.button,
+                                                    masterdataStyles.backMain,
+                                                ]}
                                             >
-                                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>
+                                                <Text
+                                                    style={[
+                                                        masterdataStyles.text,
+                                                        masterdataStyles.textBold,
+                                                        masterdataStyles.textLight,
+                                                    ]}
+                                                >
                                                     Delete sub form
                                                 </Text>
                                             </Pressable>
                                         )}
 
                                         <Pressable
-                                            onPress={setShowDialogs}
-                                            style={[masterdataStyles.button, masterdataStyles.backMain]}
+                                            onPress={() => setIsVisible(false)}
+                                            style={[
+                                                masterdataStyles.button,
+                                                masterdataStyles.backMain,
+                                            ]}
                                         >
-                                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>
+                                            <Text
+                                                style={[
+                                                    masterdataStyles.text,
+                                                    masterdataStyles.textBold,
+                                                    masterdataStyles.textLight,
+                                                ]}
+                                            >
                                                 Cancel
                                             </Text>
                                         </Pressable>
@@ -127,4 +159,4 @@ const SubFormDialog: React.FC<SubFormDialogProps> = ({ isVisible, setShowDialogs
     );
 };
 
-export default SubFormDialog;
+export default React.memo(SubFormDialog);

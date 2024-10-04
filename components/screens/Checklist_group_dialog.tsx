@@ -7,21 +7,7 @@ import { Portal, Switch, Dialog } from "react-native-paper";
 import { Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
-
-interface InitialValues {
-    groupCheckListOptionId: string;
-    groupCheckListOptionName: string;
-    description: string;
-    isActive: boolean;
-}
-
-interface Checklist_group_dialogProps {
-    isVisible: boolean;
-    setIsVisible: (v: boolean) => void;
-    isEditing: boolean;
-    initialValues: InitialValues;
-    saveData: (values: InitialValues) => void;
-}
+import { ChecklistGroupDialogProps, InitialValuesGroupCheckList } from '@/typing/value'
 
 const validationSchema = Yup.object().shape({
     groupCheckListOptionName: Yup.string().required(
@@ -31,8 +17,7 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The active field is required."),
 });
 
-const Checklist_group_dialog: React.FC<Checklist_group_dialogProps> = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }) => {
-
+const Checklist_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }: ChecklistGroupDialogProps<InitialValuesGroupCheckList>) => {
     const masterdataStyles = useMasterdataStyles()
     const { colors } = useTheme()
 
@@ -42,8 +27,9 @@ const Checklist_group_dialog: React.FC<Checklist_group_dialogProps> = ({ isVisib
                 visible={isVisible}
                 onDismiss={() => setIsVisible(false)}
                 style={masterdataStyles.containerDialog}
+                testID="dialog-cgd"
             >
-                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]}>
+                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]} testID="dialog-title-cgd">
                     {isEditing ? "Edit" : "Create"}
                 </Dialog.Title>
                 <Dialog.Content>
@@ -60,7 +46,7 @@ const Checklist_group_dialog: React.FC<Checklist_group_dialogProps> = ({ isVisib
                             validationSchema={validationSchema}
                             validateOnBlur={false}
                             validateOnChange={true}
-                            onSubmit={saveData}
+                            onSubmit={(values: InitialValuesGroupCheckList) => saveData(values)}
                         >
                             {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, isValid, dirty }) => (
                                 <AccessibleView>
@@ -72,6 +58,7 @@ const Checklist_group_dialog: React.FC<Checklist_group_dialogProps> = ({ isVisib
                                         value={values.groupCheckListOptionName}
                                         error={touched.groupCheckListOptionName && Boolean(errors.groupCheckListOptionName)}
                                         errorMessage={touched.groupCheckListOptionName ? errors.groupCheckListOptionName : ""}
+                                        testId="groupCheckListOptionName-cgd"
                                     />
 
                                     <Inputs
@@ -82,6 +69,7 @@ const Checklist_group_dialog: React.FC<Checklist_group_dialogProps> = ({ isVisib
                                         value={values.description}
                                         error={touched.description && Boolean(errors.description)}
                                         errorMessage={touched.description ? errors.description : ""}
+                                        testId="description-cgd"
                                     />
 
                                     <AccessibleView style={masterdataStyles.containerSwitch}>
@@ -93,6 +81,7 @@ const Checklist_group_dialog: React.FC<Checklist_group_dialogProps> = ({ isVisib
                                             color={values.isActive ? colors.succeass : colors.disable}
                                             value={values.isActive}
                                             onValueChange={(v: boolean) => { setFieldValue("isActive", v); }}
+                                            testID="isActive-cgd"
                                         />
                                     </AccessibleView>
                                     <AccessibleView style={masterdataStyles.containerAction}>
@@ -103,10 +92,11 @@ const Checklist_group_dialog: React.FC<Checklist_group_dialogProps> = ({ isVisib
                                                 masterdataStyles.button,
                                                 isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis,
                                             ]}
+                                            testID="Save-cgd"
                                         >
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Save</Text>
                                         </Pressable>
-                                        <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]}>
+                                        <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-cgd">
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Cancel</Text>
                                         </Pressable>
                                     </AccessibleView>
@@ -120,4 +110,4 @@ const Checklist_group_dialog: React.FC<Checklist_group_dialogProps> = ({ isVisib
     )
 }
 
-export default Checklist_group_dialog
+export default React.memo(Checklist_group_dialog)

@@ -11,7 +11,7 @@ import {
   TestScreen,
   FormScreen,
   ExpectedResultScreen,
-  Preview,
+  // Preview,
   CreateFormScreen,
   MachineGroupScreen,
   MachineScreen
@@ -114,7 +114,7 @@ const Navigation: React.FC = () => {
                   ),
                 }}
               />
-              <Drawer.Screen
+              {/* <Drawer.Screen
                 name="Preview"
                 component={Preview}
                 options={{
@@ -123,7 +123,7 @@ const Navigation: React.FC = () => {
                     <TabBarIcon name="home" color={color} />
                   ),
                 }}
-              />
+              /> */}
               <Drawer.Screen
                 name="Create_form"
                 component={CreateFormScreen}

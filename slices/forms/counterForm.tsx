@@ -1,63 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { BaseSubForm, BaseFormState, Form, BaseForm } from '@/typing/form'
+import { Checklist, CheckListType, DataType } from '@/typing/type'
 
-interface BaseForm {
-  FormID: string;
-  FormName: string;
-  Description: string;
-  MachineID: string;
-}
-
-interface FormState {
-  MCListID: string;
-  CListID: string;
-  GCLOptionID: string;
-  CTypeID: string;
-  CListName?: string;
-  CTypeName?: string;
-  DTypeID: string;
-  DTypeValue?: number;
-  SFormID: string;
-  Required: boolean;
-  MinLength?: number;
-  MaxLength?: number;
-  Description: string;
-  Placeholder: string;
-  Hint: string;
-  DisplayOrder?: number;
-  EResult: string;
-}
-interface BaseSubForm {
-  SFormID: string;
-  SFormName: string;
-  FormID: string;
-  Columns?: number;
-  DisplayOrder?: number;
-  MachineID: string;
-  Fields?: FormState[];
-}
-
-interface Checklist {
-  CListID: string;
-  CListName: string;
-  IsActive: boolean;
-}
-
-interface CheckListType {
-  CTypeID: string;
-  CTypeName: string;
-  Icon: string;
-  IsActive: boolean;
-}
-
-interface DataType {
-  DTypeID: string;
-  DTypeName: string;
-  Icon: string;
-  IsActive: boolean;
-}
-interface Form extends BaseForm {
-  subForms: BaseSubForm[];
-}
 
 const initialState: Form = {
   FormID: "",
@@ -76,7 +20,7 @@ const sortSubForms = (data: BaseSubForm[]) => {
   });
 };
 
-const sortFields = (fields: FormState[]) => {
+const sortFields = (fields: BaseFormState[]) => {
   return fields.sort((a, b) => {
     const orderA = a.DisplayOrder ?? Number.POSITIVE_INFINITY;
     const orderB = b.DisplayOrder ?? Number.POSITIVE_INFINITY;
@@ -127,19 +71,19 @@ const subFormSlice = createSlice({
       sortSubForms(state.subForms);
     },
     setField: (state, action: PayloadAction<{
-      formState: FormState[];
+      BaseFormState: BaseFormState[];
       checkList: Checklist[];
       checkListType: CheckListType[];
     }>) => {
       console.log("setField");
 
-      const { formState, checkList, checkListType } = action.payload;
+      const { BaseFormState, checkList, checkListType } = action.payload;
 
       const checkListMap = new Map(checkList.map(item => [item.CListID, item.CListName]));
       const checkListTypeMap = new Map(checkListType.map(item => [item.CTypeID, item.CTypeName]));
 
       state.subForms.forEach((sub) => {
-        const matchingForms = formState.filter(form => form.SFormID === sub.SFormID);
+        const matchingForms = BaseFormState.filter(form => form.SFormID === sub.SFormID);
 
         if (matchingForms.length > 0) {
           const updatedFields = matchingForms.map((field, index) => ({
@@ -156,7 +100,7 @@ const subFormSlice = createSlice({
 
       sortSubForms(state.subForms);
     },
-    setDragField: (state, action: PayloadAction<{ data: Omit<FormState, 'DisplayOrder'>[] }>) => {
+    setDragField: (state, action: PayloadAction<{ data: Omit<BaseFormState, 'DisplayOrder'>[] }>) => {
       console.log("setDragField");
 
       const { data } = action.payload;
@@ -212,71 +156,78 @@ const subFormSlice = createSlice({
       state.subForms = state.subForms.filter((subForm) => subForm.SFormID !== SFormID);
     },
     addField: (state, action: PayloadAction<{
-      formState: FormState;
+      BaseFormState: BaseFormState;
       checkList: Checklist[];
       checkListType: CheckListType[];
       dataType: DataType[];
     }>) => {
-      const { formState, checkList, checkListType, dataType } = action.payload;
+      const { BaseFormState, checkList, checkListType, dataType } = action.payload;
+      console.log("addField");
+      console.log(BaseFormState);
+
+      const formData: BaseFormState = BaseFormState.DTypeID === null
+        ? {
+          ...BaseFormState,
+          DTypeID: dataType.find((v) => v.DTypeName === "String")?.DTypeID ?? "",
+          DTypeValue: undefined,
+          MaxLength: undefined,
+          MinLength: undefined,
+        }
+        : BaseFormState;
 
       state.subForms = state.subForms.map((sub) => {
-        if (sub.SFormID === formState.SFormID) {
-          const updatedFields = [
-            ...sub.Fields || [],
-            {
-              ...formState,
-              DisplayOrder: (sub.Fields?.length || 0) + 1,
-              CListName:
-                checkList.find((v) => v.CListID === formState.CListID)?.CListName || "",
-              CTypeName:
-                checkListType.find((v) => v.CTypeID === formState.CTypeID)?.CTypeName || "",
-            },
-          ];
+        if (sub.SFormID === formData.SFormID) {
+          const addField = {
+            ...formData,
+            DisplayOrder: (sub.Fields?.length || 0) + 1,
+            CListName: checkList.find((v) => v.CListID === formData.CListID)?.CListName,
+            CTypeName: checkListType.find((v) => v.CTypeID === formData.CTypeID)?.CTypeName,
+          };
 
-          sortFields(updatedFields);
+          const updatedFields = [...(sub.Fields || []), addField];
+          const sortedFields = sortFields(updatedFields);
 
           return {
             ...sub,
-            fields: updatedFields,
+            Fields: sortedFields,
           };
         }
         return sub;
       });
-      sortSubForms(state.subForms);
     },
     updateField: (state, action: PayloadAction<{
-      formState: FormState;
+      BaseFormState: BaseFormState;
       checkList: Checklist[];
       checkListType: CheckListType[];
       dataType: DataType[];
     }>) => {
-      const { formState, checkList, checkListType } = action.payload;
+      const { BaseFormState, checkList, checkListType } = action.payload;
 
-      state.subForms = state.subForms.map((sub) => {
-        if (sub.subFormId === formState.subFormId) {
-          const updatedFields = sub.fields.map((field) => {
-            if (field.matchCheckListId === formState.matchCheckListId) {
-              return {
-                ...formState,
-                displayOrder: field.displayOrder,
-                CheckListName:
-                  checkList.find((v) => v.checkListId === formState.checkListId)?.CListName || "",
-                CheckListTypeName:
-                  checkListType.find((v) => v.checkListTypeId === formState.checkListTypeId)?.CTypeName || "",
-              };
-            }
-            return field;
-          });
+      // state.subForms = state.subForms.map((sub) => {
+      //   if (sub.subFormId === BaseFormState.subFormId) {
+      //     const updatedFields = sub.fields.map((field) => {
+      //       if (field.matchCheckListId === BaseFormState.matchCheckListId) {
+      //         return {
+      //           ...BaseFormState,
+      //           displayOrder: field.displayOrder,
+      //           CheckListName:
+      //             checkList.find((v) => v.checkListId === BaseFormState.checkListId)?.CListName || "",
+      //           CTypeName:
+      //             checkListType.find((v) => v.checkListTypeId === BaseFormState.checkListTypeId)?.CTypeName || "",
+      //         };
+      //       }
+      //       return field;
+      //     });
 
-          sortFields(updatedFields);
+      //     sortFields(updatedFields);
 
-          return {
-            ...sub,
-            fields: updatedFields,
-          };
-        }
-        return sub;
-      });
+      //     return {
+      //       ...sub,
+      //       fields: updatedFields,
+      //     };
+      //   }
+      //   return sub;
+      // });
       sortSubForms(state.subForms);
     },
     deleteField: (state, action: PayloadAction<{

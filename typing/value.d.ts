@@ -1,0 +1,127 @@
+import * as React from "react";
+import { TypeConfig } from "./type";
+import { FormConfig } from "./form";
+
+export interface Active {
+  isActive: boolean;
+}
+
+export interface Detail {
+  description: string;
+}
+
+export interface InitialValuesMachine extends Detail, Active {
+  machineGroupId?: string;
+  machineId: string;
+  machineName: string;
+}
+
+export interface InitialValuesMachineGroup extends Detail, Active {
+  machineGroupId: string;
+  machineGroupName: string;
+}
+
+export interface InitialValuesChecklist extends Active {
+  checkListId: string;
+  checkListName: string;
+}
+
+export interface InitialValuesCheckListOption extends Active {
+  checkListOptionId: string;
+  checkListOptionName: string;
+}
+
+export interface InitialValuesGroupCheckList extends Detail, Active {
+  groupCheckListOptionId: string;
+  groupCheckListOptionName: string;
+}
+
+export interface InitialValuesMatchFormMachine {
+  machineId: string;
+  formId: string;
+}
+
+export interface InitialValuesMatchCheckListOption extends Active {
+  matchCheckListOptionId: string;
+  checkListOptionId: string[];
+  groupCheckListOptionId: string;
+}
+
+type Values =
+  | InitialValuesMachine
+  | InitialValuesMachineGroup
+  | InitialValuesChecklist
+  | InitialValuesCheckListOption
+  | InitialValuesGroupCheckList
+  | InitialValuesMatchFormMachine
+  | InitialValuesMatchCheckListOption;
+
+export type SaveDataFunction<V extends Values, D extends string | undefined> = (
+  values: V,
+  mode?: D
+) => void;
+
+export type OnDelete<V extends string> = (values: V) => void;
+
+export interface SetInitial<V extends Values | FormConfig> {
+  initialValues: V;
+  isEditing: boolean;
+}
+
+export interface SetVisible {
+  isVisible: boolean;
+  setIsVisible: (v: boolean) => void;
+}
+
+export interface BaseDialogProps<V> extends SetVisible, SetInitial<V> {
+  saveData: SaveDataFunction<V>;
+}
+
+export interface SubFormDialogProps<V extends FormConfig>
+  extends BaseDialogProps<V> {
+  onDelete: OnDelete<string>;
+}
+
+export interface SaveDialogProps extends SetVisible {
+  saveForm: () => void;
+}
+
+export interface MachineDialogProps<V extends Values, D extends TypeConfig>
+  extends BaseDialogProps<V> {
+  machineGroup?: D[];
+  dropmachine?: D[];
+}
+
+export interface MachineGroupDialogProps<V extends Values>
+  extends BaseDialogProps<V> {}
+
+export interface CheckListDialogProps<V extends Values>
+  extends BaseDialogProps<V> {}
+
+export interface CheckListOptionProps<V extends Values>
+  extends BaseDialogProps<V> {}
+
+export interface ChecklistGroupDialogProps<V extends Values>
+  extends BaseDialogProps<V> {}
+
+export interface MatchFormMachineDialogProps<
+  V extends Values,
+  D1 extends TypeConfig,
+  D2 extends TypeConfig
+> extends BaseDialogProps<V> {
+  machine?: D1[];
+  dropmachine?: D1[];
+  forms?: D2[];
+  dropform?: D2[];
+}
+
+export interface MatchChecklistOptionProps<
+  V extends Values,
+  D1 extends TypeConfig,
+  D2 extends TypeConfig
+> extends BaseDialogProps<V> {
+  checkListOption: D1[];
+  dropcheckListOption: D1[];
+  groupCheckListOption: D2[];
+  dropgroupCheckListOption: D2[];
+}

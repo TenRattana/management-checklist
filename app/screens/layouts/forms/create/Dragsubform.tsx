@@ -19,36 +19,7 @@ import { IconButton, Text } from "react-native-paper";
 import { runOnJS } from "react-native-reanimated";
 import { spacing } from "@/constants/Spacing";
 import Dragfield from "./Dragfield";
-
-interface FormState {
-    MCListID: string;
-    CListID: string;
-    GCLOptionID: string;
-    CTypeID: string;
-    CListName?: string;
-    CTypeName?: string;
-    DTypeID: string;
-    DTypeValue?: number;
-    SFormID: string;
-    Required: boolean;
-    MinLength?: number;
-    MaxLength?: number;
-    Description: string;
-    Placeholder: string;
-    Hint: string;
-    DisplayOrder?: number;
-    EResult: string;
-}
-
-interface BaseSubForm {
-    SFormID: string;
-    SFormName: string;
-    FormID: string;
-    Columns?: number;
-    DisplayOrder?: number;
-    MachineID: string;
-    Fields?: FormState[];
-}
+import { BaseFormState, BaseSubForm } from '@/typing/form'
 
 interface DragsubformProps {
     route: any;
@@ -117,6 +88,8 @@ const Dragsubform: React.FC<DragsubformProps> = ({ route }) => {
         }
     }, [])
 
+    console.log(state);
+
     const renderSubForm = ({ item, drag, isActive }: { item: BaseSubForm; drag: () => void; isActive: boolean; }) => {
 
         return (
@@ -149,6 +122,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ route }) => {
                         <Dragfield
                             data={item.Fields ?? []}
                             route={route}
+                            SFormID={item.SFormID}
                         />
                     </AccessibleView>
 
@@ -185,10 +159,10 @@ const Dragsubform: React.FC<DragsubformProps> = ({ route }) => {
 
             <SubFormDialog
                 isVisible={initialDialog}
-                setShowDialogs={handelSetDialog}
-                editMode={editMode}
-                subForm={initialSubForm}
-                saveSubForm={handelSaveSubForm}
+                setIsVisible={handelSetDialog}
+                isEditing={editMode}
+                initialValues={initialSubForm}
+                saveData={handelSaveSubForm}
                 onDelete={(SFormID: string) => dispatch(deleteSubForm({ SFormID }))}
             />
         </>

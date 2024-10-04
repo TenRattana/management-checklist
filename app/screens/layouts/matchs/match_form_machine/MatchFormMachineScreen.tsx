@@ -8,36 +8,10 @@ import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Match_form_machine_dialog from "@/components/screens/Match_form_machine_dialog";
+import { Form, MatchForm, Machine } from '@/typing/type'
+import { InitialValuesMatchFormMachine } from '@/typing/value'
 
-interface MatchFormMachineScreenProps {
-    navigation: any;
-}
-
-interface Machine {
-    MachineID: string;
-    MachineName: string;
-    IsActive: boolean;
-}
-
-interface Form {
-    FormID: string;
-    FormName: string;
-    IsActive: boolean;
-}
-
-interface MatchForm {
-    MachineID: string;
-    FormID: string;
-    MachineName: string;
-    FormName: string;
-}
-
-interface InitialValues {
-    machineId: string;
-    formId: string;
-}
-
-const MatchFormMachineScreen: React.FC<MatchFormMachineScreenProps> = ({ navigation }) => {
+const MatchFormMachineScreen = ({ navigation }: any) => {
     const [forms, setForm] = useState<Form[]>([]);
     const [machine, setMachine] = useState<Machine[]>([]);
     const [matchForm, setMatchForm] = useState<MatchForm[]>([]);
@@ -46,7 +20,7 @@ const MatchFormMachineScreen: React.FC<MatchFormMachineScreenProps> = ({ navigat
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [isLoadingButton, setIsLoadingButton] = useState<boolean>(false);
-    const [initialValues, setInitialValues] = useState<InitialValues>({
+    const [initialValues, setInitialValues] = useState<InitialValuesMatchFormMachine>({
         machineId: "",
         formId: "",
     });
@@ -95,7 +69,7 @@ const MatchFormMachineScreen: React.FC<MatchFormMachineScreenProps> = ({ navigat
         fetchData();
     }, []);
 
-    const saveData = async (values: InitialValues) => {
+    const saveData = async (values: InitialValuesMatchFormMachine) => {
         setIsLoadingButton(true);
         const data = {
             MachineID: values.machineId,

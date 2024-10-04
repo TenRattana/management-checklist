@@ -8,25 +8,17 @@ import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Checklist_option_dialog from "@/components/screens/Checklist_option_dialog";
-interface checkListOption {
-    CLOptionName: string
-    IsActive: boolean;
-    CLOptionID: string;
-}
-interface InitialValues {
-    checkListOptionId: string;
-    checkListOptionName: string;
-    isActive: boolean;
-}
+import { CheckListOption } from '@/typing/type'
+import { InitialValuesCheckListOption } from '@/typing/value'
 
 const CheckListOptionScreen = () => {
-    const [checkListOption, setCheckListOption] = useState<checkListOption[]>([]);
+    const [checkListOption, setCheckListOption] = useState<CheckListOption[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [isLoadingButton, setIsLoadingButton] = useState<boolean>(false);
-    const [initialValues, setInitialValues] = useState<InitialValues>({
+    const [initialValues, setInitialValues] = useState<InitialValuesCheckListOption>({
         checkListOptionId: "",
         checkListOptionName: "",
         isActive: true,
@@ -68,7 +60,7 @@ const CheckListOptionScreen = () => {
         fetchData();
     }, []);
 
-    const saveData = async (values: InitialValues) => {
+    const saveData = async (values: InitialValuesCheckListOption) => {
         setIsLoadingButton(true);
 
         const data = {

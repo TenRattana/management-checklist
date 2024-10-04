@@ -8,18 +8,8 @@ import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Checklist_dialog from "@/components/screens/Checklist_dialog";
-
-interface InitialValues {
-    checkListId: string;
-    checkListName: string;
-    isActive: boolean;
-}
-
-interface Checklist {
-    CListID: string;
-    CListName: string;
-    IsActive: boolean;
-}
+import { Checklist } from '@/typing/type'
+import { InitialValuesChecklist } from '@/typing/value'
 
 const CheckListScreen = () => {
     const [checkList, setCheckList] = useState<Checklist[]>([]);
@@ -28,7 +18,7 @@ const CheckListScreen = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [isLoadingButton, setIsLoadingButton] = useState<boolean>(false);
-    const [initialValues, setInitialValues] = useState<InitialValues>({
+    const [initialValues, setInitialValues] = useState<InitialValuesChecklist>({
         checkListId: "",
         checkListName: "",
         isActive: true,
@@ -69,7 +59,7 @@ const CheckListScreen = () => {
         fetchData();
     }, []);
 
-    const saveData = async (values: InitialValues) => {
+    const saveData = async (values: InitialValuesChecklist) => {
         setIsLoadingButton(true);
         const data = {
             CListId: values.checkListId ?? "",

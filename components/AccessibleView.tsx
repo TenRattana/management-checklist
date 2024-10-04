@@ -1,23 +1,19 @@
 import React from "react";
-import { View, Platform, ViewStyle } from "react-native";
+import { View, Platform } from "react-native";
+import { AccessibleViewProps } from "@/typing/tag"
 
-interface AccessibleViewProps {
-    children: React.ReactNode;
-    name?: string;
-    style?: ViewStyle | ViewStyle[];
-}
-
-const AccessibleView: React.FC<AccessibleViewProps> = ({ children, name, style }) => {
+const AccessibleView = ({ children, name, style }: AccessibleViewProps) => {
     return (
         <View
             style={style}
             accessibilityLabel={name}
             accessible={Platform.OS !== 'web'}
             role={Platform.OS === 'web' ? 'region' : undefined}
+            testID={`view-${name}`}
         >
             {children}
         </View>
     );
 };
 
-export default AccessibleView;
+export default React.memo(AccessibleView);

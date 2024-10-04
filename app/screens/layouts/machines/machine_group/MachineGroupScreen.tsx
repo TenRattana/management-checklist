@@ -8,19 +8,8 @@ import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Machine_group_dialog from "@/components/screens/Machine_group_dialog";
-
-interface MachineGroup {
-    MGroupID: string;
-    MGroupName: string;
-    Description: string;
-    IsActive: boolean;
-}
-interface InitialValues {
-    machineGroupId: string;
-    machineGroupName: string;
-    description: string;
-    isActive: boolean;
-}
+import { MachineGroup } from '@/typing/type'
+import { InitialValuesMachineGroup } from '@/typing/value'
 
 const MachineGroupScreen = () => {
     const [machineGroup, setMachineGroup] = useState<MachineGroup[]>([]);
@@ -29,7 +18,7 @@ const MachineGroupScreen = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [isLoadingButton, setIsLoadingButton] = useState<boolean>(false);
-    const [initialValues, setInitialValues] = useState<InitialValues>({
+    const [initialValues, setInitialValues] = useState<InitialValuesMachineGroup>({
         machineGroupId: "",
         machineGroupName: "",
         description: "",
@@ -71,7 +60,7 @@ const MachineGroupScreen = () => {
         fetchData();
     }, []);
 
-    const saveData = async (values: InitialValues) => {
+    const saveData = async (values: InitialValuesMachineGroup) => {
         setIsLoadingButton(true);
         const data = {
             MGroupID: values.machineGroupId ?? "",

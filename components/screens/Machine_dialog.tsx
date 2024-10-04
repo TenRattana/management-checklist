@@ -8,6 +8,8 @@ import { Portal, Switch, Dialog, HelperText } from "react-native-paper";
 import { Formik, Field } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
+import { MachineDialogProps, InitialValuesMachine } from '@/typing/value'
+import { MachineGroup } from '@/typing/type'
 
 const validationSchema = Yup.object().shape({
     machineGroupId: Yup.string().required("The machine group field is required."),
@@ -16,40 +18,14 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The active field is required."),
 });
 
-interface InitialValues {
-    machineGroupId?: string;
-    machineId: string;
-    machineName: string;
-    description: string;
-    isActive: boolean;
-}
-
-interface MachineGroup {
-    MGroupID: string;
-    MGroupName: string;
-    Description: string;
-    IsActive: boolean;
-}
-
-interface Machine_dialogProps {
-    isVisible: boolean;
-    setIsVisible: (v: boolean) => void;
-    isEditing: boolean;
-    initialValues: InitialValues;
-    saveData: (values: InitialValues) => void;
-    machineGroup: MachineGroup[];
-    dropmachine: MachineGroup[];
-}
-
-const Machine_dialog: React.FC<Machine_dialogProps> = ({ isVisible, setIsVisible, isEditing, initialValues, saveData, dropmachine, machineGroup }) => {
-
+const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData, dropmachine, machineGroup = [] }: MachineDialogProps<InitialValuesMachine, MachineGroup>) => {
     const masterdataStyles = useMasterdataStyles()
     const { colors } = useTheme()
 
     return (
         <Portal>
-            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={masterdataStyles.containerDialog}>
-                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]}>
+            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={masterdataStyles.containerDialog} testID="dialog-md">
+                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]} testID="dialog-title-md">
                     {isEditing ? "Edit" : "Create"}
                 </Dialog.Title>
                 <Dialog.Content>
@@ -59,7 +35,7 @@ const Machine_dialog: React.FC<Machine_dialogProps> = ({ isVisible, setIsVisible
                             validationSchema={validationSchema}
                             validateOnBlur={false}
                             validateOnChange={true}
-                            onSubmit={saveData}
+                            onSubmit={(values: InitialValuesMachine) => saveData(values)}
                         >
                             {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, dirty, isValid }) => (
                                 <AccessibleView>
@@ -72,8 +48,8 @@ const Machine_dialog: React.FC<Machine_dialogProps> = ({ isVisible, setIsVisible
                                                     labels="MGroupName"
                                                     values="MGroupID"
                                                     data={!isEditing
-                                                        ? machineGroup.filter((v) => v.IsActive)
-                                                        : dropmachine}
+                                                        ? machineGroup?.filter((v) => v.IsActive)
+                                                        : dropmachine || []}
                                                     selectedValue={field.value}
                                                     onValueChange={(value, icon) => {
                                                         console.log(value);
@@ -81,9 +57,10 @@ const Machine_dialog: React.FC<Machine_dialogProps> = ({ isVisible, setIsVisible
                                                         form.setFieldValue(field.name, value);
                                                         form.setTouched({ ...form.touched, [field.name]: true });
                                                     }}
+                                                    testId="machineGroupId-md"
                                                 />
                                                 {touched.machineGroupId && errors.machineGroupId && (
-                                                    <HelperText type="error" visible={Boolean(touched.machineGroupId && errors.machineGroupId)} style={{ left: -10 }}>
+                                                    <HelperText type="error" visible={Boolean(touched.machineGroupId && errors.machineGroupId)} style={{ left: -10 }} testID="error-machineGroupId-md">
                                                         {errors.machineGroupId}
                                                     </HelperText>
                                                 )}
@@ -99,6 +76,7 @@ const Machine_dialog: React.FC<Machine_dialogProps> = ({ isVisible, setIsVisible
                                         value={values.machineName}
                                         error={touched.machineName && Boolean(errors.machineName)}
                                         errorMessage={touched.machineName ? errors.machineName : ""}
+                                        testId="machineName-md"
                                     />
                                     <Inputs
                                         placeholder="Enter Description"
@@ -108,6 +86,7 @@ const Machine_dialog: React.FC<Machine_dialogProps> = ({ isVisible, setIsVisible
                                         value={values.description}
                                         error={touched.description && Boolean(errors.description)}
                                         errorMessage={touched.description ? errors.description : ""}
+                                        testId="Description-md"
                                     />
                                     <AccessibleView style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
@@ -120,6 +99,7 @@ const Machine_dialog: React.FC<Machine_dialogProps> = ({ isVisible, setIsVisible
                                             onValueChange={(v: boolean) => {
                                                 setFieldValue("isActive", v);
                                             }}
+                                            testID="isActive-md"
                                         />
                                     </AccessibleView>
                                     <AccessibleView style={masterdataStyles.containerAction}>
@@ -130,10 +110,11 @@ const Machine_dialog: React.FC<Machine_dialogProps> = ({ isVisible, setIsVisible
                                                 masterdataStyles.button,
                                                 isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis,
                                             ]}
+                                            testID="Save-md"
                                         >
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Save</Text>
                                         </Pressable>
-                                        <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]}>
+                                        <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-md">
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Cancel</Text>
                                         </Pressable>
                                     </AccessibleView>
@@ -147,4 +128,4 @@ const Machine_dialog: React.FC<Machine_dialogProps> = ({ isVisible, setIsVisible
     )
 }
 
-export default Machine_dialog
+export default React.memo(Machine_dialog)

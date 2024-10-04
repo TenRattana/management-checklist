@@ -3,18 +3,9 @@ import { Pressable } from "react-native";
 import { Portal, Dialog, Text } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import AccessibleView from "@/components/AccessibleView";
-interface DialogsProps {
-    isVisible: boolean;
-    setIsVisible: (value: boolean) => void;
-    actions?: string;
-    title?: string;
-    messages?: string;
-    handleDialog: (actions?: string, data?: string) => void;
-    handleBlur?: () => void;
-    data?: string;
-}
+import { DialogsProps } from "@/typing/tag";
 
-const Dialogs: React.FC<DialogsProps> = ({
+const Dialogs = ({
     isVisible,
     setIsVisible,
     actions,
@@ -23,7 +14,7 @@ const Dialogs: React.FC<DialogsProps> = ({
     handleDialog,
     handleBlur,
     data,
-}) => {
+}: DialogsProps) => {
     console.log("Dialog_checkble");
     const masterdataStyles = useMasterdataStyles()
 
@@ -84,4 +75,4 @@ const Dialogs: React.FC<DialogsProps> = ({
     );
 };
 
-export default Dialogs;
+export default React.memo(Dialogs);
