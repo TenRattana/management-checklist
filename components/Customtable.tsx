@@ -310,4 +310,4 @@ const CustomTable = ({ Tabledata, Tablehead, flexArr, handleAction, actionIndex,
   );
 }
 
-export default React.memo(CustomTable);
+export default CustomTable;
