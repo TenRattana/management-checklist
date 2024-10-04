@@ -16,10 +16,17 @@ const useCustomtableStyles = () => {
             backgroundColor: colors.background,
             overflow: "hidden",
         },
+        containerContent: {
+        },
+        eventColumn: {
+            flexDirection: 'row',
+        },
+        eventCell: {
+        },
         cardRow: {
             padding: spacing.medium,
             marginVertical: spacing.small,
-            borderRadius: 5,
+            borderRadius: 2,
             borderWidth: 1,
             borderColor: colors.warning,
         },

@@ -3,8 +3,8 @@ import { ScrollView, Pressable, Text } from "react-native";
 import axios from 'axios'
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme } from "@/app/contexts";
-import { Customtable, LoadingSpinner, Searchbar } from "@/components";
-import { Card } from "react-native-paper";
+import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
+import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Checklist_option_dialog from "@/components/screens/Checklist_option_dialog";
@@ -119,15 +119,13 @@ const CheckListOptionScreen = () => {
             item.CLOptionName,
             item.IsActive,
             item.CLOptionID,
-            item.CLOptionID
         ]);
     }, [checkListOption]);
 
     const tableHead = [
         { label: "Check List Option Name", align: "flex-start" },
         { label: "Change Status", align: "center" },
-        { label: "Edit", align: "center" },
-        { label: "Delete", align: "center" },
+        { label: "", align: "flex-end" },
     ];
 
     const actionIndex = [{ editIndex: 2, delIndex: 3 }];
@@ -152,36 +150,22 @@ const CheckListOptionScreen = () => {
     };
 
     return (
-        <ScrollView>
-            <Card>
-                <Card.Title
-                    titleStyle={[
-                        masterdataStyles.text,
-                        masterdataStyles.textBold,
-                        { fontSize: spacing.large, textAlign: "center", marginTop: 30, paddingTop: 10, marginBottom: 30 }
-                    ]}
-                    title="Create Option"
-                />
-                <Card.Content>
-                    <Searchbar
-                        viewProps={
-                            <Pressable
-                                onPress={handelNewData}
-                                style={[masterdataStyles.button, masterdataStyles.backMain, { marginHorizontal: 0 }]}
-                            >
-                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Create Check List</Text>
-                            </Pressable>
-                        }
-                        searchQuery={searchQuery}
-                        handleChange={setSearchQuery}
-                    />
-                    {isLoading ? (
-                        <LoadingSpinner />
-                    ) : (
-                        <Customtable {...customtableProps} />
-                    )}
-                </Card.Content>
-            </Card>
+        <ScrollView style={{ paddingHorizontal: 15 }}>
+        <Text style={[masterdataStyles.text, masterdataStyles.textBold,
+        { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>Create Option
+        </Text>
+        <Divider style={{ marginBottom: 20 }} />
+        <Card style={{ borderRadius: 5 }}>
+            <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Pressable onPress={handelNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                    <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Option</Text>
+                </Pressable>
+            </AccessibleView>
+            <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
+                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+            </Card.Content>
+        </Card>
+
 
             <Checklist_option_dialog
                 isVisible={isVisible}

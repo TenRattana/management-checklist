@@ -61,6 +61,15 @@ const useMasterdataStyles = () => {
                         : "60%",
             alignSelf: "center",
         },
+        buttonCreate: {
+            borderRadius: 8,
+            marginVertical: 20,
+            marginLeft: 30,
+            width: responsive === "small" ? "90%" : 200,
+            height: 45,
+            justifyContent: 'center',
+            alignItems: 'center'
+        },
         containerSwitch: {
             flexDirection: "row",
             alignItems: "center",

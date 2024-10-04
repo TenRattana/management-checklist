@@ -3,8 +3,8 @@ import { ScrollView, Pressable, Text } from "react-native";
 import axios from "axios";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
-import { Customtable, LoadingSpinner, Searchbar } from "@/components";
-import { Card } from "react-native-paper";
+import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
+import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Machine_group_dialog from "@/components/screens/Machine_group_dialog";
@@ -113,16 +113,14 @@ const MachineGroupScreen = () => {
             item.Description,
             item.IsActive,
             item.MGroupID,
-            item.MGroupID,
         ]);
     }, [machineGroup]);
 
     const tableHead = [
         { label: "Machine Group Name", align: "flex-start" },
         { label: "Description", align: "flex-start" },
-        { label: "Change Status", align: "center" },
-        { label: "Edit", align: "center" },
-        { label: "Delete", align: "center" },
+        { label: "Status", align: "center" },
+        { label: "", align: "flex-end" },
     ];
 
     const actionIndex = [{ editIndex: 3, delIndex: 4 }];
@@ -147,31 +145,24 @@ const MachineGroupScreen = () => {
         searchQuery,
     };
 
+    const handleChange = (text: string) => {
+        setSearchQuery(text);
+    };
+
     return (
-        <ScrollView>
-            <Card>
-                <Card.Title
-                    titleStyle={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, textAlign: "center", marginTop: 30, paddingTop: 10, marginBottom: 30 }]}
-                    title="List Group Machine"
-                />
-                <Card.Content>
-                    <Searchbar
-                        viewProps={
-                            <Pressable
-                                onPress={handelNewData}
-                                style={[masterdataStyles.button, masterdataStyles.backMain, { marginHorizontal: 0 }]}
-                            >
-                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Create Group Machine</Text>
-                            </Pressable>
-                        }
-                        searchQuery={searchQuery}
-                        handleChange={setSearchQuery}
-                    />
-                    {isLoading ? (
-                        <LoadingSpinner />
-                    ) : (
-                        <Customtable {...customtableProps} />
-                    )}
+        <ScrollView style={{ paddingHorizontal: 15 }}>
+            <Text style={[masterdataStyles.text, masterdataStyles.textBold,
+            { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>Create Group Machine
+            </Text>
+            <Divider style={{ marginBottom: 20 }} />
+            <Card style={{ borderRadius: 5 }}>
+                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Pressable onPress={handelNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                        <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Group Machine</Text>
+                    </Pressable>
+                </AccessibleView>
+                <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
+                    {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
                 </Card.Content>
             </Card>
 

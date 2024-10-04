@@ -3,8 +3,8 @@ import { ScrollView, Pressable, Text } from "react-native";
 import axios from 'axios'
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme, useRes } from "@/app/contexts";
-import { Customtable, LoadingSpinner, Searchbar } from "@/components";
-import { Card } from "react-native-paper";
+import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
+import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Match_checklist_option from "@/components/screens/Match_checklist_option_dialog";
 import { CheckListOption, MatchCheckListOption, GroupCheckListOption, } from '@/typing/type'
@@ -135,7 +135,6 @@ const MatchCheckListOptionScreen = () => {
                     matchedOption?.CLOptionName || "",
                     item.IsActive,
                     item.MCLOptionID,
-                    item.MCLOptionID,
                 ];
             })
         );
@@ -144,14 +143,13 @@ const MatchCheckListOptionScreen = () => {
     const tableHead = [
         { label: "Group Name", align: "flex-start" },
         { label: "Option Name", align: "center" },
-        { label: "Edit", align: "center" },
-        { label: "Delete", align: "center" },
+        { label: "", align: "flex-end" },
     ];
 
     const actionIndex = [
         {
-            editIndex: 3,
-            delIndex: 4,
+            editIndex: 2,
+            delIndex: 3,
         },
     ];
 
@@ -191,30 +189,26 @@ const MatchCheckListOptionScreen = () => {
         searchQuery,
     };
 
+    const handleChange = (text: string) => {
+        setSearchQuery(text);
+    };
+
     return (
-        <ScrollView>
-            <Card>
-                <Card.Title
-                    titleStyle={[
-                        masterdataStyles.text,
-                        masterdataStyles.textBold,
-                        { fontSize: spacing.large, textAlign: "center", marginTop: spacing.small, paddingTop: 10, marginBottom: spacing.small },
-                    ]}
-                    title="Create Match Group & Option"
-                />
-                <Card.Content>
-                    <Searchbar
-                        viewProps={
-                            <Pressable onPress={handleNewData} style={[masterdataStyles.button, masterdataStyles.backMain, { marginHorizontal: 0 }]}>
-                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Create Group Machine</Text>
-                            </Pressable>
-                        }
-                        searchQuery={searchQuery}
-                        handleChange={setSearchQuery}
-                    />
-                    {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
-                </Card.Content>
-            </Card>
+        <ScrollView style={{ paddingHorizontal: 15 }}>
+        <Text style={[masterdataStyles.text, masterdataStyles.textBold,
+        { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>Create Match Group & Option
+        </Text>
+        <Divider style={{ marginBottom: 20 }} />
+        <Card style={{ borderRadius: 5 }}>
+            <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                    <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Match Group & Option</Text>
+                </Pressable>
+            </AccessibleView>
+            <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
+                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+            </Card.Content>
+        </Card>
 
             <Match_checklist_option
                 isVisible={isVisible}

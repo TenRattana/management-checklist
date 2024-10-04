@@ -3,8 +3,8 @@ import { ScrollView, Pressable, Text } from "react-native";
 import axios from "axios";
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme } from "@/app/contexts";
-import { Customtable, LoadingSpinner, Searchbar } from "@/components";
-import { Card } from "react-native-paper";
+import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
+import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 
@@ -126,32 +126,17 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
     };
 
     return (
-        <ScrollView>
-            <Card>
-                <Card.Title
-                    titleStyle={[
-                        masterdataStyles.text,
-                        masterdataStyles.textBold,
-                        { fontSize: spacing.large, textAlign: "center", marginTop: spacing.small, paddingTop: 10, marginBottom: spacing.small },
-                    ]}
-                    title="Expected Result"
-                />
-                <Card.Content>
-                    <Searchbar
-                        viewProps={
-                            <Pressable
-                                onPress={handleNewForm}
-                                style={[masterdataStyles.button, masterdataStyles.backMain]}
-                            >
-                                <Text style={[masterdataStyles.text, masterdataStyles.textLight]}>New Form</Text>
-                            </Pressable>
-                        }
-                        searchQuery={searchQuery}
-                        handleChange={setSearchQuery}
-                    />
+        <ScrollView style={{ paddingHorizontal: 15 }}>
+            <Text style={[masterdataStyles.text, masterdataStyles.textBold,
+            { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>ExpectedResult
+            </Text>
+            <Divider style={{ marginBottom: 20 }} />
+            <Card style={{ borderRadius: 5 }}>
+                <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
                     {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
                 </Card.Content>
             </Card>
+
         </ScrollView>
     );
 };

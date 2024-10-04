@@ -3,8 +3,8 @@ import { ScrollView, Pressable, Text } from "react-native";
 import axios from "axios";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
-import { Customtable, LoadingSpinner, Searchbar } from "@/components";
-import { Card } from "react-native-paper";
+import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
+import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Match_form_machine_dialog from "@/components/screens/Match_form_machine_dialog";
@@ -129,7 +129,6 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
                 item.FormID,
                 item.FormID,
                 item.MachineID,
-                item.MachineID,
             ];
         })
     }, [machine]);
@@ -140,8 +139,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
         { label: "Change Form", align: "center" },
         { label: "Copy Template", align: "center" },
         { label: "Preview", align: "center" },
-        { label: "Edit", align: "center" },
-        { label: "Delete", align: "center" },
+        { label: "", align: "flex-end" },
     ];
 
     const actionIndex = [
@@ -187,27 +185,23 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
         searchQuery,
     };
 
+    const handleChange = (text: string) => {
+        setSearchQuery(text);
+    };
+
     return (
-        <ScrollView>
-            <Card>
-                <Card.Title
-                    titleStyle={[
-                        masterdataStyles.text,
-                        masterdataStyles.textBold,
-                        { fontSize: spacing.large, textAlign: "center", marginTop: spacing.small, paddingTop: 10, marginBottom: spacing.small },
-                    ]}
-                    title="Create Match Machine & Form"
-                />
-                <Card.Content>
-                    <Searchbar
-                        viewProps={
-                            <Pressable onPress={handleNewData} style={[masterdataStyles.button, masterdataStyles.backMain, { marginHorizontal: 0 }]}>
-                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Create Group Machine</Text>
-                            </Pressable>
-                        }
-                        searchQuery={searchQuery}
-                        handleChange={setSearchQuery}
-                    />
+        <ScrollView style={{ paddingHorizontal: 15 }}>
+            <Text style={[masterdataStyles.text, masterdataStyles.textBold,
+            { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>Create Match Machine & Form
+            </Text>
+            <Divider style={{ marginBottom: 20 }} />
+            <Card style={{ borderRadius: 5 }}>
+                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                        <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Match Machine & Form</Text>
+                    </Pressable>
+                </AccessibleView>
+                <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
                     {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
                 </Card.Content>
             </Card>
