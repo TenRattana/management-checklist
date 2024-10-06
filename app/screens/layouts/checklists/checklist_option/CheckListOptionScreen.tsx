@@ -143,7 +143,7 @@ const CheckListOptionScreen = () => {
     const customtableProps = {
         Tabledata: tableData,
         Tablehead: tableHead,
-        flexArr: [3, 1, 1, 1],
+        flexArr: [6, 1, 1],
         actionIndex,
         handleAction,
         searchQuery,
@@ -151,20 +151,20 @@ const CheckListOptionScreen = () => {
 
     return (
         <ScrollView style={{ paddingHorizontal: 15 }}>
-        <Text style={[masterdataStyles.text, masterdataStyles.textBold,
-        { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>Create Option
-        </Text>
-        <Divider style={{ marginBottom: 20 }} />
-        <Card style={{ borderRadius: 5 }}>
-            <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Pressable onPress={handelNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Option</Text>
-                </Pressable>
-            </AccessibleView>
-            <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
-            </Card.Content>
-        </Card>
+            <Text style={[masterdataStyles.text, masterdataStyles.textBold,
+            { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>Create Option
+            </Text>
+            <Divider style={{ marginBottom: 20 }} />
+            <Card style={{ borderRadius: 5 }}>
+                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Pressable onPress={handelNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                        <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Option</Text>
+                    </Pressable>
+                </AccessibleView>
+                <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
+                    {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+                </Card.Content>
+            </Card>
 
 
             <Checklist_option_dialog

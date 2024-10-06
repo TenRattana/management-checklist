@@ -142,14 +142,15 @@ const MatchCheckListOptionScreen = () => {
 
     const tableHead = [
         { label: "Group Name", align: "flex-start" },
-        { label: "Option Name", align: "center" },
+        { label: "Option Name", align: "flex-start" },
+        { label: "Status", align: "center" },
         { label: "", align: "flex-end" },
     ];
 
     const actionIndex = [
         {
-            editIndex: 2,
-            delIndex: 3,
+            editIndex: 3,
+            delIndex: 4,
         },
     ];
 
@@ -183,7 +184,7 @@ const MatchCheckListOptionScreen = () => {
     const customtableProps = {
         Tabledata: tableData,
         Tablehead: tableHead,
-        flexArr: [3, 4, 1, 1, 1],
+        flexArr: [3, 3, 1, 1],
         actionIndex,
         handleAction,
         searchQuery,

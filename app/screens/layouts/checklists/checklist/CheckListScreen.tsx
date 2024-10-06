@@ -133,7 +133,7 @@ const CheckListScreen = () => {
     const customtableProps = {
         Tabledata: tableData,
         Tablehead: tableHead,
-        flexArr: [3, 1, 1, 1],
+        flexArr: [6, 1, 1],
         actionIndex,
         handleAction,
         searchQuery,

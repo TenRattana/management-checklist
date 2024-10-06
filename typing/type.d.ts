@@ -60,6 +60,7 @@ export interface MatchForm {
     FormID: string;
     MachineName: string;
     FormName: string;
+    IsActive:boolean;
 }
 
 export interface MatchCheckListOption {

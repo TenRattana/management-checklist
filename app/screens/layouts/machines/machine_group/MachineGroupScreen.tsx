@@ -139,7 +139,7 @@ const MachineGroupScreen = () => {
     const customtableProps = {
         Tabledata: tableData,
         Tablehead: tableHead,
-        flexArr: [2, 3, 1, 1, 1],
+        flexArr: [3, 3, 1, 1, 1],
         actionIndex,
         handleAction,
         searchQuery,

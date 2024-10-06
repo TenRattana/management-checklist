@@ -149,7 +149,7 @@ const ChecklistGroupScreen = () => {
     const customtableProps = {
         Tabledata: tableData,
         Tablehead: tableHead,
-        flexArr: [3, 5, 1, 1, 1],
+        flexArr: [3, 3, 1, 1],
         actionIndex,
         handleAction,
         searchQuery,

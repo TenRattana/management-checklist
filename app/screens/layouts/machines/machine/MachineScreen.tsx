@@ -156,7 +156,7 @@ const MachineGroupScreen = () => {
     const customtableProps = {
         Tabledata: tableData,
         Tablehead: tableHead,
-        flexArr: [2, 2, 3, 1, 1],
+        flexArr: [2, 2, 2, 1, 1],
         actionIndex,
         handleAction,
         searchQuery,
@@ -177,13 +177,13 @@ const MachineGroupScreen = () => {
     return (
         <ScrollView style={{ paddingHorizontal: 15 }}>
             <Text style={[masterdataStyles.text, masterdataStyles.textBold,
-            { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>Create Group Machine
+            { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>Create Machine
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
                 <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                        <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Group Machine</Text>
+                        <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Machine</Text>
                     </Pressable>
                 </AccessibleView>
                 <Card.Content style={{ padding: 2, paddingVertical: 10 }}>

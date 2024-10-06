@@ -99,7 +99,7 @@ const CustomTable = ({
       } else {
         setDialogAction(action);
         setDialogData(data);
-        setDialogTitle(action === "editIndex" ? "Edit" : "Delete");
+        setDialogTitle(action === "editIndex" ? "Edit" : action === "Delete" ? "Delete" : action === "changeIndex" ? "Change Data Form": action === "copyIndex" ? "Copy Template" : action === "preIndex" ? "Preview Form" : "" );
         setDialogMessage(`${row[0]}`);
         setIsVisible(true);
       }
@@ -120,6 +120,33 @@ const CustomTable = ({
         icon = (
           <IconButton
             icon="trash-can"
+            size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium}
+            iconColor={colors.danger}
+          />
+        );
+        break;
+      case "changeIndex":
+        icon = (
+          <IconButton
+            icon="tooltip-edit"
+            size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium}
+            iconColor={colors.danger}
+          />
+        );
+        break;
+      case "copyIndex":
+        icon = (
+          <IconButton
+            icon="content-copy"
+            size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium}
+            iconColor={colors.danger}
+          />
+        );
+        break;
+      case "preIndex":
+        icon = (
+          <IconButton
+            icon="file-find"
             size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium}
             iconColor={colors.danger}
           />
@@ -206,21 +233,26 @@ const CustomTable = ({
 
                   return filteredEntries.length > 0
                     ? filteredEntries.map(([key]) => {
-                      if (key === "editIndex" || key === "delIndex" || key === "actionIndex") {
+                      if (key === "editIndex" || key === "delIndex") {
                         return (
                           <AccessibleView key={`action-${rowIndex}`} style={customtable.eventColumn}>
-                            {renderActionButton(rowData[colIndex] as string, "editIndex", rowData, rowIndex)}
-                            {renderActionButton(rowData[colIndex] as string, "delIndex", rowData, rowIndex)}
+                            {key === "editIndex" && renderActionButton(rowData[colIndex] as string, "editIndex", rowData, rowIndex)}
+                            {key === "delIndex" && renderActionButton(rowData[colIndex] as string, "delIndex", rowData, rowIndex)}
                           </AccessibleView>
                         );
+                      } else {
+                        return (
+                          <AccessibleView key={`action-${rowIndex}`} style={customtable.eventColumn}>
+                            {renderActionButton(rowData[colIndex] as string, key, rowData, rowIndex)}
+                          </AccessibleView>
+                        )
                       }
-                      return null;
                     })
                     : renderCellContent(rowData[colIndex], colIndex, rowData, rowIndex);
                 })}
               </AccessibleView>
             ))}
-            
+
           </AccessibleView>
         ))
       ) : (
@@ -261,12 +293,17 @@ const CustomTable = ({
                             if (key === "editIndex" || key === "delIndex") {
                               return (
                                 <AccessibleView key={`action-${rowIndex}`} style={customtable.eventColumn}>
-                                  {renderActionButton(row[cellIndex] as string, "editIndex", row, rowIndex)}
-                                  {renderActionButton(row[cellIndex] as string, "delIndex", row, rowIndex)}
+                                  {key === "editIndex" && renderActionButton(row[cellIndex] as string, "editIndex", row, rowIndex)}
+                                  {key === "delIndex" && renderActionButton(row[cellIndex] as string, "delIndex", row, rowIndex)}
                                 </AccessibleView>
                               );
+                            } else {
+                              return (
+                                <AccessibleView key={`action-${rowIndex}`} style={customtable.eventColumn}>
+                                  {renderActionButton(row[cellIndex] as string, key, row, rowIndex)}
+                                </AccessibleView>
+                              )
                             }
-                            return null;
                           })
                           : renderCellContent(cell, cellIndex, row, rowIndex);
                       })}
