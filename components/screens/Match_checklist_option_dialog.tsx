@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Pressable, Text } from "react-native";
 import { useTheme } from "@/app/contexts";
 import AccessibleView from "@/components/AccessibleView";
@@ -6,29 +6,47 @@ import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import CustomDropdownMultiple from "@/components/CustomDropdownMultiple";
 import { Portal, Switch, Dialog, HelperText } from "react-native-paper";
 import { Formik, Field } from "formik";
-import * as Yup from 'yup'
+import * as Yup from 'yup';
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { CheckListOption, GroupCheckListOption, } from '@/typing/type'
-import { InitialValuesMatchCheckListOption, MatchChecklistOptionProps } from '@/typing/value'
+import { CheckListOption, GroupCheckListOption } from '@/typing/type';
+import { InitialValuesMatchCheckListOption, MatchChecklistOptionProps } from '@/typing/value';
+import { IMultiSelectRef } from "react-native-element-dropdown";
 
 const validationSchema = Yup.object().shape({
-    groupCheckListOptionId: Yup.string().required(
-        "This group check list field is required"
-    ),
+    groupCheckListOptionId: Yup.string().required("This group check list field is required"),
     checkListOptionId: Yup.array()
         .of(Yup.string())
         .min(1, "The check list option field requires at least one option to be selected"),
     isActive: Yup.boolean().required("The active field is required."),
 });
 
-const Match_checklist_option = ({ isVisible, setIsVisible, isEditing, initialValues, saveData,
+const Match_checklist_option = ({
+    isVisible,
+    setIsVisible,
+    isEditing,
+    initialValues,
+    saveData,
     checkListOption,
     dropcheckListOption,
     groupCheckListOption,
-    dropgroupCheckListOption, }: MatchChecklistOptionProps<InitialValuesMatchCheckListOption, CheckListOption, GroupCheckListOption>) => {
+    dropgroupCheckListOption,
+}: MatchChecklistOptionProps<InitialValuesMatchCheckListOption, CheckListOption, GroupCheckListOption>) => {
 
-    const masterdataStyles = useMasterdataStyles()
-    const { colors } = useTheme()
+    const masterdataStyles = useMasterdataStyles();
+    const { colors } = useTheme();
+    const multiSelectRef = useRef<IMultiSelectRef>(null);
+
+    if (multiSelectRef.current?.close) {
+        const selectedValues = multiSelectRef.current.getSelectedValues();
+        console.log("Selected Values: ", selectedValues);
+    }
+    
+    const handleShowSelectedValues = () => {
+        if (multiSelectRef.current?.close) {
+            const selectedValues = multiSelectRef.current.getSelectedValues();
+            console.log("Selected Values: ", selectedValues);
+        }
+    };
 
     return (
         <Portal>
@@ -47,7 +65,6 @@ const Match_checklist_option = ({ isVisible, setIsVisible, isEditing, initialVal
                         >
                             {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, dirty, isValid }) => (
                                 <AccessibleView>
-
                                     <Field
                                         name="groupCheckListOptionId"
                                         component={({ field, form }: any) => (
@@ -60,9 +77,7 @@ const Match_checklist_option = ({ isVisible, setIsVisible, isEditing, initialVal
                                                         ? groupCheckListOption.filter((v) => v.IsActive)
                                                         : dropgroupCheckListOption}
                                                     selectedValue={field.value}
-                                                    onValueChange={(value, icon) => {
-                                                        console.log(value);
-
+                                                    onValueChange={(value) => {
                                                         form.setFieldValue(field.name, value);
                                                         form.setTouched({ ...form.touched, [field.name]: true });
                                                     }}
@@ -76,7 +91,7 @@ const Match_checklist_option = ({ isVisible, setIsVisible, isEditing, initialVal
                                             </AccessibleView>
                                         )}
                                     />
-
+                                    <Text onPress={handleShowSelectedValues}>Show Selected Values</Text>
                                     <Field
                                         name="checkListOptionId"
                                         component={({ field, form }: any) => (
@@ -89,16 +104,15 @@ const Match_checklist_option = ({ isVisible, setIsVisible, isEditing, initialVal
                                                         ? checkListOption.filter((v) => v.IsActive)
                                                         : dropcheckListOption}
                                                     selectedValue={field.value}
-                                                    onValueChange={(value, icon) => {
-                                                        console.log(value);
-
+                                                    onValueChange={(value) => {
                                                         form.setFieldValue(field.name, value);
                                                         form.setTouched({ ...form.touched, [field.name]: true });
                                                     }}
                                                     testId="checkListOptionId-mcod"
+                                                    ref={multiSelectRef}
                                                 />
                                                 {touched.checkListOptionId && errors.checkListOptionId && (
-                                                    <HelperText type="error" visible={Boolean(touched.checkListOptionId && errors.groupCheckListOptionId)} style={{ left: -10 }} testID="error-checkListOptionId-mcod">
+                                                    <HelperText type="error" visible={Boolean(touched.checkListOptionId && errors.checkListOptionId)} style={{ left: -10 }} testID="error-checkListOptionId-mcod">
                                                         {errors.checkListOptionId}
                                                     </HelperText>
                                                 )}
@@ -130,7 +144,7 @@ const Match_checklist_option = ({ isVisible, setIsVisible, isEditing, initialVal
                                             ]}
                                             testID="Save-mcod"
                                         >
-                                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Save</Text>
+                                            <Text style={[masterdataStyles.text, masterdataStyles.textBold]}>Save</Text>
                                         </Pressable>
                                         <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-mcod">
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Cancel</Text>
@@ -143,7 +157,7 @@ const Match_checklist_option = ({ isVisible, setIsVisible, isEditing, initialVal
                 </Dialog.Content>
             </Dialog>
         </Portal>
-    )
-}
+    );
+};
 
-export default React.memo(Match_checklist_option)
+export default Match_checklist_option;

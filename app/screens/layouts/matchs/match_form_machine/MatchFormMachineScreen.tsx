@@ -129,7 +129,6 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
                 item.FormID,
                 item.FormID,
                 item.IsActive,
-                item.MachineID,
             ];
         })
     }, [machine]);
@@ -141,7 +140,6 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
         { label: "Copy Template", align: "center" },
         { label: "Preview", align: "center" },
         { label: "Status", align: "center" },
-        { label: "", align: "flex-end" },
     ];
 
     const actionIndex = [
@@ -149,7 +147,6 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
             changeIndex: 2,
             copyIndex: 3,
             preIndex: 4,
-            editIndex: 6
         },
     ];
 
@@ -180,7 +177,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
     const customtableProps = {
         Tabledata: tableData,
         Tablehead: tableHead,
-        flexArr: [2, 3, 1, 1, 1, 1, 1],
+        flexArr: [2, 3, 1, 1, 1, 1],
         actionIndex,
         handleAction,
         searchQuery,

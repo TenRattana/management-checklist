@@ -99,7 +99,7 @@ const CustomTable = ({
       } else {
         setDialogAction(action);
         setDialogData(data);
-        setDialogTitle(action === "editIndex" ? "Edit" : action === "Delete" ? "Delete" : action === "changeIndex" ? "Change Data Form": action === "copyIndex" ? "Copy Template" : action === "preIndex" ? "Preview Form" : "" );
+        setDialogTitle(action === "editIndex" ? "Edit" : action === "Delete" ? "Delete" : action === "changeIndex" ? "Change Data Form" : action === "copyIndex" ? "Copy Template" : action === "preIndex" ? "Preview Form" : "");
         setDialogMessage(`${row[0]}`);
         setIsVisible(true);
       }
@@ -293,8 +293,8 @@ const CustomTable = ({
                             if (key === "editIndex" || key === "delIndex") {
                               return (
                                 <AccessibleView key={`action-${rowIndex}`} style={customtable.eventColumn}>
-                                  {key === "editIndex" && renderActionButton(row[cellIndex] as string, "editIndex", row, rowIndex)}
-                                  {key === "delIndex" && renderActionButton(row[cellIndex] as string, "delIndex", row, rowIndex)}
+                                  {renderActionButton(row[cellIndex] as string, "editIndex", row, rowIndex)}
+                                  {renderActionButton(row[cellIndex] as string, "delIndex", row, rowIndex)}
                                 </AccessibleView>
                               );
                             } else {
