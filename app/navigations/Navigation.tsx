@@ -18,6 +18,11 @@ import {
   MatchCheckListOptionScreen,
   MatchFormMachineScreen,
   CheckListScreen,
+  ScanQR,
+  GenerateQR,
+  InputFormMachine,
+  Managepermissions,
+  SettingScreen,
   // PreviewScreen,
   CheckListOptionScreen,
   ChecklistGroupScreen,
@@ -108,6 +113,38 @@ function CustomDrawerContent({ navigation }: any) {
             android_ripple={{ color: '#f0f0f0' }}
           >
             <Text style={styles.menuText}>Test</Text>
+          </Pressable>
+
+          <Pressable
+            onPress={() => navigation.navigate('ScanQR')}
+            style={styles.menuItem}
+            android_ripple={{ color: '#f0f0f0' }}
+          >
+            <Text style={styles.menuText}>Scan QR Code</Text>
+          </Pressable>
+
+          <Pressable
+            onPress={() => navigation.navigate('GenerateQR')}
+            style={styles.menuItem}
+            android_ripple={{ color: '#f0f0f0' }}
+          >
+            <Text style={styles.menuText}>Generate QR Code</Text>
+          </Pressable>
+
+          <Pressable
+            onPress={() => navigation.navigate('Managepermissions')}
+            style={styles.menuItem}
+            android_ripple={{ color: '#f0f0f0' }}
+          >
+            <Text style={styles.menuText}>Managepermissions</Text>
+          </Pressable>
+
+          <Pressable
+            onPress={() => navigation.navigate('Setting')}
+            style={styles.menuItem}
+            android_ripple={{ color: '#f0f0f0' }}
+          >
+            <Text style={styles.menuText}>Setting</Text>
           </Pressable>
 
           <Pressable
@@ -241,6 +278,11 @@ export default function App() {
               {/* <Drawer.Screen name="Preview" component={UserScreen} /> */}
               <Drawer.Screen name="Super_admin" component={SuperAdminScreen} />
               <Drawer.Screen name="Admin" component={AdminScreen} />
+              <Drawer.Screen name="ScanQR" component={ScanQR} />
+              <Drawer.Screen name="GenerateQR" component={GenerateQR} />
+              <Drawer.Screen name="InputFormMachine" component={InputFormMachine} />
+              <Drawer.Screen name="Managepermissions" component={Managepermissions} />
+              <Drawer.Screen name="Setting" component={SettingScreen} />
               <Drawer.Screen name="Logout" component={LogoutScreen} />
             </>
           )}
@@ -259,19 +301,18 @@ export default function App() {
               <Drawer.Screen name="Test" component={TestScreen} />
               <Drawer.Screen name="User" component={UserScreen} />
               <Drawer.Screen name="Admin" component={AdminScreen} />
+              <Drawer.Screen name="ScanQR" component={ScanQR} />
+              <Drawer.Screen name="GenerateQR" component={GenerateQR} />
+              <Drawer.Screen name="InputFormMachine" component={InputFormMachine} />
+              <Drawer.Screen name="Setting" component={SettingScreen} />
               <Drawer.Screen name="Logout" component={LogoutScreen} />
             </>
           )}
           {role === "GeneralUser" && (
             <>
-              <Drawer.Screen name="Machine_group" component={MachineGroupScreen} />
-              <Drawer.Screen name="Machine" component={MachineScreen} />
-              <Drawer.Screen name="Checklist" component={CheckListScreen} />
-              <Drawer.Screen name="Checklist_option" component={CheckListOptionScreen} />
-              <Drawer.Screen name="Checklist_group" component={ChecklistGroupScreen} />
-              <Drawer.Screen name="Create_form" component={CreateFormScreen} />
-              <Drawer.Screen name="Expected_result" component={ExpectedResultScreen} />
+              <Drawer.Screen name="ScanQR" component={ScanQR} />
               <Drawer.Screen name="Form" component={FormScreen} />
+              <Drawer.Screen name="Setting" component={SettingScreen} />
               <Drawer.Screen name="Logout" component={LogoutScreen} />
             </>
           )}

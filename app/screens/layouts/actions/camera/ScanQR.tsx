@@ -47,7 +47,7 @@ const CameraScan: React.FC<CameraScanProps> = ({ navigation }) => {
     const handleAction = (value: string | null) => {
         try {
             if (value) {
-                navigation.navigate("Screen Scan", {
+                navigation.navigate("InputFormMachine", {
                     machineId: value,
                 });
                 setScanned(false);
