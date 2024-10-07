@@ -42,7 +42,7 @@ const Inputs: React.FC<InputProps> = ({
         label={label}
         onChangeText={handleChange}
         onBlur={handleBlur}
-        value={value}
+        value={value || ""}
         right={
           value ? (
             <TextInput.Icon
@@ -54,6 +54,7 @@ const Inputs: React.FC<InputProps> = ({
         error={error}
         enterKeyHint="done"
         testID={testId}
+        id={testId}
       />
       {hint && <Text>{hint}</Text>}
       <HelperText type="error" visible={error} style={{ left: -10 }}>

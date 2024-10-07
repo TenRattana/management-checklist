@@ -83,7 +83,7 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation }) => {
     };
 
     const handleNewForm = () => {
-        navigation.navigate("screens/layouts/forms/create/CreateFormScreen");
+        navigation.navigate("Create_form");
     };
 
     const tableData = useMemo(() => {

@@ -72,7 +72,7 @@ const useCreateformStyle = () => {
             backgroundColor: '#00796b',
             borderRadius: 8,
             alignItems: 'center',
-            marginTop: 16,
+            margin: 16,
         },
         saveButtonText: {
             color: colors.light,

@@ -45,11 +45,12 @@ const FieldDialog: React.FC<FieldDialogProps> = ({ isVisible, formState, onDelet
     const [shouldRender, setShouldRender] = useState<string>("");
     const [shouldRenderDT, setShouldRenderDT] = useState<boolean>(false);
     const { colors } = useTheme()
+console.log(editMode);
 
     const validationSchemaField = Yup.object().shape({
         CListID: Yup.string().required("The checklist field is required."),
         CTypeID: Yup.string().required("The checklist type field is required."),
-        DTypeID: Yup.string().required("The data type field is required."),
+        // DTypeID: Yup.string().required("The data type field is required."),
         // GCLOptionID: Yup.string().when(['shouldRender'], {
         //     is: (shouldRender: string) => shouldRender === "detail",
         //     then: Yup.string().required("The group checklist field is required."),

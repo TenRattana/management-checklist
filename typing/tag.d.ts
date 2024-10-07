@@ -59,6 +59,7 @@ export interface DefaultProps {
 
 export interface CheckboxsProps extends Event, DefaultProps {
   option: Option[];
+  testId?:string;
 }
 
 interface DialogsProps  {

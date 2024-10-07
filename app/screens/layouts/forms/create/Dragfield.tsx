@@ -84,7 +84,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, errorMes
 
     const handleSaveField = useCallback((values: BaseFormState, mode: string) => {
         const payload = { BaseFormState: values, checkList, checkListType, dataType };
-
+        
         try {
             if (mode === "add") {
                 dispatch(addField(payload));
@@ -112,7 +112,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, errorMes
                         onPressOut={() => onPressOut(item.SFormID)}
                         onPress={() => {
                             setIsEditing(true);
-                            handleDialogToggle();
+                            setDialogVisible(true);
                             handleField(item);
                         }}
                         onLongPress={drag}
@@ -145,7 +145,10 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, errorMes
                 autoscrollSpeed={30}
             />
             <Pressable
-                onPress={handleDialogToggle}
+                onPress={() => {
+                    handleDialogToggle();
+                    handleField();
+                }}
                 style={[createformStyles.fieldContainer, { justifyContent: "center", opacity: 0.5 }]}
             >
                 <IconButton icon="plus" size={16} />
