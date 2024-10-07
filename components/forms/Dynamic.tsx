@@ -29,6 +29,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
     );
 
   const fieldName = field.MCListID;
+console.log(fieldName);
 
   const renderField = () => {
     switch (field.CTypeName) {

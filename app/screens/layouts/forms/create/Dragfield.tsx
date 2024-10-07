@@ -37,6 +37,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, errorMes
         Required: false, Placeholder: "", Hint: "", EResult: "", CListName: "", DTypeValue: undefined, MinLength: undefined, MaxLength: undefined
     });
     const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [count , setCount] = useState(0)
 
     const createformStyles = useCreateformStyle();
     const scaleValues = useRef<{ [key: string]: Animated.Value }>({});
@@ -76,8 +77,9 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, errorMes
     }, []);
 
     const handleField = useCallback((item?: BaseFormState) => {
+        setCount(count+ 1)
         setCurrentField(item || {
-            MCListID: "", CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: SFormID,
+            MCListID: `MCL-ADD-${count}`, CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: SFormID,
             Required: false, Placeholder: "", Hint: "", EResult: "", CListName: "", DTypeValue: undefined, MinLength: undefined, MaxLength: undefined
         });
     }, []);

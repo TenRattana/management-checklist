@@ -45,7 +45,7 @@ const FieldDialog: React.FC<FieldDialogProps> = ({ isVisible, formState, onDelet
     const [shouldRender, setShouldRender] = useState<string>("");
     const [shouldRenderDT, setShouldRenderDT] = useState<boolean>(false);
     const { colors } = useTheme()
-console.log(editMode);
+    console.log(editMode);
 
     const validationSchemaField = Yup.object().shape({
         CListID: Yup.string().required("The checklist field is required."),
@@ -249,11 +249,11 @@ console.log(editMode);
                                                                 <IconButton onPress={() => setIsVisibleCL(true)} icon="plus" />
                                                             )}
                                                         />
-                                                        {touched.CListID && errors.CListID && (
+                                                        {touched.CListID && errors.CListID ? (
                                                             <HelperText type="error" visible={Boolean(touched.CListID && errors.CListID)} style={{ left: -10 }}>
                                                                 {errors.CListID}
                                                             </HelperText>
-                                                        )}
+                                                        ) : false}
                                                     </AccessibleView>
                                                 )}
                                             />
@@ -274,11 +274,11 @@ console.log(editMode);
                                                                 form.setTouched({ ...form.touched, [field.name]: true });
                                                             }}
                                                         />
-                                                        {touched.CTypeID && errors.CTypeID && (
+                                                        {touched.CTypeID && errors.CTypeID ? (
                                                             <HelperText type="error" visible={Boolean(touched.CTypeID && errors.CTypeID)} style={{ left: -10 }}>
                                                                 {errors.CTypeID}
                                                             </HelperText>
-                                                        )}
+                                                        ) : false}
                                                     </AccessibleView>
                                                 )}
                                             />
@@ -300,11 +300,11 @@ console.log(editMode);
                                                                         form.setTouched({ ...form.touched, [field.name]: true });
                                                                     }}
                                                                 />
-                                                                {touched.GCLOptionID && errors.GCLOptionID && (
+                                                                {touched.GCLOptionID && errors.GCLOptionID ? (
                                                                     <HelperText type="error" visible style={{ left: -10 }}>
                                                                         {errors.GCLOptionID}
                                                                     </HelperText>
-                                                                )}
+                                                                ) : false}
                                                             </AccessibleView>
                                                         )}
                                                     />
@@ -329,11 +329,11 @@ console.log(editMode);
                                                                         form.setTouched({ ...form.touched, [field.name]: true });
                                                                     }}
                                                                 />
-                                                                {touched.DTypeID && errors.DTypeID && (
+                                                                {touched.DTypeID && errors.DTypeID ? (
                                                                     <HelperText type="error" visible style={{ left: -10 }}>
                                                                         {errors.DTypeID}
                                                                     </HelperText>
-                                                                )}
+                                                                ) : false}
                                                             </AccessibleView>
                                                         )}
                                                     />

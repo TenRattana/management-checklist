@@ -161,7 +161,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ errorMessage, state, dispatch
                 renderItem={renderSubForm}
                 keyExtractor={(item, index) => `SF-${item.SFormID}-${index}`}
                 onDragEnd={({ data }) => handleDropSubForm(data)}
-                contentContainerStyle={{ paddingHorizontal: 50, paddingTop: 5, paddingBottom: 40 }}
+                contentContainerStyle={{ paddingHorizontal: 50, paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 40 :  0}}
                 nestedScrollEnabled={true}
                 activationDistance={1}
                 autoscrollSpeed={30}
