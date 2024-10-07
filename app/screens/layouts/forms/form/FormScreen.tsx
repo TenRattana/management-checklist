@@ -136,7 +136,8 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation }) => {
                     <Pressable
                         onPress={handleNewForm}
                         style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}
-                    ></Pressable>
+                    >
+                        <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>New Form</Text></Pressable>
                 </AccessibleView>
                 <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
                     {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}

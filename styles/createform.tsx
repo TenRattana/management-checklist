@@ -9,13 +9,21 @@ const useCreateformStyle = () => {
     const { responsive, spacing } = useRes();
 
     return StyleSheet.create({
-
-        containerL1: {
-            padding: 16,
-            paddingRight: 40,
+        container: {
             flex: 1,
+            flexDirection: responsive === "small" ? "column" : "row",
+            flexWrap: responsive === "small" ? "nowrap" : "wrap",
+        },
+        containerL1: {
+            display: "flex",
+            flexGrow: 0,
+            width: responsive === "small" ? "100%" : 350,
             backgroundColor: colors.light,
-            width: responsive === "small" ? "100%" : 400,
+        },
+        containerL2: {
+            display: "flex",
+            flex: 1,
+            margin: 10,
         },
         addSubFormButton: {
             margin: 16,

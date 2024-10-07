@@ -18,6 +18,7 @@ import {
   MatchCheckListOptionScreen,
   MatchFormMachineScreen,
   CheckListScreen,
+  // PreviewScreen,
   CheckListOptionScreen,
   ChecklistGroupScreen,
 } from "@/app/screens";
@@ -100,6 +101,22 @@ function CustomDrawerContent({ navigation }: any) {
           >
             <Text style={styles.menuText}>List Result</Text>
           </Pressable>
+
+          <Pressable
+            onPress={() => navigation.navigate('Test')}
+            style={styles.menuItem}
+            android_ripple={{ color: '#f0f0f0' }}
+          >
+            <Text style={styles.menuText}>Test</Text>
+          </Pressable>
+
+          <Pressable
+            onPress={() => navigation.navigate('Logout')}
+            style={styles.menuItem}
+            android_ripple={{ color: '#f0f0f0' }}
+          >
+            <Text style={styles.menuText}>Logout</Text>
+          </Pressable>
         </>
       ) : (
         <Pressable
@@ -131,13 +148,13 @@ const MenuSection = ({ title, isOpen, onToggle, items, navigation }: any) => {
 
   useEffect(() => {
     if (isOpen) {
-      opacity.value = withTiming(1, { duration: 600 });
-      height.value = withTiming(totalHeight, { duration: 600 });
+      opacity.value = withTiming(1, { duration: 300 });
+      height.value = withTiming(totalHeight, { duration: 300 });
     } else {
-      opacity.value = withTiming(0, { duration: 600 });
-      height.value = withTiming(0, { duration: 600 }, (finished) => {
-
-      });
+      setTimeout(() => {
+        opacity.value = withTiming(0, { duration: 300 });
+        height.value = withTiming(0, { duration: 300 });
+      }, 300)
     }
   }, [isOpen, totalHeight]);
 
@@ -152,20 +169,18 @@ const MenuSection = ({ title, isOpen, onToggle, items, navigation }: any) => {
         <IconButton icon={isOpen ? 'chevron-up' : 'chevron-down'} size={20} />
       </Pressable>
 
-      {isOpen && (
-        <Animated.View style={[animatedStyle, { overflow: 'hidden' }]}>
-          {items.map((item: any) => (
-            <Pressable
-              key={item.label}
-              onPress={() => navigation.navigate(item.navigateTo)}
-              style={styles.subMenuItem}
-              android_ripple={{ color: '#f0f0f0' }}
-            >
-              <Text style={styles.subMenuText}>{item.label}</Text>
-            </Pressable>
-          ))}
-        </Animated.View>
-      )}
+      <Animated.View style={[animatedStyle]}>
+        {items.map((item: any) => (
+          <Pressable
+            key={item.label}
+            onPress={() => navigation.navigate(item.navigateTo)}
+            style={styles.subMenuItem}
+            android_ripple={{ color: '#f0f0f0' }}
+          >
+            <Text style={styles.subMenuText}>{item.label}</Text>
+          </Pressable>
+        ))}
+      </Animated.View>
     </>
   );
 };
@@ -223,6 +238,7 @@ export default function App() {
               <Drawer.Screen name="Form" component={FormScreen} />
               <Drawer.Screen name="Test" component={TestScreen} />
               <Drawer.Screen name="User" component={UserScreen} />
+              {/* <Drawer.Screen name="Preview" component={UserScreen} /> */}
               <Drawer.Screen name="Super_admin" component={SuperAdminScreen} />
               <Drawer.Screen name="Admin" component={AdminScreen} />
               <Drawer.Screen name="Logout" component={LogoutScreen} />

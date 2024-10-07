@@ -47,6 +47,7 @@ export interface GroupCheckListOption {
   GCLOptionName: string;
   Description: string;
   IsActive: boolean;
+  CheckListOptions?:CheckListOption[];
 }
 
 export interface Form {

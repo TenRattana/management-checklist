@@ -9,6 +9,8 @@ import { SubForm, FormData, BaseFormState } from '@/typing/form'
 import { CheckListType, CheckListOption, Checklist, DataType, GroupCheckListOption } from '@/typing/type'
 
 const useForm = (route: any) => {
+    console.log("useForm");
+
     const dispatch = useDispatch();
     const state = useSelector((state: any) => state.form);
 
@@ -18,6 +20,7 @@ const useForm = (route: any) => {
     const [checkListType, setCheckListType] = useState<CheckListType[]>([]);
     const [dataType, setDataType] = useState<DataType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [dataLoading, setDataLoding] = useState(false);
     const { formId, action } = route.params || {};
     const { showError } = useToast();
 
@@ -51,6 +54,7 @@ const useForm = (route: any) => {
             setGroupCheckListOption(responses[2].data.data ?? []);
             setCheckListType(responses[3].data.data ?? []);
             setDataType(responses[4].data.data ?? []);
+            setDataLoding(true)
         } catch (error) {
             errorMessage(error);
         } finally {
@@ -97,7 +101,6 @@ const useForm = (route: any) => {
                     Required: itemOption.Required,
                     MinLength: itemOption.MinLength,
                     MaxLength: itemOption.MaxLength,
-                    Description: itemOption.Description,
                     Placeholder: itemOption.Placeholder,
                     Hint: itemOption.Hint,
                     DisplayOrder: itemOption.DisplayOrder,
@@ -109,25 +112,28 @@ const useForm = (route: any) => {
         return { subForms, fields };
     };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            fetchData();
+            return () => { };
+        }, [])
+    );
 
-    useEffect(() => {
-        const loadForm = async () => {
-            const formData = await fetchForm(formId);
-            if (formData) {
-                const { subForms, fields } = createSubFormsAndFields(formData);
-                dispatch(setForm({ form: formData }));
-                dispatch(setSubForm({ subForms }));
-                dispatch(setField({ formState: fields, checkList, checkListType }));
-            }
-        };
-
-        if (formId) {
+    useFocusEffect(
+        useCallback(() => {
+            const loadForm = async () => {
+                if (formId && dataLoading) {
+                    const formData = await fetchForm(formId);
+                    const { subForms, fields } = createSubFormsAndFields(formData);
+                    dispatch(setForm({ form: formData }));
+                    dispatch(setSubForm({ subForms }));
+                    dispatch(setField({ BaseFormState: fields, checkList, checkListType }));
+                }
+            };
             loadForm();
-        }
-    }, [formId, checkList, checkListType]);
+            return () => { };
+        }, [formId, dataLoading, action])
+    );
 
     return {
         state,

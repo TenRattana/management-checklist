@@ -18,7 +18,7 @@ export interface BaseSubForm {
   Columns?: number;
   DisplayOrder?: number;
   MachineID: string;
-  Fields?:string[]
+  Fields?:BaseFormState[]
 }
 
 export interface SubForm extends BaseSubForm {

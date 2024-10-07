@@ -17,34 +17,22 @@ import DraggableFlatList, { ScaleDecorator } from "react-native-draggable-flatli
 import { runOnJS } from "react-native-reanimated";
 import { spacing } from "@/constants/Spacing";
 import useCreateformStyle from "@/styles/createform";
-
-interface FormState {
-    MCListID: string;
-    CListID: string;
-    GCLOptionID: string;
-    CTypeID: string;
-    SFormID: string;
-    Required: boolean;
-    Placeholder: string;
-    Hint: string;
-    EResult: string;
-    CListName?: string;
-    DTypeID: string;
-    DTypeValue?: number;
-    MinLength?: number;
-    MaxLength?: number;
-}
-
+import { BaseFormState } from '@/typing/form'
+import { DataType, CheckListType, GroupCheckListOption, Checklist } from '@/typing/type'
 interface DragfieldProps {
-    route: any;
-    data: FormState[];
+    data: BaseFormState[];
     SFormID: string;
+    dispatch: any;
+    errorMessage: any;
+    checkList: Checklist[];
+    dataType: DataType[];
+    checkListType: CheckListType[];
+    groupCheckListOption: GroupCheckListOption[];
 }
 
-const Dragfield: React.FC<DragfieldProps> = ({ route, data, SFormID }) => {
-    const { dispatch, checkListType, dataType, checkList, errorMessage, groupCheckListOption } = useForm(route);
+const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, errorMessage, dataType, checkListType, groupCheckListOption, checkList }) => {
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
-    const [currentField, setCurrentField] = useState<FormState>({
+    const [currentField, setCurrentField] = useState<BaseFormState>({
         MCListID: "", CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: SFormID,
         Required: false, Placeholder: "", Hint: "", EResult: "", CListName: "", DTypeValue: undefined, MinLength: undefined, MaxLength: undefined
     });
@@ -70,7 +58,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ route, data, SFormID }) => {
         useNativeDriver: true,
     }), []);
 
-    const handleDropField = (data: Omit<FormState, 'DisplayOrder'>[]) => {
+    const handleDropField = (data: Omit<BaseFormState, 'DisplayOrder'>[]) => {
         runOnJS(dispatch)(setDragField({ data }));
     };
 
@@ -87,15 +75,15 @@ const Dragfield: React.FC<DragfieldProps> = ({ route, data, SFormID }) => {
         setDialogVisible(prev => !prev);
     }, []);
 
-    const handleField = useCallback((item?: FormState) => {
+    const handleField = useCallback((item?: BaseFormState) => {
         setCurrentField(item || {
             MCListID: "", CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: SFormID,
             Required: false, Placeholder: "", Hint: "", EResult: "", CListName: "", DTypeValue: undefined, MinLength: undefined, MaxLength: undefined
         });
     }, []);
 
-    const handleSaveField = useCallback((values: FormState, mode: string) => {
-        const payload = { formState: values, checkList, checkListType, dataType };
+    const handleSaveField = useCallback((values: BaseFormState, mode: string) => {
+        const payload = { BaseFormState: values, checkList, checkListType, dataType };
 
         try {
             if (mode === "add") {
@@ -114,7 +102,8 @@ const Dragfield: React.FC<DragfieldProps> = ({ route, data, SFormID }) => {
     const dropcheckListType = checkListType.filter(v => v.IsActive);
     const dropdataType = dataType.filter(v => v.IsActive);
     const dropgroupCheckListOption = groupCheckListOption.filter(v => v.IsActive);
-    const renderField = ({ item, drag, isActive }: { item: FormState; drag: () => void; isActive: boolean; }) => {
+
+    const renderField = ({ item, drag, isActive }: { item: BaseFormState; drag: () => void; isActive: boolean; }) => {
         return (
             <Animated.View style={{ transform: [{ scale: getScaleValue(item.SFormID) }] }}>
                 <ScaleDecorator>

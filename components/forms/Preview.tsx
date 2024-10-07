@@ -1,202 +1,132 @@
-// import { StyleSheet, Text, View, ScrollView, Pressable } from "react-native";
-// import React, { useEffect, useState } from "react";
-// import { Selects, Radios, Checkboxs, Textareas, Inputs } from "@/components/common";
+import { StyleSheet, Text, ScrollView, View, ViewStyle, Pressable } from "react-native";
+import React, { useEffect, useState, useCallback } from "react";
+import { Card, Divider } from "react-native-paper";
+import { useRes } from "@/app/contexts";
+import { Selects, Radios, Textareas, Inputs } from "@/components/common";
+import { CheckListOption, GroupCheckListOption, CheckListType, Checklist } from '@/typing/type';
+import { BaseFormState, BaseSubForm } from '@/typing/form';
+import AccessibleView from "../AccessibleView";
+import DynamicForm from "./Dynamic";
 
-// interface Option {
-//   label: string;
-//   value: string;
-// }
-
-// interface Field {
-//   CheckListTypeName: string;
-//   placeholder?: string;
-//   hint?: string;
-//   CheckListName: string;
-//   matchCheckListId: string;
-//   groupCheckListOptionId?: number;
-//   expectedResult?: string;
-//   displayOrder?: number;
-// }
-
-// interface SubForm {
-//   subFormName: string;
-//   fields: Field[];
-//   columns: number;
-// }
-
-// interface GroupCheckListOption {
-//   GCLOptionID: number;
-//   CheckListOptions: {
-//     CLOptionID: string;
-//     CLOptionName: string;
-//   }[];
-// }
-
-// interface PreviewProps {
-//   style: any;
-//   form: {
-//     formName?: string;
-//     description?: string;
-//   };
-//   state: {
-//     subForms: SubForm[];
-//   };
-//   groupCheckListOption: GroupCheckListOption[];
-//   ShowMessages: (message: string) => void;
-//   formValues: { [key: string]: any };
-//   setFormValues: React.Dispatch<React.SetStateAction<{ [key: string]: any }>>;
-// }
-
-// const Preview: React.FC<PreviewProps> = ({
-//   style,
-//   form,
-//   state,
-//   groupCheckListOption,
-//   ShowMessages,
-//   formValues,
-//   setFormValues,
-// }) => {
-//   const { styles, colors, spacing, responsive } = style;
-
-//   useEffect(() => {
-//     const initialValues: { [key: string]: any } = {};
-//     state.subForms.forEach((subForm) => {
-//       subForm.fields.forEach((field) => {
-//         initialValues[field.matchCheckListId] = field.expectedResult || "";
-//       });
-//     });
-//     setFormValues(initialValues);
-//   }, [state.subForms, setFormValues]);
-
-//   const handleChange = (fieldName: string, value: any) => {
-//     setFormValues((prev) => ({
-//       ...prev,
-//       [fieldName]: value,
-//     }));
-//   };
-
-//   const renderField = (field: Field) => {
-//     const fieldName = field.matchCheckListId;
-
-//     const option: Option[] = groupCheckListOption
-//       .find((option) => option.GCLOptionID === field.groupCheckListOptionId)
-//       ?.CheckListOptions.map((item) => ({
-//         label: item.CLOptionName,
-//         value: item.CLOptionID,
-//       })) || [];
-
-//     switch (field.CheckListTypeName) {
-//       case "Textinput":
-//         return (
-//           <Inputs
-//             placeholder={field.placeholder}
-//             hint={field.hint}
-//             label={field.CheckListName}
-//             value={formValues[fieldName] || ""}
-//             handleChange={(value: string) => handleChange(fieldName, value)}
-//           />
-//         );
-//       case "Textarea":
-//         return (
-//           <Textareas
-//             placeholder={field.placeholder}
-//             hint={field.hint}
-//             label={field.CheckListName}
-//             value={formValues[fieldName] || ""}
-//             handleChange={(value: string) => handleChange(fieldName, value)}
-//           />
-//         );
-//       case "Dropdown":
-//         return (
-//           <Selects
-//             option={option}
-//             hint={field.hint}
-//             label={field.CheckListName}
-//             value={formValues[fieldName] || ""}
-//             handleChange={(value: string) => handleChange(fieldName, value)}
-//           />
-//         );
-//       case "Radio":
-//         return (
-//           <Radios
-//             option={option}
-//             hint={field.hint}
-//             label={field.CheckListName}
-//             value={formValues[fieldName] || ""}
-//             handleChange={(value: string) => handleChange(fieldName, value)}
-//           />
-//         );
-//       case "Checkbox":
-//         return (
-//           <Checkboxs
-//             option={option}
-//             hint={field.hint}
-//             label={field.CheckListName}
-//             value={formValues[fieldName] || ""}
-//             handleChange={(value: string[]) => handleChange(fieldName, value)}
-//           />
-//         );
-//       default:
-//         return null;
-//     }
-//   };
-
-//   const renderFields = (subForm: SubForm) => {
-//     return subForm.fields.map((field, fieldIndex) => {
-//       const containerStyle = {
-//         flexBasis:
-//           responsive === "small" || responsive === "medium"
-//             ? "100%"
-//             : `${100 / subForm.columns}%`,
-//         flexGrow: field.displayOrder || 1,
-//         padding: 5,
-//       };
-
-//       return (
-//         <View
-//           key={`field-${fieldIndex}-${subForm.subFormName}`}
-//         >
-//           <Text
-//             style={[styles.text, styles.textDark, { paddingLeft: spacing.sm }]}
-//           >
-//             {field.CheckListName}
-//           </Text>
-//           {renderField(field)}
-//         </View>
-//       );
-//     });
-//   };
-
-//   return (
-//     <ScrollView contentContainerStyle={{ paddingBottom: 10 }}>
-//       <Text style={[styles.textHeader, { color: colors.palette.dark }]}>
-//         {form.formName || "Content Name"}
-//       </Text>
-
-
-//       <View>
-//         {state.subForms.map((subForm, index) => (
-//           <View style={styles.card} key={`subForm-${index}`}>
-//             <Text style={styles.cardTitle}>{subForm.subFormName}</Text>
-//             <View style={styles.formContainer}>{renderFields(subForm)}</View>
-//           </View>
-//         ))}
-//       </View>
-//     </ScrollView>
-//   );
-// };
-
-// export default Preview;
-
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-
-export default function Preview() {
-  return (
-    <View>
-      <Text>Preview</Text>
-    </View>
-  )
+interface PreviewProps {
+  state: any;
+  groupCheckListOption: GroupCheckListOption[];
+  checkListType: CheckListType[];
+  checkList: Checklist[];
 }
 
-const styles = StyleSheet.create({})
+const Preview: React.FC<PreviewProps> = ({
+  state,
+  groupCheckListOption,
+}) => {
+  const { responsive } = useRes();
+  const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
+
+  useEffect(() => {
+    if (state.subForms) {
+      const initialValues: { [key: string]: any } = {};
+      state.subForms.forEach((subForm: BaseSubForm) => {
+        subForm.Fields?.forEach((field: BaseFormState) => {
+          initialValues[field.MCListID] = field.EResult ?? "";
+        });
+      });
+      setFormValues(initialValues);
+    }
+  }, [state.subForms]);
+
+  const handleChange = useCallback((fieldName: string, value: any) => {
+    setFormValues((prev) => ({
+      ...prev,
+      [fieldName]: value,
+    }));
+  }, []);
+
+  return (
+    <AccessibleView style={styles.container}>
+      <Text style={styles.title}>{state.FormName || "Content Name"}</Text>
+      <Divider />
+      <Text style={[styles.description]}>{state.Description || "Content Description"}</Text>
+
+      <ScrollView style={{ flex: 1, backgroundColor: 'white' }}>
+        {state.subForms.map((subForm: BaseSubForm, index: number) => (
+          <AccessibleView key={`subForm-${index}`} >
+            <Card style={styles.card}>
+              <Card.Title title={subForm.SFormName} titleStyle={styles.cardTitle} />
+              <Card.Content style={styles.subFormContainer}>
+                {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
+                  const columns = subForm.Columns ?? 1;
+
+                  const containerStyle: ViewStyle = {
+                    flexBasis: responsive === "small" ? "100%" : `${100 / (columns > 1 ? columns : 1)}%`,
+                    flexGrow: field.DisplayOrder || 1,
+                    padding: 5,
+                  };
+
+                  return (
+                    <AccessibleView
+                      key={`field-${fieldIndex}-${subForm.SFormName}`}
+                      style={containerStyle}
+                    >
+                      <DynamicForm
+                        field={field}
+                        values={formValues}
+                        setFieldValue={handleChange}
+                        groupCheckListOption={groupCheckListOption}
+                      />
+                    </AccessibleView>
+                  );
+                })}
+              </Card.Content>
+            </Card>
+          </AccessibleView>
+        ))}
+      </ScrollView>
+    </AccessibleView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+    flex: 1,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  description: {
+    fontSize: 20,
+    marginBottom: 16,
+  },
+  subFormContainer: {
+    marginBottom: 16,
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  subFormTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  card: {
+    paddingVertical: 16,
+    borderRadius: 8,
+    elevation: 2,
+    marginBottom: 20,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
+  submitText: {
+    textAlign: 'center',
+    padding: 10,
+    backgroundColor: '#007BFF',
+    color: '#FFF',
+    borderRadius: 5,
+    marginTop: 20,
+  },
+});
+
+export default React.memo(Preview);

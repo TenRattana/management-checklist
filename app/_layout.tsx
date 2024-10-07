@@ -15,15 +15,15 @@ export default function RootLayout() {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
-  // useEffect(() => {
-  //   const hideSplashScreen = async () => {
-  //     if (fontsLoaded) {
-  //       await SplashScreen.hideAsync();
-  //     }
-  //   };
+  useEffect(() => {
+    const hideSplashScreen = async () => {
+      if (fontsLoaded) {
+        await SplashScreen.hideAsync();
+      }
+    };
 
-  //   hideSplashScreen();
-  // }, [fontsLoaded]);
+    hideSplashScreen();
+  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;

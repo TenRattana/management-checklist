@@ -1,23 +1,20 @@
-import React, { useState, useEffect, useCallback, forwardRef, useImperativeHandle, useRef } from "react";
-import { StyleSheet } from "react-native";
-import { IconButton, Chip } from "react-native-paper";
-import { MultiSelect, IMultiSelectRef } from 'react-native-element-dropdown';
+import React, { useState, useEffect, useMemo } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import DropDownPicker from 'react-native-dropdown-picker';
 import AccessibleView from "@/components/AccessibleView";
 import { CustomDropdownMultiProps } from '@/typing/tag';
 
-const CustomDropdownMulti = forwardRef<IMultiSelectRef, CustomDropdownMultiProps>(({
+const CustomDropdownMulti = ({
   labels,
   values,
   data,
   selectedValue = [],
   onValueChange,
-  testId
-}, ref) => {
-  const [options, setOptions] = useState<{ label: string; value: string }[]>([]);
+}: CustomDropdownMultiProps) => {
   const [currentValue, setCurrentValue] = useState<string[]>(selectedValue);
-  const multiSelectRef = useRef<IMultiSelectRef>(null); 
+  const [open, setOpen] = useState(false);
 
-  const processData = useCallback(() => {
+  const options = useMemo(() => {
     if (data && Array.isArray(data)) {
       return data.map((item) => ({
         label: item[labels] || "",
@@ -29,96 +26,73 @@ const CustomDropdownMulti = forwardRef<IMultiSelectRef, CustomDropdownMultiProps
   }, [data, labels, values]);
 
   useEffect(() => {
-    const newOptions = processData();
-    setOptions(newOptions);
-    setCurrentValue(prevValues => 
-      prevValues.filter(value => newOptions.some(option => option.value === value))
-    );
-  }, [processData]);
-
-  useEffect(() => {
-    setCurrentValue(selectedValue);
+    if (selectedValue.length !== currentValue.length || !selectedValue.every(val => currentValue.includes(val))) {
+      setCurrentValue(selectedValue);
+    }
   }, [selectedValue]);
 
-  useImperativeHandle(ref, () => ({
-    getSelectedValues: () => currentValue, 
-    open: () => multiSelectRef.current?.open(),
-    close: () => multiSelectRef.current?.close(),
-  }));
+  const handleSelect = (value: string[]) => {
+    setCurrentValue(value);
+    onValueChange(value);
+  };
 
   const styles = StyleSheet.create({
+    dropdownContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginVertical: 10,
+      zIndex: 1
+    },
     dropdown: {
+      flex: 1,
       height: 50,
-      borderBottomColor: 'gray',
-      borderBottomWidth: 0.5,
+      borderBottomColor: '#6200ee',
+      borderBottomWidth: 1,
+      marginRight: 10,
     },
-    icon: {
-      marginRight: 5,
+    dropdownText: {
+      fontSize: 18,
+      color: '#000',
     },
-    placeholderStyle: {
-      fontSize: 20,
+    placeholderText: {
+      fontSize: 18,
+      color: '#999',
     },
-    selectedTextStyle: {
-      fontSize: 20,
+    button: {
+      backgroundColor: '#6200ee',
+      padding: 10,
+      borderRadius: 5,
     },
-    iconStyle: {
-      width: 20,
-      height: 20,
-    },
-    inputSearchStyle: {
-      height: 40,
-      fontSize: 20,
+    buttonText: {
+      color: '#fff',
+      fontSize: 16,
     },
   });
 
   return (
-    <AccessibleView>
-      <MultiSelect
-        ref={multiSelectRef} // Attach the local ref here
-        style={styles.dropdown}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={options}
-        labelField="label"
-        valueField="value"
-        placeholder="Select item"
+    <AccessibleView style={styles.dropdownContainer}>
+      <DropDownPicker
+        open={open}
         value={currentValue}
-        search
-        searchPlaceholder="Search..."
-        onChange={item => {
-          setCurrentValue(item);
-        }}
-        renderRightIcon={() => (
-          <AccessibleView>
-            {currentValue.length > 0 ? (
-              <IconButton
-                style={styles.icon}
-                icon="window-close"
-                size={30}
-                onPress={() => {
-                  setCurrentValue([]);
-                }}
-              />
-            ) : (
-              <IconButton
-                style={styles.icon}
-                icon="chevron-down"
-                size={30}
-              />
-            )}
-          </AccessibleView>
-        )}
-        renderSelectedItem={(item, unSelect) => (
-          <Chip onPress={() => unSelect && unSelect(item)} icon="close">
-            {item.label}
-          </Chip>
-        )}
-        testID={testId}
+        items={options}
+        setOpen={setOpen}
+        // setValue={(values: string[]) => handleSelect(values)}
+        setItems={setCurrentValue}
+        multiple={true}
+        placeholder="Choose fruits"
+        multipleText="have been selected."
+        style={styles.dropdown}
+        dropDownContainerStyle={{ borderColor: 'transparent' }}
+        textStyle={styles.dropdownText}
+        placeholderStyle={styles.placeholderText}
+        zIndex={1000}
+        zIndexInverse={1000}
       />
+      <Pressable style={styles.button} onPress={() => onValueChange(currentValue)}>
+        <Text style={styles.buttonText}>Done</Text>
+      </Pressable>
     </AccessibleView>
   );
-});
+};
 
 export default React.memo(CustomDropdownMulti);

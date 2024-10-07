@@ -1,159 +1,87 @@
 import React from "react";
-import { View, Text } from "react-native";
-import { Selects, Radios, Checkboxs, Textareas, Inputs } from "@/components/common";
-
-
-interface Field {
-  CheckListTypeName: string;
-  placeholder?: string;
-  hint?: string;
-  CheckListName: string;
-  checkListId: string;
-  groupCheckListOptionId?: number;
-}
-
-interface Option {
-  label: string;
-  value: string;
-}
-
-
-interface CheckListOption {
-  CLOptionID: string;
-  CLOptionName: string;
-}
-
-interface GroupCheckListOption {
-  GCLOptionID: number;
-  CheckListOptions: CheckListOption[];
-}
+import { Text, ViewStyle } from "react-native";
+import { Selects, Radios, Textareas, Inputs } from "@/components/common";
+import { CheckListOption, GroupCheckListOption } from '@/typing/type';
+import { BaseFormState } from '@/typing/form';
+import AccessibleView from "../AccessibleView";
+import { ScrollView } from "react-native-gesture-handler";
 
 interface DynamicFormProps {
-  fields: Field[];
-  checkListType?: string;
-  style: any;
-  checkList: any;
-  values: { [key: string]: any };
-  handleChange: (field: string, value?: any) => void;
-  handleBlur: (field: string) => void;
-  touched: { [key: string]: boolean };
-  errors: { [key: string]: string };
-  indexSubForm: string;
+  field: BaseFormState;
+  values: any;
+  setFieldValue: any;
   groupCheckListOption: GroupCheckListOption[];
 }
 
 const DynamicForm: React.FC<DynamicFormProps> = ({
-  fields,
-  checkListType,
-  style,
-  checkList,
+  field,
   values,
-  handleChange,
-  handleBlur,
-  touched,
-  errors,
-  indexSubForm,
+  setFieldValue,
   groupCheckListOption,
 }) => {
-  const { styles, colors } = style;
-
-  const renderField = (field: Field, index: number) => {
-    const option: Option[] = groupCheckListOption
-      .find((option) => option.GCLOptionID === field.groupCheckListOptionId)
-      ?.CheckListOptions.map((item) => ({
+  const option = groupCheckListOption
+    .filter(option => option.GCLOptionID === field.GCLOptionID)
+    .flatMap(v =>
+      v.CheckListOptions?.map((item: CheckListOption) => ({
         label: item.CLOptionName,
         value: item.CLOptionID,
-      })) || [];
+      })) || []
+    );
 
-    switch (field.CheckListTypeName) {
+  const fieldName = field.MCListID;
+
+  const renderField = () => {
+    switch (field.CTypeName) {
       case "Textinput":
         return (
           <Inputs
-            placeholder={field.placeholder}
-            hint={field.hint}
-            label={field.CheckListName}
-            value={values.matchCheckListId || `${indexSubForm}-${index}`}
-            handleChange={() => handleChange("matchCheckListId")}
-            handleBlur={() => handleBlur("matchCheckListId")}
-            error={touched.matchCheckListId && Boolean(errors.matchCheckListId)}
-            errorMessage={
-              touched.matchCheckListId ? errors.matchCheckListId : ""
-            }
+            placeholder={field.Placeholder}
+            hint={field.Hint}
+            label={field.CListName}
+            value={values[fieldName] ?? ""}
+            handleChange={(v) => setFieldValue(fieldName, v)}
           />
         );
       case "Textarea":
         return (
           <Textareas
-            placeholder={field.placeholder}
-            hint={field.hint}
-            label={field.CheckListName}
-            value={values.matchCheckListId || `${indexSubForm}-${index}`}
-            handleChange={() => handleChange("matchCheckListId")}
-            handleBlur={() => handleBlur("matchCheckListId")}
-            error={touched.matchCheckListId && Boolean(errors.matchCheckListId)}
-            errorMessage={
-              touched.matchCheckListId ? errors.matchCheckListId : ""
-            }
+            placeholder={field.Placeholder}
+            hint={field.Hint}
+            label={field.CListName}
+            value={values[fieldName] ?? ""}
+            handleChange={(v) => setFieldValue(fieldName, v)}
           />
         );
       case "Radio":
         return (
           <Radios
             option={option}
-            hint={field.hint}
-            handleChange={(v) => handleChange("matchCheckListId", v)}
-            value={values.matchCheckListId || `${indexSubForm}-${index}`}
-            handleBlur={() => handleBlur("matchCheckListId")}
-            error={touched.matchCheckListId && Boolean(errors.matchCheckListId)}
-            errorMessage={
-              touched.matchCheckListId ? errors.matchCheckListId : ""
-            }
+            hint={field.Hint}
+            handleChange={(v) => setFieldValue(fieldName, v)}
+            value={values[fieldName]}
           />
         );
       case "Dropdown":
         return (
           <Selects
             option={option}
-            hint={field.hint}
-            handleChange={(v) => handleChange("matchCheckListId", v)}
-            value={values.matchCheckListId || `${indexSubForm}-${index}`}
-            handleBlur={() => handleBlur("matchCheckListId")}
-            error={touched.matchCheckListId && Boolean(errors.matchCheckListId)}
-            errorMessage={
-              touched.matchCheckListId ? errors.matchCheckListId : ""
-            }
-          />
-        );
-      case "Checkbox":
-        return (
-          <Checkboxs
-            option={option}
-            hint={field.hint}
-            handleChange={(v) => handleChange("matchCheckListId", v)}
-            value={values.matchCheckListId || `${indexSubForm}-${index}`}
-            handleBlur={() => handleBlur("matchCheckListId")}
-            error={touched.matchCheckListId && Boolean(errors.matchCheckListId)}
-            errorMessage={
-              touched.matchCheckListId ? errors.matchCheckListId : ""
-            }
+            hint={field.Hint}
+            handleChange={(v) => setFieldValue(fieldName, v)}
+            value={values[fieldName] ?? ""}
           />
         );
       default:
         return null;
     }
   };
+  console.log(values);
 
   return (
-    <View>
-      {fields.map((field, index) => (
-        <View key={field.checkListId} style={styles.section}>
-          <Text style={[styles.text, { color: colors.palette.dark }]}>
-            {field.CheckListName}
-          </Text>
-          {renderField(field, index)}
-        </View>
-      ))}
-    </View>
+    <AccessibleView>
+      <Text>{field.CListName}</Text>
+      {renderField()}
+    </AccessibleView>
+
   );
 };
 

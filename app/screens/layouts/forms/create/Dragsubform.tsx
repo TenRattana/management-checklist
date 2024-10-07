@@ -20,13 +20,19 @@ import { runOnJS } from "react-native-reanimated";
 import { spacing } from "@/constants/Spacing";
 import Dragfield from "./Dragfield";
 import { BaseFormState, BaseSubForm } from '@/typing/form'
+import { DataType, CheckListType, GroupCheckListOption, Checklist } from '@/typing/type'
 
 interface DragsubformProps {
-    route: any;
+    errorMessage: any;
+    state: any;
+    dispatch: any;
+    checkList: Checklist[];
+    dataType: DataType[];
+    checkListType: CheckListType[];
+    groupCheckListOption: GroupCheckListOption[];
 }
 
-const Dragsubform: React.FC<DragsubformProps> = ({ route }) => {
-    const { state, dispatch, errorMessage } = useForm(route);
+const Dragsubform: React.FC<DragsubformProps> = ({ errorMessage, state, dispatch, dataType, checkListType, groupCheckListOption, checkList }) => {
     const [initialDialog, setInitialDialog] = useState<boolean>(false)
     const [initialSubForm, setInitialSubForm] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", MachineID: "" });
     const [editMode, setEditMode] = useState<boolean>(false)
@@ -120,9 +126,14 @@ const Dragsubform: React.FC<DragsubformProps> = ({ route }) => {
                         </TouchableOpacity>
 
                         <Dragfield
-                            data={item.Fields ?? []}
-                            route={route}
+                            data={item?.Fields ?? []}
                             SFormID={item.SFormID}
+                            dispatch={dispatch}
+                            errorMessage={errorMessage}
+                            checkList={checkList}
+                            dataType={dataType}
+                            checkListType={checkListType}
+                            groupCheckListOption={groupCheckListOption}
                         />
                     </AccessibleView>
 
@@ -133,7 +144,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ route }) => {
 
 
     return (
-        <>
+        <AccessibleView style={{ flex: 1 }}>
             <Pressable
                 onPress={() => {
                     setInitialDialog(true);
@@ -150,12 +161,15 @@ const Dragsubform: React.FC<DragsubformProps> = ({ route }) => {
                 renderItem={renderSubForm}
                 keyExtractor={(item, index) => `SF-${item.SFormID}-${index}`}
                 onDragEnd={({ data }) => handleDropSubForm(data)}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: 10 }}
+                contentContainerStyle={{ paddingHorizontal: 50, paddingTop: 5, paddingBottom: 40 }}
                 nestedScrollEnabled={true}
                 activationDistance={1}
                 autoscrollSpeed={30}
             />
+
+            <Pressable onPress={() => { /* Handle Save Form */ }} style={createform.saveButton}>
+                <Text style={createform.saveButtonText}>Save Form</Text>
+            </Pressable>
 
             <SubFormDialog
                 isVisible={initialDialog}
@@ -165,7 +179,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ route }) => {
                 saveData={handelSaveSubForm}
                 onDelete={(SFormID: string) => dispatch(deleteSubForm({ SFormID }))}
             />
-        </>
+        </AccessibleView>
 
     )
 }

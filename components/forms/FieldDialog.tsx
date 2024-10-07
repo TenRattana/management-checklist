@@ -12,64 +12,17 @@ import axios from "axios";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Animated, { FadeInUp, FadeOutDown, Easing, useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-
-interface FormState {
-    MCListID: string;
-    CListID: string;
-    GCLOptionID: string;
-    CTypeID: string;
-    CListName?: string;
-    CTypeName?: string;
-    DTypeID: string;
-    DTypeValue?: number;
-    SFormID: string;
-    Required: boolean;
-    MinLength?: number;
-    MaxLength?: number;
-    Placeholder: string;
-    Hint: string;
-    DisplayOrder?: number;
-    EResult: string;
-}
-interface CheckListType {
-    CTypeID: string;
-    CTypeName: string;
-    Icon: string;
-    IsActive: boolean;
-}
-
-interface DataType {
-    DTypeID: string;
-    DTypeName: string;
-    IsActive: boolean;
-    Icon: string;
-}
-
-interface Checklist {
-    CListID: string;
-    CListName: string;
-    IsActive: boolean;
-}
-
-interface GroupCheckListOption {
-    GCLOptionID: string;
-    GCLOptionName: string;
-    Description: string;
-    IsActive: boolean;
-}
-interface InitialValuesCheckList {
-    checkListId: string;
-    checkListName: string;
-    isActive: boolean;
-}
+import { CheckListType, DataType, Checklist, GroupCheckListOption } from '@/typing/type'
+import { BaseFormState } from '@/typing/form'
+import { InitialValuesChecklist } from '@/typing/value'
 
 interface FieldDialogProps {
     isVisible: boolean;
-    formState: FormState;
+    formState: BaseFormState;
     onDeleteField: (SFormID: string, MCListID: string) => void;
     setShowDialogs: () => void;
     editMode: boolean;
-    saveField: (values: FormState, mode: string) => void;
+    saveField: (values: BaseFormState, mode: string) => void;
     checkListType: CheckListType[]
     dataType: DataType[];
     checkList: Checklist[];
@@ -85,7 +38,7 @@ const FieldDialog: React.FC<FieldDialogProps> = ({ isVisible, formState, onDelet
     , checkListType, dataType, checkList, groupCheckListOption, dropcheckList, dropcheckListType, dropdataType, dropgroupCheckListOption
 }) => {
     const [isVisibleCL, setIsVisibleCL] = useState(false)
-    const [initialValueCL, setInitialValueCL] = useState<InitialValuesCheckList>({ checkListId: "", checkListName: "", isActive: false })
+    const [initialValueCL, setInitialValueCL] = useState<InitialValuesChecklist>({ checkListId: "", checkListName: "", isActive: false })
     const masterdataStyles = useMasterdataStyles()
     const { showSuccess, showError } = useToast();
 
@@ -126,7 +79,7 @@ const FieldDialog: React.FC<FieldDialogProps> = ({ isVisible, formState, onDelet
         showError(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
     }, [showError]);
 
-    const saveDataCheckList = async (values: InitialValuesCheckList) => {
+    const saveDataCheckList = async (values: InitialValuesChecklist) => {
         const data = {
             CListId: values.checkListId ?? "",
             CListName: values.checkListName,
@@ -505,6 +458,7 @@ const FieldDialog: React.FC<FieldDialogProps> = ({ isVisible, formState, onDelet
             </Dialog>
 
             <Checklist_dialog
+                isEditing={false}
                 isVisible={isVisibleCL}
                 setIsVisible={() => { setIsVisibleCL(false); setInitialValueCL({ checkListId: "", checkListName: "", isActive: false }) }}
                 initialValues={initialValueCL}
