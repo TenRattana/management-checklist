@@ -43,7 +43,7 @@ export interface BaseFormState {
   Placeholder: string;
   Hint: string;
   DisplayOrder?: number;
-  EResult: any;
+  EResult?: any;
   CTypeName?:string;
   CListName?:string;
 }

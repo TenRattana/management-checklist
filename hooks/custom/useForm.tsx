@@ -1,12 +1,11 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "@/config/axios";
-import axios from "axios";
 import { setForm, setSubForm, setField, reset } from "@/slices";
-import { useToast, useRes } from "@/app/contexts";
+import { useToast } from "@/app/contexts";
 import { useFocusEffect } from "@react-navigation/native";
-import { SubForm, FormData, BaseFormState, BaseForm } from '@/typing/form'
-import { CheckListType, CheckListOption, Checklist, DataType, GroupCheckListOption } from '@/typing/type'
+import { SubForm, FormData, BaseFormState, BaseForm } from '@/typing/form';
+import { CheckListType, CheckListOption, Checklist, DataType, GroupCheckListOption } from '@/typing/type';
 
 const useForm = (route: any) => {
     const dispatch = useDispatch();
@@ -18,9 +17,9 @@ const useForm = (route: any) => {
     const [checkListType, setCheckListType] = useState<CheckListType[]>([]);
     const [dataType, setDataType] = useState<DataType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [dataLoading, setDataLoding] = useState(false);
-    const [found, setFound] = useState<boolean>(false)
-    const [expectedResult, setExpectedResult] = useState<{ [key: string]: any }>([])
+    const [dataLoading, setDataLoading] = useState(false);
+    const [found, setFound] = useState<boolean>(false);
+    const [expectedResult, setExpectedResult] = useState<{ [key: string]: any }>([]);
     const { formId, action, tableId } = route.params || {};
     const { handleError } = useToast();
 
@@ -40,7 +39,7 @@ const useForm = (route: any) => {
             setGroupCheckListOption(responses[2].data.data ?? []);
             setCheckListType(responses[3].data.data ?? []);
             setDataType(responses[4].data.data ?? []);
-            setDataLoding(true)
+            setDataLoading(true);
         } catch (error) {
             handleError(error);
         } finally {
@@ -50,9 +49,8 @@ const useForm = (route: any) => {
 
     const fetchForm = async (formId: string) => {
         if (!formId) return null;
-
         try {
-            const response = await axios.post("Form_service.asmx/GetForm", { FormID: formId });
+            const response = await axiosInstance.post("Form_service.asmx/GetForm", { FormID: formId });
             return response.data?.data[0] || null;
         } catch (error) {
             handleError(error);
@@ -60,26 +58,13 @@ const useForm = (route: any) => {
         }
     };
 
-    const fetchExpectedResult = async (tableId: string, formId: string) => {
-        if (!tableId && !formId) return null;
-
-        try {
-            const [formResponse, expectedResultResponse] = await Promise.all([
-                axios.post("Form_service.asmx/GetForm", { FormID: formId }),
-                axios.post("ExpectedResult_service.asmx/GetExpectedResult", { TableID: tableId })
-            ]);
-            setExpectedResult(expectedResultResponse.data?.data[0] || [])
-            return formResponse.data?.data[0] || null;
-        } catch (error) {
-            handleError(error);
-            return null;
-        }
-    }
-
     useFocusEffect(
         useCallback(() => {
             fetchData();
-            return () => { dispatch(reset()) };
+            return () => {
+                setExpectedResult([]);
+                dispatch(reset());
+            };
         }, [])
     );
 
@@ -121,35 +106,46 @@ const useForm = (route: any) => {
         return { subForms, fields };
     };
 
+    const loadForm = async (formId: string, tableId?: string) => {
+        if (tableId) {
+            const expectedResultResponse = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResult", { TableID: tableId })
+            setExpectedResult(expectedResultResponse.data?.data[0] || []);
+        }
+
+        const formData = await fetchForm(formId);
+
+        if (formData) {
+            setFound(true);
+            const { subForms, fields } = createSubFormsAndFields(formData);
+            const formCopy: BaseForm = {
+                FormID: "",
+                Description: "",
+                FormName: "",
+                MachineID: "",
+            };
+            dispatch(setForm({ form: action === "copy" ? formCopy : formData }));
+            dispatch(setSubForm({ subForms }));
+            dispatch(setField({ BaseFormState: fields, checkList, checkListType }));
+        } else {
+            setFound(false);
+        }
+    };
+
     useFocusEffect(
         useCallback(() => {
-            const loadForm = async () => {
-                if (dataLoading && formId) {
-
-                    const formData = formId && tableId ? await fetchExpectedResult(tableId, formId) : await fetchForm(formId)
-
-                    if (formData) {
-                        setFound(true)
-                        const { subForms, fields } = createSubFormsAndFields(formData);
-                        const formCopy: BaseForm = {
-                            FormID: "",
-                            Description: "",
-                            FormName: "",
-                            MachineID: "",
-                        }
-                        dispatch(setForm({ form: action === "copy" ? formCopy : formData }));
-                        dispatch(setSubForm({ subForms }));
-                        dispatch(setField({ BaseFormState: fields, checkList, checkListType }));
+            const fetchAndLoadForm = async () => {
+                if (dataLoading) {
+                    if (formId) {
+                        await loadForm(formId, tableId);
                     } else {
-                        setFound(false)
+                        setFound(false);
                     }
                 }
             };
-            loadForm();
+            fetchAndLoadForm();
             return () => { };
-        }, [formId, dataLoading, action, tableId])
+        }, [formId, dataLoading, action, tableId, setExpectedResult])
     );
-
 
     return {
         found,

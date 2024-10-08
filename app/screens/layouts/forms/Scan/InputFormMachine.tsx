@@ -148,9 +148,10 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   const onFormSubmit = async () => {
     const updatedSubForms = state.subForms.map((subForm: BaseSubForm) => ({
       ...subForm,
-      fields: subForm?.Fields?.map((field: BaseFormState) => ({
+      MachineID: state.MachineID,
+      Fields: subForm?.Fields?.map((field: BaseFormState) => ({
         ...field,
-        expectedResult: formValues[field.MCListID] || "",
+        EResult: formValues[field.MCListID] || "",
       })),
     }));
 
