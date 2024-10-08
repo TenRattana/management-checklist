@@ -20,7 +20,8 @@ const useForm = (route: any) => {
     const [isLoading, setIsLoading] = useState(false);
     const [dataLoading, setDataLoding] = useState(false);
     const [found, setFound] = useState<boolean>(false)
-    const { formId, action } = route.params || {};
+    const [expectedResult, setExpectedResult] = useState<{ [key: string]: any }>([])
+    const { formId, action, tableId } = route.params || {};
     const { handleError } = useToast();
 
     const fetchData = async () => {
@@ -59,6 +60,22 @@ const useForm = (route: any) => {
         }
     };
 
+    const fetchExpectedResult = async (tableId: string, formId: string) => {
+        if (!tableId && !formId) return null;
+
+        try {
+            const [formResponse, expectedResultResponse] = await Promise.all([
+                axios.post("Form_service.asmx/GetForm", { FormID: formId }),
+                axios.post("ExpectedResult_service.asmx/GetExpectedResult", { TableID: tableId })
+            ]);
+            setExpectedResult(expectedResultResponse.data?.data[0] || [])
+            return formResponse.data?.data[0] || null;
+        } catch (error) {
+            handleError(error);
+            return null;
+        }
+    }
+
     useFocusEffect(
         useCallback(() => {
             fetchData();
@@ -96,7 +113,7 @@ const useForm = (route: any) => {
                     Placeholder: itemOption.Placeholder,
                     Hint: itemOption.Hint,
                     DisplayOrder: itemOption.DisplayOrder,
-                    EResult: itemOption.EResult,
+                    EResult: expectedResult?.[itemOption.MCListID] || "",
                 });
             });
         });
@@ -107,8 +124,10 @@ const useForm = (route: any) => {
     useFocusEffect(
         useCallback(() => {
             const loadForm = async () => {
-                if (formId && dataLoading) {
-                    const formData = await fetchForm(formId);
+                if (dataLoading && formId) {
+
+                    const formData = formId && tableId ? await fetchExpectedResult(tableId, formId) : await fetchForm(formId)
+
                     if (formData) {
                         setFound(true)
                         const { subForms, fields } = createSubFormsAndFields(formData);
@@ -128,7 +147,7 @@ const useForm = (route: any) => {
             };
             loadForm();
             return () => { };
-        }, [formId, dataLoading, action])
+        }, [formId, dataLoading, action, tableId])
     );
 
 
