@@ -1,7 +1,15 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
+import { useNavigation } from "@react-navigation/native"
 
 const Managepermissions = () => {
+
+  const navigation = useNavigation();
+
+  navigation.navigate("InputFormMachine", {
+    machineId: "M002",
+  });
+
   return (
     <View>
       <Text>Managepermissions</Text>

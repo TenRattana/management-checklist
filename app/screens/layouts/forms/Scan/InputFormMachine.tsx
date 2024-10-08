@@ -1,17 +1,19 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "@/config/axios";
-import { Card, Divider } from "react-native-paper";
-import { StyleSheet, Text, ScrollView, ViewStyle, Pressable } from "react-native";
+import { Card, Divider, HelperText } from "react-native-paper";
+import { StyleSheet, Text, FlatList, Pressable, ViewStyle } from "react-native";
 import { setForm, setSubForm, setField, reset } from "@/slices";
 import { useToast, useRes } from "@/app/contexts";
-import { BaseSubForm, FormData, BaseFormState, BaseForm } from '@/typing/form';
-import { CheckListType, Checklist, GroupCheckListOption } from '@/typing/type';
+import { BaseSubForm, FormData, BaseFormState } from '@/typing/form';
+import { CheckListType, Checklist, GroupCheckListOption, DataType } from '@/typing/type';
 import { AccessibleView, Dynamic, NotFoundScreen } from "@/components";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { PreviewProps } from "@/typing/tag";
 import { ScanParams } from "@/typing/tag";
 import { useFocusEffect } from "expo-router";
+import { Formik, FormikErrors, FormikTouched } from 'formik';
+import * as Yup from 'yup';
 
 const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   const dispatch = useDispatch();
@@ -19,51 +21,52 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
 
   const [checkList, setCheckList] = useState<Checklist[]>([]);
   const [checkListType, setCheckListType] = useState<CheckListType[]>([]);
+  const [dataType, setDataType] = useState<DataType[]>([]);
   const [groupCheckListOption, setGroupCheckListOption] = useState<GroupCheckListOption[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [dataLoading, setDataLoading] = useState<boolean>(false);
   const [found, setFound] = useState<boolean>(false);
 
   const masterdataStyles = useMasterdataStyles();
   const { machineId } = route.params || {};
   const { showSuccess, handleError } = useToast();
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
       const responses = await Promise.all([
         axiosInstance.post("CheckList_service.asmx/GetCheckLists"),
         axiosInstance.post("CheckListType_service.asmx/GetCheckListTypes"),
         axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions"),
+        axiosInstance.post("DataType_service.asmx/GetDataTypes"),
       ]);
 
       setCheckList(responses[0].data.data ?? []);
       setCheckListType(responses[1].data.data ?? []);
       setGroupCheckListOption(responses[2].data.data ?? []);
-      setDataLoading(true);
+      setDataType(responses[3].data.data ?? []);
     } catch (error) {
       handleError(error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [handleError]);
 
-  const fetchForm = async (machineId: string) => {
+  const fetchForm = useCallback(async (machineId: string) => {
     if (!machineId) return null;
 
     try {
       const response = await axiosInstance.post("Form_service.asmx/ScanForm", { MachineID: machineId });
-      setFound(response.data.status)
+      setFound(response.data.status);
       showSuccess(String(response.data?.message));
       return response.data?.data[0] || null;
     } catch (error) {
       handleError(error);
-      setFound(false)
+      setFound(false);
       return null;
     }
-  };
+  }, [handleError, showSuccess]);
 
-  const createSubFormsAndFields = (formData: FormData) => {
+  const createSubFormsAndFields = useCallback((formData: FormData) => {
     const subForms: BaseSubForm[] = [];
     const fields: BaseFormState[] = [];
 
@@ -99,13 +102,13 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
     });
 
     return { subForms, fields };
-  };
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
       fetchData();
       return () => { dispatch(reset()); };
-    }, [dispatch])
+    }, [dispatch, fetchData])
   );
 
   useFocusEffect(
@@ -113,7 +116,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
       const loadForm = async () => {
         if (machineId) {
           const formData = await fetchForm(machineId);
-          if (found) {
+          if (found && formData) {
             const { subForms, fields } = createSubFormsAndFields(formData);
             dispatch(setForm({ form: formData }));
             dispatch(setSubForm({ subForms }));
@@ -123,131 +126,159 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
       };
       loadForm();
       return () => { };
-    }, [machineId, found, dispatch, checkList, checkListType])
+    }, [machineId, found, dispatch, fetchForm, createSubFormsAndFields, checkList, checkListType])
   );
 
   const { responsive } = useRes();
-  const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
 
-  useEffect(() => {
-    if (state.subForms) {
-      const initialValues: { [key: string]: any } = {};
-      state.subForms.forEach((subForm: BaseSubForm) => {
-        subForm.Fields?.forEach((field: BaseFormState) => {
-          initialValues[field.MCListID] = field.EResult ?? "";
-        });
+  const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
+  const validationSchema = useMemo(() => {
+    const shape: any = {};
+
+    state.subForms?.forEach((subForm: BaseSubForm) => {
+      subForm.Fields?.forEach((field: BaseFormState) => {
+        if (field.Required) {
+          shape[field.MCListID] = Yup.string()
+            .required(`${field.Placeholder} is required`)
+            .test('is-correct-type', `${field.Placeholder} must be a ${dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName}`, (value) => {
+              if (dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName === 'String') {
+                return !value || !isNaN(Number(value));
+              }
+              return true;
+            });
+        }
       });
-      setFormValues(initialValues);
-    }
+    });
+
+    return Yup.object().shape(shape);
   }, [state.subForms]);
 
-  const handleChange = useCallback((fieldName: string, value: any) => {
-    setFormValues((prev) => ({ ...prev, [fieldName]: value }));
-  }, []);
-
-  const onFormSubmit = async () => {
+  const onFormSubmit = useCallback(async (values: { [key: string]: any }) => {
     const updatedSubForms = state.subForms.map((subForm: BaseSubForm) => ({
       ...subForm,
       MachineID: state.MachineID,
       Fields: subForm?.Fields?.map((field: BaseFormState) => ({
         ...field,
-        EResult: formValues[field.MCListID] || "",
+        EResult: values[field.MCListID] || "",
       })),
     }));
 
     const data = { FormData: JSON.stringify(updatedSubForms) };
 
-    try {
-      const response = await axiosInstance.post("ExpectedResult_service.asmx/SaveExpectedResult", data);
-      showSuccess(String(response.data.message));
-    } catch (error) {
-      handleError(error);
-    }
-  };
+    console.log(data);
+
+    // try {
+    //   const response = await axiosInstance.post("ExpectedResult_service.asmx/SaveExpectedResult", data);
+    //   showSuccess(String(response.data.message));
+    // } catch (error) {
+    //   handleError(error);
+    // }
+  }, [showSuccess, handleError, state.subForms, state.MachineID]);
+
+  const renderSubForm = useCallback(
+    (item: BaseSubForm, setFieldValue: (name: string, value: any) => void, values: { [key: string]: any; }, errors: FormikErrors<{ [key: string]: any; }>, touched: FormikTouched<{ [key: string]: any; }>) => {
+      return (
+        <AccessibleView key={item.SFormID}>
+          <Card style={styles.card}>
+            <Card.Title title={item.SFormName} titleStyle={styles.cardTitle} />
+            <Card.Content style={styles.subFormContainer}>
+              {item.Fields?.map((field: BaseFormState, fieldIndex: number) => {
+                return (
+                  <AccessibleView key={`field-${fieldIndex}-${item.SFormID}`}>
+                    <Dynamic
+                      field={field}
+                      values={values}
+                      setFieldValue={setFieldValue}
+                      groupCheckListOption={groupCheckListOption}
+                    />
+                    {touched?.[field.MCListID] && errors?.[field.MCListID] && (
+                      <HelperText
+                        type="error"
+                        visible={Boolean(touched[field.MCListID] && errors[field.MCListID])}
+                        style={masterdataStyles.textError}
+                        testID="error-machineGroupId-md"
+                      >
+                        {typeof errors[field.MCListID] === 'string'
+                          ? errors[field.MCListID]
+                          : Array.isArray(errors[field.MCListID])
+                            ? errors[field.MCListID].join(', ') || ""
+                            : '' }
+                      </HelperText>
+                    )}
+                  </AccessibleView>
+                );
+              })}
+            </Card.Content>
+          </Card>
+        </AccessibleView>
+      );
+    },
+    [groupCheckListOption, formValues]
+  );
+
 
   return found ? (
-    <AccessibleView style={styles.container} >
+    <AccessibleView style={styles.container}>
       <Text style={styles.title}>{state.FormName || "Content Name"}</Text>
       <Divider />
-      <Text style={[styles.description]}>{state.Description || "Content Description"}</Text>
+      <Text style={styles.description}>{state.Description || "Content Description"}</Text>
 
-      <ScrollView style={{ flex: 1 }}>
-        {state.subForms.map((subForm: BaseSubForm, index: number) => (
-          <AccessibleView key={`subForm-${index}`}>
-            <Card style={styles.card}>
-              <Card.Title title={subForm.SFormName} titleStyle={styles.cardTitle} />
-              <Card.Content style={styles.subFormContainer}>
-                {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
-                  const columns = subForm.Columns ?? 1;
-                  const containerStyle: ViewStyle = {
-                    flexBasis: responsive === "small" ? "100%" : `${100 / (columns > 1 ? columns : 1)}%`,
-                    flexGrow: field.DisplayOrder || 1,
-                    padding: 5,
-                  };
-
-                  return (
-                    <AccessibleView key={`field-${fieldIndex}-${subForm.SFormName}`} style={containerStyle}>
-                      <Dynamic
-                        field={field}
-                        values={formValues}
-                        setFieldValue={handleChange}
-                        groupCheckListOption={groupCheckListOption}
-                      />
-                    </AccessibleView>
-                  );
-                })}
-              </Card.Content>
-            </Card>
+      <Formik
+        initialValues={formValues}
+        validationSchema={validationSchema}
+        onSubmit={(value) => onFormSubmit(value)}
+      >
+        {({ handleSubmit, setFieldValue, values, errors, touched }) => (
+          <AccessibleView>
+            <FlatList
+              data={state.subForms}
+              renderItem={({ item }) => renderSubForm(item, setFieldValue, values, errors, touched)}
+              keyExtractor={(item) => item.SFormID}
+            />
+            <AccessibleView style={masterdataStyles.containerAction}>
+              <Pressable
+                onPress={() => handleSubmit()}
+                style={[masterdataStyles.button, masterdataStyles.backMain]}
+              >
+                <Text style={masterdataStyles.text}>Submit</Text>
+              </Pressable>
+            </AccessibleView>
           </AccessibleView>
-        ))}
-        <AccessibleView style={masterdataStyles.containerAction}>
-          <Pressable
-            onPress={onFormSubmit}
-            style={[masterdataStyles.button, masterdataStyles.backMain]}
-            testID="Save-scan"
-          >
-            <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>
-              Save Submit
-            </Text>
-          </Pressable>
-        </AccessibleView>
-      </ScrollView>
-    </AccessibleView >
+        )}
+      </Formik>
+    </AccessibleView>
   ) : (
     <NotFoundScreen />
-  )
-
+  );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
     flex: 1,
+    padding: 10,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: 10,
   },
   description: {
-    fontSize: 20,
-    marginBottom: 16,
-  },
-  subFormContainer: {
-    marginBottom: 16,
-    flexDirection: "row",
-    flexWrap: "wrap",
+    fontSize: 16,
+    marginBottom: 20,
   },
   card: {
-    paddingVertical: 16,
-    borderRadius: 8,
-    elevation: 2,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   cardTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '600',
+  },
+  subFormContainer: {
+    marginVertical: 10,
+  },
+  fieldCard: {
+    marginVertical: 5,
   },
 });
 
-export default React.memo(InputFormMachine);
+export default InputFormMachine;

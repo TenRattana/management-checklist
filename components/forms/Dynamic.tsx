@@ -5,15 +5,16 @@ import { CheckListOption } from '@/typing/type';
 import AccessibleView from "../AccessibleView";
 import { DynamicFormProps } from "@/typing/tag";
 
-
 const DynamicForm = ({
   field,
   values,
   setFieldValue,
   groupCheckListOption,
 }: DynamicFormProps) => {
+  const { CTypeName, Placeholder, Hint, CListName, MCListID, GCLOptionID } = field;
+
   const option = groupCheckListOption
-    .filter(option => option.GCLOptionID === field.GCLOptionID)
+    .filter(option => option.GCLOptionID === GCLOptionID)
     .flatMap(v =>
       v.CheckListOptions?.map((item: CheckListOption) => ({
         label: item.CLOptionName,
@@ -21,74 +22,70 @@ const DynamicForm = ({
       })) || []
     );
 
-  const fieldName = field.MCListID;
-
   const renderField = () => {
-    switch (field.CTypeName) {
+    switch (CTypeName) {
       case "Textinput":
         return (
           <Inputs
-            placeholder={field.Placeholder}
-            hint={field.Hint}
-            label={field.CListName}
-            value={values[fieldName] ?? ""}
-            handleChange={(v) => setFieldValue(fieldName, v)}
-            testId={`input-${fieldName}`}
+            placeholder={Placeholder}
+            hint={Hint}
+            label={CListName}
+            value={values[MCListID] ?? ""}
+            handleChange={(v) => setFieldValue(MCListID, v)}
+            testId={`input-${MCListID}`}
           />
         );
       case "Textarea":
         return (
           <Textareas
-            placeholder={field.Placeholder}
-            hint={field.Hint}
-            label={field.CListName}
-            value={values[fieldName] ?? ""}
-            handleChange={(v) => setFieldValue(fieldName, v)}
-            testId={`inputarea-${fieldName}`}
+            placeholder={Placeholder}
+            hint={Hint}
+            label={CListName}
+            value={values[MCListID] ?? ""}
+            handleChange={(v) => setFieldValue(MCListID, v)}
+            testId={`inputarea-${MCListID}`}
           />
         );
       case "Radio":
         return (
           <Radios
             option={option}
-            hint={field.Hint}
-            handleChange={(v) => setFieldValue(fieldName, v)}
-            value={values[fieldName]}
-            testId={`radio-${fieldName}`}
+            hint={Hint}
+            handleChange={(v) => setFieldValue(MCListID, v)}
+            value={values[MCListID]}
+            testId={`radio-${MCListID}`}
           />
         );
       case "Dropdown":
         return (
           <Selects
             option={option}
-            hint={field.Hint}
-            handleChange={(v) => setFieldValue(fieldName, v)}
-            value={values[fieldName] ?? ""}
-            testId={`dropdown-${fieldName}`}
+            hint={Hint}
+            handleChange={(v) => setFieldValue(MCListID, v)}
+            value={values[MCListID] ?? ""}
+            testId={`dropdown-${MCListID}`}
           />
         );
       case "Checkbox":
         return (
           <Checkboxs
             option={option}
-            hint={field.Hint}
-            handleChange={(v) => setFieldValue(fieldName, v)}
-            value={values[fieldName] ?? []}
-            testId={`checkbox-${fieldName}`}
+            hint={Hint}
+            handleChange={(v) => setFieldValue(MCListID, v)}
+            value={values[MCListID] ?? []}
+            testId={`checkbox-${MCListID}`}
           />
-        )
+        );
       default:
         return null;
     }
   };
-  console.log(values);
 
   return (
     <AccessibleView>
-      <Text>{field.CListName}</Text>
+      <Text>{CListName}</Text>
       {renderField()}
     </AccessibleView>
-
   );
 };
 
