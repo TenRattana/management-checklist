@@ -208,7 +208,7 @@ const FieldDialog: React.FC<FieldDialogProps> = ({ isVisible, formState, onDelet
                                         if (newRender === "detail") {
                                             setFieldValue("DTypeID", null);
                                         } else {
-                                            setFieldValue("GCLOptionID", []);
+                                            setFieldValue("GCLOptionID", null);
                                         }
                                         setShouldRender(newRender);
                                     }
@@ -431,7 +431,10 @@ const FieldDialog: React.FC<FieldDialogProps> = ({ isVisible, formState, onDelet
 
                                             {editMode && (
                                                 <Pressable
-                                                    onPress={() => onDeleteField(values.SFormID, values.MCListID)}
+                                                    onPress={() => {
+                                                        onDeleteField(values.SFormID, values.MCListID);
+                                                        setShowDialogs();
+                                                    }}
                                                     style={[masterdataStyles.button, masterdataStyles.backMain]}
                                                 >
                                                     <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>

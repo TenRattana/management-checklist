@@ -6,9 +6,11 @@ import { useToast, useTheme, useRes } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
 import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
+import { useFocusEffect } from "@react-navigation/native";
 
 interface FormScreenProps {
-    navigation: any
+    navigation: any;
+    route: any;
 }
 
 interface Form {
@@ -18,10 +20,11 @@ interface Form {
     Description: string;
 }
 
-const FormScreen: React.FC<FormScreenProps> = (({ navigation }) => {
+const FormScreen: React.FC<FormScreenProps> = (({ navigation, route }) => {
     const [form, setForm] = useState<Form[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const { messages } = route.params || {};
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, showError } = useToast();
@@ -58,9 +61,17 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation }) => {
         }
     };
 
+    useFocusEffect(
+        useCallback(() => {
+            fetchData();
+            return () => { };
+        }, [])
+    );
+
     useEffect(() => {
-        fetchData();
-    }, []);
+        if (messages)
+            showSuccess(String(messages))
+    }, [messages])
 
     const handleAction = async (action?: string, item?: string) => {
         try {

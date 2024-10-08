@@ -47,7 +47,7 @@ const Preview: React.FC<PreviewProps> = ({
       <Divider />
       <Text style={[styles.description]}>{state.Description || "Content Description"}</Text>
 
-      <ScrollView style={{ flex: 1, backgroundColor: 'white' }}>
+      <ScrollView style={{ flex: 1 }}>
         {state.subForms.map((subForm: BaseSubForm, index: number) => (
           <AccessibleView key={`subForm-${index}`} >
             <Card style={styles.card}>

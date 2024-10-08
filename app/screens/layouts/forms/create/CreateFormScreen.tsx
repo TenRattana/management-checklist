@@ -10,7 +10,7 @@ import React, { useState, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "@/config/axios";
 import axios from "axios";
-import { setForm, setSubForm, setField } from "@/slices";
+import { setForm, setSubForm, setField, reset } from "@/slices";
 import { useToast, useRes } from "@/app/contexts";
 import { useFocusEffect } from "@react-navigation/native";
 import { SubForm, FormData, BaseFormState } from '@/typing/form'
@@ -19,9 +19,10 @@ import { AccessibleView, Preview } from "@/components";
 
 interface CreateFormProps {
     route: any;
+    navigation: any;
 }
 
-const CreateFormScreen: React.FC<CreateFormProps> = ({ route }) => {
+const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
     const dispatch = useDispatch();
     const state = useSelector((state: any) => state.form);
 
@@ -35,6 +36,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route }) => {
     const { formId, action } = route.params || {};
     const { showError } = useToast();
     const [currentField, setCurrentField] = useState<any>({});
+
     const errorMessage = useCallback((error: unknown) => {
         let errorMsg: string | string[];
 
@@ -126,7 +128,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route }) => {
     useFocusEffect(
         useCallback(() => {
             fetchData();
-            return () => { };
+            return () => { dispatch(reset()) };
         }, [])
     );
 
@@ -155,6 +157,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route }) => {
             <AccessibleView style={[createform.container]}>
                 <AccessibleView style={createform.containerL1}>
                     <Dragsubform
+                        navigation={navigation}
                         errorMessage={errorMessage}
                         state={state}
                         dispatch={dispatch}

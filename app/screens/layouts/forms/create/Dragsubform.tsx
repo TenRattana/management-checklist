@@ -2,7 +2,6 @@ import React, { useState, useCallback, useRef, useMemo } from "react";
 import {
     Animated,
     Pressable,
-    TouchableOpacity,
 } from "react-native";
 import {
     setDragSubForm,
@@ -10,8 +9,7 @@ import {
     updateSubForm,
     deleteSubForm,
 } from "@/slices";
-import useForm from '@/hooks/custom/useForm';
-import { AccessibleView } from "@/components";
+import { AccessibleView, SaveDialog } from "@/components";
 import SubFormDialog from "@/components/forms/SubFormDialog";
 import useCreateformStyle from "@/styles/createform";
 import DraggableFlatList, { ScaleDecorator } from "react-native-draggable-flatlist";
@@ -19,7 +17,7 @@ import { IconButton, Text } from "react-native-paper";
 import { runOnJS } from "react-native-reanimated";
 import { spacing } from "@/constants/Spacing";
 import Dragfield from "./Dragfield";
-import { BaseFormState, BaseSubForm } from '@/typing/form'
+import { BaseSubForm } from '@/typing/form'
 import { DataType, CheckListType, GroupCheckListOption, Checklist } from '@/typing/type'
 
 interface DragsubformProps {
@@ -30,10 +28,12 @@ interface DragsubformProps {
     dataType: DataType[];
     checkListType: CheckListType[];
     groupCheckListOption: GroupCheckListOption[];
+    navigation: any;
 }
 
-const Dragsubform: React.FC<DragsubformProps> = ({ errorMessage, state, dispatch, dataType, checkListType, groupCheckListOption, checkList }) => {
+const Dragsubform: React.FC<DragsubformProps> = ({ errorMessage, state, dispatch, dataType, checkListType, groupCheckListOption, checkList, navigation }) => {
     const [initialDialog, setInitialDialog] = useState<boolean>(false)
+    const [initialSaveDialog, setInitialSaveDialog] = useState<boolean>(false)
     const [initialSubForm, setInitialSubForm] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", MachineID: "" });
     const [editMode, setEditMode] = useState<boolean>(false)
 
@@ -71,6 +71,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ errorMessage, state, dispatch
     const handelSetDialog = useCallback(() => {
         setEditMode(false)
         setInitialDialog(false)
+        setInitialSaveDialog(false)
     }, [])
 
     const handelSubForm = useCallback((item?: BaseSubForm) => {
@@ -102,7 +103,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ errorMessage, state, dispatch
             <Animated.View style={{ transform: [{ scale: getScaleValue(item.SFormID) }] }}>
                 <ScaleDecorator>
                     <AccessibleView style={{ marginBottom: 30 }}>
-                        <TouchableOpacity
+                        <Pressable
                             onPress={() => {
                                 setEditMode(true);
                                 setInitialDialog(true);
@@ -123,7 +124,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ errorMessage, state, dispatch
                                 Sub Form: {item.SFormName}
                             </Text>
                             <IconButton icon="chevron-right" size={18} />
-                        </TouchableOpacity>
+                        </Pressable>
 
                         <Dragfield
                             data={item?.Fields ?? []}
@@ -141,6 +142,8 @@ const Dragsubform: React.FC<DragsubformProps> = ({ errorMessage, state, dispatch
             </Animated.View>
         );
     };
+
+    console.log(initialSaveDialog);
 
 
     return (
@@ -161,13 +164,13 @@ const Dragsubform: React.FC<DragsubformProps> = ({ errorMessage, state, dispatch
                 renderItem={renderSubForm}
                 keyExtractor={(item, index) => `SF-${item.SFormID}-${index}`}
                 onDragEnd={({ data }) => handleDropSubForm(data)}
-                contentContainerStyle={{ paddingHorizontal: 50, paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 40 :  0}}
+                contentContainerStyle={{ paddingHorizontal: 50, paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 40 : 0 }}
                 nestedScrollEnabled={true}
                 activationDistance={1}
                 autoscrollSpeed={30}
             />
 
-            <Pressable onPress={() => { /* Handle Save Form */ }} style={createform.saveButton}>
+            <Pressable onPress={() => setInitialSaveDialog(true)} style={createform.saveButton}>
                 <Text style={createform.saveButtonText}>Save Form</Text>
             </Pressable>
 
@@ -178,6 +181,13 @@ const Dragsubform: React.FC<DragsubformProps> = ({ errorMessage, state, dispatch
                 initialValues={initialSubForm}
                 saveData={handelSaveSubForm}
                 onDelete={(SFormID: string) => dispatch(deleteSubForm({ SFormID }))}
+            />
+
+            <SaveDialog
+                state={state}
+                isVisible={initialSaveDialog}
+                setIsVisible={handelSetDialog}
+                navigation={navigation}
             />
         </AccessibleView>
 

@@ -83,7 +83,7 @@ export interface SubFormDialogProps<V extends FormConfig>
 }
 
 export interface SaveDialogProps extends SetVisible {
-  saveForm: () => void;
+  state:any;
 }
 
 export interface MachineDialogProps<V extends Values, D extends TypeConfig>

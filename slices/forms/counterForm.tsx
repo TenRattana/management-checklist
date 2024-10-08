@@ -203,31 +203,30 @@ const subFormSlice = createSlice({
     }>) => {
       const { BaseFormState, checkList, checkListType } = action.payload;
 
-      // state.subForms = state.subForms.map((sub) => {
-      //   if (sub.subFormId === BaseFormState.subFormId) {
-      //     const updatedFields = sub.fields.map((field) => {
-      //       if (field.matchCheckListId === BaseFormState.matchCheckListId) {
-      //         return {
-      //           ...BaseFormState,
-      //           displayOrder: field.displayOrder,
-      //           CheckListName:
-      //             checkList.find((v) => v.checkListId === BaseFormState.checkListId)?.CListName || "",
-      //           CTypeName:
-      //             checkListType.find((v) => v.checkListTypeId === BaseFormState.checkListTypeId)?.CTypeName || "",
-      //         };
-      //       }
-      //       return field;
-      //     });
+      state.subForms = state.subForms.map((sub) => {
+        if (sub.SFormID === BaseFormState.SFormID) {
+          const updatedFields = sub.Fields?.map((field) => {
+            if (field.MCListID === BaseFormState.MCListID) {
+              return {
+                ...BaseFormState,
+                displayOrder: field.DisplayOrder,
+                CheckListName: checkList.find(v => v.CListID === BaseFormState.CListID)?.CListName || "",
+                CTypeName: checkListType.find(v => v.CTypeID === BaseFormState.CTypeID)?.CTypeName || "",
+              };
+            }
+            return field;
+          }) || [];
 
-      //     sortFields(updatedFields);
+          const sortedFields = sortFields(updatedFields);
 
-      //     return {
-      //       ...sub,
-      //       fields: updatedFields,
-      //     };
-      //   }
-      //   return sub;
-      // });
+          return {
+            ...sub,
+            Fields: sortedFields,
+          };
+        }
+        return sub;
+      });
+
       sortSubForms(state.subForms);
     },
     deleteField: (state, action: PayloadAction<{
@@ -240,7 +239,7 @@ const subFormSlice = createSlice({
         if (subForm.SFormID === SFormID) {
           return {
             ...subForm,
-            fields: subForm.Fields?.filter((f) => f.MCListID !== MCListID),
+            Fields: subForm.Fields?.filter((f) => f.MCListID !== MCListID),
           };
         }
         return subForm;
