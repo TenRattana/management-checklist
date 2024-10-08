@@ -1,14 +1,13 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "@/config/axios";
-import axios from "axios";
 import { Card, Divider } from "react-native-paper";
 import { StyleSheet, Text, ScrollView, ViewStyle, Pressable } from "react-native";
 import { setForm, setSubForm, setField, reset } from "@/slices";
 import { useToast, useRes } from "@/app/contexts";
-import { BaseSubForm, FormData, BaseFormState, BaseForm } from '@/typing/form'
-import { CheckListType, Checklist, GroupCheckListOption } from '@/typing/type'
-import { AccessibleView, Dynamic } from "@/components";
+import { BaseSubForm, FormData, BaseFormState, BaseForm } from '@/typing/form';
+import { CheckListType, Checklist, GroupCheckListOption } from '@/typing/type';
+import { AccessibleView, Dynamic, NotFoundScreen } from "@/components";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { PreviewProps } from "@/typing/tag";
 import { ScanParams } from "@/typing/tag";
@@ -22,9 +21,10 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   const [checkListType, setCheckListType] = useState<CheckListType[]>([]);
   const [groupCheckListOption, setGroupCheckListOption] = useState<GroupCheckListOption[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [dataLoading, setDataLoding] = useState<boolean>(false);
-  const masterdataStyles = useMasterdataStyles()
+  const [dataLoading, setDataLoading] = useState<boolean>(false);
+  const [found, setFound] = useState<boolean>(false);
 
+  const masterdataStyles = useMasterdataStyles();
   const { machineId } = route.params || {};
   const { showSuccess, handleError } = useToast();
 
@@ -40,7 +40,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
       setCheckList(responses[0].data.data ?? []);
       setCheckListType(responses[1].data.data ?? []);
       setGroupCheckListOption(responses[2].data.data ?? []);
-      setDataLoding(true)
+      setDataLoading(true);
     } catch (error) {
       handleError(error);
     } finally {
@@ -52,11 +52,13 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
     if (!machineId) return null;
 
     try {
-      const response = await axios.post("Form_service.asmx/ScanForm", { MachineID: machineId });
-      showSuccess(String(response.data.message))
+      const response = await axiosInstance.post("Form_service.asmx/ScanForm", { MachineID: machineId });
+      setFound(response.data.status)
+      showSuccess(String(response.data?.message));
       return response.data?.data[0] || null;
     } catch (error) {
       handleError(error);
+      setFound(false)
       return null;
     }
   };
@@ -102,8 +104,8 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   useFocusEffect(
     useCallback(() => {
       fetchData();
-      return () => { dispatch(reset()) };
-    }, [])
+      return () => { dispatch(reset()); };
+    }, [dispatch])
   );
 
   useFocusEffect(
@@ -111,23 +113,18 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
       const loadForm = async () => {
         if (machineId) {
           const formData = await fetchForm(machineId);
-          const { subForms, fields } = createSubFormsAndFields(formData);
-          const formCopy: BaseForm = {
-            FormID: "",
-            Description: "",
-            FormName: "",
-            MachineID: "",
+          if (found) {
+            const { subForms, fields } = createSubFormsAndFields(formData);
+            dispatch(setForm({ form: formData }));
+            dispatch(setSubForm({ subForms }));
+            dispatch(setField({ BaseFormState: fields, checkList, checkListType }));
           }
-          dispatch(setForm({ form: formData }));
-          dispatch(setSubForm({ subForms }));
-          dispatch(setField({ BaseFormState: fields, checkList, checkListType }));
         }
       };
       loadForm();
       return () => { };
-    }, [machineId, dataLoading])
+    }, [machineId, found, dispatch, checkList, checkListType])
   );
-
 
   const { responsive } = useRes();
   const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
@@ -145,10 +142,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   }, [state.subForms]);
 
   const handleChange = useCallback((fieldName: string, value: any) => {
-    setFormValues((prev) => ({
-      ...prev,
-      [fieldName]: value,
-    }));
+    setFormValues((prev) => ({ ...prev, [fieldName]: value }));
   }, []);
 
   const onFormSubmit = async () => {
@@ -163,28 +157,27 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
     const data = { FormData: JSON.stringify(updatedSubForms) };
 
     try {
-      const response = await axios.post("ExpectedResult_service.asmx/SaveExpectedResult", data);
+      const response = await axiosInstance.post("ExpectedResult_service.asmx/SaveExpectedResult", data);
       showSuccess(String(response.data.message));
     } catch (error) {
-      handleError(error)
+      handleError(error);
     }
   };
 
-  return (
-    <AccessibleView style={styles.container}>
+  return found ? (
+    <AccessibleView style={styles.container} >
       <Text style={styles.title}>{state.FormName || "Content Name"}</Text>
       <Divider />
       <Text style={[styles.description]}>{state.Description || "Content Description"}</Text>
 
       <ScrollView style={{ flex: 1 }}>
         {state.subForms.map((subForm: BaseSubForm, index: number) => (
-          <AccessibleView key={`subForm-${index}`} >
+          <AccessibleView key={`subForm-${index}`}>
             <Card style={styles.card}>
               <Card.Title title={subForm.SFormName} titleStyle={styles.cardTitle} />
               <Card.Content style={styles.subFormContainer}>
                 {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
                   const columns = subForm.Columns ?? 1;
-
                   const containerStyle: ViewStyle = {
                     flexBasis: responsive === "small" ? "100%" : `${100 / (columns > 1 ? columns : 1)}%`,
                     flexGrow: field.DisplayOrder || 1,
@@ -192,10 +185,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                   };
 
                   return (
-                    <AccessibleView
-                      key={`field-${fieldIndex}-${subForm.SFormName}`}
-                      style={containerStyle}
-                    >
+                    <AccessibleView key={`field-${fieldIndex}-${subForm.SFormName}`} style={containerStyle}>
                       <Dynamic
                         field={field}
                         values={formValues}
@@ -212,18 +202,20 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
         <AccessibleView style={masterdataStyles.containerAction}>
           <Pressable
             onPress={onFormSubmit}
-            style={[
-              masterdataStyles.button,
-              masterdataStyles.backMain
-            ]}
+            style={[masterdataStyles.button, masterdataStyles.backMain]}
             testID="Save-scan"
           >
-            <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Save Submit</Text>
+            <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>
+              Save Submit
+            </Text>
           </Pressable>
         </AccessibleView>
       </ScrollView>
-    </AccessibleView>
-  );
+    </AccessibleView >
+  ) : (
+    <NotFoundScreen />
+  )
+
 };
 
 const styles = StyleSheet.create({
@@ -245,11 +237,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
   },
-  subFormTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
   card: {
     paddingVertical: 16,
     borderRadius: 8,
@@ -258,15 +245,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 18,
-    fontWeight: 'bold'
-  },
-  submitText: {
-    textAlign: 'center',
-    padding: 10,
-    backgroundColor: '#007BFF',
-    color: '#FFF',
-    borderRadius: 5,
-    marginTop: 20,
+    fontWeight: 'bold',
   },
 });
 

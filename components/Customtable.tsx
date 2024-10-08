@@ -1,6 +1,6 @@
 import React, { useRef, useMemo, useState, useEffect, useCallback } from "react";
-import { Text, Pressable, Animated, FlexStyle } from "react-native";
-import { DataTable, IconButton, Divider } from "react-native-paper";
+import { Text, Pressable, Animated } from "react-native";
+import { DataTable, IconButton } from "react-native-paper";
 import Dialogs from "@/components/common/Dialogs";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useRes, useToast } from "@/app/contexts";
@@ -107,7 +107,7 @@ const CustomTable = ({
       } else {
         setDialogAction(action);
         setDialogData(data);
-        setDialogTitle(action === "editIndex" ? "Edit" : action === "Delete" ? "Delete" : action === "changeIndex" ? "Change Data Form" : action === "copyIndex" ? "Copy Template" : action === "preIndex" ? "Preview Form" : "");
+        setDialogTitle(action === "editIndex" ? "Edit" : action === "Delete" ? "Delete" : action === "changeIndex" ? "Change Data Form" : action === "copyIndex" ? "Copy Template" : action === "preIndex" ? "Preview Form" : action === "editOnlyIndex" ? "Edit" : "");
         setDialogMessage(`${row[0]}`);
         setIsVisible(true);
       }
@@ -115,6 +115,15 @@ const CustomTable = ({
 
     let icon;
     switch (action) {
+      case "editOnlyIndex":
+        icon = (
+          <IconButton
+            icon="pencil-box"
+            size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium}
+            iconColor={colors.main}
+          />
+        );
+        break;
       case "editIndex":
         icon = (
           <IconButton

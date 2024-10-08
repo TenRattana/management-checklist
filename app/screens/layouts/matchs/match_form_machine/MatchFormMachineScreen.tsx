@@ -79,12 +79,12 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
     const handleAction = async (action?: string, item?: string) => {
         try {
             if (action === "changeIndex") {
-                navigation.navigate("Create Form", { formId: item });
+                navigation.navigate("Create_form", { formId: item });
             } else if (action === "preIndex") {
-                navigation.navigate("View Form", { formId: item });
+                navigation.navigate("Preview", { formId: item });
             } else if (action === "copyIndex") {
-                navigation.navigate("Create Form", { formId: item, action: "copy" });
-            } else if (action === "editIndex") {
+                navigation.navigate("Create_form", { formId: item, action: "copy" });
+            } else if (action === "editOnlyIndex") {
                 const response = await axios.post("MatchFormMachine_service.asmx/GetMatchFormMachine", {
                     MachineID: item,
                 });
@@ -116,6 +116,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
                 item.FormID,
                 item.FormID,
                 item.IsActive,
+                item.MachineID,
             ];
         })
     }, [machine]);
@@ -127,6 +128,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
         { label: "Copy Template", align: "center" },
         { label: "Preview", align: "center" },
         { label: "Status", align: "center" },
+        { label: "", align: "flex-end" }
     ];
 
     const actionIndex = [
@@ -134,6 +136,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
             changeIndex: 2,
             copyIndex: 3,
             preIndex: 4,
+            editOnlyIndex: 6
         },
     ];
 
@@ -164,7 +167,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
     const customtableProps = {
         Tabledata: tableData,
         Tablehead: tableHead,
-        flexArr: [2, 3, 1, 1, 1, 1],
+        flexArr: [3, 4, 1, 1, 1, 1, 1],
         actionIndex,
         handleAction,
         searchQuery,

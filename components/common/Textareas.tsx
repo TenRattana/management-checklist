@@ -59,6 +59,7 @@ const Textareas = ({
 const styles = StyleSheet.create({
     container: {
         marginVertical: 10,
+        paddingHorizontal: 10
     },
     textInput: {
         height: 120,

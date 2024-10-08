@@ -19,6 +19,7 @@ const useForm = (route: any) => {
     const [dataType, setDataType] = useState<DataType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [dataLoading, setDataLoding] = useState(false);
+    const [found, setFound] = useState<boolean>(false)
     const { formId, action } = route.params || {};
     const { handleError } = useToast();
 
@@ -108,16 +109,21 @@ const useForm = (route: any) => {
             const loadForm = async () => {
                 if (formId && dataLoading) {
                     const formData = await fetchForm(formId);
-                    const { subForms, fields } = createSubFormsAndFields(formData);
-                    const formCopy: BaseForm = {
-                        FormID: "",
-                        Description: "",
-                        FormName: "",
-                        MachineID: "",
+                    if (formData) {
+                        setFound(true)
+                        const { subForms, fields } = createSubFormsAndFields(formData);
+                        const formCopy: BaseForm = {
+                            FormID: "",
+                            Description: "",
+                            FormName: "",
+                            MachineID: "",
+                        }
+                        dispatch(setForm({ form: action === "copy" ? formCopy : formData }));
+                        dispatch(setSubForm({ subForms }));
+                        dispatch(setField({ BaseFormState: fields, checkList, checkListType }));
+                    } else {
+                        setFound(false)
                     }
-                    dispatch(setForm({ form: action === "copy" ? formCopy : formData }));
-                    dispatch(setSubForm({ subForms }));
-                    dispatch(setField({ BaseFormState: fields, checkList, checkListType }));
                 }
             };
             loadForm();
@@ -127,6 +133,7 @@ const useForm = (route: any) => {
 
 
     return {
+        found,
         state,
         checkListOption,
         setCheckListOption,

@@ -93,6 +93,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 12,
+    paddingHorizontal: 10
+
   },
   checkboxLabel: {
     fontSize: 16,

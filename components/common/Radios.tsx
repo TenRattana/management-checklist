@@ -74,6 +74,7 @@ const Radios = ({
 const styles = StyleSheet.create({
   container: {
     marginBottom: 20,
+    paddingHorizontal: 10
   },
   label: {
     fontSize: 16,

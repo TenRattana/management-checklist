@@ -68,7 +68,7 @@ const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
                 <Camera style={styles.camera} onBarCodeScanned={handleBarCodeScanned} />
             ) : (
                 <View style={styles.resultContainer}>
-                    <Text style={styles.resultText}>Scanned QR Code: {qrValue}</Text>
+                    <Text style={styles.resultText}>Scanned QR Code</Text>
                 </View>
             )}
         </View>

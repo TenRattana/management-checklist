@@ -3,13 +3,14 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Card, Divider } from "react-native-paper";
 import { useRes } from "@/app/contexts";
 import { BaseFormState, BaseSubForm } from '@/typing/form';
-import { AccessibleView, Dynamic } from "@/components";
+import { AccessibleView, Dynamic, NotFoundScreen } from "@/components";
 import useForm from "@/hooks/custom/useForm";
 import { PreviewProps } from "@/typing/tag";
 import { PreviewParams } from "@/typing/tag";
 
 const Preview: React.FC<PreviewProps<PreviewParams>> = ({ route }) => {
     const {
+        found,
         state,
         groupCheckListOption,
     } = useForm(route);
@@ -38,44 +39,49 @@ const Preview: React.FC<PreviewProps<PreviewParams>> = ({ route }) => {
 
     return (
         <AccessibleView style={styles.container}>
-            <Text style={styles.title}>{state.FormName || "Content Name"}</Text>
-            <Divider />
-            <Text style={[styles.description]}>{state.Description || "Content Description"}</Text>
+            {found ? (
+                <>
+                    <Text style={styles.title}>{state.FormName || "Content Name"}</Text>
+                    <Divider />
+                    <Text style={[styles.description]}>{state.Description || "Content Description"}</Text>
 
-            <ScrollView style={{ flex: 1 }}>
-                {state.subForms.map((subForm: BaseSubForm, index: number) => (
-                    <AccessibleView key={`subForm-${index}`} >
-                        <Card style={styles.card}>
-                            <Card.Title title={subForm.SFormName} titleStyle={styles.cardTitle} />
-                            <Card.Content style={styles.subFormContainer}>
-                                {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
-                                    const columns = subForm.Columns ?? 1;
+                    <ScrollView style={{ flex: 1 }}>
+                        {state.subForms.map((subForm: BaseSubForm, index: number) => (
+                            <AccessibleView key={`subForm-${index}`} >
+                                <Card style={styles.card}>
+                                    <Card.Title title={subForm.SFormName} titleStyle={styles.cardTitle} />
+                                    <Card.Content style={styles.subFormContainer}>
+                                        {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
+                                            const columns = subForm.Columns ?? 1;
 
-                                    const containerStyle: ViewStyle = {
-                                        flexBasis: responsive === "small" ? "100%" : `${100 / (columns > 1 ? columns : 1)}%`,
-                                        flexGrow: field.DisplayOrder || 1,
-                                        padding: 5,
-                                    };
+                                            const containerStyle: ViewStyle = {
+                                                flexBasis: responsive === "small" ? "100%" : `${100 / (columns > 1 ? columns : 1)}%`,
+                                                flexGrow: field.DisplayOrder || 1,
+                                                padding: 5,
+                                            };
 
-                                    return (
-                                        <AccessibleView
-                                            key={`field-${fieldIndex}-${subForm.SFormName}`}
-                                            style={containerStyle}
-                                        >
-                                            <Dynamic
-                                                field={field}
-                                                values={formValues}
-                                                setFieldValue={handleChange}
-                                                groupCheckListOption={groupCheckListOption}
-                                            />
-                                        </AccessibleView>
-                                    );
-                                })}
-                            </Card.Content>
-                        </Card>
-                    </AccessibleView>
-                ))}
-            </ScrollView>
+                                            return (
+                                                <AccessibleView
+                                                    key={`field-${fieldIndex}-${subForm.SFormName}`}
+                                                    style={containerStyle}
+                                                >
+                                                    <Dynamic
+                                                        field={field}
+                                                        values={formValues}
+                                                        setFieldValue={handleChange}
+                                                        groupCheckListOption={groupCheckListOption}
+                                                    />
+                                                </AccessibleView>
+                                            );
+                                        })}
+                                    </Card.Content>
+                                </Card>
+                            </AccessibleView>
+                        ))}
+                    </ScrollView>
+                </>
+            ) : <NotFoundScreen />}
+
         </AccessibleView>
     );
 };
