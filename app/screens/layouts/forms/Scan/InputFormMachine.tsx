@@ -6,14 +6,15 @@ import { Card, Divider } from "react-native-paper";
 import { StyleSheet, Text, ScrollView, ViewStyle, Pressable } from "react-native";
 import { setForm, setSubForm, setField, reset } from "@/slices";
 import { useToast, useRes } from "@/app/contexts";
-import { useFocusEffect } from "@react-navigation/native";
 import { BaseSubForm, FormData, BaseFormState, BaseForm } from '@/typing/form'
 import { CheckListType, Checklist, GroupCheckListOption } from '@/typing/type'
 import { AccessibleView, Dynamic } from "@/components";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { PreviewProps } from "@/typing/tag";
+import { ScanParams } from "@/typing/tag";
+import { useFocusEffect } from "expo-router";
 
-const InputFormMachine: React.FC<PreviewProps> = ({ route }) => {
+const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   const dispatch = useDispatch();
   const state = useSelector((state: any) => state.form);
 
@@ -25,21 +26,7 @@ const InputFormMachine: React.FC<PreviewProps> = ({ route }) => {
   const masterdataStyles = useMasterdataStyles()
 
   const { machineId } = route.params || {};
-  const { showSuccess, showError } = useToast();
-
-  const errorMessage = useCallback((error: unknown) => {
-    let errorMsg: string | string[];
-
-    if (axios.isAxiosError(error)) {
-      errorMsg = error.response?.data?.errors ?? ["Something went wrong!"];
-    } else if (error instanceof Error) {
-      errorMsg = [error.message];
-    } else {
-      errorMsg = ["An unknown error occurred!"];
-    }
-
-    showError(Array.isArray(errorMsg) ? errorMsg : [errorMsg]);
-  }, [showError]);
+  const { showSuccess, handleError } = useToast();
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -55,7 +42,7 @@ const InputFormMachine: React.FC<PreviewProps> = ({ route }) => {
       setGroupCheckListOption(responses[2].data.data ?? []);
       setDataLoding(true)
     } catch (error) {
-      errorMessage(error);
+      handleError(error);
     } finally {
       setIsLoading(false);
     }
@@ -69,7 +56,7 @@ const InputFormMachine: React.FC<PreviewProps> = ({ route }) => {
       showSuccess(String(response.data.message))
       return response.data?.data[0] || null;
     } catch (error) {
-      errorMessage(error);
+      handleError(error);
       return null;
     }
   };
@@ -179,7 +166,7 @@ const InputFormMachine: React.FC<PreviewProps> = ({ route }) => {
       const response = await axios.post("ExpectedResult_service.asmx/SaveExpectedResult", data);
       showSuccess(String(response.data.message));
     } catch (error) {
-      errorMessage(error)
+      handleError(error)
     }
   };
 

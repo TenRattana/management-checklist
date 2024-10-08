@@ -15,24 +15,10 @@ const SaveDialog = ({
     setIsVisible,
     navigation
 }: SaveDialogProps & { navigation: any }) => {
-    const { showError } = useToast();
+    const { handleError } = useToast();
     const masterdataStyles = useMasterdataStyles();
 
     const router = useRouter();
-
-    const errorMessage = useCallback((error: unknown) => {
-        let errorMsg: string | string[];
-
-        if (axios.isAxiosError(error)) {
-            errorMsg = error.response?.data?.errors ?? ["Something went wrong!"];
-        } else if (error instanceof Error) {
-            errorMsg = [error.message];
-        } else {
-            errorMsg = ["An unknown error occurred!"];
-        }
-
-        showError(Array.isArray(errorMsg) ? errorMsg : [errorMsg]);
-    }, [showError]);
 
     const saveForm = useCallback(async () => {
         let messages = ""
@@ -53,7 +39,7 @@ const SaveDialog = ({
             const response = await axios.post("MatchCheckList_service.asmx/SaveFormCheckList", data);
             messages = (String(response.data.message));
         } catch (error) {
-            errorMessage(error)
+            handleError(error)
         } finally {
             setIsVisible(false)
             navigation.navigate("Form", { messages });

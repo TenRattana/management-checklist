@@ -10,6 +10,7 @@ import { useRes } from "@/app/contexts";
 import Checklist_option_dialog from "@/components/screens/Checklist_option_dialog";
 import { CheckListOption } from '@/typing/type'
 import { InitialValuesCheckListOption } from '@/typing/value'
+import { useFocusEffect } from "expo-router";
 
 const CheckListOptionScreen = () => {
     const [checkListOption, setCheckListOption] = useState<CheckListOption[]>([]);
@@ -25,23 +26,9 @@ const CheckListOptionScreen = () => {
     });
 
     const masterdataStyles = useMasterdataStyles();
-    const { showSuccess, showError } = useToast();
+    const { showSuccess, handleError } = useToast();
     const { colors } = useTheme();
     const { spacing } = useRes();
-
-    const errorMessage = useCallback((error: unknown) => {
-        let errorMessage: string | string[];
-
-        if (axios.isAxiosError(error)) {
-            errorMessage = error.response?.data?.errors ?? ["Something went wrong!"];
-        } else if (error instanceof Error) {
-            errorMessage = [error.message];
-        } else {
-            errorMessage = ["An unknown error occurred!"];
-        }
-
-        showError(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
-    }, [showError]);
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -50,15 +37,18 @@ const CheckListOptionScreen = () => {
             const response = await axiosInstance.post("CheckListOption_service.asmx/GetCheckListOptions");
             setCheckListOption(response.data.data ?? []);
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         } finally {
             setIsLoading(false);
         }
     };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            fetchData();
+            return () => { };
+        }, [])
+    );
 
     const saveData = async (values: InitialValuesCheckListOption) => {
         setIsLoadingButton(true);
@@ -79,7 +69,7 @@ const CheckListOptionScreen = () => {
 
             await fetchData();
         } catch (error) {
-            errorMessage(error)
+            handleError(error)
         } finally {
             setIsLoadingButton(false);
         }
@@ -110,7 +100,7 @@ const CheckListOptionScreen = () => {
                 await fetchData()
             }
         } catch (error) {
-            errorMessage(error)
+            handleError(error)
         }
     };
 

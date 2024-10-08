@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ScrollView, Pressable, Text } from "react-native";
-import axios from "axios";
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme, useRes } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
 import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { useFocusEffect } from "@react-navigation/native";
 import { FormScreenProps } from "@/typing/tag";
 import { Form } from "@/typing/type";
+import { useFocusEffect } from "expo-router";
 
 const FormScreen: React.FC<FormScreenProps> = (({ navigation, route }) => {
     const [form, setForm] = useState<Form[]>([]);
@@ -17,26 +16,9 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation, route }) => {
     const { messages } = route.params || {};
 
     const masterdataStyles = useMasterdataStyles();
-    const { showSuccess, showError } = useToast();
+    const { showSuccess, handleError } = useToast();
     const { colors } = useTheme();
     const { spacing } = useRes();
-
-    const errorMessage = useCallback(
-        (error: unknown) => {
-            let errorMessage: string | string[];
-
-            if (axios.isAxiosError(error)) {
-                errorMessage = error.response?.data?.errors ?? ["Something went wrong!"];
-            } else if (error instanceof Error) {
-                errorMessage = [error.message];
-            } else {
-                errorMessage = ["An unknown error occurred!"];
-            }
-
-            showError(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
-        },
-        [showError]
-    );
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -45,7 +27,7 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation, route }) => {
             const formResponse = await axiosInstance.post("Form_service.asmx/GetForms");
             setForm(formResponse.data.data ?? []);
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         } finally {
             setIsLoading(false);
         }
@@ -79,7 +61,7 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation, route }) => {
                 await fetchData();
             }
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         }
     };
 

@@ -32,7 +32,7 @@ const CustomTable = ({
 
   const colors = useThemeColor();
   const { responsive, spacing } = useRes();
-  const { showError } = useToast();
+  const { handleError } = useToast();
 
   useEffect(() => {
     const loadPagination = async () => {
@@ -47,18 +47,6 @@ const CustomTable = ({
   const customtable = useCustomtableStyles();
   const masterdataStyles = useMasterdataStyles();
 
-  const errorMessage = useCallback((error: unknown) => {
-    let errorMessage: string | string[];
-
-    if (error instanceof Error) {
-      errorMessage = [error.message];
-    } else {
-      errorMessage = ["An unknown error occurred!"];
-    }
-
-    showError(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
-  }, [showError]);
-
   const animations = useRef(Tabledata.map(() => new Animated.Value(1))).current;
 
   useEffect(() => {
@@ -67,7 +55,16 @@ const CustomTable = ({
 
   const handleSort = (columnIndex: number) => {
     if (sortColumn === columnIndex) {
-      setSortDirection(sortDirection === "ascending" ? "descending" : "ascending");
+      setSortDirection((prevDirection) => {
+        switch (prevDirection) {
+          case "ascending":
+            return "descending";
+          case "descending":
+            return undefined;
+          default:
+            return "ascending";
+        }
+      });
     } else {
       setSortColumn(columnIndex);
       setSortDirection("ascending");
@@ -196,7 +193,7 @@ const CustomTable = ({
             }),
           ]).start();
         } catch (error) {
-          errorMessage(error);
+          handleError(error);
         }
 
         const status = row[cellIndex] ? "Inactive" : "Active";

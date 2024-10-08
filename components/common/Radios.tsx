@@ -42,7 +42,7 @@ const Radios = ({
       {label && <Text style={styles.label}>{label}</Text>}
       <RadioButton.Group
         onValueChange={handleChange}
-        value={value}
+        value={value as string}
       >
         {option.map((opt, index) => (
           <Pressable

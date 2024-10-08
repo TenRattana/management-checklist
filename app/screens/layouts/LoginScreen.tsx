@@ -4,10 +4,10 @@ import { Card, Text } from "react-native-paper";
 import { useAuth } from "../../contexts/auth";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { useFocusEffect } from "@react-navigation/native";
 import { useToast } from "@/app/contexts/toastify";
 import { AccessibleView, Inputs } from "@/components";
 import useMasterdataStyles from "@/styles/common/masterdata";
+import { useFocusEffect } from "expo-router";
 
 const validationSchema = Yup.object().shape({
   username: Yup.string().required("The username field is required."),

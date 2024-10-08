@@ -24,7 +24,7 @@ const Textareas = ({
                 label={label}
                 onChangeText={handleChange}
                 onBlur={handleBlur}
-                value={value || ""}
+                value={value as string}
                 multiline
                 numberOfLines={4}
                 right={

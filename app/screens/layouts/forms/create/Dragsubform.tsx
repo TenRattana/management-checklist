@@ -19,14 +19,16 @@ import { spacing } from "@/constants/Spacing";
 import Dragfield from "./Dragfield";
 import { BaseSubForm } from '@/typing/form'
 import { DragsubformProps } from "@/typing/tag";
+import { useToast } from "@/app/contexts";
 
-const Dragsubform: React.FC<DragsubformProps> = ({ errorMessage, state, dispatch, dataType, checkListType, groupCheckListOption, checkList, navigation }) => {
+const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, checkListType, groupCheckListOption, checkList, navigation }) => {
     const [initialDialog, setInitialDialog] = useState<boolean>(false)
     const [initialSaveDialog, setInitialSaveDialog] = useState<boolean>(false)
     const [initialSubForm, setInitialSubForm] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", MachineID: "" });
     const [editMode, setEditMode] = useState<boolean>(false)
 
     const createform = useCreateformStyle();
+    const { handleError } = useToast();
 
     const scaleValues = useRef<{ [key: string]: Animated.Value }>({});
 
@@ -78,7 +80,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ errorMessage, state, dispatch
                 dispatch(updateSubForm(payload));
             }
         } catch (error) {
-            errorMessage(error)
+            handleError(error)
         } finally {
             handelSetDialog()
         }
@@ -119,7 +121,6 @@ const Dragsubform: React.FC<DragsubformProps> = ({ errorMessage, state, dispatch
                             data={item?.Fields ?? []}
                             SFormID={item.SFormID}
                             dispatch={dispatch}
-                            errorMessage={errorMessage}
                             checkList={checkList}
                             dataType={dataType}
                             checkListType={checkListType}

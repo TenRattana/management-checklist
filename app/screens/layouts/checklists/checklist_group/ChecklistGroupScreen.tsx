@@ -10,6 +10,7 @@ import { useRes } from "@/app/contexts";
 import Checklist_group_dialog from "@/components/screens/Checklist_group_dialog";
 import { GroupCheckListOption } from '@/typing/type'
 import { InitialValuesGroupCheckList } from '@/typing/value'
+import { useFocusEffect } from "expo-router";
 
 const ChecklistGroupScreen = () => {
     const [groupCheckListOption, setGroupCheckListOption] = useState<GroupCheckListOption[]>([]);
@@ -27,23 +28,9 @@ const ChecklistGroupScreen = () => {
 
     const masterdataStyles = useMasterdataStyles();
 
-    const { showSuccess, showError } = useToast();
+    const { showSuccess, handleError } = useToast();
     const { colors } = useTheme();
     const { spacing } = useRes();
-
-    const errorMessage = useCallback((error: unknown) => {
-        let errorMessage: string | string[];
-
-        if (axios.isAxiosError(error)) {
-            errorMessage = error.response?.data?.errors ?? ["Something went wrong!"];
-        } else if (error instanceof Error) {
-            errorMessage = [error.message];
-        } else {
-            errorMessage = ["An unknown error occurred!"];
-        }
-
-        showError(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
-    }, [showError]);
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -52,15 +39,18 @@ const ChecklistGroupScreen = () => {
             const response = await axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions");
             setGroupCheckListOption(response.data.data ?? []);
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         } finally {
             setIsLoading(false);
         }
     };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            fetchData();
+            return () => { };
+        }, [])
+    );
 
     const saveData = async (values: InitialValuesGroupCheckList) => {
         setIsLoadingButton(true);
@@ -81,7 +71,7 @@ const ChecklistGroupScreen = () => {
 
             await fetchData()
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         } finally {
             setIsLoadingButton(false);
         }
@@ -113,7 +103,7 @@ const ChecklistGroupScreen = () => {
                 await fetchData()
             }
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         }
     };
 

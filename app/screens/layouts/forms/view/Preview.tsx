@@ -6,8 +6,9 @@ import { BaseFormState, BaseSubForm } from '@/typing/form';
 import { AccessibleView, Dynamic } from "@/components";
 import useForm from "@/hooks/custom/useForm";
 import { PreviewProps } from "@/typing/tag";
+import { PreviewParams } from "@/typing/tag";
 
-const Preview: React.FC<PreviewProps> = ({ route }) => {
+const Preview: React.FC<PreviewProps<PreviewParams>> = ({ route }) => {
     const {
         state,
         groupCheckListOption,

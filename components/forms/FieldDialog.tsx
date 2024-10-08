@@ -21,7 +21,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
     const [isVisibleCL, setIsVisibleCL] = useState<boolean>(false)
     const [initialValueCL, setInitialValueCL] = useState<InitialValuesChecklist>({ checkListId: "", checkListName: "", isActive: false })
     const masterdataStyles = useMasterdataStyles()
-    const { showSuccess, showError } = useToast();
+    const { showSuccess, handleError } = useToast();
 
     const [shouldRender, setShouldRender] = useState<string>("");
     const [shouldRenderDT, setShouldRenderDT] = useState<boolean>(false);
@@ -46,21 +46,6 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
         // MaxLength?: number;
     });
 
-
-    const errorMessage = useCallback((error: unknown) => {
-        let errorMessage: string | string[];
-
-        if (axios.isAxiosError(error)) {
-            errorMessage = error.response?.data?.errors ?? ["Something went wrong!"];
-        } else if (error instanceof Error) {
-            errorMessage = [error.message];
-        } else {
-            errorMessage = ["An unknown error occurred!"];
-        }
-
-        showError(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
-    }, [showError]);
-
     const saveDataCheckList = async (values: InitialValuesChecklist) => {
         const data = {
             CListId: values.checkListId ?? "",
@@ -73,7 +58,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
             setIsVisibleCL(!response.data.status);
             showSuccess(String(response.data.message));
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         }
     };
 

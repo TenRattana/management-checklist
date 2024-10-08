@@ -9,6 +9,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import { ExpectedResult } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
+import { useFocusEffect } from "expo-router";
 
 const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => {
     const [expectedResult, setExpectedResult] = useState<ExpectedResult[]>([]);
@@ -16,26 +17,9 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const masterdataStyles = useMasterdataStyles();
-    const { showSuccess, showError } = useToast();
+    const { showSuccess, handleError } = useToast();
     const { colors } = useTheme();
     const { spacing } = useRes();
-
-    const errorMessage = useCallback(
-        (error: unknown) => {
-            let errorMessage: string | string[];
-
-            if (axios.isAxiosError(error)) {
-                errorMessage = error.response?.data?.errors ?? ["Something went wrong!"];
-            } else if (error instanceof Error) {
-                errorMessage = [error.message];
-            } else {
-                errorMessage = ["An unknown error occurred!"];
-            }
-
-            showError(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
-        },
-        [showError]
-    );
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -45,15 +29,18 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
             setExpectedResult(expectedResultResponse.data.data ?? []);
             showSuccess(String(expectedResultResponse.data.message))
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         } finally {
             setIsLoading(false);
         }
     };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            fetchData();
+            return () => { };
+        }, [])
+    );
 
     const handleAction = async (action?: string, item?: string) => {
         try {
@@ -65,7 +52,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
                 });
             }
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         }
     };
 

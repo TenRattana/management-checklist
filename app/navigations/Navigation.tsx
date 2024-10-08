@@ -33,22 +33,26 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 const Drawer = createDrawerNavigator();
 
-function CustomDrawerContent({ navigation }: any) {
-  const [isMenuListOpen, setIsMenuListOpen] = useState<{ machine: boolean, checklist: boolean, match: boolean }>({
+import { DrawerContentScrollView } from '@react-navigation/drawer';
+
+function CustomDrawerContent(props: any) {
+  const { navigation } = props;
+
+  const [isMenuListOpen, setIsMenuListOpen] = useState<{ machine: boolean; checklist: boolean; match: boolean }>({
     machine: false,
     checklist: false,
     match: false,
   });
 
-  const { user, role, loading } = useAuth();
+  const { user, loading } = useAuth();
 
   if (loading) {
     return null;
   }
 
   return (
-    <AccessibleView style={styles.container}>
-      <ScrollView>
+    <ScrollView style={styles.container}>
+      <DrawerContentScrollView {...props}>
         {user ? (
           <>
             <Pressable
@@ -166,19 +170,16 @@ function CustomDrawerContent({ navigation }: any) {
             <Text style={styles.menuText}>Login</Text>
           </Pressable>
         )}
-      </ScrollView>
-
-    </AccessibleView>
+      </DrawerContentScrollView>
+    </ScrollView>
   );
 }
 
 
 const MenuSection = ({ title, isOpen, onToggle, items, navigation }: any) => {
-  const itemHeight = 40;
-
+  const itemHeight = 68;
   const height = useSharedValue(0);
   const opacity = useSharedValue(0);
-
   const totalHeight = items.length * itemHeight;
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -195,7 +196,7 @@ const MenuSection = ({ title, isOpen, onToggle, items, navigation }: any) => {
       setTimeout(() => {
         opacity.value = withTiming(0, { duration: 300 });
         height.value = withTiming(0, { duration: 300 });
-      }, 300)
+      }, 300);
     }
   }, [isOpen, totalHeight]);
 
@@ -243,15 +244,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   subMenuItem: {
-    paddingLeft: 30,
+    paddingLeft: 40,
+    minHeight: 68,
     paddingVertical: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   subMenuText: {
-    fontSize: 14,
-    color: '#555',
+    fontSize: 16,
+    color: '#5e5e5e',
   },
 });
-export default function App() {
+
+const App = () => {
   const { user, role, loading } = useAuth();
 
   if (loading) {
@@ -276,7 +282,6 @@ export default function App() {
     { name: "GenerateQR", component: GenerateQR },
     { name: "InputFormMachine", component: InputFormMachine },
     { name: "Setting", component: SettingScreen },
-    { name: "Logout", component: LogoutScreen },
   ];
 
   const superAdminScreens = [
@@ -299,13 +304,13 @@ export default function App() {
       {user && (
         <>
           {(role === "SuperAdmin" || role === "Admin") && adminScreens.map((screen) => (
-            <Drawer.Screen key={screen.name} name={screen.name} component={screen.component} />
+            <Drawer.Screen key={screen.name} name={screen.name} component={screen.component as any} />
           ))}
           {role === "SuperAdmin" && superAdminScreens.map((screen) => (
-            <Drawer.Screen key={screen.name} name={screen.name} component={screen.component} />
+            <Drawer.Screen key={screen.name} name={screen.name} component={screen.component as any} />
           ))}
           {role === "GeneralUser" && generalUserScreens.map((screen) => (
-            <Drawer.Screen key={screen.name} name={screen.name} component={screen.component} />
+            <Drawer.Screen key={screen.name} name={screen.name} component={screen.component as any} />
           ))}
         </>
       )}
@@ -328,3 +333,5 @@ const LogoutScreen: React.FC = () => {
     </AccessibleView>
   );
 };
+
+export default App;

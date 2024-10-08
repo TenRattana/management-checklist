@@ -28,7 +28,7 @@ const Inputs = ({
         label={label}
         onChangeText={handleChange}
         onBlur={handleBlur}
-        value={value || ""}
+        value={value as string}
         right={
           value ? (
             <TextInput.Icon

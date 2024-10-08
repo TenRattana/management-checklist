@@ -4,7 +4,6 @@ import { Text, StyleSheet, Animated, Pressable } from "react-native";
 import { CheckboxsProps } from "@/typing/tag";
 import AccessibleView from "@/components/AccessibleView";
 
-
 const Checkboxs = ({
   option,
   value,
@@ -18,7 +17,11 @@ const Checkboxs = ({
   const [scale] = useState<Animated.Value>(new Animated.Value(1));
 
   useEffect(() => {
-    setCheckedOptions(value);
+    if (Array.isArray(value)) {
+      setCheckedOptions(value);
+    } else {
+      setCheckedOptions(value ? [value] : []);
+    }
   }, [value]);
 
   const handleCheckBoxChange = (value: string) => {

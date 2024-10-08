@@ -10,6 +10,7 @@ import { useRes } from "@/app/contexts";
 import Match_form_machine_dialog from "@/components/screens/Match_form_machine_dialog";
 import { Form, MatchForm, Machine } from '@/typing/type'
 import { InitialValuesMatchFormMachine } from '@/typing/value'
+import { useFocusEffect } from "expo-router";
 
 const MatchFormMachineScreen = ({ navigation }: any) => {
     const [forms, setForm] = useState<Form[]>([]);
@@ -26,25 +27,8 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
     });
 
     const masterdataStyles = useMasterdataStyles();
-    const { showSuccess, showError } = useToast();
+    const { showSuccess, handleError } = useToast();
     const { spacing } = useRes();
-
-    const errorMessage = useCallback(
-        (error: unknown) => {
-            let errorMessage: string | string[];
-
-            if (axios.isAxiosError(error)) {
-                errorMessage = error.response?.data?.errors ?? ["Something went wrong!"];
-            } else if (error instanceof Error) {
-                errorMessage = [error.message];
-            } else {
-                errorMessage = ["An unknown error occurred!"];
-            }
-
-            showError(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
-        },
-        [showError]
-    );
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -59,15 +43,18 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
             setForm(formResponse.data.data ?? []);
             setMatchForm(matchFormResponse.data.data ?? []);
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         } finally {
             setIsLoading(false);
         }
     };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            fetchData();
+            return () => { };
+        }, [])
+    );
 
     const saveData = async (values: InitialValuesMatchFormMachine) => {
         setIsLoadingButton(true);
@@ -83,7 +70,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
 
             await fetchData();
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         } finally {
             setIsLoadingButton(false);
         }
@@ -116,7 +103,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
                 await fetchData();
             }
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         }
     };
 

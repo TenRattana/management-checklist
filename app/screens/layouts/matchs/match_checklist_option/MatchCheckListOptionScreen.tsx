@@ -9,6 +9,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import Match_checklist_option from "@/components/screens/Match_checklist_option_dialog";
 import { CheckListOption, MatchCheckListOption, GroupCheckListOption, } from '@/typing/type'
 import { InitialValuesMatchCheckListOption } from '@/typing/value'
+import { useFocusEffect } from "expo-router";
 
 
 const MatchCheckListOptionScreen = () => {
@@ -28,24 +29,9 @@ const MatchCheckListOptionScreen = () => {
     });
 
     const masterdataStyles = useMasterdataStyles();
-    const { showSuccess, showError } = useToast();
+    const { showSuccess, handleError } = useToast();
     const { colors } = useTheme();
     const { spacing } = useRes();
-
-    const errorMessage = useCallback((error: unknown) => {
-        let errorMessage: string | string[];
-
-        if (axios.isAxiosError(error)) {
-            errorMessage = error.response?.data?.errors ?? ["Something went wrong!"];
-        } else if (error instanceof Error) {
-            errorMessage = [error.message];
-        } else {
-            errorMessage = ["An unknown error occurred!"];
-        }
-
-        showError(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
-    }, [showError]);
-
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -65,15 +51,18 @@ const MatchCheckListOptionScreen = () => {
             setGroupCheckListOption(groupCheckListOptionResponse.data.data ?? []);
             setMatchCheckListOption(matchCheckListOptionResponse.data.data ?? []);
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         } finally {
             setIsLoading(false);
         }
     };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            fetchData();
+            return () => { };
+        }, [])
+    );
 
     const saveData = async (values: InitialValuesMatchCheckListOption) => {
         setIsLoadingButton(true);
@@ -92,7 +81,7 @@ const MatchCheckListOptionScreen = () => {
 
             await fetchData();
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         } finally {
             setIsLoadingButton(false);
         }
@@ -122,7 +111,7 @@ const MatchCheckListOptionScreen = () => {
                 await fetchData();
             }
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         }
     };
 
@@ -196,20 +185,20 @@ const MatchCheckListOptionScreen = () => {
 
     return (
         <ScrollView style={{ paddingHorizontal: 15 }}>
-        <Text style={[masterdataStyles.text, masterdataStyles.textBold,
-        { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>Create Match Group & Option
-        </Text>
-        <Divider style={{ marginBottom: 20 }} />
-        <Card style={{ borderRadius: 5 }}>
-            <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Match Group & Option</Text>
-                </Pressable>
-            </AccessibleView>
-            <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
-            </Card.Content>
-        </Card>
+            <Text style={[masterdataStyles.text, masterdataStyles.textBold,
+            { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>Create Match Group & Option
+            </Text>
+            <Divider style={{ marginBottom: 20 }} />
+            <Card style={{ borderRadius: 5 }}>
+                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                        <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Match Group & Option</Text>
+                    </Pressable>
+                </AccessibleView>
+                <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
+                    {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+                </Card.Content>
+            </Card>
 
             <Match_checklist_option
                 isVisible={isVisible}

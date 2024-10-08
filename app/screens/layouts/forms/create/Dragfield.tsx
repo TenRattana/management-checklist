@@ -17,8 +17,9 @@ import { spacing } from "@/constants/Spacing";
 import useCreateformStyle from "@/styles/createform";
 import { BaseFormState } from '@/typing/form'
 import { DragfieldProps } from "@/typing/tag";
+import { useToast } from "@/app/contexts";
 
-const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, errorMessage, dataType, checkListType, groupCheckListOption, checkList }) => {
+const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType, checkListType, groupCheckListOption, checkList }) => {
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const [currentField, setCurrentField] = useState<BaseFormState>({
         MCListID: "", CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: SFormID,
@@ -26,6 +27,8 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, errorMes
     });
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [count, setCount] = useState<number>(0)
+
+    const { handleError } = useToast();
 
     const createformStyles = useCreateformStyle();
     const scaleValues = useRef<{ [key: string]: Animated.Value }>({});
@@ -82,7 +85,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, errorMes
                 dispatch(updateField(payload));
             }
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         } finally {
             handleDialogToggle();
         }

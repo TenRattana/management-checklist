@@ -15,7 +15,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
         groupCheckListOption,
         checkListType,
         dataType,
-        errorMessage,
     } = useForm(route);
 
     const createform = useCreateformStyle();
@@ -28,7 +27,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                 <AccessibleView style={createform.containerL1}>
                     <Dragsubform
                         navigation={navigation}
-                        errorMessage={errorMessage}
                         state={state}
                         dispatch={dispatch}
                         checkList={checkList}

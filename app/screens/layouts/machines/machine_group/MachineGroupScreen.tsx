@@ -10,6 +10,7 @@ import { useRes } from "@/app/contexts";
 import Machine_group_dialog from "@/components/screens/Machine_group_dialog";
 import { MachineGroup } from '@/typing/type'
 import { InitialValuesMachineGroup } from '@/typing/value'
+import { useFocusEffect } from "expo-router";
 
 const MachineGroupScreen = () => {
     const [machineGroup, setMachineGroup] = useState<MachineGroup[]>([]);
@@ -26,22 +27,8 @@ const MachineGroupScreen = () => {
     });
     const masterdataStyles = useMasterdataStyles();
 
-    const { showSuccess, showError } = useToast();
+    const { showSuccess, handleError } = useToast();
     const { spacing } = useRes();
-
-    const errorMessage = useCallback((error: unknown) => {
-        let errorMessage: string | string[];
-
-        if (axios.isAxiosError(error)) {
-            errorMessage = error.response?.data?.errors ?? ["Something went wrong!"];
-        } else if (error instanceof Error) {
-            errorMessage = [error.message];
-        } else {
-            errorMessage = ["An unknown error occurred!"];
-        }
-
-        showError(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
-    }, [showError]);
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -50,15 +37,18 @@ const MachineGroupScreen = () => {
             const response = await axiosInstance.post("MachineGroup_service.asmx/GetMachineGroups");
             setMachineGroup(response.data.data ?? []);
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         } finally {
             setIsLoading(false);
         }
     };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            fetchData();
+            return () => { };
+        }, [])
+    );
 
     const saveData = async (values: InitialValuesMachineGroup) => {
         setIsLoadingButton(true);
@@ -76,7 +66,7 @@ const MachineGroupScreen = () => {
 
             await fetchData()
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         } finally {
             setIsLoadingButton(false);
         }
@@ -103,7 +93,7 @@ const MachineGroupScreen = () => {
                 await fetchData()
             }
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         }
     };
 

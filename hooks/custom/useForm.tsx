@@ -20,21 +20,7 @@ const useForm = (route: any) => {
     const [isLoading, setIsLoading] = useState(false);
     const [dataLoading, setDataLoding] = useState(false);
     const { formId, action } = route.params || {};
-    const { showError } = useToast();
-
-    const errorMessage = useCallback((error: unknown) => {
-        let errorMsg: string | string[];
-
-        if (axios.isAxiosError(error)) {
-            errorMsg = error.response?.data?.errors ?? ["Something went wrong!"];
-        } else if (error instanceof Error) {
-            errorMsg = [error.message];
-        } else {
-            errorMsg = ["An unknown error occurred!"];
-        }
-
-        showError(Array.isArray(errorMsg) ? errorMsg : [errorMsg]);
-    }, [showError]);
+    const { handleError } = useToast();
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -54,7 +40,7 @@ const useForm = (route: any) => {
             setDataType(responses[4].data.data ?? []);
             setDataLoding(true)
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
         } finally {
             setIsLoading(false);
         }
@@ -67,7 +53,7 @@ const useForm = (route: any) => {
             const response = await axios.post("Form_service.asmx/GetForm", { FormID: formId });
             return response.data?.data[0] || null;
         } catch (error) {
-            errorMessage(error);
+            handleError(error);
             return null;
         }
     };
@@ -155,7 +141,6 @@ const useForm = (route: any) => {
         isLoading,
         dispatch,
         fetchData,
-        errorMessage,
     };
 };
 

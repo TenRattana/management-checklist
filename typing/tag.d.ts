@@ -1,12 +1,102 @@
 import * as React from "react";
-import { ViewProps, ViewStyle,NativeSyntheticEvent, TextInputFocusEventData } from "react-native";
+import {
+  ViewProps,
+  ViewStyle,
+  NativeSyntheticEvent,
+  TextInputFocusEventData,
+} from "react-native";
+import { NavigationProp, RouteProp } from "@react-navigation/native";
+import { Form } from "./form";
+import { DataType, Checklist, CheckListType, GroupCheckListOption } from "./type";
 
-export interface AccessibleViewProps {
-  children: React.ReactNode;
-  name?: string;
-  style?: ViewStyle | ViewStyle[];
+// Route Parameters
+export type CreateFormParams = { formId: string };
+export type FormParams = { messages: string };
+export type PreviewParams = { formId: string; action?: string };
+export type ScanParams = { machineId: string };
+
+// Route Type
+export type Route<T = any> = { name: string; params?: T };
+
+// Event Types
+export type HandleChange = <V extends string | string[] | ChangeEvent<any>>(selectedValues: V) => void;
+
+export interface Event {
+  handleChange: HandleChange;
+  handleBlur?: (fieldName: any) => void;
 }
 
+// Default Properties
+export interface DefaultProps {
+  value: string | string[];
+  label?: string;
+  hint?: string;
+  error?: boolean;
+  errorMessage?: string;
+  testId?: string;
+}
+
+// Dialogs Properties
+export interface DialogsProps {
+  isVisible: boolean;
+  setIsVisible: (value: boolean) => void;
+  actions?: string;
+  title?: string;
+  messages?: string;
+  handleDialog: (actions?: string, data?: string) => void;
+  handleBlur?: () => void;
+  data?: string;
+}
+
+// Component Props
+export interface InputProps extends Event, DefaultProps {
+  placeholder?: string;
+  mode?: "outlined" | "flat";
+  lefticon?: string;
+  name?: string;
+}
+
+export interface RadiosProps extends Event, DefaultProps {
+  option?: { label: string; value: string }[];
+}
+
+export interface SelectsProps extends Event, DefaultProps {
+  option: { label: string; value: string }[];
+}
+
+export interface CheckboxsProps extends Event, DefaultProps {
+  option: { label: string; value: string }[];
+}
+
+export interface TextareasProps extends Event, DefaultProps {
+  placeholder?: string;
+  mode?: "outlined" | "flat";
+}
+
+// Form Props
+export interface DynamicFormProps {
+  field: BaseFormState;
+  values: any;
+  setFieldValue: any;
+  groupCheckListOption: GroupCheckListOption[];
+}
+
+// Navigation Props
+export interface PreviewProps<T extends PreviewParams | ScanParams> {
+  route: Route<T>;
+}
+
+export interface FormScreenProps {
+  navigation: NavigationProp<any>;
+  route: Route<FormParams>;
+}
+
+export interface CreateFormProps {
+  navigation: NavigationProp<any>;
+  route: Route<CreateFormParams>;
+}
+
+// Miscellaneous Props
 export interface CustomDropdownSingleProps {
   labels: string;
   values: string;
@@ -39,162 +129,52 @@ export interface CustomTableProps {
   searchQuery: string;
 }
 
-interface Option {
-  label: string;
-  value: string;
-}
-export type handleChange = <V extends string | string[]>(selectedValues: V) => void;
-
-export interface Event {
-  handleChange: handleChange;
-  handleBlur?: () => void;
-}
-export interface DefaultProps {
-  value: string[];
-  label?: string;
-  hint?: string;
-  error?: boolean;
-  errorMessage?: string;
-}
-
-export interface CheckboxsProps extends Event, DefaultProps {
-  option: Option[];
-  testId?:string;
-}
-
-interface DialogsProps  {
-    isVisible: boolean;
-    setIsVisible: (value: boolean) => void;
-    actions?: string;
-    title?: string;
-    messages?: string;
-    handleDialog: (actions?: string, data?: string) => void;
-    handleBlur?: () => void;
-    data?: string;
-}
-
-export interface GenerateQRProps { }
-
-export interface AdminProps {}
-
-export interface ScanQRProps {
-    navigation: {
-        navigate: (screen: string, params?: object) => void;
-    };
-}
-
-export interface CreateFormProps {
-    route: any;
-    navigation: any;
-}
-
 export interface DragfieldProps {
-    data: BaseFormState[];
-    SFormID: string;
-    dispatch: any;
-    errorMessage: any;
-    checkList: Checklist[];
-    dataType: DataType[];
-    checkListType: CheckListType[];
-    groupCheckListOption: GroupCheckListOption[];
-}
-
-export interface DragsubformProps {
-    errorMessage: any;
-    state: any;
-    dispatch: any;
-    checkList: Checklist[];
-    dataType: DataType[];
-    checkListType: CheckListType[];
-    groupCheckListOption: GroupCheckListOption[];
-    navigation: any;
-}
-
-export interface FormScreenProps {
-    navigation: any;
-    route: any;
-}
-
-export interface PreviewProps {
-    route: any;
-}
-
-export interface ExpectedResultProps {
-    navigation: any;
-}
-
-export interface InputProps {
-  placeholder?: string;
-  label?: string;
-  error?: boolean;
-  errorMessage?: string;
-  value: string;
-  handleChange: (text: string) => void;
-  handleBlur?: (event: NativeSyntheticEvent<TextInputFocusEventData>) => void;
-  hint?: string;
-  mode?: "outlined" | "flat";
-  lefticon?: string;
-  name?: string;
-  testId?: string;
-}
-
-export interface RadiosProps {
-  option?: Option[];
-  label?: string;
-  value: string;
-  handleChange: (selectedValues: string) => void;
-  hint?: string;
-  handleBlur?: () => void;
-  error?: boolean;
-  errorMessage?: string;
-  testId?:string;
-}
-
-export interface SelectsProps {
-  option: Option[];
-  label?: string;
-  value: string; 
-  handleChange: (selectedValues: string) => void; 
-  hint?: string;
-  handleBlur?: () => void;
-  error?: boolean;
-  errorMessage?: string;
-  testId?:string;
-}
-
-export interface TextareasProps {
-    hint?: string;
-    placeholder?: string;
-    label?: string;
-    error?: boolean;
-    errorMessage?: string;
-    value: string;
-    handleChange: (value: string) => void;
-    handleBlur?: () => void;
-    mode?: "outlined" | "flat";
-    testId?: string;
-}
-
-export interface DynamicFormProps {
-  field: BaseFormState;
-  values: any;
-  setFieldValue: any;
+  data: BaseFormState[];
+  SFormID: string;
+  dispatch: any;
+  checkList: Checklist[];
+  dataType: DataType[];
+  checkListType: CheckListType[];
   groupCheckListOption: GroupCheckListOption[];
 }
 
+export interface DragsubformProps {
+  state: Form;
+  dispatch: (action: AppActions) => void;
+  checkList: Checklist[];
+  dataType: DataType[];
+  checkListType: CheckListType[];
+  groupCheckListOption: GroupCheckListOption[];
+  navigation: NavigationProp<any>;
+}
+
+// Admin and QR Props
+export interface GenerateQRProps {}
+export interface AdminProps {}
+export interface ExpectedResultProps {
+  navigation: any;
+}
+export interface ScanQRProps {
+  navigation: {
+    navigate: (screen: string, params?: object) => void;
+  };
+}
+
+// Field Dialog Props
 export interface FieldDialogProps {
-    isVisible: boolean;
-    formState: BaseFormState;
-    onDeleteField: (SFormID: string, MCListID: string) => void;
-    setShowDialogs: () => void;
-    editMode: boolean;
-    saveField: (values: BaseFormState, mode: string) => void;
-    checkListType: CheckListType[]
-    dataType: DataType[];
-    checkList: Checklist[];
-    groupCheckListOption: GroupCheckListOption[];
-    dropcheckList: Checklist[];
-    dropcheckListType: CheckListType[];
-    dropdataType: DataType[];
-    dropgroupCheckListOption: GroupCheckListOption[];
+  isVisible: boolean;
+  formState: BaseFormState;
+  onDeleteField: (SFormID: string, MCListID: string) => void;
+  setShowDialogs: () => void;
+  editMode: boolean;
+  saveField: (values: BaseFormState, mode: string) => void;
+  checkListType: CheckListType[];
+  dataType: DataType[];
+  checkList: Checklist[];
+  groupCheckListOption: GroupCheckListOption[];
+  dropcheckList: Checklist[];
+  dropcheckListType: CheckListType[];
+  dropdataType: DataType[];
+  dropgroupCheckListOption: GroupCheckListOption[];
 }
