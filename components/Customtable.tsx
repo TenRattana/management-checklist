@@ -8,6 +8,7 @@ import AccessibleView from "@/components/AccessibleView";
 import { CustomTableProps } from '@/typing/tag';
 import useMasterdataStyles from "@/styles/common/masterdata";
 import useCustomtableStyles from "@/styles/customtable";
+import { savePaginate, loadPaginate } from '@/app/services/storage';
 
 type justifyContent = 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly' | undefined;
 const CustomTable = ({
@@ -19,7 +20,7 @@ const CustomTable = ({
   searchQuery,
 }: CustomTableProps) => {
   const [page, setPage] = useState<number>(0);
-  const [numberOfItemsPerPageList] = useState([5, 10, 15]);
+  const [numberOfItemsPerPageList] = useState([10, 20, 50]);
   const [itemsPerPage, onItemsPerPageChange] = useState(numberOfItemsPerPageList[0]);
   const [sortColumn, setSortColumn] = useState<number | null>(null);
   const [sortDirection, setSortDirection] = useState<"ascending" | "descending" | undefined>(undefined);
@@ -32,6 +33,16 @@ const CustomTable = ({
   const colors = useThemeColor();
   const { responsive, spacing } = useRes();
   const { showError } = useToast();
+
+  useEffect(() => {
+    const loadPagination = async () => {
+      const paginate = await loadPaginate();
+
+      paginate ? onItemsPerPageChange(paginate.paginate) : numberOfItemsPerPageList[0]
+    }
+
+    loadPagination()
+  }, [])
 
   const customtable = useCustomtableStyles();
   const masterdataStyles = useMasterdataStyles();
@@ -212,6 +223,11 @@ const CustomTable = ({
     return <Text key={`cell-content-${cellIndex}`}>{cell}</Text>;
   };
 
+  const handelPerPageChange = useCallback((value: number) => {
+    savePaginate({ paginate: value })
+    onItemsPerPageChange(value)
+  }, [])
+
   const currentData = useMemo(() => {
     return filteredData.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
   }, [filteredData, page, itemsPerPage]);
@@ -322,7 +338,7 @@ const CustomTable = ({
             label={`Page ${page + 1} of ${Math.ceil(filteredData.length / itemsPerPage)}`}
             numberOfItemsPerPage={itemsPerPage}
             numberOfItemsPerPageList={numberOfItemsPerPageList}
-            onItemsPerPageChange={onItemsPerPageChange}
+            onItemsPerPageChange={(value: number) => handelPerPageChange(value)}
             showFastPaginationControls
             selectPageDropdownLabel={"Rows per page"}
           />

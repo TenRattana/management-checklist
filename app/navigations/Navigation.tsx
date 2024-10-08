@@ -23,7 +23,7 @@ import {
   InputFormMachine,
   Managepermissions,
   SettingScreen,
-  // PreviewScreen,
+  PreviewScreen,
   CheckListOptionScreen,
   ChecklistGroupScreen,
 } from "@/app/screens";
@@ -251,7 +251,6 @@ const styles = StyleSheet.create({
     color: '#555',
   },
 });
-
 export default function App() {
   const { user, role, loading } = useAuth();
 
@@ -259,67 +258,55 @@ export default function App() {
     return null;
   }
 
+  const adminScreens = [
+    { name: "Machine_group", component: MachineGroupScreen },
+    { name: "Machine", component: MachineScreen },
+    { name: "Checklist", component: CheckListScreen },
+    { name: "Checklist_option", component: CheckListOptionScreen },
+    { name: "Checklist_group", component: ChecklistGroupScreen },
+    { name: "Match_checklist_option", component: MatchCheckListOptionScreen },
+    { name: "Match_form_machine", component: MatchFormMachineScreen },
+    { name: "Create_form", component: CreateFormScreen },
+    { name: "Expected_result", component: ExpectedResultScreen },
+    { name: "Form", component: FormScreen },
+    { name: "User", component: UserScreen },
+    { name: "Preview", component: PreviewScreen },
+    { name: "Admin", component: AdminScreen },
+    { name: "ScanQR", component: ScanQR },
+    { name: "GenerateQR", component: GenerateQR },
+    { name: "InputFormMachine", component: InputFormMachine },
+    { name: "Setting", component: SettingScreen },
+    { name: "Logout", component: LogoutScreen },
+  ];
+
+  const superAdminScreens = [
+    { name: "Managepermissions", component: Managepermissions },
+    { name: "Super_admin", component: SuperAdminScreen },
+    { name: "Test", component: TestScreen },
+  ];
+
+  const generalUserScreens = [
+    { name: "ScanQR", component: ScanQR },
+    { name: "Form", component: FormScreen },
+    { name: "Setting", component: SettingScreen },
+    { name: "Logout", component: LogoutScreen },
+  ];
+
   return (
     <Drawer.Navigator drawerContent={(props) => <CustomDrawerContent {...props} />}>
       <Drawer.Screen name={user ? "Home" : "Login"} component={user ? HomeScreen : LoginScreen} />
 
       {user && (
         <>
-          {role === "SuperAdmin" && (
-            <>
-              <Drawer.Screen name="Machine_group" component={MachineGroupScreen} />
-              <Drawer.Screen name="Machine" component={MachineScreen} />
-              <Drawer.Screen name="Checklist" component={CheckListScreen} />
-              <Drawer.Screen name="Checklist_option" component={CheckListOptionScreen} />
-              <Drawer.Screen name="Checklist_group" component={ChecklistGroupScreen} />
-              <Drawer.Screen name="Match_checklist_option" component={MatchCheckListOptionScreen} />
-              <Drawer.Screen name="Match_form_machine" component={MatchFormMachineScreen} />
-              <Drawer.Screen name="Create_form" component={CreateFormScreen} />
-              <Drawer.Screen name="Expected_result" component={ExpectedResultScreen} />
-              <Drawer.Screen name="Form" component={FormScreen} />
-              <Drawer.Screen name="Test" component={TestScreen} />
-              <Drawer.Screen name="User" component={UserScreen} />
-              {/* <Drawer.Screen name="Preview" component={UserScreen} /> */}
-              <Drawer.Screen name="Super_admin" component={SuperAdminScreen} />
-              <Drawer.Screen name="Admin" component={AdminScreen} />
-              <Drawer.Screen name="ScanQR" component={ScanQR} />
-              <Drawer.Screen name="GenerateQR" component={GenerateQR} />
-              <Drawer.Screen name="InputFormMachine" component={InputFormMachine} />
-              <Drawer.Screen name="Managepermissions" component={Managepermissions} />
-              <Drawer.Screen name="Setting" component={SettingScreen} />
-              <Drawer.Screen name="Logout" component={LogoutScreen} />
-            </>
-          )}
-          {role === "Admin" && (
-            <>
-              <Drawer.Screen name="Machine_group" component={MachineGroupScreen} />
-              <Drawer.Screen name="Machine" component={MachineScreen} />
-              <Drawer.Screen name="Checklist" component={CheckListScreen} />
-              <Drawer.Screen name="Checklist_option" component={CheckListOptionScreen} />
-              <Drawer.Screen name="Checklist_group" component={ChecklistGroupScreen} />
-              <Drawer.Screen name="Match_checklist_option" component={MatchCheckListOptionScreen} />
-              <Drawer.Screen name="Match_form_machine" component={MatchFormMachineScreen} />
-              <Drawer.Screen name="Create_form" component={CreateFormScreen} />
-              <Drawer.Screen name="Expected_result" component={ExpectedResultScreen} />
-              <Drawer.Screen name="Form" component={FormScreen} />
-              <Drawer.Screen name="Test" component={TestScreen} />
-              <Drawer.Screen name="User" component={UserScreen} />
-              <Drawer.Screen name="Admin" component={AdminScreen} />
-              <Drawer.Screen name="ScanQR" component={ScanQR} />
-              <Drawer.Screen name="GenerateQR" component={GenerateQR} />
-              <Drawer.Screen name="InputFormMachine" component={InputFormMachine} />
-              <Drawer.Screen name="Setting" component={SettingScreen} />
-              <Drawer.Screen name="Logout" component={LogoutScreen} />
-            </>
-          )}
-          {role === "GeneralUser" && (
-            <>
-              <Drawer.Screen name="ScanQR" component={ScanQR} />
-              <Drawer.Screen name="Form" component={FormScreen} />
-              <Drawer.Screen name="Setting" component={SettingScreen} />
-              <Drawer.Screen name="Logout" component={LogoutScreen} />
-            </>
-          )}
+          {(role === "SuperAdmin" || role === "Admin") && adminScreens.map((screen) => (
+            <Drawer.Screen key={screen.name} name={screen.name} component={screen.component} />
+          ))}
+          {role === "SuperAdmin" && superAdminScreens.map((screen) => (
+            <Drawer.Screen key={screen.name} name={screen.name} component={screen.component} />
+          ))}
+          {role === "GeneralUser" && generalUserScreens.map((screen) => (
+            <Drawer.Screen key={screen.name} name={screen.name} component={screen.component} />
+          ))}
         </>
       )}
     </Drawer.Navigator>

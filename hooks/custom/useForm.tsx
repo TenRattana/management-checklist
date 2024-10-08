@@ -2,15 +2,13 @@ import React, { useState, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "@/config/axios";
 import axios from "axios";
-import { setForm, setSubForm, setField } from "@/slices";
+import { setForm, setSubForm, setField, reset } from "@/slices";
 import { useToast, useRes } from "@/app/contexts";
 import { useFocusEffect } from "@react-navigation/native";
-import { SubForm, FormData, BaseFormState } from '@/typing/form'
+import { SubForm, FormData, BaseFormState, BaseForm } from '@/typing/form'
 import { CheckListType, CheckListOption, Checklist, DataType, GroupCheckListOption } from '@/typing/type'
 
 const useForm = (route: any) => {
-    console.log("useForm");
-
     const dispatch = useDispatch();
     const state = useSelector((state: any) => state.form);
 
@@ -74,6 +72,13 @@ const useForm = (route: any) => {
         }
     };
 
+    useFocusEffect(
+        useCallback(() => {
+            fetchData();
+            return () => { dispatch(reset()) };
+        }, [])
+    );
+
     const createSubFormsAndFields = (formData: FormData) => {
         const subForms: SubForm[] = [];
         const fields: BaseFormState[] = [];
@@ -114,18 +119,17 @@ const useForm = (route: any) => {
 
     useFocusEffect(
         useCallback(() => {
-            fetchData();
-            return () => { };
-        }, [])
-    );
-
-    useFocusEffect(
-        useCallback(() => {
             const loadForm = async () => {
                 if (formId && dataLoading) {
                     const formData = await fetchForm(formId);
                     const { subForms, fields } = createSubFormsAndFields(formData);
-                    dispatch(setForm({ form: formData }));
+                    const formCopy: BaseForm = {
+                        FormID: "",
+                        Description: "",
+                        FormName: "",
+                        MachineID: "",
+                    }
+                    dispatch(setForm({ form: action === "copy" ? formCopy : formData }));
                     dispatch(setSubForm({ subForms }));
                     dispatch(setField({ BaseFormState: fields, checkList, checkListType }));
                 }
@@ -135,13 +139,19 @@ const useForm = (route: any) => {
         }, [formId, dataLoading, action])
     );
 
+
     return {
         state,
         checkListOption,
+        setCheckListOption,
         dataType,
+        setDataType,
         checkList,
+        setCheckList,
         checkListType,
+        setCheckListType,
         groupCheckListOption,
+        setGroupCheckListOption,
         isLoading,
         dispatch,
         fetchData,

@@ -1,183 +1,129 @@
-// import React, { useEffect, useState, useCallback } from "react";
-// import { ScrollView, View, Text } from "react-native";
-// import { useDispatch, useSelector } from "react-redux";
-// import {
-//     LoadingSpinner,
-//     Inputs,
-//     Radios,
-//     Checkboxs,
-//     Textareas,
-//     Selects,
-//     AccessibleView,
-// } from "@/components";
-// import axios from "axios";
-// import axiosInstance from "@/config/axios";
-// import { setSubForm, setField, reset } from "@/slices";
-// import { useToast, useTheme, useRes } from "@/app/contexts";
-// import { useFocusEffect } from "@react-navigation/native";
-// import useMasterdataStyles from "@/styles/common/masterdata";
-// import { Divider } from "react-native-paper";
-// import useForm from '@/hooks/custom/useForm';
-// import { BaseFormState, BaseSubForm } from '@/typing/form'
+import { StyleSheet, Text, ScrollView, View, ViewStyle, Pressable } from "react-native";
+import React, { useEffect, useState, useCallback } from "react";
+import { Card, Divider } from "react-native-paper";
+import { useRes } from "@/app/contexts";
+import { BaseFormState, BaseSubForm } from '@/typing/form';
+import { AccessibleView, Dynamic } from "@/components";
+import useForm from "@/hooks/custom/useForm";
 
-// interface PreviewProps {
-//     route: any
-// }
+interface PreviewProps {
+    route: any;
+}
 
-// const Preview = ({ route }: any) => {
-//     const { formId, tableId } = route.params || {};
-//     const {
-//         state,
-//         isLoading,
-//         dispatch,
-//         fetchData
-//     } = useForm(route);
-//     const [formValues, setFormValues] = useState<Record<string, any>>({});
+const Preview: React.FC<PreviewProps> = ({ route }) => {
+    const {
+        state,
+        groupCheckListOption,
+    } = useForm(route);
 
-//     const masterdataStyles = useMasterdataStyles();
-//     const { showError } = useToast();
-//     const { spacing } = useRes();
+    const { responsive } = useRes();
+    const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
 
-//     const errorMessage = useCallback((error: unknown) => {
-//         let errorMessage: string | string[];
+    useEffect(() => {
+        if (state.subForms) {
+            const initialValues: { [key: string]: any } = {};
+            state.subForms.forEach((subForm: BaseSubForm) => {
+                subForm.Fields?.forEach((field: BaseFormState) => {
+                    initialValues[field.MCListID] = field.EResult ?? "";
+                });
+            });
+            setFormValues(initialValues);
+        }
+    }, [state.subForms]);
 
-//         if (axios.isAxiosError(error)) {
-//             errorMessage = error.response?.data?.errors ?? ["Something went wrong!"];
-//         } else if (error instanceof Error) {
-//             errorMessage = [error.message];
-//         } else {
-//             errorMessage = ["An unknown error occurred!"];
-//         }
+    const handleChange = useCallback((fieldName: string, value: any) => {
+        setFormValues((prev) => ({
+            ...prev,
+            [fieldName]: value,
+        }));
+    }, []);
 
-//         showError(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
-//     }, [showError]);
+    return (
+        <AccessibleView style={styles.container}>
+            <Text style={styles.title}>{state.FormName || "Content Name"}</Text>
+            <Divider />
+            <Text style={[styles.description]}>{state.Description || "Content Description"}</Text>
 
-//     useEffect(() => {
-//         fetchData();
-//     }, [formId]);
+            <ScrollView style={{ flex: 1 }}>
+                {state.subForms.map((subForm: BaseSubForm, index: number) => (
+                    <AccessibleView key={`subForm-${index}`} >
+                        <Card style={styles.card}>
+                            <Card.Title title={subForm.SFormName} titleStyle={styles.cardTitle} />
+                            <Card.Content style={styles.subFormContainer}>
+                                {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
+                                    const columns = subForm.Columns ?? 1;
 
-//     const handleChange = (fieldName: string, value: string) => {
-//         setFormValues((prev) => ({
-//             ...prev,
-//             [fieldName]: value,
-//         }));
-//     };
+                                    const containerStyle: ViewStyle = {
+                                        flexBasis: responsive === "small" ? "100%" : `${100 / (columns > 1 ? columns : 1)}%`,
+                                        flexGrow: field.DisplayOrder || 1,
+                                        padding: 5,
+                                    };
 
-//     const renderField = (field: BaseFormState) => {
-//         const fieldName = field.MCListID;
-//         console.log(field);
+                                    return (
+                                        <AccessibleView
+                                            key={`field-${fieldIndex}-${subForm.SFormName}`}
+                                            style={containerStyle}
+                                        >
+                                            <Dynamic
+                                                field={field}
+                                                values={formValues}
+                                                setFieldValue={handleChange}
+                                                groupCheckListOption={groupCheckListOption}
+                                            />
+                                        </AccessibleView>
+                                    );
+                                })}
+                            </Card.Content>
+                        </Card>
+                    </AccessibleView>
+                ))}
+            </ScrollView>
+        </AccessibleView>
+    );
+};
 
-//         switch (field.CTypeName) {
-//             case "Textinput":
-//                 return (
-//                     <Inputs
-//                         placeholder={field.Placeholder}
-//                         hint={field.Hint}
-//                         label={field.CListName}
-//                         value={formValues[fieldName] || ""}
-//                         handleChange={(value) => handleChange(fieldName, value)}
-//                     />
-//                 );
-//             case "Textarea":
-//                 return (
-//                     <Textareas
-//                         placeholder={field.Placeholder}
-//                         hint={field.Hint}
-//                         label={field.CListName}
-//                         value={formValues[fieldName] || ""}
-//                         handleChange={(value) => handleChange(fieldName, value)}
-//                     />
-//                 );
-//             case "Dropdown":
-//                 const options = groupCheckListOption
-//                     ?.find((opt) => opt.GCLOptionID === field.GCLOptionID)
-//                     ?.CheckListOptions.map((item) => ({
-//                         label: item.CLOptionName,
-//                         value: item.CLOptionID,
-//                     }));
-//                 return (
-//                     <Selects
-//                         option={options}
-//                         hint={field.Hint}
-//                         label={field.CheckListName}
-//                         value={formValues[fieldName] || ""}
-//                         handleChange={(value) => handleChange(fieldName, value)}
-//                     />
-//                 );
-//             case "Radio":
-//                 const radioOptions = groupCheckListOption
-//                     ?.find((opt) => opt.GCLOptionID === field.GCLOptionID)
-//                     ?.CheckListOptions.map((item) => ({
-//                         label: item.CLOptionName,
-//                         value: item.CLOptionID,
-//                     }));
-//                 return (
-//                     <Radios
-//                         option={radioOptions}
-//                         hint={field.Hint}
-//                         label={field.CheckListName}
-//                         value={formValues[fieldName] || ""}
-//                         handleChange={(value) => handleChange(fieldName, value)}
-//                     />
-//                 );
-//             case "Checkbox":
-//                 const checkboxOptions = groupCheckListOption
-//                     ?.find((opt) => opt.GCLOptionID === field.GCLOptionID)
-//                     ?.CheckListOptions.map((item) => ({
-//                         label: item.CLOptionName,
-//                         value: item.CLOptionID,
-//                     }));
-//                 return (
-//                     <Checkboxs
-//                         option={checkboxOptions}
-//                         hint={field.Hint}
-//                         label={field.CheckListName}
-//                         value={formValues[fieldName] || ""}
-//                         handleChange={(value) => handleChange(fieldName, value)}
-//                     />
-//                 );
-//             default:
-//                 return null;
-//         }
-//     };
-//     console.log(state);
+const styles = StyleSheet.create({
+    container: {
+        padding: 16,
+        flex: 1,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 16,
+    },
+    description: {
+        fontSize: 20,
+        marginBottom: 16,
+    },
+    subFormContainer: {
+        marginBottom: 16,
+        flexDirection: "row",
+        flexWrap: "wrap",
+    },
+    subFormTitle: {
+        fontSize: 20,
+        fontWeight: '600',
+        marginBottom: 8,
+    },
+    card: {
+        paddingVertical: 16,
+        borderRadius: 8,
+        elevation: 2,
+        marginBottom: 20,
+    },
+    cardTitle: {
+        fontSize: 18,
+        fontWeight: 'bold'
+    },
+    submitText: {
+        textAlign: 'center',
+        padding: 10,
+        backgroundColor: '#007BFF',
+        color: '#FFF',
+        borderRadius: 5,
+        marginTop: 20,
+    },
+});
 
-//     return (
-//         <ScrollView
-//             contentContainerStyle={{
-//                 flexGrow: 1,
-//             }}
-//         >
-//             {isLoading ? (
-//                 <LoadingSpinner />
-//             ) : (
-//                 <>
-//                     <AccessibleView>
-//                         <Text>{state.FormName}</Text>
-//                         <Text>{state.Description}</Text>
-//                     </AccessibleView>
-//                     {state.subForms.map((subForm: BaseSubForm) => (
-//                         <View key={subForm.SFormName}>
-//                             <Divider />
-//                             <AccessibleView>
-//                                 <Text>{subForm.SFormName}</Text>
-//                             </AccessibleView>
-//                             <View style={{ flexDirection: "row" }}>
-//                                 {subForm.Fields?.map((field) => (
-//                                     <View
-//                                         key={field.MCListID}
-//                                         style={{ flex: 1 / subForm.Columns }}
-//                                     >
-//                                         {renderField(field)}
-//                                     </View>
-//                                 ))}
-//                             </View>
-//                         </View>
-//                     ))}
-//                 </>
-//             )}
-//         </ScrollView>
-//     );
-// };
-
-// export default React.memo(Preview);
+export default React.memo(Preview);

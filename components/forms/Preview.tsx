@@ -2,23 +2,21 @@ import { StyleSheet, Text, ScrollView, View, ViewStyle, Pressable } from "react-
 import React, { useEffect, useState, useCallback } from "react";
 import { Card, Divider } from "react-native-paper";
 import { useRes } from "@/app/contexts";
-import { Selects, Radios, Textareas, Inputs } from "@/components/common";
-import { CheckListOption, GroupCheckListOption, CheckListType, Checklist } from '@/typing/type';
 import { BaseFormState, BaseSubForm } from '@/typing/form';
 import AccessibleView from "../AccessibleView";
 import DynamicForm from "./Dynamic";
+import useForm from "@/hooks/custom/useForm";
 
 interface PreviewProps {
-  state: any;
-  groupCheckListOption: GroupCheckListOption[];
-  checkListType: CheckListType[];
-  checkList: Checklist[];
+  route: any;
 }
 
-const Preview: React.FC<PreviewProps> = ({
-  state,
-  groupCheckListOption,
-}) => {
+const Preview: React.FC<PreviewProps> = ({ route }) => {
+  const {
+    state,
+    groupCheckListOption,
+  } = useForm(route);
+
   const { responsive } = useRes();
   const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
 
