@@ -4,7 +4,7 @@ import axios from 'axios'
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
-import { Card, Divider } from "react-native-paper";
+import { Card, Divider, Searchbar } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Checklist_group_dialog from "@/components/screens/Checklist_group_dialog";
@@ -15,6 +15,7 @@ import { useFocusEffect } from "expo-router";
 const ChecklistGroupScreen = () => {
     const [groupCheckListOption, setGroupCheckListOption] = useState<GroupCheckListOption[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -51,6 +52,16 @@ const ChecklistGroupScreen = () => {
             return () => { };
         }, [])
     );
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 500);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchQuery]);
 
     const saveData = async (values: InitialValuesGroupCheckList) => {
         setIsLoadingButton(true);
@@ -107,14 +118,25 @@ const ChecklistGroupScreen = () => {
         }
     };
 
+    const fieldsToFilter: (keyof GroupCheckListOption)[] = ['GCLOptionName', 'Description'];
+
     const tableData = useMemo(() => {
-        return groupCheckListOption.map((item) => [
-            item.GCLOptionName,
-            item.Description,
-            item.IsActive,
-            item.GCLOptionID,
-        ]);
-    }, [groupCheckListOption]);
+        return groupCheckListOption
+            .filter(item =>
+                fieldsToFilter.some(field => {
+                    const value = item[field];
+                    if (typeof value === 'string') {
+                        return value.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
+                    }
+                    return false;
+                }))
+            .map((item) => [
+                item.GCLOptionName,
+                item.Description,
+                item.IsActive,
+                item.GCLOptionID,
+            ]);
+    }, [groupCheckListOption, debouncedSearchQuery]);
 
     const tableHead = [
         { label: "Group Option Name", align: "flex-start" },
@@ -156,7 +178,15 @@ const ChecklistGroupScreen = () => {
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
+                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                    <Searchbar
+                        placeholder="Search Machine..."
+                        value={searchQuery}
+                        onChangeText={handleChange}
+                        style={masterdataStyles.searchbar}
+                        iconColor="#007AFF"
+                        placeholderTextColor="#a0a0a0"
+                    />
                     <Pressable onPress={handelNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Group Option</Text>
                     </Pressable>

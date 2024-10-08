@@ -39,8 +39,6 @@ const Preview: React.FC<PreviewProps<PreviewParams>> = ({ route }) => {
 
     return (
         <AccessibleView style={styles.container}>
-            {found ? (
-                <>
                     <Text style={styles.title}>{state.FormName || "Content Name"}</Text>
                     <Divider />
                     <Text style={[styles.description]}>{state.Description || "Content Description"}</Text>
@@ -79,9 +77,6 @@ const Preview: React.FC<PreviewProps<PreviewParams>> = ({ route }) => {
                             </AccessibleView>
                         ))}
                     </ScrollView>
-                </>
-            ) : <NotFoundScreen />}
-
         </AccessibleView>
     );
 };

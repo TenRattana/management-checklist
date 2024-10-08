@@ -4,18 +4,19 @@ import axios from "axios";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
 import { AccessibleView, Customtable, LoadingSpinner } from "@/components";
-import { Card, Divider } from "react-native-paper";
+import { Card, Divider, Searchbar } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Machine_dialog from "@/components/screens/Machine_dialog";
-import { Machine, MachineGroup } from '@/typing/type'
-import { InitialValuesMachine } from '@/typing/value'
+import { Machine, MachineGroup } from '@/typing/type';
+import { InitialValuesMachine } from '@/typing/value';
 import { useFocusEffect } from "expo-router";
 
 const MachineGroupScreen = () => {
     const [machine, setMachine] = useState<Machine[]>([]);
     const [machineGroup, setMachineGroup] = useState<MachineGroup[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -55,6 +56,16 @@ const MachineGroupScreen = () => {
             return () => { };
         }, [])
     );
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 500);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchQuery]);
 
     const saveData = async (values: InitialValuesMachine) => {
         setIsLoadingButton(true);
@@ -104,19 +115,34 @@ const MachineGroupScreen = () => {
             handleError(error);
         }
     };
+    
+    const fieldsToFilter: (keyof Machine)[] = ['MachineName', 'Description'];
 
     const tableData = useMemo(() => {
-        return machine.map((item) => {
-            return [
-                machineGroup.find((group) => group.MGroupID === item.MGroupID)
-                    ?.MGroupName || "",
-                item.MachineName,
-                item.Description,
-                item.IsActive,
-                item.MachineID,
-            ];
-        })
-    }, [machine, machineGroup]);
+        return machine
+            .filter(item =>
+                fieldsToFilter.some(field => {
+                    const value = item[field];
+                    if (typeof value === 'string') {
+                        return value.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
+                    }
+                    return false;
+                }) ||
+                machineGroup.some(group =>
+                    group.MGroupName.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) &&
+                    group.MGroupID === item.MGroupID
+                )
+            )
+            .map((item) => {
+                return [
+                    machineGroup.find((group) => group.MGroupID === item.MGroupID)?.MGroupName || "",
+                    item.MachineName,
+                    item.Description,
+                    item.IsActive,
+                    item.MachineID,
+                ];
+            });
+    }, [machine, machineGroup, debouncedSearchQuery]);
 
     const tableHead = [
         { label: "Machine Group Name", align: "flex-start" },
@@ -168,7 +194,15 @@ const MachineGroupScreen = () => {
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
+                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                    <Searchbar
+                        placeholder="Search Machine..."
+                        value={searchQuery}
+                        onChangeText={handleChange}
+                        style={masterdataStyles.searchbar}
+                        iconColor="#007AFF"
+                        placeholderTextColor="#a0a0a0"
+                    />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Machine</Text>
                     </Pressable>

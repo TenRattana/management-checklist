@@ -3,7 +3,7 @@ import { ScrollView, Pressable, Text } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme, useRes } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
-import { Card, Divider } from "react-native-paper";
+import { Card, Divider, Searchbar } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { FormScreenProps } from "@/typing/tag";
 import { Form } from "@/typing/type";
@@ -12,6 +12,7 @@ import { useFocusEffect } from "expo-router";
 const FormScreen: React.FC<FormScreenProps> = (({ navigation, route }) => {
     const [form, setForm] = useState<Form[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { messages } = route.params || {};
 
@@ -39,6 +40,16 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation, route }) => {
             return () => { };
         }, [])
     );
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 500);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchQuery]);
 
     useEffect(() => {
         if (messages)
@@ -69,17 +80,28 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation, route }) => {
         navigation.navigate("Create_form");
     };
 
+    const fieldsToFilter: (keyof Form)[] = ['FormName', 'Description'];
+
     const tableData = useMemo(() => {
-        return form.map((item) => {
-            return [
-                item.FormName,
-                item.Description,
-                item.IsActive,
-                item.FormID,
-                item.FormID,
-                item.FormID,
-            ];
-        })
+        return form
+            .filter(item =>
+                fieldsToFilter.some(field => {
+                    const value = item[field];
+                    if (typeof value === 'string') {
+                        return value.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
+                    }
+                    return false;
+                }))
+            .map((item) => {
+                return [
+                    item.FormName,
+                    item.Description,
+                    item.IsActive,
+                    item.FormID,
+                    item.FormID,
+                    item.FormID,
+                ];
+            })
     }, [form]);
 
     const tableHead = [
@@ -108,6 +130,10 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation, route }) => {
         searchQuery,
     };
 
+    const handleChange = (text: string) => {
+        setSearchQuery(text);
+    };
+    
     return (
         <ScrollView style={{ paddingHorizontal: 15 }}>
             <Text style={[masterdataStyles.text, masterdataStyles.textBold,
@@ -115,7 +141,15 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation, route }) => {
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
+                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                    <Searchbar
+                        placeholder="Search Machine..."
+                        value={searchQuery}
+                        onChangeText={handleChange}
+                        style={masterdataStyles.searchbar}
+                        iconColor="#007AFF"
+                        placeholderTextColor="#a0a0a0"
+                    />
                     <Pressable
                         onPress={handleNewForm}
                         style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}

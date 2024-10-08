@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Text, Pressable, StyleSheet } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { IconButton } from 'react-native-paper';
+import { ActivityIndicator, IconButton } from 'react-native-paper';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import {
   HomeScreen,
@@ -261,7 +261,7 @@ const App = () => {
   const { user, role, loading } = useAuth();
 
   if (loading) {
-    return null;
+    return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
   const adminScreens = [

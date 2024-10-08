@@ -4,7 +4,7 @@ import axios from "axios";
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
-import { Card, Divider } from "react-native-paper";
+import { Card, Divider, Searchbar } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import { ExpectedResult } from "@/typing/type";
@@ -14,6 +14,7 @@ import { useFocusEffect } from "expo-router";
 const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => {
     const [expectedResult, setExpectedResult] = useState<ExpectedResult[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const masterdataStyles = useMasterdataStyles();
@@ -42,6 +43,16 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
         }, [])
     );
 
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 500);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchQuery]);
+
     const handleAction = async (action?: string, item?: string) => {
         try {
             if (action === "preIndex") {
@@ -67,14 +78,25 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
         return `${day}/${month}/${year} เวลา ${hours}:${minutes}`;
     };
 
+    const fieldsToFilter: (keyof ExpectedResult)[] = ['MachineName', 'FormName'];
+
     const tableData = useMemo(() => {
-        return expectedResult.map((item) => [
-            item.MachineName,
-            item.FormName,
-            convertToThaiDateTime(item.CreateDate),
-            item.TableID,
-        ]);
-    }, [expectedResult]);
+        return expectedResult
+            .filter(item =>
+                fieldsToFilter.some(field => {
+                    const value = item[field];
+                    if (typeof value === 'string') {
+                        return value.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
+                    }
+                    return false;
+                }))
+            .map((item) => [
+                item.MachineName,
+                item.FormName,
+                convertToThaiDateTime(item.CreateDate),
+                item.TableID,
+            ]);
+    }, [expectedResult, debouncedSearchQuery]);
 
     const tableHead = [
         { label: "Machine Name", align: "flex-start" },
@@ -98,6 +120,10 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
         searchQuery,
     };
 
+    const handleChange = (text: string) => {
+        setSearchQuery(text);
+    };
+    
     return (
         <ScrollView style={{ paddingHorizontal: 15 }}>
             <Text style={[masterdataStyles.text, masterdataStyles.textBold,
@@ -105,6 +131,16 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
+                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                    <Searchbar
+                        placeholder="Search Machine..."
+                        value={searchQuery}
+                        onChangeText={handleChange}
+                        style={masterdataStyles.searchbar}
+                        iconColor="#007AFF"
+                        placeholderTextColor="#a0a0a0"
+                    />
+                </AccessibleView>
                 <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
                     {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
                 </Card.Content>

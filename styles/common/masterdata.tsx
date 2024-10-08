@@ -89,7 +89,16 @@ const useMasterdataStyles = () => {
         containerInput: {
             marginVertical: 12,
             marginHorizontal: 12,
-        }
+        },
+        searchbar: {
+            width: 400,
+            maxHeight:60,
+            marginVertical: 10,
+            marginHorizontal: 30,
+            borderRadius: 10, 
+            elevation: 4, 
+            fontSize: 18,
+        },
     });
 };
 

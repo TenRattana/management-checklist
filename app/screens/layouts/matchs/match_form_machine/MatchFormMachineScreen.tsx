@@ -4,7 +4,7 @@ import axios from "axios";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
-import { Card, Divider } from "react-native-paper";
+import { Card, Divider, Searchbar } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Match_form_machine_dialog from "@/components/screens/Match_form_machine_dialog";
@@ -17,6 +17,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
     const [machine, setMachine] = useState<Machine[]>([]);
     const [matchForm, setMatchForm] = useState<MatchForm[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -55,6 +56,16 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
             return () => { };
         }, [])
     );
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 500);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchQuery]);
 
     const saveData = async (values: InitialValuesMatchFormMachine) => {
         setIsLoadingButton(true);
@@ -107,19 +118,30 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
         }
     };
 
+    const fieldsToFilter: (keyof MatchForm)[] = ['MachineName', 'FormName'];
+
     const tableData = useMemo(() => {
-        return matchForm.map((item) => {
-            return [
-                item.MachineName,
-                item.FormName,
-                item.FormID,
-                item.FormID,
-                item.FormID,
-                item.IsActive,
-                item.MachineID,
-            ];
-        })
-    }, [machine]);
+        return matchForm
+            .filter(item =>
+                fieldsToFilter.some(field => {
+                    const value = item[field];
+                    if (typeof value === 'string') {
+                        return value.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
+                    }
+                    return false;
+                }))
+            .map((item) => {
+                return [
+                    item.MachineName,
+                    item.FormName,
+                    item.FormID,
+                    item.FormID,
+                    item.FormID,
+                    item.IsActive,
+                    item.MachineID,
+                ];
+            })
+    }, [machine, debouncedSearchQuery]);
 
     const tableHead = [
         { label: "Machine Name", align: "flex-start" },
@@ -184,7 +206,15 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
+                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                    <Searchbar
+                        placeholder="Search Machine..."
+                        value={searchQuery}
+                        onChangeText={handleChange}
+                        style={masterdataStyles.searchbar}
+                        iconColor="#007AFF"
+                        placeholderTextColor="#a0a0a0"
+                    />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Match Machine & Form</Text>
                     </Pressable>

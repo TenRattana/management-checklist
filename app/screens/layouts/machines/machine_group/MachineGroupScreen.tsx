@@ -4,7 +4,7 @@ import axios from "axios";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
-import { Card, Divider } from "react-native-paper";
+import { Card, Divider, Searchbar } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Machine_group_dialog from "@/components/screens/Machine_group_dialog";
@@ -15,6 +15,7 @@ import { useFocusEffect } from "expo-router";
 const MachineGroupScreen = () => {
     const [machineGroup, setMachineGroup] = useState<MachineGroup[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -49,6 +50,16 @@ const MachineGroupScreen = () => {
             return () => { };
         }, [])
     );
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 500);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchQuery]);
 
     const saveData = async (values: InitialValuesMachineGroup) => {
         setIsLoadingButton(true);
@@ -97,14 +108,26 @@ const MachineGroupScreen = () => {
         }
     };
 
+    const fieldsToFilter: (keyof MachineGroup)[] = ['MGroupName', 'Description'];
+
     const tableData = useMemo(() => {
-        return machineGroup.map(item => [
-            item.MGroupName,
-            item.Description,
-            item.IsActive,
-            item.MGroupID,
-        ]);
-    }, [machineGroup]);
+        return machineGroup
+            .filter(item =>
+                fieldsToFilter.some(field => {
+                    const value = item[field];
+                    if (typeof value === 'string') {
+                        return value.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
+                    }
+                    return false; 
+                })
+            )
+            .map(item => [
+                item.MGroupName,
+                item.Description,
+                item.IsActive,
+                item.MGroupID,
+            ]);
+    }, [machineGroup, debouncedSearchQuery]);
 
     const tableHead = [
         { label: "Machine Group Name", align: "flex-start" },
@@ -146,7 +169,15 @@ const MachineGroupScreen = () => {
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
+                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                    <Searchbar
+                        placeholder="Search Machine..."
+                        value={searchQuery}
+                        onChangeText={handleChange}
+                        style={masterdataStyles.searchbar}
+                        iconColor="#007AFF"
+                        placeholderTextColor="#a0a0a0"
+                    />
                     <Pressable onPress={handelNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Group Machine</Text>
                     </Pressable>

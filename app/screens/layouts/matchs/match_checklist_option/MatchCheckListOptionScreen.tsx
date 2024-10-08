@@ -4,17 +4,17 @@ import axios from 'axios'
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme, useRes } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
-import { Card, Divider } from "react-native-paper";
+import { Card, Divider, Searchbar } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Match_checklist_option from "@/components/screens/Match_checklist_option_dialog";
 import { CheckListOption, MatchCheckListOption, GroupCheckListOption, } from '@/typing/type'
 import { InitialValuesMatchCheckListOption } from '@/typing/value'
 import { useFocusEffect } from "expo-router";
 
-
 const MatchCheckListOptionScreen = () => {
     const [checkListOption, setCheckListOption] = useState<CheckListOption[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [groupCheckListOption, setGroupCheckListOption] = useState<GroupCheckListOption[]>([]);
     const [matchCheckListOption, setMatchCheckListOption] = useState<MatchCheckListOption[]>([]);
     const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -63,6 +63,16 @@ const MatchCheckListOptionScreen = () => {
             return () => { };
         }, [])
     );
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 500);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchQuery]);
 
     const saveData = async (values: InitialValuesMatchCheckListOption) => {
         setIsLoadingButton(true);
@@ -115,19 +125,30 @@ const MatchCheckListOptionScreen = () => {
         }
     };
 
+    const fieldsToFilter: (keyof MatchCheckListOption)[] = ['GCLOptionName'];
+
     const tableData = useMemo(() => {
         return matchCheckListOption.flatMap((item) =>
-            item.CheckListOptions.map((option) => {
-                const matchedOption = checkListOption.find((group) => group.CLOptionID === option.CLOptionID);
-                return [
-                    item.GCLOptionName,
-                    matchedOption?.CLOptionName || "",
-                    item.IsActive,
-                    item.MCLOptionID,
-                ];
-            })
+            item.CheckListOptions
+                .filter(option => {
+                    const matchedOption = checkListOption.find(group => group.CLOptionID === option.CLOptionID);
+                    return (
+                        item.GCLOptionName.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+                        (matchedOption && matchedOption.CLOptionName.toLowerCase().includes(debouncedSearchQuery.toLowerCase()))
+                    );
+                })
+                .map(option => {
+                    const matchedOption = checkListOption.find(group => group.CLOptionID === option.CLOptionID);
+                    return [
+                        item.GCLOptionName,
+                        matchedOption?.CLOptionName || "",
+                        item.IsActive,
+                        item.MCLOptionID,
+                    ];
+                })
         );
-    }, [matchCheckListOption, checkListOption]);
+    }, [matchCheckListOption, checkListOption, debouncedSearchQuery]);
+
 
     const tableHead = [
         { label: "Group Name", align: "flex-start" },
@@ -190,7 +211,15 @@ const MatchCheckListOptionScreen = () => {
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
+                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                    <Searchbar
+                        placeholder="Search Machine..."
+                        value={searchQuery}
+                        onChangeText={handleChange}
+                        style={masterdataStyles.searchbar}
+                        iconColor="#007AFF"
+                        placeholderTextColor="#a0a0a0"
+                    />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Match Group & Option</Text>
                     </Pressable>
