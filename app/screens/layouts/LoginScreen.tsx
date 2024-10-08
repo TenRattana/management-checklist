@@ -102,4 +102,4 @@ const LoginScreen = () => {
   );
 };
 
-export default LoginScreen;
+export default React.memo(LoginScreen);

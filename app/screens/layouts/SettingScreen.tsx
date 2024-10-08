@@ -1,12 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-export default function SettingScreen() {
+const SettingScreen = () => {
   return (
     <View>
       <Text>SettingScreen</Text>
     </View>
   )
 }
+
+export default React.memo(SettingScreen)
 
 const styles = StyleSheet.create({})

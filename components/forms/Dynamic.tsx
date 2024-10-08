@@ -1,24 +1,17 @@
 import React from "react";
-import { Text, ViewStyle } from "react-native";
+import { Text } from "react-native";
 import { Selects, Radios, Textareas, Inputs, Checkboxs } from "@/components/common";
-import { CheckListOption, GroupCheckListOption } from '@/typing/type';
-import { BaseFormState } from '@/typing/form';
+import { CheckListOption } from '@/typing/type';
 import AccessibleView from "../AccessibleView";
-import { ScrollView } from "react-native-gesture-handler";
+import { DynamicFormProps } from "@/typing/tag";
 
-interface DynamicFormProps {
-  field: BaseFormState;
-  values: any;
-  setFieldValue: any;
-  groupCheckListOption: GroupCheckListOption[];
-}
 
-const DynamicForm: React.FC<DynamicFormProps> = ({
+const DynamicForm = ({
   field,
   values,
   setFieldValue,
   groupCheckListOption,
-}) => {
+}: DynamicFormProps) => {
   const option = groupCheckListOption
     .filter(option => option.GCLOptionID === field.GCLOptionID)
     .flatMap(v =>
@@ -29,7 +22,6 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
     );
 
   const fieldName = field.MCListID;
-console.log(fieldName);
 
   const renderField = () => {
     switch (field.CTypeName) {

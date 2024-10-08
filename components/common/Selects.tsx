@@ -1,26 +1,11 @@
 import React from "react";
 import { Picker } from "@react-native-picker/picker";
 import { HelperText } from "react-native-paper";
-import { View, Text, StyleSheet } from "react-native";
+import { Text, StyleSheet } from "react-native";
+import { SelectsProps } from "@/typing/tag";
+import AccessibleView from "@/components/AccessibleView";
 
-interface Option {
-  label: string;
-  value: string;
-}
-
-interface SelectsProps {
-  option: Option[];
-  label?: string;
-  value: string; 
-  handleChange: (selectedValues: string) => void; 
-  hint?: string;
-  handleBlur?: () => void;
-  error?: boolean;
-  errorMessage?: string;
-  testId?:string;
-}
-
-const Selects: React.FC<SelectsProps> = ({
+const Selects = ({
   hint,
   option,
   value,
@@ -30,15 +15,15 @@ const Selects: React.FC<SelectsProps> = ({
   error,
   errorMessage,
   testId
-}) => {
+}: SelectsProps) => {
   if (!option || option.length === 0) {
     return null;
   }
 
   return (
-    <View style={styles.container}>
+    <AccessibleView style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
-      <View style={styles.dropdownContainer}>
+      <AccessibleView style={styles.dropdownContainer}>
         <Picker
           selectedValue={value}
           onValueChange={handleChange}
@@ -56,24 +41,24 @@ const Selects: React.FC<SelectsProps> = ({
             />
           ))}
         </Picker>
-      </View>
+      </AccessibleView>
       {hint && <Text style={styles.hint}>{hint}</Text>}
       <HelperText type="error" visible={error} style={styles.errorText}>
         {errorMessage}
       </HelperText>
-    </View>
+    </AccessibleView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     marginVertical: 10,
-    paddingHorizontal:10
+    paddingHorizontal: 10
   },
   label: {
     fontSize: 18,
     marginBottom: 5,
-    color: '#333', 
+    color: '#333',
   },
   dropdownContainer: {
     borderWidth: 1,
@@ -87,7 +72,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   hint: {
-    fontSize: 16, 
+    fontSize: 16,
     marginTop: 5,
     color: '#777',
   },

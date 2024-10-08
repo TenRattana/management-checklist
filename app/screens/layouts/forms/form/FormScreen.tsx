@@ -7,22 +7,12 @@ import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
 import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useFocusEffect } from "@react-navigation/native";
-
-interface FormScreenProps {
-    navigation: any;
-    route: any;
-}
-
-interface Form {
-    FormID: string;
-    FormName: string;
-    IsActive: boolean;
-    Description: string;
-}
+import { FormScreenProps } from "@/typing/tag";
+import { Form } from "@/typing/type";
 
 const FormScreen: React.FC<FormScreenProps> = (({ navigation, route }) => {
     const [form, setForm] = useState<Form[]>([]);
-    const [searchQuery, setSearchQuery] = useState("");
+    const [searchQuery, setSearchQuery] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { messages } = route.params || {};
 

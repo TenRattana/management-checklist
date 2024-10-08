@@ -18,18 +18,7 @@ import { runOnJS } from "react-native-reanimated";
 import { spacing } from "@/constants/Spacing";
 import Dragfield from "./Dragfield";
 import { BaseSubForm } from '@/typing/form'
-import { DataType, CheckListType, GroupCheckListOption, Checklist } from '@/typing/type'
-
-interface DragsubformProps {
-    errorMessage: any;
-    state: any;
-    dispatch: any;
-    checkList: Checklist[];
-    dataType: DataType[];
-    checkListType: CheckListType[];
-    groupCheckListOption: GroupCheckListOption[];
-    navigation: any;
-}
+import { DragsubformProps } from "@/typing/tag";
 
 const Dragsubform: React.FC<DragsubformProps> = ({ errorMessage, state, dispatch, dataType, checkListType, groupCheckListOption, checkList, navigation }) => {
     const [initialDialog, setInitialDialog] = useState<boolean>(false)

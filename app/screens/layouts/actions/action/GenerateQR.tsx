@@ -3,9 +3,7 @@ import { StyleSheet, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { Inputs } from "@/components";
 
-interface GenerateQRProps { }
-
-const GenerateQR: React.FC<GenerateQRProps> = () => {
+const GenerateQR = () => {
     const [qrValue, setQrValue] = useState<string>("");
 
     const generateQR = (value: string) => {
@@ -49,4 +47,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default GenerateQR;
+export default React.memo(GenerateQR);

@@ -5,11 +5,7 @@ import React from "react";
 import useForm from "@/hooks/custom/useForm";
 import { AccessibleView } from "@/components";
 import Preview from "@/app/screens/layouts/forms/view/Preview";
-
-interface CreateFormProps {
-    route: any;
-    navigation: any;
-}
+import { CreateFormProps } from "@/typing/tag";
 
 const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
     const {

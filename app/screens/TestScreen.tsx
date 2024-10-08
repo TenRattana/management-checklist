@@ -12,7 +12,6 @@ import DraggableFlatList, { ScaleDecorator } from "react-native-draggable-flatli
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withTiming,
   FadeInRight,
   FadeInLeft,
   FadeOutRight,
@@ -77,7 +76,7 @@ const DragAndDropForm = () => {
             itemTranslateY.value = e.nativeEvent.translationY;
             setDraggedItem(item);
           }}
-          onEnded={(e: PanGestureHandlerGestureEvent) => {
+          onEnded={(e: any) => {
             if (e.nativeEvent.absoluteX > width / 2) {
               handleDrop();
             }
@@ -241,4 +240,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DragAndDropForm;
+export default React.memo(DragAndDropForm);

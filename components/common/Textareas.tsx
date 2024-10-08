@@ -1,21 +1,10 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { Text, StyleSheet } from "react-native";
 import { TextInput, HelperText } from "react-native-paper";
+import { TextareasProps } from "@/typing/tag";
+import AccessibleView from "@/components/AccessibleView";
 
-interface TextareasProps {
-    hint?: string;
-    placeholder?: string;
-    label?: string;
-    error?: boolean;
-    errorMessage?: string;
-    value: string;
-    handleChange: (value: string) => void;
-    handleBlur?: () => void;
-    mode?: "outlined" | "flat";
-    testId?:string;
-}
-
-const Textareas: React.FC<TextareasProps> = ({
+const Textareas = ({
     placeholder,
     label,
     error,
@@ -26,9 +15,9 @@ const Textareas: React.FC<TextareasProps> = ({
     mode = "outlined",
     hint,
     testId
-}) => {
+}: TextareasProps) => {
     return (
-        <View style={styles.container}>
+        <AccessibleView style={styles.container}>
             <TextInput
                 mode={mode}
                 placeholder={placeholder}
@@ -51,9 +40,9 @@ const Textareas: React.FC<TextareasProps> = ({
                 style={styles.textInput}
                 theme={{
                     colors: {
-                        primary: '#6200ee', 
-                        placeholder: '#aaa', 
-                        text: '#000', 
+                        primary: '#6200ee',
+                        placeholder: '#aaa',
+                        text: '#000',
                     },
                 }}
                 testID={testId}
@@ -63,29 +52,28 @@ const Textareas: React.FC<TextareasProps> = ({
             <HelperText type="error" visible={error} style={styles.errorText}>
                 {errorMessage}
             </HelperText>
-        </View>
+        </AccessibleView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        marginVertical: 10, // ระยะห่างระหว่างฟิลด์
+        marginVertical: 10,
     },
     textInput: {
-        height: 120, // เพิ่มความสูงของ textarea
-        backgroundColor: '#f5f5f5', // สีพื้นหลังของ textarea
-        borderRadius: 8, // ขอบมน
-        fontSize: 16, // ขนาดฟอนต์
-        padding: 10, // ระยะห่างภายใน
+        height: 120,
+        borderRadius: 8,
+        fontSize: 16,
+        padding: 10,
     },
     hintText: {
-        fontSize: 14, // ขนาดฟอนต์ของ hint
-        color: '#888', // สีของ hint
+        fontSize: 14,
+        color: '#888',
         marginTop: 5,
     },
     errorText: {
         left: -10,
-        fontSize: 14, // ขนาดฟอนต์ของข้อความ error
+        fontSize: 14,
     },
 });
 

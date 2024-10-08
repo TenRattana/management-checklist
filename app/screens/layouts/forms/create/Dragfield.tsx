@@ -9,8 +9,6 @@ import {
     deleteField,
     setDragField
 } from "@/slices";
-import useForm from '@/hooks/custom/useForm';
-import { AccessibleView } from "@/components";
 import FieldDialog from "@/components/forms/FieldDialog";
 import { IconButton, Text } from "react-native-paper";
 import DraggableFlatList, { ScaleDecorator } from "react-native-draggable-flatlist";
@@ -18,17 +16,7 @@ import { runOnJS } from "react-native-reanimated";
 import { spacing } from "@/constants/Spacing";
 import useCreateformStyle from "@/styles/createform";
 import { BaseFormState } from '@/typing/form'
-import { DataType, CheckListType, GroupCheckListOption, Checklist } from '@/typing/type'
-interface DragfieldProps {
-    data: BaseFormState[];
-    SFormID: string;
-    dispatch: any;
-    errorMessage: any;
-    checkList: Checklist[];
-    dataType: DataType[];
-    checkListType: CheckListType[];
-    groupCheckListOption: GroupCheckListOption[];
-}
+import { DragfieldProps } from "@/typing/tag";
 
 const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, errorMessage, dataType, checkListType, groupCheckListOption, checkList }) => {
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
@@ -37,7 +25,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, errorMes
         Required: false, Placeholder: "", Hint: "", EResult: "", CListName: "", DTypeValue: undefined, MinLength: undefined, MaxLength: undefined
     });
     const [isEditing, setIsEditing] = useState<boolean>(false);
-    const [count , setCount] = useState(0)
+    const [count, setCount] = useState<number>(0)
 
     const createformStyles = useCreateformStyle();
     const scaleValues = useRef<{ [key: string]: Animated.Value }>({});
@@ -77,7 +65,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, errorMes
     }, []);
 
     const handleField = useCallback((item?: BaseFormState) => {
-        setCount(count+ 1)
+        setCount(count + 1)
         setCurrentField(item || {
             MCListID: `MCL-ADD-${count}`, CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: SFormID,
             Required: false, Placeholder: "", Hint: "", EResult: "", CListName: "", DTypeValue: undefined, MinLength: undefined, MaxLength: undefined
@@ -86,7 +74,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, errorMes
 
     const handleSaveField = useCallback((values: BaseFormState, mode: string) => {
         const payload = { BaseFormState: values, checkList, checkListType, dataType };
-        
+
         try {
             if (mode === "add") {
                 dispatch(addField(payload));

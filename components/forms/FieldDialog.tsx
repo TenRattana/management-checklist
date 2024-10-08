@@ -11,33 +11,14 @@ import axiosInstance from "@/config/axios";
 import axios from "axios";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
-import Animated, { FadeInUp, FadeOutDown, Easing, useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { CheckListType, DataType, Checklist, GroupCheckListOption } from '@/typing/type'
-import { BaseFormState } from '@/typing/form'
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { InitialValuesChecklist } from '@/typing/value'
+import { FieldDialogProps } from "@/typing/tag";
 
-interface FieldDialogProps {
-    isVisible: boolean;
-    formState: BaseFormState;
-    onDeleteField: (SFormID: string, MCListID: string) => void;
-    setShowDialogs: () => void;
-    editMode: boolean;
-    saveField: (values: BaseFormState, mode: string) => void;
-    checkListType: CheckListType[]
-    dataType: DataType[];
-    checkList: Checklist[];
-    groupCheckListOption: GroupCheckListOption[];
-    dropcheckList: Checklist[];
-    dropcheckListType: CheckListType[];
-    dropdataType: DataType[];
-    dropgroupCheckListOption: GroupCheckListOption[];
-}
-
-
-const FieldDialog: React.FC<FieldDialogProps> = ({ isVisible, formState, onDeleteField, editMode, saveField, setShowDialogs
+const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField, setShowDialogs
     , checkListType, dataType, checkList, groupCheckListOption, dropcheckList, dropcheckListType, dropdataType, dropgroupCheckListOption
-}) => {
-    const [isVisibleCL, setIsVisibleCL] = useState(false)
+}: FieldDialogProps) => {
+    const [isVisibleCL, setIsVisibleCL] = useState<boolean>(false)
     const [initialValueCL, setInitialValueCL] = useState<InitialValuesChecklist>({ checkListId: "", checkListName: "", isActive: false })
     const masterdataStyles = useMasterdataStyles()
     const { showSuccess, showError } = useToast();

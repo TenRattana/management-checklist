@@ -1,25 +1,10 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Animated, Pressable } from "react-native";
+import { Text, StyleSheet, Animated, Pressable } from "react-native";
 import { RadioButton, HelperText } from "react-native-paper";
+import { RadiosProps } from "@/typing/tag";
+import AccessibleView from "@/components/AccessibleView";
 
-interface Option {
-  label: string;
-  value: string;
-}
-
-interface RadiosProps {
-  option?: Option[];
-  label?: string;
-  value: string;
-  handleChange: (selectedValues: string) => void;
-  hint?: string;
-  handleBlur?: () => void;
-  error?: boolean;
-  errorMessage?: string;
-  testId?:string;
-}
-
-const Radios: React.FC<RadiosProps> = ({
+const Radios = ({
   option,
   value,
   handleChange,
@@ -29,8 +14,8 @@ const Radios: React.FC<RadiosProps> = ({
   error,
   errorMessage,
   testId
-}) => {
-  const [scale] = useState(new Animated.Value(1)); 
+}: RadiosProps) => {
+  const [scale] = useState<Animated.Value>(new Animated.Value(1));
 
   const animateScaleIn = () => {
     Animated.spring(scale, {
@@ -42,7 +27,7 @@ const Radios: React.FC<RadiosProps> = ({
 
   const animateScaleOut = () => {
     Animated.spring(scale, {
-      toValue: 1, 
+      toValue: 1,
       tension: 200,
       useNativeDriver: true,
     }).start();
@@ -53,7 +38,7 @@ const Radios: React.FC<RadiosProps> = ({
   }
 
   return (
-    <View style={styles.container}>
+    <AccessibleView style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
       <RadioButton.Group
         onValueChange={handleChange}
@@ -65,7 +50,7 @@ const Radios: React.FC<RadiosProps> = ({
             onPressIn={animateScaleIn}
             onPressOut={animateScaleOut}
             onPress={() => handleChange(opt.value)}
-            style={{flex:1}}
+            style={{ flex: 1 }}
             testID={testId}
             id={testId}
           >
@@ -82,7 +67,7 @@ const Radios: React.FC<RadiosProps> = ({
           {errorMessage}
         </HelperText>
       )}
-    </View>
+    </AccessibleView>
   );
 };
 

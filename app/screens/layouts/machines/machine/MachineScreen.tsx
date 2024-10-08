@@ -2,9 +2,9 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ScrollView, Pressable, Text } from "react-native";
 import axios from "axios";
 import axiosInstance from "@/config/axios";
-import { useToast, useTheme } from "@/app/contexts";
+import { useToast } from "@/app/contexts";
 import { AccessibleView, Customtable, LoadingSpinner } from "@/components";
-import { Card, Divider, Searchbar } from "react-native-paper";
+import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Machine_dialog from "@/components/screens/Machine_dialog";
@@ -14,11 +14,11 @@ import { InitialValuesMachine } from '@/typing/value'
 const MachineGroupScreen = () => {
     const [machine, setMachine] = useState<Machine[]>([]);
     const [machineGroup, setMachineGroup] = useState<MachineGroup[]>([]);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [isEditing, setIsEditing] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isVisible, setIsVisible] = useState(false);
-    const [isLoadingButton, setIsLoadingButton] = useState(false);
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isVisible, setIsVisible] = useState<boolean>(false);
+    const [isLoadingButton, setIsLoadingButton] = useState<boolean>(false);
     const [initialValues, setInitialValues] = useState<InitialValuesMachine>({
         machineId: "",
         machineGroupId: "",
@@ -29,7 +29,7 @@ const MachineGroupScreen = () => {
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, showError } = useToast();
-    const {  spacing } = useRes();
+    const { spacing } = useRes();
 
     const errorMessage = useCallback(
         (error: unknown) => {

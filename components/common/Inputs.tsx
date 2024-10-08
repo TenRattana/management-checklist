@@ -1,24 +1,10 @@
 import React from "react";
 import { TextInput, HelperText, Text } from "react-native-paper";
-import { NativeSyntheticEvent, TextInputFocusEventData, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
+import { InputProps } from "@/typing/tag";
 
-interface InputProps {
-  placeholder?: string;
-  label?: string;
-  error?: boolean;
-  errorMessage?: string;
-  value: string;
-  handleChange: (text: string) => void;
-  handleBlur?: (event: NativeSyntheticEvent<TextInputFocusEventData>) => void;
-  hint?: string;
-  mode?: "outlined" | "flat";
-  lefticon?: string;
-  name?: string;
-  testId?: string;
-}
-
-const Inputs: React.FC<InputProps> = ({
+const Inputs = ({
   placeholder,
   label,
   error,
@@ -30,7 +16,7 @@ const Inputs: React.FC<InputProps> = ({
   mode,
   lefticon,
   testId
-}) => {
+}: InputProps) => {
 
   return (
     <AccessibleView

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ViewProps, ViewStyle } from "react-native";
+import { ViewProps, ViewStyle,NativeSyntheticEvent, TextInputFocusEventData } from "react-native";
 
 export interface AccessibleViewProps {
   children: React.ReactNode;
@@ -71,4 +71,130 @@ interface DialogsProps  {
     handleDialog: (actions?: string, data?: string) => void;
     handleBlur?: () => void;
     data?: string;
+}
+
+export interface GenerateQRProps { }
+
+export interface AdminProps {}
+
+export interface ScanQRProps {
+    navigation: {
+        navigate: (screen: string, params?: object) => void;
+    };
+}
+
+export interface CreateFormProps {
+    route: any;
+    navigation: any;
+}
+
+export interface DragfieldProps {
+    data: BaseFormState[];
+    SFormID: string;
+    dispatch: any;
+    errorMessage: any;
+    checkList: Checklist[];
+    dataType: DataType[];
+    checkListType: CheckListType[];
+    groupCheckListOption: GroupCheckListOption[];
+}
+
+export interface DragsubformProps {
+    errorMessage: any;
+    state: any;
+    dispatch: any;
+    checkList: Checklist[];
+    dataType: DataType[];
+    checkListType: CheckListType[];
+    groupCheckListOption: GroupCheckListOption[];
+    navigation: any;
+}
+
+export interface FormScreenProps {
+    navigation: any;
+    route: any;
+}
+
+export interface PreviewProps {
+    route: any;
+}
+
+export interface ExpectedResultProps {
+    navigation: any;
+}
+
+export interface InputProps {
+  placeholder?: string;
+  label?: string;
+  error?: boolean;
+  errorMessage?: string;
+  value: string;
+  handleChange: (text: string) => void;
+  handleBlur?: (event: NativeSyntheticEvent<TextInputFocusEventData>) => void;
+  hint?: string;
+  mode?: "outlined" | "flat";
+  lefticon?: string;
+  name?: string;
+  testId?: string;
+}
+
+export interface RadiosProps {
+  option?: Option[];
+  label?: string;
+  value: string;
+  handleChange: (selectedValues: string) => void;
+  hint?: string;
+  handleBlur?: () => void;
+  error?: boolean;
+  errorMessage?: string;
+  testId?:string;
+}
+
+export interface SelectsProps {
+  option: Option[];
+  label?: string;
+  value: string; 
+  handleChange: (selectedValues: string) => void; 
+  hint?: string;
+  handleBlur?: () => void;
+  error?: boolean;
+  errorMessage?: string;
+  testId?:string;
+}
+
+export interface TextareasProps {
+    hint?: string;
+    placeholder?: string;
+    label?: string;
+    error?: boolean;
+    errorMessage?: string;
+    value: string;
+    handleChange: (value: string) => void;
+    handleBlur?: () => void;
+    mode?: "outlined" | "flat";
+    testId?: string;
+}
+
+export interface DynamicFormProps {
+  field: BaseFormState;
+  values: any;
+  setFieldValue: any;
+  groupCheckListOption: GroupCheckListOption[];
+}
+
+export interface FieldDialogProps {
+    isVisible: boolean;
+    formState: BaseFormState;
+    onDeleteField: (SFormID: string, MCListID: string) => void;
+    setShowDialogs: () => void;
+    editMode: boolean;
+    saveField: (values: BaseFormState, mode: string) => void;
+    checkListType: CheckListType[]
+    dataType: DataType[];
+    checkList: Checklist[];
+    groupCheckListOption: GroupCheckListOption[];
+    dropcheckList: Checklist[];
+    dropcheckListType: CheckListType[];
+    dropdataType: DataType[];
+    dropgroupCheckListOption: GroupCheckListOption[];
 }

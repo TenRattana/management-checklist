@@ -2,10 +2,12 @@ import React from "react";
 import { Text } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 
-export default function SuperAdminScreen() {
+const SuperAdminScreen = () => {
   return (
     <AccessibleView>
       <Text>Welcome SuperAdminScreen</Text>
     </AccessibleView>
   );
 }
+
+export default React.memo(SuperAdminScreen)

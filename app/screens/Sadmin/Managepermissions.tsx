@@ -1,12 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-export default function Managepermissions() {
+const Managepermissions = () => {
   return (
     <View>
       <Text>Managepermissions</Text>
     </View>
   )
 }
+
+export default React.memo(Managepermissions)
 
 const styles = StyleSheet.create({})

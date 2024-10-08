@@ -1,8 +1,9 @@
+import React from 'react';
 import { Link, Stack } from 'expo-router';
 import { StyleSheet, Text } from 'react-native';
 import { AccessibleView } from "@/components";
 
-export default function NotFoundScreen() {
+const NotFoundScreen = () => {
   console.log("NotFoundScreen");
 
   return (
@@ -17,6 +18,8 @@ export default function NotFoundScreen() {
     </>
   );
 }
+
+export default React.memo(NotFoundScreen)
 
 const styles = StyleSheet.create({
   container: {

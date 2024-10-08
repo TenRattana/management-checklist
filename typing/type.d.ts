@@ -54,6 +54,7 @@ export interface Form {
     FormID: string;
     FormName: string;
     IsActive: boolean;
+    Description:string;
 }
 
 export interface MatchForm {
@@ -70,6 +71,15 @@ export interface MatchCheckListOption {
     CheckListOptions: Array<{ CLOptionID: string }>;
     IsActive: boolean;
     GCLOptionName: string;
+}
+
+export interface ExpectedResult {
+    TableID: string;
+    MachineID: string;
+    MachineName: string;
+    FormID: string;
+    FormName: string;
+    CreateDate: string;
 }
 
 export type TypeConfig = 

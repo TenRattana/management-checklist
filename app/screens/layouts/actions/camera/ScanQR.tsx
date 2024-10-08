@@ -1,14 +1,9 @@
 import { Camera } from "expo-camera/legacy";
 import React, { useEffect, useState } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
+import { ScanQRProps } from "@/typing/tag";
 
-interface CameraScanProps {
-    navigation: {
-        navigate: (screen: string, params?: object) => void;
-    };
-}
-
-const CameraScan: React.FC<CameraScanProps> = ({ navigation }) => {
+const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
     const [hasPermission, setHasPermission] = useState<boolean | null>(null);
     const [scanned, setScanned] = useState<boolean>(false);
     const [qrValue, setQrValue] = useState<string | null>(null);
@@ -105,4 +100,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CameraScan;
+export default ScanQR;

@@ -7,24 +7,13 @@ import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
 import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
-
-interface ExpectedResultProps {
-    navigation: any;
-}
-
-interface ExpectedResult {
-    TableID: string;
-    MachineID: string;
-    MachineName: string;
-    FormID: string;
-    FormName: string;
-    CreateDate: string;
-}
+import { ExpectedResult } from "@/typing/type";
+import { ExpectedResultProps } from "@/typing/tag";
 
 const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => {
     const [expectedResult, setExpectedResult] = useState<ExpectedResult[]>([]);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, showError } = useToast();
@@ -54,6 +43,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
         try {
             const expectedResultResponse = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResults");
             setExpectedResult(expectedResultResponse.data.data ?? []);
+            showSuccess(String(expectedResultResponse.data.message))
         } catch (error) {
             errorMessage(error);
         } finally {
@@ -77,10 +67,6 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
         } catch (error) {
             errorMessage(error);
         }
-    };
-
-    const handleNewForm = () => {
-        navigation.navigate("Create Form");
     };
 
     const convertToThaiDateTime = (dateString: string) => {

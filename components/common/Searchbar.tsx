@@ -5,8 +5,8 @@ import AccessibleView from "@/components/AccessibleView";
 import useMasterdataStyles from "@/styles/common/masterdata";
 
 const SearchWithButton: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isSearchVisible, setSearchVisible] = useState(false); // สถานะการแสดงผลของ Searchbar
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [isSearchVisible, setSearchVisible] = useState<boolean>(false);
 
   const styles = StyleSheet.create({
     containerSearch: {
@@ -37,7 +37,7 @@ const SearchWithButton: React.FC = () => {
     <AccessibleView style={styles.containerSearch}>
       <Button
         mode="contained"
-        onPress={() => setSearchVisible(!isSearchVisible)} // สลับสถานะการแสดงผลของ Searchbar
+        onPress={() => setSearchVisible(!isSearchVisible)}
         style={{ marginBottom: 10 }}
       >
         {isSearchVisible ? "Hide Search" : "Show Search"}
