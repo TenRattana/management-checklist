@@ -43,6 +43,14 @@ const subFormSlice = createSlice({
       state.Description = form?.Description || "";
       state.MachineID = form?.MachineID || "";
     },
+    updateForm: (state, action: PayloadAction<{ form?: BaseForm }>) => {
+      console.log("setForm");
+
+      const { form } = action.payload;
+
+      state.FormName = form?.FormName || "";
+      state.Description = form?.Description || "";
+    },
     setSubForm: (state, action: PayloadAction<{ subForms: BaseSubForm[] }>) => {
       console.log("setSubForm");
 
@@ -261,6 +269,7 @@ const subFormSlice = createSlice({
 
 export const {
   setForm,
+  updateForm,
   setSubForm,
   setDragSubForm,
   setDragField,

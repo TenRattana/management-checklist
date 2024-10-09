@@ -23,7 +23,6 @@ import { useToast } from "@/app/contexts";
 
 const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, checkListType, groupCheckListOption, checkList, navigation }) => {
     const [initialDialog, setInitialDialog] = useState<boolean>(false)
-    const [initialSaveDialog, setInitialSaveDialog] = useState<boolean>(false)
     const [initialSubForm, setInitialSubForm] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", MachineID: "" });
     const [editMode, setEditMode] = useState<boolean>(false)
 
@@ -62,7 +61,6 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
     const handelSetDialog = useCallback(() => {
         setEditMode(false)
         setInitialDialog(false)
-        setInitialSaveDialog(false)
     }, [])
 
     const handelSubForm = useCallback((item?: BaseSubForm) => {
@@ -133,9 +131,6 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
         );
     };
 
-    console.log(initialSaveDialog);
-
-
     return (
         <AccessibleView style={{ flex: 1 }}>
             <Pressable
@@ -160,10 +155,6 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                 autoscrollSpeed={30}
             />
 
-            <Pressable onPress={() => setInitialSaveDialog(true)} style={createform.saveButton}>
-                <Text style={createform.saveButtonText}>Save Form</Text>
-            </Pressable>
-
             <SubFormDialog
                 isVisible={initialDialog}
                 setIsVisible={handelSetDialog}
@@ -173,12 +164,6 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                 onDelete={(SFormID: string) => dispatch(deleteSubForm({ SFormID }))}
             />
 
-            <SaveDialog
-                state={state}
-                isVisible={initialSaveDialog}
-                setIsVisible={handelSetDialog}
-                navigation={navigation}
-            />
         </AccessibleView>
 
     )

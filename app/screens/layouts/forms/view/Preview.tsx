@@ -50,18 +50,25 @@ const Preview: React.FC<PreviewProps<PreviewParams>> = ({ route }) => {
                             <Card.Title title={subForm.SFormName} titleStyle={styles.cardTitle} />
                             <Card.Content style={styles.subFormContainer}>
                                 {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
-                                    const columns = subForm.Columns ?? 1;
-
-                                    const isLastColumn = (fieldIndex + 1) % columns === 0;
-
-                                    const containerStyle: ViewStyle = {
-                                        flexBasis: responsive === "small" ? "100%" : `${95 / columns}%`,
-                                        flexGrow: field.DisplayOrder || 1,
-                                        padding: 5,
-                                        borderRightWidth: isLastColumn ? 0 : 1,
-                                        marginHorizontal: 5
-                                    };
-
+                                 const columns = subForm.Columns ?? 1;
+                                 const borderRightWidth = 1;
+                                 const totalBorderWidth = (columns - 1) * borderRightWidth; 
+                                 
+                                 const isLastColumn = (fieldIndex + 1) % columns === 0;
+                                 
+                                 const columnWidth = responsive === "small" 
+                                     ? "100" 
+                                     : 100 / columns;
+                                 
+                                 const containerStyle: ViewStyle = {
+                                     flexBasis: `${columnWidth}%`,
+                                     flexGrow: field.DisplayOrder || 1, 
+                                     padding: 5,
+                                    //  borderRightWidth: isLastColumn ? 0 : borderRightWidth, 
+                                     flexDirection: "row",
+                                     flexWrap: "nowrap", 
+                                 };
+                                 
                                     return (
                                         <AccessibleView
                                             key={`field-${fieldIndex}-${subForm.SFormName}`}

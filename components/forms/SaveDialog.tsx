@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { Pressable } from "react-native";
 import { Portal, Dialog, Text } from "react-native-paper";
 import { SaveDialogProps } from "@/typing/value";
@@ -38,11 +38,11 @@ const SaveDialog = ({
         try {
             const response = await axios.post("MatchCheckList_service.asmx/SaveFormCheckList", data);
             messages = (String(response.data.message));
+            navigation.navigate("Form", { messages });
         } catch (error) {
             handleError(error)
         } finally {
             setIsVisible(false)
-            navigation.navigate("Form", { messages });
         }
     }, [state, state?.subForms]);
 
