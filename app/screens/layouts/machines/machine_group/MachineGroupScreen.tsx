@@ -108,25 +108,13 @@ const MachineGroupScreen = () => {
         }
     };
 
-    const fieldsToFilter: (keyof MachineGroup)[] = ['MGroupName', 'Description'];
-
     const tableData = useMemo(() => {
-        return machineGroup
-            .filter(item =>
-                fieldsToFilter.some(field => {
-                    const value = item[field];
-                    if (typeof value === 'string') {
-                        return value.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
-                    }
-                    return false; 
-                })
-            )
-            .map(item => [
-                item.MGroupName,
-                item.Description,
-                item.IsActive,
-                item.MGroupID,
-            ]);
+        return machineGroup.map(item => [
+            item.MGroupName,
+            item.Description,
+            item.IsActive,
+            item.MGroupID,
+        ]);
     }, [machineGroup, debouncedSearchQuery]);
 
     const tableHead = [
@@ -155,7 +143,7 @@ const MachineGroupScreen = () => {
         flexArr: [3, 3, 1, 1, 1],
         actionIndex,
         handleAction,
-        searchQuery,
+        searchQuery: debouncedSearchQuery,
     };
 
     const handleChange = (text: string) => {

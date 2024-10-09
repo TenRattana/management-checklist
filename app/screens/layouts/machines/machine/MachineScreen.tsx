@@ -115,33 +115,17 @@ const MachineGroupScreen = () => {
             handleError(error);
         }
     };
-    
-    const fieldsToFilter: (keyof Machine)[] = ['MachineName', 'Description'];
 
     const tableData = useMemo(() => {
-        return machine
-            .filter(item =>
-                fieldsToFilter.some(field => {
-                    const value = item[field];
-                    if (typeof value === 'string') {
-                        return value.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
-                    }
-                    return false;
-                }) ||
-                machineGroup.some(group =>
-                    group.MGroupName.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) &&
-                    group.MGroupID === item.MGroupID
-                )
-            )
-            .map((item) => {
-                return [
-                    machineGroup.find((group) => group.MGroupID === item.MGroupID)?.MGroupName || "",
-                    item.MachineName,
-                    item.Description,
-                    item.IsActive,
-                    item.MachineID,
-                ];
-            });
+        return machine.map((item) => {
+            return [
+                machineGroup.find((group) => group.MGroupID === item.MGroupID)?.MGroupName || "",
+                item.MachineName,
+                item.Description,
+                item.IsActive,
+                item.MachineID,
+            ];
+        });
     }, [machine, machineGroup, debouncedSearchQuery]);
 
     const tableHead = [
@@ -172,7 +156,7 @@ const MachineGroupScreen = () => {
         flexArr: [2, 2, 2, 1, 1],
         actionIndex,
         handleAction,
-        searchQuery,
+        searchQuery: debouncedSearchQuery,
     };
 
     const dropmachine = useMemo(() => {

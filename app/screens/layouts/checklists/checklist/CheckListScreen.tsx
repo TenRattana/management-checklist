@@ -105,23 +105,12 @@ const CheckListScreen = () => {
         }
     };
 
-    const fieldsToFilter: (keyof Checklist)[] = ['CListName'];
-
     const tableData = useMemo(() => {
-        return checkList
-            .filter(item =>
-                fieldsToFilter.some(field => {
-                    const value = item[field];
-                    if (typeof value === 'string') {
-                        return value.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
-                    }
-                    return false;
-                }))
-            .map(item => [
-                item.CListName,
-                item.IsActive,
-                item.CListID,
-            ]);
+        return checkList.map(item => [
+            item.CListName,
+            item.IsActive,
+            item.CListID,
+        ]);
     }, [checkList, debouncedSearchQuery]);
 
     const tableHead = [
@@ -148,7 +137,7 @@ const CheckListScreen = () => {
         flexArr: [6, 1, 1],
         actionIndex,
         handleAction,
-        searchQuery,
+        searchQuery: debouncedSearchQuery,
     };
 
     const handleChange = (text: string) => {

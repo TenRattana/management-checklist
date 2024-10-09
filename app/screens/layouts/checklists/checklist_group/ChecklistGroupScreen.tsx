@@ -118,24 +118,13 @@ const ChecklistGroupScreen = () => {
         }
     };
 
-    const fieldsToFilter: (keyof GroupCheckListOption)[] = ['GCLOptionName', 'Description'];
-
     const tableData = useMemo(() => {
-        return groupCheckListOption
-            .filter(item =>
-                fieldsToFilter.some(field => {
-                    const value = item[field];
-                    if (typeof value === 'string') {
-                        return value.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
-                    }
-                    return false;
-                }))
-            .map((item) => [
-                item.GCLOptionName,
-                item.Description,
-                item.IsActive,
-                item.GCLOptionID,
-            ]);
+        return groupCheckListOption.map((item) => [
+            item.GCLOptionName,
+            item.Description,
+            item.IsActive,
+            item.GCLOptionID,
+        ]);
     }, [groupCheckListOption, debouncedSearchQuery]);
 
     const tableHead = [
@@ -164,7 +153,7 @@ const ChecklistGroupScreen = () => {
         flexArr: [3, 3, 1, 1],
         actionIndex,
         handleAction,
-        searchQuery,
+        searchQuery: debouncedSearchQuery,
     };
 
     const handleChange = (text: string) => {

@@ -115,23 +115,12 @@ const CheckListOptionScreen = () => {
         }
     };
 
-    const fieldsToFilter: (keyof CheckListOption)[] = ['CLOptionName'];
-
     const tableData = useMemo(() => {
-        return checkListOption
-            .filter(item =>
-                fieldsToFilter.some(field => {
-                    const value = item[field];
-                    if (typeof value === 'string') {
-                        return value.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
-                    }
-                    return false;
-                }))
-            .map(item => [
-                item.CLOptionName,
-                item.IsActive,
-                item.CLOptionID,
-            ]);
+        return checkListOption.map(item => [
+            item.CLOptionName,
+            item.IsActive,
+            item.CLOptionID,
+        ]);
     }, [checkListOption, debouncedSearchQuery]);
 
     const tableHead = [
@@ -158,7 +147,7 @@ const CheckListOptionScreen = () => {
         flexArr: [6, 1, 1],
         actionIndex,
         handleAction,
-        searchQuery,
+        searchQuery: debouncedSearchQuery,
     };
 
     const handleChange = (text: string) => {

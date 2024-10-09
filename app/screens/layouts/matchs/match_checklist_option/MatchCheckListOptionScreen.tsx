@@ -125,27 +125,17 @@ const MatchCheckListOptionScreen = () => {
         }
     };
 
-    const fieldsToFilter: (keyof MatchCheckListOption)[] = ['GCLOptionName'];
-
     const tableData = useMemo(() => {
         return matchCheckListOption.flatMap((item) =>
-            item.CheckListOptions
-                .filter(option => {
-                    const matchedOption = checkListOption.find(group => group.CLOptionID === option.CLOptionID);
-                    return (
-                        item.GCLOptionName.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-                        (matchedOption && matchedOption.CLOptionName.toLowerCase().includes(debouncedSearchQuery.toLowerCase()))
-                    );
-                })
-                .map(option => {
-                    const matchedOption = checkListOption.find(group => group.CLOptionID === option.CLOptionID);
-                    return [
-                        item.GCLOptionName,
-                        matchedOption?.CLOptionName || "",
-                        item.IsActive,
-                        item.MCLOptionID,
-                    ];
-                })
+            item.CheckListOptions.map(option => {
+                const matchedOption = checkListOption.find(group => group.CLOptionID === option.CLOptionID);
+                return [
+                    item.GCLOptionName,
+                    matchedOption?.CLOptionName || "",
+                    item.IsActive,
+                    item.MCLOptionID,
+                ];
+            })
         );
     }, [matchCheckListOption, checkListOption, debouncedSearchQuery]);
 
@@ -197,7 +187,7 @@ const MatchCheckListOptionScreen = () => {
         flexArr: [3, 3, 1, 1],
         actionIndex,
         handleAction,
-        searchQuery,
+        searchQuery: debouncedSearchQuery,
     };
 
     const handleChange = (text: string) => {

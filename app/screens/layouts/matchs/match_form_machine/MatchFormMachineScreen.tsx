@@ -120,28 +120,17 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
         }
     };
 
-    const fieldsToFilter: (keyof MatchForm)[] = ['MachineName', 'FormName'];
-
     const tableData = useMemo(() => {
-        return matchForm
-            .filter(item =>
-                fieldsToFilter.some(field => {
-                    const value = item[field];
-                    if (typeof value === 'string') {
-                        return value.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
-                    }
-                    return false;
-                }))
-            .map((item) => {
-                return [
-                    item.MachineName,
-                    item.FormName,
-                    item.FormID,
-                    item.FormID,
-                    item.FormID,
-                    item.MachineID,
-                ];
-            })
+        return matchForm.map((item) => {
+            return [
+                item.MachineName,
+                item.FormName,
+                item.FormID,
+                item.FormID,
+                item.FormID,
+                item.MachineID,
+            ];
+        })
     }, [machine, debouncedSearchQuery]);
 
     const tableHead = [
@@ -193,7 +182,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
         flexArr: [2, 3, 1, 1, 1, 1],
         actionIndex,
         handleAction,
-        searchQuery,
+        searchQuery: debouncedSearchQuery,
     };
 
     const handleChange = (text: string) => {

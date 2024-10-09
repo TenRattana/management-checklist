@@ -80,28 +80,17 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation, route }) => {
         navigation.navigate("Create_form");
     };
 
-    const fieldsToFilter: (keyof Form)[] = ['FormName', 'Description'];
-
     const tableData = useMemo(() => {
-        return form
-            .filter(item =>
-                fieldsToFilter.some(field => {
-                    const value = item[field];
-                    if (typeof value === 'string') {
-                        return value.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
-                    }
-                    return false;
-                }))
-            .map((item) => {
-                return [
-                    item.FormName,
-                    item.Description,
-                    item.IsActive,
-                    item.FormID,
-                    item.FormID,
-                    item.FormID,
-                ];
-            })
+        return form.map((item) => {
+            return [
+                item.FormName,
+                item.Description,
+                item.IsActive,
+                item.FormID,
+                item.FormID,
+                item.FormID,
+            ];
+        })
     }, [form]);
 
     const tableHead = [
@@ -127,13 +116,13 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation, route }) => {
         flexArr: [2, 4, 1, 1, 1, 1],
         actionIndex,
         handleAction,
-        searchQuery,
+        searchQuery: debouncedSearchQuery,
     };
 
     const handleChange = (text: string) => {
         setSearchQuery(text);
     };
-    
+
     return (
         <ScrollView style={{ paddingHorizontal: 15 }}>
             <Text style={[masterdataStyles.text, masterdataStyles.textBold,

@@ -78,24 +78,13 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
         return `${day}/${month}/${year} เวลา ${hours}:${minutes}`;
     };
 
-    const fieldsToFilter: (keyof ExpectedResult)[] = ['MachineName', 'FormName'];
-
     const tableData = useMemo(() => {
-        return expectedResult
-            .filter(item =>
-                fieldsToFilter.some(field => {
-                    const value = item[field];
-                    if (typeof value === 'string') {
-                        return value.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
-                    }
-                    return false;
-                }))
-            .map((item) => [
-                item.MachineName,
-                item.FormName,
-                convertToThaiDateTime(item.CreateDate),
-                item.TableID,
-            ]);
+        return expectedResult.map((item) => [
+            item.MachineName,
+            item.FormName,
+            convertToThaiDateTime(item.CreateDate),
+            item.TableID,
+        ]);
     }, [expectedResult, debouncedSearchQuery]);
 
     const tableHead = [
@@ -117,13 +106,13 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
         flexArr: [3, 3, 3, 1],
         actionIndex,
         handleAction,
-        searchQuery,
+        searchQuery: debouncedSearchQuery,
     };
 
     const handleChange = (text: string) => {
         setSearchQuery(text);
     };
-    
+
     return (
         <ScrollView style={{ paddingHorizontal: 15 }}>
             <Text style={[masterdataStyles.text, masterdataStyles.textBold,
