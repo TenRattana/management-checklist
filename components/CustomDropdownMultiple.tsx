@@ -1,22 +1,15 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { StyleSheet, View } from "react-native";
-import { Dropdown } from 'react-native-element-dropdown';
+import React, { useState, useEffect, useCallback } from "react";
+import { StyleSheet } from "react-native";
+import { IconButton, Chip, Text } from "react-native-paper";
+import { MultiSelect } from 'react-native-element-dropdown';
 import AccessibleView from "@/components/AccessibleView";
 import { CustomDropdownMultiProps } from '@/typing/tag';
-import { IconButton, Chip } from "react-native-paper";
+import { useRes } from "@/app/contexts";
 
-const CustomDropdownMulti = ({
-  labels,
-  values,
-  data,
-  selectedValue = [],
-  onValueChange,
-  iconRight,
-  lefticon,
-}: CustomDropdownMultiProps) => {
+const CustomDropdownMultiple = ({ labels, values, title, data, selectedValue, onValueChange, lefticon, iconRight, testId }: CustomDropdownMultiProps) => {
   const [options, setOptions] = useState<{ label?: string; value?: string; icon?: () => JSX.Element }[]>([]);
   const [currentValue, setCurrentValue] = useState<string[]>(Array.isArray(selectedValue) ? selectedValue : []);
-  const [open, setOpen] = useState(false);
+  const { spacing } = useRes();
 
   const processData = useCallback(() => {
     if (data && Array.isArray(data)) {
@@ -32,21 +25,11 @@ const CustomDropdownMulti = ({
   useEffect(() => {
     const newOptions = processData();
     setOptions(newOptions);
-    if (!newOptions.find(option => option.value === currentValue)) {
-      setCurrentValue([]);
-    }
   }, [processData]);
 
   useEffect(() => {
-    if (selectedValue.length !== currentValue.length || !selectedValue.every(val => currentValue.includes(val))) {
-      setCurrentValue(Array.isArray(selectedValue) ? selectedValue : []);
-    }
+    setCurrentValue(Array.isArray(selectedValue) ? selectedValue : []);
   }, [selectedValue]);
-
-  const handleSelect = (value: string[]) => {
-    setCurrentValue(value);
-    onValueChange(value);
-  };
 
   const handleChipClose = (chipToRemove: string) => {
     const newValue = currentValue.filter(value => value !== chipToRemove);
@@ -63,6 +46,18 @@ const CustomDropdownMulti = ({
     icon: {
       marginRight: 5,
     },
+    placeholderStyle: {
+      fontSize: spacing.medium,
+    },
+    selectedTextStyle: {
+      fontSize: spacing.medium,
+    },
+    iconStyle: {
+      width: 20,
+    },
+    inputSearchStyle: {
+      fontSize: spacing.medium,
+    },
     chipContainer: {
       flexDirection: 'row',
       flexWrap: 'wrap',
@@ -71,31 +66,42 @@ const CustomDropdownMulti = ({
     chip: {
       marginRight: 5,
       marginBottom: 5,
+      borderWidth: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 5,
+    },
+    chipText: {
+      fontSize: spacing.medium,
+      marginLeft: 5,
     },
   });
 
   return (
-    <AccessibleView style={styles.dropdown}>
-      <Dropdown
+    <AccessibleView>
+      <MultiSelect
         style={styles.dropdown}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
         data={options}
+        search
+        maxHeight={300}
         labelField="label"
         valueField="value"
+        placeholder={`Select ${title}`}
+        searchPlaceholder="Search..."
         value={currentValue}
-        placeholder="Choose options"
-        multiple={true}
-        onChange={handleSelect}
-        onOpen={() => setOpen(true)}
-        onClose={() => setOpen(false)}
+        onChange={newValue => {
+          setCurrentValue(newValue);
+          onValueChange(newValue);
+        }}
         renderLeftIcon={() => (
           <IconButton
             style={styles.icon}
-            icon={
-              options.find((v) => v.value === currentValue)?.icon ||
-              lefticon ||
-              "check-all"
-            }
-            size={20}
+            icon={lefticon || "check-all"}
+            size={spacing.medium}
           />
         )}
         renderRightIcon={() => (
@@ -104,7 +110,7 @@ const CustomDropdownMulti = ({
               <IconButton
                 style={styles.icon}
                 icon="window-close"
-                size={30}
+                size={spacing.medium}
                 onPress={() => {
                   setCurrentValue([]);
                   onValueChange([]);
@@ -114,27 +120,31 @@ const CustomDropdownMulti = ({
               <IconButton
                 style={styles.icon}
                 icon="chevron-down"
-                size={30}
+                size={spacing.medium}
               />
             )}
-            {iconRight ?? false}
+            {iconRight ?? null}
           </AccessibleView>
         )}
-      />
-
-      <View style={styles.chipContainer}>
-        {(Array.isArray(currentValue) ? currentValue : []).map((chip) => (
+        renderSelectedItem={(item) => (
           <Chip
-            key={chip}
             style={styles.chip}
-            onClose={() => handleChipClose(chip)}
+            mode="outlined"
+            onClose={() => handleChipClose(item.value ?? "")}
           >
-            {options.find(option => option.value === chip)?.label || chip}
+            <IconButton
+              icon="delete"
+              size={spacing.medium}
+              onPress={() => handleChipClose(item.value ?? "")}
+              style={{ padding: 0 }}
+            />
+            <Text style={styles.chipText}>{item.label}</Text>
           </Chip>
-        ))}
-      </View>
+        )}
+        testID={testId}
+      />
     </AccessibleView>
   );
 };
 
-export default React.memo(CustomDropdownMulti);
+export default React.memo(CustomDropdownMultiple);
