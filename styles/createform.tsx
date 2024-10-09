@@ -24,6 +24,7 @@ const useCreateformStyle = () => {
             display: "flex",
             flex: 1,
             margin: 10,
+            padding: 5
         },
         addSubFormButton: {
             margin: 16,

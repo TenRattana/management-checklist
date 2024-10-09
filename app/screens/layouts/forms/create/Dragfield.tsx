@@ -39,6 +39,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
         }
         return scaleValues.current[subFormID];
     };
+    console.log(currentField);
 
     const animatedDefault = useMemo(() => ({
         toValue: 1,
@@ -67,13 +68,15 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
         setDialogVisible(prev => !prev);
     }, []);
 
-    const handleField = useCallback((item?: BaseFormState) => {
-        setCount(count + 1)
-        setCurrentField(item || {
-            MCListID: `MCL-ADD-${count}`, CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: SFormID,
-            Required: false, Placeholder: "", Hint: "", EResult: "", CListName: "", DTypeValue: undefined, MinLength: undefined, MaxLength: undefined
-        });
-    }, []);
+    const handleField = (item?: BaseFormState) => {
+        item ? setCurrentField(item) :
+            setCurrentField({
+                MCListID: `MCL-ADD-${count}`, CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: SFormID,
+                Required: false, Placeholder: "", Hint: "", EResult: "", CListName: "", DTypeValue: undefined, MinLength: undefined, MaxLength: undefined
+            })
+    };
+
+    console.log(count);
 
     const handleSaveField = useCallback((values: BaseFormState, mode: string) => {
         const payload = { BaseFormState: values, checkList, checkListType, dataType };
@@ -87,9 +90,10 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
         } catch (error) {
             handleError(error);
         } finally {
+            setCount(prevCount => prevCount + 1);
             handleDialogToggle();
         }
-    }, []);
+    }, [dispatch, handleError, handleDialogToggle, checkList, checkListType, dataType]);
 
     const dropcheckList = checkList.filter(v => v.IsActive);
     const dropcheckListType = checkListType.filter(v => v.IsActive);

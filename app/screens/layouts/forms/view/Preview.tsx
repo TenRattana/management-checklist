@@ -55,7 +55,7 @@ const Preview: React.FC<PreviewProps<PreviewParams>> = ({ route }) => {
                                     const isLastColumn = (fieldIndex + 1) % columns === 0;
 
                                     const containerStyle: ViewStyle = {
-                                        flexBasis: responsive === "small" ? "100%" : `${98 / columns}%`,
+                                        flexBasis: responsive === "small" ? "100%" : `${95 / columns}%`,
                                         flexGrow: field.DisplayOrder || 1,
                                         padding: 5,
                                         borderRightWidth: isLastColumn ? 0 : 1,
