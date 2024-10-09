@@ -39,44 +39,48 @@ const Preview: React.FC<PreviewProps<PreviewParams>> = ({ route }) => {
 
     return (
         <AccessibleView style={styles.container}>
-                    <Text style={styles.title}>{state.FormName || "Content Name"}</Text>
-                    <Divider />
-                    <Text style={[styles.description]}>{state.Description || "Content Description"}</Text>
+            <Text style={styles.title}>{state.FormName || "Content Name"}</Text>
+            <Divider />
+            <Text style={[styles.description]}>{state.Description || "Content Description"}</Text>
 
-                    <ScrollView style={{ flex: 1 }}>
-                        {state.subForms.map((subForm: BaseSubForm, index: number) => (
-                            <AccessibleView key={`subForm-${index}`} >
-                                <Card style={styles.card}>
-                                    <Card.Title title={subForm.SFormName} titleStyle={styles.cardTitle} />
-                                    <Card.Content style={styles.subFormContainer}>
-                                        {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
-                                            const columns = subForm.Columns ?? 1;
+            <ScrollView style={{ flex: 1 }}>
+                {state.subForms.map((subForm: BaseSubForm, index: number) => (
+                    <AccessibleView key={`subForm-${index}`} >
+                        <Card style={styles.card}>
+                            <Card.Title title={subForm.SFormName} titleStyle={styles.cardTitle} />
+                            <Card.Content style={styles.subFormContainer}>
+                                {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
+                                    const columns = subForm.Columns ?? 1;
 
-                                            const containerStyle: ViewStyle = {
-                                                flexBasis: responsive === "small" ? "100%" : `${100 / (columns > 1 ? columns : 1)}%`,
-                                                flexGrow: field.DisplayOrder || 1,
-                                                padding: 5,
-                                            };
+                                    const isLastColumn = (fieldIndex + 1) % columns === 0;
 
-                                            return (
-                                                <AccessibleView
-                                                    key={`field-${fieldIndex}-${subForm.SFormName}`}
-                                                    style={containerStyle}
-                                                >
-                                                    <Dynamic
-                                                        field={field}
-                                                        values={formValues}
-                                                        setFieldValue={handleChange}
-                                                        groupCheckListOption={groupCheckListOption}
-                                                    />
-                                                </AccessibleView>
-                                            );
-                                        })}
-                                    </Card.Content>
-                                </Card>
-                            </AccessibleView>
-                        ))}
-                    </ScrollView>
+                                    const containerStyle: ViewStyle = {
+                                        flexBasis: responsive === "small" ? "100%" : `${98 / columns}%`,
+                                        flexGrow: field.DisplayOrder || 1,
+                                        padding: 5,
+                                        borderRightWidth: isLastColumn ? 0 : 1,
+                                        marginHorizontal: 5
+                                    };
+
+                                    return (
+                                        <AccessibleView
+                                            key={`field-${fieldIndex}-${subForm.SFormName}`}
+                                            style={containerStyle}
+                                        >
+                                            <Dynamic
+                                                field={field}
+                                                values={formValues}
+                                                setFieldValue={handleChange}
+                                                groupCheckListOption={groupCheckListOption}
+                                            />
+                                        </AccessibleView>
+                                    );
+                                })}
+                            </Card.Content>
+                        </Card>
+                    </AccessibleView>
+                ))}
+            </ScrollView>
         </AccessibleView>
     );
 };

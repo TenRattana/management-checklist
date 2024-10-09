@@ -132,26 +132,59 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   const { responsive } = useRes();
 
   const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
+
   const validationSchema = useMemo(() => {
     const shape: any = {};
 
     state.subForms?.forEach((subForm: BaseSubForm) => {
       subForm.Fields?.forEach((field: BaseFormState) => {
-        if (field.Required) {
-          shape[field.MCListID] = Yup.string()
-            .required(`${field.Placeholder} is required`)
-            .test('is-correct-type', `${field.Placeholder} must be a ${dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName}`, (value) => {
-              if (dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName === 'String') {
-                return !value || !isNaN(Number(value));
-              }
-              return true;
-            });
+        const dataTypeName = dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName;
+        const checkListTypeName = checkListType.find(item => item.CTypeID === field.CTypeID)?.CTypeName;
+
+        if (dataTypeName === "Number") {
+          let validator = Yup.number()
+            .nullable()
+            .typeError(`The ${field.CListName} field a valid number`);
+
+          if (field.Required) {
+            validator = validator.required(`The ${field.Placeholder} field is required`);
+          }
+
+          if (field.MinLength) {
+            validator = validator.min(field.MinLength, `The ${field.CListName} minimum value is ${field.MinLength}`)
+          }
+
+          if (field.MaxLength) {
+            validator = validator.max(field.MaxLength, `The ${field.CListName} maximum value is ${field.MaxLength}`)
+          }
+
+          shape[field.MCListID] = validator;
+        }
+        else if (dataTypeName === "String") {
+
+          let validator;
+
+          if (checkListTypeName === "Checkbox") {
+            validator = Yup.array()
+              .of(Yup.string())
+              .min(1, `The ${field.CListName} field requires at least one option to be selected`)
+          } else {
+            validator = Yup.string()
+              .nullable()
+              .typeError(`The ${field.CListName} field a valid string`);;
+          }
+
+          if (field.Required) {
+            validator = validator.required(`The ${field.Placeholder} field is required`);
+          }
+
+          shape[field.MCListID] = validator;
         }
       });
     });
 
     return Yup.object().shape(shape);
-  }, [state.subForms]);
+  }, [state.subForms, dataType, checkListType]);
 
   const onFormSubmit = useCallback(async (values: { [key: string]: any }) => {
     const updatedSubForms = state.subForms.map((subForm: BaseSubForm) => ({
@@ -165,26 +198,36 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
 
     const data = { FormData: JSON.stringify(updatedSubForms) };
 
-    console.log(data);
-
-    // try {
-    //   const response = await axiosInstance.post("ExpectedResult_service.asmx/SaveExpectedResult", data);
-    //   showSuccess(String(response.data.message));
-    // } catch (error) {
-    //   handleError(error);
-    // }
+    try {
+      const response = await axiosInstance.post("ExpectedResult_service.asmx/SaveExpectedResult", data);
+      showSuccess(String(response.data.message));
+    } catch (error) {
+      handleError(error);
+    }
   }, [showSuccess, handleError, state.subForms, state.MachineID]);
 
   const renderSubForm = useCallback(
     (item: BaseSubForm, setFieldValue: (name: string, value: any) => void, values: { [key: string]: any; }, errors: FormikErrors<{ [key: string]: any; }>, touched: FormikTouched<{ [key: string]: any; }>) => {
       return (
-        <AccessibleView key={item.SFormID}>
+        <AccessibleView key={item.SFormID} >
           <Card style={styles.card}>
             <Card.Title title={item.SFormName} titleStyle={styles.cardTitle} />
             <Card.Content style={styles.subFormContainer}>
               {item.Fields?.map((field: BaseFormState, fieldIndex: number) => {
+
+                const columns = item.Columns ?? 1;
+                const isLastColumn = (fieldIndex + 1) % columns === 0;
+
+                const containerStyle: ViewStyle = {
+                  flexBasis: responsive === "small" ? "100%" : `${98 / columns}%`,
+                  flexGrow: field.DisplayOrder || 1,
+                  padding: 5,
+                  borderRightWidth: isLastColumn ? 0 : 1,
+                  marginHorizontal: 5,
+                };
+
                 return (
-                  <AccessibleView key={`field-${fieldIndex}-${item.SFormID}`}>
+                  <AccessibleView key={`field-${fieldIndex}-${item.SFormID}`} style={containerStyle}>
                     <Dynamic
                       field={field}
                       values={values}
@@ -202,7 +245,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                           ? errors[field.MCListID]
                           : Array.isArray(errors[field.MCListID])
                             ? errors[field.MCListID].join(', ') || ""
-                            : '' }
+                            : ''}
                       </HelperText>
                     )}
                   </AccessibleView>
@@ -226,24 +269,36 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
       <Formik
         initialValues={formValues}
         validationSchema={validationSchema}
+        validateOnBlur={false}
+        validateOnChange={true}
         onSubmit={(value) => onFormSubmit(value)}
       >
-        {({ handleSubmit, setFieldValue, values, errors, touched }) => (
-          <AccessibleView>
-            <FlatList
-              data={state.subForms}
-              renderItem={({ item }) => renderSubForm(item, setFieldValue, values, errors, touched)}
-              keyExtractor={(item) => item.SFormID}
-            />
-            <AccessibleView style={masterdataStyles.containerAction}>
-              <Pressable
-                onPress={() => handleSubmit()}
-                style={[masterdataStyles.button, masterdataStyles.backMain]}
-              >
-                <Text style={masterdataStyles.text}>Submit</Text>
-              </Pressable>
+        {({ handleSubmit, setFieldValue, values, errors, touched, isValid, dirty }) => (
+          <>
+            <AccessibleView style={{ flex: 1 }}>
+              <FlatList
+                data={state.subForms}
+                renderItem={({ item }) => renderSubForm(item, setFieldValue, values, errors, touched)}
+                keyExtractor={(item) => item.SFormID}
+                nestedScrollEnabled={true}
+                ListFooterComponentStyle={{ alignItems: 'center', width: "100%" }}
+                ListFooterComponent={() => (
+                  <AccessibleView styles={[masterdataStyles.containerAction]}>
+                    <Pressable
+                      onPress={() => handleSubmit()}
+                      style={[
+                        masterdataStyles.button,
+                        masterdataStyles.backMain
+                      ]}
+                    >
+                      <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Submit</Text>
+                    </Pressable>
+                  </AccessibleView>
+                )}
+              />
+
             </AccessibleView>
-          </AccessibleView>
+          </>
         )}
       </Formik>
     </AccessibleView>
@@ -274,7 +329,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   subFormContainer: {
-    marginVertical: 10,
+    marginBottom: 16,
+    flexDirection: "row",
+    flexWrap: "wrap",
   },
   fieldCard: {
     marginVertical: 5,

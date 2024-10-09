@@ -7,7 +7,7 @@ const Managepermissions = () => {
   const navigation = useNavigation();
 
   navigation.navigate("InputFormMachine", {
-    machineId: "M002",
+    machineId: "M001",
   });
 
   return (
