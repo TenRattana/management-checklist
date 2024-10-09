@@ -117,6 +117,7 @@ export interface CustomDropdownMultiProps {
   selectedValue?: string[];
   onValueChange: (value: string[], icon?: () => JSX.Element) => void;
   lefticon?: string;
+  iconRight?: React.ReactNode;
   testId?: string;
 }
 

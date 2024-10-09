@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import DropDownPicker from 'react-native-dropdown-picker';
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { StyleSheet, View } from "react-native";
+import { Dropdown } from 'react-native-element-dropdown';
 import AccessibleView from "@/components/AccessibleView";
 import { CustomDropdownMultiProps } from '@/typing/tag';
+import { IconButton, Chip } from "react-native-paper";
 
 const CustomDropdownMulti = ({
   labels,
@@ -10,11 +11,14 @@ const CustomDropdownMulti = ({
   data,
   selectedValue = [],
   onValueChange,
+  iconRight,
+  lefticon,
 }: CustomDropdownMultiProps) => {
-  const [currentValue, setCurrentValue] = useState<string[]>(selectedValue);
+  const [options, setOptions] = useState<{ label?: string; value?: string; icon?: () => JSX.Element }[]>([]);
+  const [currentValue, setCurrentValue] = useState<string[]>(Array.isArray(selectedValue) ? selectedValue : []);
   const [open, setOpen] = useState(false);
 
-  const options = useMemo(() => {
+  const processData = useCallback(() => {
     if (data && Array.isArray(data)) {
       return data.map((item) => ({
         label: item[labels] || "",
@@ -26,8 +30,16 @@ const CustomDropdownMulti = ({
   }, [data, labels, values]);
 
   useEffect(() => {
+    const newOptions = processData();
+    setOptions(newOptions);
+    if (!newOptions.find(option => option.value === currentValue)) {
+      setCurrentValue([]);
+    }
+  }, [processData]);
+
+  useEffect(() => {
     if (selectedValue.length !== currentValue.length || !selectedValue.every(val => currentValue.includes(val))) {
-      setCurrentValue(selectedValue);
+      setCurrentValue(Array.isArray(selectedValue) ? selectedValue : []);
     }
   }, [selectedValue]);
 
@@ -36,61 +48,91 @@ const CustomDropdownMulti = ({
     onValueChange(value);
   };
 
+  const handleChipClose = (chipToRemove: string) => {
+    const newValue = currentValue.filter(value => value !== chipToRemove);
+    setCurrentValue(newValue);
+    onValueChange(newValue);
+  };
+
   const styles = StyleSheet.create({
-    dropdownContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginVertical: 10,
-      zIndex: 1
-    },
     dropdown: {
-      flex: 1,
       height: 50,
-      borderBottomColor: '#6200ee',
-      borderBottomWidth: 1,
-      marginRight: 10,
+      borderBottomColor: 'gray',
+      borderBottomWidth: 0.5,
     },
-    dropdownText: {
-      fontSize: 18,
-      color: '#000',
+    icon: {
+      marginRight: 5,
     },
-    placeholderText: {
-      fontSize: 18,
-      color: '#999',
+    chipContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      marginVertical: 5,
     },
-    button: {
-      backgroundColor: '#6200ee',
-      padding: 10,
-      borderRadius: 5,
-    },
-    buttonText: {
-      color: '#fff',
-      fontSize: 16,
+    chip: {
+      marginRight: 5,
+      marginBottom: 5,
     },
   });
 
   return (
-    <AccessibleView style={styles.dropdownContainer}>
-      <DropDownPicker
-        open={open}
-        value={currentValue}
-        items={options}
-        setOpen={setOpen}
-        // setValue={(values: string[]) => handleSelect(values)}
-        setItems={setCurrentValue}
-        multiple={true}
-        placeholder="Choose fruits"
-        multipleText="have been selected."
+    <AccessibleView style={styles.dropdown}>
+      <Dropdown
         style={styles.dropdown}
-        dropDownContainerStyle={{ borderColor: 'transparent' }}
-        textStyle={styles.dropdownText}
-        placeholderStyle={styles.placeholderText}
-        zIndex={1000}
-        zIndexInverse={1000}
+        data={options}
+        labelField="label"
+        valueField="value"
+        value={currentValue}
+        placeholder="Choose options"
+        multiple={true}
+        onChange={handleSelect}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
+        renderLeftIcon={() => (
+          <IconButton
+            style={styles.icon}
+            icon={
+              options.find((v) => v.value === currentValue)?.icon ||
+              lefticon ||
+              "check-all"
+            }
+            size={20}
+          />
+        )}
+        renderRightIcon={() => (
+          <AccessibleView style={{ flexDirection: "row" }}>
+            {currentValue.length > 0 ? (
+              <IconButton
+                style={styles.icon}
+                icon="window-close"
+                size={30}
+                onPress={() => {
+                  setCurrentValue([]);
+                  onValueChange([]);
+                }}
+              />
+            ) : (
+              <IconButton
+                style={styles.icon}
+                icon="chevron-down"
+                size={30}
+              />
+            )}
+            {iconRight ?? false}
+          </AccessibleView>
+        )}
       />
-      <Pressable style={styles.button} onPress={() => onValueChange(currentValue)}>
-        <Text style={styles.buttonText}>Done</Text>
-      </Pressable>
+
+      <View style={styles.chipContainer}>
+        {(Array.isArray(currentValue) ? currentValue : []).map((chip) => (
+          <Chip
+            key={chip}
+            style={styles.chip}
+            onClose={() => handleChipClose(chip)}
+          >
+            {options.find(option => option.value === chip)?.label || chip}
+          </Chip>
+        ))}
+      </View>
     </AccessibleView>
   );
 };

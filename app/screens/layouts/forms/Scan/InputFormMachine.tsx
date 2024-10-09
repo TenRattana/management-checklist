@@ -14,10 +14,13 @@ import { ScanParams } from "@/typing/tag";
 import { useFocusEffect } from "expo-router";
 import { Formik, FormikErrors, FormikTouched } from 'formik';
 import * as Yup from 'yup';
+import { useNavigation } from "expo-router";
 
 const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   const dispatch = useDispatch();
   const state = useSelector((state: any) => state.form);
+
+  const navigation = useNavigation();
 
   const [checkList, setCheckList] = useState<Checklist[]>([]);
   const [checkListType, setCheckListType] = useState<CheckListType[]>([]);
@@ -25,6 +28,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   const [groupCheckListOption, setGroupCheckListOption] = useState<GroupCheckListOption[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [found, setFound] = useState<boolean>(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const masterdataStyles = useMasterdataStyles();
   const { machineId } = route.params || {};
@@ -201,6 +205,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
     try {
       const response = await axiosInstance.post("ExpectedResult_service.asmx/SaveExpectedResult", data);
       showSuccess(String(response.data.message));
+      setIsSubmitted(true);
     } catch (error) {
       handleError(error);
     }
@@ -262,45 +267,59 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
 
   return found ? (
     <AccessibleView style={styles.container}>
-      <Text style={styles.title}>{state.FormName || "Content Name"}</Text>
-      <Divider />
-      <Text style={styles.description}>{state.Description || "Content Description"}</Text>
+      {!isSubmitted ? (
+        <>
+          <Text style={styles.title}>{state.FormName || "Content Name"}</Text>
+          <Divider />
+          <Text style={styles.description}>{state.Description || "Content Description"}</Text>
 
-      <Formik
-        initialValues={formValues}
-        validationSchema={validationSchema}
-        validateOnBlur={false}
-        validateOnChange={true}
-        onSubmit={(value) => onFormSubmit(value)}
-      >
-        {({ handleSubmit, setFieldValue, values, errors, touched, isValid, dirty }) => (
-          <>
-            <AccessibleView style={{ flex: 1 }}>
-              <FlatList
-                data={state.subForms}
-                renderItem={({ item }) => renderSubForm(item, setFieldValue, values, errors, touched)}
-                keyExtractor={(item) => item.SFormID}
-                nestedScrollEnabled={true}
-                ListFooterComponentStyle={{ alignItems: 'center', width: "100%" }}
-                ListFooterComponent={() => (
-                  <AccessibleView styles={[masterdataStyles.containerAction]}>
-                    <Pressable
-                      onPress={() => handleSubmit()}
-                      style={[
-                        masterdataStyles.button,
-                        masterdataStyles.backMain
-                      ]}
-                    >
-                      <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Submit</Text>
-                    </Pressable>
-                  </AccessibleView>
-                )}
-              />
+          <Formik
+            initialValues={formValues}
+            validationSchema={validationSchema}
+            validateOnBlur={false}
+            validateOnChange={true}
+            onSubmit={(value) => onFormSubmit(value)}
+          >
+            {({ handleSubmit, setFieldValue, values, errors, touched, isValid, dirty }) => (
+              <>
+                <AccessibleView style={{ flex: 1 }}>
+                  <FlatList
+                    data={state.subForms}
+                    renderItem={({ item }) => renderSubForm(item, setFieldValue, values, errors, touched)}
+                    keyExtractor={(item) => item.SFormID}
+                    nestedScrollEnabled={true}
+                    ListFooterComponentStyle={{ alignItems: 'center', width: "100%" }}
+                    ListFooterComponent={() => (
+                      <AccessibleView styles={[masterdataStyles.containerAction]}>
+                        <Pressable
+                          onPress={() => handleSubmit()}
+                          style={[
+                            masterdataStyles.button,
+                            masterdataStyles.backMain
+                          ]}
+                        >
+                          <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Submit</Text>
+                        </Pressable>
+                      </AccessibleView>
+                    )}
+                  />
 
-            </AccessibleView>
-          </>
-        )}
-      </Formik>
+                </AccessibleView>
+              </>
+            )}
+          </Formik>
+        </>
+      ) : (
+        <AccessibleView style={styles.containerScccess}>
+          <Text>Your form has been submitted successfully!</Text>
+          <Pressable onPress={() => {
+            setIsSubmitted(false)
+            navigation.navigate("ScanQR")
+          }} style={styles.linkScccess}>
+            <Text style={styles.linkTextScccess}>Submit another</Text>
+          </Pressable>
+        </AccessibleView>
+      )}
     </AccessibleView>
   ) : (
     <NotFoundScreen />
@@ -311,6 +330,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
+  },
+  containerScccess: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  titleScccess: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  linkScccess: {
+    marginTop: 15,
+    paddingVertical: 15,
+  },
+  linkTextScccess: {
+    color: '#1e90ff',
   },
   title: {
     fontSize: 24,
