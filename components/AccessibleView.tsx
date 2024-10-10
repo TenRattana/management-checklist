@@ -1,11 +1,11 @@
 import React, { ReactNode, memo } from "react";
-import { View, Platform } from "react-native";
+import { View, Platform, ViewStyle } from "react-native";
 import PropTypes from "prop-types";
 
 interface AccessibleViewProps {
     children: ReactNode;
     name: string;
-    style?: any;
+    style?: ViewStyle | ViewStyle[];
 }
 
 const AccessibleView = ({ children, name, style }: AccessibleViewProps) => {

@@ -19,7 +19,7 @@ const Dialogs = ({
     const masterdataStyles = useMasterdataStyles()
 
     return (
-        <AccessibleView>
+        <AccessibleView name="dialog-container">
             <Portal>
                 <Dialog
                     visible={isVisible}
@@ -43,7 +43,7 @@ const Dialogs = ({
                             . Please confirm your action.
                         </Text>
 
-                        <AccessibleView style={masterdataStyles.containerAction}>
+                        <AccessibleView name="dialog-action" style={masterdataStyles.containerAction}>
                             <Pressable
                                 onPress={() => {
                                     handleDialog(actions, data);

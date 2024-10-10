@@ -1,40 +1,14 @@
-import React, { useEffect, useState, lazy, Suspense } from 'react';
-import { Text, Pressable, StyleSheet } from 'react-native';
+import React, { useEffect, useState, lazy, Suspense, useRef } from 'react';
+import { Text, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { ActivityIndicator, IconButton } from 'react-native-paper';
+import { IconButton } from 'react-native-paper';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import {
-  HomeScreen,
-  LoginScreen,
-  AdminScreen,
-  SuperAdminScreen,
-  ScanQR,
-  GenerateQR,
-  UserScreen,
-  SettingScreen,
-  Managepermissions
-} from '@/app/screens'
-
-const TestScreen = lazy(() => import('@/app/screens/TestScreen'));
-const FormScreen = lazy(() => import('@/app/screens/layouts/forms/form/FormScreen'));
-const ExpectedResultScreen = lazy(() => import('@/app/screens/layouts/transitions/expected_result/ExpectedResultScreen'));
-const CreateFormScreen = lazy(() => import('@/app/screens/layouts/forms/create/CreateFormScreen'));
-const MachineGroupScreen = lazy(() => import('@/app/screens/layouts/machines/machine_group/MachineGroupScreen'));
-const MachineScreen = lazy(() => import('@/app/screens/layouts/machines/machine/MachineScreen'));
-const MatchCheckListOptionScreen = lazy(() => import('@/app/screens/layouts/matchs/match_checklist_option/MatchCheckListOptionScreen'));
-const MatchFormMachineScreen = lazy(() => import('@/app/screens/layouts/matchs/match_form_machine/MatchFormMachineScreen'));
-const CheckListScreen = lazy(() => import('@/app/screens/layouts/checklists/checklist/CheckListScreen'));
-const InputFormMachine = lazy(() => import('@/app/screens/layouts/forms/Scan/InputFormMachine'));
-const PreviewScreen = lazy(() => import('@/app/screens/layouts/forms/view/Preview'));
-const CheckListOptionScreen = lazy(() => import('@/app/screens/layouts/checklists/checklist_option/CheckListOptionScreen'));
-const ChecklistGroupScreen = lazy(() => import('@/app/screens/layouts/checklists/checklist_group/ChecklistGroupScreen'));
-
+import { HomeScreen, LoginScreen, AdminScreen, SuperAdminScreen, ScanQR, GenerateQR, UserScreen, SettingScreen, Managepermissions } from '@/app/screens';
 import { useAuth } from "@/app/contexts/auth";
 import { AccessibleView } from '@/components';
 import { ScrollView } from 'react-native-gesture-handler';
 
 const Drawer = createDrawerNavigator();
-
 import { DrawerContentScrollView } from '@react-navigation/drawer';
 
 function CustomDrawerContent(props: any) {
@@ -177,7 +151,6 @@ function CustomDrawerContent(props: any) {
   );
 }
 
-
 const MenuSection = ({ title, isOpen, onToggle, items, navigation }: any) => {
   const itemHeight = 68;
   const height = useSharedValue(0);
@@ -204,28 +177,136 @@ const MenuSection = ({ title, isOpen, onToggle, items, navigation }: any) => {
 
   return (
     <>
-      <Pressable
-        onPress={onToggle}
-        style={styles.menuItem}
-        android_ripple={{ color: '#f0f0f0' }}
-      >
+      <Pressable onPress={onToggle} style={styles.menuItem}>
         <Text style={styles.menuText}>{title}</Text>
         <IconButton icon={isOpen ? 'chevron-up' : 'chevron-down'} size={20} />
       </Pressable>
-
       <Animated.View style={[animatedStyle]}>
         {items.map((item: any) => (
-          <Pressable
-            key={item.label}
-            onPress={() => navigation.navigate(item.navigateTo)}
-            style={styles.subMenuItem}
-            android_ripple={{ color: '#f0f0f0' }}
-          >
+          <Pressable key={item.label} onPress={() => navigation.navigate(item.navigateTo)} style={styles.subMenuItem}>
             <Text style={styles.subMenuText}>{item.label}</Text>
           </Pressable>
         ))}
       </Animated.View>
     </>
+  );
+};
+
+type ComponentNames = 'TestScreen' | 'Form' | 'Expected_result' | 'Create_form' | 'Machine_group' |
+  'Machine' | 'Match_checklist_option' | 'Match_form_machine' | 'Checklist' |
+  'InputFormMachine' | 'Preview' | 'Checklist_option' | 'Checklist_group';
+
+const components: Record<ComponentNames, () => Promise<{ default: React.ComponentType<any> }>> = {
+  TestScreen: () => import('@/app/screens/TestScreen'),
+  Form: () => import('@/app/screens/layouts/forms/form/FormScreen'),
+  Expected_result: () => import('@/app/screens/layouts/transitions/expected_result/ExpectedResultScreen'),
+  Create_form: () => import('@/app/screens/layouts/forms/create/CreateFormScreen'),
+  Machine_group: () => import('@/app/screens/layouts/machines/machine_group/MachineGroupScreen'),
+  Machine: () => import('@/app/screens/layouts/machines/machine/MachineScreen'),
+  Match_checklist_option: () => import('@/app/screens/layouts/matchs/match_checklist_option/MatchCheckListOptionScreen'),
+  Match_form_machine: () => import('@/app/screens/layouts/matchs/match_form_machine/MatchFormMachineScreen'),
+  Checklist: () => import('@/app/screens/layouts/checklists/checklist/CheckListScreen'),
+  InputFormMachine: () => import('@/app/screens/layouts/forms/Scan/InputFormMachine'),
+  Preview: () => import('@/app/screens/layouts/forms/view/Preview'),
+  Checklist_option: () => import('@/app/screens/layouts/checklists/checklist_option/CheckListOptionScreen'),
+  Checklist_group: () => import('@/app/screens/layouts/checklists/checklist_group/ChecklistGroupScreen'),
+};
+
+const App = () => {
+  const { user, role, loading } = useAuth();
+  const [loadedComponents, setLoadedComponents] = useState(new Set<string>());
+  const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
+  const renderComponent = (name: ComponentNames) => {
+    if (!loadedComponents.has(name)) {
+      if (!cachedComponents.current[name]) {
+        cachedComponents.current[name] = lazy(components[name]);
+      }
+      loadedComponents.add(name);
+    }
+
+    const Component = cachedComponents.current[name];
+    return (props: any) => <Component {...props} />;
+  };
+
+  return (
+    <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+      <Drawer.Navigator drawerContent={(props) => <CustomDrawerContent {...props} />}>
+        <Drawer.Screen name={user ? "Home" : "Login"} component={user ? HomeScreen : LoginScreen} />
+        {user && (
+          <>
+            {(role === "SuperAdmin" || role === "Admin") && (
+              <>
+                {[
+                  { name: "Machine_group" },
+                  { name: "Machine" },
+                  { name: "Checklist" },
+                  { name: "Checklist_option" },
+                  { name: "Checklist_group" },
+                  { name: "Match_checklist_option" },
+                  { name: "Match_form_machine" },
+                  { name: "Create_form" },
+                  { name: "Expected_result" },
+                  { name: "Form" },
+                  { name: "User" },
+                  { name: "Preview" },
+                  { name: "Admin" },
+                  { name: "ScanQR" },
+                  { name: "GenerateQR" },
+                  { name: "InputFormMachine" },
+                  { name: "Setting" },
+                ].map(screen => (
+                  <Drawer.Screen key={screen.name} name={screen.name} component={renderComponent(screen.name as ComponentNames)} />
+                ))}
+              </>
+            )}
+            {role === "SuperAdmin" && (
+              <>
+                {[
+                  { name: "Managepermissions" },
+                  { name: "SuperAdmin" },
+                  { name: "Test" },
+                ].map(screen => (
+                  <Drawer.Screen key={screen.name} name={screen.name} component={renderComponent(screen.name as ComponentNames)} />
+                ))}
+              </>
+            )}
+            {role === "GeneralUser" && (
+              <>
+                {[
+                  { name: "ScanQR" },
+                  { name: "InputFormMachine" },
+                  { name: "Setting" },
+                  { name: "Logout" },
+                ].map(screen => (
+                  <Drawer.Screen key={screen.name} name={screen.name} component={renderComponent(screen.name as ComponentNames)} />
+                ))}
+              </>
+            )}
+          </>
+        )}
+      </Drawer.Navigator>
+    </Suspense>
+  );
+};
+
+const LogoutScreen: React.FC = () => {
+  const { logout } = useAuth();
+
+  useEffect(() => {
+    logout();
+  }, [logout]);
+
+  return (
+    <AccessibleView name="navigation" style={styles.container}>
+      <Pressable disabled>
+        <Text>Logging out...</Text>
+      </Pressable>
+    </AccessibleView>
   );
 };
 
@@ -258,85 +339,5 @@ const styles = StyleSheet.create({
     color: '#5e5e5e',
   },
 });
-
-const App = () => {
-  const { user, role, loading } = useAuth();
-
-  if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
-  }
-
-  const adminScreens = [
-    { name: "Machine_group", component: MachineGroupScreen },
-    { name: "Machine", component: MachineScreen },
-    { name: "Checklist", component: CheckListScreen },
-    { name: "Checklist_option", component: CheckListOptionScreen },
-    { name: "Checklist_group", component: ChecklistGroupScreen },
-    { name: "Match_checklist_option", component: MatchCheckListOptionScreen },
-    { name: "Match_form_machine", component: MatchFormMachineScreen },
-    { name: "Create_form", component: CreateFormScreen },
-    { name: "Expected_result", component: ExpectedResultScreen },
-    { name: "Form", component: FormScreen },
-    { name: "User", component: UserScreen },
-    { name: "Preview", component: PreviewScreen },
-    { name: "Admin", component: AdminScreen },
-    { name: "ScanQR", component: ScanQR },
-    { name: "GenerateQR", component: GenerateQR },
-    { name: "InputFormMachine", component: InputFormMachine },
-    { name: "Setting", component: SettingScreen },
-  ];
-
-  const superAdminScreens = [
-    { name: "Managepermissions", component: Managepermissions },
-    { name: "Super_admin", component: SuperAdminScreen },
-    { name: "Test", component: TestScreen },
-  ];
-
-  const generalUserScreens = [
-    { name: "ScanQR", component: ScanQR },
-    { name: "Form", component: FormScreen },
-    { name: "Setting", component: SettingScreen },
-    { name: "Logout", component: LogoutScreen },
-  ];
-
-  return (
-    <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
-      <Drawer.Navigator drawerContent={(props) => <CustomDrawerContent {...props} />}>
-        <Drawer.Screen name={user ? "Home" : "Login"} component={user ? HomeScreen : LoginScreen} />
-
-        {user && (
-          <>
-            {(role === "SuperAdmin" || role === "Admin") && adminScreens.map((screen) => (
-              <Drawer.Screen key={screen.name} name={screen.name} component={screen.component as any} />
-            ))}
-            {role === "SuperAdmin" && superAdminScreens.map((screen) => (
-              <Drawer.Screen key={screen.name} name={screen.name} component={screen.component as any} />
-            ))}
-            {role === "GeneralUser" && generalUserScreens.map((screen) => (
-              <Drawer.Screen key={screen.name} name={screen.name} component={screen.component as any} />
-            ))}
-          </>
-        )}
-      </Drawer.Navigator>
-    </Suspense>
-  );
-}
-console.log("Navigation");
-
-const LogoutScreen: React.FC = () => {
-  const { logout } = useAuth();
-
-  useEffect(() => {
-    logout();
-  }, [logout]);
-
-  return (
-    <AccessibleView name="navigation" style={styles.container}>
-      <Pressable disabled>
-        <Text>Logging out...</Text>
-      </Pressable>
-    </AccessibleView>
-  );
-};
 
 export default App;
