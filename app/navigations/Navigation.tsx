@@ -236,8 +236,7 @@ const App = () => {
   return (
     <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
       <Drawer.Navigator drawerContent={(props) => <CustomDrawerContent {...props} />}>
-        <Drawer.Screen name={user ? "Home" : "Login"} component={user ? HomeScreen : LoginScreen} />
-        {user && (
+        {user ? (
           <>
             {(role === "SuperAdmin" || role === "Admin") && (
               <>
@@ -287,6 +286,10 @@ const App = () => {
                 ))}
               </>
             )}
+          </>
+        ) : (
+          <>
+            <Drawer.Screen name={"Login"} component={LoginScreen} />
           </>
         )}
       </Drawer.Navigator>
