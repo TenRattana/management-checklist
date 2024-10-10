@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ScrollView, Pressable, Text } from "react-native";
-import axios from "axios";
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme } from "@/app/contexts";
-import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
-import { Card, Divider, Searchbar } from "react-native-paper";
+import { Customtable, LoadingSpinner, AccessibleView, Searchbar } from "@/components";
+import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import { ExpectedResult } from "@/typing/type";
@@ -23,7 +22,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
     const { spacing } = useRes();
     console.log("ExpectedResultScreen");
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setIsLoading(true);
 
         try {
@@ -35,13 +34,12 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [handleError]);
 
     useFocusEffect(
         useCallback(() => {
             fetchData();
-            return () => { };
-        }, [])
+        }, [fetchData])
     );
 
     useEffect(() => {
@@ -54,7 +52,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
         };
     }, [searchQuery]);
 
-    const handleAction = async (action?: string, item?: string) => {
+    const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
             if (action === "preIndex") {
                 const data = expectedResult.find((v) => v.TableID === item);
@@ -66,7 +64,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
         } catch (error) {
             handleError(error);
         }
-    };
+    }, [fetchData, handleError]);
 
     const convertToThaiDateTime = (dateString: string) => {
         const date = new Date(dateString);
@@ -88,31 +86,23 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
         ]);
     }, [expectedResult, debouncedSearchQuery]);
 
-    const tableHead = [
-        { label: "Machine Name", align: "flex-start" },
-        { label: "Form Name", align: "flex-start" },
-        { label: "Time Submit", align: "flex-start" },
-        { label: "Preview", align: "center" },
-    ];
-
-    const actionIndex = [
-        {
-            preIndex: 3,
-        },
-    ];
-
-    const customtableProps = {
+    const customtableProps = useMemo(() => ({
         Tabledata: tableData,
-        Tablehead: tableHead,
+        Tablehead: [
+            { label: "Machine Name", align: "flex-start" },
+            { label: "Form Name", align: "flex-start" },
+            { label: "Time Submit", align: "flex-start" },
+            { label: "Preview", align: "center" },
+        ],
         flexArr: [3, 3, 3, 1],
-        actionIndex,
+        actionIndex: [
+            {
+                preIndex: 3,
+            },
+        ],
         handleAction,
         searchQuery: debouncedSearchQuery,
-    };
-
-    const handleChange = (text: string) => {
-        setSearchQuery(text);
-    };
+    }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
         <ScrollView style={{ paddingHorizontal: 15 }}>
@@ -121,14 +111,11 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                <AccessibleView name="expected-result" style={{ paddingVertical: 20, flexDirection: 'row' }}>
                     <Searchbar
-                        placeholder="Search Machine..."
+                        placeholder="Search Expected Result..."
                         value={searchQuery}
-                        onChangeText={handleChange}
-                        style={masterdataStyles.searchbar}
-                        iconColor="#007AFF"
-                        placeholderTextColor="#a0a0a0"
+                        onChangeText={setSearchQuery}
                     />
                 </AccessibleView>
                 <Card.Content style={{ padding: 2, paddingVertical: 10 }}>

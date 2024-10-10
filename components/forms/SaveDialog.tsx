@@ -69,7 +69,7 @@ const SaveDialog = ({
                         You are about to save the form. Are you sure?
                     </Text>
 
-                    <AccessibleView style={masterdataStyles.containerAction}>
+                    <AccessibleView name="sd" style={masterdataStyles.containerAction}>
                         <Pressable
                             onPress={() => saveForm()}
                             style={[

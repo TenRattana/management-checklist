@@ -39,10 +39,10 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                             onSubmit={(values: InitialValuesMachine) => saveData(values)}
                         >
                             {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, dirty, isValid }) => (
-                                <AccessibleView>
+                                <AccessibleView name="form-md">
                                     <FastField name="machineGroupId">
                                         {({ field, form }: any) => (
-                                            <AccessibleView style={masterdataStyles.containerInput}>
+                                            <AccessibleView name="form-machineGroupId" style={masterdataStyles.containerInput}>
                                                 <CustomDropdownSingle
                                                     title="Machine Group"
                                                     labels="MGroupName"
@@ -84,7 +84,7 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                                         errorMessage={touched.description ? errors.description : ""}
                                         testId="Description-md"
                                     />
-                                    <AccessibleView style={masterdataStyles.containerSwitch}>
+                                    <AccessibleView name="form-active-md" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                             Status: {values.isActive ? "Active" : "Inactive"}
                                         </Text>
@@ -98,7 +98,7 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                                             testID="isActive-md"
                                         />
                                     </AccessibleView>
-                                    <AccessibleView style={masterdataStyles.containerAction}>
+                                    <AccessibleView name="form-action-md" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}

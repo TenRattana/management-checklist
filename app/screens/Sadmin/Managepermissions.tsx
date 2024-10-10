@@ -1,20 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { useNavigation } from "@react-navigation/native"
+import { AccessibleView } from '@/components';
 
 const Managepermissions = () => {
   console.log("Managepermissions");
 
-  const navigation = useNavigation();
-
-  navigation.navigate("InputFormMachine", {
-    machineId: "M001",
-  });
-
   return (
-    <View>
+    <AccessibleView name="managepermssion">
       <Text>Managepermissions</Text>
-    </View>
+    </AccessibleView>
   )
 }
 

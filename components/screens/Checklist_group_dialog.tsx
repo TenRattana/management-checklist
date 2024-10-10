@@ -50,7 +50,7 @@ const Checklist_group_dialog = ({ isVisible, setIsVisible, isEditing, initialVal
                             onSubmit={(values: InitialValuesGroupCheckList) => saveData(values)}
                         >
                             {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, isValid, dirty }) => (
-                                <AccessibleView>
+                                <AccessibleView name="form-cgd">
                                     <Inputs
                                         placeholder="Enter Group Check List"
                                         label="Group Check List Name"
@@ -73,7 +73,7 @@ const Checklist_group_dialog = ({ isVisible, setIsVisible, isEditing, initialVal
                                         testId="description-cgd"
                                     />
 
-                                    <AccessibleView style={masterdataStyles.containerSwitch}>
+                                    <AccessibleView name="form-active-cgd" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                             Status: {values.isActive ? "Active" : "Inactive"}
                                         </Text>
@@ -85,7 +85,7 @@ const Checklist_group_dialog = ({ isVisible, setIsVisible, isEditing, initialVal
                                             testID="isActive-cgd"
                                         />
                                     </AccessibleView>
-                                    <AccessibleView style={masterdataStyles.containerAction}>
+                                    <AccessibleView name="form-action-cgd" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}

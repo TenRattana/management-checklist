@@ -92,7 +92,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
         return (
             <Animated.View style={{ transform: [{ scale: getScaleValue(item.SFormID) }] }}>
                 <ScaleDecorator>
-                    <AccessibleView style={{ marginBottom: 30 }}>
+                    <AccessibleView name="drag-field-container" style={{ marginBottom: 30 }}>
                         <Pressable
                             onPress={() => {
                                 setEditMode(true);
@@ -133,7 +133,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
     };
 
     return (
-        <AccessibleView style={{ flex: 1 }}>
+        <AccessibleView name="drag-subform" style={{ flex: 1 }}>
             <Pressable
                 onPress={() => {
                     setInitialDialog(true);

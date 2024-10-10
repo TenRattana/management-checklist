@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ScrollView, Pressable, Text } from "react-native";
-import axios from 'axios'
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme } from "@/app/contexts";
-import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
-import { Card, Divider, Searchbar } from "react-native-paper";
+import { Customtable, LoadingSpinner, AccessibleView, Searchbar } from "@/components";
+import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Checklist_option_dialog from "@/components/screens/Checklist_option_dialog";
@@ -19,7 +18,6 @@ const CheckListOptionScreen = () => {
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isVisible, setIsVisible] = useState<boolean>(false);
-    const [isLoadingButton, setIsLoadingButton] = useState<boolean>(false);
     const [initialValues, setInitialValues] = useState<InitialValuesCheckListOption>({
         checkListOptionId: "",
         checkListOptionName: "",
@@ -29,10 +27,9 @@ const CheckListOptionScreen = () => {
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
-    const { colors } = useTheme();
     const { spacing } = useRes();
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setIsLoading(true);
 
         try {
@@ -43,13 +40,12 @@ const CheckListOptionScreen = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [handleError]);
 
     useFocusEffect(
         useCallback(() => {
             fetchData();
-            return () => { };
-        }, [])
+        }, [fetchData])
     );
 
     useEffect(() => {
@@ -62,8 +58,7 @@ const CheckListOptionScreen = () => {
         };
     }, [searchQuery]);
 
-    const saveData = async (values: InitialValuesCheckListOption) => {
-        setIsLoadingButton(true);
+    const saveData = useCallback(async (values: InitialValuesCheckListOption) => {
 
         const data = {
             CLOptionID: values.checkListOptionId,
@@ -82,15 +77,13 @@ const CheckListOptionScreen = () => {
             await fetchData();
         } catch (error) {
             handleError(error)
-        } finally {
-            setIsLoadingButton(false);
         }
-    };
+    }, [fetchData, handleError]);
 
-    const handleAction = async (action?: string, item?: string) => {
+    const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
             if (action === "editIndex") {
-                const response = await axios.post(
+                const response = await axiosInstance.post(
                     "CheckListOption_service.asmx/GetCheckListOption",
                     {
                         CLOptionID: item,
@@ -114,7 +107,7 @@ const CheckListOptionScreen = () => {
         } catch (error) {
             handleError(error)
         }
-    };
+    }, [fetchData, handleError]);
 
     const tableData = useMemo(() => {
         return checkListOption.map(item => [
@@ -124,15 +117,7 @@ const CheckListOptionScreen = () => {
         ]);
     }, [checkListOption, debouncedSearchQuery]);
 
-    const tableHead = [
-        { label: "Check List Option Name", align: "flex-start" },
-        { label: "Change Status", align: "center" },
-        { label: "", align: "flex-end" },
-    ];
-
-    const actionIndex = [{ editIndex: 2, delIndex: 3 }];
-
-    const handelNewData = useCallback(() => {
+    const handleNewData = useCallback(() => {
         setInitialValues({
             checkListOptionId: "",
             checkListOptionName: "",
@@ -142,18 +127,18 @@ const CheckListOptionScreen = () => {
         setIsVisible(true);
     }, []);
 
-    const customtableProps = {
+    const customtableProps = useMemo(() => ({
         Tabledata: tableData,
-        Tablehead: tableHead,
+        Tablehead: [
+            { label: "Check List Option Name", align: "flex-start" },
+            { label: "Change Status", align: "center" },
+            { label: "", align: "flex-end" },
+        ],
         flexArr: [6, 1, 1],
-        actionIndex,
+        actionIndex: [{ editIndex: 2, delIndex: 3 }],
         handleAction,
         searchQuery: debouncedSearchQuery,
-    };
-
-    const handleChange = (text: string) => {
-        setSearchQuery(text);
-    };
+    }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
         <ScrollView style={{ paddingHorizontal: 15 }}>
@@ -162,16 +147,13 @@ const CheckListOptionScreen = () => {
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                <AccessibleView name="checklistoption" style={{ paddingVertical: 20, flexDirection: 'row' }}>
                     <Searchbar
-                        placeholder="Search Machine..."
+                        placeholder="Search Checklist Option..."
                         value={searchQuery}
-                        onChangeText={handleChange}
-                        style={masterdataStyles.searchbar}
-                        iconColor="#007AFF"
-                        placeholderTextColor="#a0a0a0"
+                        onChangeText={setSearchQuery}
                     />
-                    <Pressable onPress={handelNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                    <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Option</Text>
                     </Pressable>
                 </AccessibleView>

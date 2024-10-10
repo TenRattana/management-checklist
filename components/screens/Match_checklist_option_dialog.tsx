@@ -55,10 +55,10 @@ const Match_checklist_option = ({
                             onSubmit={(values: InitialValuesMatchCheckListOption) => saveData(values)}
                         >
                             {({ values, errors, touched, handleSubmit, setFieldValue, dirty, isValid }) => (
-                                <AccessibleView>
+                                <AccessibleView name="form-mcod">
                                     <FastField name="groupCheckListOptionId">
                                         {({ field, form }: any) => (
-                                            <AccessibleView style={masterdataStyles.containerInput}>
+                                            <AccessibleView name="form-groupCheckListOptionId" style={masterdataStyles.containerInput}>
                                                 <CustomDropdownSingle
                                                     title="Group Check List Option"
                                                     labels="GCLOptionName"
@@ -84,7 +84,7 @@ const Match_checklist_option = ({
 
                                     <FastField name="checkListOptionId">
                                         {({ field, form }: any) => (
-                                            <AccessibleView style={masterdataStyles.containerInput}>
+                                            <AccessibleView name="form-checkListOptionId" style={masterdataStyles.containerInput}>
                                                 <CustomDropdownMultiple
                                                     title="Check List Option"
                                                     labels="CLOptionName"
@@ -106,7 +106,7 @@ const Match_checklist_option = ({
                                         )}
                                     </FastField>
 
-                                    <AccessibleView style={masterdataStyles.containerSwitch}>
+                                    <AccessibleView name="form-active-mcod" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                             Status: {values.isActive ? "Active" : "Inactive"}
                                         </Text>
@@ -120,7 +120,7 @@ const Match_checklist_option = ({
                                             testID="isActive-mcod"
                                         />
                                     </AccessibleView>
-                                    <AccessibleView style={masterdataStyles.containerAction}>
+                                    <AccessibleView name="form-action-mcod" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}

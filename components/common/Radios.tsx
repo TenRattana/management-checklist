@@ -39,7 +39,7 @@ const Radios = ({
   }
 
   return (
-    <AccessibleView style={styles.container}>
+    <AccessibleView name="radios" style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
       <RadioButton.Group
         onValueChange={handleChange}

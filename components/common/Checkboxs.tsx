@@ -57,7 +57,7 @@ const Checkboxs = ({
   }
 
   return (
-    <AccessibleView>
+    <AccessibleView name="checkboxs">
       {option.map((item, index) => (
         <Pressable
           key={index}
@@ -68,7 +68,7 @@ const Checkboxs = ({
           id={testId}
         >
           <Animated.View style={{ transform: [{ scale }] }}>
-            <AccessibleView style={styles.checkboxContainer}>
+            <AccessibleView name="group-checkboxs" style={styles.checkboxContainer}>
               <Checkbox
                 status={
                   checkedOptions.includes(item.value || '') ? "checked" : "unchecked"

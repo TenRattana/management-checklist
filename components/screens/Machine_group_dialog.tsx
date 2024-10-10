@@ -41,7 +41,7 @@ const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValue
                             onSubmit={(values: InitialValuesMachineGroup) => saveData(values)}
                         >
                             {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, isValid, dirty }) => (
-                                <AccessibleView>
+                                <AccessibleView name="form-mgd">
                                     <Inputs
                                         placeholder="Enter Machine Group Name"
                                         label="Machine Group Name"
@@ -62,7 +62,7 @@ const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValue
                                         errorMessage={touched.description ? errors.description : ""}
                                         testId="description-mgd"
                                     />
-                                    <AccessibleView style={masterdataStyles.containerSwitch}>
+                                    <AccessibleView name="form-active-mgd" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                             Status: {values.isActive ? "Active" : "Inactive"}
                                         </Text>
@@ -76,7 +76,7 @@ const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValue
                                             testID="isActive-mgd"
                                         />
                                     </AccessibleView>
-                                    <AccessibleView style={masterdataStyles.containerAction}>
+                                    <AccessibleView name="form-action-mgd" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}

@@ -83,7 +83,7 @@ const DynamicForm = React.memo(({
   };
 
   return (
-    <AccessibleView style={{ flex: 1 }}>
+    <AccessibleView name="form-layout2" style={{ flex: 1 }}>
       <Text>{CListName}</Text>
       {renderField()}
     </AccessibleView>

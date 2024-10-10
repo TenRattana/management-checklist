@@ -69,7 +69,7 @@ const SubFormDialog = ({
                                 isValid,
                                 dirty,
                             }) => (
-                                <AccessibleView>
+                                <AccessibleView name="sfd">
                                     <Inputs
                                         placeholder="Enter Sub Form Name"
                                         label="Sub Form Name"
@@ -90,7 +90,7 @@ const SubFormDialog = ({
                                         errorMessage={touched.Columns ? errors.Columns : ""}
                                     />
 
-                                    <AccessibleView style={masterdataStyles.containerAction}>
+                                    <AccessibleView name="sfd-action" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}

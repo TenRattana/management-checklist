@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ScrollView, Pressable, Text } from "react-native";
-import axios from "axios";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
-import { AccessibleView, Customtable, LoadingSpinner } from "@/components";
-import { Card, Divider, Searchbar } from "react-native-paper";
+import { AccessibleView, Customtable, LoadingSpinner, Searchbar } from "@/components";
+import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Machine_dialog from "@/components/screens/Machine_dialog";
@@ -20,7 +19,6 @@ const MachineGroupScreen = () => {
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isVisible, setIsVisible] = useState<boolean>(false);
-    const [isLoadingButton, setIsLoadingButton] = useState<boolean>(false);
     const [initialValues, setInitialValues] = useState<InitialValuesMachine>({
         machineId: "",
         machineGroupId: "",
@@ -34,13 +32,13 @@ const MachineGroupScreen = () => {
     const { showSuccess, handleError } = useToast();
     const { spacing } = useRes();
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setIsLoading(true);
 
         try {
             const [machineResponse, machineGroupResponse] = await Promise.all([
-                axios.post("Machine_service.asmx/GetMachines"),
-                axios.post("MachineGroup_service.asmx/GetMachineGroups"),
+                axiosInstance.post("Machine_service.asmx/GetMachines"),
+                axiosInstance.post("MachineGroup_service.asmx/GetMachineGroups"),
             ]);
             setMachine(machineResponse.data.data ?? []);
             setMachineGroup(machineGroupResponse.data.data ?? []);
@@ -49,13 +47,12 @@ const MachineGroupScreen = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [handleError]);
 
     useFocusEffect(
         useCallback(() => {
             fetchData();
-            return () => { };
-        }, [])
+        }, [fetchData])
     );
 
     useEffect(() => {
@@ -68,8 +65,7 @@ const MachineGroupScreen = () => {
         };
     }, [searchQuery]);
 
-    const saveData = async (values: InitialValuesMachine) => {
-        setIsLoadingButton(true);
+    const saveData = useCallback(async (values: InitialValuesMachine) => {
         const data = {
             MachineID: values.machineId,
             MGroupID: values.machineGroupId ?? "",
@@ -86,12 +82,10 @@ const MachineGroupScreen = () => {
             await fetchData();
         } catch (error) {
             handleError(error);
-        } finally {
-            setIsLoadingButton(false);
         }
-    };
+    }, [fetchData, handleError]);
 
-    const handleAction = async (action?: string, item?: string) => {
+    const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
             if (action === "editIndex") {
                 const response = await axiosInstance.post("Machine_service.asmx/GetMachine", { MachineID: item });
@@ -115,29 +109,17 @@ const MachineGroupScreen = () => {
         } catch (error) {
             handleError(error);
         }
-    };
+    }, [fetchData, handleError]);
 
     const tableData = useMemo(() => {
-        return machine.map((item) => {
-            return [
-                machineGroup.find((group) => group.MGroupID === item.MGroupID)?.MGroupName || "",
-                item.MachineName,
-                item.Description,
-                item.IsActive,
-                item.MachineID,
-            ];
-        });
+        return machine.map((item) => [
+            machineGroup.find((group) => group.MGroupID === item.MGroupID)?.MGroupName || "",
+            item.MachineName,
+            item.Description,
+            item.IsActive,
+            item.MachineID,
+        ])
     }, [machine, machineGroup, debouncedSearchQuery]);
-
-    const tableHead = [
-        { label: "Machine Group Name", align: "flex-start" },
-        { label: "Machine Name", align: "flex-start" },
-        { label: "Description", align: "flex-start" },
-        { label: "Status", align: "center" },
-        { label: "", align: "flex-end" },
-    ];
-
-    const actionIndex = [{ editIndex: 4, delIndex: 5 }];
 
     const handleNewData = useCallback(() => {
         setInitialValues({
@@ -151,14 +133,20 @@ const MachineGroupScreen = () => {
         setIsVisible(true);
     }, []);
 
-    const customtableProps = {
+    const customtableProps = useMemo(() => ({
         Tabledata: tableData,
-        Tablehead: tableHead,
+        Tablehead: [
+            { label: "Machine Group Name", align: "flex-start" },
+            { label: "Machine Name", align: "flex-start" },
+            { label: "Description", align: "flex-start" },
+            { label: "Status", align: "center" },
+            { label: "", align: "flex-end" },
+        ],
         flexArr: [2, 2, 2, 1, 1],
-        actionIndex,
+        actionIndex: [{ editIndex: 4, delIndex: 5 }],
         handleAction,
         searchQuery: debouncedSearchQuery,
-    };
+    }), [tableData, debouncedSearchQuery, handleAction]);
 
     const dropmachine = useMemo(() => {
         return Array.isArray(machineGroup)
@@ -168,10 +156,6 @@ const MachineGroupScreen = () => {
             : [];
     }, [machineGroup, initialValues.machineGroupId]);
 
-    const handleChange = (text: string) => {
-        setSearchQuery(text);
-    };
-
     return (
         <ScrollView style={{ paddingHorizontal: 15 }}>
             <Text style={[masterdataStyles.text, masterdataStyles.textBold,
@@ -179,14 +163,11 @@ const MachineGroupScreen = () => {
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                <AccessibleView name="machine" style={{ paddingVertical: 20, flexDirection: 'row' }}>
                     <Searchbar
                         placeholder="Search Machine..."
                         value={searchQuery}
-                        onChangeText={handleChange}
-                        style={masterdataStyles.searchbar}
-                        iconColor="#007AFF"
-                        placeholderTextColor="#a0a0a0"
+                        onChangeText={setSearchQuery}
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Machine</Text>

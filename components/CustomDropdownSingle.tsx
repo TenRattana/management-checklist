@@ -59,7 +59,7 @@ const CustomDropdownSingle = ({ labels, values, title, data, selectedValue = "",
     });
 
     return (
-        <AccessibleView>
+        <AccessibleView name="customdropdown-single">
             <Dropdown
                 style={styles.dropdown}
                 placeholderStyle={styles.placeholderStyle}
@@ -95,7 +95,7 @@ const CustomDropdownSingle = ({ labels, values, title, data, selectedValue = "",
                     />
                 )}
                 renderRightIcon={() => (
-                    <AccessibleView style={{ flexDirection: "row" }}>
+                    <AccessibleView name="customdropdown-single-right-icon" style={{ flexDirection: "row" }}>
                         {currentValue !== null ? (
                             <IconButton
                                 style={styles.icon}

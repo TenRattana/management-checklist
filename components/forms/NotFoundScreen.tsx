@@ -9,7 +9,7 @@ const NotFoundScreen = () => {
 
     return (
         <>
-            <AccessibleView style={styles.container}>
+            <AccessibleView name="notfound" style={styles.container}>
                 <Text style={styles.title}>This form doesn't exist.</Text>
                 <Pressable style={styles.link} onPress={() => navigation.navigate("ScanQR")}>
                     <Text style={styles.linkText}>Scan again!</Text>

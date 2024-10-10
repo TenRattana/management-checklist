@@ -22,9 +22,9 @@ const Selects = ({
   console.log("Selects");
 
   return (
-    <AccessibleView style={styles.container}>
+    <AccessibleView name="selects" style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
-      <AccessibleView style={styles.dropdownContainer}>
+      <AccessibleView name="group-selects" style={styles.dropdownContainer}>
         <Picker
           selectedValue={value}
           onValueChange={handleChange}

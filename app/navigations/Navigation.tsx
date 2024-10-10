@@ -331,7 +331,7 @@ const LogoutScreen: React.FC = () => {
   }, [logout]);
 
   return (
-    <AccessibleView style={styles.container}>
+    <AccessibleView name="navigation" style={styles.container}>
       <Pressable disabled>
         <Text>Logging out...</Text>
       </Pressable>

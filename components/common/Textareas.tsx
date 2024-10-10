@@ -19,7 +19,7 @@ const Textareas = ({
     console.log("Textareas");
 
     return (
-        <AccessibleView style={styles.container}>
+        <AccessibleView name="text-areas" style={styles.container}>
             <TextInput
                 mode={mode}
                 placeholder={placeholder}

@@ -40,7 +40,7 @@ const Checklist_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, s
                             onSubmit={(values: InitialValuesChecklist) => saveData(values)}
                         >
                             {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, dirty, isValid }) => (
-                                <AccessibleView>
+                                <AccessibleView name="form-cd">
 
                                     <Inputs
                                         placeholder="Enter Check List Name"
@@ -52,7 +52,7 @@ const Checklist_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, s
                                         errorMessage={touched.checkListName ? errors.checkListName : ""}
                                         testId="checkListName-cd"
                                     />
-                                    <AccessibleView style={masterdataStyles.containerSwitch}>
+                                    <AccessibleView name="form-active-cd" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                             Status: {values.isActive ? "Active" : "Inactive"}
                                         </Text>
@@ -66,7 +66,7 @@ const Checklist_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, s
                                             testID="isActive-cd"
                                         />
                                     </AccessibleView>
-                                    <AccessibleView style={masterdataStyles.containerAction}>
+                                    <AccessibleView name="form-action-cd" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}

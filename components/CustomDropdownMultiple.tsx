@@ -79,7 +79,7 @@ const CustomDropdownMultiple = ({ labels, values, title, data, selectedValue, on
   });
 
   return (
-    <AccessibleView>
+    <AccessibleView name="customdropdown-multi">
       <MultiSelect
         style={styles.dropdown}
         placeholderStyle={styles.placeholderStyle}
@@ -106,7 +106,7 @@ const CustomDropdownMultiple = ({ labels, values, title, data, selectedValue, on
           />
         )}
         renderRightIcon={() => (
-          <AccessibleView style={{ flexDirection: "row" }}>
+          <AccessibleView name="customdropdown-multi-right-icon" style={{ flexDirection: "row" }}>
             {currentValue.length > 0 ? (
               <IconButton
                 style={styles.icon}

@@ -39,14 +39,14 @@ const Preview: React.FC<PreviewProps<PreviewParams>> = ({ route }) => {
     }, []);
 
     return (
-        <AccessibleView style={styles.container}>
+        <AccessibleView name="preview" style={styles.container}>
             <Text style={styles.title}>{state.FormName || "Content Name"}</Text>
             <Divider />
             <Text style={[styles.description]}>{state.Description || "Content Description"}</Text>
 
             <ScrollView style={{ flex: 1 }}>
                 {state.subForms.map((subForm: BaseSubForm, index: number) => (
-                    <AccessibleView key={`subForm-${index}`} >
+                    <AccessibleView name="gen-subForm" key={`subForm-${index}`} >
                         <Card style={styles.card}>
                             <Card.Title title={subForm.SFormName} titleStyle={styles.cardTitle} />
                             <Card.Content style={styles.subFormContainer}>
@@ -71,6 +71,7 @@ const Preview: React.FC<PreviewProps<PreviewParams>> = ({ route }) => {
 
                                     return (
                                         <AccessibleView
+                                            name="container-layout2"
                                             key={`field-${fieldIndex}-${subForm.SFormName}`}
                                             style={containerStyle}
                                         >

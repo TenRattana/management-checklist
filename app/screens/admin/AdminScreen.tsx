@@ -5,7 +5,7 @@ console.log("AdminScreen");
 
 const AdminScreen = () => {
   return (
-    <AccessibleView>
+    <AccessibleView name="admin">
       <Text>Admin Dashboard</Text>
     </AccessibleView>
   );

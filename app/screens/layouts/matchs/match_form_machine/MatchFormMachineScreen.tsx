@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ScrollView, Pressable, Text } from "react-native";
-import axios from "axios";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
-import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
-import { Card, Divider, Searchbar } from "react-native-paper";
+import { Customtable, LoadingSpinner, AccessibleView, Searchbar } from "@/components";
+import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Match_form_machine_dialog from "@/components/screens/Match_form_machine_dialog";
@@ -21,7 +20,6 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isVisible, setIsVisible] = useState<boolean>(false);
-    const [isLoadingButton, setIsLoadingButton] = useState<boolean>(false);
     const [initialValues, setInitialValues] = useState<InitialValuesMatchFormMachine>({
         machineId: "",
         formId: "",
@@ -32,7 +30,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
     const { showSuccess, handleError } = useToast();
     const { spacing } = useRes();
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setIsLoading(true);
 
         try {
@@ -49,13 +47,12 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [handleError]);
 
     useFocusEffect(
         useCallback(() => {
             fetchData();
-            return () => { };
-        }, [])
+        }, [fetchData])
     );
 
     useEffect(() => {
@@ -68,9 +65,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
         };
     }, [searchQuery]);
 
-    const saveData = async (values: InitialValuesMatchFormMachine) => {
-        setIsLoadingButton(true);
-
+    const saveData = useCallback(async (values: InitialValuesMatchFormMachine) => {
         const data = {
             MachineID: values.machineId,
             FormID: values.formId,
@@ -85,12 +80,10 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
             await fetchData();
         } catch (error) {
             handleError(error);
-        } finally {
-            setIsLoadingButton(false);
         }
-    };
+    }, [fetchData, handleError]);
 
-    const handleAction = async (action?: string, item?: string) => {
+    const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
             if (action === "changeIndex") {
                 navigation.navigate("Create_form", { formId: item });
@@ -99,7 +92,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
             } else if (action === "copyIndex") {
                 navigation.navigate("Create_form", { formId: item, action: "copy" });
             } else if (action === "editIndex") {
-                const response = await axios.post("MatchFormMachine_service.asmx/GetMatchFormMachine", {
+                const response = await axiosInstance.post("MatchFormMachine_service.asmx/GetMatchFormMachine", {
                     MachineID: item,
                 });
                 const machineData = response.data.data[0] ?? {};
@@ -119,39 +112,18 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
         } catch (error) {
             handleError(error);
         }
-    };
+    }, [fetchData, handleError]);
 
     const tableData = useMemo(() => {
-        return matchForm.map((item) => {
-            return [
-                item.MachineName,
-                item.FormName,
-                item.FormID,
-                item.FormID,
-                item.FormID,
-                item.MachineID,
-            ];
-        })
+        return matchForm.map((item) => [
+            item.MachineName,
+            item.FormName,
+            item.FormID,
+            item.FormID,
+            item.FormID,
+            item.MachineID,
+        ])
     }, [machine, debouncedSearchQuery]);
-
-    const tableHead = [
-        { label: "Machine Name", align: "flex-start" },
-        { label: "Form Name", align: "flex-start" },
-        { label: "Change Form", align: "center" },
-        { label: "Copy Template", align: "center" },
-        { label: "Preview", align: "center" },
-        { label: "", align: "flex-end" }
-    ];
-
-    const actionIndex = [
-        {
-            changeIndex: 2,
-            copyIndex: 3,
-            preIndex: 4,
-            editIndex: 5,
-            delIndex: 6
-        },
-    ];
 
     const handleNewData = useCallback(() => {
         setInitialValues({
@@ -177,18 +149,29 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
             : [];
     }, [forms, initialValues.formId]);
 
-    const customtableProps = {
+    const customtableProps = useMemo(() => ({
         Tabledata: tableData,
-        Tablehead: tableHead,
+        Tablehead: [
+            { label: "Machine Name", align: "flex-start" },
+            { label: "Form Name", align: "flex-start" },
+            { label: "Change Form", align: "center" },
+            { label: "Copy Template", align: "center" },
+            { label: "Preview", align: "center" },
+            { label: "", align: "flex-end" }
+        ],
         flexArr: [2, 3, 1, 1, 1, 1],
-        actionIndex,
+        actionIndex: [
+            {
+                changeIndex: 2,
+                copyIndex: 3,
+                preIndex: 4,
+                editIndex: 5,
+                delIndex: 6
+            },
+        ],
         handleAction,
         searchQuery: debouncedSearchQuery,
-    };
-
-    const handleChange = (text: string) => {
-        setSearchQuery(text);
-    };
+    }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
         <ScrollView style={{ paddingHorizontal: 15 }}>
@@ -197,14 +180,11 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                <AccessibleView name="match-form-machine" style={{ paddingVertical: 20, flexDirection: 'row' }}>
                     <Searchbar
-                        placeholder="Search Machine..."
+                        placeholder="Search Macht Form Machine..."
                         value={searchQuery}
-                        onChangeText={handleChange}
-                        style={masterdataStyles.searchbar}
-                        iconColor="#007AFF"
-                        placeholderTextColor="#a0a0a0"
+                        onChangeText={setSearchQuery}
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Match Machine & Form</Text>

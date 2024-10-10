@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ScrollView, Pressable, Text } from "react-native";
-import axios from 'axios'
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme } from "@/app/contexts";
-import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
-import { Card, Divider, Searchbar } from "react-native-paper";
+import { Customtable, LoadingSpinner, AccessibleView, Searchbar } from "@/components";
+import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Checklist_dialog from "@/components/screens/Checklist_dialog";
-import { Checklist } from '@/typing/type'
-import { InitialValuesChecklist } from '@/typing/value'
+import { Checklist } from '@/typing/type';
+import { InitialValuesChecklist } from '@/typing/value';
 import { useFocusEffect } from "expo-router";
 
 const CheckListScreen = () => {
@@ -19,7 +18,6 @@ const CheckListScreen = () => {
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isVisible, setIsVisible] = useState<boolean>(false);
-    const [isLoadingButton, setIsLoadingButton] = useState<boolean>(false);
     const [initialValues, setInitialValues] = useState<InitialValuesChecklist>({
         checkListId: "",
         checkListName: "",
@@ -31,9 +29,8 @@ const CheckListScreen = () => {
     const { showSuccess, handleError } = useToast();
     const { spacing } = useRes();
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setIsLoading(true);
-
         try {
             const response = await axiosInstance.post("CheckList_service.asmx/GetCheckLists");
             setCheckList(response.data.data ?? []);
@@ -42,27 +39,22 @@ const CheckListScreen = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [handleError]);
 
     useFocusEffect(
         useCallback(() => {
             fetchData();
-            return () => { };
-        }, [])
+        }, [fetchData])
     );
 
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearchQuery(searchQuery);
         }, 500);
-
-        return () => {
-            clearTimeout(handler);
-        };
+        return () => clearTimeout(handler);
     }, [searchQuery]);
 
-    const saveData = async (values: InitialValuesChecklist) => {
-        setIsLoadingButton(true);
+    const saveData = useCallback(async (values: InitialValuesChecklist) => {
         const data = {
             CListId: values.checkListId ?? "",
             CListName: values.checkListName,
@@ -71,18 +63,15 @@ const CheckListScreen = () => {
 
         try {
             const response = await axiosInstance.post("CheckList_service.asmx/SaveCheckList", data);
-            setIsVisible(!response.data.status);
             showSuccess(String(response.data.message));
-
+            setIsVisible(!response.data.status);
             await fetchData();
         } catch (error) {
             handleError(error);
-        } finally {
-            setIsLoadingButton(false);
         }
-    };
+    }, [fetchData, handleError]);
 
-    const handleAction = async (action?: string, item?: string) => {
+    const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
             if (action === "editIndex") {
                 const response = await axiosInstance.post("CheckList_service.asmx/GetCheckList", { CListID: item });
@@ -98,13 +87,12 @@ const CheckListScreen = () => {
                 const endpoint = action === "activeIndex" ? "ChangeCheckList" : "DeleteCheckList";
                 const response = await axiosInstance.post(`CheckList_service.asmx/${endpoint}`, { CListID: item });
                 showSuccess(String(response.data.message));
-
                 await fetchData();
             }
         } catch (error) {
             handleError(error);
         }
-    };
+    }, [fetchData, handleError]);
 
     const tableData = useMemo(() => {
         return checkList.map(item => [
@@ -112,17 +100,9 @@ const CheckListScreen = () => {
             item.IsActive,
             item.CListID,
         ]);
-    }, [checkList, debouncedSearchQuery]);
+    }, [checkList]);
 
-    const tableHead = [
-        { label: "Check List Name", align: "flex-start" },
-        { label: "Status", align: "center" },
-        { label: "", align: "flex-end" },
-    ];
-
-    const actionIndex = [{ editIndex: 2, delIndex: 3 }];
-
-    const handelNewData = useCallback(() => {
+    const handleNewData = useCallback(() => {
         setInitialValues({
             checkListId: "",
             checkListName: "",
@@ -132,36 +112,33 @@ const CheckListScreen = () => {
         setIsVisible(true);
     }, []);
 
-    const customtableProps = {
+    const customtableProps = useMemo(() => ({
         Tabledata: tableData,
-        Tablehead: tableHead,
+        Tablehead: [
+            { label: "Check List Name", align: "flex-start" },
+            { label: "Status", align: "center" },
+            { label: "", align: "flex-end" },
+        ],
         flexArr: [6, 1, 1],
-        actionIndex,
+        actionIndex: [{ editIndex: 2, delIndex: 3 }],
         handleAction,
         searchQuery: debouncedSearchQuery,
-    };
-
-    const handleChange = (text: string) => {
-        setSearchQuery(text);
-    };
+    }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
         <ScrollView style={{ paddingHorizontal: 15 }}>
-            <Text style={[masterdataStyles.text, masterdataStyles.textBold,
-            { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>Create Check List
+            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>
+                Create Check List
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                <AccessibleView name="checklist" style={{ paddingVertical: 20, flexDirection: 'row' }}>
                     <Searchbar
-                        placeholder="Search Machine..."
+                        placeholder="Search Checklist..."
                         value={searchQuery}
-                        onChangeText={handleChange}
-                        style={masterdataStyles.searchbar}
-                        iconColor="#007AFF"
-                        placeholderTextColor="#a0a0a0"
+                        onChangeText={setSearchQuery}
                     />
-                    <Pressable onPress={handelNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                    <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Check List</Text>
                     </Pressable>
                 </AccessibleView>

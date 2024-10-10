@@ -21,6 +21,7 @@ const Inputs: React.FC<InputProps> = ({
 
   return (
     <AccessibleView
+      name="inputs"
       style={style.containerInput}
     >
       <TextInput

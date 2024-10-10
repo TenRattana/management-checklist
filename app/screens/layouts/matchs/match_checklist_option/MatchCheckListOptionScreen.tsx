@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ScrollView, Pressable, Text } from "react-native";
-import axios from 'axios'
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme, useRes } from "@/app/contexts";
-import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
-import { Card, Divider, Searchbar } from "react-native-paper";
+import { Customtable, LoadingSpinner, AccessibleView, Searchbar } from "@/components";
+import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Match_checklist_option from "@/components/screens/Match_checklist_option_dialog";
 import { CheckListOption, MatchCheckListOption, GroupCheckListOption, } from '@/typing/type'
@@ -31,10 +30,9 @@ const MatchCheckListOptionScreen = () => {
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
-    const { colors } = useTheme();
     const { spacing } = useRes();
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setIsLoading(true);
 
         try {
@@ -43,9 +41,9 @@ const MatchCheckListOptionScreen = () => {
                 groupCheckListOptionResponse,
                 matchCheckListOptionResponse,
             ] = await Promise.all([
-                axios.post("CheckListOption_service.asmx/GetCheckListOptions"),
-                axios.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions"),
-                axios.post("MatchCheckListOption_service.asmx/GetMatchCheckListOptions"),
+                axiosInstance.post("CheckListOption_service.asmx/GetCheckListOptions"),
+                axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions"),
+                axiosInstance.post("MatchCheckListOption_service.asmx/GetMatchCheckListOptions"),
             ]);
 
             setCheckListOption(checkListOptionResponse.data.data ?? []);
@@ -56,13 +54,12 @@ const MatchCheckListOptionScreen = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [handleError]);
 
     useFocusEffect(
         useCallback(() => {
             fetchData();
-            return () => { };
-        }, [])
+        }, [fetchData])
     );
 
     useEffect(() => {
@@ -75,7 +72,7 @@ const MatchCheckListOptionScreen = () => {
         };
     }, [searchQuery]);
 
-    const saveData = async (values: InitialValuesMatchCheckListOption) => {
+    const saveData = useCallback(async (values: InitialValuesMatchCheckListOption) => {
         setIsLoadingButton(true);
 
         const data = {
@@ -96,9 +93,9 @@ const MatchCheckListOptionScreen = () => {
         } finally {
             setIsLoadingButton(false);
         }
-    };
+    }, [fetchData, handleError]);
 
-    const handleAction = async (action?: string, item?: string) => {
+    const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
             if (action === "editIndex") {
 
@@ -124,7 +121,7 @@ const MatchCheckListOptionScreen = () => {
         } catch (error) {
             handleError(error);
         }
-    };
+    }, [fetchData, handleError]);
 
     const tableData = useMemo(() => {
         return matchCheckListOption.flatMap((item) =>
@@ -139,21 +136,6 @@ const MatchCheckListOptionScreen = () => {
             })
         );
     }, [matchCheckListOption, checkListOption, debouncedSearchQuery]);
-
-
-    const tableHead = [
-        { label: "Group Name", align: "flex-start" },
-        { label: "Option Name", align: "flex-start" },
-        { label: "Status", align: "center" },
-        { label: "", align: "flex-end" },
-    ];
-
-    const actionIndex = [
-        {
-            editIndex: 3,
-            delIndex: 4,
-        },
-    ];
 
     const handleNewData = useCallback(() => {
         setInitialValues({
@@ -182,18 +164,24 @@ const MatchCheckListOptionScreen = () => {
             : [];
     }, [groupCheckListOption, initialValues.groupCheckListOptionId]);
 
-    const customtableProps = {
+    const customtableProps = useMemo(() => ({
         Tabledata: tableData,
-        Tablehead: tableHead,
+        Tablehead: [
+            { label: "Group Name", align: "flex-start" },
+            { label: "Option Name", align: "flex-start" },
+            { label: "Status", align: "center" },
+            { label: "", align: "flex-end" },
+        ],
         flexArr: [3, 3, 1, 1],
-        actionIndex,
+        actionIndex: [
+            {
+                editIndex: 3,
+                delIndex: 4,
+            },
+        ],
         handleAction,
         searchQuery: debouncedSearchQuery,
-    };
-
-    const handleChange = (text: string) => {
-        setSearchQuery(text);
-    };
+    }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
         <ScrollView style={{ paddingHorizontal: 15 }}>
@@ -202,14 +190,11 @@ const MatchCheckListOptionScreen = () => {
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                <AccessibleView name="match-check-list-option" style={{ paddingVertical: 20, flexDirection: 'row' }}>
                     <Searchbar
-                        placeholder="Search Machine..."
+                        placeholder="Search Match Checklist Machine..."
                         value={searchQuery}
-                        onChangeText={handleChange}
-                        style={masterdataStyles.searchbar}
-                        iconColor="#007AFF"
-                        placeholderTextColor="#a0a0a0"
+                        onChangeText={setSearchQuery}
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Match Group & Option</Text>

@@ -68,8 +68,8 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
 
     return (
         <GestureHandlerRootView style={{ flexGrow: 1 }}>
-            <AccessibleView style={createform.container}>
-                <AccessibleView style={createform.containerL1}>
+            <AccessibleView name="container-laout1" style={createform.container}>
+                <AccessibleView name="contaner-sagment" style={createform.containerL1}>
                     <SegmentedControl
                         values={["Form", "Tool"]}
                         selectedIndex={selectedIndex}
@@ -82,7 +82,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                     <Animated.View style={[animatedStyle]}>
                         {selectedIndex === 0 ? (
                             <>
-                                <AccessibleView>
+                                <AccessibleView name="container-form">
                                     <Inputs
                                         placeholder="Enter Content Name"
                                         label="Content Name"
@@ -95,7 +95,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                                         handleChange={(value) => handleChange("Description", value)}
                                         value={initialForm.Description}
                                     />
-                                    <AccessibleView style={masterdataStyles.containerAction}>
+                                    <AccessibleView name="save-form" style={masterdataStyles.containerAction}>
                                         <Pressable onPress={() => setInitialSaveDialog(true)} style={createform.saveButton}>
                                             <Text style={createform.saveButtonText}>Save Form</Text>
                                         </Pressable>
@@ -128,7 +128,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                     </Animated.View>
                 </AccessibleView>
 
-                <AccessibleView style={createform.containerL2}>
+                <AccessibleView name="container-layout2" style={createform.containerL2}>
                     <Preview route={route} />
                 </AccessibleView>
             </AccessibleView>

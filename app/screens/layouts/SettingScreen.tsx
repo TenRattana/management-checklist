@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Switch, StyleSheet, Pressable, TextInput } from 'react-native';
+import { Text, Switch, StyleSheet, Pressable, TextInput } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
+import { AccessibleView } from '@/components';
 
 const SettingsScreen: React.FC = () => {
   const [darkMode, setDarkMode] = useState<boolean>(false);
@@ -40,18 +41,18 @@ const SettingsScreen: React.FC = () => {
   };
 
   return (
-    <View style={[styles.container, darkMode ? styles.darkContainer : styles.lightContainer]}>
+    <AccessibleView name="setting" style={[styles.container, darkMode ? styles.darkContainer : styles.lightContainer]}>
       <Text style={[styles.title, { fontSize: fontSize === 'large' ? 24 : fontSize === 'medium' ? 18 : 14 }]}>Settings</Text>
 
-      <View style={styles.settingItem}>
+      <AccessibleView name="setting-mode" style={styles.settingItem}>
         <Text style={styles.settingText}>Dark Mode</Text>
         <Switch
           onValueChange={toggleSwitch}
           value={darkMode}
         />
-      </View>
+      </AccessibleView>
 
-      <View style={styles.settingItem}>
+      <AccessibleView name="setting-font" style={styles.settingItem}>
         <Text style={styles.settingText}>Font Size</Text>
         <Picker
           selectedValue={fontSize}
@@ -62,21 +63,8 @@ const SettingsScreen: React.FC = () => {
           <Picker.Item label="Medium" value="medium" />
           <Picker.Item label="Large" value="large" />
         </Picker>
-      </View>
-
-      <View style={styles.settingItem}>
-        <Text style={styles.settingText}>Language</Text>
-        <Picker
-          selectedValue={language}
-          style={styles.picker}
-          onValueChange={handleLanguageChange}
-        >
-          <Picker.Item label="English" value="en" />
-          <Picker.Item label="Thai" value="th" />
-          {/* เพิ่มภาษาที่ต้องการ */}
-        </Picker>
-      </View>
-    </View>
+      </AccessibleView>
+    </AccessibleView>
   );
 };
 

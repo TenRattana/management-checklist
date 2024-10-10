@@ -42,7 +42,7 @@ const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialVa
                             onSubmit={(values: InitialValuesCheckListOption) => saveData(values)}
                         >
                             {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, dirty, isValid }) => (
-                                <AccessibleView>
+                                <AccessibleView name="form-cod">
 
                                     <Inputs
                                         placeholder="Enter Check List Option"
@@ -55,7 +55,7 @@ const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialVa
                                         testId="checkListOptionName-cod"
                                     />
 
-                                    <AccessibleView style={masterdataStyles.containerSwitch}>
+                                    <AccessibleView name="form-active-cod" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                             Status: {values.isActive ? "Active" : "Inactive"}
                                         </Text>
@@ -69,7 +69,7 @@ const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialVa
                                             testID="isActive-cod"
                                         />
                                     </AccessibleView>
-                                    <AccessibleView style={masterdataStyles.containerAction}>
+                                    <AccessibleView name="form-action-cod" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}

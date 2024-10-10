@@ -6,7 +6,7 @@ const UserScreen = () => {
   console.log("UserScreen");
 
   return (
-    <AccessibleView>
+    <AccessibleView name="user">
       <Text>User Dashboard</Text>
     </AccessibleView>
   );

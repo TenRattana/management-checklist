@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ScrollView, Pressable, Text } from "react-native";
-import axios from 'axios'
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme } from "@/app/contexts";
-import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
-import { Card, Divider, Searchbar } from "react-native-paper";
+import { Customtable, LoadingSpinner, AccessibleView, Searchbar } from "@/components";
+import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Checklist_group_dialog from "@/components/screens/Checklist_group_dialog";
@@ -19,7 +18,6 @@ const ChecklistGroupScreen = () => {
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isVisible, setIsVisible] = useState<boolean>(false);
-    const [isLoadingButton, setIsLoadingButton] = useState<boolean>(false);
     const [initialValues, setInitialValues] = useState<InitialValuesGroupCheckList>({
         groupCheckListOptionId: "",
         groupCheckListOptionName: "",
@@ -31,10 +29,9 @@ const ChecklistGroupScreen = () => {
     const masterdataStyles = useMasterdataStyles();
 
     const { showSuccess, handleError } = useToast();
-    const { colors } = useTheme();
     const { spacing } = useRes();
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setIsLoading(true);
 
         try {
@@ -45,27 +42,22 @@ const ChecklistGroupScreen = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [handleError]);
 
     useFocusEffect(
         useCallback(() => {
             fetchData();
-            return () => { };
-        }, [])
+        }, [fetchData])
     );
 
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearchQuery(searchQuery);
         }, 500);
-
-        return () => {
-            clearTimeout(handler);
-        };
+        return () => clearTimeout(handler);
     }, [searchQuery]);
 
-    const saveData = async (values: InitialValuesGroupCheckList) => {
-        setIsLoadingButton(true);
+    const saveData = useCallback(async (values: InitialValuesGroupCheckList) => {
         const data = {
             GCLOptionID: values.groupCheckListOptionId,
             GCLOptionName: values.groupCheckListOptionName,
@@ -74,25 +66,19 @@ const ChecklistGroupScreen = () => {
         };
 
         try {
-            const response = await axios.post(
-                "GroupCheckListOption_service.asmx/SaveGroupCheckListOption",
-                data
-            );
-            setIsVisible(!response.data.status);
+            const response = await axiosInstance.post("GroupCheckListOption_service.asmx/SaveGroupCheckListOption", data);
             showSuccess(String(response.data.message));
-
+            setIsVisible(!response.data.status);
             await fetchData()
         } catch (error) {
             handleError(error);
-        } finally {
-            setIsLoadingButton(false);
         }
-    };
+    }, [fetchData, handleError]);
 
-    const handleAction = async (action?: string, item?: string) => {
+    const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
             if (action === "editIndex") {
-                const response = await axios.post(
+                const response = await axiosInstance.post(
                     "GroupCheckListOption_service.asmx/GetGroupCheckListOption",
                     {
                         GCLOptionID: item,
@@ -111,13 +97,12 @@ const ChecklistGroupScreen = () => {
                 const endpoint = action === "activeIndex" ? "ChangeGroupCheckListOption" : "DeleteGroupCheckListOption";
                 const response = await axiosInstance.post(`GroupCheckListOption_service.asmx/${endpoint}`, { GCLOptionID: item });
                 showSuccess(String(response.data.message));
-
                 await fetchData()
             }
         } catch (error) {
             handleError(error);
         }
-    };
+    }, [fetchData, handleError]);
 
     const tableData = useMemo(() => {
         return groupCheckListOption.map((item) => [
@@ -128,16 +113,7 @@ const ChecklistGroupScreen = () => {
         ]);
     }, [groupCheckListOption, debouncedSearchQuery]);
 
-    const tableHead = [
-        { label: "Group Option Name", align: "flex-start" },
-        { label: "Description", align: "flex-start" },
-        { label: "Status", align: "center" },
-        { label: "", align: "center" },
-    ];
-
-    const actionIndex = [{ editIndex: 3, delIndex: 4 }];
-
-    const handelNewData = useCallback(() => {
+    const handleNewData = useCallback(() => {
         setInitialValues({
             groupCheckListOptionId: "",
             groupCheckListOptionName: "",
@@ -148,18 +124,19 @@ const ChecklistGroupScreen = () => {
         setIsVisible(true);
     }, []);
 
-    const customtableProps = {
+    const customtableProps = useMemo(() => ({
         Tabledata: tableData,
-        Tablehead: tableHead,
+        Tablehead: [
+            { label: "Group Option Name", align: "flex-start" },
+            { label: "Description", align: "flex-start" },
+            { label: "Status", align: "center" },
+            { label: "", align: "center" },
+        ],
         flexArr: [3, 3, 1, 1],
-        actionIndex,
+        actionIndex: [{ editIndex: 3, delIndex: 4 }],
         handleAction,
         searchQuery: debouncedSearchQuery,
-    };
-
-    const handleChange = (text: string) => {
-        setSearchQuery(text);
-    };
+    }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
         <ScrollView style={{ paddingHorizontal: 15 }}>
@@ -168,16 +145,16 @@ const ChecklistGroupScreen = () => {
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                <AccessibleView name="checklistgroup" style={{ paddingVertical: 20, flexDirection: 'row' }}>
                     <Searchbar
                         placeholder="Search Machine..."
                         value={searchQuery}
-                        onChangeText={handleChange}
+                        onChangeText={setSearchQuery}
                         style={masterdataStyles.searchbar}
                         iconColor="#007AFF"
                         placeholderTextColor="#a0a0a0"
                     />
-                    <Pressable onPress={handelNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                    <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Group Option</Text>
                     </Pressable>
                 </AccessibleView>

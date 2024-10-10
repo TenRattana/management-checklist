@@ -66,7 +66,7 @@ const LoginScreen = () => {
               isValid,
               dirty,
             }) => (
-              <AccessibleView>
+              <AccessibleView name="login">
                 <Inputs
                   placeholder="Enter Username"
                   label="Username"
@@ -78,7 +78,7 @@ const LoginScreen = () => {
                   name="username"
                 />
 
-                <AccessibleView>
+                <AccessibleView name="login-action">
                   <Pressable
                     onPress={() => handleSubmit()}
                     disabled={!isValid || !dirty || loading}

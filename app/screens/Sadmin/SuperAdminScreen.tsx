@@ -6,7 +6,7 @@ const SuperAdminScreen = () => {
   console.log("SuperAdminScreen");
 
   return (
-    <AccessibleView>
+    <AccessibleView name="superadmin">
       <Text>Welcome SuperAdminScreen</Text>
     </AccessibleView>
   );

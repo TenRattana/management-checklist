@@ -51,7 +51,7 @@ const DragTool: React.FC<{ checkListType: CheckListType[] }> = ({ checkListType 
         return (
             <PanGestureHandler onGestureEvent={onGestureEvent} onEnded={onGestureEnd}>
                 <Animated.View style={[{ marginHorizontal: 10 }, itemAnimatedStyle]}>
-                    <AccessibleView style={[createformStyles.fieldContainer]}>
+                    <AccessibleView name="button-tool" style={[createformStyles.fieldContainer]}>
                         <IconButton
                             icon={item.Icon ?? "camera"}
                             size={spacing.large + 5}
@@ -67,7 +67,7 @@ const DragTool: React.FC<{ checkListType: CheckListType[] }> = ({ checkListType 
     };
 
     return (
-        <AccessibleView>
+        <AccessibleView name="drag-tool">
             <Text style={[masterdataStyles.text, masterdataStyles.textBold, { textAlign: 'center', marginVertical: 10 }]}>Tool</Text>
             <FlatList
                 data={checkListType}

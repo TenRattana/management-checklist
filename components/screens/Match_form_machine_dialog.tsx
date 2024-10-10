@@ -37,10 +37,10 @@ const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initial
                             onSubmit={(values: InitialValuesMatchFormMachine) => saveData(values)}
                         >
                             {({ handleSubmit, dirty, isValid }) => (
-                                <AccessibleView>
+                                <AccessibleView name="form-mfmd">
                                     <FastField name="machineId">
                                         {({ field, form }: any) => (
-                                            <AccessibleView style={masterdataStyles.containerInput}>
+                                            <AccessibleView name="form-machineId" style={masterdataStyles.containerInput}>
                                                 <CustomDropdownSingle
                                                     title="Machine"
                                                     labels="MachineName"
@@ -52,7 +52,7 @@ const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initial
                                                         form.setFieldValue(field.name, value);
                                                         form.setTouched({ ...form.touched, [field.name]: true });
                                                     }}
-                                                    testId={`machineId-mfm`}
+                                                    testId={`machineId-mfmd`}
                                                 />
                                                 {form.touched.machineId && form.errors.machineId ? (
                                                     <HelperText type="error" visible style={{ left: -10 }}>
@@ -65,7 +65,7 @@ const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initial
 
                                     <FastField name="formId">
                                         {({ field, form }: any) => (
-                                            <AccessibleView style={masterdataStyles.containerInput}>
+                                            <AccessibleView name="form-formId" style={masterdataStyles.containerInput}>
                                                 <CustomDropdownSingle
                                                     title="Form"
                                                     labels="FormName"
@@ -77,7 +77,7 @@ const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initial
                                                         form.setFieldValue(field.name, value);
                                                         form.setTouched({ ...form.touched, [field.name]: true });
                                                     }}
-                                                    testId={`formId-mfm`}
+                                                    testId={`formId-mfmd`}
                                                 />
                                                 {form.touched.formId && form.errors.formId ? (
                                                     <HelperText type="error" visible style={{ left: -10 }}>
@@ -88,7 +88,7 @@ const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initial
                                         )}
                                     </FastField>
 
-                                    <AccessibleView style={masterdataStyles.containerAction}>
+                                    <AccessibleView name="form-action-mfmd" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}

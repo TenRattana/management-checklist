@@ -6,7 +6,7 @@ const HomeScreen = () => {
   console.log("HomeScreen");
 
   return (
-    <AccessibleView>
+    <AccessibleView name="home">
       <Text>Welcome Home</Text>
     </AccessibleView>
   );

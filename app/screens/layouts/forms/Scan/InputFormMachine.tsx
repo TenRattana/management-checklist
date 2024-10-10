@@ -215,7 +215,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   const renderSubForm = useCallback(
     (item: BaseSubForm, setFieldValue: (name: string, value: any) => void, values: { [key: string]: any; }, errors: FormikErrors<{ [key: string]: any; }>, touched: FormikTouched<{ [key: string]: any; }>) => {
       return (
-        <AccessibleView key={item.SFormID} >
+        <AccessibleView name="input-form-machine" key={item.SFormID} >
           <Card style={styles.card}>
             <Card.Title title={item.SFormName} titleStyle={styles.cardTitle} />
             <Card.Content style={styles.subFormContainer}>
@@ -233,7 +233,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                 };
 
                 return (
-                  <AccessibleView key={`field-${fieldIndex}-${item.SFormID}`} style={containerStyle}>
+                  <AccessibleView name="contianer-layout2" key={`field-${fieldIndex}-${item.SFormID}`} style={containerStyle}>
                     <Dynamic
                       field={field}
                       values={values}
@@ -267,7 +267,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
 
 
   return found ? (
-    <AccessibleView style={styles.container}>
+    <AccessibleView name="container-form-scan" style={styles.container}>
       {!isSubmitted ? (
         <>
           <Text style={styles.title}>{state.FormName || "Content Name"}</Text>
@@ -283,7 +283,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
           >
             {({ handleSubmit, setFieldValue, values, errors, touched, isValid, dirty }) => (
               <>
-                <AccessibleView style={{ flex: 1 }}>
+                <AccessibleView name="form-scan" style={{ flex: 1 }}>
                   <FlatList
                     data={state.subForms}
                     renderItem={({ item }) => renderSubForm(item, setFieldValue, values, errors, touched)}
@@ -291,7 +291,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                     nestedScrollEnabled={true}
                     ListFooterComponentStyle={{ alignItems: 'center', width: "100%" }}
                     ListFooterComponent={() => (
-                      <AccessibleView styles={[masterdataStyles.containerAction]}>
+                      <AccessibleView name="form-action-scan" style={[masterdataStyles.containerAction]}>
                         <Pressable
                           onPress={() => handleSubmit()}
                           style={[
@@ -311,7 +311,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
           </Formik>
         </>
       ) : (
-        <AccessibleView style={styles.containerScccess}>
+        <AccessibleView name="form-success" style={styles.containerScccess}>
           <Text>Your form has been submitted successfully!</Text>
           <Pressable onPress={() => {
             setIsSubmitted(false)

@@ -193,7 +193,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                 }, [values.DTypeID]);
 
                                 return (
-                                    <AccessibleView>
+                                    <AccessibleView name="form-fd">
 
                                         <ScrollView
                                             contentContainerStyle={{ paddingBottom: 5, paddingHorizontal: 10 }}
@@ -202,7 +202,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                         >
                                             <FastField name="CListID">
                                                 {({ field, form }: any) => (
-                                                    <AccessibleView style={masterdataStyles.containerInput}>
+                                                    <AccessibleView name="form-CListID" style={masterdataStyles.containerInput}>
                                                         <CustomDropdownSingle
                                                             title="Check List"
                                                             labels="CListName"
@@ -226,7 +226,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
 
                                             <FastField name="CTypeID">
                                                 {({ field, form }: any) => (
-                                                    <AccessibleView style={masterdataStyles.containerInput}>
+                                                    <AccessibleView name="form-CTypeID" style={masterdataStyles.containerInput}>
                                                         <CustomDropdownSingle
                                                             title="Check List Type"
                                                             labels="CTypeName"
@@ -252,7 +252,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                 <Animated.View style={[animatedDetail]}>
                                                     <FastField name="GCLOptionID">
                                                         {({ field, form }: any) => (
-                                                            <AccessibleView style={masterdataStyles.containerInput}>
+                                                            <AccessibleView name="form-GCLOptionID" style={masterdataStyles.containerInput}>
                                                                 <CustomDropdownSingle
                                                                     title="Match Check List Option Group"
                                                                     labels="GCLOptionName"
@@ -280,7 +280,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                 <Animated.View style={[animatedText]}>
                                                     <FastField name="DTypeID">
                                                         {({ field, form }: any) => (
-                                                            <AccessibleView style={masterdataStyles.containerInput}>
+                                                            <AccessibleView name="form-DTypeID" style={masterdataStyles.containerInput}>
                                                                 <CustomDropdownSingle
                                                                     title="Data Type"
                                                                     labels="DTypeName"
@@ -363,7 +363,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                 testId={`hint-form`}
                                             />
 
-                                            <AccessibleView style={masterdataStyles.containerSwitch}>
+                                            <AccessibleView name="form-active-fd" style={masterdataStyles.containerSwitch}>
                                                 <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                                     Required: {values.Required ? "Notnull" : "Nullable"}
                                                 </Text>
@@ -378,7 +378,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                             </AccessibleView>
                                         </ScrollView>
 
-                                        <AccessibleView style={masterdataStyles.containerAction}>
+                                        <AccessibleView name="form-action-fd" style={masterdataStyles.containerAction}>
                                             <Pressable
                                                 onPress={() => handleSubmit()}
                                                 disabled={!isValid || !dirty}
