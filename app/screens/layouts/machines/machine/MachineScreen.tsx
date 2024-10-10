@@ -28,6 +28,7 @@ const MachineGroupScreen = () => {
         description: "",
         isActive: true,
     });
+    console.log("MachineGroupScreen");
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();

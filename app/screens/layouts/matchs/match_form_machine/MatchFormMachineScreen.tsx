@@ -26,6 +26,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
         machineId: "",
         formId: "",
     });
+    console.log("MatchFormMachineScreen");
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();

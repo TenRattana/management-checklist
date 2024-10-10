@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 
 const NotFoundScreen = () => {
     const navigation = useNavigation();
+    console.log("NotFoundScreen");
 
     return (
         <>

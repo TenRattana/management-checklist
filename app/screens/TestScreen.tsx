@@ -32,6 +32,7 @@ const DragAndDropForm = () => {
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const isDropped = useSharedValue(false);
+  console.log("DragAndDropForm");
 
   const handleDrop = () => {
     if (draggedItem && !isDropped.value) {

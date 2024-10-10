@@ -30,6 +30,7 @@ const Match_checklist_option = ({
     groupCheckListOption,
     dropgroupCheckListOption,
 }: MatchChecklistOptionProps<InitialValuesMatchCheckListOption, CheckListOption, GroupCheckListOption>) => {
+    console.log("Match_checklist_option");
 
     const masterdataStyles = useMasterdataStyles();
     const { colors } = useTheme();

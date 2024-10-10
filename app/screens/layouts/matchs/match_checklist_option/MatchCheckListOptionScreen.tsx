@@ -27,6 +27,7 @@ const MatchCheckListOptionScreen = () => {
         groupCheckListOptionId: "",
         isActive: true,
     });
+    console.log("MatchCheckListOptionScreen");
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();

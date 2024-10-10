@@ -9,6 +9,7 @@ interface CustomInputProps {
     label: string;
     name: string;
 }
+console.log("CustomInput");
 
 export const CustomInput: React.FC<CustomInputProps> = React.memo(({ label, name }) => (
     <Field name={name}>

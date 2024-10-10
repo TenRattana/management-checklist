@@ -15,6 +15,7 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation, route }) => {
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { messages } = route.params || {};
+    console.log("FormScreen");
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
@@ -102,7 +103,7 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation, route }) => {
         { label: "Copy Template", align: "center" },
         { label: "Preview", align: "center" },
     ];
-    console.log('Form')
+
     const actionIndex = [
         {
             changeIndex: 3,

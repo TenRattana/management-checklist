@@ -19,6 +19,7 @@ const CustomDropdownSingle = ({ labels, values, title, data, selectedValue = "",
         }
         return [];
     }, [data, labels, values]);
+    console.log("CustomDropdownSingle");
 
     useEffect(() => {
         const newOptions = processData();
@@ -56,8 +57,6 @@ const CustomDropdownSingle = ({ labels, values, title, data, selectedValue = "",
             fontSize: 20,
         },
     });
-
-    console.log(currentValue);
 
     return (
         <AccessibleView>

@@ -14,6 +14,7 @@ const Preview: React.FC<PreviewProps<PreviewParams>> = ({ route }) => {
         state,
         groupCheckListOption,
     } = useForm(route);
+    console.log("Preview");
 
     const { responsive } = useRes();
     const [formValues, setFormValues] = useState<{ [key: string]: any }>({});

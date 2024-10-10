@@ -19,6 +19,7 @@ const validationSchema = Yup.object().shape({
 const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData, dropmachine, machine = [], forms = [], dropform }: MatchFormMachineDialogProps<InitialValuesMatchFormMachine, Machine, Form>) => {
     const masterdataStyles = useMasterdataStyles()
     const { colors } = useTheme()
+    console.log("Match_form_machine_dialog");
 
     return (
         <Portal>

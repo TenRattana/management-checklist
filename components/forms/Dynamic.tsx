@@ -21,6 +21,7 @@ const DynamicForm = React.memo(({
         value: item.CLOptionID,
       })) || []
     );
+  console.log("DynamicForm");
 
   const renderField = () => {
     switch (CTypeName) {

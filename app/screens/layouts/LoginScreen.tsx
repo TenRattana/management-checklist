@@ -18,6 +18,7 @@ const LoginScreen = () => {
   const { showSuccess, showError } = useToast();
   const [initialValues, setInitialValues] = useState({ username: "" });
   const [loading, setLoading] = useState(false);
+  console.log("LoginScreen");
 
   const handleSuccess = useCallback(() => {
     showSuccess("Operation was successful!");

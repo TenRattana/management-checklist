@@ -3,6 +3,7 @@ import React from 'react'
 import { useNavigation } from "@react-navigation/native"
 
 const Managepermissions = () => {
+  console.log("Managepermissions");
 
   const navigation = useNavigation();
 

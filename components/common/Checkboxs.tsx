@@ -15,6 +15,7 @@ const Checkboxs = ({
 }: CheckboxsProps) => {
   const [checkedOptions, setCheckedOptions] = useState<string[]>([]);
   const [scale] = useState<Animated.Value>(new Animated.Value(1));
+  console.log("Checkboxs");
 
   useEffect(() => {
     if (Array.isArray(value)) {

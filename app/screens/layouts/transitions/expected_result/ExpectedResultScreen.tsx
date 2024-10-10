@@ -21,6 +21,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
     const { showSuccess, handleError } = useToast();
     const { colors } = useTheme();
     const { spacing } = useRes();
+    console.log("ExpectedResultScreen");
 
     const fetchData = async () => {
         setIsLoading(true);

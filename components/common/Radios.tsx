@@ -16,6 +16,7 @@ const Radios = ({
   testId
 }: RadiosProps) => {
   const [scale] = useState<Animated.Value>(new Animated.Value(1));
+  console.log("Radios");
 
   const animateScaleIn = () => {
     Animated.spring(scale, {

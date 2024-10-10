@@ -19,6 +19,7 @@ const validationSchema = Yup.object().shape({
 const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }: CheckListOptionProps<InitialValuesCheckListOption>) => {
     const masterdataStyles = useMasterdataStyles()
     const { colors } = useTheme()
+    console.log("Checklist_option_dialog");
 
     return (
         <Portal>

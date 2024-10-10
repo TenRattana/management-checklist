@@ -26,6 +26,7 @@ const ChecklistGroupScreen = () => {
         description: "",
         isActive: true,
     });
+    console.log("ChecklistGroupScreen");
 
     const masterdataStyles = useMasterdataStyles();
 

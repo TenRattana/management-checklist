@@ -3,6 +3,8 @@ import { AccessibleView } from "@/components";
 import { Text } from "react-native";
 
 const UserScreen = () => {
+  console.log("UserScreen");
+
   return (
     <AccessibleView>
       <Text>User Dashboard</Text>

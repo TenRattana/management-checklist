@@ -27,6 +27,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
     });
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [count, setCount] = useState<number>(0)
+    console.log("Dragfield");
 
     const { handleError } = useToast();
 

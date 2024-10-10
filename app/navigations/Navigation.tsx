@@ -3,11 +3,18 @@ import { Text, Pressable, StyleSheet } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { ActivityIndicator, IconButton } from 'react-native-paper';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-const HomeScreen = lazy(() => import('@/app/screens/layouts/HomeScreen'));
-const LoginScreen = lazy(() => import('@/app/screens/layouts/LoginScreen'));
-const AdminScreen = lazy(() => import('@/app/screens/admin/AdminScreen'));
-const SuperAdminScreen = lazy(() => import('@/app/screens/SAdmin/SuperAdminScreen'));
-const UserScreen = lazy(() => import('@/app/screens/UserScreen'));
+import {
+  HomeScreen,
+  LoginScreen,
+  AdminScreen,
+  SuperAdminScreen,
+  ScanQR,
+  GenerateQR,
+  UserScreen,
+  SettingScreen,
+  Managepermissions
+} from '@/app/screens'
+
 const TestScreen = lazy(() => import('@/app/screens/TestScreen'));
 const FormScreen = lazy(() => import('@/app/screens/layouts/forms/form/FormScreen'));
 const ExpectedResultScreen = lazy(() => import('@/app/screens/layouts/transitions/expected_result/ExpectedResultScreen'));
@@ -17,11 +24,7 @@ const MachineScreen = lazy(() => import('@/app/screens/layouts/machines/machine/
 const MatchCheckListOptionScreen = lazy(() => import('@/app/screens/layouts/matchs/match_checklist_option/MatchCheckListOptionScreen'));
 const MatchFormMachineScreen = lazy(() => import('@/app/screens/layouts/matchs/match_form_machine/MatchFormMachineScreen'));
 const CheckListScreen = lazy(() => import('@/app/screens/layouts/checklists/checklist/CheckListScreen'));
-const ScanQR = lazy(() => import('@/app/screens/layouts/actions/camera/ScanQR'));
-const GenerateQR = lazy(() => import('@/app/screens/layouts/actions/action/GenerateQR'));
 const InputFormMachine = lazy(() => import('@/app/screens/layouts/forms/Scan/InputFormMachine'));
-const Managepermissions = lazy(() => import('@/app/screens/SAdmin/Managepermissions'));
-const SettingScreen = lazy(() => import('@/app/screens/layouts/SettingScreen'));
 const PreviewScreen = lazy(() => import('@/app/screens/layouts/forms/view/Preview'));
 const CheckListOptionScreen = lazy(() => import('@/app/screens/layouts/checklists/checklist_option/CheckListOptionScreen'));
 const ChecklistGroupScreen = lazy(() => import('@/app/screens/layouts/checklists/checklist_group/ChecklistGroupScreen'));
@@ -318,6 +321,7 @@ const App = () => {
     </Suspense>
   );
 }
+console.log("Navigation");
 
 const LogoutScreen: React.FC = () => {
   const { logout } = useAuth();

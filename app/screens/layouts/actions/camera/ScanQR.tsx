@@ -7,6 +7,7 @@ const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
     const [hasPermission, setHasPermission] = useState<boolean | null>(null);
     const [scanned, setScanned] = useState<boolean>(false);
     const [qrValue, setQrValue] = useState<string | null>(null);
+    console.log("ScanQR");
 
     useEffect(() => {
         (async () => {

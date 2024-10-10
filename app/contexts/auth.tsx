@@ -5,7 +5,7 @@ interface User {
   username: string;
   role: 'SuperAdmin' | 'Admin' | 'GeneralUser';
 }
-
+console.log("Auth")
 interface AuthContextType {
   user: string | null;
   role: 'SuperAdmin' | 'Admin' | 'GeneralUser' | null;

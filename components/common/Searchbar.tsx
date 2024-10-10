@@ -3,6 +3,8 @@ import React from 'react';
 import { Searchbar } from 'react-native-paper';
 import { StyleSheet } from 'react-native';
 
+console.log("SearchBar");
+
 const SearchBar = ({ value, onChange, placeholder }: any) => (
   <Searchbar
     placeholder={placeholder}

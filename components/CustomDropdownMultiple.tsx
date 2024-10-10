@@ -10,6 +10,7 @@ const CustomDropdownMultiple = ({ labels, values, title, data, selectedValue, on
   const [options, setOptions] = useState<{ label?: string; value?: string; icon?: () => JSX.Element }[]>([]);
   const [currentValue, setCurrentValue] = useState<string[]>(Array.isArray(selectedValue) ? selectedValue : []);
   const { spacing } = useRes();
+  console.log("CustomDropdownMultiple");
 
   const processData = useCallback(() => {
     if (data && Array.isArray(data)) {

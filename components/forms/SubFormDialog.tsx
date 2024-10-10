@@ -23,6 +23,7 @@ const SubFormDialog = ({
     onDelete,
 }: SubFormDialogProps<BaseSubForm>) => {
     const masterdataStyles = useMasterdataStyles();
+    console.log("SubFormDialog");
 
     return (
         <Portal>

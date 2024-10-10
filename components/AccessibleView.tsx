@@ -1,8 +1,9 @@
 import React from "react";
 import { View, Platform } from "react-native";
-import { AccessibleViewProps } from "@/typing/tag"
 
-const AccessibleView = ({ children, name, style }: AccessibleViewProps) => {
+const AccessibleView = ({ children, name, style }: any) => {
+    console.log("AccessibleView");
+
     return (
         <View
             style={style}

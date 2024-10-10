@@ -16,6 +16,7 @@ const DragTool: React.FC<{ checkListType: CheckListType[] }> = ({ checkListType 
     const createformStyles = useCreateformStyle();
     const masterdataStyles = useMasterdataStyles();
     const { spacing } = useRes();
+    console.log("DragTool");
 
     const handleDrop = (item: CheckListType) => {
         setGeneratedComponents((prev) => [...prev, item]);

@@ -8,6 +8,7 @@ interface ThemeProviderProps {
 interface ThemeContextProps {
   colors: ReturnType<typeof useThemeColor>;
 }
+console.log("them")
 
 export const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
 

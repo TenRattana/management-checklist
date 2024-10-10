@@ -29,6 +29,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [found, setFound] = useState<boolean>(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  console.log("InputFormMachine");
 
   const masterdataStyles = useMasterdataStyles();
   const { machineId } = route.params || {};

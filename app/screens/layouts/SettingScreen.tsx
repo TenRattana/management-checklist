@@ -7,6 +7,7 @@ const SettingsScreen: React.FC = () => {
   const [darkMode, setDarkMode] = useState<boolean>(false);
   const [fontSize, setFontSize] = useState<string>('medium');
   const [language, setLanguage] = useState<string>('en');
+  console.log("SettingsScreen");
 
   useEffect(() => {
     const loadSettings = async () => {

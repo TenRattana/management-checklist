@@ -25,6 +25,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
     const [initialDialog, setInitialDialog] = useState<boolean>(false)
     const [initialSubForm, setInitialSubForm] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", MachineID: "" });
     const [editMode, setEditMode] = useState<boolean>(false)
+    console.log("Dragsubform");
 
     const createform = useCreateformStyle();
     const { handleError } = useToast();

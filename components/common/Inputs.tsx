@@ -17,6 +17,7 @@ const Inputs: React.FC<InputProps> = ({
   lefticon,
   testId
 }) => {
+  console.log("Inputs");
 
   return (
     <AccessibleView

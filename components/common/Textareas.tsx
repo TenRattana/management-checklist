@@ -16,6 +16,8 @@ const Textareas = ({
     hint,
     testId
 }: TextareasProps) => {
+    console.log("Textareas");
+
     return (
         <AccessibleView style={styles.container}>
             <TextInput

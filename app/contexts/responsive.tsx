@@ -10,6 +10,7 @@ interface ResponsiveContextType {
     large: number;
   };
 }
+console.log("res")
 
 const ResponsiveContext = createContext<ResponsiveContextType | undefined>(undefined);
 

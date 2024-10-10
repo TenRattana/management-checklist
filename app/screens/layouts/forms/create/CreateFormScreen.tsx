@@ -19,6 +19,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
     const { state, dispatch, checkList, groupCheckListOption, checkListType, dataType } = useForm(route);
     const createform = useCreateformStyle();
     const masterdataStyles = useMasterdataStyles();
+    console.log("CreateFormScreen");
 
     const [initialSaveDialog, setInitialSaveDialog] = useState(false);
 

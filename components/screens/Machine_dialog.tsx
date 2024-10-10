@@ -21,6 +21,7 @@ const validationSchema = Yup.object().shape({
 const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData, dropmachine, machineGroup = [] }: MachineDialogProps<InitialValuesMachine, MachineGroup>) => {
     const masterdataStyles = useMasterdataStyles()
     const { colors } = useTheme()
+    console.log("Machine_dialog");
 
     return (
         <Portal>

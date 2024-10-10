@@ -25,6 +25,7 @@ const CheckListOptionScreen = () => {
         checkListOptionName: "",
         isActive: true,
     });
+    console.log("CheckListOptionScreen");
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();

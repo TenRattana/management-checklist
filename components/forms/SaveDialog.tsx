@@ -17,6 +17,7 @@ const SaveDialog = ({
 }: SaveDialogProps & { navigation: any }) => {
     const { handleError } = useToast();
     const masterdataStyles = useMasterdataStyles();
+    console.log("SaveDialog");
 
     const router = useRouter();
 

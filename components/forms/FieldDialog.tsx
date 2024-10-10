@@ -26,7 +26,8 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
     const [shouldRender, setShouldRender] = useState<string>("");
     const [shouldRenderDT, setShouldRenderDT] = useState<boolean>(false);
     const { colors } = useTheme()
-    console.log(editMode);
+    console.log("FieldDialog");
+
 
     const validationSchemaField = Yup.object().shape({
         CListID: Yup.string().required("The checklist field is required."),

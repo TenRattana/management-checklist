@@ -19,6 +19,7 @@ const Selects = ({
   if (!option || option.length === 0) {
     return null;
   }
+  console.log("Selects");
 
   return (
     <AccessibleView style={styles.container}>
