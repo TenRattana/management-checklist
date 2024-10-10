@@ -9,7 +9,6 @@ const CustomDropdownSingle = ({ labels, values, title, data, selectedValue = "",
     const [options, setOptions] = useState<{ label?: string; value?: string; icon?: () => JSX.Element }[]>([]);
     const [currentValue, setCurrentValue] = useState<string | null>(selectedValue || null);
     const [open, setOpen] = useState<boolean>(false);
-
     const processData = useCallback(() => {
         if (data && Array.isArray(data)) {
             return data.map((item) => ({

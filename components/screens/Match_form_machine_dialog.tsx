@@ -3,8 +3,8 @@ import { Pressable, Text } from "react-native";
 import { useTheme } from "@/app/contexts";
 import AccessibleView from "@/components/AccessibleView";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
-import { Portal, Switch, Dialog, HelperText } from "react-native-paper";
-import { Formik, Field } from "formik";
+import { Portal, Dialog, HelperText } from "react-native-paper";
+import { Formik, FastField } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { Form, Machine } from '@/typing/type'
@@ -35,11 +35,10 @@ const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initial
                             validateOnChange={true}
                             onSubmit={(values: InitialValuesMatchFormMachine) => saveData(values)}
                         >
-                            {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, dirty, isValid }) => (
+                            {({ handleSubmit, dirty, isValid }) => (
                                 <AccessibleView>
-                                    <Field
-                                        name="machineId"
-                                        component={({ field, form }: any) => (
+                                    <FastField name="machineId">
+                                        {({ field, form }: any) => (
                                             <AccessibleView style={masterdataStyles.containerInput}>
                                                 <CustomDropdownSingle
                                                     title="Machine"
@@ -48,26 +47,23 @@ const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initial
                                                     data={!isEditing
                                                         ? machine.filter((v) => v.IsActive) : dropmachine || []}
                                                     selectedValue={field.value}
-                                                    onValueChange={(value, icon) => {
-                                                        console.log(value);
-
+                                                    onValueChange={(value) => {
                                                         form.setFieldValue(field.name, value);
                                                         form.setTouched({ ...form.touched, [field.name]: true });
                                                     }}
-                                                    testId="machineId-mfmd"
+                                                    testId={`machineId-mfm`}
                                                 />
-                                                {touched.machineId && errors.machineId && (
-                                                    <HelperText type="error" visible={Boolean(touched.machineId && errors.machineId)} style={{ left: -10 }} testID="error-machineId-mfmd">
-                                                        {errors.machineId}
+                                                {form.touched.machineId && form.errors.machineId ? (
+                                                    <HelperText type="error" visible style={{ left: -10 }}>
+                                                        {form.errors.machineId}
                                                     </HelperText>
-                                                )}
+                                                ) : null}
                                             </AccessibleView>
                                         )}
-                                    />
+                                    </FastField>
 
-                                    <Field
-                                        name="formId"
-                                        component={({ field, form }: any) => (
+                                    <FastField name="formId">
+                                        {({ field, form }: any) => (
                                             <AccessibleView style={masterdataStyles.containerInput}>
                                                 <CustomDropdownSingle
                                                     title="Form"
@@ -76,22 +72,20 @@ const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initial
                                                     data={!isEditing
                                                         ? forms.filter((v) => v.IsActive) : dropform || []}
                                                     selectedValue={field.value}
-                                                    onValueChange={(value, icon) => {
-                                                        console.log(value);
-
+                                                    onValueChange={(value) => {
                                                         form.setFieldValue(field.name, value);
                                                         form.setTouched({ ...form.touched, [field.name]: true });
                                                     }}
-                                                    testId="formId-mfmd"
+                                                    testId={`formId-mfm`}
                                                 />
-                                                {touched.formId && errors.formId && (
-                                                    <HelperText type="error" visible={Boolean(touched.formId && errors.formId)} style={{ left: -10 }} testID="error-formId-mfmd">
-                                                        {errors.formId}
+                                                {form.touched.formId && form.errors.formId ? (
+                                                    <HelperText type="error" visible style={{ left: -10 }}>
+                                                        {form.errors.formId}
                                                     </HelperText>
-                                                )}
+                                                ) : null}
                                             </AccessibleView>
                                         )}
-                                    />
+                                    </FastField>
 
                                     <AccessibleView style={masterdataStyles.containerAction}>
                                         <Pressable

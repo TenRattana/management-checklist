@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
-import { MultiSelect } from 'react-native-element-dropdown';
+import { View, TextInput, Button, Text, StyleSheet, ScrollView } from 'react-native';
+import { Formik, useField } from 'formik';
+import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import * as Yup from 'yup'
+
+interface CustomInputProps {
+  label: string;
+  name: string;
+  value: string;
+}
 
 const data = [
   { label: 'Item 1', value: '1' },
@@ -14,82 +22,120 @@ const data = [
   { label: 'Item 8', value: '8' },
 ];
 
-const MultiSelectComponent = () => {
-  const [selected, setSelected] = useState([]);
-
-  const renderItem = (item: any) => {
-    return (
-      <View style={styles.item}>
-        <Text style={styles.selectedTextStyle}>{item.label}</Text>
-        <AntDesign style={styles.icon} color="black" name="Safety" size={20} />
-      </View>
-    );
-  };
+const CustomInput: React.FC<CustomInputProps> = React.memo(({ label, name, value }) => {
+  const [field, meta, { setTouched, setValue }] = useField(name);
 
   return (
-    <View style={styles.container}>
-      <MultiSelect
-        style={styles.dropdown}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={data}
-        labelField="label"
-        valueField="value"
-        placeholder="Select item"
-        value={selected}
-        search
-        searchPlaceholder="Search..."
-        onChange={item => {
-          setSelected(item);
+    <View>
+      <Text>{label}</Text>
+      <TextInput
+        {...field}
+        style={{
+          borderColor: meta.touched && meta.error ? 'red' : 'gray',
+          borderWidth: 1,
+          marginBottom: 10,
+          padding: 10,
         }}
-        renderLeftIcon={() => (
-          <AntDesign
-            style={styles.icon}
-            color="black"
-            name="Safety"
-            size={20}
-          />
-        )}
-        renderItem={renderItem}
-        renderSelectedItem={(item, unSelect) => (
-          <TouchableOpacity onPress={() => unSelect && unSelect(item)}>
-            <View style={styles.selectedStyle}>
-              <Text style={styles.textSelectedStyle}>{item.label}</Text>
-              <AntDesign color="black" name="delete" size={17} />
-            </View>
-          </TouchableOpacity>
-        )}
+        onChangeText={value => setValue(value)}
+        onBlur={() => setTouched(true)}
+        value={value}
       />
+      {meta.touched && meta.error ? (
+        <Text style={{ color: 'red' }}>{meta.error}</Text>
+      ) : null}
     </View>
   );
-};
+});
 
-export default MultiSelectComponent;
+const CustomDropdown: React.FC<{ name: string; data: { label: string; value: string }[] }> = React.memo(({ name, data }) => {
+  const [field, meta, helpers] = useField(name);
+
+  return (
+    <Dropdown
+      style={styles.dropdown}
+      placeholderStyle={styles.placeholderStyle}
+      selectedTextStyle={styles.selectedTextStyle}
+      inputSearchStyle={styles.inputSearchStyle}
+      iconStyle={styles.iconStyle}
+      data={data}
+      search
+      maxHeight={300}
+      labelField="label"
+      valueField="value"
+      placeholder="Select item"
+      searchPlaceholder="Search..."
+      value={field.value}
+      onChange={item => {
+        helpers.setValue(item.value);
+      }}
+      renderLeftIcon={() => (
+        <AntDesign style={styles.icon} color="black" name="Safety" size={20} />
+      )}
+    />
+  );
+});
+
+const validationSchemaField = Yup.object().shape({
+  CListID: Yup.string().required("The checklist field is required."),
+  CTypeID: Yup.string().required("The checklist type field is required."),
+  Placeholder: Yup.string().nullable(),
+  Hint: Yup.string().nullable(),
+  Required: Yup.boolean().required("The required field is required."),
+});
+
+const MyForm: React.FC = () => (
+  <Formik
+    initialValues={{ Placeholder: '', Hint: '' }}
+    validationSchema={validationSchemaField}
+    onSubmit={values => console.log(values)}
+  >
+    {({ handleSubmit }) => (
+      <ScrollView>
+        {["Placeholder", "Hint"].map((name, index) => {
+          const [field, meta, { setTouched, setValue }] = useField(name);
+          return (
+            <CustomInput label={field.name} name={field.name} key={`${name}-${index}`} value={field.value} onChange={(value) => setValue(value)} onBlur={() => setTouched(true)} />
+          )
+        })}
+        <Button onPress={() => handleSubmit()} title="Submit" />
+      </ScrollView>
+    )}
+  </Formik>
+
+  // <Formik
+  //   initialValues={{ input1: '', input2: '', dropdown: '' }}
+  //   onSubmit={(values) => {
+  //     console.log(values);
+  //   }}
+  // >
+  //   {({ handleSubmit }) => (
+  //     <View>
+  //       <CustomInput label="Input 1" name="input1" />
+  //       <CustomInput label="Input 2" name="input2" />
+  //       <CustomDropdown name="dropdown" data={data} />
+  //       <Button onPress={() => handleSubmit()} title="Submit" />
+  //     </View>
+  //   )}
+  // </Formik>
+);
+
+export default MyForm;
 
 const styles = StyleSheet.create({
-  container: { padding: 16 },
   dropdown: {
+    margin: 16,
     height: 50,
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 12,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-
-    elevation: 2,
+    borderBottomColor: 'gray',
+    borderBottomWidth: 0.5,
+  },
+  icon: {
+    marginRight: 5,
   },
   placeholderStyle: {
     fontSize: 16,
   },
   selectedTextStyle: {
-    fontSize: 14,
+    fontSize: 16,
   },
   iconStyle: {
     width: 20,
@@ -99,37 +145,56 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 16,
   },
-  icon: {
-    marginRight: 5,
-  },
-  item: {
-    padding: 17,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  selectedStyle: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 14,
-    backgroundColor: 'white',
-    shadowColor: '#000',
-    marginTop: 8,
-    marginRight: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-
-    elevation: 2,
-  },
-  textSelectedStyle: {
-    marginRight: 5,
-    fontSize: 16,
-  },
 });
+
+// import React from 'react';
+// import { View, Button, StyleSheet } from 'react-native';
+// import { Formik } from 'formik';
+// import { CustomDropdown, CustomInput } from './cm'
+
+// const data = [
+//   { label: 'Item 1', value: '1' },
+//   { label: 'Item 2', value: '2' },
+//   { label: 'Item 3', value: '3' },
+//   { label: 'Item 4', value: '4' },
+//   { label: 'Item 5', value: '5' },
+//   { label: 'Item 6', value: '6' },
+//   { label: 'Item 7', value: '7' },
+//   { label: 'Item 8', value: '8' },
+// ];
+
+// const MyForm: React.FC = () => (
+//   <View>
+//     <CustomInput label="Input 1" name="input1" />
+//     <CustomInput label="Input 2" name="input2" />
+//     <CustomDropdown name="dropdown" data={data} />
+//   </View>
+// );
+
+// export default MyForm;
+
+// const styles = StyleSheet.create({
+//   dropdown: {
+//     margin: 16,
+//     height: 50,
+//     borderBottomColor: 'gray',
+//     borderBottomWidth: 0.5,
+//   },
+//   icon: {
+//     marginRight: 5,
+//   },
+//   placeholderStyle: {
+//     fontSize: 16,
+//   },
+//   selectedTextStyle: {
+//     fontSize: 16,
+//   },
+//   iconStyle: {
+//     width: 20,
+//     height: 20,
+//   },
+//   inputSearchStyle: {
+//     height: 40,
+//     fontSize: 16,
+//   },
+// });

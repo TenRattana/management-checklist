@@ -4,7 +4,7 @@ import AccessibleView from "@/components/AccessibleView";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import { Inputs } from "@/components/common";
 import { Portal, Dialog, HelperText, Switch, IconButton } from "react-native-paper";
-import { Formik, Field } from "formik";
+import { Formik, FastField } from "formik";
 import Checklist_dialog from "../screens/Checklist_dialog";
 import { useTheme, useToast } from "@/app/contexts";
 import axiosInstance from "@/config/axios";
@@ -196,37 +196,32 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                             showsVerticalScrollIndicator={false}
                                             style={{ maxHeight: 330 }}
                                         >
-                                            <Field
-                                                name="CListID"
-                                                component={({ field, form }: any) => (
-                                                    <AccessibleView style={[masterdataStyles.containerInput]}>
+                                            <FastField name="CListID">
+                                                {({ field, form }: any) => (
+                                                    <AccessibleView style={masterdataStyles.containerInput}>
                                                         <CustomDropdownSingle
                                                             title="Check List"
                                                             labels="CListName"
                                                             values="CListID"
                                                             data={editMode ? checkList : dropcheckList}
                                                             selectedValue={field.value}
-                                                            onValueChange={(value, icon) => {
-
+                                                            onValueChange={(value) => {
                                                                 form.setFieldValue(field.name, value);
                                                                 form.setTouched({ ...form.touched, [field.name]: true });
                                                             }}
-                                                            iconRight={(
-                                                                <IconButton onPress={() => setIsVisibleCL(true)} icon="plus" />
-                                                            )}
+                                                            testId={`CListID-form`}
                                                         />
-                                                        {touched.CListID && errors.CListID ? (
-                                                            <HelperText type="error" visible={Boolean(touched.CListID && errors.CListID)} style={{ left: -10 }}>
-                                                                {errors.CListID}
+                                                        {form.touched.CListID && form.errors.CListID ? (
+                                                            <HelperText type="error" visible style={{ left: -10 }}>
+                                                                {form.errors.CListID}
                                                             </HelperText>
-                                                        ) : false}
+                                                        ) : null}
                                                     </AccessibleView>
                                                 )}
-                                            />
+                                            </FastField>
 
-                                            <Field
-                                                name="CTypeID"
-                                                component={({ field, form }: any) => (
+                                            <FastField name="CTypeID">
+                                                {({ field, form }: any) => (
                                                     <AccessibleView style={masterdataStyles.containerInput}>
                                                         <CustomDropdownSingle
                                                             title="Check List Type"
@@ -234,26 +229,25 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                             values="CTypeID"
                                                             data={editMode ? checkListType : dropcheckListType}
                                                             selectedValue={field.value}
-                                                            onValueChange={(value, icon) => {
-
+                                                            onValueChange={(value) => {
                                                                 form.setFieldValue(field.name, value);
                                                                 form.setTouched({ ...form.touched, [field.name]: true });
                                                             }}
+                                                            testId={`CTypeID-form`}
                                                         />
-                                                        {touched.CTypeID && errors.CTypeID ? (
-                                                            <HelperText type="error" visible={Boolean(touched.CTypeID && errors.CTypeID)} style={{ left: -10 }}>
-                                                                {errors.CTypeID}
+                                                        {form.touched.CTypeID && form.errors.CTypeID ? (
+                                                            <HelperText type="error" visible style={{ left: -10 }}>
+                                                                {form.errors.CTypeID}
                                                             </HelperText>
-                                                        ) : false}
+                                                        ) : null}
                                                     </AccessibleView>
                                                 )}
-                                            />
+                                            </FastField>
 
                                             {shouldRender === "detail" && (
                                                 <Animated.View style={[animatedDetail]}>
-                                                    <Field
-                                                        name="GCLOptionID"
-                                                        component={({ field, form }: any) => (
+                                                    <FastField name="GCLOptionID">
+                                                        {({ field, form }: any) => (
                                                             <AccessibleView style={masterdataStyles.containerInput}>
                                                                 <CustomDropdownSingle
                                                                     title="Match Check List Option Group"
@@ -265,23 +259,23 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                                         form.setFieldValue(field.name, value);
                                                                         form.setTouched({ ...form.touched, [field.name]: true });
                                                                     }}
+                                                                    testId={`GCLOptionID-form`}
                                                                 />
-                                                                {touched.GCLOptionID && errors.GCLOptionID ? (
+                                                                {form.touched.GCLOptionID && form.errors.GCLOptionID ? (
                                                                     <HelperText type="error" visible style={{ left: -10 }}>
-                                                                        {errors.GCLOptionID}
+                                                                        {form.errors.GCLOptionID}
                                                                     </HelperText>
-                                                                ) : false}
+                                                                ) : null}
                                                             </AccessibleView>
                                                         )}
-                                                    />
+                                                    </FastField>
                                                 </Animated.View>
                                             )}
 
                                             {shouldRender === "text" && (
                                                 <Animated.View style={[animatedText]}>
-                                                    <Field
-                                                        name="DTypeID"
-                                                        component={({ field, form }: any) => (
+                                                    <FastField name="DTypeID">
+                                                        {({ field, form }: any) => (
                                                             <AccessibleView style={masterdataStyles.containerInput}>
                                                                 <CustomDropdownSingle
                                                                     title="Data Type"
@@ -290,25 +284,24 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                                     data={editMode ? dataType : dropdataType}
                                                                     selectedValue={field.value}
                                                                     onValueChange={(value) => {
-
                                                                         form.setFieldValue(field.name, value);
                                                                         form.setTouched({ ...form.touched, [field.name]: true });
                                                                     }}
+                                                                    testId={`DTypeID-form`}
                                                                 />
-                                                                {touched.DTypeID && errors.DTypeID ? (
+                                                                {form.touched.DTypeID && form.errors.DTypeID ? (
                                                                     <HelperText type="error" visible style={{ left: -10 }}>
-                                                                        {errors.DTypeID}
+                                                                        {form.errors.DTypeID}
                                                                     </HelperText>
-                                                                ) : false}
+                                                                ) : null}
                                                             </AccessibleView>
                                                         )}
-                                                    />
+                                                    </FastField>
                                                 </Animated.View>
                                             )}
 
                                             {shouldRenderDT && (
                                                 <Animated.View style={[animatedStyleNumber]}>
-
                                                     <Inputs
                                                         placeholder="Digis Value"
                                                         label="DTypeValue"

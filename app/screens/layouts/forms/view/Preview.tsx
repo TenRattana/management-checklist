@@ -50,25 +50,24 @@ const Preview: React.FC<PreviewProps<PreviewParams>> = ({ route }) => {
                             <Card.Title title={subForm.SFormName} titleStyle={styles.cardTitle} />
                             <Card.Content style={styles.subFormContainer}>
                                 {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
-                                 const columns = subForm.Columns ?? 1;
-                                 const borderRightWidth = 1;
-                                 const totalBorderWidth = (columns - 1) * borderRightWidth; 
-                                 
-                                 const isLastColumn = (fieldIndex + 1) % columns === 0;
-                                 
-                                 const columnWidth = responsive === "small" 
-                                     ? "100" 
-                                     : 100 / columns;
-                                 
-                                 const containerStyle: ViewStyle = {
-                                     flexBasis: `${columnWidth}%`,
-                                     flexGrow: field.DisplayOrder || 1, 
-                                     padding: 5,
-                                    //  borderRightWidth: isLastColumn ? 0 : borderRightWidth, 
-                                     flexDirection: "row",
-                                     flexWrap: "nowrap", 
-                                 };
-                                 
+                                    const columns = subForm.Columns ?? 1;
+                                    const borderRightWidth = 1;
+                                    const totalBorderWidth = (columns - 1) * borderRightWidth;
+
+                                    const isLastColumn = (fieldIndex + 1) % columns === 0;
+
+                                    const columnWidth = responsive === "small"
+                                        ? "100"
+                                        : 100 / columns;
+
+                                    const containerStyle: ViewStyle = {
+                                        flexBasis: `${columnWidth}%`,
+                                        flexGrow: field.DisplayOrder || 1,
+                                        //  borderRightWidth: isLastColumn ? 0 : borderRightWidth, 
+                                        flexDirection: "row",
+                                        flexWrap: "nowrap",
+                                    };
+
                                     return (
                                         <AccessibleView
                                             key={`field-${fieldIndex}-${subForm.SFormName}`}
@@ -94,7 +93,6 @@ const Preview: React.FC<PreviewProps<PreviewParams>> = ({ route }) => {
 
 const styles = StyleSheet.create({
     container: {
-        padding: 16,
         flex: 1,
     },
     title: {

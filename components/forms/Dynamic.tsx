@@ -5,7 +5,7 @@ import { CheckListOption } from '@/typing/type';
 import AccessibleView from "../AccessibleView";
 import { DynamicFormProps } from "@/typing/tag";
 
-const DynamicForm = ({
+const DynamicForm = React.memo(({
   field,
   values,
   setFieldValue,
@@ -82,11 +82,11 @@ const DynamicForm = ({
   };
 
   return (
-    <AccessibleView>
+    <AccessibleView style={{ flex: 1 }}>
       <Text>{CListName}</Text>
       {renderField()}
     </AccessibleView>
   );
-};
+});
 
 export default DynamicForm;

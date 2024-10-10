@@ -18,7 +18,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
     const { state, dispatch, checkList, groupCheckListOption, checkListType, dataType } = useForm(route);
     const createform = useCreateformStyle();
     const masterdataStyles = useMasterdataStyles();
-    
+
     const [initialSaveDialog, setInitialSaveDialog] = useState(false);
     const [initialForm, setInitialForm] = useState<BaseForm>({
         FormID: "",
@@ -30,12 +30,12 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
     const formRef = useRef(initialForm);
 
     const handleChange = useCallback((fieldName: string, value: string) => {
-        const newForm = { ...formRef.current, [fieldName]: value }; 
-        formRef.current = newForm; 
-        setInitialForm(newForm); 
-        dispatch(updateForm({ form: newForm })); 
+        const newForm = { ...formRef.current, [fieldName]: value };
+        formRef.current = newForm;
+        setInitialForm(newForm);
+        dispatch(updateForm({ form: newForm }));
     }, [dispatch]);
-    
+
 
     useEffect(() => {
         const newForm: BaseForm = {
@@ -44,8 +44,8 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
             Description: state.Description || "",
             MachineID: state.MachineID || "",
         };
-        setInitialForm(newForm); 
-        formRef.current = newForm; 
+        setInitialForm(newForm);
+        formRef.current = newForm;
     }, [state]);
 
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -63,7 +63,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
     const handleSaveDialog = useCallback(() => {
         setInitialSaveDialog(false);
     }, []);
-console.log(state);
+    console.log(state);
 
     return (
         <GestureHandlerRootView style={{ flexGrow: 1 }}>

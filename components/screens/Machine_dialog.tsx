@@ -5,7 +5,7 @@ import AccessibleView from "@/components/AccessibleView";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import { Inputs } from "@/components/common";
 import { Portal, Switch, Dialog, HelperText } from "react-native-paper";
-import { Formik, Field } from "formik";
+import { Formik, FastField } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { MachineDialogProps, InitialValuesMachine } from '@/typing/value'
@@ -39,34 +39,29 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                         >
                             {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, dirty, isValid }) => (
                                 <AccessibleView>
-                                    <Field
-                                        name="machineGroupId"
-                                        component={({ field, form }: any) => (
+                                    <FastField name="machineGroupId">
+                                        {({ field, form }: any) => (
                                             <AccessibleView style={masterdataStyles.containerInput}>
                                                 <CustomDropdownSingle
                                                     title="Machine Group"
                                                     labels="MGroupName"
                                                     values="MGroupID"
-                                                    data={!isEditing
-                                                        ? machineGroup?.filter((v) => v.IsActive)
-                                                        : dropmachine || []}
+                                                    data={!isEditing ? machineGroup?.filter((v) => v.IsActive) : dropmachine || []}
                                                     selectedValue={field.value}
-                                                    onValueChange={(value, icon) => {
-                                                        console.log(value);
-
+                                                    onValueChange={(value) => {
                                                         form.setFieldValue(field.name, value);
                                                         form.setTouched({ ...form.touched, [field.name]: true });
                                                     }}
                                                     testId="machineGroupId-md"
                                                 />
-                                                {touched.machineGroupId && errors.machineGroupId && (
-                                                    <HelperText type="error" visible={Boolean(touched.machineGroupId && errors.machineGroupId)} style={{ left: -10 }} testID="error-machineGroupId-md">
-                                                        {errors.machineGroupId}
+                                                {form.touched.machineGroupId && form.errors.machineGroupId ? (
+                                                    <HelperText type="error" visible style={{ left: -10 }}>
+                                                        {form.errors.machineGroupId}
                                                     </HelperText>
-                                                )}
+                                                ) : null}
                                             </AccessibleView>
                                         )}
-                                    />
+                                    </FastField>
 
                                     <Inputs
                                         placeholder="Enter Machine Group Name"

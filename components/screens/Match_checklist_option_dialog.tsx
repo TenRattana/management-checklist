@@ -5,7 +5,7 @@ import AccessibleView from "@/components/AccessibleView";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import CustomDropdownMultiple from "@/components/CustomDropdownMultiple";
 import { Portal, Switch, Dialog, HelperText, Chip } from "react-native-paper";
-import { Formik, Field } from "formik";
+import { Formik, FastField } from "formik";
 import * as Yup from 'yup';
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { CheckListOption, GroupCheckListOption } from '@/typing/type';
@@ -55,9 +55,8 @@ const Match_checklist_option = ({
                         >
                             {({ values, errors, touched, handleSubmit, setFieldValue, dirty, isValid }) => (
                                 <AccessibleView>
-                                    <Field
-                                        name="groupCheckListOptionId"
-                                        component={({ field, form }: any) => (
+                                    <FastField name="groupCheckListOptionId">
+                                        {({ field, form }: any) => (
                                             <AccessibleView style={masterdataStyles.containerInput}>
                                                 <CustomDropdownSingle
                                                     title="Group Check List Option"
@@ -73,18 +72,17 @@ const Match_checklist_option = ({
                                                     }}
                                                     testId="groupCheckListOptionId-mcod"
                                                 />
-                                                {touched.groupCheckListOptionId && errors.groupCheckListOptionId && (
-                                                    <HelperText type="error" visible={Boolean(touched.groupCheckListOptionId && errors.groupCheckListOptionId)} style={{ left: -10 }} testID="error-groupCheckListOptionId-mcod">
-                                                        {errors.groupCheckListOptionId}
+                                                {form.touched.groupCheckListOptionId && form.errors.groupCheckListOptionId ? (
+                                                    <HelperText type="error" visible style={{ left: -10 }}>
+                                                        {form.errors.groupCheckListOptionId}
                                                     </HelperText>
-                                                )}
+                                                ) : null}
                                             </AccessibleView>
                                         )}
-                                    />
+                                    </FastField>
 
-                                    <Field
-                                        name="checkListOptionId"
-                                        component={({ field, form }: any) => (
+                                    <FastField name="checkListOptionId">
+                                        {({ field, form }: any) => (
                                             <AccessibleView style={masterdataStyles.containerInput}>
                                                 <CustomDropdownMultiple
                                                     title="Check List Option"
@@ -95,18 +93,17 @@ const Match_checklist_option = ({
                                                     onValueChange={(value) => {
                                                         form.setFieldValue(field.name, value);
                                                         form.setTouched({ ...form.touched, [field.name]: true });
-
                                                     }}
                                                     testId="checkListOptionId-mcod"
                                                 />
-                                                {touched.checkListOptionId && errors.checkListOptionId && (
-                                                    <HelperText type="error" visible={Boolean(touched.checkListOptionId && errors.checkListOptionId)} style={{ left: -10 }} testID="error-checkListOptionId-mcod">
-                                                        {errors.checkListOptionId}
+                                                {form.touched.checkListOptionId && form.errors.checkListOptionId ? (
+                                                    <HelperText type="error" visible style={{ left: -10 }}>
+                                                        {form.errors.checkListOptionId}
                                                     </HelperText>
-                                                )}
+                                                ) : null}
                                             </AccessibleView>
                                         )}
-                                    />
+                                    </FastField>
 
                                     <AccessibleView style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
