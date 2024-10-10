@@ -13,6 +13,7 @@ const SearchBar = ({ value, onChange, placeholder }: any) => (
     style={styles.searchbar}
     iconColor="#007AFF"
     placeholderTextColor="#a0a0a0"
+    testID={`search-${placeholder}`}
   />
 );
 

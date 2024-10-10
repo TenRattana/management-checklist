@@ -1,235 +1,197 @@
-// import React, { useState } from "react";
-// import {
-//   View,
-//   Text,
-//   TextInput,
-//   StyleSheet,
-//   Dimensions,
-//   Pressable
-// } from "react-native";
-// import { PanGestureHandler, PanGestureHandlerGestureEvent } from "react-native-gesture-handler";
-// import DraggableFlatList, { ScaleDecorator } from "react-native-draggable-flatlist";
-// import Animated, {
-//   useSharedValue,
-//   useAnimatedStyle,
-//   withSpring,
-//   runOnJS,
-// } from "react-native-reanimated";
+import React, { useState, useRef } from "react";
+import { View, Text, StyleSheet, Alert, LayoutRectangle } from "react-native";
+import { PanGestureHandler } from "react-native-gesture-handler";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, runOnJS } from "react-native-reanimated";
 
-// // Menu items to be dragged
-// const menuItems = [
-//   { id: "1", name: "Text", type: "text", color: "#ffcccb" },
-//   { id: "2", name: "TextInput", type: "textinput", color: "#add8e6" },
-//   { id: "3", name: "Dropdown", type: "dropdown", color: "#90ee90" },
-//   { id: "4", name: "Checkbox", type: "checkbox", color: "#ffe4e1" },
-// ];
-
-// const { width } = Dimensions.get("window");
-
-// const DragAndDropForm = () => {
-//   const [generatedComponents, setGeneratedComponents] = useState<any[]>([]);
-//   const [draggedItem, setDraggedItem] = useState<any>(null);
-//   const translateX = useSharedValue(0);
-//   const translateY = useSharedValue(0);
-//   const isDropped = useSharedValue(false);
-//   console.log("DragAndDropForm");
-
-//   const handleDrop = () => {
-//     if (draggedItem && !isDropped.value) {
-//       runOnJS(setGeneratedComponents)((prev) => [...prev, draggedItem]);
-//     }
-//   };
-
-//   const animatedStyle = useAnimatedStyle(() => {
-//     return {
-//       transform: [
-//         { translateX: withSpring(translateX.value) },
-//         { translateY: withSpring(translateY.value) },
-//       ],
-//     };
-//   });
-
-//   const renderMenuItem = (item: any) => {
-//     const itemTranslateX = useSharedValue(0);
-//     const itemTranslateY = useSharedValue(0);
-
-//     const itemAnimatedStyle = useAnimatedStyle(() => {
-//       return {
-//         transform: [
-//           { translateX: withSpring(itemTranslateX.value) },
-//           { translateY: withSpring(itemTranslateY.value) },
-//         ],
-//       };
-//     });
-
-//     return (
-//       <PanGestureHandler
-//         key={item.id}
-//         onGestureEvent={(e: PanGestureHandlerGestureEvent) => {
-//           itemTranslateX.value = e.nativeEvent.translationX;
-//           itemTranslateY.value = e.nativeEvent.translationY;
-
-//           setDraggedItem(item);
-//         }}
-//         onEnded={(e: PanGestureHandlerGestureEvent) => {
-//           if (e.nativeEvent.absoluteX > width / 2) {
-//             handleDrop();
-//           }
-//           itemTranslateX.value = 0;
-//           itemTranslateY.value = 0;
-//         }}
-//       >
-//         <Animated.View
-//           style={[styles.menuItem, { backgroundColor: item.color }, itemAnimatedStyle]}
-//         >
-//           <Text style={styles.menuItemText}>{item.name}</Text>
-//         </Animated.View>
-//       </PanGestureHandler>
-//     );
-//   };
-
-//   const renderComponent = ({ item, drag, isActive }: { item: any; drag: () => void; isActive: boolean; }) => {
-//     const backgroundColor = item.color || "#fff";
-
-//     let type: React.ReactNode = null;
-
-//     switch (item.type) {
-//       case "text":
-//         type = (
-//           <Text key={`GeneratedText-${item.id}`} style={[styles.generatedText, { backgroundColor }]}>
-//             This is a Text
-//           </Text>
-//         );
-//         break;
-
-//       case "textinput":
-//         type = (
-//           <TextInput
-//             key={`GeneratedInput-${item.id}`}
-//             style={[styles.generatedInput, { backgroundColor }]}
-//             placeholder="Text Input"
-//           />
-//         );
-//         break;
-
-//       case "dropdown":
-//         type = (
-//           <Text key={`GeneratedDropdown-${item.id}`} style={[styles.generatedText, { backgroundColor }]}>
-//             Dropdown Component (replace with Picker)
-//           </Text>
-//         );
-//         break;
-
-//       case "checkbox":
-//         type = (
-//           <Text key={`GeneratedCheckbox-${item.id}`} style={[styles.generatedText, { backgroundColor }]}>
-//             Checkbox Component (replace with Checkbox)
-//           </Text>
-//         );
-//         break;
-//     }
-
-//     return (
-//       <ScaleDecorator>
-//         <Pressable
-//           onLongPress={drag}
-//           disabled={isActive}
-//         >
-//           {type}
-//         </Pressable>
-//       </ScaleDecorator>
-//     );
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       {/* Left side: Menu */}
-//       <View style={styles.leftPane}>
-//         <Text style={styles.header}>Menu</Text>
-//         {menuItems.map((item) => renderMenuItem(item))}
-//       </View>
-
-//       {/* Right side: Generated components */}
-//       <View style={styles.rightPane}>
-//         <Text style={styles.header}>Generated Components</Text>
-
-//         <DraggableFlatList
-//           data={generatedComponents}
-//           renderItem={renderComponent}
-//           onDragEnd={({ data }) => setGeneratedComponents(data)}
-//           keyExtractor={(item, index) => `SF-${item.id}-${index}`}
-//           showsVerticalScrollIndicator={false}
-//           activationDistance={1}
-//         />
-//       </View>
-//     </View>
-//   );
-// };
-
-// // Styles
-// const styles = StyleSheet.create({
-//   container: {
-//     flexDirection: "row",
-//     flex: 1,
-//     padding: 10,
-//   },
-//   leftPane: {
-//     flex: 1,
-//     padding: 10,
-//     borderRightWidth: 1,
-//     borderColor: "#ddd",
-//     backgroundColor: "#f9f9f9",
-//   },
-//   rightPane: {
-//     flex: 2,
-//     padding: 10,
-//   },
-//   header: {
-//     fontSize: 18,
-//     marginBottom: 10,
-//     fontWeight: "bold",
-//   },
-//   menuItem: {
-//     marginBottom: 10,
-//     borderRadius: 8,
-//     overflow: "hidden",
-//     elevation: 4,
-//     shadowColor: "#000",
-//     shadowOffset: { width: 0, height: 1 },
-//     shadowOpacity: 0.2,
-//     shadowRadius: 1,
-//   },
-//   menuItemText: {
-//     padding: 15,
-//     textAlign: "center",
-//     color: "#333",
-//     fontWeight: "500",
-//   },
-//   generatedText: {
-//     padding: 15,
-//     marginBottom: 10,
-//     borderRadius: 5,
-//   },
-//   generatedInput: {
-//     borderWidth: 1,
-//     borderColor: "#ddd",
-//     padding: 10,
-//     marginBottom: 10,
-//     borderRadius: 5,
-//   },
-// });
-
-// export default DragAndDropForm;
-import { StyleSheet, Text } from 'react-native'
-import React from 'react'
-import AccessibleView from "@/components/AccessibleView";
-
-export default function TestScreen() {
-  return (
-    <AccessibleView name="test">
-      <Text>TestScreen</Text>
-    </AccessibleView>
-  )
+interface Tool {
+    id: string;
+    type: string;
+    label: string;
 }
 
-const styles = StyleSheet.create({})
+interface CardItem {
+    id: string;
+    type: string;
+    label: string;
+}
+
+interface Card {
+    id: string;
+    type: string;
+    columns: number;
+    items: CardItem[];
+    layout: LayoutRectangle | null; 
+}
+
+const tools: Tool[] = [
+    { id: "1", type: "card", label: "Card" },
+    { id: "2", type: "text", label: "Text" },
+    { id: "3", type: "textinput", label: "Text Input" },
+    { id: "4", type: "radio", label: "Radio" },
+];
+
+const ToolItem: React.FC<{ tool: Tool; onDrop: (tool: Tool, x: number, y: number) => void }> = ({ tool, onDrop }) => {
+    const translateX = useSharedValue(0);
+    const translateY = useSharedValue(0);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ translateX: translateX.value }, { translateY: translateY.value }],
+    }));
+
+    const onGestureEvent = (event: any) => {
+        translateX.value = event.nativeEvent.translationX;
+        translateY.value = event.nativeEvent.translationY;
+    };
+
+    const onGestureEnd = (event: any) => {
+        const { absoluteX, absoluteY } = event.nativeEvent;
+        runOnJS(onDrop)(tool, absoluteX, absoluteY);
+
+        translateX.value = withSpring(0);
+        translateY.value = withSpring(0);
+    };
+
+    return (
+        <PanGestureHandler onGestureEvent={onGestureEvent} onEnded={onGestureEnd}>
+            <Animated.View style={[styles.toolItem, animatedStyle]}>
+                <Text>{tool.label}</Text>
+            </Animated.View>
+        </PanGestureHandler>
+    );
+};
+
+const CreateFormScreen: React.FC = () => {
+    const [cards, setCards] = useState<Card[]>([]);
+    const [nextCardId, setNextCardId] = useState(1);
+
+    const handleDrop = (tool: Tool, x: number, y: number) => {
+        if (tool.type === "card") {
+            setCards((prev) => [
+                ...prev,
+                { id: `card-${nextCardId}`, type: "card", columns: 1, items: [], layout: null }, 
+            ]);
+            setNextCardId(nextCardId + 1);
+        } else {
+            const cardIndex = cards.findIndex((card) => {
+                const layout = card.layout;
+                return layout && x >= layout.x && x <= layout.x + layout.width && y >= layout.y && y <= layout.y + layout.height;
+            });
+
+            if (cardIndex >= 0) {
+                addItemToCard(cards[cardIndex].id, tool);
+            } else {
+                Alert.alert("Error", "You must drop the item inside a card!");
+            }
+        }
+    };
+
+    const addItemToCard = (cardId: string, item: Tool) => {
+        setCards((prev) => {
+            return prev.map((card) => {
+                if (card.id === cardId) {
+                    const newItem: CardItem = { id: Date.now().toString(), type: item.type, label: item.label };
+                    return { ...card, items: [...card.items, newItem] };
+                }
+                return card;
+            });
+        });
+    };
+
+    const onCardLayout = (cardId: string, layout: LayoutRectangle) => {
+        setCards((prev) =>
+            prev.map((card) =>
+                card.id === cardId ? { ...card, layout } : card
+            )
+        );
+    };
+
+    return (
+        <View style={styles.container}>
+            <View style={styles.leftPane}>
+                {tools.map((tool) => (
+                    <ToolItem key={tool.id} tool={tool} onDrop={handleDrop} />
+                ))}
+            </View>
+            <View style={styles.rightPane}>
+                {cards.map((card) => (
+                    <Card key={card.id} card={card} onLayout={(layout) => onCardLayout(card.id, layout)} />
+                ))}
+            </View>
+        </View>
+    );
+};
+
+const Card: React.FC<{ card: Card; onLayout: (layout: LayoutRectangle) => void }> = ({ card, onLayout }) => {
+    const cardRef = useRef<View>(null);
+
+    const handleLayout = () => {
+        if (cardRef.current) {
+            cardRef.current.measure((x, y, width, height, pageX, pageY) => {
+                onLayout({ x: pageX, y: pageY, width, height });
+            });
+        }
+    };
+
+    return (
+        <View ref={cardRef} style={styles.card} onLayout={handleLayout}>
+            <Text style={styles.cardTitle}>Card</Text>
+            <View style={styles.cardContent}>
+                {card.items.map((item) => (
+                    <Text key={item.id} style={styles.cardItem}>
+                        {item.label}
+                    </Text>
+                ))}
+            </View>
+        </View>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        flexDirection: "row",
+        flex: 1,
+    },
+    leftPane: {
+        width: "30%",
+        backgroundColor: "#f0f0f0",
+        padding: 10,
+    },
+    rightPane: {
+        width: "70%",
+        padding: 10,
+        backgroundColor: "#fff",
+        position: "relative",
+    },
+    toolItem: {
+        padding: 10,
+        marginVertical: 5,
+        backgroundColor: "#e0e0e0",
+        borderRadius: 5,
+    },
+    card: {
+        borderWidth: 1,
+        borderColor: "#ccc",
+        borderRadius: 5,
+        padding: 10,
+        marginBottom: 10,
+        width: "100%",
+        minHeight: 100,
+        position: "relative",
+    },
+    cardTitle: {
+        fontWeight: "bold",
+        marginBottom: 5,
+    },
+    cardContent: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+    },
+    cardItem: {
+        margin: 5,
+        padding: 5,
+        backgroundColor: "#d0d0d0",
+        borderRadius: 3,
+    },
+});
+
+export default CreateFormScreen;

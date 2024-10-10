@@ -103,8 +103,9 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                                 </AccessibleView>
 
                                 <Divider />
-                                {checkListType && (
-                                    <DragTool checkListType={checkListType} />
+
+                               {checkListType && (
+                                    <DragTool checkListType={checkListType}/>
                                 )}
 
                                 <SaveDialog

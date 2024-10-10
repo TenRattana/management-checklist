@@ -192,12 +192,12 @@ const MenuSection = ({ title, isOpen, onToggle, items, navigation }: any) => {
   );
 };
 
-type ComponentNames = 'TestScreen' | 'Form' | 'Expected_result' | 'Create_form' | 'Machine_group' |
+type ComponentNames = 'Test' | 'Form' | 'Expected_result' | 'Create_form' | 'Machine_group' |
   'Machine' | 'Match_checklist_option' | 'Match_form_machine' | 'Checklist' |
   'InputFormMachine' | 'Preview' | 'Checklist_option' | 'Checklist_group';
 
 const components: Record<ComponentNames, () => Promise<{ default: React.ComponentType<any> }>> = {
-  TestScreen: () => import('@/app/screens/TestScreen'),
+  Test: () => import('@/app/screens/TestScreen'),
   Form: () => import('@/app/screens/layouts/forms/form/FormScreen'),
   Expected_result: () => import('@/app/screens/layouts/transitions/expected_result/ExpectedResultScreen'),
   Create_form: () => import('@/app/screens/layouts/forms/create/CreateFormScreen'),
