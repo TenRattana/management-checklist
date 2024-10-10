@@ -2,16 +2,18 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "module": "esnext",
+    "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["*"]
     }
   },
   "include": [
+    "app/**/*",
+    "components/**/*",
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "components/common/index.js", "app/index.js", "app/+not-found.js", "app/_layout.js", "app/navigations/Navigation.js", "app/contexts/auth.js", "app/contexts/toastify.js"  ]
+  ]
 }

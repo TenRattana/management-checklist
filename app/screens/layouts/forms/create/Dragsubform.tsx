@@ -169,4 +169,4 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
     )
 }
 
-export default Dragsubform
+export default React.memo(Dragsubform)

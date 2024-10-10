@@ -4,7 +4,7 @@ import { StyleSheet } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import { InputProps } from "@/typing/tag";
 
-const Inputs = React.memo(({
+const Inputs: React.FC<InputProps> = ({
   placeholder,
   label,
   error,
@@ -16,7 +16,7 @@ const Inputs = React.memo(({
   mode,
   lefticon,
   testId
-}: InputProps) => {
+}) => {
 
   return (
     <AccessibleView
@@ -49,9 +49,9 @@ const Inputs = React.memo(({
       </HelperText>
     </AccessibleView>
   );
-});
+};
 
-export default Inputs;
+export default React.memo(Inputs);
 
 const style = StyleSheet.create({
   containerInput: {

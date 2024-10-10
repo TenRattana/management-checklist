@@ -171,4 +171,4 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
     );
 }
 
-export default Dragfield;
+export default React.memo(Dragfield);

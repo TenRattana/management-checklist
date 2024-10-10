@@ -1,32 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Text, Pressable, StyleSheet } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { ActivityIndicator, IconButton } from 'react-native-paper';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import {
-  HomeScreen,
-  LoginScreen,
-  AdminScreen,
-  SuperAdminScreen,
-  UserScreen,
-  TestScreen,
-  FormScreen,
-  ExpectedResultScreen,
-  CreateFormScreen,
-  MachineGroupScreen,
-  MachineScreen,
-  MatchCheckListOptionScreen,
-  MatchFormMachineScreen,
-  CheckListScreen,
-  ScanQR,
-  GenerateQR,
-  InputFormMachine,
-  Managepermissions,
-  SettingScreen,
-  PreviewScreen,
-  CheckListOptionScreen,
-  ChecklistGroupScreen,
-} from "@/app/screens";
+const HomeScreen = lazy(() => import('@/app/screens/layouts/HomeScreen'));
+const LoginScreen = lazy(() => import('@/app/screens/layouts/LoginScreen'));
+const AdminScreen = lazy(() => import('@/app/screens/admin/AdminScreen'));
+const SuperAdminScreen = lazy(() => import('@/app/screens/SAdmin/SuperAdminScreen'));
+const UserScreen = lazy(() => import('@/app/screens/UserScreen'));
+const TestScreen = lazy(() => import('@/app/screens/TestScreen'));
+const FormScreen = lazy(() => import('@/app/screens/layouts/forms/form/FormScreen'));
+const ExpectedResultScreen = lazy(() => import('@/app/screens/layouts/transitions/expected_result/ExpectedResultScreen'));
+const CreateFormScreen = lazy(() => import('@/app/screens/layouts/forms/create/CreateFormScreen'));
+const MachineGroupScreen = lazy(() => import('@/app/screens/layouts/machines/machine_group/MachineGroupScreen'));
+const MachineScreen = lazy(() => import('@/app/screens/layouts/machines/machine/MachineScreen'));
+const MatchCheckListOptionScreen = lazy(() => import('@/app/screens/layouts/matchs/match_checklist_option/MatchCheckListOptionScreen'));
+const MatchFormMachineScreen = lazy(() => import('@/app/screens/layouts/matchs/match_form_machine/MatchFormMachineScreen'));
+const CheckListScreen = lazy(() => import('@/app/screens/layouts/checklists/checklist/CheckListScreen'));
+const ScanQR = lazy(() => import('@/app/screens/layouts/actions/camera/ScanQR'));
+const GenerateQR = lazy(() => import('@/app/screens/layouts/actions/action/GenerateQR'));
+const InputFormMachine = lazy(() => import('@/app/screens/layouts/forms/Scan/InputFormMachine'));
+const Managepermissions = lazy(() => import('@/app/screens/SAdmin/Managepermissions'));
+const SettingScreen = lazy(() => import('@/app/screens/layouts/SettingScreen'));
+const PreviewScreen = lazy(() => import('@/app/screens/layouts/forms/view/Preview'));
+const CheckListOptionScreen = lazy(() => import('@/app/screens/layouts/checklists/checklist_option/CheckListOptionScreen'));
+const ChecklistGroupScreen = lazy(() => import('@/app/screens/layouts/checklists/checklist_group/ChecklistGroupScreen'));
+
 import { useAuth } from "@/app/contexts/auth";
 import { AccessibleView } from '@/components';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -298,23 +297,25 @@ const App = () => {
   ];
 
   return (
-    <Drawer.Navigator drawerContent={(props) => <CustomDrawerContent {...props} />}>
-      <Drawer.Screen name={user ? "Home" : "Login"} component={user ? HomeScreen : LoginScreen} />
+    <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+      <Drawer.Navigator drawerContent={(props) => <CustomDrawerContent {...props} />}>
+        <Drawer.Screen name={user ? "Home" : "Login"} component={user ? HomeScreen : LoginScreen} />
 
-      {user && (
-        <>
-          {(role === "SuperAdmin" || role === "Admin") && adminScreens.map((screen) => (
-            <Drawer.Screen key={screen.name} name={screen.name} component={screen.component as any} />
-          ))}
-          {role === "SuperAdmin" && superAdminScreens.map((screen) => (
-            <Drawer.Screen key={screen.name} name={screen.name} component={screen.component as any} />
-          ))}
-          {role === "GeneralUser" && generalUserScreens.map((screen) => (
-            <Drawer.Screen key={screen.name} name={screen.name} component={screen.component as any} />
-          ))}
-        </>
-      )}
-    </Drawer.Navigator>
+        {user && (
+          <>
+            {(role === "SuperAdmin" || role === "Admin") && adminScreens.map((screen) => (
+              <Drawer.Screen key={screen.name} name={screen.name} component={screen.component as any} />
+            ))}
+            {role === "SuperAdmin" && superAdminScreens.map((screen) => (
+              <Drawer.Screen key={screen.name} name={screen.name} component={screen.component as any} />
+            ))}
+            {role === "GeneralUser" && generalUserScreens.map((screen) => (
+              <Drawer.Screen key={screen.name} name={screen.name} component={screen.component as any} />
+            ))}
+          </>
+        )}
+      </Drawer.Navigator>
+    </Suspense>
   );
 }
 

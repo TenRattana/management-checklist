@@ -62,6 +62,9 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
         }
     };
 
+    const itemHeight = 88;
+    const itemHeightN = itemHeight * 3
+
     const opacityT = useSharedValue(0);
     const heightT = useSharedValue(0);
 
@@ -97,13 +100,13 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
 
         if (shouldRender === "text") {
             opacityT.value = withTiming(1, { duration: 300 });
-            heightT.value = withTiming(70, { duration: 300 });
+            heightT.value = withTiming(itemHeight, { duration: 300 });
         } else if (shouldRender === "detail") {
             opacityT.value = withTiming(0, { duration: 200 });
             heightT.value = withTiming(0, { duration: 200 });
             setTimeout(() => {
                 opacityD.value = withTiming(1, { duration: 100 });
-                heightD.value = withTiming(70, { duration: 100 });
+                heightD.value = withTiming(itemHeight, { duration: 100 });
             }, 300);
         } else {
             opacityT.value = withTiming(0, { duration: 300 });
@@ -119,7 +122,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
 
         if (shouldRender) {
             opacityN.value = withTiming(1, { duration: 300 });
-            heightN.value = withTiming(260, { duration: 300 });
+            heightN.value = withTiming(itemHeightN, { duration: 300 });
         } else {
             setTimeout(() => {
                 opacityN.value = withTiming(0, { duration: 300 });

@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ScrollView, Pressable, Text } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme, useRes } from "@/app/contexts";
-import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
-import { Card, Divider, Searchbar } from "react-native-paper";
+import { Customtable, LoadingSpinner, AccessibleView, Searchbar } from "@/components";
+import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { FormScreenProps } from "@/typing/tag";
 import { Form } from "@/typing/type";
@@ -52,9 +52,10 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation, route }) => {
     }, [searchQuery]);
 
     useEffect(() => {
-        if (messages)
-            showSuccess(String(messages))
-    }, [messages])
+        if (messages) {
+            showSuccess(String(messages));
+        }
+    }, [messages]);
 
     const handleAction = async (action?: string, item?: string) => {
         try {
@@ -101,7 +102,7 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation, route }) => {
         { label: "Copy Template", align: "center" },
         { label: "Preview", align: "center" },
     ];
-
+    console.log('Form')
     const actionIndex = [
         {
             changeIndex: 3,
@@ -135,9 +136,6 @@ const FormScreen: React.FC<FormScreenProps> = (({ navigation, route }) => {
                         placeholder="Search Machine..."
                         value={searchQuery}
                         onChangeText={handleChange}
-                        style={masterdataStyles.searchbar}
-                        iconColor="#007AFF"
-                        placeholderTextColor="#a0a0a0"
                     />
                     <Pressable
                         onPress={handleNewForm}

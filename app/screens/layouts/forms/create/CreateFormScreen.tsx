@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Pressable } from "react-native";
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
+import { GestureHandlerRootView, PanGestureHandler, PanGestureHandlerGestureEvent } from "react-native-gesture-handler";
+import { Dimensions, Pressable, FlatList } from "react-native";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS } from "react-native-reanimated";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
-import { Text } from "react-native-paper";
+import { IconButton, Text, Divider } from "react-native-paper";
 import useCreateformStyle from "@/styles/createform";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import useForm from "@/hooks/custom/useForm";
@@ -13,6 +13,7 @@ import Preview from "@/app/screens/layouts/forms/view/Preview";
 import { CreateFormProps } from "@/typing/tag";
 import { BaseForm } from "@/typing/form";
 import { updateForm } from "@/slices";
+import DragTool from "./DragTool";
 
 const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
     const { state, dispatch, checkList, groupCheckListOption, checkListType, dataType } = useForm(route);
@@ -20,22 +21,22 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
     const masterdataStyles = useMasterdataStyles();
 
     const [initialSaveDialog, setInitialSaveDialog] = useState(false);
-    const [initialForm, setInitialForm] = useState<BaseForm>({
+
+    const formRef = useRef<BaseForm>({
         FormID: "",
         FormName: "",
         Description: "",
         MachineID: "",
     });
 
-    const formRef = useRef(initialForm);
+    const [initialForm, setInitialForm] = useState<BaseForm>(formRef.current);
 
-    const handleChange = useCallback((fieldName: string, value: string) => {
+    const handleChange = useCallback((fieldName: keyof BaseForm, value: string) => {
         const newForm = { ...formRef.current, [fieldName]: value };
         formRef.current = newForm;
         setInitialForm(newForm);
         dispatch(updateForm({ form: newForm }));
     }, [dispatch]);
-
 
     useEffect(() => {
         const newForm: BaseForm = {
@@ -63,7 +64,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
     const handleSaveDialog = useCallback(() => {
         setInitialSaveDialog(false);
     }, []);
-    console.log(state);
 
     return (
         <GestureHandlerRootView style={{ flexGrow: 1 }}>
@@ -76,11 +76,12 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                             const newIndex = event.nativeEvent.selectedSegmentIndex;
                             setSelectedIndex(newIndex);
                         }}
+                        style={{ height: 40, marginVertical: 20, borderRadius: 0 }}
                     />
                     <Animated.View style={[animatedStyle]}>
                         {selectedIndex === 0 ? (
-                            <AccessibleView style={{ padding: 20 }}>
-                                <AccessibleView style={{ padding: 0 }}>
+                            <>
+                                <AccessibleView>
                                     <Inputs
                                         placeholder="Enter Content Name"
                                         label="Content Name"
@@ -93,7 +94,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                                         handleChange={(value) => handleChange("Description", value)}
                                         value={initialForm.Description}
                                     />
-
                                     <AccessibleView style={masterdataStyles.containerAction}>
                                         <Pressable onPress={() => setInitialSaveDialog(true)} style={createform.saveButton}>
                                             <Text style={createform.saveButtonText}>Save Form</Text>
@@ -101,13 +101,18 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                                     </AccessibleView>
                                 </AccessibleView>
 
+                                <Divider />
+                                {checkListType && (
+                                    <DragTool checkListType={checkListType} />
+                                )}
+
                                 <SaveDialog
                                     state={state}
                                     isVisible={initialSaveDialog}
                                     setIsVisible={handleSaveDialog}
                                     navigation={navigation}
                                 />
-                            </AccessibleView>
+                            </>
                         ) : (
                             <Dragsubform
                                 navigation={navigation}
