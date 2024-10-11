@@ -15,6 +15,7 @@ import { BaseForm } from "@/typing/form";
 import { updateForm } from "@/slices";
 import { CheckListType } from "@/typing/type";
 import { useRes } from "@/app/contexts";
+import { defaultDataForm } from "@/slices";
 
 const DraggableItem: React.FC<{
     item: CheckListType;
@@ -112,12 +113,12 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
     const childRef = useRef<any>()
 
     const handleDrop = (item: CheckListType, x: number, y: number) => {
-        console.log(item, x, y);
-
         const cardIndex = childRef.current.checkCardPosition(x, y);
 
         if (cardIndex >= 0) {
-            const card = state.subForms[cardIndex];
+            const SFormID = state.subForms[cardIndex].SFormID;
+            const CL = checkList.find((v) => v.CListID === 'CL000') || checkList[0]
+            dispatch(defaultDataForm({ item, SFormID, checkList: CL, dataType }))
         } else {
             Alert.alert("Error", "You must drop the item inside a card!");
         }

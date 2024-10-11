@@ -264,7 +264,49 @@ const subFormSlice = createSlice({
     //   });
     // },
     reset: () => initialState,
+    defaultDataForm: (state, action: PayloadAction<{
+      item: CheckListType;
+      SFormID: string;
+      checkList: Checklist;
+      dataType: DataType[];
+    }>) => {
+      const { item, SFormID, CL } = action.payload
+
+      console.log(item);
+      console.log(SFormID);
+
+      const formData: BaseFormState = BaseFormState.DTypeID === null
+        ? {
+          ...item,
+          DTypeID: dataType.find((v) => v.DTypeName === "String")?.DTypeID ?? "",
+          DTypeValue: undefined,
+          MaxLength: undefined,
+          MinLength: undefined,
+        }
+        : BaseFormState;
+
+      state.subForms = state.subForms.map((sub) => {
+        if (sub.SFormID === formData.SFormID) {
+          const addField = {
+            ...formData,
+            DisplayOrder: (sub.Fields?.length || 0) + 1,
+            CListName: checkList.find((v) => v.CListID === formData.CListID)?.CListName,
+            CTypeName: checkListType.find((v) => v.CTypeID === formData.CTypeID)?.CTypeName,
+          };
+
+          const updatedFields = [...(sub.Fields || []), addField];
+          const sortedFields = sortFields(updatedFields);
+
+          return {
+            ...sub,
+            Fields: sortedFields,
+          };
+        }
+        return sub;
+      });
+    }
   },
+
 });
 
 export const {
@@ -282,6 +324,7 @@ export const {
   deleteField,
   // setExpected,
   reset,
+  defaultDataForm
 } = subFormSlice.actions;
 
 export default subFormSlice.reducer;
