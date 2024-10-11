@@ -17,15 +17,12 @@ const Inputs: React.FC<InputProps> = ({
   lefticon,
   testId
 }) => {
-  console.log("Inputs");
-
   return (
     <AccessibleView
       name="inputs"
       style={style.containerInput}
     >
       <TextInput
-        style={{ flex: 1 }}
         mode={mode || "outlined"}
         placeholder={placeholder}
         label={label}
@@ -57,7 +54,6 @@ export default React.memo(Inputs);
 
 const style = StyleSheet.create({
   containerInput: {
-    marginVertical: 12,
-    marginHorizontal: 12,
+    margin: 12,
   }
-})
+});

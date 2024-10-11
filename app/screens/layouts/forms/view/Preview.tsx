@@ -1,23 +1,49 @@
-import { StyleSheet, Text, ScrollView, View, ViewStyle, Pressable } from "react-native";
-import React, { useEffect, useState, useCallback } from "react";
+import { StyleSheet, Text, ScrollView, View, ViewStyle } from "react-native";
+import React, { useEffect, useState, useCallback, forwardRef, useImperativeHandle, useRef } from "react";
 import { Card, Divider } from "react-native-paper";
 import { useRes } from "@/app/contexts";
 import { BaseFormState, BaseSubForm } from '@/typing/form';
-import { AccessibleView, Dynamic, NotFoundScreen } from "@/components";
+import { AccessibleView, Dynamic } from "@/components";
 import useForm from "@/hooks/custom/useForm";
 import { PreviewProps } from "@/typing/tag";
-import { PreviewParams } from "@/typing/tag";
 
-const Preview: React.FC<PreviewProps<PreviewParams>> = ({ route }) => {
-    const {
-        found,
-        state,
-        groupCheckListOption,
-    } = useForm(route);
-    console.log("Preview");
-
+const Preview = forwardRef<any, any>((props, ref) => {
+    const { route } = props;
+    const { found, state, groupCheckListOption } = useForm(route);
+    const cardRef = useRef<View>(null);
     const { responsive } = useRes();
     const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
+
+    const cardRefs = useRef<(View | null)[]>([]);
+    const cardPositions = useRef<{ pageX: number; pageY: number; width: number; height: number }[]>([]);
+
+    useEffect(() => {
+        const positions: { pageX: number; pageY: number; width: number; height: number }[] = [];
+        cardRefs.current.forEach((cardRef) => {
+            if (cardRef) {
+                cardRef.measure((x, y, width, height, pageX, pageY) => {
+                    positions.push({ pageX, pageY, width, height });
+                });
+            }
+        });
+        cardPositions.current = positions;
+    }, [state.subForms]);
+
+    useImperativeHandle(ref, () => ({
+        getCardPosition: (callback: (x: number, y: number) => void) => {
+            if (cardRef.current) {
+                cardRef.current.measure((x, y, width, height, pageX, pageY) => {
+                    callback(pageX, pageY);
+                });
+            }
+        },
+        checkCardPosition: (x: number, y: number) => {
+            return cardPositions.current.findIndex((card) =>
+                x >= card.pageX && x <= card.pageX + card.width &&
+                y >= card.pageY && y <= card.pageY + card.height
+            );
+        },
+    }));
 
     useEffect(() => {
         if (state.subForms) {
@@ -42,29 +68,21 @@ const Preview: React.FC<PreviewProps<PreviewParams>> = ({ route }) => {
         <AccessibleView name="preview" style={styles.container}>
             <Text style={styles.title}>{state.FormName || "Content Name"}</Text>
             <Divider />
-            <Text style={[styles.description]}>{state.Description || "Content Description"}</Text>
+            <Text style={styles.description}>{state.Description || "Content Description"}</Text>
 
             <ScrollView style={{ flex: 1 }}>
                 {state.subForms.map((subForm: BaseSubForm, index: number) => (
-                    <AccessibleView name="gen-subForm" key={`subForm-${index}`} >
-                        <Card style={styles.card}>
+                    <AccessibleView name="gen-subForm" key={`subForm-${index}`}>
+                        <Card style={styles.card} ref={(el) => (cardRefs.current[index] = el)}>
                             <Card.Title title={subForm.SFormName} titleStyle={styles.cardTitle} />
                             <Card.Content style={styles.subFormContainer}>
                                 {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
                                     const columns = subForm.Columns ?? 1;
-                                    const borderRightWidth = 1;
-                                    const totalBorderWidth = (columns - 1) * borderRightWidth;
-
-                                    const isLastColumn = (fieldIndex + 1) % columns === 0;
-
-                                    const columnWidth = responsive === "small"
-                                        ? "100"
-                                        : 100 / columns;
+                                    const columnWidth = responsive === "small" ? "100" : 100 / columns;
 
                                     const containerStyle: ViewStyle = {
                                         flexBasis: `${columnWidth}%`,
                                         flexGrow: field.DisplayOrder || 1,
-                                        //  borderRightWidth: isLastColumn ? 0 : borderRightWidth, 
                                         flexDirection: "row",
                                         flexWrap: "nowrap",
                                     };
@@ -91,7 +109,7 @@ const Preview: React.FC<PreviewProps<PreviewParams>> = ({ route }) => {
             </ScrollView>
         </AccessibleView>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {
@@ -111,11 +129,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         flexWrap: "wrap",
     },
-    subFormTitle: {
-        fontSize: 20,
-        fontWeight: '600',
-        marginBottom: 8,
-    },
     card: {
         paddingVertical: 16,
         borderRadius: 8,
@@ -125,14 +138,6 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 18,
         fontWeight: 'bold'
-    },
-    submitText: {
-        textAlign: 'center',
-        padding: 10,
-        backgroundColor: '#007BFF',
-        color: '#FFF',
-        borderRadius: 5,
-        marginTop: 20,
     },
 });
 

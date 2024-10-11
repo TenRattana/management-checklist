@@ -23,7 +23,7 @@ export type HandleChange = <V extends string | string[] | ChangeEvent<any>>(sele
 
 export interface Event {
   handleChange: HandleChange;
-  handleBlur?: (fieldName: any) => void;
+  handleBlur?: (fieldName?: any) => void;
 }
 
 // Default Properties
@@ -72,6 +72,15 @@ export interface TextareasProps extends Event, DefaultProps {
   placeholder?: string;
   mode?: "outlined" | "flat";
 }
+export interface CustomDropdownSingleProps extends Event , DefaultProps{
+  labels:string;
+  values:string;
+  title: string;
+  data: Array<{ [key: string]: any }>;
+  lefticon?: string;
+  iconRight?: React.ReactNode;
+  handleBlur:()=>void;
+}
 
 // Form Props
 export interface DynamicFormProps {
@@ -84,6 +93,8 @@ export interface DynamicFormProps {
 // Navigation Props
 export interface PreviewProps<T extends PreviewParams | ScanParams> {
   route: Route<T>;
+  // onLayout: (SFormID:string,layout: LayoutRectangle) => void;
+  // SFRefs:{ [key: string]: any };
 }
 
 export interface FormScreenProps {
@@ -97,17 +108,7 @@ export interface CreateFormProps {
 }
 
 // Miscellaneous Props
-export interface CustomDropdownSingleProps {
-  labels: string;
-  values: string;
-  title: string;
-  data: Array<{ [key: string]: any }>;
-  selectedValue?: string;
-  onValueChange: (value?: string, icon?: () => JSX.Element) => void;
-  lefticon?: string;
-  iconRight?: React.ReactNode;
-  testId?: string;
-}
+
 
 export interface CustomDropdownMultiProps {
   labels: string;

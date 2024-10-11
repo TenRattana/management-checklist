@@ -4,7 +4,7 @@ import { useTheme } from "@/app/contexts";
 import AccessibleView from "@/components/AccessibleView";
 import { Inputs } from "@/components/common";
 import { Portal, Switch, Dialog } from "react-native-paper";
-import { Formik } from "formik";
+import { FastField, Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { InitialValuesCheckListOption, CheckListOptionProps } from '@/typing/value'
@@ -37,23 +37,27 @@ const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialVa
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}
-                            validateOnBlur={false}
-                            validateOnChange={true}
+                            validateOnBlur={true}
+                            validateOnChange={false}
                             onSubmit={(values: InitialValuesCheckListOption) => saveData(values)}
                         >
-                            {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, dirty, isValid }) => (
+                            {({ values, handleSubmit, setFieldValue, dirty, isValid }) => (
                                 <AccessibleView name="form-cod">
 
-                                    <Inputs
-                                        placeholder="Enter Check List Option"
-                                        label="Machine Check List Option"
-                                        handleChange={handleChange("checkListOptionName")}
-                                        handleBlur={handleBlur("checkListOptionName")}
-                                        value={values.checkListOptionName}
-                                        error={touched.checkListOptionName && Boolean(errors.checkListOptionName)}
-                                        errorMessage={touched.checkListOptionName ? errors.checkListOptionName : ""}
-                                        testId="checkListOptionName-cod"
-                                    />
+                                    <FastField name="checkListOptionName">
+                                        {({ field, form }: any) => (
+                                            <Inputs
+                                                placeholder="Enter Check List Option"
+                                                label="Machine Check List Option"
+                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                value={field.value}
+                                                error={form.touched.checkListOptionName && Boolean(form.errors.checkListOptionName)}
+                                                errorMessage={form.touched.checkListOptionName ? form.errors.checkListOptionName : ""}
+                                                testId="checkListOptionName-cod"
+                                            />
+                                        )}
+                                    </FastField >
 
                                     <AccessibleView name="form-active-cod" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>

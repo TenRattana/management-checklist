@@ -5,7 +5,7 @@ import AccessibleView from "@/components/AccessibleView";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import { Inputs } from "@/components/common";
 import { Portal, Switch, Dialog, HelperText } from "react-native-paper";
-import { Formik, FastField } from "formik";
+import { Formik, FastField, Field } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { MachineDialogProps, InitialValuesMachine } from '@/typing/value'
@@ -34,56 +34,67 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}
-                            validateOnBlur={false}
-                            validateOnChange={true}
+                            validateOnBlur={true}
+                            validateOnChange={false}
                             onSubmit={(values: InitialValuesMachine) => saveData(values)}
                         >
-                            {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, dirty, isValid }) => (
+                            {({ values, handleSubmit, setFieldValue, dirty, isValid }) => (
                                 <AccessibleView name="form-md">
                                     <FastField name="machineGroupId">
                                         {({ field, form }: any) => (
-                                            <AccessibleView name="form-machineGroupId" style={masterdataStyles.containerInput}>
-                                                <CustomDropdownSingle
-                                                    title="Machine Group"
-                                                    labels="MGroupName"
-                                                    values="MGroupID"
-                                                    data={!isEditing ? machineGroup?.filter((v) => v.IsActive) : dropmachine || []}
-                                                    selectedValue={field.value}
-                                                    onValueChange={(value) => {
-                                                        form.setFieldValue(field.name, value);
-                                                        form.setTouched({ ...form.touched, [field.name]: true });
-                                                    }}
-                                                    testId="machineGroupId-md"
-                                                />
-                                                {form.touched.machineGroupId && form.errors.machineGroupId ? (
-                                                    <HelperText type="error" visible style={{ left: -10 }}>
-                                                        {form.errors.machineGroupId}
-                                                    </HelperText>
-                                                ) : null}
-                                            </AccessibleView>
+                                            <CustomDropdownSingle
+                                                title="Machine Group"
+                                                labels="MGroupName"
+                                                values="MGroupID"
+                                                data={!isEditing ? machineGroup?.filter((v) => v.IsActive) : dropmachine || []}
+                                                value={field.value}
+                                                handleChange={(value) => {
+                                                    form.setFieldValue(field.name, value.value);
+                                                    setTimeout(() => {
+                                                        form.setFieldTouched(field.name, true);
+                                                    }, 0)
+                                                }}
+                                                handleBlur={() => {
+                                                    form.setFieldTouched(field.name, true);
+                                                }}
+                                                testId="machineGroupId-md"
+                                                error={form.touched.machineGroupId && Boolean(form.errors.machineGroupId)}
+                                                errorMessage={form.touched.machineGroupId ? form.errors.machineGroupId : ""}
+                                            />
                                         )}
                                     </FastField>
 
-                                    <Inputs
-                                        placeholder="Enter Machine Group Name"
-                                        label="Machine Group Name"
-                                        handleChange={handleChange("machineName")}
-                                        handleBlur={handleBlur("machineName")}
-                                        value={values.machineName}
-                                        error={touched.machineName && Boolean(errors.machineName)}
-                                        errorMessage={touched.machineName ? errors.machineName : ""}
-                                        testId="machineName-md"
-                                    />
-                                    <Inputs
-                                        placeholder="Enter Description"
-                                        label="Description"
-                                        handleChange={handleChange("description")}
-                                        handleBlur={handleBlur("description")}
-                                        value={values.description}
-                                        error={touched.description && Boolean(errors.description)}
-                                        errorMessage={touched.description ? errors.description : ""}
-                                        testId="Description-md"
-                                    />
+
+                                    <FastField name="machineName">
+                                        {({ field, form }: any) => (
+                                            <Inputs
+                                                placeholder="Enter Machine Name"
+                                                label="Machine Name"
+                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                value={field.value}
+                                                error={form.touched.machineName && Boolean(form.errors.machineName)}
+                                                errorMessage={form.touched.machineName ? form.errors.machineName : ""}
+                                                testId="machineName-md"
+                                            />
+                                        )}
+                                    </FastField >
+
+                                    <FastField name="description">
+                                        {({ field, form }: any) => (
+                                            <Inputs
+                                                placeholder="Enter Description"
+                                                label="Description"
+                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                value={field.value}
+                                                error={form.touched.description && Boolean(form.errors.description)}
+                                                errorMessage={form.touched.description ? form.errors.description : ""}
+                                                testId="description-md"
+                                            />
+                                        )}
+                                    </FastField>
+
                                     <AccessibleView name="form-active-md" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                             Status: {values.isActive ? "Active" : "Inactive"}
@@ -98,6 +109,7 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                                             testID="isActive-md"
                                         />
                                     </AccessibleView>
+
                                     <AccessibleView name="form-action-md" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
@@ -117,6 +129,8 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                                 </AccessibleView>
                             )}
                         </Formik>
+
+
                     )}
                 </Dialog.Content>
             </Dialog>

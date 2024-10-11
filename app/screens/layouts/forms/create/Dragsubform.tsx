@@ -133,7 +133,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
     };
 
     return (
-        <AccessibleView name="drag-subform" style={{ flex: 1 }}>
+        <>
             <Pressable
                 onPress={() => {
                     setInitialDialog(true);
@@ -165,7 +165,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                 onDelete={(SFormID: string) => dispatch(deleteSubForm({ SFormID }))}
             />
 
-        </AccessibleView>
+        </>
 
     )
 }

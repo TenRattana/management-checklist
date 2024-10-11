@@ -50,35 +50,36 @@ const Match_checklist_option = ({
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}
-                            validateOnBlur={false}
-                            validateOnChange={true}
+                            validateOnBlur={true}
+                            validateOnChange={false}
                             onSubmit={(values: InitialValuesMatchCheckListOption) => saveData(values)}
                         >
                             {({ values, errors, touched, handleSubmit, setFieldValue, dirty, isValid }) => (
                                 <AccessibleView name="form-mcod">
+
                                     <FastField name="groupCheckListOptionId">
                                         {({ field, form }: any) => (
-                                            <AccessibleView name="form-groupCheckListOptionId" style={masterdataStyles.containerInput}>
-                                                <CustomDropdownSingle
-                                                    title="Group Check List Option"
-                                                    labels="GCLOptionName"
-                                                    values="GCLOptionID"
-                                                    data={!isEditing
-                                                        ? groupCheckListOption.filter((v) => v.IsActive)
-                                                        : dropgroupCheckListOption}
-                                                    selectedValue={field.value}
-                                                    onValueChange={(value) => {
-                                                        form.setFieldValue(field.name, value);
-                                                        form.setTouched({ ...form.touched, [field.name]: true });
-                                                    }}
-                                                    testId="groupCheckListOptionId-mcod"
-                                                />
-                                                {form.touched.groupCheckListOptionId && form.errors.groupCheckListOptionId ? (
-                                                    <HelperText type="error" visible style={{ left: -10 }}>
-                                                        {form.errors.groupCheckListOptionId}
-                                                    </HelperText>
-                                                ) : null}
-                                            </AccessibleView>
+                                            <CustomDropdownSingle
+                                                title="Group Check List Option"
+                                                labels="GCLOptionName"
+                                                values="GCLOptionID"
+                                                data={!isEditing
+                                                    ? groupCheckListOption.filter((v) => v.IsActive)
+                                                    : dropgroupCheckListOption}
+                                                value={field.value}
+                                                handleChange={(value) => {
+                                                    form.setFieldValue(field.name, value.value);
+                                                    setTimeout(() => {
+                                                        form.setFieldTouched(field.name, true);
+                                                    }, 0)
+                                                }}
+                                                handleBlur={() => {
+                                                    form.setFieldTouched(field.name, true);
+                                                }}
+                                                testId="groupCheckListOptionId-mcod"
+                                                error={form.touched.groupCheckListOptionId && Boolean(form.errors.groupCheckListOptionId)}
+                                                errorMessage={form.touched.groupCheckListOptionId ? form.errors.groupCheckListOptionId : ""}
+                                            />
                                         )}
                                     </FastField>
 

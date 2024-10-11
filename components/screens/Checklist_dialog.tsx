@@ -4,7 +4,7 @@ import { useTheme } from "@/app/contexts";
 import AccessibleView from "@/components/AccessibleView";
 import { Inputs } from "@/components/common";
 import { Portal, Switch, Dialog } from "react-native-paper";
-import { Formik } from "formik";
+import { FastField, Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { CheckListDialogProps, InitialValuesChecklist } from '@/typing/value'
@@ -35,23 +35,28 @@ const Checklist_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, s
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}
-                            validateOnBlur={false}
-                            validateOnChange={true}
+                            validateOnBlur={true}
+                            validateOnChange={false}
                             onSubmit={(values: InitialValuesChecklist) => saveData(values)}
                         >
-                            {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, dirty, isValid }) => (
+                            {({ values, handleSubmit, setFieldValue, dirty, isValid }) => (
                                 <AccessibleView name="form-cd">
 
-                                    <Inputs
-                                        placeholder="Enter Check List Name"
-                                        label="Check List Name"
-                                        handleChange={handleChange("checkListName")}
-                                        handleBlur={handleBlur("checkListName")}
-                                        value={values.checkListName}
-                                        error={touched.checkListName && Boolean(errors.checkListName)}
-                                        errorMessage={touched.checkListName ? errors.checkListName : ""}
-                                        testId="checkListName-cd"
-                                    />
+                                    <FastField name="checkListName">
+                                        {({ field, form }: any) => (
+                                            <Inputs
+                                                placeholder="Enter Check List Name"
+                                                label="Check List Name"
+                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                value={field.value}
+                                                error={form.touched.checkListName && Boolean(form.errors.checkListName)}
+                                                errorMessage={form.touched.checkListName ? form.errors.checkListName : ""}
+                                                testId="checkListName-cd"
+                                            />
+                                        )}
+                                    </FastField >
+
                                     <AccessibleView name="form-active-cd" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                             Status: {values.isActive ? "Active" : "Inactive"}

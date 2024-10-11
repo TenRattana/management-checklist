@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { GestureHandlerRootView, PanGestureHandler, PanGestureHandlerGestureEvent } from "react-native-gesture-handler";
-import { Dimensions, Pressable, FlatList } from "react-native";
+import { GestureHandlerRootView, PanGestureHandler, PanGestureHandlerGestureEvent, ScrollView } from "react-native-gesture-handler";
+import { Dimensions, Pressable, FlatList, View, LayoutRectangle, Alert } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS } from "react-native-reanimated";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { IconButton, Text, Divider } from "react-native-paper";
@@ -13,14 +13,67 @@ import Preview from "@/app/screens/layouts/forms/view/Preview";
 import { CreateFormProps } from "@/typing/tag";
 import { BaseForm } from "@/typing/form";
 import { updateForm } from "@/slices";
-import DragTool from "./DragTool";
+import { CheckListType } from "@/typing/type";
+import { useRes } from "@/app/contexts";
+
+const DraggableItem: React.FC<{
+    item: CheckListType;
+    onDrop: (item: CheckListType, x: number, y: number) => void;
+}> = ({ item, onDrop }) => {
+    const itemTranslateX = useSharedValue(0);
+    const itemTranslateY = useSharedValue(0);
+
+    const itemAnimatedStyle = useAnimatedStyle(() => ({
+        transform: [
+            { translateX: itemTranslateX.value },
+            { translateY: itemTranslateY.value },
+        ],
+    }));
+
+    const createform = useCreateformStyle();
+    const { spacing } = useRes();
+
+    const onGestureEvent = (e: any) => {
+        itemTranslateX.value = e.nativeEvent.translationX;
+        itemTranslateY.value = e.nativeEvent.translationY;
+    };
+
+    const onGestureEnd = (e: any) => {
+        const { absoluteX, absoluteY } = e.nativeEvent;
+
+        runOnJS(onDrop)(item, absoluteX, absoluteY);
+
+        itemTranslateX.value = withSpring(0);
+        itemTranslateY.value = withSpring(0);
+    };
+
+    return (
+        <PanGestureHandler onGestureEvent={onGestureEvent} onEnded={onGestureEnd}>
+            <Animated.View style={[{ marginHorizontal: 10 }, itemAnimatedStyle, createform.addSubFormButton]}>
+                <IconButton icon={item.Icon} size={spacing.large + 5} animated />
+                <Text style={[createform.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
+                    {item.CTypeName}
+                </Text>
+            </Animated.View>
+        </PanGestureHandler>
+    );
+};
+
+interface Card {
+    id: string;
+    type: string;
+    columns: number;
+    items: CheckListType[];
+    layout: LayoutRectangle | null;
+    SFormID: string; // เพิ่ม SFormID ที่นี่
+}
 
 const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
     const { state, dispatch, checkList, groupCheckListOption, checkListType, dataType } = useForm(route);
     const createform = useCreateformStyle();
     const masterdataStyles = useMasterdataStyles();
-    console.log("CreateFormScreen");
 
+    const subForm = useRef<View>(null);
     const [initialSaveDialog, setInitialSaveDialog] = useState(false);
 
     const formRef = useRef<BaseForm>({
@@ -31,13 +84,8 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
     });
 
     const [initialForm, setInitialForm] = useState<BaseForm>(formRef.current);
-
-    const handleChange = useCallback((fieldName: keyof BaseForm, value: string) => {
-        const newForm = { ...formRef.current, [fieldName]: value };
-        formRef.current = newForm;
-        setInitialForm(newForm);
-        dispatch(updateForm({ form: newForm }));
-    }, [dispatch]);
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const [cards, setCards] = useState<Card[]>([]); // แก้ไขเป็น array ของ Card
 
     useEffect(() => {
         const newForm: BaseForm = {
@@ -50,90 +98,111 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
         formRef.current = newForm;
     }, [state]);
 
-    const [selectedIndex, setSelectedIndex] = useState(0);
-    const transition = useSharedValue(0);
-
-    useEffect(() => {
-        transition.value = withTiming(selectedIndex, { duration: 300 });
-    }, [selectedIndex]);
-
-    const animatedStyle = useAnimatedStyle(() => ({
-        opacity: 1,
-        transform: [{ translateX: 0 }],
-    }));
+    const handleChange = useCallback((fieldName: keyof BaseForm, value: string) => {
+        const newForm = { ...formRef.current, [fieldName]: value };
+        formRef.current = newForm;
+        setInitialForm(newForm);
+        dispatch(updateForm({ form: newForm }));
+    }, [dispatch]);
 
     const handleSaveDialog = useCallback(() => {
         setInitialSaveDialog(false);
     }, []);
 
+    const childRef = useRef<any>()
+
+    const handleDrop = (item: CheckListType, x: number, y: number) => {
+        console.log(item, x, y);
+
+        const cardIndex = childRef.current.checkCardPosition(x, y);
+
+        if (cardIndex >= 0) {
+            const card = state.subForms[cardIndex];
+        } else {
+            Alert.alert("Error", "You must drop the item inside a card!");
+        }
+    };
+
+    const addCard = (SFormID: string) => {
+        const newCard: Card = {
+            id: `card-${cards.length + 1}`,
+            type: "card",
+            columns: 1,
+            items: [],
+            layout: null,
+            SFormID: SFormID,
+        };
+        setCards((prev) => [...prev, newCard]);
+    };
+
     return (
-        <GestureHandlerRootView style={{ flexGrow: 1 }}>
-            <AccessibleView name="container-laout1" style={createform.container}>
-                <AccessibleView name="contaner-sagment" style={createform.containerL1}>
-                    <SegmentedControl
-                        values={["Form", "Tool"]}
-                        selectedIndex={selectedIndex}
-                        onChange={(event) => {
-                            const newIndex = event.nativeEvent.selectedSegmentIndex;
-                            setSelectedIndex(newIndex);
-                        }}
-                        style={{ height: 40, marginVertical: 20, borderRadius: 0 }}
-                    />
-                    <Animated.View style={[animatedStyle]}>
-                        {selectedIndex === 0 ? (
-                            <>
-                                <AccessibleView name="container-form">
-                                    <Inputs
-                                        placeholder="Enter Content Name"
-                                        label="Content Name"
-                                        handleChange={(value) => handleChange("FormName", value)}
-                                        value={initialForm.FormName}
-                                    />
-                                    <Inputs
-                                        label="Content Description"
-                                        placeholder="Enter Content Description"
-                                        handleChange={(value) => handleChange("Description", value)}
-                                        value={initialForm.Description}
-                                    />
-                                    <AccessibleView name="save-form" style={masterdataStyles.containerAction}>
-                                        <Pressable onPress={() => setInitialSaveDialog(true)} style={createform.saveButton}>
-                                            <Text style={createform.saveButtonText}>Save Form</Text>
-                                        </Pressable>
-                                    </AccessibleView>
-                                </AccessibleView>
+        <AccessibleView name="container-layout1" style={createform.container}>
+            <AccessibleView name="container-segment" style={createform.containerL1}>
+                <SegmentedControl
+                    values={["Form", "Tool"]}
+                    selectedIndex={selectedIndex}
+                    onChange={(event) => {
+                        const newIndex = event.nativeEvent.selectedSegmentIndex;
+                        setSelectedIndex(newIndex);
+                    }}
+                    style={{ height: 80, marginBottom: 10 }}
+                />
+                {selectedIndex === 0 ? (
+                    <AccessibleView name="form" style={{ flexGrow: 1 }}>
+                        <Inputs
+                            placeholder="Enter Content Name"
+                            label="Content Name"
+                            handleChange={(value) => handleChange("FormName", value)}
+                            value={initialForm.FormName}
+                        />
+                        <Inputs
+                            label="Content Description"
+                            placeholder="Enter Content Description"
+                            handleChange={(value) => handleChange("Description", value)}
+                            value={initialForm.Description}
+                        />
+                        <AccessibleView name="save-form" style={masterdataStyles.containerAction}>
+                            <Pressable onPress={() => setInitialSaveDialog(true)} style={createform.saveButton}>
+                                <Text style={createform.saveButtonText}>Save Form</Text>
+                            </Pressable>
+                        </AccessibleView>
 
-                                <Divider />
+                        <Divider />
 
-                               {checkListType && (
-                                    <DragTool checkListType={checkListType}/>
-                                )}
+                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { textAlign: 'center', marginVertical: 10 }]}>
+                            Tool
+                        </Text>
 
-                                <SaveDialog
-                                    state={state}
-                                    isVisible={initialSaveDialog}
-                                    setIsVisible={handleSaveDialog}
-                                    navigation={navigation}
-                                />
-                            </>
-                        ) : (
-                            <Dragsubform
-                                navigation={navigation}
-                                state={state}
-                                dispatch={dispatch}
-                                checkList={checkList}
-                                dataType={dataType}
-                                checkListType={checkListType}
-                                groupCheckListOption={groupCheckListOption}
-                            />
-                        )}
-                    </Animated.View>
-                </AccessibleView>
+                        {checkListType && checkListType.map((item, index) => (
+                            <DraggableItem item={item} onDrop={handleDrop} key={`${item.CTypeID}-${index}`} />
+                        ))}
 
-                <AccessibleView name="container-layout2" style={createform.containerL2}>
-                    <Preview route={route} />
-                </AccessibleView>
+                        <SaveDialog
+                            state={state}
+                            isVisible={initialSaveDialog}
+                            setIsVisible={handleSaveDialog}
+                            navigation={navigation}
+                        />
+                    </AccessibleView>
+                ) : (
+                    <AccessibleView name="tap-form">
+                        <Dragsubform
+                            navigation={navigation}
+                            state={state}
+                            dispatch={dispatch}
+                            checkList={checkList}
+                            dataType={dataType}
+                            checkListType={checkListType}
+                            groupCheckListOption={groupCheckListOption}
+                        />
+                    </AccessibleView>
+                )}
             </AccessibleView>
-        </GestureHandlerRootView>
+
+            <AccessibleView name="container-layout2" style={createform.containerL2}>
+                <Preview route={route} ref={childRef} />
+            </AccessibleView>
+        </AccessibleView>
     );
 };
 

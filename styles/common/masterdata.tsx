@@ -114,6 +114,28 @@ const useMasterdataStyles = () => {
             textAlign: "center",
             fontWeight: "500",
         },
+        dropdown: {
+            height: 50,
+            borderBottomColor: 'gray',
+            borderBottomWidth: 0.5,
+        },
+        icon: {
+            marginRight: 5,
+        },
+        placeholderStyle: {
+            fontSize: 20,
+        },
+        selectedTextStyle: {
+            fontSize: 20,
+        },
+        iconStyle: {
+            width: 20,
+            height: 20,
+        },
+        inputSearchStyle: {
+            height: 40,
+            fontSize: 20,
+        },
     });
 };
 

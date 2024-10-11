@@ -20,7 +20,7 @@ interface Card {
     type: string;
     columns: number;
     items: CardItem[];
-    layout: LayoutRectangle | null; 
+    layout: LayoutRectangle | null;
 }
 
 const tools: Tool[] = [
@@ -68,7 +68,7 @@ const CreateFormScreen: React.FC = () => {
         if (tool.type === "card") {
             setCards((prev) => [
                 ...prev,
-                { id: `card-${nextCardId}`, type: "card", columns: 1, items: [], layout: null }, 
+                { id: `card-${nextCardId}`, type: "card", columns: 1, items: [], layout: null },
             ]);
             setNextCardId(nextCardId + 1);
         } else {

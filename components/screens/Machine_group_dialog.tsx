@@ -4,7 +4,7 @@ import { useTheme } from "@/app/contexts";
 import AccessibleView from "@/components/AccessibleView";
 import { Inputs } from "@/components/common";
 import { Portal, Switch, Dialog } from "react-native-paper";
-import { Formik } from "formik";
+import { FastField, Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { MachineGroupDialogProps, InitialValuesMachineGroup } from '@/typing/value'
@@ -36,32 +36,42 @@ const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValue
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}
-                            validateOnBlur={false}
-                            validateOnChange={true}
+                            validateOnBlur={true}
+                            validateOnChange={false}
                             onSubmit={(values: InitialValuesMachineGroup) => saveData(values)}
                         >
                             {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, isValid, dirty }) => (
                                 <AccessibleView name="form-mgd">
-                                    <Inputs
-                                        placeholder="Enter Machine Group Name"
-                                        label="Machine Group Name"
-                                        handleChange={handleChange("machineGroupName")}
-                                        handleBlur={handleBlur("machineGroupName")}
-                                        value={values.machineGroupName}
-                                        error={touched.machineGroupName && Boolean(errors.machineGroupName)}
-                                        errorMessage={touched.machineGroupName ? errors.machineGroupName : ""}
-                                        testId="machineGroupName-mgd"
-                                    />
-                                    <Inputs
-                                        placeholder="Enter Description"
-                                        label="Description"
-                                        handleChange={handleChange("description")}
-                                        handleBlur={handleBlur("description")}
-                                        value={values.description}
-                                        error={touched.description && Boolean(errors.description)}
-                                        errorMessage={touched.description ? errors.description : ""}
-                                        testId="description-mgd"
-                                    />
+                                    <FastField name="machineGroupName">
+                                        {({ field, form }: any) => (
+                                            <Inputs
+                                                placeholder="Enter Machine Group Name"
+                                                label="Machine Group Name"
+                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                value={field.value}
+                                                error={form.touched.machineGroupName && Boolean(form.errors.machineGroupName)}
+                                                errorMessage={form.touched.machineGroupName ? form.errors.machineGroupName : ""}
+                                                testId="machineGroupName-mgd"
+                                            />
+                                        )}
+                                    </FastField >
+
+                                    <FastField name="description">
+                                        {({ field, form }: any) => (
+                                            <Inputs
+                                                placeholder="Enter Description"
+                                                label="Description"
+                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                value={field.value}
+                                                error={form.touched.description && Boolean(form.errors.description)}
+                                                errorMessage={form.touched.description ? form.errors.description : ""}
+                                                testId="description-mgd"
+                                            />
+                                        )}
+                                    </FastField >
+
                                     <AccessibleView name="form-active-mgd" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                             Status: {values.isActive ? "Active" : "Inactive"}

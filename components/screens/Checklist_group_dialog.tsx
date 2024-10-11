@@ -4,7 +4,7 @@ import { useTheme } from "@/app/contexts";
 import AccessibleView from "@/components/AccessibleView";
 import { Inputs } from "@/components/common";
 import { Portal, Switch, Dialog } from "react-native-paper";
-import { Formik } from "formik";
+import { FastField, Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { ChecklistGroupDialogProps, InitialValuesGroupCheckList } from '@/typing/value'
@@ -45,33 +45,42 @@ const Checklist_group_dialog = ({ isVisible, setIsVisible, isEditing, initialVal
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}
-                            validateOnBlur={false}
-                            validateOnChange={true}
+                            validateOnBlur={true}
+                            validateOnChange={false}
                             onSubmit={(values: InitialValuesGroupCheckList) => saveData(values)}
                         >
-                            {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, isValid, dirty }) => (
+                            {({ values, handleSubmit, setFieldValue, isValid, dirty }) => (
                                 <AccessibleView name="form-cgd">
-                                    <Inputs
-                                        placeholder="Enter Group Check List"
-                                        label="Group Check List Name"
-                                        handleChange={handleChange("groupCheckListOptionName")}
-                                        handleBlur={handleBlur("groupCheckListOptionName")}
-                                        value={values.groupCheckListOptionName}
-                                        error={touched.groupCheckListOptionName && Boolean(errors.groupCheckListOptionName)}
-                                        errorMessage={touched.groupCheckListOptionName ? errors.groupCheckListOptionName : ""}
-                                        testId="groupCheckListOptionName-cgd"
-                                    />
 
-                                    <Inputs
-                                        placeholder="Enter Description"
-                                        label="Description"
-                                        handleChange={handleChange("description")}
-                                        handleBlur={handleBlur("description")}
-                                        value={values.description}
-                                        error={touched.description && Boolean(errors.description)}
-                                        errorMessage={touched.description ? errors.description : ""}
-                                        testId="description-cgd"
-                                    />
+                                    <FastField name="groupCheckListOptionName">
+                                        {({ field, form }: any) => (
+                                            <Inputs
+                                                placeholder="Enter Group Check List"
+                                                label="Group Check List Name"
+                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                value={field.value}
+                                                error={form.touched.groupCheckListOptionName && Boolean(form.errors.groupCheckListOptionName)}
+                                                errorMessage={form.touched.groupCheckListOptionName ? form.errors.groupCheckListOptionName : ""}
+                                                testId="groupCheckListOptionName-cgd"
+                                            />
+                                        )}
+                                    </FastField >
+
+                                    <FastField name="description">
+                                        {({ field, form }: any) => (
+                                            <Inputs
+                                                placeholder="Enter Description"
+                                                label="Description"
+                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                value={field.value}
+                                                error={form.touched.description && Boolean(form.errors.description)}
+                                                errorMessage={form.touched.description ? form.errors.description : ""}
+                                                testId="description-cgd"
+                                            />
+                                        )}
+                                    </FastField >
 
                                     <AccessibleView name="form-active-cgd" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>

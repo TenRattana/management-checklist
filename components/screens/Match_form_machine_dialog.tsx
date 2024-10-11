@@ -32,59 +32,59 @@ const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initial
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}
-                            validateOnBlur={false}
-                            validateOnChange={true}
+                            validateOnBlur={true}
+                            validateOnChange={false}
                             onSubmit={(values: InitialValuesMatchFormMachine) => saveData(values)}
                         >
                             {({ handleSubmit, dirty, isValid }) => (
                                 <AccessibleView name="form-mfmd">
                                     <FastField name="machineId">
                                         {({ field, form }: any) => (
-                                            <AccessibleView name="form-machineId" style={masterdataStyles.containerInput}>
-                                                <CustomDropdownSingle
-                                                    title="Machine"
-                                                    labels="MachineName"
-                                                    values="MachineID"
-                                                    data={!isEditing
-                                                        ? machine.filter((v) => v.IsActive) : dropmachine || []}
-                                                    selectedValue={field.value}
-                                                    onValueChange={(value) => {
-                                                        form.setFieldValue(field.name, value);
-                                                        form.setTouched({ ...form.touched, [field.name]: true });
-                                                    }}
-                                                    testId={`machineId-mfmd`}
-                                                />
-                                                {form.touched.machineId && form.errors.machineId ? (
-                                                    <HelperText type="error" visible style={{ left: -10 }}>
-                                                        {form.errors.machineId}
-                                                    </HelperText>
-                                                ) : null}
-                                            </AccessibleView>
+                                            <CustomDropdownSingle
+                                                title="Machine"
+                                                labels="MachineName"
+                                                values="MachineID"
+                                                data={!isEditing
+                                                    ? machine.filter((v) => v.IsActive) : dropmachine || []}
+                                                value={field.value}
+                                                handleChange={(value) => {
+                                                    form.setFieldValue(field.name, value.value);
+                                                    setTimeout(() => {
+                                                        form.setFieldTouched(field.name, true);
+                                                    }, 0)
+                                                }}
+                                                handleBlur={() => {
+                                                    form.setFieldTouched(field.name, true);
+                                                }}
+                                                testId={`machineId-mfmd`}
+                                                error={form.touched.machineId && Boolean(form.errors.machineId)}
+                                                errorMessage={form.touched.machineId ? form.errors.machineId : ""}
+                                            />
                                         )}
                                     </FastField>
 
                                     <FastField name="formId">
                                         {({ field, form }: any) => (
-                                            <AccessibleView name="form-formId" style={masterdataStyles.containerInput}>
-                                                <CustomDropdownSingle
-                                                    title="Form"
-                                                    labels="FormName"
-                                                    values="FormID"
-                                                    data={!isEditing
-                                                        ? forms.filter((v) => v.IsActive) : dropform || []}
-                                                    selectedValue={field.value}
-                                                    onValueChange={(value) => {
-                                                        form.setFieldValue(field.name, value);
-                                                        form.setTouched({ ...form.touched, [field.name]: true });
-                                                    }}
-                                                    testId={`formId-mfmd`}
-                                                />
-                                                {form.touched.formId && form.errors.formId ? (
-                                                    <HelperText type="error" visible style={{ left: -10 }}>
-                                                        {form.errors.formId}
-                                                    </HelperText>
-                                                ) : null}
-                                            </AccessibleView>
+                                            <CustomDropdownSingle
+                                                title="Form"
+                                                labels="FormName"
+                                                values="FormID"
+                                                data={!isEditing
+                                                    ? forms.filter((v) => v.IsActive) : dropform || []}
+                                                value={field.value}
+                                                handleChange={(value) => {
+                                                    form.setFieldValue(field.name, value.value);
+                                                    setTimeout(() => {
+                                                        form.setFieldTouched(field.name, true);
+                                                    }, 0)
+                                                }}
+                                                handleBlur={() => {
+                                                    form.setFieldTouched(field.name, true);
+                                                }}
+                                                testId={`formId-mfmd`}
+                                                error={form.touched.formId && Boolean(form.errors.formId)}
+                                                errorMessage={form.touched.formId ? form.errors.formId : ""}
+                                            />
                                         )}
                                     </FastField>
 
