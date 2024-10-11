@@ -270,7 +270,7 @@ const subFormSlice = createSlice({
       checkList: Checklist;
       dataType: DataType[];
     }>) => {
-      const { item, SFormID, CL } = action.payload
+      const { item, SFormID, checkList, dataType } = action.payload
 
       console.log(item);
       console.log(SFormID);
@@ -290,8 +290,8 @@ const subFormSlice = createSlice({
           const addField = {
             ...formData,
             DisplayOrder: (sub.Fields?.length || 0) + 1,
-            CListName: checkList.find((v) => v.CListID === formData.CListID)?.CListName,
-            CTypeName: checkListType.find((v) => v.CTypeID === formData.CTypeID)?.CTypeName,
+            CListName: checkList.CListName,
+            CTypeName: item.CTypeName,
           };
 
           const updatedFields = [...(sub.Fields || []), addField];
