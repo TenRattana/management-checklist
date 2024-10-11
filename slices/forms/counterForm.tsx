@@ -286,7 +286,7 @@ const subFormSlice = createSlice({
         : BaseFormState;
 
       state.subForms = state.subForms.map((sub) => {
-        if (sub.SFormID === formData.SFormID) {
+        if (sub.SFormID === SFormID) {
           const addField = {
             ...formData,
             DisplayOrder: (sub.Fields?.length || 0) + 1,
