@@ -122,8 +122,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                 ? (groupCheckListOption.find((v) => v.GCLOptionID === "GCLO000") || groupCheckListOption[0])?.GCLOptionID
                 : undefined
 
-            console.log(currentField);
-
             dispatch(defaultDataForm({ currentField }))
         }
     };

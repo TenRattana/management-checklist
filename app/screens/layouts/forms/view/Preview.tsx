@@ -114,6 +114,7 @@ const Preview = forwardRef<any, any>((props, ref) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        paddingHorizontal: 10
     },
     title: {
         fontSize: 24,
