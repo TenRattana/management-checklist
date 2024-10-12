@@ -8,7 +8,7 @@ import { DynamicFormProps } from "@/typing/tag";
 const DynamicForm = React.memo(({
   field,
   values,
-  setFieldValue,
+  handleChange,
   groupCheckListOption,
 }: DynamicFormProps) => {
   const { CTypeName, Placeholder, Hint, CListName, MCListID, GCLOptionID } = field;
@@ -31,8 +31,9 @@ const DynamicForm = React.memo(({
             placeholder={Placeholder}
             hint={Hint}
             label={CListName}
-            value={values[MCListID] ?? ""}
-            handleChange={(v) => setFieldValue(MCListID, v)}
+            value={values}
+            handleChange={(v) => handleChange(MCListID, v)}
+            // handleBlur={handleBlur}
             testId={`input-${MCListID}`}
           />
         );
@@ -42,8 +43,9 @@ const DynamicForm = React.memo(({
             placeholder={Placeholder}
             hint={Hint}
             label={CListName}
-            value={values[MCListID] ?? ""}
-            handleChange={(v) => setFieldValue(MCListID, v)}
+            value={values}
+            handleChange={(v) => handleChange(MCListID, v)}
+            // handleBlur={handleBlur}
             testId={`inputarea-${MCListID}`}
           />
         );
@@ -52,8 +54,9 @@ const DynamicForm = React.memo(({
           <Radios
             option={option}
             hint={Hint}
-            handleChange={(v) => setFieldValue(MCListID, v)}
-            value={values[MCListID]}
+            handleChange={(v) => handleChange(MCListID, v)}
+            // handleBlur={handleBlur}
+            value={values}
             testId={`radio-${MCListID}`}
           />
         );
@@ -62,8 +65,9 @@ const DynamicForm = React.memo(({
           <Selects
             option={option}
             hint={Hint}
-            handleChange={(v) => setFieldValue(MCListID, v)}
-            value={values[MCListID] ?? ""}
+            handleChange={(v) => handleChange(MCListID, v)}
+            // handleBlur={handleBlur}
+            value={values}
             testId={`dropdown-${MCListID}`}
           />
         );
@@ -72,8 +76,9 @@ const DynamicForm = React.memo(({
           <Checkboxs
             option={option}
             hint={Hint}
-            handleChange={(v) => setFieldValue(MCListID, v)}
-            value={values[MCListID] ?? []}
+            handleChange={(v) => handleChange(MCListID, v)}
+            // handleBlur={handleBlur}
+            value={values}
             testId={`checkbox-${MCListID}`}
           />
         );

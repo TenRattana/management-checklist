@@ -24,7 +24,7 @@ const Radios = ({
   const animateScaleIn = () => {
     Animated.spring(scale, {
       toValue: 1.2,
-      tension: 200,
+      tension: 10,
       useNativeDriver: true,
     }).start();
   };
@@ -32,7 +32,7 @@ const Radios = ({
   const animateScaleOut = () => {
     Animated.spring(scale, {
       toValue: 1,
-      tension: 200,
+      tension: 10,
       useNativeDriver: true,
     }).start();
   };

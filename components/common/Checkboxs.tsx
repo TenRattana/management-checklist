@@ -9,6 +9,7 @@ const Checkboxs = ({
   option,
   value,
   handleChange,
+  handleBlur,
   hint,
   error,
   errorMessage,
@@ -39,8 +40,7 @@ const Checkboxs = ({
   const animateScaleIn = () => {
     Animated.spring(scale, {
       toValue: 1.1,
-      friction: 3,
-      tension: 200,
+      tension: 10,
       useNativeDriver: true,
     }).start();
   };
@@ -48,8 +48,7 @@ const Checkboxs = ({
   const animateScaleOut = () => {
     Animated.spring(scale, {
       toValue: 1,
-      friction: 3,
-      tension: 200,
+      tension: 10,
       useNativeDriver: true,
     }).start();
   };
@@ -65,7 +64,9 @@ const Checkboxs = ({
           key={index}
           onPressIn={animateScaleIn}
           onPressOut={animateScaleOut}
-          onPress={() => handleCheckBoxChange(item.value || '')}
+          onPress={() => {
+            handleCheckBoxChange(item.value || '');
+          }}
           testID={testId}
           id={testId}
         >
@@ -75,7 +76,9 @@ const Checkboxs = ({
                 status={
                   checkedOptions.includes(item.value || '') ? "checked" : "unchecked"
                 }
-                onPress={() => handleCheckBoxChange(item.value || '')}
+                onPress={() => {
+                  handleCheckBoxChange(item.value || '');
+                }}
               />
               <Text style={masterdataStyles.checkboxLabel}>{item.label}</Text>
             </AccessibleView>

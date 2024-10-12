@@ -190,6 +190,55 @@ const useMasterdataStyles = () => {
             width: '100%',
             fontSize: 18,
         },
+        container: {
+            flex: 1,
+            paddingHorizontal: 10
+        },
+        title: {
+            fontSize: 24,
+            fontWeight: 'bold',
+            marginBottom: 16,
+        },
+        description: {
+            fontSize: 20,
+            marginBottom: 16,
+        },
+        subFormContainer: {
+            marginBottom: 16,
+            flexDirection: "row",
+            flexWrap: "wrap",
+        },
+        card: {
+            paddingVertical: 16,
+            borderRadius: 8,
+            elevation: 2,
+            marginBottom: 20,
+        },
+        cardTitle: {
+            fontSize: 18,
+            fontWeight: 'bold'
+        },
+        containerScccess: {
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 20,
+        },
+        titleScccess: {
+            fontSize: 24,
+            fontWeight: 'bold',
+            textAlign: 'center',
+        },
+        linkScccess: {
+            marginTop: 15,
+            paddingVertical: 15,
+        },
+        linkTextScccess: {
+            color: '#1e90ff',
+        },
+        fieldCard: {
+            marginVertical: 5,
+        },
     });
 };
 

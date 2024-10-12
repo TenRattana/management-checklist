@@ -86,7 +86,8 @@ export interface CustomDropdownSingleProps extends Event, DefaultProps {
 export interface DynamicFormProps {
   field: BaseFormState;
   values: any;
-  setFieldValue: any;
+  handleChange:(fieldName:string , value:any) => void;
+  // handleBlur: () => void;
   groupCheckListOption: GroupCheckListOption[];
 }
 

@@ -20,6 +20,7 @@ const SearchBar = ({ value, onChange, placeholder }: SeractBarProps) => {
       iconColor="#007AFF"
       placeholderTextColor="#a0a0a0"
       testID={`search-${placeholder}`}
+
     />
   );
 }
