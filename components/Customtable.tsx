@@ -216,43 +216,49 @@ const CustomTable = ({
     );
   };
 
+  const renderSmallRes = (rowData: (string | number | boolean)[], rowIndex: number) => {
+    return (
+      <AccessibleView name={`row-${rowIndex}`} key={`row-${rowIndex}`} style={[customtable.cardRow, { alignItems: 'flex-start' }]}>
+        {Tablehead.map((header, colIndex) => (
+          <AccessibleView name={`header-${rowIndex}-${colIndex}`} key={`header-${rowIndex}-${colIndex}`}>
+            <Text style={[masterdataStyles.text, masterdataStyles.textError, { marginVertical: 5 }]}>
+              {header.label}
+            </Text>
+            {actionIndex.map((actionItem) => {
+              const filteredEntries = Object.entries(actionItem).filter(
+                ([, value]) => value === colIndex
+              );
+
+              return filteredEntries.length > 0
+                ? filteredEntries.map(([key]) => {
+                  if (key === "editIndex" || key === "delIndex") {
+                    return (
+                      <AccessibleView name={`action-${rowIndex}`} key={`action-${rowIndex}`} style={customtable.eventColumn}>
+                        {key === "editIndex" && renderActionButton(rowData[colIndex] as string, "editIndex", rowData, rowIndex)}
+                        {key === "delIndex" && renderActionButton(rowData[colIndex] as string, "delIndex", rowData, rowIndex)}
+                      </AccessibleView>
+                    );
+                  } else {
+                    return (
+                      <AccessibleView name={`action-${rowIndex}`} key={`action-${rowIndex}`} style={customtable.eventColumn}>
+                        {renderActionButton(rowData[colIndex] as string, key, rowData, rowIndex)}
+                      </AccessibleView>
+                    )
+                  }
+                })
+                : renderCellContent(rowData[colIndex], colIndex, rowData, rowIndex);
+            })}
+          </AccessibleView>
+        ))}
+      </AccessibleView>
+    )
+  }
+
   return (
     <AccessibleView name="customtable" style={customtable.containerContent}>
       {responsive === "small" ? (
         currentData.map((rowData, rowIndex) => (
-          <AccessibleView name={`row-${rowIndex}`} key={`row-${rowIndex}`} style={[customtable.cardRow, { alignItems: 'flex-start' }]}>
-            {Tablehead.map((header, colIndex) => (
-              <AccessibleView name={`header-${rowIndex}-${colIndex}`} key={`header-${rowIndex}-${colIndex}`}>
-                <Text style={[masterdataStyles.text, masterdataStyles.textError, { marginVertical: 5 }]}>
-                  {header.label}
-                </Text>
-                {actionIndex.map((actionItem) => {
-                  const filteredEntries = Object.entries(actionItem).filter(
-                    ([, value]) => value === colIndex
-                  );
-
-                  return filteredEntries.length > 0
-                    ? filteredEntries.map(([key]) => {
-                      if (key === "editIndex" || key === "delIndex") {
-                        return (
-                          <AccessibleView name={`action-${rowIndex}`} key={`action-${rowIndex}`} style={customtable.eventColumn}>
-                            {key === "editIndex" && renderActionButton(rowData[colIndex] as string, "editIndex", rowData, rowIndex)}
-                            {key === "delIndex" && renderActionButton(rowData[colIndex] as string, "delIndex", rowData, rowIndex)}
-                          </AccessibleView>
-                        );
-                      } else {
-                        return (
-                          <AccessibleView name={`action-${rowIndex}`} key={`action-${rowIndex}`} style={customtable.eventColumn}>
-                            {renderActionButton(rowData[colIndex] as string, key, rowData, rowIndex)}
-                          </AccessibleView>
-                        )
-                      }
-                    })
-                    : renderCellContent(rowData[colIndex], colIndex, rowData, rowIndex);
-                })}
-              </AccessibleView>
-            ))}
-          </AccessibleView>
+          renderSmallRes(rowData, rowIndex)
         ))
       ) : (
         <DataTable>

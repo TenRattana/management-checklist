@@ -1,13 +1,11 @@
 import React, { useEffect, useState, lazy, Suspense, useRef } from 'react';
-import { Text, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
+import { Text, Pressable, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { IconButton } from 'react-native-paper';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { HomeScreen, LoginScreen, AdminScreen, SuperAdminScreen, ScanQR, GenerateQR, UserScreen, SettingScreen, Managepermissions } from '@/app/screens';
 import { useAuth } from "@/app/contexts/auth";
 import { AccessibleView } from '@/components';
-import { ScrollView } from 'react-native-gesture-handler';
-
 const Drawer = createDrawerNavigator();
 import { DrawerContentScrollView } from '@react-navigation/drawer';
 

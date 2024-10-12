@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { ScrollView, Pressable, Text } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
-import { Customtable, LoadingSpinner, AccessibleView, Searchbar } from "@/components";
+import { LoadingSpinner, AccessibleView, Searchbar } from "@/components";
 import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
@@ -10,6 +10,7 @@ import Machine_group_dialog from "@/components/screens/Machine_group_dialog";
 import { MachineGroup } from '@/typing/type'
 import { InitialValuesMachineGroup } from '@/typing/value'
 import { useFocusEffect } from "expo-router";
+const Customtable = lazy(() => import('@/components/Customtable'));
 
 const MachineGroupScreen = () => {
     const [machineGroup, setMachineGroup] = useState<MachineGroup[]>([]);
@@ -149,13 +150,16 @@ const MachineGroupScreen = () => {
                         placeholder="Search Machine Group..."
                         value={searchQuery}
                         onChange={setSearchQuery}
+                        testId="search-machine-group"
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Group Machine</Text>
                     </Pressable>
                 </AccessibleView>
                 <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
-                    {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+                    <Suspense fallback={<LoadingSpinner />}>
+                        {!isLoading ? <Customtable {...customtableProps} /> : <LoadingSpinner />}
+                    </Suspense>
                 </Card.Content>
             </Card>
 
