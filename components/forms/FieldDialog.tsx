@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Pressable, Text, ScrollView } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
@@ -28,24 +28,32 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
     const { colors } = useTheme()
     console.log("FieldDialog");
 
+    const validationSchema = useMemo(() => {
+        const shape = {
+            CListID: Yup.string().required("The checklist field is required."),
+            CTypeID: Yup.string().required("The checklist type field is required."),
+            Placeholder: Yup.string().nullable(),
+            Hint: Yup.string().nullable(),
+            Required: Yup.boolean().required("The required field is required."),
 
-    const validationSchemaField = Yup.object().shape({
-        CListID: Yup.string().required("The checklist field is required."),
-        CTypeID: Yup.string().required("The checklist type field is required."),
-        // DTypeID: Yup.string().required("The data type field is required."),
-        // GCLOptionID: Yup.string().when(['shouldRender'], {
-        //     is: (shouldRender: string) => shouldRender === "detail",
-        //     then: Yup.string().required("The group checklist field is required."),
-        //     otherwise: Yup.string().nullable(),
-        // }),
-        Placeholder: Yup.string().nullable(),
-        Hint: Yup.string().nullable(),
-        Required: Yup.boolean().required("The required field is required."),
+            DTypeID: Yup.string().when('CTypeID', {
+                is: (CTypeID) => ['Textinput', 'Textarea'].includes(CTypeID),
+                then: Yup.string().required("DTypeID is required for Text/TextArea."),
+                otherwise: Yup.string().nullable(),
+            }),
+            GCLOptionID: Yup.string().when('CTypeID', {
+                is: (CTypeID) => ['Dropdown', 'Checkbox', 'Radio'].includes(CTypeID),
+                then: Yup.string().required("GCLOptionID is required for Dropdown/Select/Radio."),
+                otherwise: Yup.string().nullable(),
+            }),
 
-        // DTypeValue?: number;
-        // MinLength?: number;
-        // MaxLength?: number;
-    });
+            DTypeValue: Yup.number().nullable(),
+            MinLength: Yup.number().nullable(),
+            MaxLength: Yup.number().nullable(),
+        };
+
+        return Yup.object().shape(shape);
+    }, []);
 
     const saveDataCheckList = async (values: InitialValuesChecklist) => {
         const data = {
@@ -134,7 +142,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
 
     return (
         <Portal>
-            <Dialog visible={isVisible} onDismiss={setShowDialogs} style={masterdataStyles.containerDialog}>
+            <Dialog visible={isVisible} onDismiss={() => setShowDialogs()} style={masterdataStyles.containerDialog}>
                 <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]}>
                     {editMode ? "Edit check list" : "Create check list"}
                 </Dialog.Title>
@@ -147,18 +155,14 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                     {isVisible && (
                         <Formik
                             initialValues={formState}
-                            validationSchema={validationSchemaField}
+                            validationSchema={validationSchema}
                             validateOnBlur={true}
                             validateOnChange={false}
                             onSubmit={values => saveField(values, editMode ? "update" : "add")}
                         >
                             {({
-                                handleChange,
-                                handleBlur,
                                 setFieldValue,
                                 values,
-                                errors,
-                                touched,
                                 handleSubmit,
                                 isValid,
                                 dirty,
@@ -429,7 +433,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                             )}
 
                                             <Pressable
-                                                onPress={setShowDialogs}
+                                                onPress={() => setShowDialogs()}
                                                 style={[masterdataStyles.button, masterdataStyles.backMain]}
                                             >
                                                 <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>
@@ -449,7 +453,10 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
             <Checklist_dialog
                 isEditing={false}
                 isVisible={isVisibleCL}
-                setIsVisible={() => { setIsVisibleCL(false); setInitialValueCL({ checkListId: "", checkListName: "", isActive: false }) }}
+                setIsVisible={() => {
+                    setIsVisibleCL(false);
+                    setInitialValueCL({ checkListId: "", checkListName: "", isActive: false });
+                }}
                 initialValues={initialValueCL}
                 saveData={saveDataCheckList}
             />

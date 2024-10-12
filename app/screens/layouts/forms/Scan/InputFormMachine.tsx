@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "@/config/axios";
 import { Card, Divider, HelperText } from "react-native-paper";
-import { StyleSheet, Text, FlatList, Pressable, ViewStyle } from "react-native";
+import { Text, FlatList, Pressable, ViewStyle } from "react-native";
 import { setForm, setSubForm, setField, reset } from "@/slices";
 import { useToast, useRes } from "@/app/contexts";
 import { BaseSubForm, FormData, BaseFormState } from '@/typing/form';

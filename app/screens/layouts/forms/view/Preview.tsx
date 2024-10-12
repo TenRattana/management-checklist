@@ -99,9 +99,10 @@ const Preview = forwardRef<any, any>((props, ref) => {
                                                     key={`field-${fieldIndex}-${subForm.SFormName}`}
                                                     style={containerStyle}
                                                 >
+                                                    {/* <Text>A</Text> */}
                                                     <Dynamic
                                                         field={field}
-                                                        values={formValues?.[field.MCListID]}
+                                                        values={formValues[field.MCListID] ?? ""}
                                                         handleChange={(fieldname: string, value: any) => handleChange(fieldname, value)}
                                                         groupCheckListOption={groupCheckListOption}
                                                     />
