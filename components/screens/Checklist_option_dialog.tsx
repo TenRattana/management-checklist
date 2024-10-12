@@ -18,7 +18,7 @@ const validationSchema = Yup.object().shape({
 
 const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }: CheckListOptionProps<InitialValuesCheckListOption>) => {
     const masterdataStyles = useMasterdataStyles()
-    const { colors } = useTheme()
+    // const { colors } = useTheme()
     console.log("Checklist_option_dialog");
 
     return (
@@ -65,7 +65,7 @@ const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialVa
                                         </Text>
                                         <Switch
                                             style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                            color={values.isActive ? colors.succeass : colors.disable}
+                                            // color={values.isActive ? colors.succeass : colors.disable}
                                             value={values.isActive}
                                             onValueChange={(v: boolean) => {
                                                 setFieldValue("isActive", v);

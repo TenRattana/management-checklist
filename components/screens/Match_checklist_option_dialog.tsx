@@ -33,7 +33,7 @@ const Match_checklist_option = ({
     console.log("Match_checklist_option");
 
     const masterdataStyles = useMasterdataStyles();
-    const { colors } = useTheme();
+    // const { colors } = useTheme();
 
     const filteredData = useMemo(() => {
         return !isEditing ? checkListOption.filter((v) => v.IsActive) : dropcheckListOption;
@@ -113,7 +113,7 @@ const Match_checklist_option = ({
                                         </Text>
                                         <Switch
                                             style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                            color={values.isActive ? colors.succeass : colors.disable}
+                                            // color={values.isActive ? colors.succeass : colors.disable}
                                             value={values.isActive}
                                             onValueChange={(v: boolean) => {
                                                 setFieldValue("isActive", v);

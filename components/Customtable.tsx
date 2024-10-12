@@ -31,7 +31,7 @@ const CustomTable = ({
   const [dialogData, setDialogData] = useState<string>("");
   console.log("CustomTable");
 
-  const colors = useThemeColor();
+  // const colors = useThemeColor();
   const { responsive, spacing } = useRes();
   const { handleError } = useToast();
   const customtable = useCustomtableStyles();
@@ -121,7 +121,7 @@ const CustomTable = ({
             <IconButton
               icon={cell ? "toggle-switch" : "toggle-switch-off-outline"}
               size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium}
-              iconColor={cell ? colors.succeass : colors.main}
+            // iconColor={cell ? colors.succeass : colors.main}
             />
           </Animated.View>
         </Pressable>
@@ -156,7 +156,7 @@ const CustomTable = ({
           <IconButton
             icon="pencil-box"
             size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium}
-            iconColor={colors.main}
+          // iconColor={colors.main}
           />
         );
         break;
@@ -165,7 +165,7 @@ const CustomTable = ({
           <IconButton
             icon="pencil-box"
             size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium}
-            iconColor={colors.main}
+          // iconColor={colors.main}
           />
         );
         break;
@@ -174,7 +174,7 @@ const CustomTable = ({
           <IconButton
             icon="trash-can"
             size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium}
-            iconColor={colors.danger}
+          // iconColor={colors.danger}
           />
         );
         break;
@@ -183,7 +183,7 @@ const CustomTable = ({
           <IconButton
             icon="tooltip-edit"
             size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium}
-            iconColor={colors.danger}
+          // iconColor={colors.danger}
           />
         );
         break;
@@ -192,7 +192,7 @@ const CustomTable = ({
           <IconButton
             icon="content-copy"
             size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium}
-            iconColor={colors.danger}
+          // iconColor={colors.danger}
           />
         );
         break;
@@ -201,7 +201,7 @@ const CustomTable = ({
           <IconButton
             icon="file-find"
             size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium}
-            iconColor={colors.danger}
+          // iconColor={colors.danger}
           />
         );
         break;

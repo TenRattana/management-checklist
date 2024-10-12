@@ -20,7 +20,7 @@ const validationSchema = Yup.object().shape({
 
 const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData, dropmachine, machineGroup = [] }: MachineDialogProps<InitialValuesMachine, MachineGroup>) => {
     const masterdataStyles = useMasterdataStyles()
-    const { colors } = useTheme()
+    // const { colors } = useTheme()
     console.log("Machine_dialog");
 
     return (
@@ -101,7 +101,7 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                                         </Text>
                                         <Switch
                                             style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                            color={values.isActive ? colors.succeass : colors.disable}
+                                            // color={values.isActive ? colors.succeass : colors.disable}
                                             value={values.isActive}
                                             onValueChange={(v: boolean) => {
                                                 setFieldValue("isActive", v);

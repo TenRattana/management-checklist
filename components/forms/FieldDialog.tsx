@@ -25,7 +25,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
 
     const [shouldRender, setShouldRender] = useState<string>("");
     const [shouldRenderDT, setShouldRenderDT] = useState<boolean>(false);
-    const { colors } = useTheme()
+    // const { colors } = useTheme()
     console.log("FieldDialog");
 
     const validationSchema = useMemo(() => {
@@ -395,7 +395,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                 </Text>
                                                 <Switch
                                                     style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                                    color={values.Required ? colors.succeass : colors.disable}
+                                                    // color={values.Required ? colors.succeass : colors.disable}
                                                     value={values.Required}
                                                     onValueChange={(v: boolean) => {
                                                         setFieldValue("Required", v);
