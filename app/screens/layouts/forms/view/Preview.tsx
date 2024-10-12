@@ -65,7 +65,7 @@ const Preview = forwardRef<any, any>((props, ref) => {
     }, []);
 
     return (
-        <AccessibleView name="preview" style={styles.container}>
+        <AccessibleView name="preview" style={[styles.container, { maxHeight: 900, paddingBottom: 30 }]}>
             <Text style={styles.title}>{state.FormName || "Content Name"}</Text>
             <Divider />
             <Text style={styles.description}>{state.Description || "Content Description"}</Text>

@@ -145,16 +145,18 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                 <Text style={createform.addSubFormText}>Add Sub Form</Text>
             </Pressable>
 
-            <DraggableFlatList
-                data={state.subForms}
-                renderItem={renderSubForm}
-                keyExtractor={(item, index) => `SF-${item.SFormID}-${index}`}
-                onDragEnd={({ data }) => handleDropSubForm(data)}
-                contentContainerStyle={{ paddingHorizontal: 50, paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 40 : 0 }}
-                nestedScrollEnabled={true}
-                activationDistance={1}
-                autoscrollSpeed={30}
-            />
+            <AccessibleView name="drag-subform" style={{ paddingHorizontal: 50, paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 40 : 0 }}>
+                <DraggableFlatList
+                    data={state.subForms}
+                    renderItem={renderSubForm}
+                    keyExtractor={(item, index) => `SF-${item.SFormID}-${index}`}
+                    onDragEnd={({ data }) => handleDropSubForm(data)}
+                    nestedScrollEnabled={true}
+                    activationDistance={1}
+                    autoscrollSpeed={30}
+                />
+            </AccessibleView>
+
 
             <SubFormDialog
                 isVisible={initialDialog}

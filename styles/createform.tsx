@@ -79,7 +79,10 @@ const useCreateformStyle = () => {
             color: colors.light,
             fontSize: 16,
         },
-
+        scrollableContainer: {
+            maxHeight: 500,
+            overflow: 'scroll',
+        },
     });
 };
 
