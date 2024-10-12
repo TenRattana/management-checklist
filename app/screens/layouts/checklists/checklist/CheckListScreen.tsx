@@ -136,7 +136,7 @@ const CheckListScreen = () => {
                     <Searchbar
                         placeholder="Search Checklist..."
                         value={searchQuery}
-                        onChangeText={setSearchQuery}
+                        onChange={setSearchQuery}
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Check List</Text>

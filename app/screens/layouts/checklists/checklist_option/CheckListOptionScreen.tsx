@@ -151,7 +151,7 @@ const CheckListOptionScreen = () => {
                     <Searchbar
                         placeholder="Search Checklist Option..."
                         value={searchQuery}
-                        onChangeText={setSearchQuery}
+                        onChange={setSearchQuery}
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Option</Text>

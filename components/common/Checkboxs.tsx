@@ -3,6 +3,7 @@ import { Checkbox, HelperText } from "react-native-paper";
 import { Text, StyleSheet, Animated, Pressable } from "react-native";
 import { CheckboxsProps } from "@/typing/tag";
 import AccessibleView from "@/components/AccessibleView";
+import useMasterdataStyles from "@/styles/common/masterdata";
 
 const Checkboxs = ({
   option,
@@ -16,6 +17,7 @@ const Checkboxs = ({
   const [checkedOptions, setCheckedOptions] = useState<string[]>([]);
   const [scale] = useState<Animated.Value>(new Animated.Value(1));
   console.log("Checkboxs");
+  const masterdataStyles = useMasterdataStyles();
 
   useEffect(() => {
     if (Array.isArray(value)) {
@@ -57,7 +59,7 @@ const Checkboxs = ({
   }
 
   return (
-    <AccessibleView name="checkboxs">
+    <AccessibleView name="checkboxs" style={masterdataStyles.commonContainer}>
       {option.map((item, index) => (
         <Pressable
           key={index}
@@ -68,44 +70,25 @@ const Checkboxs = ({
           id={testId}
         >
           <Animated.View style={{ transform: [{ scale }] }}>
-            <AccessibleView name="group-checkboxs" style={styles.checkboxContainer}>
+            <AccessibleView name="group-checkboxs" style={masterdataStyles.checkboxContainer}>
               <Checkbox
                 status={
                   checkedOptions.includes(item.value || '') ? "checked" : "unchecked"
                 }
                 onPress={() => handleCheckBoxChange(item.value || '')}
               />
-              <Text style={styles.checkboxLabel}>{item.label}</Text>
+              <Text style={masterdataStyles.checkboxLabel}>{item.label}</Text>
             </AccessibleView>
           </Animated.View>
         </Pressable>
       ))}
 
-      {hint && <Text style={styles.hint}>{hint}</Text>}
+      {hint && <Text style={masterdataStyles.hint}>{hint}</Text>}
       <HelperText type="error" visible={error} style={{ left: -10 }}>
         {errorMessage}
       </HelperText>
     </AccessibleView>
   );
 };
-
-const styles = StyleSheet.create({
-  checkboxContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-    paddingHorizontal: 10
-
-  },
-  checkboxLabel: {
-    fontSize: 16,
-    marginLeft: 8,
-  },
-  hint: {
-    fontSize: 12,
-    color: "#6e6e6e",
-    marginTop: 5,
-  },
-});
 
 export default React.memo(Checkboxs);

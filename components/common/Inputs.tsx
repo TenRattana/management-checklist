@@ -3,6 +3,7 @@ import { TextInput, HelperText, Text } from "react-native-paper";
 import { StyleSheet } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import { InputProps } from "@/typing/tag";
+import useMasterdataStyles from "@/styles/common/masterdata";
 
 const Inputs: React.FC<InputProps> = ({
   placeholder,
@@ -17,10 +18,12 @@ const Inputs: React.FC<InputProps> = ({
   lefticon,
   testId
 }) => {
+  const masterdataStyles = useMasterdataStyles();
+
   return (
     <AccessibleView
       name="inputs"
-      style={style.containerInput}
+      style={masterdataStyles.commonContainer}
     >
       <TextInput
         mode={mode || "outlined"}
@@ -42,7 +45,7 @@ const Inputs: React.FC<InputProps> = ({
         testID={testId}
         id={testId}
       />
-      {hint && <Text>{hint}</Text>}
+      {hint && <Text style={masterdataStyles.hint}>{hint}</Text>}
       <HelperText type="error" visible={error} style={{ left: -10 }}>
         {errorMessage}
       </HelperText>
@@ -52,8 +55,3 @@ const Inputs: React.FC<InputProps> = ({
 
 export default React.memo(Inputs);
 
-const style = StyleSheet.create({
-  containerInput: {
-    margin: 12,
-  }
-});

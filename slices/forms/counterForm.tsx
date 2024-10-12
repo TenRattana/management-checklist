@@ -265,33 +265,17 @@ const subFormSlice = createSlice({
     // },
     reset: () => initialState,
     defaultDataForm: (state, action: PayloadAction<{
-      item: CheckListType;
-      SFormID: string;
-      checkList: Checklist;
-      dataType: DataType[];
+      currentField: BaseFormState;
     }>) => {
-      const { item, SFormID, checkList, dataType } = action.payload
+      console.log("defaultDataForm");
 
-      console.log(item);
-      console.log(SFormID);
-
-      const formData: BaseFormState = BaseFormState.DTypeID === null
-        ? {
-          ...item,
-          DTypeID: dataType.find((v) => v.DTypeName === "String")?.DTypeID ?? "",
-          DTypeValue: undefined,
-          MaxLength: undefined,
-          MinLength: undefined,
-        }
-        : BaseFormState;
+      const { currentField } = action.payload
 
       state.subForms = state.subForms.map((sub) => {
-        if (sub.SFormID === SFormID) {
+        if (sub.SFormID === currentField.SFormID) {
           const addField = {
-            ...formData,
+            ...currentField,
             DisplayOrder: (sub.Fields?.length || 0) + 1,
-            CListName: checkList.CListName,
-            CTypeName: item.CTypeName,
           };
 
           const updatedFields = [...(sub.Fields || []), addField];

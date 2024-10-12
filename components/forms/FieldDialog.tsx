@@ -148,8 +148,8 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                         <Formik
                             initialValues={formState}
                             validationSchema={validationSchemaField}
-                            validateOnBlur={false}
-                            validateOnChange={true}
+                            validateOnBlur={true}
+                            validateOnChange={false}
                             onSubmit={values => saveField(values, editMode ? "update" : "add")}
                         >
                             {({
@@ -202,49 +202,49 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                         >
                                             <FastField name="CListID">
                                                 {({ field, form }: any) => (
-                                                    <AccessibleView name="form-CListID" style={masterdataStyles.containerInput}>
-                                                        <CustomDropdownSingle
-                                                            title="Check List"
-                                                            labels="CListName"
-                                                            values="CListID"
-                                                            data={editMode ? checkList : dropcheckList}
-                                                            selectedValue={field.value}
-                                                            onValueChange={(value) => {
-                                                                form.setFieldValue(field.name, value);
-                                                                form.setTouched({ ...form.touched, [field.name]: true });
-                                                            }}
-                                                            testId={`CListID-form`}
-                                                        />
-                                                        {form.touched.CListID && form.errors.CListID ? (
-                                                            <HelperText type="error" visible style={{ left: -10 }}>
-                                                                {form.errors.CListID}
-                                                            </HelperText>
-                                                        ) : null}
-                                                    </AccessibleView>
+                                                    <CustomDropdownSingle
+                                                        title="Check List"
+                                                        labels="CListName"
+                                                        values="CListID"
+                                                        data={editMode ? checkList : dropcheckList}
+                                                        value={field.value}
+                                                        handleChange={(value) => {
+                                                            form.setFieldValue(field.name, value.value);
+                                                            setTimeout(() => {
+                                                                form.setFieldTouched(field.name, true);
+                                                            }, 0)
+                                                        }}
+                                                        handleBlur={() => {
+                                                            form.setFieldTouched(field.name, true);
+                                                        }}
+                                                        testId={`CListID-form`}
+                                                        error={form.touched.CListID && Boolean(form.errors.CListID)}
+                                                        errorMessage={form.touched.CListID ? form.errors.CListID : ""}
+                                                    />
                                                 )}
                                             </FastField>
 
                                             <FastField name="CTypeID">
                                                 {({ field, form }: any) => (
-                                                    <AccessibleView name="form-CTypeID" style={masterdataStyles.containerInput}>
-                                                        <CustomDropdownSingle
-                                                            title="Check List Type"
-                                                            labels="CTypeName"
-                                                            values="CTypeID"
-                                                            data={editMode ? checkListType : dropcheckListType}
-                                                            selectedValue={field.value}
-                                                            onValueChange={(value) => {
-                                                                form.setFieldValue(field.name, value);
-                                                                form.setTouched({ ...form.touched, [field.name]: true });
-                                                            }}
-                                                            testId={`CTypeID-form`}
-                                                        />
-                                                        {form.touched.CTypeID && form.errors.CTypeID ? (
-                                                            <HelperText type="error" visible style={{ left: -10 }}>
-                                                                {form.errors.CTypeID}
-                                                            </HelperText>
-                                                        ) : null}
-                                                    </AccessibleView>
+                                                    <CustomDropdownSingle
+                                                        title="Check List Type"
+                                                        labels="CTypeName"
+                                                        values="CTypeID"
+                                                        data={editMode ? checkListType : dropcheckListType}
+                                                        value={field.value}
+                                                        handleChange={(value) => {
+                                                            form.setFieldValue(field.name, value.value);
+                                                            setTimeout(() => {
+                                                                form.setFieldTouched(field.name, true);
+                                                            }, 0)
+                                                        }}
+                                                        handleBlur={() => {
+                                                            form.setFieldTouched(field.name, true);
+                                                        }}
+                                                        testId={`CTypeID-form`}
+                                                        error={form.touched.CTypeID && Boolean(form.errors.CTypeID)}
+                                                        errorMessage={form.touched.CTypeID ? form.errors.CTypeID : ""}
+                                                    />
                                                 )}
                                             </FastField>
 
@@ -252,25 +252,25 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                 <Animated.View style={[animatedDetail]}>
                                                     <FastField name="GCLOptionID">
                                                         {({ field, form }: any) => (
-                                                            <AccessibleView name="form-GCLOptionID" style={masterdataStyles.containerInput}>
-                                                                <CustomDropdownSingle
-                                                                    title="Match Check List Option Group"
-                                                                    labels="GCLOptionName"
-                                                                    values="GCLOptionID"
-                                                                    data={editMode ? groupCheckListOption : dropgroupCheckListOption}
-                                                                    selectedValue={field.value}
-                                                                    onValueChange={(value) => {
-                                                                        form.setFieldValue(field.name, value);
-                                                                        form.setTouched({ ...form.touched, [field.name]: true });
-                                                                    }}
-                                                                    testId={`GCLOptionID-form`}
-                                                                />
-                                                                {form.touched.GCLOptionID && form.errors.GCLOptionID ? (
-                                                                    <HelperText type="error" visible style={{ left: -10 }}>
-                                                                        {form.errors.GCLOptionID}
-                                                                    </HelperText>
-                                                                ) : null}
-                                                            </AccessibleView>
+                                                            <CustomDropdownSingle
+                                                                title="Match Check List Option Group"
+                                                                labels="GCLOptionName"
+                                                                values="GCLOptionID"
+                                                                data={editMode ? groupCheckListOption : dropgroupCheckListOption}
+                                                                value={field.value}
+                                                                handleChange={(value) => {
+                                                                    form.setFieldValue(field.name, value.value);
+                                                                    setTimeout(() => {
+                                                                        form.setFieldTouched(field.name, true);
+                                                                    }, 0)
+                                                                }}
+                                                                handleBlur={() => {
+                                                                    form.setFieldTouched(field.name, true);
+                                                                }}
+                                                                testId={`GCLOptionID-form`}
+                                                                error={form.touched.GCLOptionID && Boolean(form.errors.GCLOptionID)}
+                                                                errorMessage={form.touched.GCLOptionID ? form.errors.GCLOptionID : ""}
+                                                            />
                                                         )}
                                                     </FastField>
                                                 </Animated.View>
@@ -280,25 +280,25 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                 <Animated.View style={[animatedText]}>
                                                     <FastField name="DTypeID">
                                                         {({ field, form }: any) => (
-                                                            <AccessibleView name="form-DTypeID" style={masterdataStyles.containerInput}>
-                                                                <CustomDropdownSingle
-                                                                    title="Data Type"
-                                                                    labels="DTypeName"
-                                                                    values="DTypeID"
-                                                                    data={editMode ? dataType : dropdataType}
-                                                                    selectedValue={field.value}
-                                                                    onValueChange={(value) => {
-                                                                        form.setFieldValue(field.name, value);
-                                                                        form.setTouched({ ...form.touched, [field.name]: true });
-                                                                    }}
-                                                                    testId={`DTypeID-form`}
-                                                                />
-                                                                {form.touched.DTypeID && form.errors.DTypeID ? (
-                                                                    <HelperText type="error" visible style={{ left: -10 }}>
-                                                                        {form.errors.DTypeID}
-                                                                    </HelperText>
-                                                                ) : null}
-                                                            </AccessibleView>
+                                                            <CustomDropdownSingle
+                                                                title="Data Type"
+                                                                labels="DTypeName"
+                                                                values="DTypeID"
+                                                                data={editMode ? dataType : dropdataType}
+                                                                value={field.value}
+                                                                handleChange={(value) => {
+                                                                    form.setFieldValue(field.name, value.value);
+                                                                    setTimeout(() => {
+                                                                        form.setFieldTouched(field.name, true);
+                                                                    }, 0)
+                                                                }}
+                                                                handleBlur={() => {
+                                                                    form.setFieldTouched(field.name, true);
+                                                                }}
+                                                                testId={`DTypeID-form`}
+                                                                error={form.touched.DTypeID && Boolean(form.errors.DTypeID)}
+                                                                errorMessage={form.touched.DTypeID ? form.errors.DTypeID : ""}
+                                                            />
                                                         )}
                                                     </FastField>
                                                 </Animated.View>
@@ -306,62 +306,84 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
 
                                             {shouldRenderDT && (
                                                 <Animated.View style={[animatedStyleNumber]}>
-                                                    <Inputs
-                                                        placeholder="Digis Value"
-                                                        label="DTypeValue"
-                                                        handleChange={handleChange("DTypeValue")}
-                                                        handleBlur={handleBlur("DTypeValue")}
-                                                        value={String(values.DTypeValue ?? "")}
-                                                        error={touched.DTypeValue && Boolean(errors.DTypeValue)}
-                                                        errorMessage={touched.DTypeValue ? errors.DTypeValue : ""}
-                                                        testId={`DTypeValue-form`}
-                                                    />
+                                                    <FastField name="DTypeValue">
+                                                        {({ field, form }: any) => (
+                                                            <Inputs
+                                                                placeholder="Digis Value"
+                                                                label="DTypeValue"
+                                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                                value={field.value}
+                                                                error={form.touched.DTypeValue && Boolean(form.errors.DTypeValue)}
+                                                                errorMessage={form.touched.DTypeValue ? form.errors.DTypeValue : ""}
+                                                                testId={`DTypeValue-form`}
+                                                            />
+                                                        )}
+                                                    </FastField >
 
-                                                    <Inputs
-                                                        placeholder="Min Value"
-                                                        label="MinLength"
-                                                        handleChange={handleChange("MinLength")}
-                                                        handleBlur={handleBlur("MinLength")}
-                                                        value={String(values.MinLength ?? "")}
-                                                        error={touched.MinLength && Boolean(errors.MinLength)}
-                                                        errorMessage={touched.MinLength ? errors.MinLength : ""}
-                                                        testId={`MinLength-form`}
-                                                    />
+                                                    <FastField name="MinLength">
+                                                        {({ field, form }: any) => (
+                                                            <Inputs
+                                                                placeholder="Min Value"
+                                                                label="MinLength"
+                                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                                value={field.value}
+                                                                error={form.touched.MinLength && Boolean(form.errors.MinLength)}
+                                                                errorMessage={form.touched.MinLength ? form.errors.MinLength : ""}
+                                                                testId={`MinLength-form`}
+                                                            />
+                                                        )}
+                                                    </FastField >
 
-                                                    <Inputs
-                                                        placeholder="Max Value"
-                                                        label="MaxLength"
-                                                        handleChange={handleChange("MaxLength")}
-                                                        handleBlur={handleBlur("MaxLength")}
-                                                        value={String(values.MaxLength ?? "")}
-                                                        error={touched.MaxLength && Boolean(errors.MaxLength)}
-                                                        errorMessage={touched.MaxLength ? errors.MaxLength : ""}
-                                                        testId={`MaxLength-form`}
-                                                    />
+                                                    <FastField name="MaxLength">
+                                                        {({ field, form }: any) => (
+                                                            <Inputs
+                                                                placeholder="Max Value"
+                                                                label="MaxLength"
+                                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                                value={field.value}
+                                                                error={form.touched.MaxLength && Boolean(form.errors.MaxLength)}
+                                                                errorMessage={form.touched.MaxLength ? form.errors.MaxLength : ""}
+                                                                testId={`MaxLength-form`}
+                                                            />
+                                                        )}
+                                                    </FastField >
+
                                                 </Animated.View>
                                             )}
 
-                                            <Inputs
-                                                placeholder="Enter Placeholder"
-                                                label="Placeholder"
-                                                handleChange={handleChange("Placeholder")}
-                                                handleBlur={handleBlur("Placeholder")}
-                                                value={values.Placeholder}
-                                                error={touched.Placeholder && Boolean(errors.Placeholder)}
-                                                errorMessage={touched.Placeholder ? errors.Placeholder : ""}
-                                                testId={`Placeholder-form`}
-                                            />
+                                            <FastField name="Placeholder">
+                                                {({ field, form }: any) => (
+                                                    <Inputs
+                                                        placeholder="Enter Placeholder"
+                                                        label="Placeholder"
+                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                        handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                        value={field.value}
+                                                        error={form.touched.Placeholder && Boolean(form.errors.Placeholder)}
+                                                        errorMessage={form.touched.Placeholder ? form.errors.Placeholder : ""}
+                                                        testId={`Placeholder-form`}
+                                                    />
+                                                )}
+                                            </FastField >
 
-                                            <Inputs
-                                                placeholder="Enter Hint"
-                                                label="Hint"
-                                                handleChange={handleChange("Hint")}
-                                                handleBlur={handleBlur("Hint")}
-                                                value={values.Hint}
-                                                error={touched.Hint && Boolean(errors.Hint)}
-                                                errorMessage={touched.Hint ? errors.Hint : ""}
-                                                testId={`hint-form`}
-                                            />
+                                            <FastField name="Hint">
+                                                {({ field, form }: any) => (
+                                                    <Inputs
+                                                        placeholder="Enter Hint"
+                                                        label="Hint"
+                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                        handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                        value={field.value}
+                                                        error={form.touched.Hint && Boolean(form.errors.Hint)}
+                                                        errorMessage={form.touched.Hint ? form.errors.Hint : ""}
+                                                        testId={`Hint-form`}
+                                                    />
+                                                )}
+                                            </FastField >
+
 
                                             <AccessibleView name="form-active-fd" style={masterdataStyles.containerSwitch}>
                                                 <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>

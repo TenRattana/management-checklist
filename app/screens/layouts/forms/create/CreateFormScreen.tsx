@@ -11,9 +11,9 @@ import { AccessibleView, Inputs, SaveDialog } from "@/components";
 import Dragsubform from "./Dragsubform";
 import Preview from "@/app/screens/layouts/forms/view/Preview";
 import { CreateFormProps } from "@/typing/tag";
-import { BaseForm } from "@/typing/form";
+import { BaseForm, BaseFormState } from "@/typing/form";
 import { updateForm } from "@/slices";
-import { CheckListType } from "@/typing/type";
+import { CheckListType, DataType } from "@/typing/type";
 import { useRes } from "@/app/contexts";
 import { defaultDataForm } from "@/slices";
 
@@ -60,21 +60,11 @@ const DraggableItem: React.FC<{
     );
 };
 
-interface Card {
-    id: string;
-    type: string;
-    columns: number;
-    items: CheckListType[];
-    layout: LayoutRectangle | null;
-    SFormID: string; // เพิ่ม SFormID ที่นี่
-}
-
 const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
     const { state, dispatch, checkList, groupCheckListOption, checkListType, dataType } = useForm(route);
     const createform = useCreateformStyle();
     const masterdataStyles = useMasterdataStyles();
 
-    const subForm = useRef<View>(null);
     const [initialSaveDialog, setInitialSaveDialog] = useState(false);
 
     const formRef = useRef<BaseForm>({
@@ -86,7 +76,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
 
     const [initialForm, setInitialForm] = useState<BaseForm>(formRef.current);
     const [selectedIndex, setSelectedIndex] = useState(0);
-    const [cards, setCards] = useState<Card[]>([]); // แก้ไขเป็น array ของ Card
 
     useEffect(() => {
         const newForm: BaseForm = {
@@ -116,28 +105,28 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
         const cardIndex = childRef.current.checkCardPosition(x, y);
 
         if (cardIndex >= 0) {
-            const SFormID = state.subForms[cardIndex].SFormID;
-            const CL = checkList.find((v) => v.CListID === 'CL000') || checkList[0]
-            dispatch(defaultDataForm({ item, SFormID, checkList: CL, dataType }))
+            const SFormID = state.subForms[cardIndex].SFormID
+
+            const CL = checkList.find(v => v.CListID === "CL000") || checkList[0];
+            const DT = dataType.find((v) => v.DTypeName === "String") || dataType[0]
+
+            const currentField: BaseFormState = {
+                MCListID: `MCL-ADD-${SFormID.Fields?.length ?? 1}`, CListID: CL.CListID, GCLOptionID: "", CTypeID: item.CTypeID, DTypeID: DT.DTypeID, SFormID: SFormID,
+                Required: false, Placeholder: "Empty content", Hint: "Empty content", EResult: "", CListName: CL.CListName, CTypeName: item.CTypeName, DTypeValue: undefined, MinLength: undefined, MaxLength: undefined
+            };
+
+            currentField.GCLOptionID = ["Dropdown", "Radio", "Checkbox"].includes(item.CTypeName)
+                ? (groupCheckListOption.find((v) => v.GCLOptionID === "GCLO000") || groupCheckListOption[0])?.GCLOptionID
+                : undefined
+
+            dispatch(defaultDataForm({ currentField }))
         } else {
-            Alert.alert("Error", "You must drop the item inside a card!");
+            Alert.alert("Error", "You must drop the item inside a card!")
         }
     };
 
-    const addCard = (SFormID: string) => {
-        const newCard: Card = {
-            id: `card-${cards.length + 1}`,
-            type: "card",
-            columns: 1,
-            items: [],
-            layout: null,
-            SFormID: SFormID,
-        };
-        setCards((prev) => [...prev, newCard]);
-    };
-
     return (
-        <AccessibleView name="container-layout1" style={createform.container}>
+        <ScrollView contentContainerStyle={createform.container}>
             <AccessibleView name="container-segment" style={createform.containerL1}>
                 <SegmentedControl
                     values={["Form", "Tool"]}
@@ -203,7 +192,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
             <AccessibleView name="container-layout2" style={createform.containerL2}>
                 <Preview route={route} ref={childRef} />
             </AccessibleView>
-        </AccessibleView>
+        </ScrollView>
     );
 };
 

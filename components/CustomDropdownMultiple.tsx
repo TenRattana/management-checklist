@@ -1,14 +1,18 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { StyleSheet } from "react-native";
 import { IconButton, Chip, Text } from "react-native-paper";
 import { MultiSelect } from 'react-native-element-dropdown';
 import AccessibleView from "@/components/AccessibleView";
 import { CustomDropdownMultiProps } from '@/typing/tag';
 import { useRes } from "@/app/contexts";
+import useMasterdataStyles from "@/styles/common/masterdata";
 
-const CustomDropdownMultiple = ({ labels, values, title, data, selectedValue, onValueChange, lefticon, iconRight, testId }: CustomDropdownMultiProps) => {
+const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChange, lefticon, iconRight, testId, handleBlur }: CustomDropdownMultiProps) => {
   const [options, setOptions] = useState<{ label?: string; value?: string; icon?: () => JSX.Element }[]>([]);
-  const [currentValue, setCurrentValue] = useState<string[]>(Array.isArray(selectedValue) ? selectedValue : []);
+
+  console.log("Value", value);
+
+  const masterdataStyles = useMasterdataStyles();
+
   const { spacing } = useRes();
   console.log("CustomDropdownMultiple");
 
@@ -28,64 +32,14 @@ const CustomDropdownMultiple = ({ labels, values, title, data, selectedValue, on
     setOptions(newOptions);
   }, [processData]);
 
-  useEffect(() => {
-    setCurrentValue(Array.isArray(selectedValue) ? selectedValue : []);
-  }, [selectedValue]);
-
-  const handleChipClose = (chipToRemove: string) => {
-    const newValue = currentValue.filter(value => value !== chipToRemove);
-    setCurrentValue(newValue);
-    onValueChange(newValue);
-  };
-
-  const styles = StyleSheet.create({
-    dropdown: {
-      height: 50,
-      borderBottomColor: 'gray',
-      borderBottomWidth: 0.5,
-    },
-    icon: {
-      marginRight: 5,
-    },
-    placeholderStyle: {
-      fontSize: spacing.medium,
-    },
-    selectedTextStyle: {
-      fontSize: spacing.medium,
-    },
-    iconStyle: {
-      width: 20,
-    },
-    inputSearchStyle: {
-      fontSize: spacing.medium,
-    },
-    chipContainer: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      marginVertical: 5,
-    },
-    chip: {
-      marginRight: 5,
-      marginBottom: 5,
-      borderWidth: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      padding: 5,
-    },
-    chipText: {
-      fontSize: spacing.medium,
-      marginLeft: 5,
-    },
-  });
-
   return (
-    <AccessibleView name="customdropdown-multi">
+    <AccessibleView name="customdropdown-multi" style={masterdataStyles.containerInput}>
       <MultiSelect
-        style={styles.dropdown}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
+        style={masterdataStyles.dropdown}
+        placeholderStyle={masterdataStyles.placeholderStyle}
+        selectedTextStyle={masterdataStyles.selectedTextStyle}
+        inputSearchStyle={masterdataStyles.inputSearchStyle}
+        iconStyle={masterdataStyles.iconStyle}
         data={options}
         search
         maxHeight={300}
@@ -93,54 +47,49 @@ const CustomDropdownMultiple = ({ labels, values, title, data, selectedValue, on
         valueField="value"
         placeholder={`Select ${title}`}
         searchPlaceholder="Search..."
-        value={currentValue}
-        onChange={newValue => {
-          setCurrentValue(newValue);
-          onValueChange(newValue);
-        }}
+        value={value as string[]}
+        onChange={handleChange}
+        onBlur={handleBlur}
         renderLeftIcon={() => (
           <IconButton
-            style={styles.icon}
-            icon={lefticon || "check-all"}
-            size={spacing.medium}
+            style={masterdataStyles.icon}
+            icon={options.find((v) => v.value === value)?.icon || lefticon || "check-all"}
+            size={20}
           />
         )}
         renderRightIcon={() => (
-          <AccessibleView name="customdropdown-multi-right-icon" style={{ flexDirection: "row" }}>
-            {currentValue.length > 0 ? (
+          <AccessibleView name="customdropdown-single-right-icon" style={{ flexDirection: "row" }}>
+            {Array.isArray(value) && value.length > 0 ? (
               <IconButton
-                style={styles.icon}
+                style={masterdataStyles.icon}
                 icon="window-close"
-                size={spacing.medium}
+                size={30}
                 onPress={() => {
-                  setCurrentValue([]);
-                  onValueChange([]);
+                  handleChange([]);
                 }}
               />
             ) : (
-              <IconButton
-                style={styles.icon}
-                icon="chevron-down"
-                size={spacing.medium}
-              />
+              <IconButton style={masterdataStyles.icon} icon="chevron-down" size={30} />
             )}
-            {iconRight ?? null}
+            {iconRight ?? false}
           </AccessibleView>
         )}
-        renderSelectedItem={(item) => (
-          <Chip
-            style={styles.chip}
-            mode="outlined"
-            onClose={() => handleChipClose(item.value ?? "")}
-          >
-            <IconButton
-              icon="delete"
-              size={spacing.medium}
-              onPress={() => handleChipClose(item.value ?? "")}
-              style={{ padding: 0 }}
-            />
-            <Text style={styles.chipText}>{item.label}</Text>
-          </Chip>
+        renderSelectedItem={(item, unSelect) => (
+          <AccessibleView name="chip-mul" style={masterdataStyles.chipContainer}>
+            <Chip
+              style={masterdataStyles.chip}
+              mode="outlined"
+              onClose={() => unSelect?.(item)}
+            >
+              <IconButton
+                icon="delete"
+                size={spacing.small}
+                onPress={() => unSelect?.(item)}
+                style={{ padding: 0 }}
+              />
+              <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{item.label}</Text>
+            </Chip>
+          </AccessibleView>
         )}
         testID={testId}
       />

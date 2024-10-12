@@ -149,10 +149,7 @@ const ChecklistGroupScreen = () => {
                     <Searchbar
                         placeholder="Search Machine..."
                         value={searchQuery}
-                        onChangeText={setSearchQuery}
-                        style={masterdataStyles.searchbar}
-                        iconColor="#007AFF"
-                        placeholderTextColor="#a0a0a0"
+                        onChange={setSearchQuery}
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Group Option</Text>

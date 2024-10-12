@@ -7,26 +7,29 @@ import {
 } from "react-native";
 import { NavigationProp, RouteProp } from "@react-navigation/native";
 import { Form } from "./form";
-import { DataType, Checklist, CheckListType, GroupCheckListOption } from "./type";
+import {
+  DataType,
+  Checklist,
+  CheckListType,
+  GroupCheckListOption,
+} from "./type";
 
-// Route Parameters
 export type CreateFormParams = { formId: string };
 export type FormParams = { messages: string };
 export type PreviewParams = { formId: string; action?: string };
 export type ScanParams = { machineId: string };
 
-// Route Type
 export type Route<T = any> = { name: string; params?: T };
 
-// Event Types
-export type HandleChange = <V extends string | string[] | ChangeEvent<any>>(selectedValues: V) => void;
+export type HandleChange = <V extends string | string[] | ChangeEvent<any>>(
+  selectedValues: V
+) => void;
 
 export interface Event {
   handleChange: HandleChange;
   handleBlur?: (fieldName?: any) => void;
 }
 
-// Default Properties
 export interface DefaultProps {
   value: string | string[];
   label?: string;
@@ -36,7 +39,6 @@ export interface DefaultProps {
   testId?: string;
 }
 
-// Dialogs Properties
 export interface DialogsProps {
   isVisible: boolean;
   setIsVisible: (value: boolean) => void;
@@ -48,7 +50,6 @@ export interface DialogsProps {
   data?: string;
 }
 
-// Component Props
 export interface InputProps extends Event, DefaultProps {
   placeholder?: string;
   mode?: "outlined" | "flat";
@@ -72,17 +73,16 @@ export interface TextareasProps extends Event, DefaultProps {
   placeholder?: string;
   mode?: "outlined" | "flat";
 }
-export interface CustomDropdownSingleProps extends Event , DefaultProps{
-  labels:string;
-  values:string;
+export interface CustomDropdownSingleProps extends Event, DefaultProps {
+  labels: string;
+  values: string;
   title: string;
   data: Array<{ [key: string]: any }>;
   lefticon?: string;
   iconRight?: React.ReactNode;
-  handleBlur:()=>void;
+  handleBlur: () => void;
 }
 
-// Form Props
 export interface DynamicFormProps {
   field: BaseFormState;
   values: any;
@@ -90,7 +90,6 @@ export interface DynamicFormProps {
   groupCheckListOption: GroupCheckListOption[];
 }
 
-// Navigation Props
 export interface PreviewProps<T extends PreviewParams | ScanParams> {
   route: Route<T>;
   // onLayout: (SFormID:string,layout: LayoutRectangle) => void;
@@ -109,17 +108,14 @@ export interface CreateFormProps {
 
 // Miscellaneous Props
 
-
-export interface CustomDropdownMultiProps {
+export interface CustomDropdownMultiProps extends Event, DefaultProps {
   labels: string;
   values: string;
   title: string;
-  data: { [key: string]: any }[];
-  selectedValue?: string[];
-  onValueChange: (value: string[], icon?: () => JSX.Element) => void;
+  data: Array<{ [key: string]: any }>;
   lefticon?: string;
   iconRight?: React.ReactNode;
-  testId?: string;
+  handleBlur: () => void;
 }
 
 export interface CustomTableProps {

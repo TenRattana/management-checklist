@@ -1,21 +1,28 @@
-// SearchBar.tsx
 import React from 'react';
 import { Searchbar } from 'react-native-paper';
 import { StyleSheet } from 'react-native';
 
-console.log("SearchBar");
+interface SeractBarProps {
+  value: string;
+  onChange: (search: string) => void;
+  placeholder: string;
+}
 
-const SearchBar = ({ value, onChange, placeholder }: any) => (
-  <Searchbar
-    placeholder={placeholder}
-    value={value}
-    onChangeText={onChange}
-    style={styles.searchbar}
-    iconColor="#007AFF"
-    placeholderTextColor="#a0a0a0"
-    testID={`search-${placeholder}`}
-  />
-);
+const SearchBar = ({ value, onChange, placeholder }: SeractBarProps) => {
+  console.log("SearchBar");
+
+  return (
+    <Searchbar
+      placeholder={placeholder}
+      value={value}
+      onChangeText={onChange}
+      style={styles.searchbar}
+      iconColor="#007AFF"
+      placeholderTextColor="#a0a0a0"
+      testID={`search-${placeholder}`}
+    />
+  );
+}
 
 const styles = StyleSheet.create({
   searchbar: {

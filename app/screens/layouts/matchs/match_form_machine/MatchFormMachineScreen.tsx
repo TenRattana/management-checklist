@@ -184,7 +184,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
                     <Searchbar
                         placeholder="Search Macht Form Machine..."
                         value={searchQuery}
-                        onChangeText={setSearchQuery}
+                        onChange={setSearchQuery}
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Match Machine & Form</Text>

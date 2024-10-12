@@ -4,6 +4,7 @@ import { HelperText } from "react-native-paper";
 import { Text, StyleSheet } from "react-native";
 import { SelectsProps } from "@/typing/tag";
 import AccessibleView from "@/components/AccessibleView";
+import useMasterdataStyles from "@/styles/common/masterdata";
 
 const Selects = ({
   hint,
@@ -20,16 +21,17 @@ const Selects = ({
     return null;
   }
   console.log("Selects");
+  const masterdataStyles = useMasterdataStyles()
 
   return (
-    <AccessibleView name="selects" style={styles.container}>
-      {label && <Text style={styles.label}>{label}</Text>}
-      <AccessibleView name="group-selects" style={styles.dropdownContainer}>
+    <AccessibleView name="selects" style={masterdataStyles.commonContainer}>
+      {label && <Text style={masterdataStyles.label}>{label}</Text>}
+      <AccessibleView name="group-selects" style={masterdataStyles.dropdownContainer}>
         <Picker
           selectedValue={value}
           onValueChange={handleChange}
           onBlur={handleBlur}
-          style={styles.picker}
+          style={masterdataStyles.picker}
           testID={testId}
           id={testId}
         >
@@ -43,44 +45,12 @@ const Selects = ({
           ))}
         </Picker>
       </AccessibleView>
-      {hint && <Text style={styles.hint}>{hint}</Text>}
-      <HelperText type="error" visible={error} style={styles.errorText}>
+      {hint && <Text style={masterdataStyles.hint}>{hint}</Text>}
+      <HelperText type="error" visible={error} style={masterdataStyles.errorText}>
         {errorMessage}
       </HelperText>
     </AccessibleView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    marginVertical: 10,
-    paddingHorizontal: 10
-  },
-  label: {
-    fontSize: 18,
-    marginBottom: 5,
-    color: '#333',
-  },
-  dropdownContainer: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  picker: {
-    height: 50,
-    width: '100%',
-    fontSize: 18,
-  },
-  hint: {
-    fontSize: 16,
-    marginTop: 5,
-    color: '#777',
-  },
-  errorText: {
-    left: -10,
-    fontSize: 16,
-  },
-});
 
 export default Selects;

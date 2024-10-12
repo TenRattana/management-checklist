@@ -136,6 +136,60 @@ const useMasterdataStyles = () => {
             height: 40,
             fontSize: 20,
         },
+        chipContainer: {
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+        },
+        chip: {
+            margin: 5,
+            borderWidth: 1,
+            alignItems: 'center',
+        },
+        commonContainer: {
+            margin: 12
+        },
+        checkboxContainer: {
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 12,
+            paddingHorizontal: 10
+        },
+        checkboxLabel: {
+            fontSize: 16,
+            marginLeft: 8,
+        },
+        hint: {
+            fontSize: 12,
+            color: "#6e6e6e",
+            marginTop: 5,
+        },
+        label: {
+            fontSize: 16,
+            marginBottom: 10,
+            fontWeight: "bold",
+        },
+        radioItem: {
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 8,
+        },
+        radioLabel: {
+            fontSize: 16,
+        },
+        errorText: {
+            marginTop: 5,
+        },
+        dropdownContainer: {
+            borderWidth: 1,
+            borderColor: '#ccc',
+            borderRadius: 8,
+            overflow: 'hidden',
+        },
+        picker: {
+            height: 50,
+            width: '100%',
+            fontSize: 18,
+        },
     });
 };
 

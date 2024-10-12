@@ -115,7 +115,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
                     <Searchbar
                         placeholder="Search Expected Result..."
                         value={searchQuery}
-                        onChangeText={setSearchQuery}
+                        onChange={setSearchQuery}
                     />
                 </AccessibleView>
                 <Card.Content style={{ padding: 2, paddingVertical: 10 }}>

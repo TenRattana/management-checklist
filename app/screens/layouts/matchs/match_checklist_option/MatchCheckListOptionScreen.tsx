@@ -194,7 +194,7 @@ const MatchCheckListOptionScreen = () => {
                     <Searchbar
                         placeholder="Search Match Checklist Machine..."
                         value={searchQuery}
-                        onChangeText={setSearchQuery}
+                        onChange={setSearchQuery}
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Match Group & Option</Text>

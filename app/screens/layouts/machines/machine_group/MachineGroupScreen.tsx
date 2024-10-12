@@ -112,7 +112,7 @@ const MachineGroupScreen = () => {
         ]);
     }, [machineGroup, debouncedSearchQuery]);
 
-    const handelNewData = useCallback(() => {
+    const handleNewData = useCallback(() => {
         setInitialValues({
             machineGroupId: "",
             machineGroupName: "",
@@ -148,9 +148,9 @@ const MachineGroupScreen = () => {
                     <Searchbar
                         placeholder="Search Machine Group..."
                         value={searchQuery}
-                        onChangeText={setSearchQuery}
+                        onChange={setSearchQuery}
                     />
-                    <Pressable onPress={handelNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                    <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Group Machine</Text>
                     </Pressable>
                 </AccessibleView>

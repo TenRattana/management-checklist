@@ -167,7 +167,7 @@ const MachineGroupScreen = () => {
                     <Searchbar
                         placeholder="Search Machine..."
                         value={searchQuery}
-                        onChangeText={setSearchQuery}
+                        onChange={setSearchQuery}
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Machine</Text>

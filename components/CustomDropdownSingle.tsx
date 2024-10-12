@@ -23,6 +23,8 @@ const CustomDropdownSingle = ({
     const [options, setOptions] = useState<{ label?: string; value?: string; icon?: () => JSX.Element }[]>([]);
     const masterdataStyles = useMasterdataStyles();
 
+    console.log("CustomDropdownSingleProps");
+
     const processData = useCallback(() => {
         if (data && Array.isArray(data)) {
             return data.map((item) => ({
@@ -56,9 +58,7 @@ const CustomDropdownSingle = ({
                 searchPlaceholder="Search..."
                 value={value as string}
                 onChange={handleChange}
-                onBlur={() => {
-                    handleBlur();
-                }}
+                onBlur={handleBlur}
                 renderLeftIcon={() => (
                     <IconButton
                         style={masterdataStyles.icon}

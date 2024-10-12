@@ -3,6 +3,7 @@ import { Text, StyleSheet } from "react-native";
 import { TextInput, HelperText } from "react-native-paper";
 import { TextareasProps } from "@/typing/tag";
 import AccessibleView from "@/components/AccessibleView";
+import useMasterdataStyles from "@/styles/common/masterdata";
 
 const Textareas = ({
     placeholder,
@@ -12,16 +13,17 @@ const Textareas = ({
     value,
     handleChange,
     handleBlur,
-    mode = "outlined",
+    mode,
     hint,
     testId
 }: TextareasProps) => {
     console.log("Textareas");
+    const masterdataStyles = useMasterdataStyles()
 
     return (
-        <AccessibleView name="text-areas" style={styles.container}>
+        <AccessibleView name="text-areas" style={masterdataStyles.commonContainer}>
             <TextInput
-                mode={mode}
+                mode={mode || "outlined"}
                 placeholder={placeholder}
                 label={label}
                 onChangeText={handleChange}
@@ -35,49 +37,19 @@ const Textareas = ({
                             icon={"window-close"}
                             onPress={() => handleChange("")}
                         />
-                    ) : null
+                    ) : undefined
                 }
                 error={error}
                 enterKeyHint="done"
-                style={styles.textInput}
-                theme={{
-                    colors: {
-                        primary: '#6200ee',
-                        placeholder: '#aaa',
-                        text: '#000',
-                    },
-                }}
                 testID={testId}
                 id={testId}
             />
-            {hint && <Text style={styles.hintText}>{hint}</Text>}
-            <HelperText type="error" visible={error} style={styles.errorText}>
+            {hint && <Text style={masterdataStyles.hint}>{hint}</Text>}
+            <HelperText type="error" visible={error} style={masterdataStyles.errorText}>
                 {errorMessage}
             </HelperText>
         </AccessibleView>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        marginVertical: 10,
-        paddingHorizontal: 10
-    },
-    textInput: {
-        height: 120,
-        borderRadius: 8,
-        fontSize: 16,
-        padding: 10,
-    },
-    hintText: {
-        fontSize: 14,
-        color: '#888',
-        marginTop: 5,
-    },
-    errorText: {
-        left: -10,
-        fontSize: 14,
-    },
-});
 
 export default Textareas;

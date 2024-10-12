@@ -85,25 +85,25 @@ const Match_checklist_option = ({
 
                                     <FastField name="checkListOptionId">
                                         {({ field, form }: any) => (
-                                            <AccessibleView name="form-checkListOptionId" style={masterdataStyles.containerInput}>
-                                                <CustomDropdownMultiple
-                                                    title="Check List Option"
-                                                    labels="CLOptionName"
-                                                    values="CLOptionID"
-                                                    data={filteredData}
-                                                    selectedValue={field.value}
-                                                    onValueChange={(value) => {
-                                                        form.setFieldValue(field.name, value);
-                                                        form.setTouched({ ...form.touched, [field.name]: true });
-                                                    }}
-                                                    testId="checkListOptionId-mcod"
-                                                />
-                                                {form.touched.checkListOptionId && form.errors.checkListOptionId ? (
-                                                    <HelperText type="error" visible style={{ left: -10 }}>
-                                                        {form.errors.checkListOptionId}
-                                                    </HelperText>
-                                                ) : null}
-                                            </AccessibleView>
+                                            <CustomDropdownMultiple
+                                                title="Check List Option"
+                                                labels="CLOptionName"
+                                                values="CLOptionID"
+                                                data={filteredData}
+                                                value={field.value}
+                                                handleChange={(value) => {
+                                                    form.setFieldValue(field.name, value);
+                                                    setTimeout(() => {
+                                                        form.setFieldTouched(field.name, true);
+                                                    }, 0)
+                                                }}
+                                                handleBlur={() => {
+                                                    form.setFieldTouched(field.name, true);
+                                                }}
+                                                testId="checkListOptionId-mcod"
+                                                error={form.touched.checkListOptionId && Boolean(form.errors.checkListOptionId)}
+                                                errorMessage={form.touched.checkListOptionId ? form.errors.checkListOptionId : ""}
+                                            />
                                         )}
                                     </FastField>
 
