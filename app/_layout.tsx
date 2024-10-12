@@ -7,23 +7,6 @@ import { ThemeProvider, ToastProvider, ResponsiveProvider } from "@/app/contexts
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-  });
-
-  useEffect(() => {
-    const hideSplashScreen = async () => {
-      if (fontsLoaded) {
-        await SplashScreen.hideAsync();
-      }
-    };
-
-    hideSplashScreen();
-  }, [fontsLoaded]);
-
-  if (!fontsLoaded) {
-    return null;
-  }
   console.log("RootLayout");
 
   return (

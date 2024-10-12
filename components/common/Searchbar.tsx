@@ -6,9 +6,10 @@ interface SeractBarProps {
   value: string;
   onChange: (search: string) => void;
   placeholder: string;
+  testId: string;
 }
 
-const SearchBar = ({ value, onChange, placeholder }: SeractBarProps) => {
+const SearchBar = ({ value, onChange, placeholder, testId }: SeractBarProps) => {
   console.log("SearchBar");
 
   return (
@@ -19,8 +20,7 @@ const SearchBar = ({ value, onChange, placeholder }: SeractBarProps) => {
       style={styles.searchbar}
       iconColor="#007AFF"
       placeholderTextColor="#a0a0a0"
-      testID={`search-${placeholder}`}
-
+      testID={testId}
     />
   );
 }
