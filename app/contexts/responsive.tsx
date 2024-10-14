@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from "react";
 import { useWindowDimensions } from "react-native";
 import { useSpacing } from "@/hooks/useSpacing";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ResponsiveContextType {
   responsive: "small" | "medium" | "large";
@@ -9,8 +10,11 @@ interface ResponsiveContextType {
     medium: number;
     large: number;
   };
+  darkMode: boolean;
+  fontSize: string;
+  setFontSize: (value: string) => void;
+  setDarkMode: (value: boolean) => void;
 }
-console.log("res")
 
 const ResponsiveContext = createContext<ResponsiveContextType | undefined>(undefined);
 
@@ -21,7 +25,22 @@ interface ResponsiveProviderProps {
 export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children }) => {
   const { width } = useWindowDimensions();
   const spacingValues = useSpacing();
+  
   const [responsive, setResponsive] = useState<"small" | "medium" | "large">("small");
+  const [darkMode, setDarkMode] = useState<boolean>(false);
+  const [fontSize, setFontSize] = useState<string>('small');
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      const storedDarkMode = await AsyncStorage.getItem('darkMode');
+      const storedFontSize = await AsyncStorage.getItem('fontSize');
+      
+      setDarkMode(storedDarkMode === "darkMode");
+      setFontSize(storedFontSize ?? "small");
+    };
+
+    loadSettings();
+  }, []);
 
   useEffect(() => {
     if (width > spacingValues.breakpoints.large) {
@@ -31,21 +50,21 @@ export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children
     } else {
       setResponsive("small");
     }
-  }, [width]);
+  }, [width, spacingValues.breakpoints]);
 
   const spacing = useMemo(() => {
-    switch (responsive) {
+    switch (fontSize) {
       case "large":
         return {
-          small: spacingValues.xxmedium,
-          medium: spacingValues.large,
-          large: spacingValues.xLarge,
+          small: spacingValues.large,
+          medium: spacingValues.xLarge,
+          large: spacingValues.xxLarge,
         };
       case "medium":
         return {
-          small: spacingValues.medium,
-          medium: spacingValues.xmedium,
-          large: spacingValues.xxmedium,
+          small: spacingValues.xmedium,
+          medium: spacingValues.xxmedium,
+          large: spacingValues.large,
         };
       case "small":
       default:
@@ -55,9 +74,29 @@ export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children
           large: spacingValues.xxmedium,
         };
     }
-  }, [responsive, spacingValues]);
+  }, [fontSize, spacingValues]);
 
-  const value = useMemo(() => ({ responsive, spacing }), [responsive, spacing]);
+  const handleFontSizeChange = async (value: string) => {
+    setFontSize(value);
+    await AsyncStorage.setItem('fontSize', value);
+  };
+
+  const handleDarkModeChange = async (value: boolean) => {
+    setDarkMode(value);
+    await AsyncStorage.setItem('darkMode', value ? "darkMode" : "");
+  };
+
+  const value = useMemo(
+    () => ({
+      responsive,
+      spacing,
+      darkMode,
+      fontSize,
+      setFontSize: handleFontSizeChange,
+      setDarkMode: handleDarkModeChange
+    }),
+    [responsive, spacing, darkMode, fontSize]
+  );
 
   return (
     <ResponsiveContext.Provider value={value}>

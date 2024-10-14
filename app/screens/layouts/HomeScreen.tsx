@@ -31,6 +31,7 @@ const HomeScreen = () => {
   const masterdataStyles = useMasterdataStyles();
   const { showSuccess, handleError } = useToast();
   const { spacing } = useRes();
+  console.log(spacing);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);

@@ -32,24 +32,18 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
         const shape = {
             CListID: Yup.string().required("The checklist field is required."),
             CTypeID: Yup.string().required("The checklist type field is required."),
-            Placeholder: Yup.string().nullable(),
-            Hint: Yup.string().nullable(),
             Required: Yup.boolean().required("The required field is required."),
 
-            DTypeID: Yup.string().when('CTypeID', {
-                is: (CTypeID) => ['Textinput', 'Textarea'].includes(CTypeID),
-                then: Yup.string().required("DTypeID is required for Text/TextArea."),
-                otherwise: Yup.string().nullable(),
-            }),
-            GCLOptionID: Yup.string().when('CTypeID', {
-                is: (CTypeID) => ['Dropdown', 'Checkbox', 'Radio'].includes(CTypeID),
-                then: Yup.string().required("GCLOptionID is required for Dropdown/Select/Radio."),
-                otherwise: Yup.string().nullable(),
-            }),
-
-            DTypeValue: Yup.number().nullable(),
-            MinLength: Yup.number().nullable(),
-            MaxLength: Yup.number().nullable(),
+            // DTypeID: Yup.string().when('CTypeID', {
+            //     is: (CTypeID) => ['Textinput', 'Textarea'].includes(CTypeID),
+            //     then: Yup.string().required("DTypeID is required for Text/TextArea."),
+            //     otherwise: Yup.string().nullable(),
+            // }),
+            // GCLOptionID: Yup.string().when('CTypeID', {
+            //     is: (CTypeID) => ['Dropdown', 'Checkbox', 'Radio'].includes(CTypeID),
+            //     then: Yup.string().required("GCLOptionID is required for Dropdown/Select/Radio."),
+            //     otherwise: Yup.string().nullable(),
+            // }),
         };
 
         return Yup.object().shape(shape);

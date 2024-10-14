@@ -1,6 +1,5 @@
 import { StyleSheet } from "react-native";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { useSpacing } from "@/hooks/useSpacing";
 import { useRes } from "@/app/contexts";
 
 
@@ -13,7 +12,7 @@ const useMasterdataStyles = () => {
             flex: 1,
         },
         text: {
-            fontSize: spacing.medium,
+            fontSize: spacing.small,
             color: colors.text,
         },
         textItalic: {
@@ -123,10 +122,10 @@ const useMasterdataStyles = () => {
             marginRight: 5,
         },
         placeholderStyle: {
-            fontSize: 20,
+            fontSize: spacing.small,
         },
         selectedTextStyle: {
-            fontSize: 20,
+            fontSize: spacing.small,
         },
         iconStyle: {
             width: 20,
@@ -134,7 +133,7 @@ const useMasterdataStyles = () => {
         },
         inputSearchStyle: {
             height: 40,
-            fontSize: 20,
+            fontSize: spacing.small,
         },
         chipContainer: {
             flexDirection: 'row',
@@ -159,12 +158,12 @@ const useMasterdataStyles = () => {
             marginLeft: 8,
         },
         hint: {
-            fontSize: 12,
+            fontSize: spacing.small,
             color: "#6e6e6e",
             marginTop: 5,
         },
         label: {
-            fontSize: 16,
+            fontSize: spacing.small,
             marginBottom: 10,
             fontWeight: "bold",
         },
@@ -174,7 +173,7 @@ const useMasterdataStyles = () => {
             marginBottom: 8,
         },
         radioLabel: {
-            fontSize: 16,
+            fontSize: spacing.small,
         },
         errorText: {
             marginTop: 5,
@@ -195,12 +194,12 @@ const useMasterdataStyles = () => {
             paddingHorizontal: 10
         },
         title: {
-            fontSize: 24,
+            fontSize: spacing.medium,
             fontWeight: 'bold',
             marginBottom: 16,
         },
         description: {
-            fontSize: 20,
+            fontSize: spacing.small,
             marginBottom: 16,
         },
         subFormContainer: {
@@ -215,7 +214,7 @@ const useMasterdataStyles = () => {
             marginBottom: 20,
         },
         cardTitle: {
-            fontSize: 18,
+            fontSize: spacing.small,
             fontWeight: 'bold'
         },
         containerScccess: {
@@ -225,7 +224,7 @@ const useMasterdataStyles = () => {
             padding: 20,
         },
         titleScccess: {
-            fontSize: 24,
+            fontSize: spacing.medium,
             fontWeight: 'bold',
             textAlign: 'center',
         },

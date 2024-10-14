@@ -49,6 +49,16 @@ const MachineGroupScreen = () => {
         }
     }, [handleError]);
 
+    useEffect(() => {
+        fetchData(); 
+
+        const pollingInterval = setInterval(() => {
+            fetchData();
+        }, 5000); 
+
+        return () => clearInterval(pollingInterval);
+    }, [fetchData]);
+
     useFocusEffect(
         useCallback(() => {
             fetchData();

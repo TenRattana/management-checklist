@@ -1,24 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { Text, Switch, StyleSheet, Pressable, TextInput } from 'react-native';
+import { Text, Switch, StyleSheet, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 import { AccessibleView } from '@/components';
+import { useRes } from '@/app/contexts';
 
 const SettingsScreen: React.FC = () => {
-  const [darkMode, setDarkMode] = useState<boolean>(false);
-  const [fontSize, setFontSize] = useState<string>('medium');
-  const [language, setLanguage] = useState<string>('en');
   console.log("SettingsScreen");
+  const { darkMode ,spacing, fontSize, setFontSize , setDarkMode} = useRes();
 
   useEffect(() => {
     const loadSettings = async () => {
       const savedDarkMode = await AsyncStorage.getItem('darkMode');
       const savedFontSize = await AsyncStorage.getItem('fontSize');
-      const savedLanguage = await AsyncStorage.getItem('language');
 
       if (savedDarkMode !== null) setDarkMode(savedDarkMode === 'true');
       if (savedFontSize) setFontSize(savedFontSize);
-      if (savedLanguage) setLanguage(savedLanguage);
     };
 
     loadSettings();
@@ -35,34 +32,33 @@ const SettingsScreen: React.FC = () => {
     await AsyncStorage.setItem('fontSize', size);
   };
 
-  const handleLanguageChange = async (lang: string) => {
-    setLanguage(lang);
-    await AsyncStorage.setItem('language', lang);
-  };
-
   return (
-    <AccessibleView name="setting" style={[styles.container, darkMode ? styles.darkContainer : styles.lightContainer]}>
-      <Text style={[styles.title, { fontSize: fontSize === 'large' ? 24 : fontSize === 'medium' ? 18 : 14 }]}>Settings</Text>
+    <AccessibleView name="setting" style={[styles.container]}>
+      <Text style={[styles.title]}>Settings</Text>
 
-      <AccessibleView name="setting-mode" style={styles.settingItem}>
-        <Text style={styles.settingText}>Dark Mode</Text>
+      <AccessibleView name="setting-mode" style={[styles.settingItem]}>
+        <Text style={[styles.settingText, { fontSize: spacing.small}]}>Dark Mode</Text>
         <Switch
           onValueChange={toggleSwitch}
           value={darkMode}
+          thumbColor={darkMode ? "#00000e" : "#f4f3f4"}
+          trackColor={{ false: "#767577", true: "#81b0ff" }}
         />
       </AccessibleView>
 
-      <AccessibleView name="setting-font" style={styles.settingItem}>
-        <Text style={styles.settingText}>Font Size</Text>
-        <Picker
-          selectedValue={fontSize}
-          style={styles.picker}
-          onValueChange={handleFontSizeChange}
-        >
-          <Picker.Item label="Small" value="small" />
-          <Picker.Item label="Medium" value="medium" />
-          <Picker.Item label="Large" value="large" />
-        </Picker>
+      <AccessibleView name="setting-font" style={[styles.settingItem]}>
+        <Text style={[styles.settingText, { fontSize: spacing.small } ]}>Font Size</Text>
+        <AccessibleView name="Picker" style={[styles.pickerContainer]}>
+          <Picker
+            selectedValue={fontSize}
+            style={[styles.picker]}
+            onValueChange={handleFontSizeChange}
+          >
+            <Picker.Item label="Small" value="small" />
+            <Picker.Item label="Medium" value="medium" />
+            <Picker.Item label="Large" value="large" />
+          </Picker>
+        </AccessibleView>
       </AccessibleView>
     </AccessibleView>
   );
@@ -73,29 +69,32 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  darkContainer: {
-    backgroundColor: '#333',
-  },
-  lightContainer: {
-    backgroundColor: '#fff',
-  },
   title: {
     fontWeight: 'bold',
     marginBottom: 20,
+    textAlign: 'center',
   },
   settingItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    marginVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
   },
   settingText: {
-    fontSize: 18,
-    color: '#000',
+    fontWeight: '500',
+  },
+  pickerContainer: {
+    width: 150,
+    borderWidth: 1,
+    borderRadius: 8,
   },
   picker: {
     height: 50,
-    width: 150,
+    width: '100%',
   },
 });
 

@@ -31,7 +31,7 @@ const CustomTable = ({
   const [dialogData, setDialogData] = useState<string>("");
   console.log("CustomTable");
 
-  // const colors = useThemeColor();
+  const colors = useThemeColor();
   const { responsive, spacing } = useRes();
   const { handleError } = useToast();
   const customtable = useCustomtableStyles();
@@ -120,14 +120,14 @@ const CustomTable = ({
           <Animated.View style={{ transform: [{ scale: animations[rowIndex] }] }}>
             <IconButton
               icon={cell ? "toggle-switch" : "toggle-switch-off-outline"}
-              size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium}
-            // iconColor={cell ? colors.succeass : colors.main}
+              size={(responsive === "small" ? spacing.large : spacing.large) + 10}
+              iconColor={cell ? colors.succeass : colors.main}
             />
           </Animated.View>
         </Pressable>
       );
     }
-    return <Text key={`cell-content-${cellIndex}`}>{cell}</Text>;
+    return <Text key={`cell-content-${cellIndex}`} style={[masterdataStyles.text, masterdataStyles.textDark]}>{cell}</Text>;
   };
 
 
@@ -155,8 +155,8 @@ const CustomTable = ({
         icon = (
           <IconButton
             icon="pencil-box"
-            size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium}
-          // iconColor={colors.main}
+            size={responsive === "small" ? spacing.large : spacing.large}
+            iconColor={colors.main}
           />
         );
         break;
@@ -164,8 +164,8 @@ const CustomTable = ({
         icon = (
           <IconButton
             icon="pencil-box"
-            size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium}
-          // iconColor={colors.main}
+            size={responsive === "small" ? spacing.large : spacing.large}
+            iconColor={colors.main}
           />
         );
         break;
@@ -173,8 +173,8 @@ const CustomTable = ({
         icon = (
           <IconButton
             icon="trash-can"
-            size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium}
-          // iconColor={colors.danger}
+            size={responsive === "small" ? spacing.large : spacing.large}
+            iconColor={colors.danger}
           />
         );
         break;
@@ -182,8 +182,8 @@ const CustomTable = ({
         icon = (
           <IconButton
             icon="tooltip-edit"
-            size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium}
-          // iconColor={colors.danger}
+            size={responsive === "small" ? spacing.large : spacing.large}
+            iconColor={colors.danger}
           />
         );
         break;
@@ -191,8 +191,8 @@ const CustomTable = ({
         icon = (
           <IconButton
             icon="content-copy"
-            size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium}
-          // iconColor={colors.danger}
+            size={responsive === "small" ? spacing.large : spacing.large}
+            iconColor={colors.danger}
           />
         );
         break;
@@ -200,8 +200,8 @@ const CustomTable = ({
         icon = (
           <IconButton
             icon="file-find"
-            size={responsive === "small" ? 20 + spacing.medium : 10 + spacing.medium}
-          // iconColor={colors.danger}
+            size={responsive === "small" ? spacing.large : spacing.large}
+            iconColor={colors.danger}
           />
         );
         break;

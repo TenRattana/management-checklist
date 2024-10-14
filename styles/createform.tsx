@@ -36,7 +36,7 @@ const useCreateformStyle = () => {
             justifyContent: 'center',
         },
         addSubFormText: {
-            fontSize: 16,
+            fontSize: spacing.small,
             color: '#00796b',
             marginLeft: 8,
         },
@@ -63,10 +63,10 @@ const useCreateformStyle = () => {
             backgroundColor: '#d0f0d0',
         },
         fieldText: {
-            fontSize: 16,
+            fontSize: spacing.small,
         },
         subFormText: {
-            fontSize: 16,
+            fontSize: spacing.small,
         },
         saveButton: {
             padding: 16,
@@ -77,7 +77,7 @@ const useCreateformStyle = () => {
         },
         saveButtonText: {
             color: colors.light,
-            fontSize: 16,
+            fontSize: spacing.small,
         },
         scrollableContainer: {
             maxHeight: 500,
