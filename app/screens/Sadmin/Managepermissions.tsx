@@ -66,7 +66,7 @@ const Managepermissions = () => {
 
   const saveData = useCallback(async (values: InitialValuesManagepermission) => {
     const data = {
-      UserID: values.UserID,
+      UserID: values.UserID ?? "",
       UserName: values.UserName,
       RoleID: values.RoleID,
       IsActive: values.IsActive
@@ -113,12 +113,12 @@ const Managepermissions = () => {
   const tableData = useMemo(() => {
     return user.map((item) => [
       item.UserName,
-      item.GUserID,
+      groupUser.find((group) => group.GUserID === item.GUserID)?.GUserName || "",
       item.IsActive,
       item.UserID,
       item.UserID,
     ])
-  }, [user, debouncedSearchQuery]);
+  }, [user, groupUser, debouncedSearchQuery]);
 
   const handleNewData = useCallback(() => {
     setInitialValues({

@@ -39,6 +39,7 @@ export interface InitialValuesGroupCheckList extends Detail, Active {
 export interface InitialValuesMatchFormMachine {
   machineId: string;
   formId: string;
+  
 }
 
 export interface InitialValuesMatchCheckListOption extends Active {
