@@ -1,18 +1,20 @@
 import { StyleSheet, Text, ScrollView, View, ViewStyle } from "react-native";
 import React, { useEffect, useState, useCallback, forwardRef, useImperativeHandle, useRef } from "react";
-import { ActivityIndicator, Card, Divider } from "react-native-paper";
+import { ActivityIndicator, Card, Divider, HelperText } from "react-native-paper";
 import { useRes } from "@/app/contexts";
 import { BaseFormState, BaseSubForm } from '@/typing/form';
 import { AccessibleView, Dynamic } from "@/components";
 import useForm from "@/hooks/custom/useForm";
 import { PreviewProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
+import { FastField, Field, Formik } from "formik";
 
 const Preview = forwardRef<any, any>((props, ref) => {
-    const { route } = props;
+    const { route, validationSchema } = props;
     const { found, state, groupCheckListOption } = useForm(route);
 
     const masterdataStyles = useMasterdataStyles();
+    console.log(validationSchema);
 
     const cardRef = useRef<View>(null);
     const { responsive } = useRes();
@@ -61,62 +63,78 @@ const Preview = forwardRef<any, any>((props, ref) => {
         }
     }, [state.subForms]);
 
-    const handleChange = useCallback((fieldName: string, value: any) => {
-        setFormValues((prev) => ({
-            ...prev,
-            [fieldName]: value,
-        }));
-    }, []);
-
     return (
         <AccessibleView name="preview" style={[masterdataStyles.container, { maxHeight: 900, paddingBottom: 30 }]}>
-            {state.subForms.length > 0 ? (
-                <>
-                    <Text style={masterdataStyles.title}>{state.FormName || "Content Name"}</Text>
-                    <Divider />
-                    <Text style={masterdataStyles.description}>{state.Description || "Content Description"}</Text>
+            <>
+                <Text style={masterdataStyles.title}>{state.FormName || "Content Name"}</Text>
+                <Divider />
+                <Text style={masterdataStyles.description}>{state.Description || "Content Description"}</Text>
 
-                    <ScrollView style={{ flex: 1 }}>
-                        {state.subForms.map((subForm: BaseSubForm, index: number) => (
-                            <AccessibleView name="gen-subForm" key={`subForm-${index}`}>
-                                <Card style={masterdataStyles.card} ref={(el) => (cardRefs.current[index] = el)}>
-                                    <Card.Title title={subForm.SFormName} titleStyle={masterdataStyles.cardTitle} />
-                                    <Card.Content style={masterdataStyles.subFormContainer}>
-                                        {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
-                                            const columns = subForm.Columns ?? 1;
-                                            const columnWidth = responsive === "small" ? "100" : 100 / columns;
+                {/* {state.subForms.length > 0 ? ( */}
 
-                                            const containerStyle: ViewStyle = {
-                                                flexBasis: `${columnWidth}%`,
-                                                flexGrow: field.DisplayOrder || 1,
-                                                flexDirection: "row",
-                                                flexWrap: "nowrap",
-                                            };
+                <ScrollView style={{ flex: 1 }}>
 
-                                            return (
-                                                <AccessibleView
-                                                    name="container-layout2"
-                                                    key={`field-${fieldIndex}-${subForm.SFormName}`}
-                                                    style={containerStyle}
-                                                >
-                                                    {/* <Text>A</Text> */}
-                                                    <Dynamic
-                                                        field={field}
-                                                        values={formValues[field.MCListID] ?? ""}
-                                                        handleChange={(fieldname: string, value: any) => handleChange(fieldname, value)}
-                                                        groupCheckListOption={groupCheckListOption}
-                                                    />
-                                                </AccessibleView>
-                                            );
-                                        })}
-                                    </Card.Content>
-                                </Card>
-                            </AccessibleView>
-                        ))}
+                    <Formik
+                        initialValues={formValues}
+                        validationSchema={validationSchema}
+                        validateOnBlur={true}
+                        validateOnChange={false}
+                        onSubmit={(value) => console.log(value)}
+                    >
+                        {({ handleSubmit, isValid, dirty }) => (
+                            <>
+                                {state.subForms.map((subForm: BaseSubForm, index: number) => (
+                                    <Card style={masterdataStyles.card} ref={(el) => (cardRefs.current[index] = el)} key={subForm.SFormID}>
+                                        <Card.Title title={subForm.SFormName} titleStyle={masterdataStyles.cardTitle} />
+                                        <Card.Content style={masterdataStyles.subFormContainer}>
+                                            {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
+                                                const columns = subForm.Columns ?? 1;
 
-                    </ScrollView>
-                </>
-            ) : (<ActivityIndicator size="large" color="#0000ff" />)}
+                                                const containerStyle: ViewStyle = {
+                                                    flexBasis: responsive === "small" ? "100%" : `${98 / columns}%`,
+                                                    // flexGrow: field.DisplayOrder || 1,
+                                                    padding: 5,
+                                                    // borderRightWidth: isLastColumn ? 0 : 1,
+                                                    // flexDirection: 'column',
+                                                    // flexWrap: 'wrap',
+                                                    marginHorizontal: 5,
+                                                };
+                                                console.log(containerStyle);
+
+                                                return (
+                                                    <FastField name={field.MCListID}>
+                                                        {({ fields, form }: any) => (
+                                                            <AccessibleView name="contianer-layout2" key={`fieldid-${fields.CListID}-field-${fieldIndex}-${subForm.SFormID}`} style={containerStyle}>
+                                                                <Dynamic
+                                                                    field={field}
+                                                                    values={fields.value}
+                                                                    handleChange={(fieldname: string, value: any) => {
+                                                                        form.setFieldValue(fields.name, value)
+                                                                        setTimeout(() => {
+                                                                            form.setTouched({ ...form.touched, [fields.name]: true })
+                                                                        }, 0)
+                                                                    }}
+                                                                    groupCheckListOption={groupCheckListOption}
+                                                                />
+                                                                <HelperText type="error" visible={form.touched[fields.name] && Boolean(form.errors[fields.name])} style={{ left: -10 }}>
+                                                                    {form.errors[fields.name] || ""}
+                                                                </HelperText>
+                                                            </AccessibleView>
+
+                                                        )}
+                                                    </FastField>
+                                                );
+                                            })}
+
+                                        </Card.Content>
+                                    </Card>
+                                ))}
+                            </>
+                        )}
+                    </Formik>
+                </ScrollView>
+                {/* ) : (<ActivityIndicator size="large" color="#0000ff" />)} */}
+            </>
 
         </AccessibleView>
     );

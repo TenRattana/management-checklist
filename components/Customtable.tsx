@@ -155,7 +155,7 @@ const CustomTable = ({
         icon = (
           <IconButton
             icon="pencil-box"
-            size={responsive === "small" ? spacing.large : spacing.large}
+            size={(responsive === "small" ? spacing.large : spacing.large) + 5}
             iconColor={colors.main}
           />
         );
@@ -164,7 +164,7 @@ const CustomTable = ({
         icon = (
           <IconButton
             icon="pencil-box"
-            size={responsive === "small" ? spacing.large : spacing.large}
+            size={(responsive === "small" ? spacing.large : spacing.large) + 5}
             iconColor={colors.main}
           />
         );
@@ -173,7 +173,7 @@ const CustomTable = ({
         icon = (
           <IconButton
             icon="trash-can"
-            size={responsive === "small" ? spacing.large : spacing.large}
+            size={(responsive === "small" ? spacing.large : spacing.large) + 5}
             iconColor={colors.danger}
           />
         );
@@ -182,7 +182,7 @@ const CustomTable = ({
         icon = (
           <IconButton
             icon="tooltip-edit"
-            size={responsive === "small" ? spacing.large : spacing.large}
+            size={(responsive === "small" ? spacing.large : spacing.large) + 5}
             iconColor={colors.danger}
           />
         );
@@ -191,7 +191,7 @@ const CustomTable = ({
         icon = (
           <IconButton
             icon="content-copy"
-            size={responsive === "small" ? spacing.large : spacing.large}
+            size={(responsive === "small" ? spacing.large : spacing.large) + 5}
             iconColor={colors.danger}
           />
         );
@@ -200,7 +200,7 @@ const CustomTable = ({
         icon = (
           <IconButton
             icon="file-find"
-            size={responsive === "small" ? spacing.large : spacing.large}
+            size={(responsive === "small" ? spacing.large : spacing.large) + 5}
             iconColor={colors.danger}
           />
         );
@@ -275,7 +275,7 @@ const CustomTable = ({
             ))}
           </DataTable.Header>
 
-          {filteredData.length === 0 ? (
+          {filteredData && filteredData.length === 0 ? (
             <Text>No data found...</Text>
           ) : (
             currentData.map((row, rowIndex) => (

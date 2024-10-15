@@ -32,10 +32,14 @@ const Selects = ({
           onValueChange={handleChange}
           onBlur={handleBlur}
           style={masterdataStyles.picker}
+          itemStyle={masterdataStyles.text}
           testID={testId}
           id={testId}
         >
-          <Picker.Item label="Select..." value="" />
+          <Picker.Item label="Select..."
+            value=""
+            style={masterdataStyles.text}
+          />
           {option.map((item, index) => (
             <Picker.Item
               key={`value-${index}`}

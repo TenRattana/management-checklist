@@ -21,7 +21,7 @@ const AccessibleView = ({ children, name, style }: AccessibleViewProps) => {
 
         },
         lightContainer: {
-            backgroundColor: '#f5f5f5',
+            // backgroundColor: '#f5f5f5',
             color: '#00000e',
             borderColor: '#00000e',
         },
@@ -29,7 +29,7 @@ const AccessibleView = ({ children, name, style }: AccessibleViewProps) => {
 
     return (
         <View
-            style={[style , darkMode ? styles.darkContainer : styles.lightContainer]}
+            style={[style, darkMode ? styles.darkContainer : styles.lightContainer]}
             accessibilityLabel={name}
             accessible={Platform.OS !== "web"}
             testID={`view-${name}`}

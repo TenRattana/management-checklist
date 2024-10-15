@@ -145,20 +145,20 @@ const useMasterdataStyles = () => {
             alignItems: 'center',
         },
         commonContainer: {
-            margin: 12
+            margin: 12,
         },
         checkboxContainer: {
             flexDirection: "row",
             alignItems: "center",
             marginBottom: 12,
-            paddingHorizontal: 10
+            paddingHorizontal: 10,
         },
         checkboxLabel: {
-            fontSize: 16,
+            fontSize: spacing.small,
             marginLeft: 8,
         },
         hint: {
-            fontSize: spacing.small,
+            fontSize: spacing.small - 2,
             color: "#6e6e6e",
             marginTop: 5,
         },
@@ -187,7 +187,7 @@ const useMasterdataStyles = () => {
         picker: {
             height: 50,
             width: '100%',
-            fontSize: 18,
+            fontSize: spacing.small,
         },
         container: {
             flex: 1,
@@ -212,6 +212,7 @@ const useMasterdataStyles = () => {
             borderRadius: 8,
             elevation: 2,
             marginBottom: 20,
+            backgroundColor: '#e7e7e7'
         },
         cardTitle: {
             fontSize: spacing.small,

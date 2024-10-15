@@ -1,20 +1,20 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { ScrollView, Text } from "react-native";
+import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
+import { ScrollView, Pressable, Text } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
-import { AccessibleView, Customtable, LoadingSpinner, Searchbar } from "@/components";
+import { AccessibleView, LoadingSpinner, Searchbar } from "@/components";
 import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
-import { Machine, MachineGroup } from '@/typing/type';
+import { Machine, MatchForm } from '@/typing/type';
 import { InitialValuesMachine } from '@/typing/value';
 import { useFocusEffect } from "expo-router";
+import { ScanQRProps } from "@/typing/tag";
+const Customtable = lazy(() => import('@/components/Customtable'));
 
-const HomeScreen = () => {
-  console.log("HomeScreen");
-
+const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
   const [machine, setMachine] = useState<Machine[]>([]);
-  const [machineGroup, setMachineGroup] = useState<MachineGroup[]>([]);
+  const [matchForm, setMatchForm] = useState<MatchForm[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -31,18 +31,16 @@ const HomeScreen = () => {
   const masterdataStyles = useMasterdataStyles();
   const { showSuccess, handleError } = useToast();
   const { spacing } = useRes();
-  console.log(spacing);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
-
     try {
-      const [machineResponse, machineGroupResponse] = await Promise.all([
+      const [machineResponse, matchFormResponse] = await Promise.all([
         axiosInstance.post("Machine_service.asmx/GetMachines"),
-        axiosInstance.post("MachineGroup_service.asmx/GetMachineGroups"),
+        axiosInstance.post("MatchFormMachine_service.asmx/GetMatchFormMachines"),
       ]);
       setMachine(machineResponse.data.data ?? []);
-      setMachineGroup(machineGroupResponse.data.data ?? []);
+      setMatchForm(matchFormResponse.data.data ?? [])
     } catch (error) {
       handleError(error);
     } finally {
@@ -52,7 +50,11 @@ const HomeScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
-      fetchData();
+      const pollingInterval = setInterval(() => {
+        fetchData();
+      }, 5000);
+
+      return () => clearInterval(pollingInterval);
     }, [fetchData])
   );
 
@@ -66,36 +68,61 @@ const HomeScreen = () => {
     };
   }, [searchQuery]);
 
-  const tableData = useMemo(() => {
-    return machine.map((item) => [
-      machineGroup.find((group) => group.MGroupID === item.MGroupID)?.MGroupName || "",
-      item.MachineName,
-      item.Description,
-      item.IsActive,
-      item.MachineID,
-    ])
-  }, [machine, machineGroup, debouncedSearchQuery]);
+  const handleAction = useCallback(async (action?: string, item?: string) => {
 
+  }, [fetchData, handleError]);
+
+  const tableData = useMemo(() => {
+    return matchForm.map((item) => [
+      item.MachineName,
+      item.FormName,
+      item.IsActive ? "Wait" : "Success",
+    ]);
+  }, [machine, debouncedSearchQuery]);
+
+  const handleSacnQR = useCallback(() => {
+    navigation.navigate("ScanQR")
+  }, []);
 
   const customtableProps = useMemo(() => ({
     Tabledata: tableData,
     Tablehead: [
-      { label: "Machine Group Name", align: "flex-start" },
       { label: "Machine Name", align: "flex-start" },
-      { label: "Description", align: "flex-start" },
+      { label: "FormName", align: "flex-start" },
       { label: "Status", align: "center" },
-      { label: "", align: "flex-end" },
     ],
-    flexArr: [2, 2, 2, 1, 1],
+    flexArr: [4, 2, 1],
     actionIndex: [{ editIndex: 4, delIndex: 5 }],
+    handleAction,
     searchQuery: debouncedSearchQuery,
-  }), [tableData, debouncedSearchQuery]);
+  }), [tableData, debouncedSearchQuery, handleAction]);
 
   return (
     <ScrollView style={{ paddingHorizontal: 15 }}>
-      <Text>Welcome Home</Text>
+      <Text style={[masterdataStyles.text, masterdataStyles.textBold,
+      { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>List Diary
+      </Text>
+      <Divider style={{ marginBottom: 20 }} />
+      <Card style={{ borderRadius: 5 }}>
+        <AccessibleView name="machine" style={{ paddingVertical: 20, flexDirection: 'row' }}>
+          <Searchbar
+            placeholder="Search List Form..."
+            value={searchQuery}
+            onChange={setSearchQuery}
+            testId="search-list-form"
+          />
+          <Pressable onPress={handleSacnQR} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+            <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Scan QR</Text>
+          </Pressable>
+        </AccessibleView>
+        <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
+          <Suspense fallback={<LoadingSpinner />}>
+            {!isLoading ? <Customtable {...customtableProps} /> : <LoadingSpinner />}
+          </Suspense>
+        </Card.Content>
+      </Card>
     </ScrollView>
   );
-}
+};
 
-export default React.memo(HomeScreen)
+export default React.memo(HomeScreen);

@@ -217,7 +217,7 @@ const subFormSlice = createSlice({
             if (field.MCListID === BaseFormState.MCListID) {
               return {
                 ...BaseFormState,
-                displayOrder: field.DisplayOrder,
+                DisplayOrder: field.DisplayOrder,
                 CheckListName: checkList.find(v => v.CListID === BaseFormState.CListID)?.CListName || "",
                 CTypeName: checkListType.find(v => v.CTypeID === BaseFormState.CTypeID)?.CTypeName || "",
               };

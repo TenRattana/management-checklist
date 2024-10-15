@@ -13,6 +13,7 @@ import {
   CheckListType,
   GroupCheckListOption,
 } from "./type";
+import * as Yup from 'yup';
 
 export type CreateFormParams = { formId: string };
 export type FormParams = { messages: string };
@@ -86,7 +87,7 @@ export interface CustomDropdownSingleProps extends Event, DefaultProps {
 export interface DynamicFormProps {
   field: BaseFormState;
   values: any;
-  handleChange:(fieldName:string , value:any) => void;
+  handleChange: (fieldName: string, value: any) => void;
   // handleBlur: () => void;
   groupCheckListOption: GroupCheckListOption[];
 }
@@ -147,6 +148,7 @@ export interface DragsubformProps {
   groupCheckListOption: GroupCheckListOption[];
   navigation: NavigationProp<any>;
 }
+  // validationSchema: Yup.ObjectSchema<{[x: string]: any;},Yup.AnyObject,{[x: string]: any;},"" >;
 
 // Admin and QR Props
 export interface GenerateQRProps {}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ScrollView, Pressable, Text } from "react-native";
 import axiosInstance from "@/config/axios";
-import { useToast, useTheme } from "@/app/contexts";
+import { useToast } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar } from "@/components";
 import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
@@ -18,7 +18,6 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
-    const { colors } = useTheme();
     const { spacing } = useRes();
     console.log("ExpectedResultScreen");
 
@@ -116,6 +115,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
                         placeholder="Search Expected Result..."
                         value={searchQuery}
                         onChange={setSearchQuery}
+                        testId="search-er"
                     />
                 </AccessibleView>
                 <Card.Content style={{ padding: 2, paddingVertical: 10 }}>

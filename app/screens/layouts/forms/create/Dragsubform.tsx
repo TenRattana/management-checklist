@@ -17,7 +17,7 @@ import { IconButton, Text } from "react-native-paper";
 import { runOnJS } from "react-native-reanimated";
 import { spacing } from "@/constants/Spacing";
 import Dragfield from "./Dragfield";
-import { BaseSubForm } from '@/typing/form'
+import { BaseFormState, BaseSubForm } from '@/typing/form'
 import { DragsubformProps } from "@/typing/tag";
 import { useToast } from "@/app/contexts";
 
@@ -131,6 +131,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
             </Animated.View>
         );
     };
+    console.log(state);
 
     return (
         <>

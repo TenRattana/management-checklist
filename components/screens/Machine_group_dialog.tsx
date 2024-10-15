@@ -7,7 +7,7 @@ import { Portal, Switch, Dialog } from "react-native-paper";
 import { FastField, Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { MachineGroupDialogProps, InitialValuesMachineGroup } from '@/typing/value'
+import { GroupMachineDialogProps, InitialValuesGroupMachine } from '@/typing/value'
 
 const validationSchema = Yup.object().shape({
     machineGroupName: Yup.string().required("The machine group name field is required."),
@@ -15,7 +15,7 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The active field is required."),
 });
 
-const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }: MachineGroupDialogProps<InitialValuesMachineGroup>) => {
+const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }: GroupMachineDialogProps<InitialValuesGroupMachine>) => {
     const masterdataStyles = useMasterdataStyles()
     // const { colors } = useTheme()
     console.log("Machine_group_dialog");
@@ -38,7 +38,7 @@ const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValue
                             validationSchema={validationSchema}
                             validateOnBlur={true}
                             validateOnChange={false}
-                            onSubmit={(values: InitialValuesMachineGroup) => saveData(values)}
+                            onSubmit={(values: InitialValuesGroupMachine) => saveData(values)}
                         >
                             {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, isValid, dirty }) => (
                                 <AccessibleView name="form-mgd">

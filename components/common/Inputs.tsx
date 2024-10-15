@@ -28,10 +28,15 @@ const Inputs: React.FC<InputProps> = ({
       <TextInput
         mode={mode || "outlined"}
         placeholder={placeholder}
-        label={label}
+        label={(
+          <Text style={[masterdataStyles.text]}>
+            {label}
+          </Text>
+        )}
+        style={masterdataStyles.text}
         onChangeText={handleChange}
         onBlur={handleBlur}
-        value={value as string}
+        value={String(value)}
         right={
           value ? (
             <TextInput.Icon
@@ -40,6 +45,7 @@ const Inputs: React.FC<InputProps> = ({
             />
           ) : undefined
         }
+        contentStyle={masterdataStyles.text}
         error={error}
         enterKeyHint="done"
         testID={testId}

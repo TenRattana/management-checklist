@@ -1,15 +1,15 @@
 import * as React from "react";
 
 // Domain-Specific Interfaces
-export interface MachineGroup {
-  MGroupID: string;
-  MGroupName: string;
+export interface GroupMachine {
+  GMachineID: string;
+  GMachineName: string;
   Description: string;
   IsActive: boolean;
 }
 
 export interface Machine {
-  MGroupID: string;
+  GMachineID: string;
   MachineID: string;
   MachineName: string;
   Description: string;
@@ -47,49 +47,64 @@ export interface GroupCheckListOption {
   GCLOptionName: string;
   Description: string;
   IsActive: boolean;
-  CheckListOptions?:CheckListOption[];
+  CheckListOptions?: CheckListOption[];
 }
 
 export interface Form {
-    FormID: string;
-    FormName: string;
-    IsActive: boolean;
-    Description:string;
+  FormID: string;
+  FormName: string;
+  IsActive: boolean;
+  Description: string;
 }
 
 export interface MatchForm {
-    MachineID: string;
-    FormID: string;
-    MachineName: string;
-    FormName: string;
-    IsActive:boolean;
+  MachineID: string;
+  FormID: string;
+  MachineName: string;
+  FormName: string;
+  IsActive: boolean;
 }
 
 export interface MatchCheckListOption {
-    MCLOptionID: string;
-    GCLOptionID: string;
-    CheckListOptions: Array<{ CLOptionID: string }>;
-    IsActive: boolean;
-    GCLOptionName: string;
+  MCLOptionID: string;
+  GCLOptionID: string;
+  CheckListOptions: Array<{ CLOptionID: string }>;
+  IsActive: boolean;
+  GCLOptionName: string;
 }
 
 export interface ExpectedResult {
-    TableID: string;
-    MachineID: string;
-    MachineName: string;
-    FormID: string;
-    FormName: string;
-    CreateDate: string;
+  TableID: string;
+  MachineID: string;
+  MachineName: string;
+  FormID: string;
+  FormName: string;
+  CreateDate: string;
 }
 
-export type TypeConfig = 
-  | MachineGroup 
-  | Machine 
-  | Checklist 
-  | CheckListType 
-  | CheckListOption 
-  | DataType 
+export interface Users {
+  UserID: string;
+  UserName: string;
+  GUserID : string;
+  IsActive: boolean;
+}
+
+export interface GroupUsers {
+  GUserID: string; 
+  GUserName:string;
+  IsActive: boolean;
+}
+
+export type TypeConfig =
+  | GroupMachine
+  | Machine
+  | Checklist
+  | CheckListType
+  | CheckListOption
+  | DataType
   | GroupCheckListOption
   | Form
   | MatchForm
-  | MatchCheckListOption;
+  | MatchCheckListOption
+  | Users
+  | GroupUsers;

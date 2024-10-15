@@ -176,7 +176,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                         if (newRender === "detail") {
                                             setFieldValue("DTypeID", null);
                                         } else {
-                                            setFieldValue("GCLOptionID", null);
+                                            setFieldValue("GCLOptionID", undefined);
                                         }
                                         setShouldRender(newRender);
                                     }
@@ -311,7 +311,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                                 label="DTypeValue"
                                                                 handleChange={(value) => form.setFieldValue(field.name, value)}
                                                                 handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                                value={field.value}
+                                                                value={String(field.value ?? "")}
                                                                 error={form.touched.DTypeValue && Boolean(form.errors.DTypeValue)}
                                                                 errorMessage={form.touched.DTypeValue ? form.errors.DTypeValue : ""}
                                                                 testId={`DTypeValue-form`}
@@ -326,7 +326,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                                 label="MinLength"
                                                                 handleChange={(value) => form.setFieldValue(field.name, value)}
                                                                 handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                                value={field.value}
+                                                                value={String(field.value ?? "")}
                                                                 error={form.touched.MinLength && Boolean(form.errors.MinLength)}
                                                                 errorMessage={form.touched.MinLength ? form.errors.MinLength : ""}
                                                                 testId={`MinLength-form`}
@@ -341,7 +341,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                                 label="MaxLength"
                                                                 handleChange={(value) => form.setFieldValue(field.name, value)}
                                                                 handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                                value={field.value}
+                                                                value={String(field.value ?? "")}
                                                                 error={form.touched.MaxLength && Boolean(form.errors.MaxLength)}
                                                                 errorMessage={form.touched.MaxLength ? form.errors.MaxLength : ""}
                                                                 testId={`MaxLength-form`}

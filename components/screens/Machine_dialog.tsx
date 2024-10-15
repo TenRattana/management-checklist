@@ -9,7 +9,7 @@ import { Formik, FastField, Field } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { MachineDialogProps, InitialValuesMachine } from '@/typing/value'
-import { MachineGroup } from '@/typing/type'
+import { GroupMachine } from '@/typing/type'
 
 const validationSchema = Yup.object().shape({
     machineGroupId: Yup.string().required("The machine group field is required."),
@@ -18,7 +18,7 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The active field is required."),
 });
 
-const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData, dropmachine, machineGroup = [] }: MachineDialogProps<InitialValuesMachine, MachineGroup>) => {
+const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData, dropmachine, machineGroup = [] }: MachineDialogProps<InitialValuesMachine, GroupMachine>) => {
     const masterdataStyles = useMasterdataStyles()
     // const { colors } = useTheme()
     console.log("Machine_dialog");
@@ -44,8 +44,8 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                                         {({ field, form }: any) => (
                                             <CustomDropdownSingle
                                                 title="Machine Group"
-                                                labels="MGroupName"
-                                                values="MGroupID"
+                                                labels="GMachineName"
+                                                values="GMachineID"
                                                 data={!isEditing ? machineGroup?.filter((v) => v.IsActive) : dropmachine || []}
                                                 value={field.value}
                                                 handleChange={(value) => {

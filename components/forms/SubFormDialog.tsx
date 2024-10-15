@@ -27,7 +27,7 @@ const SubFormDialog = ({
 
     return (
         <Portal>
-            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)}>
+            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={masterdataStyles.containerDialog}>
                 <Dialog.Title
                     style={[
                         masterdataStyles.text,

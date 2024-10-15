@@ -167,7 +167,8 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
                 dropcheckList={dropcheckList}
                 dropcheckListType={dropcheckListType}
                 dropdataType={dropdataType}
-                dropgroupCheckListOption={dropgroupCheckListOption} />
+                dropgroupCheckListOption={dropgroupCheckListOption}
+            />
         </>
     );
 }

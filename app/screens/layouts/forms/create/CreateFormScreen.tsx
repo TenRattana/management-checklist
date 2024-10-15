@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { GestureHandlerRootView, PanGestureHandler, PanGestureHandlerGestureEvent, ScrollView } from "react-native-gesture-handler";
 import { Dimensions, Pressable, FlatList, View, LayoutRectangle, Alert } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS } from "react-native-reanimated";
@@ -11,11 +11,12 @@ import { AccessibleView, Inputs, SaveDialog } from "@/components";
 import Dragsubform from "./Dragsubform";
 import Preview from "@/app/screens/layouts/forms/view/Preview";
 import { CreateFormProps } from "@/typing/tag";
-import { BaseForm, BaseFormState } from "@/typing/form";
+import { BaseForm, BaseFormState, BaseSubForm } from "@/typing/form";
 import { updateForm } from "@/slices";
 import { CheckListType, DataType } from "@/typing/type";
 import { useRes } from "@/app/contexts";
 import { defaultDataForm } from "@/slices";
+import * as Yup from 'yup'
 
 const DraggableItem: React.FC<{
     item: CheckListType;
@@ -126,6 +127,59 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
         }
     };
 
+    const validationSchema = useMemo(() => {
+        const shape: any = {};
+
+        state.subForms?.forEach((subForm: BaseSubForm) => {
+            subForm.Fields?.forEach((field: BaseFormState) => {
+                const dataTypeName = dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName;
+                const checkListTypeName = checkListType.find(item => item.CTypeID === field.CTypeID)?.CTypeName;
+
+                if (dataTypeName === "Number") {
+                    let validator = Yup.number()
+                        .nullable()
+                        .typeError(`The ${field.CListName} field a valid number`);
+
+                    if (field.Required) {
+                        validator = validator.required(`The ${field.Placeholder} field is required`);
+                    }
+
+                    if (field.MinLength) {
+                        validator = validator.min(field.MinLength, `The ${field.CListName} minimum value is ${field.MinLength}`)
+                    }
+
+                    if (field.MaxLength) {
+                        validator = validator.max(field.MaxLength, `The ${field.CListName} maximum value is ${field.MaxLength}`)
+                    }
+
+                    shape[field.MCListID] = validator;
+                }
+                else if (dataTypeName === "String") {
+
+                    let validator;
+
+                    if (checkListTypeName === "Checkbox") {
+                        validator = Yup.array()
+                            .of(Yup.string())
+                            .min(1, `The ${field.CListName} field requires at least one option to be selected`)
+                    } else {
+                        validator = Yup.string()
+                            .nullable()
+                            .typeError(`The ${field.CListName} field a valid string`);;
+                    }
+
+                    if (field.Required) {
+                        validator = validator.required(`The ${field.Placeholder} field is required`);
+                    }
+
+                    shape[field.MCListID] = validator;
+                }
+            });
+        });
+
+        return Yup.object().shape(shape);
+    }, [state.subForms, dataType, checkListType]);
+
     return (
         <AccessibleView name="create-form" style={createform.container}>
             <AccessibleView name="container-segment" style={createform.containerL1}>
@@ -136,7 +190,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                         const newIndex = event.nativeEvent.selectedSegmentIndex;
                         setSelectedIndex(newIndex);
                     }}
-                    style={{ height: 80, marginBottom: 10 }}
+                    style={{ height: 80, marginBottom: 10, borderRadius: 0 }}
                 />
                 <FlatList
                     data={[{}]}
@@ -197,7 +251,11 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
             </AccessibleView>
 
             <AccessibleView name="container-layout2" style={createform.containerL2}>
-                <Preview route={route} ref={childRef} />
+                <Preview
+                    route={route}
+                    ref={childRef}
+                    validationSchema={validationSchema}
+                />
             </AccessibleView>
 
         </AccessibleView>

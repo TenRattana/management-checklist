@@ -130,7 +130,6 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
         }
       };
       loadForm();
-      return () => { };
     }, [machineId, found, dispatch, fetchForm, createSubFormsAndFields, checkList, checkListType])
   );
 
@@ -227,14 +226,14 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                 flexBasis: responsive === "small" ? "100%" : `${98 / columns}%`,
                 flexGrow: fields.DisplayOrder || 1,
                 padding: 5,
-                borderRightWidth: isLastColumn ? 0 : 1,
+                // borderRightWidth: isLastColumn ? 0 : 1,
                 marginHorizontal: 5,
               };
 
               return (
                 <FastField name={fields.MCListID}>
                   {({ field, form }: any) => (
-                    <AccessibleView name="contianer-layout2" key={`field-${fieldIndex}-${item.SFormID}`} style={containerStyle}>
+                    <AccessibleView name="contianer-layout2" key={`fieldid-${fields.CListID}-field-${fieldIndex}-${item.SFormID}`} style={containerStyle}>
                       <Dynamic
                         field={fields}
                         values={field.value}
@@ -243,8 +242,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                           setTimeout(() => {
                             form.setTouched({ ...form.touched, [field.name]: true })
                           }, 0)
-                        }
-                        }
+                        }}
                         groupCheckListOption={groupCheckListOption}
                       />
                       <HelperText type="error" visible={form.touched[field.name] && Boolean(form.errors[field.name])} style={{ left: -10 }}>

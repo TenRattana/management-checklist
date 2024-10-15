@@ -7,19 +7,19 @@ import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Machine_group_dialog from "@/components/screens/Machine_group_dialog";
-import { MachineGroup } from '@/typing/type'
-import { InitialValuesMachineGroup } from '@/typing/value'
+import { GroupMachine } from '@/typing/type'
+import { InitialValuesGroupMachine } from '@/typing/value'
 import { useFocusEffect } from "expo-router";
 const Customtable = lazy(() => import('@/components/Customtable'));
 
 const MachineGroupScreen = () => {
-    const [machineGroup, setMachineGroup] = useState<MachineGroup[]>([]);
+    const [machineGroup, setMachineGroup] = useState<GroupMachine[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isVisible, setIsVisible] = useState<boolean>(false);
-    const [initialValues, setInitialValues] = useState<InitialValuesMachineGroup>({
+    const [initialValues, setInitialValues] = useState<InitialValuesGroupMachine>({
         machineGroupId: "",
         machineGroupName: "",
         description: "",
@@ -35,7 +35,7 @@ const MachineGroupScreen = () => {
         setIsLoading(true);
 
         try {
-            const response = await axiosInstance.post("MachineGroup_service.asmx/GetMachineGroups");
+            const response = await axiosInstance.post("GroupMachine_service.asmx/GetGroupMachines");
             setMachineGroup(response.data.data ?? []);
         } catch (error) {
             handleError(error);
@@ -60,16 +60,16 @@ const MachineGroupScreen = () => {
         };
     }, [searchQuery]);
 
-    const saveData = useCallback(async (values: InitialValuesMachineGroup) => {
+    const saveData = useCallback(async (values: InitialValuesGroupMachine) => {
         const data = {
-            MGroupID: values.machineGroupId ?? "",
-            MGroupName: values.machineGroupName,
+            GMachineID: values.machineGroupId ?? "",
+            GMachineName: values.machineGroupName,
             Description: values.description,
             isActive: values.isActive,
         };
 
         try {
-            const response = await axiosInstance.post("MachineGroup_service.asmx/SaveMachineGroup", data);
+            const response = await axiosInstance.post("GroupMachine_service.asmx/SaveGroupMachine", data);
             setIsVisible(!response.data.status);
             showSuccess(String(response.data.message));
 
@@ -82,19 +82,19 @@ const MachineGroupScreen = () => {
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
             if (action === "editIndex") {
-                const response = await axiosInstance.post("MachineGroup_service.asmx/GetMachineGroup", { MGroupID: item });
+                const response = await axiosInstance.post("GroupMachine_service.asmx/GetGroupMachine", { GMachineID: item });
                 const machineGroupData = response.data.data[0] ?? {};
                 setInitialValues({
-                    machineGroupId: machineGroupData.MGroupID ?? "",
-                    machineGroupName: machineGroupData.MGroupName ?? "",
+                    machineGroupId: machineGroupData.GMachineID ?? "",
+                    machineGroupName: machineGroupData.GMachineName ?? "",
                     description: machineGroupData.Description ?? "",
                     isActive: Boolean(machineGroupData.IsActive),
                 });
                 setIsEditing(true);
                 setIsVisible(true);
             } else {
-                const endpoint = action === "activeIndex" ? "ChangeMachineGroup" : "DeleteMachineGroup";
-                const response = await axiosInstance.post(`MachineGroup_service.asmx/${endpoint}`, { MGroupID: item });
+                const endpoint = action === "activeIndex" ? "ChangeGroupMachine" : "DeleteGroupMachine";
+                const response = await axiosInstance.post(`GroupMachine_service.asmx/${endpoint}`, { GMachineID: item });
                 showSuccess(String(response.data.message));
 
                 await fetchData()
@@ -106,10 +106,10 @@ const MachineGroupScreen = () => {
 
     const tableData = useMemo(() => {
         return machineGroup.map(item => [
-            item.MGroupName,
+            item.GMachineName,
             item.Description,
             item.IsActive,
-            item.MGroupID,
+            item.GMachineID,
         ]);
     }, [machineGroup, debouncedSearchQuery]);
 

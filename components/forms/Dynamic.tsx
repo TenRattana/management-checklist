@@ -4,6 +4,7 @@ import { Selects, Radios, Textareas, Inputs, Checkboxs } from "@/components/comm
 import { CheckListOption } from '@/typing/type';
 import AccessibleView from "../AccessibleView";
 import { DynamicFormProps } from "@/typing/tag";
+import useMasterdataStyles from "@/styles/common/masterdata";
 
 const DynamicForm = React.memo(({
   field,
@@ -12,7 +13,7 @@ const DynamicForm = React.memo(({
   groupCheckListOption,
 }: DynamicFormProps) => {
   const { CTypeName, Placeholder, Hint, CListName, MCListID, GCLOptionID } = field;
-
+  const masterdataStyles = useMasterdataStyles()
   const option = groupCheckListOption
     .filter(option => option.GCLOptionID === GCLOptionID)
     .flatMap(v =>
@@ -88,8 +89,11 @@ const DynamicForm = React.memo(({
   };
 
   return (
-    <AccessibleView name="form-layout2" style={{ flex: 1 }}>
-      <Text>{CListName}</Text>
+    <AccessibleView name="form-layout2" style={{
+      flex: 1,
+      backgroundColor: '#e7e7e7'
+    }}>
+      <Text style={masterdataStyles.text}>{CListName}</Text>
       {renderField()}
     </AccessibleView>
   );

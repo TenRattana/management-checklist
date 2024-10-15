@@ -7,13 +7,13 @@ import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Machine_dialog from "@/components/screens/Machine_dialog";
-import { Machine, MachineGroup } from '@/typing/type';
+import { Machine, GroupMachine } from '@/typing/type';
 import { InitialValuesMachine } from '@/typing/value';
 import { useFocusEffect } from "expo-router";
 
 const MachineGroupScreen = () => {
     const [machine, setMachine] = useState<Machine[]>([]);
-    const [machineGroup, setMachineGroup] = useState<MachineGroup[]>([]);
+    const [machineGroup, setMachineGroup] = useState<GroupMachine[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -38,7 +38,7 @@ const MachineGroupScreen = () => {
         try {
             const [machineResponse, machineGroupResponse] = await Promise.all([
                 axiosInstance.post("Machine_service.asmx/GetMachines"),
-                axiosInstance.post("MachineGroup_service.asmx/GetMachineGroups"),
+                axiosInstance.post("GroupMachine_service.asmx/GetGroupMachines"),
             ]);
             setMachine(machineResponse.data.data ?? []);
             setMachineGroup(machineGroupResponse.data.data ?? []);
@@ -48,16 +48,6 @@ const MachineGroupScreen = () => {
             setIsLoading(false);
         }
     }, [handleError]);
-
-    useEffect(() => {
-        fetchData(); 
-
-        const pollingInterval = setInterval(() => {
-            fetchData();
-        }, 5000); 
-
-        return () => clearInterval(pollingInterval);
-    }, [fetchData]);
 
     useFocusEffect(
         useCallback(() => {
@@ -78,7 +68,7 @@ const MachineGroupScreen = () => {
     const saveData = useCallback(async (values: InitialValuesMachine) => {
         const data = {
             MachineID: values.machineId,
-            MGroupID: values.machineGroupId ?? "",
+            GMachineID: values.machineGroupId ?? "",
             MachineName: values.machineName,
             Description: values.description,
             isActive: values.isActive,
@@ -102,7 +92,7 @@ const MachineGroupScreen = () => {
                 const machineData = response.data.data[0] ?? {};
                 setInitialValues({
                     machineId: machineData.MachineID ?? "",
-                    machineGroupId: machineData.MGroupID ?? "",
+                    machineGroupId: machineData.GMachineID ?? "",
                     machineName: machineData.MachineName ?? "",
                     description: machineData.Description ?? "",
                     isActive: Boolean(machineData.IsActive),
@@ -123,7 +113,7 @@ const MachineGroupScreen = () => {
 
     const tableData = useMemo(() => {
         return machine.map((item) => [
-            machineGroup.find((group) => group.MGroupID === item.MGroupID)?.MGroupName || "",
+            machineGroup.find((group) => group.GMachineID === item.GMachineID)?.GMachineName || "",
             item.MachineName,
             item.Description,
             item.IsActive,
@@ -161,7 +151,7 @@ const MachineGroupScreen = () => {
     const dropmachine = useMemo(() => {
         return Array.isArray(machineGroup)
             ? machineGroup.filter(
-                (v) => v.IsActive || v.MGroupID === initialValues.machineGroupId
+                (v) => v.IsActive || v.GMachineID === initialValues.machineGroupId
             )
             : [];
     }, [machineGroup, initialValues.machineGroupId]);

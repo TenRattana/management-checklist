@@ -192,10 +192,9 @@ const MenuSection = ({ title, isOpen, onToggle, items, navigation }: any) => {
 
 type ComponentNames = 'TestScreen' | 'Form' | 'Expected_result' | 'Create_form' | 'Machine_group' |
   'Machine' | 'Match_checklist_option' | 'Match_form_machine' | 'Checklist' |
-  'InputFormMachine' | 'Preview' | 'Checklist_option' | 'Checklist_group' | 'Home' | 'ScanQR' | 'GenerateQR' | 'Setting';
+  'InputFormMachine' | 'Preview' | 'Checklist_option' | 'Checklist_group' | 'ScanQR' | 'GenerateQR' | 'Setting' | 'Managepermissions';
 
 const components: Record<ComponentNames, () => Promise<{ default: React.ComponentType<any> }>> = {
-  Home: () => Promise.resolve({ default: HomeScreen }),
   ScanQR: () => Promise.resolve({ default: ScanQR }),
   GenerateQR: () => Promise.resolve({ default: GenerateQR }),
   Setting: () => Promise.resolve({ default: SettingScreen }),
@@ -208,6 +207,7 @@ const components: Record<ComponentNames, () => Promise<{ default: React.Componen
   Match_checklist_option: () => import('@/app/screens/layouts/matchs/match_checklist_option/MatchCheckListOptionScreen'),
   Match_form_machine: () => import('@/app/screens/layouts/matchs/match_form_machine/MatchFormMachineScreen'),
   Checklist: () => import('@/app/screens/layouts/checklists/checklist/CheckListScreen'),
+  Managepermissions: () => import('@/app/screens/SAdmin/Managepermissions'),
   InputFormMachine: () => import('@/app/screens/layouts/forms/Scan/InputFormMachine'),
   Preview: () => import('@/app/screens/layouts/forms/view/Preview'),
   Checklist_option: () => import('@/app/screens/layouts/checklists/checklist_option/CheckListOptionScreen'),
@@ -237,13 +237,16 @@ const App = () => {
 
   return (
     <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
-      <Drawer.Navigator drawerContent={(props) => <CustomDrawerContent {...props} />}>
+      <Drawer.Navigator
+        drawerContent={(props) => <CustomDrawerContent {...props} />}
+        initialRouteName='Home'
+      >
         {user ? (
           <>
             {(role === "SuperAdmin" || role === "Admin") && (
               <>
+                <Drawer.Screen name="Home" component={HomeScreen} />
                 {[
-                  { name: "Home" },
                   { name: "Machine_group" },
                   { name: "Machine" },
                   { name: "Checklist" },
@@ -279,6 +282,7 @@ const App = () => {
             )}
             {role === "GeneralUser" && (
               <>
+                <Drawer.Screen name="Home" component={HomeScreen} />
                 {[
                   { name: "ScanQR" },
                   { name: "InputFormMachine" },

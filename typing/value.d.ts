@@ -16,7 +16,7 @@ export interface InitialValuesMachine extends Detail, Active {
   machineName: string;
 }
 
-export interface InitialValuesMachineGroup extends Detail, Active {
+export interface InitialValuesGroupMachine extends Detail, Active {
   machineGroupId: string;
   machineGroupName: string;
 }
@@ -47,14 +47,22 @@ export interface InitialValuesMatchCheckListOption extends Active {
   groupCheckListOptionId: string;
 }
 
+export interface InitialValuesManagepermission {
+  UserID?: number;
+  UserName: string;
+  RoleID: string;
+  IsActive: boolean;
+}
+
 type Values =
   | InitialValuesMachine
-  | InitialValuesMachineGroup
+  | InitialValuesGroupMachine
   | InitialValuesChecklist
   | InitialValuesCheckListOption
   | InitialValuesGroupCheckList
   | InitialValuesMatchFormMachine
-  | InitialValuesMatchCheckListOption;
+  | InitialValuesMatchCheckListOption
+  | InitialValuesManagepermission;
 
 export type SaveDataFunction<V extends Values, D extends string | undefined> = (
   values: V,
@@ -83,7 +91,7 @@ export interface SubFormDialogProps<V extends FormConfig>
 }
 
 export interface SaveDialogProps extends SetVisible {
-  state:any;
+  state: any;
 }
 
 export interface MachineDialogProps<V extends Values, D extends TypeConfig>
@@ -92,7 +100,7 @@ export interface MachineDialogProps<V extends Values, D extends TypeConfig>
   dropmachine?: D[];
 }
 
-export interface MachineGroupDialogProps<V extends Values>
+export interface GroupMachineDialogProps<V extends Values>
   extends BaseDialogProps<V> {}
 
 export interface CheckListDialogProps<V extends Values>
@@ -104,6 +112,14 @@ export interface CheckListOptionProps<V extends Values>
 export interface ChecklistGroupDialogProps<V extends Values>
   extends BaseDialogProps<V> {}
 
+export interface ManagepermissionDialogProps<
+  V extends Values,
+  D1 extends TypeConfig,
+  D2 extends TypeConfig
+> extends BaseDialogProps<V> {
+  users: D1[];
+  groupUser: D2[];
+}
 export interface MatchFormMachineDialogProps<
   V extends Values,
   D1 extends TypeConfig,

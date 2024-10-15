@@ -1,17 +1,189 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { AccessibleView } from '@/components';
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { ScrollView, Pressable, Text, Role } from "react-native";
+import axiosInstance from "@/config/axios";
+import { useToast } from "@/app/contexts";
+import { Customtable, LoadingSpinner, AccessibleView, Searchbar } from "@/components";
+import { Card, Divider } from "react-native-paper";
+import useMasterdataStyles from "@/styles/common/masterdata";
+import { useRes } from "@/app/contexts";
+import Managepermisstion_dialog from "@/components/screens/Managepermisstion_dialog";
+import { Users, GroupUsers } from '@/typing/type'
+import { InitialValuesManagepermission } from '@/typing/value'
+import { useFocusEffect } from "expo-router";
 
 const Managepermissions = () => {
+  const [user, setUser] = useState<Users[]>([]);
+  const [groupUser, setGroupUser] = useState<GroupUsers[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [initialValues, setInitialValues] = useState<InitialValuesManagepermission>({
+    UserID: undefined,
+    UserName: "",
+    IsActive: true,
+    RoleID: "",
+  });
   console.log("Managepermissions");
 
+  const masterdataStyles = useMasterdataStyles();
+  const { showSuccess, handleError } = useToast();
+  const { spacing } = useRes();
+
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      const [userResponse, groupUserResponse] = await Promise.all([
+        axiosInstance.post("User_service.asmx/GetUsers"),
+        axiosInstance.post("GroupUser_service.asmx/GetGroupUsers"),
+      ]);
+      setUser(userResponse.data.data ?? []);
+      setGroupUser(groupUserResponse.data.data ?? []);
+    } catch (error) {
+      handleError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [handleError]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [fetchData])
+  );
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchQuery]);
+
+  const saveData = useCallback(async (values: InitialValuesManagepermission) => {
+    const data = {
+      UserID: values.UserID,
+      UserName: values.UserName,
+      RoleID: values.RoleID,
+      IsActive: values.IsActive
+    };
+
+    try {
+      const response = await axiosInstance.post("User_service.asmx/SaveUser", data);
+      setIsVisible(!response.data.status);
+      showSuccess(String(response.data.message));
+
+      await fetchData();
+    } catch (error) {
+      handleError(error);
+    }
+  }, [fetchData, handleError]);
+
+  const handleAction = useCallback(async (action?: string, item?: string) => {
+    try {
+      if (action === "editIndex") {
+        const response = await axiosInstance.post("User_service.asmx/GetUser", {
+          UserID: item,
+        });
+        const userData = response.data.data[0] ?? {};
+        setInitialValues({
+          UserID: userData.UserID,
+          UserName: userData.FormID ?? "",
+          RoleID: userData.RoleID ?? "",
+          IsActive: userData.IsActive
+        });
+        setIsVisible(true);
+        setIsEditing(true);
+      } else {
+        const endpoint = action === "activeIndex" ? "ChangeUser" : "DeleteUser";
+        const response = await axiosInstance.post(`User_service.asmx/${endpoint}`, { MachineID: item });
+        showSuccess(String(response.data.message));
+
+        await fetchData();
+      }
+    } catch (error) {
+      handleError(error);
+    }
+  }, [fetchData, handleError]);
+
+  const tableData = useMemo(() => {
+    return user.map((item) => [
+      item.UserName,
+      item.GUserID,
+      item.IsActive,
+      item.UserID,
+      item.UserID,
+    ])
+  }, [user, debouncedSearchQuery]);
+
+  const handleNewData = useCallback(() => {
+    setInitialValues({
+      UserID: undefined,
+      UserName: "",
+      IsActive: true,
+      RoleID: "",
+    });
+    setIsEditing(false);
+    setIsVisible(true);
+  }, []);
+
+  const customtableProps = useMemo(() => ({
+    Tabledata: tableData,
+    Tablehead: [
+      { label: "User Name", align: "flex-start" },
+      { label: "Role Name", align: "flex-start" },
+      { label: "Status", align: "center" },
+      { label: "", align: "flex-end" }
+    ],
+    flexArr: [3, 3, 1, 1],
+    actionIndex: [
+      {
+        editIndex: 3,
+        delIndex: 4
+      },
+    ],
+    handleAction,
+    searchQuery: debouncedSearchQuery,
+  }), [tableData, debouncedSearchQuery, handleAction]);
+
   return (
-    <AccessibleView name="managepermssion">
-      <Text>Managepermissions</Text>
-    </AccessibleView>
-  )
-}
+    <ScrollView style={{ paddingHorizontal: 15 }}>
+      <Text style={[masterdataStyles.text, masterdataStyles.textBold,
+      { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>List User
+      </Text>
+      <Divider style={{ marginBottom: 20 }} />
+      <Card style={{ borderRadius: 5 }}>
+        <AccessibleView name="match-form-machine" style={{ paddingVertical: 20, flexDirection: 'row' }}>
+          <Searchbar
+            placeholder="Search User..."
+            value={searchQuery}
+            onChange={setSearchQuery}
+            testId="search-user"
+          />
+          <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+            <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create User & Permission</Text>
+          </Pressable>
+        </AccessibleView>
+        <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
+          {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+        </Card.Content>
+      </Card>
+
+      <Managepermisstion_dialog
+        isVisible={isVisible}
+        setIsVisible={setIsVisible}
+        isEditing={isEditing}
+        initialValues={initialValues}
+        saveData={saveData}
+        users={user}
+        groupUser={groupUser}
+      />
+    </ScrollView>
+  );
+};
 
 export default React.memo(Managepermissions)
-
-const styles = StyleSheet.create({})

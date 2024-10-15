@@ -14,8 +14,10 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [show, setShow] = useState<boolean>(false)
     const { messages } = route.params || {};
     console.log("FormScreen");
+    console.log(show);
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
@@ -36,6 +38,7 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
     useFocusEffect(
         useCallback(() => {
             fetchData();
+            return () => setShow(true)
         }, [])
     );
 
@@ -47,8 +50,11 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
     }, [searchQuery]);
 
     useEffect(() => {
-        if (messages) showSuccess(String(messages));
-    }, [messages]);
+        if (messages && show) {
+            showSuccess(String(messages));
+            setShow(false)
+        }
+    }, [messages, show]);
 
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
@@ -109,9 +115,10 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
             <Card style={{ borderRadius: 5 }}>
                 <AccessibleView name="form" style={{ paddingVertical: 20, flexDirection: 'row' }}>
                     <Searchbar
-                        placeholder="Search Machine..."
+                        placeholder="Search Form..."
                         value={searchQuery}
-                        onChangeText={setSearchQuery}
+                        onChange={setSearchQuery}
+                        testId="search-form"
                     />
                     <Pressable onPress={handleNewForm} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>New Form</Text>
