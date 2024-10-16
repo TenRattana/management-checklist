@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo, useImperativeHandle } from "react";
-import { Dimensions, Pressable, View, Alert, FlatList, ViewStyle } from "react-native";
+import { Dimensions, Pressable, View, PanResponder, FlatList, ViewStyle } from "react-native";
 import { GestureHandlerRootView, PanGestureHandler } from "react-native-gesture-handler";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, runOnJS } from "react-native-reanimated";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
@@ -31,6 +31,7 @@ const DraggableItem: React.FC<{
 }> = ({ item, onDrop }) => {
     const itemTranslateX = useSharedValue(0);
     const itemTranslateY = useSharedValue(0);
+    const isDragging = useSharedValue(false);
 
     const itemAnimatedStyle = useAnimatedStyle(() => ({
         transform: [
@@ -45,29 +46,46 @@ const DraggableItem: React.FC<{
     const onGestureEvent = (e: any) => {
         itemTranslateX.value = e.nativeEvent.translationX;
         itemTranslateY.value = e.nativeEvent.translationY;
+        isDragging.value = true;
     };
 
     const onGestureEnd = (e: any) => {
         const { absoluteX, absoluteY } = e.nativeEvent;
 
-        runOnJS(onDrop)(item, absoluteX, absoluteY);
+        const dropX = absoluteX + itemTranslateX.value;
+        const dropY = absoluteY + itemTranslateY.value;
+
+        runOnJS(onDrop)(item, dropX, dropY);
 
         itemTranslateX.value = withSpring(0);
         itemTranslateY.value = withSpring(0);
+        isDragging.value = false;
     };
 
     return (
-        <AccessibleView name={`drag-form-${item.CTypeID}`} style={{ paddingHorizontal: 16 }}>
+        // <AccessibleView name={`drag-form-${item.CTypeID}`} style={{ paddingHorizontal: 16 }}>
             <PanGestureHandler onGestureEvent={onGestureEvent} onEnded={onGestureEnd}>
                 <Animated.View style={[{ marginHorizontal: 10 }, itemAnimatedStyle, createform.addSubFormButton]}>
                     <IconButton icon={item.Icon} size={spacing.large + 5} animated />
                     <Text style={[createform.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
                         {item.CTypeName}
                     </Text>
+                    {isDragging.value && (
+                        <View style={{
+                        
+                        }}>
+                            <Text style={{ fontWeight: 'bold', color: 'black' }}>Dragging...</Text>
+                        </View>
+                    )}
                 </Animated.View>
             </PanGestureHandler>
-        </AccessibleView>
+        // </AccessibleView>
     );
+};
+
+type ChildRef = {
+    getCardPosition: (callback: (x: number, y: number) => void) => void;
+    checkCardPosition: (x: number, y: number) => number;
 };
 
 const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
@@ -125,6 +143,9 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
             }
         },
         checkCardPosition: (x: number, y: number) => {
+            console.log(x, y);
+            console.log(cardPositions.current);
+            // console.log(panResponder.panHandlers?.onPanResponderRelease());
             return cardPositions.current.findIndex((card) =>
                 x >= card.pageX && x <= card.pageX + card.width &&
                 y >= card.pageY && y <= card.pageY + card.height
@@ -132,17 +153,19 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
         },
     }));
 
-    useEffect(() => {
-        if (state.subForms) {
-            const initialValues: { [key: string]: any } = {};
-            state.subForms.forEach((subForm: BaseSubForm) => {
-                subForm.Fields?.forEach((field: BaseFormState) => {
-                    initialValues[field.MCListID] = field.EResult ?? "";
-                });
-            });
-            setFormValues(initialValues);
-        }
-    }, [state.subForms]);
+    // const panResponder = useRef(
+    //     PanResponder.create({
+    //         onMoveShouldSetPanResponder: () => true,
+    //         onPanResponderRelease: () => {
+    //             if (cardRef.current) {
+    //                 cardRef.current.measure((x, y, width, height, pageX, pageY) => {
+    //                     console.log(`ตำแหน่งของการ์ด: pageX: ${pageX}, pageY: ${pageY}, width: ${width}, height: ${height}`);
+    //                 });
+    //             }
+    //         },
+    //     })
+    // ).current;
+
     useEffect(() => {
         const positions: { pageX: number; pageY: number; width: number; height: number }[] = [];
         cardRefs.current.forEach((cardRef) => {
@@ -155,26 +178,52 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
         cardPositions.current = positions;
     }, [state.subForms]);
 
+    useEffect(() => {
+        const positions: { pageX: number; pageY: number; width: number; height: number }[] = [];
+        cardRefs.current.forEach((cardRef) => {
+            if (cardRef) {
+                cardRef.measure((x, y, width, height, pageX, pageY) => {
+                    positions.push({ pageX: pageX + 400, pageY, width, height });
+                });
+            }
+        });
+        cardPositions.current = positions;
+    }, [state.subForms]);
+
     const handleDrop = (item: CheckListType, x: number, y: number) => {
         const cardIndex = childRef.current.checkCardPosition(x, y);
+        console.log(cardIndex);
+        console.log(x, y);
 
         if (cardIndex >= 0) {
-            const SFormID = state.subForms[cardIndex].SFormID;
+            const targetSubForm = state.subForms[cardIndex];
+            const currentFieldCount = targetSubForm?.Fields?.length ?? 0;
+            const selectedChecklist = checkList.find(v => v.CListID === "CL000") || checkList[0];
+            const selectedDataType = dataType.find(v => v.DTypeName === "String") || dataType[0];
 
-            const MDcount = state.subForms[cardIndex]?.Fields?.length ?? 0;
-            const CL = checkList.find(v => v.CListID === "CL000") || checkList[0];
-            const DT = dataType.find((v) => v.DTypeName === "String") || dataType[0];
-
-            const currentField: BaseFormState = {
-                MCListID: `MCL-ADD-${MDcount}`, CListID: CL.CListID, GCLOptionID: "", CTypeID: item.CTypeID, DTypeID: DT.DTypeID, SFormID: SFormID,
-                Required: false, Placeholder: "Empty content", Hint: "Empty content", EResult: "", CListName: CL.CListName, CTypeName: item.CTypeName, DTypeValue: undefined, MinLength: undefined, MaxLength: undefined
+            const newField: BaseFormState = {
+                MCListID: `MCL-ADD-${currentFieldCount}`,
+                CListID: selectedChecklist.CListID,
+                GCLOptionID: "",
+                CTypeID: item.CTypeID,
+                DTypeID: selectedDataType.DTypeID,
+                SFormID: targetSubForm.SFormID,
+                Required: false,
+                Placeholder: "Empty content",
+                Hint: "Empty content",
+                EResult: "",
+                CListName: selectedChecklist.CListName,
+                CTypeName: item.CTypeName,
+                DTypeValue: undefined,
+                MinLength: undefined,
+                MaxLength: undefined
             };
 
-            currentField.GCLOptionID = ["Dropdown", "Radio", "Checkbox"].includes(item.CTypeName)
-                ? (groupCheckListOption.find((v) => v.GCLOptionID === "GCLO000") || groupCheckListOption[0])?.GCLOptionID
+            newField.GCLOptionID = ["Dropdown", "Radio", "Checkbox"].includes(item.CTypeName)
+                ? (groupCheckListOption.find(v => v.GCLOptionID === "GCLO000") || groupCheckListOption[0])?.GCLOptionID
                 : undefined;
 
-            dispatch(defaultDataForm({ currentField }));
+            dispatch(defaultDataForm({ currentField: newField }));
         }
     };
 
@@ -231,7 +280,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
 
     return (
         <GestureHandlerRootView style={[createform.container]}>
-            <AccessibleView name="" style={createform.containerL1}>
+            <AccessibleView name="" style={[createform.containerL1, {}]}>
                 <FlatList
                     data={[{}]}
                     renderItem={() => selectedIndex === 0 ? (
@@ -250,9 +299,9 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                             />
                             <Divider bold />
 
-                            <Text style={[masterdataStyles.title , {textAlign:'center' , paddingTop:10}]}>Menu List Type</Text>
+                            <Text style={[masterdataStyles.title, { textAlign: 'center', paddingTop: 10 }]}>Menu List Type</Text>
 
-                            <AccessibleView name="" style={{ paddingBottom: 40 , marginBottom: 30 }}>
+                            <AccessibleView name="" style={{ paddingBottom: 40, marginBottom: 30 }}>
                                 {checkListType.map((item, index) => (
                                     <DraggableItem item={item} onDrop={handleDrop} key={`${item.CTypeID}-${index}`} />
 
@@ -283,12 +332,12 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                         </>
                     )}
                     contentContainerStyle={{
-                        maxHeight: screenHeight,
+                        maxHeight: screenHeight * 0.7,
                     }}
                 />
             </AccessibleView>
 
-            <AccessibleView name="" style={createform.containerL2}>
+            <AccessibleView name="" style={[createform.containerL2, {}]}>
                 <FlatList
                     data={state.subForms}
                     renderItem={({ item, index }) => (
@@ -305,6 +354,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                                     <Card
                                         style={masterdataStyles.card}
                                         ref={(el) => (cardRefs.current[index] = el)}
+                                        // {...panResponder.panHandlers} 
                                         key={item.SFormID}
                                     >
                                         <Card.Title
@@ -378,9 +428,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                         </>
                     )}
                     contentContainerStyle={{
-                        paddingBottom: 40,
-                        maxHeight: screenHeight,
-                        paddingTop: 5,
+                        maxHeight: screenHeight * 0.7,
                     }}
                 />
             </AccessibleView>

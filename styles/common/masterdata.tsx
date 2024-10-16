@@ -212,7 +212,7 @@ const useMasterdataStyles = () => {
             flexWrap: "wrap",
         },
         card: {
-            paddingVertical: 16,
+            paddingVertical: 5,
             borderRadius: 8,
             elevation: 2,
             marginBottom: 20,
