@@ -81,12 +81,18 @@ export interface ExpectedResult {
   FormName: string;
   CreateDate: string;
 }
-
 export interface Users {
+  UserName: string;
+}
+export interface UsersPermission {
   UserID: string;
   UserName: string;
   GUserID : string;
   IsActive: boolean;
+}
+
+export interface Userset {
+  UserName: string;
 }
 
 export interface GroupUsers {
@@ -107,4 +113,5 @@ export type TypeConfig =
   | MatchForm
   | MatchCheckListOption
   | Users
-  | GroupUsers;
+  | GroupUsers
+  | UsersPermission ;

@@ -63,7 +63,7 @@ const useMasterdataStyles = () => {
         buttonCreate: {
             borderRadius: 8,
             marginVertical: 20,
-            marginLeft: 30,
+            marginLeft: responsive === "small" ? "5%" : 30,
             width: responsive === "small" ? "90%" : 200,
             height: 45,
             justifyContent: 'center',
@@ -87,16 +87,20 @@ const useMasterdataStyles = () => {
         },
         containerInput: {
             marginVertical: 12,
-            marginHorizontal: 12,
+        },
+        containerSearch: {
+            marginVertical: 12,
+            flexDirection: 'row',
+            flexWrap: 'wrap'
         },
         searchbar: {
-            width: 400,
+            width: responsive === "small" ? "90%" : 400,
             maxHeight: 60,
             marginVertical: 10,
-            marginHorizontal: 30,
+            marginHorizontal: responsive === "small" ? '5%' : 30,
             borderRadius: 10,
             elevation: 4,
-            fontSize: 18,
+            fontSize: spacing.small,
         },
         menuItem: {
             marginBottom: 10,
@@ -212,7 +216,7 @@ const useMasterdataStyles = () => {
             borderRadius: 8,
             elevation: 2,
             marginBottom: 20,
-            backgroundColor: '#e7e7e7'
+            // backgroundColor: '#e7e7e7'
         },
         cardTitle: {
             fontSize: spacing.small,

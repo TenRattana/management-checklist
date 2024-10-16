@@ -38,7 +38,7 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
     useFocusEffect(
         useCallback(() => {
             fetchData();
-            return () => setShow(true)
+            // return () => setShow(true)
         }, [])
     );
 

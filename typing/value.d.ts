@@ -49,9 +49,9 @@ export interface InitialValuesMatchCheckListOption extends Active {
 }
 
 export interface InitialValuesManagepermission {
-  UserID?: number;
+  UserID?: string;
   UserName: string;
-  RoleID: string;
+  GUserID: string;
   IsActive: boolean;
 }
 

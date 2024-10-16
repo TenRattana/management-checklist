@@ -180,11 +180,12 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView name="match-form-machine" style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                <AccessibleView name="match-form-machine" style={masterdataStyles.containerSearch}>
                     <Searchbar
                         placeholder="Search Macht Form Machine..."
                         value={searchQuery}
                         onChange={setSearchQuery}
+                        testId="search-match-form-machine"
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Match Machine & Form</Text>

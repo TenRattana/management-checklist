@@ -145,11 +145,12 @@ const ChecklistGroupScreen = () => {
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView name="checklistgroup" style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                <AccessibleView name="checklistgroup" style={masterdataStyles.containerSearch}>
                     <Searchbar
-                        placeholder="Search Machine..."
+                        placeholder="Search Group CheckList..."
                         value={searchQuery}
                         onChange={setSearchQuery}
+                        testId="search-groupchecklist"
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Group Option</Text>

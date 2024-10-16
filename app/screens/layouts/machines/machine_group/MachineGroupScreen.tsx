@@ -145,7 +145,7 @@ const MachineGroupScreen = () => {
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView name="machine-group" style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                <AccessibleView name="machine-group" style={masterdataStyles.containerSearch}>
                     <Searchbar
                         placeholder="Search Machine Group..."
                         value={searchQuery}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef } from "react";
-import { StyleSheet, Text, ScrollView, View, ViewStyle } from "react-native";
+import { StyleSheet, Text, ScrollView, View, ViewStyle, FlatList } from "react-native";
 import { Card, Divider, HelperText } from "react-native-paper";
 import { useRes } from "@/app/contexts";
 import { BaseFormState, BaseSubForm } from '@/typing/form';
@@ -65,96 +65,101 @@ const Preview = forwardRef<any, any>((props, ref) => {
     }, [state.subForms]);
 
     return (
-        <AccessibleView name="preview" style={[masterdataStyles.container, { maxHeight: 900, paddingBottom: 30 }]}>
-            <>
-                <Text style={masterdataStyles.title}>{state.FormName || "Content Name"}</Text>
-                <Divider />
-                <Text style={masterdataStyles.description}>{state.Description || "Content Description"}</Text>
+        <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { maxHeight: 900, paddingBottom: 30 }]}>
+            <FlatList
+                data={[{}]}
+                renderItem={() => (
+                    <>
+                        <Text style={masterdataStyles.title}>{state.FormName || "Content Name"}</Text>
+                        <Divider />
+                        <Text style={masterdataStyles.description}>{state.Description || "Content Description"}</Text>
 
-                <ScrollView style={{ flex: 1 }}>
-                    {state.subForms.map((subForm: BaseSubForm, index: number) => (
+                        {state.subForms.map((subForm: BaseSubForm, index: number) => (
+                            <Formik
+                                initialValues={formValues}
+                                validationSchema={validationSchema}
+                                validateOnBlur={true}
+                                validateOnChange={false}
+                                onSubmit={(value) => console.log(value)}
+                                key={subForm.SFormID + subForm.Columns}
+                            >
+                                {({ errors, touched, setFieldValue, setTouched }) => (
+                                    <>
+                                        <Card
+                                            style={masterdataStyles.card}
+                                            ref={(el) => (cardRefs.current[index] = el)}
+                                            key={subForm.SFormID}
+                                        >
+                                            <Card.Title
+                                                title={subForm.SFormName}
+                                                titleStyle={masterdataStyles.cardTitle}
+                                            />
+                                            <Card.Content style={[masterdataStyles.subFormContainer]}>
+                                                {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
+                                                    const columns = subForm.Columns ?? 1;
+                                                    // const isLastColumn = (fieldIndex + 1) % columns === 0;
 
+                                                    const containerStyle: ViewStyle = {
+                                                        width: responsive === "small" ? "100%" : `${98 / columns}%`,
+                                                        flexGrow: field.DisplayOrder || 1,
+                                                        padding: 5,
+                                                        // borderRightWidth: isLastColumn ? 0 : 1,
+                                                    };
 
-                        <Formik
-                            initialValues={formValues}
-                            validationSchema={validationSchema}
-                            validateOnBlur={true}
-                            validateOnChange={false}
-                            onSubmit={(value) => console.log(value)}
-                            key={subForm.SFormID + subForm.Columns}
-                        >
-                            {({ errors, touched, setFieldValue, setTouched }) => (
-                                <>
-                                    <Card
-                                        style={masterdataStyles.card}
-                                        ref={(el) => (cardRefs.current[index] = el)}
-                                        key={subForm.SFormID}
-                                    >
-                                        <Card.Title
-                                            title={subForm.SFormName}
-                                            titleStyle={masterdataStyles.cardTitle}
-                                        />
-                                        <Card.Content style={[masterdataStyles.subFormContainer , {flexWrap:'wrap-reverse'}]}>
-                                            {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
-                                                const columns = subForm.Columns ?? 1;
+                                                    return (
+                                                        <FastField name={field.MCListID} key={`field-${fieldIndex}-${subForm.Columns}`}>
+                                                            {({ field: fastFieldProps }: FieldProps) => (
+                                                                <AccessibleView name="container-layout2" style={containerStyle}>
+                                                                    <Dynamic
+                                                                        field={field}
+                                                                        values={fastFieldProps.value ?? ""}
+                                                                        handleChange={(fieldName: string, value: any) => {
+                                                                            setFieldValue(fastFieldProps.name, value);
+                                                                            setTimeout(() => {
+                                                                                setTouched({
+                                                                                    ...touched,
+                                                                                    [fastFieldProps.name]: true,
+                                                                                });
+                                                                            }, 0);
+                                                                        }}
+                                                                        groupCheckListOption={groupCheckListOption}
+                                                                    />
+                                                                    {Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name]) && (
+                                                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                                            <HelperText
+                                                                                type="error"
+                                                                                visible={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
+                                                                                style={{ left: -10 }}
+                                                                            >
+                                                                                {errors[fastFieldProps.name] || ""}
+                                                                            </HelperText>
+                                                                            <Text
+                                                                                style={{ color: 'blue', marginLeft: 10 }}
+                                                                                onPress={() => {
+                                                                                    setTouched({ ...touched, [fastFieldProps.name]: false });
+                                                                                }}
+                                                                            >
+                                                                                Close
+                                                                            </Text>
+                                                                        </View>
+                                                                    )}
+                                                                </AccessibleView>
+                                                            )}
+                                                        </FastField>
+                                                    );
+                                                })}
+                                            </Card.Content>
+                                        </Card>
+                                    </>
+                                )}
+                            </Formik>
+                        )
+                        )}
+                    </>
 
-                                                const containerStyle: ViewStyle = {
-                                                    width: responsive === "small" ? "100%" : `${98 / columns}%`,
-                                                    flexGrow: field.DisplayOrder || 1,
-                                                    marginHorizontal: 5,
-                                                };
-
-                                                return (
-                                                    <FastField name={field.MCListID} key={`field-${fieldIndex}-${columns}`}>
-                                                        {({ field: fastFieldProps }: FieldProps) => (
-                                                            <AccessibleView name="container-layout2" style={containerStyle}>
-                                                                <Dynamic
-                                                                    field={field}
-                                                                    values={fastFieldProps.value}
-                                                                    handleChange={(fieldName: string, value: any) => {
-                                                                        setFieldValue(fastFieldProps.name, value);
-                                                                        setTimeout(() => {
-                                                                            setTouched({
-                                                                                ...touched,
-                                                                                [fastFieldProps.name]: true,
-                                                                            });
-                                                                        }, 0);
-                                                                    }}
-                                                                    groupCheckListOption={groupCheckListOption}
-                                                                />
-                                                                {Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name]) && (
-                                                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                                        <HelperText
-                                                                            type="error"
-                                                                            visible={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
-                                                                            style={{ left: -10 }}
-                                                                        >
-                                                                            {errors[fastFieldProps.name] || ""}
-                                                                        </HelperText>
-                                                                        <Text
-                                                                            style={{ color: 'blue', marginLeft: 10 }}
-                                                                            onPress={() => {
-                                                                                setTouched({ ...touched, [fastFieldProps.name]: false });
-                                                                            }}
-                                                                        >
-                                                                            Close
-                                                                        </Text>
-                                                                    </View>
-                                                                )}
-                                                            </AccessibleView>
-                                                        )}
-                                                    </FastField>
-                                                );
-                                            })}
-                                        </Card.Content>
-                                    </Card>
-                                </>
-                            )}
-                        </Formik>
-                    ))}
-
-                </ScrollView>
-            </>
+                )}
+                keyExtractor={(_, index) => index.toString()}
+            />
         </AccessibleView>
     );
 });

@@ -190,11 +190,12 @@ const MatchCheckListOptionScreen = () => {
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView name="match-check-list-option" style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                <AccessibleView name="match-check-list-option" style={masterdataStyles.containerSearch}>
                     <Searchbar
                         placeholder="Search Match Checklist Machine..."
                         value={searchQuery}
                         onChange={setSearchQuery}
+                        testId="search-match-checklist"
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Match Group & Option</Text>

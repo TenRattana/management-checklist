@@ -124,7 +124,7 @@ export interface CustomTableProps {
   Tabledata: (string | number | boolean)[][];
   Tablehead: { label?: string; align?: string }[];
   flexArr: number[];
-  handleAction: (action?: string, data?: string) => void;
+  handleAction?: (action?: string, data?: string) => void;
   actionIndex: { [key: string]: number }[];
   searchQuery: string;
 }
@@ -162,6 +162,11 @@ export interface ScanQRProps {
   };
 }
 
+export interface HomeScreenProps {
+  navigation: {
+    navigate: (screen: string, params?: object) => void;
+  };
+}
 // Field Dialog Props
 export interface FieldDialogProps {
   isVisible: boolean;

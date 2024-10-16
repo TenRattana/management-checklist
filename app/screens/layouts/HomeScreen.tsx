@@ -2,34 +2,24 @@ import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from
 import { ScrollView, Pressable, Text } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
-import { AccessibleView, LoadingSpinner, Searchbar } from "@/components";
+import { AccessibleView, LoadingSpinner, Searchbar, Customtable } from "@/components";
 import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import { Machine, MatchForm } from '@/typing/type';
-import { InitialValuesMachine } from '@/typing/value';
 import { useFocusEffect } from "expo-router";
 import { ScanQRProps } from "@/typing/tag";
-const Customtable = lazy(() => import('@/components/Customtable'));
+// const Customtable = lazy(() => import('@/components/Customtable'));
 
 const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
   const [machine, setMachine] = useState<Machine[]>([]);
   const [matchForm, setMatchForm] = useState<MatchForm[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
-  const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [initialValues, setInitialValues] = useState<InitialValuesMachine>({
-    machineId: "",
-    machineGroupId: "",
-    machineName: "",
-    description: "",
-    isActive: true,
-  });
 
   const masterdataStyles = useMasterdataStyles();
-  const { showSuccess, handleError } = useToast();
+  const { handleError } = useToast();
   const { spacing } = useRes();
 
   const fetchData = useCallback(async () => {
@@ -68,10 +58,6 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
     };
   }, [searchQuery]);
 
-  const handleAction = useCallback(async (action?: string, item?: string) => {
-
-  }, [fetchData, handleError]);
-
   const tableData = useMemo(() => {
     return matchForm.map((item) => [
       item.MachineName,
@@ -93,9 +79,8 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
     ],
     flexArr: [4, 2, 1],
     actionIndex: [{ editIndex: 4, delIndex: 5 }],
-    handleAction,
     searchQuery: debouncedSearchQuery,
-  }), [tableData, debouncedSearchQuery, handleAction]);
+  }), [tableData, debouncedSearchQuery]);
 
   return (
     <ScrollView style={{ paddingHorizontal: 15 }}>
@@ -104,7 +89,7 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
       </Text>
       <Divider style={{ marginBottom: 20 }} />
       <Card style={{ borderRadius: 5 }}>
-        <AccessibleView name="machine" style={{ paddingVertical: 20, flexDirection: 'row' }}>
+        <AccessibleView name="machine" style={masterdataStyles.containerSearch}>
           <Searchbar
             placeholder="Search List Form..."
             value={searchQuery}
@@ -116,9 +101,9 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
           </Pressable>
         </AccessibleView>
         <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
-          <Suspense fallback={<LoadingSpinner />}>
-            {!isLoading ? <Customtable {...customtableProps} /> : <LoadingSpinner />}
-          </Suspense>
+          {/* <Suspense fallback={<LoadingSpinner />}> */}
+          {!isLoading ? <Customtable {...customtableProps} /> : <LoadingSpinner />}
+          {/* </Suspense> */}
         </Card.Content>
       </Card>
     </ScrollView>

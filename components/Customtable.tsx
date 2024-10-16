@@ -44,16 +44,16 @@ const CustomTable = ({
       if (paginate) onItemsPerPageChange(paginate.paginate);
     };
     loadPagination();
-  }, []);
+  }, [loadPaginate]);
 
   useEffect(() => {
     setPage(0);
   }, [itemsPerPage, searchQuery, sortColumn, sortDirection]);
 
-  const handleSort = (columnIndex: number) => {
+  const handleSort = useCallback((columnIndex: number) => {
     setSortColumn(prev => (prev === columnIndex ? null : columnIndex));
     setSortDirection(prev => (prev === "ascending" ? "descending" : "ascending"));
-  };
+  }, [setSortColumn, setSortDirection]);
 
   const sortedData = useMemo(() => {
     return [...Tabledata].sort((a, b) => {
@@ -75,14 +75,16 @@ const CustomTable = ({
   }, [sortedData, searchQuery]);
 
   const handleDialog = useCallback((action?: string, data?: string) => {
-    handleAction(action, data);
+    if (handleAction) {
+      handleAction(action, data);
+    }
   }, [handleAction]);
 
   const currentData = useMemo(() => {
     return filteredData.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
   }, [filteredData, page, itemsPerPage]);
 
-  const renderCellContent = (
+  const renderCellContent = useCallback((
     cell: string | number | boolean,
     cellIndex: number,
     row: (string | number | boolean)[],
@@ -128,10 +130,10 @@ const CustomTable = ({
       );
     }
     return <Text key={`cell-content-${cellIndex}`} style={[masterdataStyles.text, masterdataStyles.textDark]}>{cell}</Text>;
-  };
+  }, [setDialogAction, setDialogTitle, setDialogData, setDialogMessage, setIsVisible]);
 
 
-  const renderActionButton = (
+  const renderActionButton = useCallback((
     data: string,
     action: string,
     row: (string | number | boolean)[],
@@ -214,9 +216,9 @@ const CustomTable = ({
         {icon}
       </Pressable>
     );
-  };
+  }, [handleDialog, setDialogAction, setDialogTitle, setDialogMessage, setIsVisible]);
 
-  const renderSmallRes = (rowData: (string | number | boolean)[], rowIndex: number) => {
+  const renderSmallRes = useCallback((rowData: (string | number | boolean)[], rowIndex: number) => {
     return (
       <AccessibleView name={`row-${rowIndex}`} key={`row-${rowIndex}`} style={[customtable.cardRow, { alignItems: 'flex-start' }]}>
         {Tablehead.map((header, colIndex) => (
@@ -252,87 +254,96 @@ const CustomTable = ({
         ))}
       </AccessibleView>
     )
-  }
+  }, [renderCellContent, renderActionButton])
+
+  const renderTableData = useCallback((row: any, rowIndex: number) => {
+    return (
+      <DataTable.Row key={`row-${rowIndex}`}>
+        {row.map((cell: any, cellIndex: number) => {
+          const Align: justifyContent = Tablehead[cellIndex]?.align as justifyContent;
+          const justifyContent = {
+            justifyContent: Align,
+          };
+          return (
+            <DataTable.Cell key={`cell-${rowIndex}-${cellIndex}`}
+              style={[justifyContent, { flex: flexArr[cellIndex] || 1 }]}>
+              {actionIndex.map((actionItem) => {
+                const filteredEntries = Object.entries(actionItem).filter(
+                  ([, value]) => value === cellIndex
+                );
+
+                return filteredEntries.length > 0
+                  ? filteredEntries.map(([key]) => {
+                    if (key === "editIndex" || key === "delIndex") {
+                      return (
+                        <AccessibleView name={`action-${rowIndex}`} key={`action-${rowIndex}`} style={customtable.eventColumn}>
+                          {renderActionButton(row[cellIndex] as string, "editIndex", row, rowIndex)}
+                          {renderActionButton(row[cellIndex] as string, "delIndex", row, rowIndex)}
+                        </AccessibleView>
+                      );
+                    } else {
+                      return (
+                        <AccessibleView name={`action-${rowIndex}`} key={`action-${rowIndex}`} style={customtable.eventColumn}>
+                          {renderActionButton(row[cellIndex] as string, key, row, rowIndex)}
+                        </AccessibleView>
+                      )
+                    }
+                  })
+                  : renderCellContent(cell, cellIndex, row, rowIndex);
+              })}
+            </DataTable.Cell>
+          );
+        })}
+      </DataTable.Row>
+    )
+  }, [renderCellContent, renderActionButton])
 
   return (
     <AccessibleView name="customtable" style={customtable.containerContent}>
-      {responsive === "small" ? (
-        currentData.map((rowData, rowIndex) => (
-          renderSmallRes(rowData, rowIndex)
-        ))
-      ) : (
-        <DataTable>
-          <DataTable.Header>
-            {Tablehead.map((header, index) => (
-              <DataTable.Title
-                key={`header-${index}`}
-                sortDirection={sortColumn === index ? sortDirection : undefined}
-                onPress={() => handleSort(index)}
-                style={{ justifyContent: header.align as justifyContent, flex: flexArr[index] || 1 }}
-              >
-                {header.label}
-              </DataTable.Title>
-            ))}
-          </DataTable.Header>
+      {responsive === "small" ?
+        filteredData && filteredData.length === 0 ? (
+          <Text style={[masterdataStyles.text, { textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }]}>No data found...</Text>
+        ) : (
+          currentData.map((rowData, rowIndex) => (
+            renderSmallRes(rowData, rowIndex)
+          ))
+        ) : (
+          <DataTable>
+            <DataTable.Header>
+              {Tablehead.map((header, index) => (
+                <DataTable.Title
+                  key={`header-${index}`}
+                  sortDirection={sortColumn === index ? sortDirection : undefined}
+                  onPress={() => handleSort(index)}
+                  style={{ justifyContent: header.align as justifyContent, flex: flexArr[index] || 1 }}
+                >
+                  {header.label}
+                </DataTable.Title>
+              ))}
+            </DataTable.Header>
 
-          {filteredData && filteredData.length === 0 ? (
-            <Text>No data found...</Text>
-          ) : (
-            currentData.map((row, rowIndex) => (
-              <DataTable.Row key={`row-${rowIndex}`}>
-                {row.map((cell, cellIndex) => {
-                  const Align: justifyContent = Tablehead[cellIndex]?.align as justifyContent;
-                  const justifyContent = {
-                    justifyContent: Align,
-                  };
-                  return (
-                    <DataTable.Cell key={`cell-${rowIndex}-${cellIndex}`}
-                      style={[justifyContent, { flex: flexArr[cellIndex] || 1 }]}>
-                      {actionIndex.map((actionItem) => {
-                        const filteredEntries = Object.entries(actionItem).filter(
-                          ([, value]) => value === cellIndex
-                        );
+            {filteredData && filteredData.length === 0 ? (
+              <Text style={[masterdataStyles.text, { textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }]}>No data found...</Text>
+            ) : (
+              currentData.map((row, rowIndex) => (
+                renderTableData(row, rowIndex)
+              ))
+            )}
 
-                        return filteredEntries.length > 0
-                          ? filteredEntries.map(([key]) => {
-                            if (key === "editIndex" || key === "delIndex") {
-                              return (
-                                <AccessibleView name={`action-${rowIndex}`} key={`action-${rowIndex}`} style={customtable.eventColumn}>
-                                  {renderActionButton(row[cellIndex] as string, "editIndex", row, rowIndex)}
-                                  {renderActionButton(row[cellIndex] as string, "delIndex", row, rowIndex)}
-                                </AccessibleView>
-                              );
-                            } else {
-                              return (
-                                <AccessibleView name={`action-${rowIndex}`} key={`action-${rowIndex}`} style={customtable.eventColumn}>
-                                  {renderActionButton(row[cellIndex] as string, key, row, rowIndex)}
-                                </AccessibleView>
-                              )
-                            }
-                          })
-                          : renderCellContent(cell, cellIndex, row, rowIndex);
-                      })}
-                    </DataTable.Cell>
-                  );
-                })}
-              </DataTable.Row>
-            ))
-          )}
-
-          <DataTable.Pagination
-            style={{ paddingTop: 5 }}
-            page={page}
-            numberOfPages={Math.ceil(filteredData.length / itemsPerPage)}
-            onPageChange={(newPage) => setPage(newPage)}
-            label={`Page ${page + 1} of ${Math.ceil(filteredData.length / itemsPerPage)}`}
-            numberOfItemsPerPage={itemsPerPage}
-            numberOfItemsPerPageList={numberOfItemsPerPageList}
-            onItemsPerPageChange={onItemsPerPageChange}
-            showFastPaginationControls
-            selectPageDropdownLabel={"Rows per page"}
-          />
-        </DataTable>
-      )}
+            <DataTable.Pagination
+              style={{ paddingTop: 5 }}
+              page={page}
+              numberOfPages={Math.ceil(filteredData.length / itemsPerPage)}
+              onPageChange={(newPage) => setPage(newPage)}
+              label={`Page ${page + 1} of ${Math.ceil(filteredData.length / itemsPerPage)}`}
+              numberOfItemsPerPage={itemsPerPage}
+              numberOfItemsPerPageList={numberOfItemsPerPageList}
+              onItemsPerPageChange={onItemsPerPageChange}
+              showFastPaginationControls
+              selectPageDropdownLabel={"Rows per page"}
+            />
+          </DataTable>
+        )}
       <Dialogs
         isVisible={isVisible}
         title={dialogTitle}

@@ -3,16 +3,17 @@ import React from "react";
 import { Pressable, Text } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
-import { Portal, Dialog, HelperText } from "react-native-paper";
+import { Portal, Dialog, HelperText, Switch } from "react-native-paper";
 import { Formik, FastField } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { Users, GroupUsers } from '@/typing/type'
 import { ManagepermissionDialogProps, InitialValuesManagepermission } from '@/typing/value'
+import { Inputs } from "../common";
 
 const validationSchema = Yup.object().shape({
-    UserName: Yup.string().required("This username field is required"),
-    RoleID: Yup.string().required("This role field is required"),
+    UserName: Yup.string().required("This user field is required"),
+    GUserID: Yup.string().required("This role field is required"),
     IsActive: Yup.boolean().required("This isactive field is required")
 });
 
@@ -37,14 +38,14 @@ const Managepermisstion_dialog = ({ isVisible, setIsVisible, isEditing, initialV
                             validateOnChange={false}
                             onSubmit={(values: InitialValuesManagepermission) => saveData(values)}
                         >
-                            {({ handleSubmit, dirty, isValid }) => (
+                            {({ values, handleSubmit, dirty, isValid, setFieldValue }) => (
                                 <AccessibleView name="form-managed">
                                     <FastField name="UserName">
                                         {({ field, form }: any) => (
                                             <CustomDropdownSingle
                                                 title="User Name"
                                                 labels="UserName"
-                                                values="UserID"
+                                                values="UserName"
                                                 data={users}
                                                 value={field.value}
                                                 handleChange={(value) => {
@@ -87,6 +88,21 @@ const Managepermisstion_dialog = ({ isVisible, setIsVisible, isEditing, initialV
                                         )}
                                     </FastField>
 
+                                    <AccessibleView name="form-active-md" style={masterdataStyles.containerSwitch}>
+                                        <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
+                                            Status: {values.IsActive ? "Active" : "Inactive"}
+                                        </Text>
+                                        <Switch
+                                            style={{ transform: [{ scale: 1.1 }], top: 2 }}
+                                            // color={values.isActive ? colors.succeass : colors.disable}
+                                            value={values.IsActive}
+                                            onValueChange={(v: boolean) => {
+                                                setFieldValue("IsActive", v);
+                                            }}
+                                            testID="IsActive-managed"
+                                        />
+                                    </AccessibleView>
+
                                     <AccessibleView name="form-action-managed" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
@@ -109,7 +125,7 @@ const Managepermisstion_dialog = ({ isVisible, setIsVisible, isEditing, initialV
                     )}
                 </Dialog.Content>
             </Dialog>
-        </Portal>
+        </Portal >
     )
 }
 

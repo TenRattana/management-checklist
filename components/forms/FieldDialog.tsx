@@ -65,7 +65,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
         }
     };
 
-    const itemHeight = 88;
+    const itemHeight = 100;
     const itemHeightN = itemHeight * 3
 
     const opacityT = useSharedValue(0);

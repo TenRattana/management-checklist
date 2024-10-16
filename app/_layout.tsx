@@ -1,9 +1,9 @@
 // import React, { useEffect } from "react";
 // import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
+// import * as SplashScreen from "expo-splash-screen";
 // import { Stack } from "expo-router";
 
-SplashScreen.preventAutoHideAsync();
+// SplashScreen.preventAutoHideAsync();
 
 // export default function RootLayout() {
 //   console.log("RootLayout");

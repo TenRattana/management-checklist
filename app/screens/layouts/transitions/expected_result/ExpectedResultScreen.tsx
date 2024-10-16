@@ -110,7 +110,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView name="expected-result" style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                <AccessibleView name="expected-result" style={masterdataStyles.containerSearch}>
                     <Searchbar
                         placeholder="Search Expected Result..."
                         value={searchQuery}

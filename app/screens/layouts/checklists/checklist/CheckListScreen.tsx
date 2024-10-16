@@ -132,11 +132,12 @@ const CheckListScreen = () => {
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView name="checklist" style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                <AccessibleView name="checklist" style={masterdataStyles.containerSearch}>
                     <Searchbar
                         placeholder="Search Checklist..."
                         value={searchQuery}
                         onChange={setSearchQuery}
+                        testId="search-checklist"
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Check List</Text>

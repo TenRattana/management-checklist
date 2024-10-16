@@ -7,12 +7,13 @@ import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Managepermisstion_dialog from "@/components/screens/Managepermisstion_dialog";
-import { Users, GroupUsers } from '@/typing/type'
+import { Users, GroupUsers, UsersPermission } from '@/typing/type'
 import { InitialValuesManagepermission } from '@/typing/value'
 import { useFocusEffect } from "expo-router";
 
 const Managepermissions = () => {
   const [user, setUser] = useState<Users[]>([]);
+  const [userPermission, setUserPermission] = useState<UsersPermission[]>([]);
   const [groupUser, setGroupUser] = useState<GroupUsers[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
@@ -20,10 +21,10 @@ const Managepermissions = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [initialValues, setInitialValues] = useState<InitialValuesManagepermission>({
-    UserID: undefined,
+    UserID: "",
     UserName: "",
     IsActive: true,
-    RoleID: "",
+    GUserID: "",
   });
   console.log("Managepermissions");
 
@@ -35,12 +36,14 @@ const Managepermissions = () => {
     setIsLoading(true);
 
     try {
-      const [userResponse, groupUserResponse] = await Promise.all([
+      const [userResponse, groupUserResponse, userPermission] = await Promise.all([
         axiosInstance.post("User_service.asmx/GetUsers"),
         axiosInstance.post("GroupUser_service.asmx/GetGroupUsers"),
+        axiosInstance.post("User_service.asmx/GetUsersPermission")
       ]);
       setUser(userResponse.data.data ?? []);
       setGroupUser(groupUserResponse.data.data ?? []);
+      setUserPermission(userPermission.data.data ?? [])
     } catch (error) {
       handleError(error);
     } finally {
@@ -66,9 +69,9 @@ const Managepermissions = () => {
 
   const saveData = useCallback(async (values: InitialValuesManagepermission) => {
     const data = {
-      UserID: values.UserID ?? "",
+      UserID: values.UserID,
       UserName: values.UserName,
-      RoleID: values.RoleID,
+      GUserID: values.GUserID,
       IsActive: values.IsActive
     };
 
@@ -92,15 +95,15 @@ const Managepermissions = () => {
         const userData = response.data.data[0] ?? {};
         setInitialValues({
           UserID: userData.UserID,
-          UserName: userData.FormID ?? "",
-          RoleID: userData.RoleID ?? "",
+          UserName: userData.UserName ?? "",
+          GUserID: userData.GUserID ?? "",
           IsActive: userData.IsActive
         });
         setIsVisible(true);
         setIsEditing(true);
       } else {
         const endpoint = action === "activeIndex" ? "ChangeUser" : "DeleteUser";
-        const response = await axiosInstance.post(`User_service.asmx/${endpoint}`, { MachineID: item });
+        const response = await axiosInstance.post(`User_service.asmx/${endpoint}`, { UserID: item });
         showSuccess(String(response.data.message));
 
         await fetchData();
@@ -111,21 +114,20 @@ const Managepermissions = () => {
   }, [fetchData, handleError]);
 
   const tableData = useMemo(() => {
-    return user.map((item) => [
+    return userPermission.map((item) => [
       item.UserName,
       groupUser.find((group) => group.GUserID === item.GUserID)?.GUserName || "",
       item.IsActive,
-      item.UserID,
       item.UserID,
     ])
   }, [user, groupUser, debouncedSearchQuery]);
 
   const handleNewData = useCallback(() => {
     setInitialValues({
-      UserID: undefined,
+      UserID: "",
       UserName: "",
       IsActive: true,
-      RoleID: "",
+      GUserID: "",
     });
     setIsEditing(false);
     setIsVisible(true);
@@ -143,7 +145,7 @@ const Managepermissions = () => {
     actionIndex: [
       {
         editIndex: 3,
-        delIndex: 4
+        delIndex: 4,
       },
     ],
     handleAction,
@@ -157,7 +159,7 @@ const Managepermissions = () => {
       </Text>
       <Divider style={{ marginBottom: 20 }} />
       <Card style={{ borderRadius: 5 }}>
-        <AccessibleView name="match-form-machine" style={{ paddingVertical: 20, flexDirection: 'row' }}>
+        <AccessibleView name="match-form-machine" style={masterdataStyles.containerSearch}>
           <Searchbar
             placeholder="Search User..."
             value={searchQuery}
@@ -165,7 +167,7 @@ const Managepermissions = () => {
             testId="search-user"
           />
           <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-            <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create User & Permission</Text>
+            <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Add Permission</Text>
           </Pressable>
         </AccessibleView>
         <Card.Content style={{ padding: 2, paddingVertical: 10 }}>

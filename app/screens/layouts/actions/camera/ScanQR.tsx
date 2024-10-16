@@ -1,20 +1,25 @@
 import { Camera } from "expo-camera/legacy";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
 import { ScanQRProps } from "@/typing/tag";
+import { useFocusEffect } from "expo-router";
 
 const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
     const [hasPermission, setHasPermission] = useState<boolean | null>(null);
     const [scanned, setScanned] = useState<boolean>(false);
     const [qrValue, setQrValue] = useState<string | null>(null);
-    console.log("ScanQR");
+    const [cameraActive, setCameraActive] = useState<boolean>(true);
 
-    useEffect(() => {
-        (async () => {
-            const { status } = await Camera.requestCameraPermissionsAsync();
-            setHasPermission(status === "granted");
-        })();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            (async () => {
+                const { status } = await Camera.requestCameraPermissionsAsync();
+                setHasPermission(status === "granted");
+            })();
+
+            return () => setCameraActive(false);
+        }, [])
+    )
 
     useEffect(() => {
         if (scanned && qrValue) {
@@ -47,6 +52,7 @@ const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
                     machineId: value,
                 });
                 setScanned(false);
+                setCameraActive(false); // ปิดกล้องเมื่อสแกนเสร็จ
             }
         } catch (error) {
             console.log(error);
@@ -65,11 +71,12 @@ const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            {!scanned ? (
+            {cameraActive && !scanned ? (
                 <Camera style={styles.camera} onBarCodeScanned={handleBarCodeScanned} />
             ) : (
                 <View style={styles.resultContainer}>
                     <Text style={styles.resultText}>Scanned QR Code</Text>
+                    <Button title="Scan Again" onPress={() => { setScanned(false); setCameraActive(true); }} />
                 </View>
             )}
         </View>
