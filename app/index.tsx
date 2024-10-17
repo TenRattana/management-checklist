@@ -7,14 +7,6 @@ import Navigation from "@/app/navigations/Navigation";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ToastProvider, ResponsiveProvider } from "@/app/contexts";
 
-if (__DEV__) {
-  const { getFlipper } = require('react-native-flipper');
-  const flipper = getFlipper();
-  flipper.addListener('someEvent', (data: any) => {
-    console.log(data); // ข้อมูลจะถูกแสดงใน Flipper
-  });
-}
-
 const App = () => {
   console.log("App");
 
