@@ -114,24 +114,15 @@ const Preview = forwardRef<any, any>((props, ref) => {
                                                         padding: 5,
                                                         // borderRightWidth: isLastColumn ? 0 : 1,
                                                     };
-
                                                     return (
                                                         <FastField name={field.MCListID} key={`field-${fieldIndex}-${subForm.Columns}`}>
                                                             {({ field: fastFieldProps }: FieldProps) => (
                                                                 <AccessibleView name="container-layout2" style={containerStyle}>
                                                                     <Dynamic
-                                                                        field={field}
-                                                                        values={fastFieldProps.value ?? ""}
-                                                                        handleChange={(fieldName: string, value: any) => {
-                                                                            setFieldValue(fastFieldProps.name, value);
-                                                                            setTimeout(() => {
-                                                                                setTouched({
-                                                                                    ...touched,
-                                                                                    [fastFieldProps.name]: true,
-                                                                                });
-                                                                            }, 0);
-                                                                        }}
-                                                                        groupCheckListOption={groupCheckListOption}
+                                                                       field={field}
+                                                                       values={displayValue}  
+                                                                       handleChange={handleInputChange}  
+                                                                       groupCheckListOption={groupCheckListOption}
                                                                     />
                                                                     {Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name]) && (
                                                                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -177,3 +168,56 @@ const Preview = forwardRef<any, any>((props, ref) => {
 });
 
 export default React.memo(Preview);
+
+
+
+import React, { useState } from 'react';
+
+
+// <FastField name={field.MCListID} key={`field-${fieldIndex}-${subForm.Columns}`}>
+//     {({ field: fastFieldProps }: FieldProps) => {
+//         const [displayValue, setDisplayValue] = useState(fastFieldProps.value || "");
+
+//         const handleInputChange = (value: string) => {
+//             // อัปเดตค่าที่ผู้ใช้กรอก
+//             setDisplayValue(value);
+//             if (value === "" || !isNaN(value)) {
+//                 setFieldValue(fastFieldProps.name, value);
+//                 setTouched({
+//                     ...touched,
+//                     [fastFieldProps.name]: true,
+//                 });
+//             }
+//         };
+
+//         return (
+//             <AccessibleView name="container-layout2" style={containerStyle}>
+//                 <Dynamic
+//                     field={field}
+//                     values={displayValue}  // แสดงค่าที่ผู้ใช้กรอก
+//                     handleChange={handleInputChange}  // ส่งค่าเข้าไปในฟิลด์
+//                     groupCheckListOption={groupCheckListOption}
+//                 />
+//                 {Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name]) && (
+//                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+//                         <HelperText
+//                             type="error"
+//                             visible={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
+//                             style={{ left: -10 }}
+//                         >
+//                             {errors[fastFieldProps.name] as string || ""}
+//                         </HelperText>
+//                         <Text
+//                             style={{ color: 'blue', marginLeft: 10 }}
+//                             onPress={() => {
+//                                 setTouched({ ...touched, [fastFieldProps.name]: false });
+//                             }}
+//                         >
+//                             Close
+//                         </Text>
+//                     </View>
+//                 )}
+//             </AccessibleView>
+//         );
+//     }}
+// </FastField>

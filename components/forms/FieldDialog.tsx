@@ -25,29 +25,28 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
 
     const [shouldRender, setShouldRender] = useState<string>("");
     const [shouldRenderDT, setShouldRenderDT] = useState<boolean>(false);
-    // const { colors } = useTheme()
+
     console.log("FieldDialog");
-
-    const validationSchema = useMemo(() => {
-        const shape = {
-            CListID: Yup.string().required("The checklist field is required."),
-            CTypeID: Yup.string().required("The checklist type field is required."),
-            Required: Yup.boolean().required("The required field is required."),
-
-            // DTypeID: Yup.string().when('CTypeID', {
-            //     is: (CTypeID) => ['Textinput', 'Textarea'].includes(CTypeID),
-            //     then: Yup.string().required("DTypeID is required for Text/TextArea."),
-            //     otherwise: Yup.string().nullable(),
-            // }),
-            // GCLOptionID: Yup.string().when('CTypeID', {
-            //     is: (CTypeID) => ['Dropdown', 'Checkbox', 'Radio'].includes(CTypeID),
-            //     then: Yup.string().required("GCLOptionID is required for Dropdown/Select/Radio."),
-            //     otherwise: Yup.string().nullable(),
-            // }),
-        };
-
-        return Yup.object().shape(shape);
-    }, []);
+    
+    const validationSchema = Yup.object().shape({
+        CListID: Yup.string().required("The checklist field is required."),
+        CTypeID: Yup.string().required("The checklist type field is required."),
+        Required: Yup.boolean().required("The required field is required."),
+        DTypeID: Yup.lazy((value, context) => {
+            const CTypeID = checkListType.find(v => v.CTypeID === context.parent.CTypeID)?.CTypeName; 
+            if (CTypeID && ['Textinput', 'Textarea'].includes(CTypeID)) {
+                return Yup.string().required("DTypeID is required for Text/TextArea.");
+            }
+            return Yup.string().nullable();
+        }),
+        GCLOptionID: Yup.lazy((value, context) => {
+            const CTypeID = checkListType.find(v => v.CTypeID === context.parent.CTypeID)?.CTypeName
+            if (CTypeID && ['Dropdown', 'Checkbox', 'Radio'].includes(CTypeID)) {
+                return Yup.string().required("GCLOptionID is required for Dropdown/Select/Radio.");
+            }
+            return Yup.string().nullable();
+        }),
+    });
 
     const saveDataCheckList = async (values: InitialValuesChecklist) => {
         const data = {
