@@ -75,22 +75,20 @@ const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChan
           </AccessibleView>
         )}
         renderSelectedItem={(item, unSelect) => (
-          <AccessibleView name="chip-mul" style={masterdataStyles.chipContainer}>
+          <AccessibleView name="chip-mul" style={masterdataStyles.containerAction}>
             <Chip
+              icon="delete"
               style={masterdataStyles.chip}
               mode="outlined"
               onClose={() => unSelect?.(item)}
             >
-              <IconButton
-                icon="delete"
-                size={spacing.small}
-                onPress={() => unSelect?.(item)}
-                style={{ padding: 0 }}
-              />
-              <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{item.label}</Text>
+              <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>
+                {item.label}
+              </Text>
             </Chip>
           </AccessibleView>
         )}
+
         testID={testId}
       />
     </AccessibleView>

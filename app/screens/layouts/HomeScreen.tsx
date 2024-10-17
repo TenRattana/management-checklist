@@ -17,6 +17,7 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  console.log("Home");
 
   const masterdataStyles = useMasterdataStyles();
   const { handleError } = useToast();
@@ -24,6 +25,7 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
+    let isMounted = true;
     try {
       const [machineResponse, matchFormResponse] = await Promise.all([
         axiosInstance.post("Machine_service.asmx/GetMachines"),
@@ -48,7 +50,7 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
     }, [fetchData])
   );
 
-  useEffect(() => {
+  useCallback(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
     }, 500);
@@ -81,6 +83,19 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
     actionIndex: [{ editIndex: 4, delIndex: 5 }],
     searchQuery: debouncedSearchQuery,
   }), [tableData, debouncedSearchQuery]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const memoryUsage = global.performance.memory;
+      console.log(`Memory Usage:
+                Total JS Heap Size: ${memoryUsage.totalJSHeapSize / 1024 / 1024} MB,
+                Used JS Heap Size: ${memoryUsage.usedJSHeapSize / 1024 / 1024} MB,
+                JS Heap Size Limit: ${memoryUsage.jsHeapSizeLimit / 1024 / 1024} MB`);
+    }, 1000); // ตรวจสอบทุก 1 วินาที
+
+    return () => clearInterval(intervalId);
+  }, []);
+
 
   return (
     <ScrollView style={{ paddingHorizontal: 15 }}>

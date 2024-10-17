@@ -15,7 +15,7 @@ const Dialogs = ({
     handleBlur,
     data,
 }: DialogsProps) => {
-    console.log("Dialog_checkble");
+    // console.log("Dialog_checkble");
     const masterdataStyles = useMasterdataStyles()
 
     return (

@@ -33,19 +33,25 @@ const MachineGroupScreen = () => {
 
     const fetchData = useCallback(async () => {
         setIsLoading(true);
+        let isMounted = true;
 
         try {
             const [machineResponse, machineGroupResponse] = await Promise.all([
                 axiosInstance.post("Machine_service.asmx/GetMachines"),
                 axiosInstance.post("GroupMachine_service.asmx/GetGroupMachines"),
             ]);
-            setMachine(machineResponse.data.data ?? []);
-            setMachineGroup(machineGroupResponse.data.data ?? []);
+            if (isMounted) {
+                setMachine(machineResponse.data.data ?? []);
+                setMachineGroup(machineGroupResponse.data.data ?? []);
+            }
         } catch (error) {
             handleError(error);
         } finally {
-            setIsLoading(false);
+            if (isMounted) {
+                setIsLoading(false);
+            }
         }
+        return () => { isMounted = false };
     }, [handleError]);
 
     useFocusEffect(
@@ -54,7 +60,7 @@ const MachineGroupScreen = () => {
         }, [fetchData])
     );
 
-    useEffect(() => {
+    useCallback(() => {
         const handler = setTimeout(() => {
             setDebouncedSearchQuery(searchQuery);
         }, 500);

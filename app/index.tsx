@@ -7,6 +7,14 @@ import Navigation from "@/app/navigations/Navigation";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ToastProvider, ResponsiveProvider } from "@/app/contexts";
 
+if (__DEV__) {
+  const { getFlipper } = require('react-native-flipper');
+  const flipper = getFlipper();
+  flipper.addListener('someEvent', (data: any) => {
+    console.log(data); // ข้อมูลจะถูกแสดงใน Flipper
+  });
+}
+
 const App = () => {
   console.log("App");
 
@@ -16,14 +24,15 @@ const App = () => {
         <AuthProvider>
           <Provider store={store}>
             <PaperProvider>
-              <Navigation />
+              <GestureHandlerRootView style={{ flex: 1 }}>
+                <Navigation />
+              </GestureHandlerRootView>
             </PaperProvider>
           </Provider>
         </AuthProvider>
       </ResponsiveProvider>
     </ToastProvider>
-
   );
 }
 
-export default App
+export default App;

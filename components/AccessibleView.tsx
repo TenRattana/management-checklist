@@ -9,21 +9,21 @@ interface AccessibleViewProps {
     style?: ViewStyle | ViewStyle[];
 }
 
+// สร้างสไตล์ก่อนที่คอมโพเนนต์จะถูกเรียกใช้
+const styles = StyleSheet.create({
+    darkContainer: {
+        color: '#f5f5f5',
+        borderColor: '#f5f5f5',
+    },
+    lightContainer: {
+        color: '#00000e',
+        borderColor: '#00000e',
+    },
+});
+
 const AccessibleView = ({ children, name, style }: AccessibleViewProps) => {
     const { darkMode } = useRes();
-
-    const styles = StyleSheet.create({
-        darkContainer: {
-            // backgroundColor: '#00000e',
-            color: '#f5f5f5',
-            borderColor: '#f5f5f5',
-        },
-        lightContainer: {
-            // backgroundColor: '#f5f5f5',
-            color: '#00000e',
-            borderColor: '#00000e',
-        },
-    });
+    // console.log("Acc");
 
     return (
         <View
@@ -38,9 +38,7 @@ const AccessibleView = ({ children, name, style }: AccessibleViewProps) => {
     );
 };
 
-const MemoizedAccessibleView = memo(AccessibleView) as React.FC<AccessibleViewProps> & {
-    propTypes?: any;
-};
+const MemoizedAccessibleView = memo(AccessibleView);
 
 MemoizedAccessibleView.propTypes = {
     children: PropTypes.node.isRequired,

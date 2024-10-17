@@ -29,7 +29,7 @@ const CustomTable = ({
   const [dialogMessage, setDialogMessage] = useState<string>("");
   const [dialogTitle, setDialogTitle] = useState<string>("");
   const [dialogData, setDialogData] = useState<string>("");
-  console.log("CustomTable");
+  // console.log("CustomTable");
 
   const colors = useThemeColor();
   const { responsive, spacing } = useRes();
