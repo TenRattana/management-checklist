@@ -12,7 +12,6 @@ const useCreateformStyle = () => {
         container: {
             flex: 1,
             flexDirection: responsive === "small" ? "column" : "row",
-            flexWrap: responsive === "small" ? "nowrap" : "wrap",
         },
         containerL1: {
             display: "flex",

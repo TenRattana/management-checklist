@@ -10,7 +10,6 @@ import { CheckListType, CheckListOption, Checklist, DataType, GroupCheckListOpti
 const useForm = (route: any) => {
     const dispatch = useDispatch();
     const state = useSelector((state: any) => state.form);
-    console.log("useForm");
 
     const [checkList, setCheckList] = useState<Checklist[]>([]);
     const [checkListOption, setCheckListOption] = useState<CheckListOption[]>([]);
@@ -90,6 +89,7 @@ const useForm = (route: any) => {
                 Columns: item.Columns,
                 DisplayOrder: item.DisplayOrder,
                 MachineID: item.MachineID,
+                Fields: []
             };
             subForms.push(subForm);
 

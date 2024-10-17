@@ -54,10 +54,14 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
         try {
             if (action === "preIndex") {
                 const data = expectedResult.find((v) => v.TableID === item);
-                navigation.navigate("Preview", {
-                    formId: data?.FormID,
-                    tableId: data?.TableID,
-                });
+                if (data) {
+                    navigation.navigate("Preview", {
+                        formId: data.FormID,
+                        tableId: data.TableID,
+                    });
+                }
+                console.log(data);
+
             }
         } catch (error) {
             handleError(error);

@@ -35,7 +35,7 @@ const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initial
                             validationSchema={validationSchema}
                             validateOnBlur={true}
                             validateOnChange={false}
-                            onSubmit={(values: InitialValuesMatchFormMachine) => saveData(values)}
+                            onSubmit={(values: InitialValuesMatchFormMachine) => saveData(values, isEditing)}
                         >
                             {({ handleSubmit, dirty, isValid }) => (
                                 <AccessibleView name="form-mfmd">

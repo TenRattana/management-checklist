@@ -12,7 +12,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { PreviewProps } from "@/typing/tag";
 import { ScanParams } from "@/typing/tag";
 import { useFocusEffect } from "expo-router";
-import { FastField, Formik, FormikErrors, FormikTouched } from 'formik';
+import { FastField, Formik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigation } from "expo-router";
 
@@ -26,7 +26,6 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   const [checkListType, setCheckListType] = useState<CheckListType[]>([]);
   const [dataType, setDataType] = useState<DataType[]>([]);
   const [groupCheckListOption, setGroupCheckListOption] = useState<GroupCheckListOption[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [found, setFound] = useState<boolean>(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -35,7 +34,6 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   const { showSuccess, handleError } = useToast();
 
   const fetchData = useCallback(async () => {
-    setIsLoading(true);
     try {
       const responses = await Promise.all([
         axiosInstance.post("CheckList_service.asmx/GetCheckLists"),
@@ -50,8 +48,6 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
       setDataType(responses[3].data.data ?? []);
     } catch (error) {
       handleError(error);
-    } finally {
-      setIsLoading(false);
     }
   }, [handleError]);
 
@@ -211,16 +207,16 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
     }
   }, [showSuccess, handleError, state.subForms, state.MachineID]);
 
-  const renderSubForm = useCallback(({ item }: any) => {
+  const renderSubForm = useCallback(({ item, index }: any) => {
     return (
-      <AccessibleView name="input-form-machine" key={item.SFormID} >
+      <AccessibleView name="input-form-machine" key={`${item.SFormID}-${index}`} >
         <Card style={masterdataStyles.card}>
           <Card.Title title={item.SFormName} titleStyle={masterdataStyles.cardTitle} />
           <Card.Content style={masterdataStyles.subFormContainer}>
             {item.Fields?.map((fields: BaseFormState, fieldIndex: number) => {
 
               const columns = item.Columns ?? 1;
-              const isLastColumn = (fieldIndex + 1) % columns === 0;
+              // const isLastColumn = (fieldIndex + 1) % columns === 0;
 
               const containerStyle: ViewStyle = {
                 flexBasis: responsive === "small" ? "100%" : `${98 / columns}%`,
@@ -283,7 +279,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                 <FlatList
                   data={state.subForms}
                   renderItem={renderSubForm}
-                  keyExtractor={(item) => item.SFormID}
+                  keyExtractor={(item, index) => `${item.SFormID}-${index}`}
                   nestedScrollEnabled={true}
                   ListFooterComponentStyle={{ alignItems: 'center', width: "100%" }}
                   ListFooterComponent={() => (

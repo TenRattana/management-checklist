@@ -1,5 +1,5 @@
 import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef } from "react";
-import { StyleSheet, Text, ScrollView, View, ViewStyle, FlatList } from "react-native";
+import { Text, View, ViewStyle, FlatList } from "react-native";
 import { Card, Divider, HelperText } from "react-native-paper";
 import { useRes } from "@/app/contexts";
 import { BaseFormState, BaseSubForm } from '@/typing/form';
@@ -14,7 +14,7 @@ interface FormValues {
 
 const Preview = forwardRef<any, any>((props, ref) => {
     const { route, validationSchema } = props;
-    const { found, state, groupCheckListOption } = useForm(route);
+    const { state, groupCheckListOption } = useForm(route);
 
     const masterdataStyles = useMasterdataStyles();
     const cardRef = useRef<View>(null);
@@ -64,7 +64,7 @@ const Preview = forwardRef<any, any>((props, ref) => {
         if (state.subForms) {
             const initialValues: { [key: string]: any } = {};
             state.subForms.forEach((subForm: BaseSubForm) => {
-                subForm.Fields?.forEach((field: BaseFormState) => {
+                subForm.Fields.forEach((field: BaseFormState) => {
                     initialValues[field.MCListID] = field.EResult ?? "";
                 });
             });
@@ -89,6 +89,7 @@ const Preview = forwardRef<any, any>((props, ref) => {
                                 validateOnBlur={true}
                                 validateOnChange={false}
                                 onSubmit={(value) => console.log(value)}
+                                enableReinitialize={true}
                                 key={subForm.SFormID + subForm.Columns}
                             >
                                 {({ errors, touched, setFieldValue, setTouched }) => (
