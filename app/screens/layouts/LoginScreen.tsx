@@ -14,11 +14,9 @@ const validationSchema = Yup.object().shape({
 });
 
 const LoginScreen = () => {
-  const { login } = useAuth();
   const { showSuccess, showError } = useToast();
   const [initialValues, setInitialValues] = useState({ username: "" });
   const [loading, setLoading] = useState(false);
-  console.log("LoginScreen");
 
   const handleSuccess = useCallback(() => {
     showSuccess("Operation was successful!");
@@ -30,9 +28,7 @@ const LoginScreen = () => {
 
   const handleLogin = useCallback(async (values: { username: string }) => {
     setLoading(true);
-    const result = await login(values);
     setLoading(false);
-    result?.success ? handleSuccess() : handleError();
   }, []);
 
   useFocusEffect(

@@ -20,6 +20,7 @@ const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initial
     const masterdataStyles = useMasterdataStyles()
     // const { colors } = useTheme()
     console.log("Match_form_machine_dialog");
+    console.log(isEditing);
 
     return (
         <Portal>

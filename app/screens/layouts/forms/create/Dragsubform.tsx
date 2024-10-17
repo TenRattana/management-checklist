@@ -23,9 +23,8 @@ import { useToast } from "@/app/contexts";
 
 const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, checkListType, groupCheckListOption, checkList, navigation }) => {
     const [initialDialog, setInitialDialog] = useState<boolean>(false)
-    const [initialSubForm, setInitialSubForm] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", MachineID: "" });
+    const [initialSubForm, setInitialSubForm] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", MachineID: "", Fields: [] });
     const [editMode, setEditMode] = useState<boolean>(false)
-    console.log("Dragsubform");
 
     const createform = useCreateformStyle();
     const { handleError } = useToast();
@@ -66,7 +65,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
 
     const handelSubForm = useCallback((item?: BaseSubForm) => {
         item ? setInitialSubForm(item) :
-            setInitialSubForm({ SFormID: "", SFormName: "", FormID: "", MachineID: "" })
+            setInitialSubForm({ SFormID: "", SFormName: "", FormID: "", MachineID: "", Fields: [] })
     }, [])
 
     const handelSaveSubForm = useCallback((values: BaseSubForm, mode: string) => {
@@ -85,7 +84,6 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
         }
     }, [])
 
-    console.log(state);
 
     const renderSubForm = ({ item, drag, isActive }: { item: BaseSubForm; drag: () => void; isActive: boolean; }) => {
 
@@ -131,7 +129,6 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
             </Animated.View>
         );
     };
-    console.log(state);
 
     return (
         <>

@@ -5,7 +5,6 @@ import { Inputs } from "@/components";
 
 const GenerateQR = () => {
     const [qrValue, setQrValue] = useState<string>("");
-    console.log("GenerateQR");
 
     const generateQR = (value: string) => {
         return (

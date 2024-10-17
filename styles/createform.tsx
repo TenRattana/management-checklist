@@ -69,10 +69,15 @@ const useCreateformStyle = () => {
             fontSize: spacing.small,
         },
         saveButton: {
-            padding: 16,
+            paddingHorizontal: 10,
+            height: 60,
+            marginVertical: 3,
             backgroundColor: '#00796b',
             borderRadius: 8,
+            flexDirection: 'row',
             alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: 16,
             margin: 16,
         },
         saveButtonText: {

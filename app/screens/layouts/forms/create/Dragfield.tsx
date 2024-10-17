@@ -27,8 +27,6 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
     });
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [count, setCount] = useState<number>(0)
-    console.log("Dragfield");
-
     const { handleError } = useToast();
 
     const createformStyles = useCreateformStyle();
@@ -40,7 +38,6 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
         }
         return scaleValues.current[subFormID];
     };
-    console.log(currentField);
 
     const animatedDefault = useMemo(() => ({
         toValue: 1,
@@ -77,7 +74,6 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
             })
     };
 
-    console.log(count);
 
     const handleSaveField = useCallback((values: BaseFormState, mode: string) => {
         const payload = { BaseFormState: values, checkList, checkListType, dataType };

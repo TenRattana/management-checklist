@@ -26,7 +26,6 @@ const Managepermissions = () => {
     IsActive: true,
     GUserID: "",
   });
-  console.log("Managepermissions");
 
   const masterdataStyles = useMasterdataStyles();
   const { showSuccess, handleError } = useToast();

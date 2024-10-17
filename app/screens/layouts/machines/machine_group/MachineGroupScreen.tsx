@@ -26,7 +26,6 @@ const MachineGroupScreen = () => {
         isActive: true,
     });
     const masterdataStyles = useMasterdataStyles();
-    console.log("MachineGroupScreen");
 
     const { showSuccess, handleError } = useToast();
     const { spacing } = useRes();

@@ -3,13 +3,14 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
 import { ScanQRProps } from "@/typing/tag";
 import { useFocusEffect } from "expo-router";
+import { useToast } from "@/app/contexts";
 
 const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
     const [hasPermission, setHasPermission] = useState<boolean | null>(null);
     const [scanned, setScanned] = useState<boolean>(false);
     const [qrValue, setQrValue] = useState<string | null>(null);
     const [cameraActive, setCameraActive] = useState<boolean>(true);
-
+    const { handleError } = useToast()
     useFocusEffect(
         useCallback(() => {
             (async () => {
@@ -55,7 +56,7 @@ const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
                 setCameraActive(false); // ปิดกล้องเมื่อสแกนเสร็จ
             }
         } catch (error) {
-            console.log(error);
+            handleError(error)
         }
     };
 
@@ -63,9 +64,7 @@ const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
         if (!scanned) {
             setScanned(true);
             setQrValue(data);
-            console.log(
-                `Bar code with type ${type} and data ${data} has been scanned!`
-            );
+
         }
     };
 

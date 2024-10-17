@@ -6,8 +6,7 @@ import { AccessibleView } from '@/components';
 import { useRes } from '@/app/contexts';
 
 const SettingsScreen: React.FC = () => {
-  console.log("SettingsScreen");
-  const { darkMode ,spacing, fontSize, setFontSize , setDarkMode} = useRes();
+  const { darkMode, spacing, fontSize, setFontSize, setDarkMode } = useRes();
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -37,7 +36,7 @@ const SettingsScreen: React.FC = () => {
       <Text style={[styles.title]}>Settings</Text>
 
       <AccessibleView name="setting-mode" style={[styles.settingItem]}>
-        <Text style={[styles.settingText, { fontSize: spacing.small}]}>Dark Mode</Text>
+        <Text style={[styles.settingText, { fontSize: spacing.small }]}>Dark Mode</Text>
         <Switch
           onValueChange={toggleSwitch}
           value={darkMode}
@@ -47,7 +46,7 @@ const SettingsScreen: React.FC = () => {
       </AccessibleView>
 
       <AccessibleView name="setting-font" style={[styles.settingItem]}>
-        <Text style={[styles.settingText, { fontSize: spacing.small } ]}>Font Size</Text>
+        <Text style={[styles.settingText, { fontSize: spacing.small }]}>Font Size</Text>
         <AccessibleView name="Picker" style={[styles.pickerContainer]}>
           <Picker
             selectedValue={fontSize}

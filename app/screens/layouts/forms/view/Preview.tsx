@@ -22,18 +22,26 @@ const Preview = forwardRef<any, any>((props, ref) => {
     const [formValues, setFormValues] = useState<FormValues>({});
 
     const cardRefs = useRef<(View | null)[]>([]);
-    const cardPositions = useRef<{ pageX: number; pageY: number; width: number; height: number }[]>([]);
+    const cardPositions = useRef<{ x: number; y: number; width: number; height: number }[]>([]);
 
-    useEffect(() => {
-        const positions: { pageX: number; pageY: number; width: number; height: number }[] = [];
-        cardRefs.current.forEach((cardRef) => {
+    const handleScroll = () => {
+        updateCardPositions();
+    };
+
+    const updateCardPositions = () => {
+        const positions: { x: number; y: number; width: number; height: number }[] = [];
+        cardRefs.current.forEach((cardRef, index) => {
             if (cardRef) {
-                cardRef.measure((x, y, width, height, pageX, pageY) => {
-                    positions.push({ pageX, pageY, width, height });
+                cardRef.measureInWindow((x, y, width, height) => {
+                    positions.push({ x, y, width: width + 350, height: height + 16 });
                 });
             }
         });
         cardPositions.current = positions;
+    };
+
+    useEffect(() => {
+        updateCardPositions();
     }, [state.subForms]);
 
     useImperativeHandle(ref, () => ({
@@ -46,8 +54,8 @@ const Preview = forwardRef<any, any>((props, ref) => {
         },
         checkCardPosition: (x: number, y: number) => {
             return cardPositions.current.findIndex((card) =>
-                x >= card.pageX && x <= card.pageX + card.width &&
-                y >= card.pageY && y <= card.pageY + card.height
+                x >= card.x && x <= card.x + card.width &&
+                y >= card.y && y <= card.y + card.height
             );
         },
     }));
@@ -65,7 +73,7 @@ const Preview = forwardRef<any, any>((props, ref) => {
     }, [state.subForms]);
 
     return (
-        <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { maxHeight: 900, paddingBottom: 30 }]}>
+        <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingHorizontal: 5 }]}>
             <FlatList
                 data={[{}]}
                 renderItem={() => (
@@ -131,7 +139,7 @@ const Preview = forwardRef<any, any>((props, ref) => {
                                                                                 visible={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
                                                                                 style={{ left: -10 }}
                                                                             >
-                                                                                {errors[fastFieldProps.name] || ""}
+                                                                                {errors[fastFieldProps.name] as string || ""}
                                                                             </HelperText>
                                                                             <Text
                                                                                 style={{ color: 'blue', marginLeft: 10 }}
@@ -159,6 +167,9 @@ const Preview = forwardRef<any, any>((props, ref) => {
 
                 )}
                 keyExtractor={(_, index) => index.toString()}
+                onScroll={handleScroll}
+                scrollEventThrottle={16}
+                contentContainerStyle={{ paddingBottom: 20 }}
             />
         </AccessibleView>
     );

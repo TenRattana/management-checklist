@@ -29,7 +29,6 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [found, setFound] = useState<boolean>(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  console.log("InputFormMachine");
 
   const masterdataStyles = useMasterdataStyles();
   const { machineId } = route.params || {};
@@ -72,11 +71,11 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   }, [handleError, showSuccess]);
 
   const createSubFormsAndFields = useCallback((formData: FormData) => {
-    const subForms: BaseSubForm[] = [];
-    const fields: BaseFormState[] = [];
+    const subForms: any = [];
+    const fields: any = [];
 
     formData.SubForm?.forEach((item) => {
-      const subForm: BaseSubForm = {
+      const subForm = {
         SFormID: item.SFormID,
         SFormName: item.SFormName,
         FormID: item.FormID,
@@ -84,6 +83,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
         DisplayOrder: item.DisplayOrder,
         MachineID: item.MachineID,
       };
+
       subForms.push(subForm);
 
       item.MatchCheckList?.forEach((itemOption) => {

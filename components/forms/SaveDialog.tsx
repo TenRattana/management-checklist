@@ -52,6 +52,7 @@ const SaveDialog = ({
             <Dialog
                 visible={isVisible}
                 onDismiss={() => setIsVisible(false)}
+                style={masterdataStyles.containerDialog}
             >
                 <Dialog.Title style={[
                     masterdataStyles.text,

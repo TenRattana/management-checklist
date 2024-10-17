@@ -11,7 +11,6 @@ interface ToastContextProps {
 interface ToastProviderProps {
   children: ReactNode;
 }
-console.log("Toast")
 
 const ToastContext = createContext<ToastContextProps | undefined>(undefined);
 

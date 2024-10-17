@@ -30,6 +30,8 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
     const { showSuccess, handleError } = useToast();
     const { spacing } = useRes();
 
+    console.log(isEditing);
+
     const fetchData = useCallback(async () => {
         setIsLoading(true);
 
@@ -66,6 +68,8 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
     }, [searchQuery]);
 
     const saveData = useCallback(async (values: InitialValuesMatchFormMachine) => {
+        console.log(isEditing);
+
         const data = {
             MachineID: values.machineId,
             FormID: values.formId,

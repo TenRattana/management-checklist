@@ -5,7 +5,6 @@ import { useToast } from "@/app/contexts/toastify";
 import { GroupUsers, Users, Userset } from '@/typing/type';
 import { useFocusEffect } from 'expo-router';
 
-console.log("Auth")
 interface AuthContextType {
   session: { UserName: string, GUserName: string }
   loading: boolean;

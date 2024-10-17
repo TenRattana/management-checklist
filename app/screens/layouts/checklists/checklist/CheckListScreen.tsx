@@ -23,7 +23,6 @@ const CheckListScreen = () => {
         checkListName: "",
         isActive: true,
     });
-    console.log("CheckListScreen");
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();

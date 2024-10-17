@@ -16,8 +16,6 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [show, setShow] = useState<boolean>(false)
     const { messages } = route.params || {};
-    console.log("FormScreen");
-    console.log(show);
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();

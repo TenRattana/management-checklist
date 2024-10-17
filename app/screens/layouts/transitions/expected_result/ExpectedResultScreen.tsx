@@ -19,7 +19,6 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
     const { spacing } = useRes();
-    console.log("ExpectedResultScreen");
 
     const fetchData = useCallback(async () => {
         setIsLoading(true);
