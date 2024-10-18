@@ -10,6 +10,7 @@ const DynamicForm = React.memo(({
   field,
   values,
   handleChange,
+  handleBlur,
   groupCheckListOption,
 }: DynamicFormProps) => {
   const { CTypeName, Placeholder, Hint, CListName, MCListID, GCLOptionID } = field;
@@ -34,7 +35,7 @@ const DynamicForm = React.memo(({
             label={CListName}
             value={values}
             handleChange={(v) => handleChange(MCListID, v)}
-            // handleBlur={handleBlur}
+            handleBlur={handleBlur}
             testId={`input-${MCListID}`}
           />
         );

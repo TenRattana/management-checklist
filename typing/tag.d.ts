@@ -88,7 +88,7 @@ export interface DynamicFormProps {
   field: BaseFormState;
   values: any;
   handleChange: (fieldName: string, value: any) => void;
-  // handleBlur: () => void;
+  handleBlur?: () => void;
   groupCheckListOption: GroupCheckListOption[];
 }
 
