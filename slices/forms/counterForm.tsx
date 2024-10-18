@@ -218,8 +218,8 @@ const subFormSlice = createSlice({
               return {
                 ...BaseFormState,
                 DisplayOrder: field.DisplayOrder,
-                CheckListName: checkList.find(v => v.CListID === BaseFormState.CListID)?.CListName || "",
-                CTypeName: checkListType.find(v => v.CTypeID === BaseFormState.CTypeID)?.CTypeName || "",
+                CListName: checkList.find((v) => v.CListID === BaseFormState.CListID)?.CListName,
+                CTypeName: checkListType.find((v) => v.CTypeID === BaseFormState.CTypeID)?.CTypeName,
               };
             }
             return field;

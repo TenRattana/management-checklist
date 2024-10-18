@@ -98,6 +98,8 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
     const dropgroupCheckListOption = groupCheckListOption.filter(v => v.IsActive);
 
     const renderField = ({ item, drag, isActive }: { item: BaseFormState; drag: () => void; isActive: boolean; }) => {
+        console.log(item);
+
         return (
             <Animated.View style={{ transform: [{ scale: getScaleValue(item.SFormID) }] }}>
                 <ScaleDecorator>

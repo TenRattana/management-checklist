@@ -1,13 +1,13 @@
 import { saveUserData, loadUserData, removeUserData } from '@/app/services/storage';
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from "react";
 import axiosInstance from '@/config/axios';
 import { useToast } from "@/app/contexts/toastify";
 import { GroupUsers, Users, Userset } from '@/typing/type';
-import { useFocusEffect } from 'expo-router';
 
 interface AuthContextType {
   session: { UserName: string, GUserName: string }
   loading: boolean;
+  screens: { name: string }[];
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,8 +22,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [session, setSession] = useState<{ UserName: string, GUserName: string }>({ UserName: "", GUserName: "" })
   const [loading, setLoading] = useState<boolean>(true);
   const { showSuccess, handleError } = useToast();
+  const [screens, setScreens] = useState<{ name: string }[]>([]);
 
   const fetchData = useCallback(async () => {
+
     try {
       const [userResponse, groupUserResponse] = await Promise.all([
         axiosInstance.post('User_service.asmx/GetUsers'),
@@ -35,65 +37,96 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       handleError(error);
     }
 
-  }, [handleError])
+  }, [handleError, setUser, setGroupUser])
 
   useEffect(() => {
+    console.log("session set");
+
     fetchData()
     setSession({
       UserName: "Rattana Chomwihok",
       GUserName: "SuperAdmin"
     })
     setLoading(false)
-  }, [fetchData])
+  }, [fetchData, setSession])
 
-  // useEffect(() => {
-  //   if (data && data.length > 0) {
-  //     axiosInstance.post('User_service.asmx/SaveUsers', { Datausers: JSON.stringify(data) })
+  useEffect(() => {
 
-  //     fetchData()
-  //   }
-  // }, [data])
+    if (session.UserName) {
+      if (session.GUserName === "SuperAdmin") {
+        setScreens([
+          { name: "Home" },
+          { name: "Machine_group" },
+          { name: "Machine" },
+          { name: "Checklist" },
+          { name: "Checklist_option" },
+          { name: "Checklist_group" },
+          { name: "Match_checklist_option" },
+          { name: "Match_form_machine" },
+          { name: "Create_form" },
+          { name: "Expected_result" },
+          { name: "Form" },
+          { name: "User" },
+          { name: "Preview" },
+          { name: "Admin" },
+          { name: "ScanQR" },
+          { name: "GenerateQR" },
+          { name: "InputFormMachine" },
+          { name: "Setting" },
+          { name: "Managepermissions" },
+          { name: "SuperAdmin" },
+          { name: "Test" },
+          { name: "Permission_deny" },
+        ]);
+      } else if (session.GUserName === "Admin") {
+        setScreens([
+          { name: "Home" },
+          { name: "Machine_group" },
+          { name: "Machine" },
+          { name: "Checklist" },
+          { name: "Checklist_option" },
+          { name: "Checklist_group" },
+          { name: "Match_checklist_option" },
+          { name: "Match_form_machine" },
+          { name: "Create_form" },
+          { name: "Expected_result" },
+          { name: "Form" },
+          { name: "User" },
+          { name: "Preview" },
+          { name: "Admin" },
+          { name: "ScanQR" },
+          { name: "GenerateQR" },
+          { name: "InputFormMachine" },
+          { name: "Setting" },
+          { name: "Permission_deny" },
+        ]);
+      } else if (session.GUserName === "GeneralUser") {
+        setScreens([
+          { name: "Home" },
+          { name: "ScanQR" },
+          { name: "InputFormMachine" },
+          { name: "Setting" },
+          { name: "Permission_deny" },
+        ]);
+      } else {
+        setScreens([{ name: "Permission_deny" }]);
+      }
+    }
+  }, [session, setSession, setScreens]);
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     console.log(data);
-  //     console.log(user);
-
-  //     if (data && data.length > 0) {
-  //       const dataUser = data.map(item => item.UserName)
-
-  //       console.log(dataUser);
-  //     }
-  //     setLoading(false)
-  //   }, [fetchData])
-  // );
-  // useEffect(() => {
-  //   fetchData()
-
-  // const fetchUserData = async () => {
-  //   const storedUser = await loadUserData();
-  //   if (storedUser) {
-  //     setUser(storedUser.username);
-  //     setRole(storedUser.role);
-  //   }
-  //   setLoading(false);
-  // };
-
-  // fetchUserData();
-  // }, [fetchData]);
-
-  // const logout = () => {
-  //   removeUserData();
-  //   setUser(null);
-  //   setRole(null);
-  // };
+  const value = useMemo(
+    () => ({ session, loading, screens }),
+    [session, loading, screens]
+  );
 
   return (
-    <AuthContext.Provider value={{ session, loading }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

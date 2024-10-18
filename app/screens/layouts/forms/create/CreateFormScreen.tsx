@@ -13,7 +13,7 @@ import { CreateFormProps } from "@/typing/tag";
 import { BaseForm, BaseFormState, BaseSubForm } from "@/typing/form";
 import { updateForm } from "@/slices";
 import { CheckListType, DataType } from "@/typing/type";
-import { useRes } from "@/app/contexts";
+import { useRes, useToast } from "@/app/contexts";
 import { defaultDataForm } from "@/slices";
 import * as Yup from 'yup';
 import { FastField, FieldProps, Formik } from "formik";
@@ -29,6 +29,9 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
     const { state, dispatch, checkList, groupCheckListOption, checkListType, dataType } = useForm(route);
     const createform = useCreateformStyle();
 
+    const [count, setCount] = useState<number>(0)
+
+    const { handleError } = useToast()
     const masterdataStyles = useMasterdataStyles();
     const createformStyles = useCreateformStyle();
 
@@ -75,7 +78,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
 
         if (cardIndex >= 0) {
             const targetSubForm = state.subForms[cardIndex];
-            const currentFieldCount = targetSubForm?.Fields?.length ?? 0;
+            const currentFieldCount = count;
             const selectedChecklist = checkList.find(v => v.CListID === "CL000") || checkList[0];
             const selectedDataType = dataType.find(v => v.DTypeName === "String") || dataType[0];
 
@@ -101,7 +104,13 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                 ? (groupCheckListOption.find(v => v.GCLOptionID === "GCLO000") || groupCheckListOption[0])?.GCLOptionID
                 : undefined;
 
-            dispatch(defaultDataForm({ currentField: newField }));
+            try {
+                dispatch(defaultDataForm({ currentField: newField }));
+
+                setCount(count + 1)
+            } catch (error) {
+                handleError(error)
+            }
         }
     };
 

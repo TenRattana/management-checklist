@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "@/config/axios";
 import { Card, Divider, HelperText } from "react-native-paper";
-import { Text, FlatList, Pressable, ViewStyle } from "react-native";
+import { Text, FlatList, Pressable, ViewStyle, View } from "react-native";
 import { setForm, setSubForm, setField, reset } from "@/slices";
 import { useToast, useRes } from "@/app/contexts";
 import { BaseSubForm, FormData, BaseFormState } from '@/typing/form';
@@ -12,7 +12,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { PreviewProps } from "@/typing/tag";
 import { ScanParams } from "@/typing/tag";
 import { useFocusEffect } from "expo-router";
-import { FastField, Formik } from 'formik';
+import { FastField, FieldProps, Formik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigation } from "expo-router";
 
@@ -207,58 +207,6 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
     }
   }, [showSuccess, handleError, state.subForms, state.MachineID]);
 
-  const renderSubForm = useCallback(({ item, index }: any) => {
-    return (
-      <AccessibleView name="input-form-machine" key={`${item.SFormID}-${index}`} >
-        <Card style={masterdataStyles.card}>
-          <Card.Title title={item.SFormName} titleStyle={masterdataStyles.cardTitle} />
-          <Card.Content style={masterdataStyles.subFormContainer}>
-            {item.Fields?.map((fields: BaseFormState, fieldIndex: number) => {
-
-              const columns = item.Columns ?? 1;
-              // const isLastColumn = (fieldIndex + 1) % columns === 0;
-
-              const containerStyle: ViewStyle = {
-                flexBasis: responsive === "small" ? "100%" : `${98 / columns}%`,
-                flexGrow: fields.DisplayOrder || 1,
-                padding: 5,
-                // borderRightWidth: isLastColumn ? 0 : 1,
-                marginHorizontal: 5,
-              };
-
-              return (
-                <FastField name={fields.MCListID}>
-                  {({ field, form }: any) => (
-                    <AccessibleView name="contianer-layout2" key={`fieldid-${fields.CListID}-field-${fieldIndex}-${item.SFormID}`} style={containerStyle}>
-                      <Dynamic
-                        field={fields}
-                        values={field.value}
-                        handleChange={(fieldname: string, value: any) => {
-                          form.setFieldValue(field.name, value)
-                          setTimeout(() => {
-                            form.setTouched({ ...form.touched, [field.name]: true })
-                          }, 0)
-                        }}
-                        groupCheckListOption={groupCheckListOption}
-                      />
-                      <HelperText type="error" visible={form.touched[field.name] && Boolean(form.errors[field.name])} style={{ left: -10 }}>
-                        {form.errors[field.name] || ""}
-                      </HelperText>
-                    </AccessibleView>
-
-                  )}
-                </FastField>
-              );
-            })}
-          </Card.Content>
-        </Card>
-      </AccessibleView>
-    );
-  },
-    [groupCheckListOption, formValues]
-  );
-
-
   return found ? (
     <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { maxHeight: 900, paddingBottom: 30 }]}>
       {!isSubmitted ? (
@@ -274,11 +222,90 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
             validateOnChange={false}
             onSubmit={(value) => onFormSubmit(value)}
           >
-            {({ handleSubmit, isValid, dirty }) => (
+            {({ handleSubmit, isValid, dirty, errors, touched, setFieldValue, setTouched }) => (
               <>
                 <FlatList
                   data={state.subForms}
-                  renderItem={renderSubForm}
+                  renderItem={({ item, index }) => (
+                    <AccessibleView name="input-form-machine" key={`${item.SFormID}-${index}`} >
+                      <Card style={masterdataStyles.card}>
+                        <Card.Title title={item.SFormName} titleStyle={masterdataStyles.cardTitle} />
+                        <Card.Content style={masterdataStyles.subFormContainer}>
+                          {item.Fields?.map((fields: BaseFormState, fieldIndex: number) => {
+
+                            const columns = item.Columns ?? 1;
+                            // const isLastColumn = (fieldIndex + 1) % columns === 0;
+
+                            const containerStyle: ViewStyle = {
+                              flexBasis: responsive === "small" ? "100%" : `${98 / columns}%`,
+                              flexGrow: fields.DisplayOrder || 1,
+                              padding: 5,
+                              // borderRightWidth: isLastColumn ? 0 : 1,
+                              marginHorizontal: 5,
+                            };
+
+                            return (
+                              <FastField name={fields.MCListID}>
+                                {({ field: fastFieldProps }: FieldProps) => {
+
+                                  const type = dataType.find(v => v.DTypeID === fields.DTypeID)?.DTypeName
+
+                                  const handleBlur = () => {
+                                    if (type === "Number") {
+                                      const numericValue = Number(fastFieldProps.value);
+
+                                      if (!isNaN(numericValue) && Number(fields.DTypeValue) > 0 && numericValue) {
+                                        const formattedValue = numericValue.toFixed(Number(fields.DTypeValue));
+                                        setFieldValue(fastFieldProps.name, formattedValue);
+                                        setTouched({
+                                          ...touched,
+                                          [fastFieldProps.name]: true,
+                                        });
+                                      } else if (isNaN(numericValue)) {
+                                        setFieldValue(fastFieldProps.name, fastFieldProps.value);
+                                        setTouched({
+                                          ...touched,
+                                          [fastFieldProps.name]: true,
+                                        });
+                                      }
+                                    }
+                                  };
+
+                                  return (
+                                    <AccessibleView name="contianer-layout2" key={`fieldid-${fields.CListID}-field-${fieldIndex}-${item.SFormID}`} style={containerStyle}>
+                                      <Dynamic
+                                        field={fields}
+                                        values={fastFieldProps.value ?? ""}
+                                        handleChange={(fieldname: string, value: any) => {
+                                          setFieldValue(fastFieldProps.name, value);
+                                          setTimeout(() => {
+                                            setTouched({
+                                              ...touched,
+                                              [fastFieldProps.name]: true,
+                                            });
+                                          }, 0)
+                                        }}
+                                        handleBlur={handleBlur}
+                                        groupCheckListOption={groupCheckListOption}
+                                      />
+                                      {Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name]) && (
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                          <HelperText type="error" visible={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])} style={{ left: -10 }}>
+                                            {errors[fastFieldProps.name] as string || ""}
+                                          </HelperText>
+                                        </View>
+                                      )}
+                                    </AccessibleView>
+
+                                  )
+                                }}
+                              </FastField>
+                            );
+                          })}
+                        </Card.Content>
+                      </Card>
+                    </AccessibleView>
+                  )}
                   keyExtractor={(item, index) => `${item.SFormID}-${index}`}
                   nestedScrollEnabled={true}
                   ListFooterComponentStyle={{ alignItems: 'center', width: "100%" }}

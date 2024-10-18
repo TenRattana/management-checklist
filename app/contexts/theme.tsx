@@ -1,5 +1,5 @@
 import { useThemeColor } from "@/hooks/useThemeColor";
-import React, { createContext, useContext, ReactNode } from "react";
+import React, { createContext, useContext, ReactNode, useMemo } from "react";
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -14,14 +14,20 @@ export const ThemeContext = createContext<ThemeContextProps | undefined>(undefin
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const colors = useThemeColor();
 
+  const value = useMemo(
+    () => ({ colors }),
+    [colors]
+  );
+
   return (
-    <ThemeContext.Provider value={{ colors }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );
 };
 
 export const useTheme = () => {
+
   const context = useContext(ThemeContext);
   if (context === undefined) {
     throw new Error("useTheme must be used within a ThemeProvider");

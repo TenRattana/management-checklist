@@ -12,6 +12,7 @@ import { ScanQRProps } from "@/typing/tag";
 // const Customtable = lazy(() => import('@/components/Customtable'));
 
 const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
+
   const [machine, setMachine] = useState<Machine[]>([]);
   const [matchForm, setMatchForm] = useState<MatchForm[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -24,8 +25,9 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
   const { spacing } = useRes();
 
   const fetchData = useCallback(async () => {
+    console.log("fetchData");
+
     setIsLoading(true);
-    let isMounted = true;
     try {
       const [machineResponse, matchFormResponse] = await Promise.all([
         axiosInstance.post("Machine_service.asmx/GetMachines"),
@@ -42,6 +44,8 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
+      console.log("useFocusEffect");
+
       const pollingInterval = setInterval(() => {
         fetchData();
       }, 5000);
@@ -51,6 +55,8 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
   );
 
   useCallback(() => {
+    console.log("setDebouncedSearchQuery");
+
     const handler = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
     }, 500);
@@ -61,40 +67,34 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
   }, [searchQuery]);
 
   const tableData = useMemo(() => {
+    console.log("tableData");
+
     return matchForm.map((item) => [
       item.MachineName,
       item.FormName,
       item.IsActive ? "Wait" : "Success",
     ]);
-  }, [machine, debouncedSearchQuery]);
+  }, [matchForm, debouncedSearchQuery]);
 
   const handleSacnQR = useCallback(() => {
     navigation.navigate("ScanQR")
   }, []);
 
-  const customtableProps = useMemo(() => ({
-    Tabledata: tableData,
-    Tablehead: [
-      { label: "Machine Name", align: "flex-start" },
-      { label: "FormName", align: "flex-start" },
-      { label: "Status", align: "center" },
-    ],
-    flexArr: [4, 2, 1],
-    actionIndex: [{ editIndex: 4, delIndex: 5 }],
-    searchQuery: debouncedSearchQuery,
-  }), [tableData, debouncedSearchQuery]);
+  const customtableProps = useMemo(() => {
+    console.log("customtableProps")
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      const memoryUsage = global.performance.memory;
-      console.log(`Memory Usage:
-                Total JS Heap Size: ${memoryUsage.totalJSHeapSize / 1024 / 1024} MB,
-                Used JS Heap Size: ${memoryUsage.usedJSHeapSize / 1024 / 1024} MB,
-                JS Heap Size Limit: ${memoryUsage.jsHeapSizeLimit / 1024 / 1024} MB`);
-    }, 1000); // ตรวจสอบทุก 1 วินาที
-
-    return () => clearInterval(intervalId);
-  }, []);
+    return {
+      Tabledata: tableData,
+      Tablehead: [
+        { label: "Machine Name", align: "flex-start" },
+        { label: "FormName", align: "flex-start" },
+        { label: "Status", align: "center" },
+      ],
+      flexArr: [4, 2, 1],
+      actionIndex: [{ editIndex: 4, delIndex: 5 }],
+      searchQuery: debouncedSearchQuery,
+    }
+  }, [tableData, debouncedSearchQuery]);
 
 
   return (

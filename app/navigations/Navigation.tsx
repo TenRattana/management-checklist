@@ -1,227 +1,23 @@
-import React, { useEffect, useState, lazy, Suspense, useRef } from 'react';
-import { Text, Pressable, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { IconButton } from 'react-native-paper';
+import React, { useState, lazy, Suspense, useRef, useCallback } from 'react';
+import { ActivityIndicator } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { HomeScreen, LoginScreen, AdminScreen, SuperAdminScreen, ScanQR, GenerateQR, UserScreen, SettingScreen, Managepermissions } from '@/app/screens';
+import NotFoundScreen from '@/app/+not-found'
 import { useAuth } from "@/app/contexts/auth";
+import CustomDrawerContent from './custom/CustomDrawer';
+
 const Drawer = createDrawerNavigator();
-import { DrawerContentScrollView } from '@react-navigation/drawer';
-
-const CustomDrawerContent = React.memo((props: any) => {
-  const { navigation } = props;
-
-  const [isMenuListOpen, setIsMenuListOpen] = useState<{ machine: boolean; checklist: boolean; match: boolean }>({
-    machine: false,
-    checklist: false,
-    match: false,
-  });
-
-  const { session, loading } = useAuth();
-
-  if (loading) {
-    return null;
-  }
-
-  return (
-    <FlatList
-      data={[{}]}
-      renderItem={() =>
-        <DrawerContentScrollView {...props}>
-          {session.UserName && (
-            <>
-              {(session.GUserName === "SuperAdmin" || session.GUserName === "Admin") && (
-                <>
-                  <Pressable
-                    onPress={() => navigation.navigate('Home')}
-                    style={styles.menuItem}
-                    android_ripple={{ color: '#f0f0f0' }}
-                  >
-                    <Text style={styles.menuText}>Home</Text>
-                  </Pressable>
-
-                  <MenuSection
-                    title="Machine"
-                    isOpen={isMenuListOpen.machine}
-                    onToggle={() => setIsMenuListOpen((prev) => ({ ...prev, machine: !prev.machine }))}
-                    items={[
-                      { label: 'Machine Group', navigateTo: 'Machine_group' },
-                      { label: 'Machine', navigateTo: 'Machine' },
-                    ]}
-                    navigation={navigation}
-                  />
-
-                  <MenuSection
-                    title="Check List"
-                    isOpen={isMenuListOpen.checklist}
-                    onToggle={() => setIsMenuListOpen((prev) => ({ ...prev, checklist: !prev.checklist }))}
-                    items={[
-                      { label: 'Check List', navigateTo: 'Checklist' },
-                      { label: 'Check List Option', navigateTo: 'Checklist_option' },
-                      { label: 'Group Check List', navigateTo: 'Checklist_group' },
-                    ]}
-                    navigation={navigation}
-                  />
-
-                  <MenuSection
-                    title="Match"
-                    isOpen={isMenuListOpen.match}
-                    onToggle={() => setIsMenuListOpen((prev) => ({ ...prev, match: !prev.match }))}
-                    items={[
-                      { label: 'Match Option & Group Check List', navigateTo: 'Match_checklist_option' },
-                      { label: 'Match Form & Machine', navigateTo: 'Match_form_machine' },
-                    ]}
-                    navigation={navigation}
-                  />
-
-                  <Pressable
-                    onPress={() => navigation.navigate('Form')}
-                    style={styles.menuItem}
-                    android_ripple={{ color: '#f0f0f0' }}
-                  >
-                    <Text style={styles.menuText}>List Form</Text>
-                  </Pressable>
-
-                  <Pressable
-                    onPress={() => navigation.navigate('Expected_result')}
-                    style={styles.menuItem}
-                    android_ripple={{ color: '#f0f0f0' }}
-                  >
-                    <Text style={styles.menuText}>List Result</Text>
-                  </Pressable>
-
-                  <Pressable
-                    onPress={() => navigation.navigate('ScanQR')}
-                    style={styles.menuItem}
-                    android_ripple={{ color: '#f0f0f0' }}
-                  >
-                    <Text style={styles.menuText}>Scan QR Code</Text>
-                  </Pressable>
-
-                  <Pressable
-                    onPress={() => navigation.navigate('GenerateQR')}
-                    style={styles.menuItem}
-                    android_ripple={{ color: '#f0f0f0' }}
-                  >
-                    <Text style={styles.menuText}>Generate QR Code</Text>
-                  </Pressable>
-
-                  <Pressable
-                    onPress={() => navigation.navigate('Setting')}
-                    style={styles.menuItem}
-                    android_ripple={{ color: '#f0f0f0' }}
-                  >
-                    <Text style={styles.menuText}>Setting</Text>
-                  </Pressable>
-                </>
-              )}
-
-              {(session.GUserName === "SuperAdmin") && (
-                <>
-                  <Pressable
-                    onPress={() => navigation.navigate('Test')}
-                    style={styles.menuItem}
-                    android_ripple={{ color: '#f0f0f0' }}
-                  >
-                    <Text style={styles.menuText}>Test</Text>
-                  </Pressable>
-
-                  <Pressable
-                    onPress={() => navigation.navigate('Managepermissions')}
-                    style={styles.menuItem}
-                    android_ripple={{ color: '#f0f0f0' }}
-                  >
-                    <Text style={styles.menuText}>Managepermissions</Text>
-                  </Pressable>
-                </>
-              )}
-
-              {(session.GUserName === "GeneralUser") && (
-                <>
-                  <Pressable
-                    onPress={() => navigation.navigate('Home')}
-                    style={styles.menuItem}
-                    android_ripple={{ color: '#f0f0f0' }}
-                  >
-                    <Text style={styles.menuText}>Home</Text>
-                  </Pressable>
-
-                  <Pressable
-                    onPress={() => navigation.navigate('ScanQR')}
-                    style={styles.menuItem}
-                    android_ripple={{ color: '#f0f0f0' }}
-                  >
-                    <Text style={styles.menuText}>Scan QR Code</Text>
-                  </Pressable>
-
-                  <Pressable
-                    onPress={() => navigation.navigate('Setting')}
-                    style={styles.menuItem}
-                    android_ripple={{ color: '#f0f0f0' }}
-                  >
-                    <Text style={styles.menuText}>Setting</Text>
-                  </Pressable>
-                </>
-              )}
-            </>
-          )}
-
-        </DrawerContentScrollView>
-      }
-      keyExtractor={(_, index) => index.toString()}
-    />
-  );
-})
-
-const MenuSection = React.memo(({ title, isOpen, onToggle, items, navigation }: any) => {
-  const itemHeight = 68;
-  const height = useSharedValue(0);
-  const opacity = useSharedValue(0);
-  const totalHeight = items.length * itemHeight;
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    height: height.value,
-    opacity: opacity.value,
-    overflow: 'hidden',
-  }));
-
-  useEffect(() => {
-    if (isOpen) {
-      opacity.value = withTiming(1, { duration: 300 });
-      height.value = withTiming(totalHeight, { duration: 300 });
-    } else {
-      setTimeout(() => {
-        opacity.value = withTiming(0, { duration: 300 });
-        height.value = withTiming(0, { duration: 300 });
-      }, 300);
-    }
-  }, [isOpen, totalHeight]);
-
-  return (
-    <>
-      <Pressable onPress={() => onToggle()} style={styles.menuItem}>
-        <Text style={styles.menuText}>{title}</Text>
-        <IconButton icon={isOpen ? 'chevron-up' : 'chevron-down'} size={20} />
-      </Pressable>
-      <Animated.View style={[animatedStyle]}>
-        {items.map((item: any) => (
-          <Pressable key={item.label} onPress={() => navigation.navigate(item.navigateTo)} style={styles.subMenuItem}>
-            <Text style={styles.subMenuText}>{item.label}</Text>
-          </Pressable>
-        ))}
-      </Animated.View>
-    </>
-  );
-});
 
 type ComponentNames = 'TestScreen' | 'Form' | 'Expected_result' | 'Create_form' | 'Machine_group' |
   'Machine' | 'Match_checklist_option' | 'Match_form_machine' | 'Checklist' |
-  'InputFormMachine' | 'Preview' | 'Checklist_option' | 'Checklist_group' | 'ScanQR' | 'GenerateQR' | 'Setting' | 'Managepermissions';
+  'InputFormMachine' | 'Preview' | 'Checklist_option' | 'Checklist_group' | 'ScanQR' | 'GenerateQR' | 'Setting' | 'Managepermissions' | 'NotFoundScreen' | 'Home';
 
 const components: Record<ComponentNames, () => Promise<{ default: React.ComponentType<any> }>> = {
+  Home: () => Promise.resolve({ default: HomeScreen }),
   ScanQR: () => Promise.resolve({ default: ScanQR }),
   GenerateQR: () => Promise.resolve({ default: GenerateQR }),
   Setting: () => Promise.resolve({ default: SettingScreen }),
+  NotFoundScreen: () => Promise.resolve({ default: NotFoundScreen }),
   TestScreen: () => import('@/app/screens/TestScreen'),
   Form: () => import('@/app/screens/layouts/forms/form/FormScreen'),
   Expected_result: () => import('@/app/screens/layouts/transitions/expected_result/ExpectedResultScreen'),
@@ -238,9 +34,11 @@ const components: Record<ComponentNames, () => Promise<{ default: React.Componen
   Checklist_group: () => import('@/app/screens/layouts/checklists/checklist_group/ChecklistGroupScreen'),
 };
 
-const App = () => {
-  const { session, loading } = useAuth();
-  const [loadedComponents, setLoadedComponents] = useState(new Set<string>());
+const Navigations = () => {
+  console.log("Navigations");
+
+  const { loading, screens } = useAuth();
+  const [loadedComponents, setLoadedComponents] = useState<Set<string>>(new Set());
   const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
 
   if (loading) {
@@ -248,6 +46,8 @@ const App = () => {
   }
 
   const renderComponent = (name: ComponentNames) => {
+    console.log("renderComponent");
+
     if (!loadedComponents.has(name)) {
       if (!cachedComponents.current[name]) {
         cachedComponents.current[name] = lazy(components[name]);
@@ -260,101 +60,21 @@ const App = () => {
   };
 
   return (
-    <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
-      <Drawer.Navigator
-        drawerContent={(props) => <CustomDrawerContent {...props} />}
-        initialRouteName='Home'
-      >
-        {session.UserName ? (
-          <>
-            {(session.GUserName === "SuperAdmin" || session.GUserName === "Admin") && (
-              <>
-                <Drawer.Screen name="Home" component={HomeScreen} />
-                {[
-                  { name: "Machine_group" },
-                  { name: "Machine" },
-                  { name: "Checklist" },
-                  { name: "Checklist_option" },
-                  { name: "Checklist_group" },
-                  { name: "Match_checklist_option" },
-                  { name: "Match_form_machine" },
-                  { name: "Create_form" },
-                  { name: "Expected_result" },
-                  { name: "Form" },
-                  { name: "User" },
-                  { name: "Preview" },
-                  { name: "Admin" },
-                  { name: "ScanQR" },
-                  { name: "GenerateQR" },
-                  { name: "InputFormMachine" },
-                  { name: "Setting" },
-                ].map(screen => (
-                  <Drawer.Screen key={screen.name} name={screen.name} component={renderComponent(screen.name as ComponentNames)} />
-                ))}
-              </>
-            )}
-            {session.GUserName === "SuperAdmin" && (
-              <>
-                {[
-                  { name: "Managepermissions" },
-                  { name: "SuperAdmin" },
-                  { name: "Test" },
-                ].map(screen => (
-                  <Drawer.Screen key={screen.name} name={screen.name} component={renderComponent(screen.name as ComponentNames)} />
-                ))}
-              </>
-            )}
-            {session.GUserName === "GeneralUser" && (
-              <>
-                <Drawer.Screen name="Home" component={HomeScreen} />
-                {[
-                  { name: "ScanQR" },
-                  { name: "InputFormMachine" },
-                  { name: "Setting" },
-                ].map(screen => (
-                  <Drawer.Screen key={screen.name} name={screen.name} component={renderComponent(screen.name as ComponentNames)} />
-                ))}
-              </>
-            )}
-          </>
-        ) : (
-          <>
-            <Drawer.Screen name={"Login"} component={LoginScreen} />
-          </>
-        )}
-      </Drawer.Navigator>
-    </Suspense>
+    <Drawer.Navigator
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      initialRouteName='Home'
+    >
+      {!loading && screens && screens.length > 0 ? screens.map(screen => (
+        <Drawer.Screen
+          key={screen.name}
+          name={screen.name}
+          component={renderComponent(screen.name as ComponentNames)}
+        />
+      )) : (
+        <Drawer.Screen name={"Login"} component={LoginScreen} />
+      )}
+    </Drawer.Navigator>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingVertical: 10,
-  },
-  menuItem: {
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    minHeight: 68,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  menuText: {
-    fontSize: 16,
-  },
-  subMenuItem: {
-    paddingLeft: 40,
-    minHeight: 68,
-    paddingVertical: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  subMenuText: {
-    fontSize: 16,
-    color: '#5e5e5e',
-  },
-});
-
-export default App;
+export default React.memo(Navigations);

@@ -49,9 +49,10 @@ const CustomDropdownSingle = ({
                 selectedTextStyle={masterdataStyles.selectedTextStyle}
                 inputSearchStyle={masterdataStyles.inputSearchStyle}
                 iconStyle={masterdataStyles.iconStyle}
+                itemTextStyle={[masterdataStyles.text, masterdataStyles.textDark]}
                 data={options}
                 search
-                maxHeight={300}
+                // maxHeight={300}
                 labelField="label"
                 valueField="value"
                 placeholder={`Select ${title}`}

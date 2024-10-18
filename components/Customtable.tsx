@@ -19,6 +19,7 @@ const CustomTable = ({
   actionIndex,
   searchQuery,
 }: CustomTableProps) => {
+
   const [page, setPage] = useState<number>(0);
   const [numberOfItemsPerPageList] = useState([10, 20, 50]);
   const [itemsPerPage, onItemsPerPageChange] = useState(numberOfItemsPerPageList[0]);
@@ -29,7 +30,7 @@ const CustomTable = ({
   const [dialogMessage, setDialogMessage] = useState<string>("");
   const [dialogTitle, setDialogTitle] = useState<string>("");
   const [dialogData, setDialogData] = useState<string>("");
-  // console.log("CustomTable");
+  console.log("CustomTable");
 
   const colors = useThemeColor();
   const { responsive, spacing } = useRes();
@@ -39,6 +40,8 @@ const CustomTable = ({
   const animations = useRef(Tabledata.map(() => new Animated.Value(1))).current;
 
   useEffect(() => {
+    console.log("loadPagination");
+
     const loadPagination = async () => {
       const paginate = await loadPaginate();
       if (paginate) onItemsPerPageChange(paginate.paginate);
@@ -53,20 +56,34 @@ const CustomTable = ({
   const handleSort = useCallback((columnIndex: number) => {
     setSortColumn(prev => (prev === columnIndex ? null : columnIndex));
     setSortDirection(prev => (prev === "ascending" ? "descending" : "ascending"));
+    console.log("handleSort");
+
   }, [setSortColumn, setSortDirection]);
 
   const sortedData = useMemo(() => {
+    console.log("sortedData");
+
     return [...Tabledata].sort((a, b) => {
       if (sortColumn === null) return 0;
       const aValue = a[sortColumn];
       const bValue = b[sortColumn];
+
+      if (typeof aValue === "string" && typeof bValue === "string") {
+        return sortDirection === "ascending"
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      }
+
       return sortDirection === "ascending"
         ? aValue < bValue ? -1 : 1
         : aValue > bValue ? -1 : 1;
     });
+
   }, [Tabledata, sortColumn, sortDirection]);
 
   const filteredData = useMemo(() => {
+    console.log("filteredData");
+
     return sortedData.filter((row) =>
       row.some((cell) =>
         cell.toString().toLowerCase().includes(searchQuery.toLowerCase())
@@ -81,6 +98,9 @@ const CustomTable = ({
   }, [handleAction]);
 
   const currentData = useMemo(() => {
+    console.log("currentData");
+    if (!filteredData) return [];
+
     return filteredData.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
   }, [filteredData, page, itemsPerPage]);
 
@@ -90,6 +110,7 @@ const CustomTable = ({
     row: (string | number | boolean)[],
     rowIndex: number
   ) => {
+
     if (typeof cell === "boolean") {
       const handlePress = () => {
         try {
@@ -139,6 +160,7 @@ const CustomTable = ({
     row: (string | number | boolean)[],
     rowIndex: number
   ) => {
+
     const handlePress = () => {
       if (action === "preIndex") {
         handleDialog(action, data);
@@ -219,6 +241,7 @@ const CustomTable = ({
   }, [handleDialog, setDialogAction, setDialogTitle, setDialogMessage, setIsVisible]);
 
   const renderSmallRes = useCallback((rowData: (string | number | boolean)[], rowIndex: number) => {
+
     return (
       <AccessibleView name={`row-${rowIndex}`} key={`row-${rowIndex}`} style={[customtable.cardRow, { alignItems: 'flex-start' }]}>
         {Tablehead.map((header, colIndex) => (
@@ -257,6 +280,7 @@ const CustomTable = ({
   }, [renderCellContent, renderActionButton])
 
   const renderTableData = useCallback((row: any, rowIndex: number) => {
+
     return (
       <DataTable.Row key={`row-${rowIndex}`}>
         {row.map((cell: any, cellIndex: number) => {

@@ -5,6 +5,7 @@ import AccessibleView from "@/components/AccessibleView";
 import { CustomDropdownMultiProps } from '@/typing/tag';
 import { useRes } from "@/app/contexts";
 import useMasterdataStyles from "@/styles/common/masterdata";
+import { Pressable, View } from "react-native";
 
 const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChange, lefticon, iconRight, testId, handleBlur }: CustomDropdownMultiProps) => {
   const [options, setOptions] = useState<{ label?: string; value?: string; icon?: () => JSX.Element }[]>([]);
@@ -35,14 +36,16 @@ const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChan
   return (
     <AccessibleView name="customdropdown-multi" style={masterdataStyles.containerInput}>
       <MultiSelect
+        mode="modal"
         style={masterdataStyles.dropdown}
         placeholderStyle={masterdataStyles.placeholderStyle}
         selectedTextStyle={masterdataStyles.selectedTextStyle}
         inputSearchStyle={masterdataStyles.inputSearchStyle}
         iconStyle={masterdataStyles.iconStyle}
+        itemTextStyle={[masterdataStyles.text, masterdataStyles.textDark]}
         data={options}
         search
-        maxHeight={300}
+        // maxHeight={500}
         labelField="label"
         valueField="value"
         placeholder={`Select ${title}`}
@@ -50,6 +53,9 @@ const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChan
         value={value as string[]}
         onChange={handleChange}
         onBlur={handleBlur}
+        activeColor={masterdataStyles.backMain.backgroundColor}
+        alwaysRenderSelectedItem
+        showsVerticalScrollIndicator
         renderLeftIcon={() => (
           <IconButton
             style={masterdataStyles.icon}
@@ -75,20 +81,13 @@ const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChan
           </AccessibleView>
         )}
         renderSelectedItem={(item, unSelect) => (
-          <AccessibleView name="chip-mul" style={masterdataStyles.containerAction}>
-            <Chip
-              icon="delete"
-              style={masterdataStyles.chip}
-              mode="outlined"
-              onClose={() => unSelect?.(item)}
-            >
-              <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>
-                {item.label}
-              </Text>
-            </Chip>
-          </AccessibleView>
+          <Pressable onPress={() => unSelect && unSelect(item)}>
+            <AccessibleView name="container-renderSelect" style={masterdataStyles.selectedStyle}>
+              <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{item.label}</Text>
+              {/* <AntDesign style={styles.icon} name="Safety" size={20} /> */}
+            </AccessibleView>
+          </Pressable>
         )}
-
         testID={testId}
       />
     </AccessibleView>

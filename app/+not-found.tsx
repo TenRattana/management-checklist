@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, Stack } from 'expo-router';
 import { StyleSheet, Text } from 'react-native';
 import { AccessibleView } from "@/components";

@@ -90,7 +90,7 @@ const Preview = forwardRef<any, any>((props, ref) => {
                                 validateOnChange={false}
                                 onSubmit={(value) => console.log(value)}
                                 enableReinitialize={true}
-                                key={subForm.SFormID + subForm.Columns}
+                                key={subForm.SFormID + subForm.Columns + JSON.stringify(subForm.Fields)}
                             >
                                 {({ errors, touched, setFieldValue, setTouched }) => (
                                     <>
@@ -120,14 +120,9 @@ const Preview = forwardRef<any, any>((props, ref) => {
 
                                                                 const type = dataType.find(v => v.DTypeID === field.DTypeID)?.DTypeName
 
-                                                                console.log(fastFieldProps.value, typeof fastFieldProps.value, "value aa");
-
-
                                                                 const handleBlur = () => {
                                                                     if (type === "Number") {
                                                                         const numericValue = Number(fastFieldProps.value);
-                                                                        console.log(numericValue, typeof numericValue), "number";
-                                                                        console.log(fastFieldProps.value, typeof fastFieldProps.value, "value");
 
                                                                         if (!isNaN(numericValue) && Number(field.DTypeValue) > 0 && numericValue) {
                                                                             const formattedValue = numericValue.toFixed(Number(field.DTypeValue));
@@ -153,6 +148,12 @@ const Preview = forwardRef<any, any>((props, ref) => {
                                                                             values={String(fastFieldProps.value)}
                                                                             handleChange={(fieldname: string, value: any) => {
                                                                                 setFieldValue(fastFieldProps.name, value);
+                                                                                setTimeout(() => {
+                                                                                    setTouched({
+                                                                                        ...touched,
+                                                                                        [fastFieldProps.name]: true,
+                                                                                    });
+                                                                                }, 0)
                                                                             }}
                                                                             handleBlur={handleBlur}
                                                                             groupCheckListOption={groupCheckListOption}
@@ -167,7 +168,7 @@ const Preview = forwardRef<any, any>((props, ref) => {
                                                                                     {errors[fastFieldProps.name] as string || ""}
                                                                                 </HelperText>
                                                                                 <Text
-                                                                                    style={{ color: 'blue', marginLeft: 10 }}
+                                                                                    style={[masterdataStyles.text, masterdataStyles.errorText]}
                                                                                     onPress={() => {
                                                                                         setTouched({ ...touched, [fastFieldProps.name]: false });
                                                                                     }}

@@ -25,7 +25,7 @@ interface ResponsiveProviderProps {
 export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children }) => {
   const { width } = useWindowDimensions();
   const spacingValues = useSpacing();
-  
+
   const [responsive, setResponsive] = useState<"small" | "medium" | "large">("small");
   const [darkMode, setDarkMode] = useState<boolean>(false);
   const [fontSize, setFontSize] = useState<string>('small');
@@ -34,13 +34,13 @@ export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children
     const loadSettings = async () => {
       const storedDarkMode = await AsyncStorage.getItem('darkMode');
       const storedFontSize = await AsyncStorage.getItem('fontSize');
-      
+
       setDarkMode(storedDarkMode === "darkMode");
       setFontSize(storedFontSize ?? "small");
     };
 
     loadSettings();
-  }, []);
+  }, [setDarkMode, setFontSize, AsyncStorage]);
 
   useEffect(() => {
     if (width > spacingValues.breakpoints.large) {
@@ -50,7 +50,7 @@ export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children
     } else {
       setResponsive("small");
     }
-  }, [width, spacingValues.breakpoints]);
+  }, [width, spacingValues.breakpoints, setResponsive]);
 
   const spacing = useMemo(() => {
     switch (fontSize) {
@@ -95,7 +95,7 @@ export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children
       setFontSize: handleFontSizeChange,
       setDarkMode: handleDarkModeChange
     }),
-    [responsive, spacing, darkMode, fontSize]
+    [responsive, spacing, darkMode, fontSize, setFontSize, setDarkMode]
   );
 
   return (

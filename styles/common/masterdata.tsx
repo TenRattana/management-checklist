@@ -238,6 +238,19 @@ const useMasterdataStyles = () => {
         fieldCard: {
             marginVertical: 5,
         },
+        selectedStyle: {
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 8,
+            backgroundColor: colors.light,
+            shadowColor: '#000',
+            marginTop: 8,
+            marginRight: 12,
+            paddingHorizontal: 20,
+            paddingVertical: 10
+
+        },
     });
 };
 
