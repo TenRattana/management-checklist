@@ -244,7 +244,6 @@ const useMasterdataStyles = () => {
             alignItems: 'center',
             borderRadius: 8,
             backgroundColor: colors.light,
-            shadowColor: '#000',
             marginTop: 8,
             marginRight: 12,
             paddingHorizontal: 20,
