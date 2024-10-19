@@ -5,7 +5,7 @@ import { Card, Divider, HelperText } from "react-native-paper";
 import { Text, FlatList, Pressable, ViewStyle, View } from "react-native";
 import { setForm, setSubForm, setField, reset } from "@/slices";
 import { useToast, useRes } from "@/app/contexts";
-import { BaseSubForm, FormData, BaseFormState } from '@/typing/form';
+import { BaseSubForm, FormData, BaseFormState, SubForm } from '@/typing/form';
 import { CheckListType, Checklist, GroupCheckListOption, DataType } from '@/typing/type';
 import { AccessibleView, Dynamic, NotFoundScreen } from "@/components";
 import useMasterdataStyles from "@/styles/common/masterdata";
@@ -35,17 +35,17 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
 
   const fetchData = useCallback(async () => {
     try {
-      const responses = await Promise.all([
+      const [checkLists, checkListTypes, groupCheckListOptions, dataTypes] = await Promise.all([
         axiosInstance.post("CheckList_service.asmx/GetCheckLists"),
         axiosInstance.post("CheckListType_service.asmx/GetCheckListTypes"),
         axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions"),
         axiosInstance.post("DataType_service.asmx/GetDataTypes"),
       ]);
 
-      setCheckList(responses[0].data.data ?? []);
-      setCheckListType(responses[1].data.data ?? []);
-      setGroupCheckListOption(responses[2].data.data ?? []);
-      setDataType(responses[3].data.data ?? []);
+      setCheckList(prev => prev.length ? prev : checkLists.data?.data ?? []);
+      setGroupCheckListOption(prev => prev.length ? prev : groupCheckListOptions.data?.data ?? []);
+      setCheckListType(prev => prev.length ? prev : checkListTypes.data?.data ?? []);
+      setDataType(prev => prev.length ? prev : dataTypes.data?.data ?? []);
     } catch (error) {
       handleError(error);
     }
@@ -67,19 +67,19 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   }, [handleError, showSuccess]);
 
   const createSubFormsAndFields = useCallback((formData: FormData) => {
-    const subForms: any = [];
-    const fields: any = [];
+    const subForms: SubForm[] = [];
+    const fields: BaseFormState[] = [];
 
     formData.SubForm?.forEach((item) => {
-      const subForm = {
+      const subForm: SubForm = {
         SFormID: item.SFormID,
         SFormName: item.SFormName,
         FormID: item.FormID,
         Columns: item.Columns,
         DisplayOrder: item.DisplayOrder,
         MachineID: item.MachineID,
+        Fields: []
       };
-
       subForms.push(subForm);
 
       item.MatchCheckList?.forEach((itemOption) => {
@@ -97,7 +97,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
           Placeholder: itemOption.Placeholder,
           Hint: itemOption.Hint,
           DisplayOrder: itemOption.DisplayOrder,
-          EResult: itemOption.EResult,
+          EResult: "",
         });
       });
     });
@@ -105,29 +105,36 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
     return { subForms, fields };
   }, []);
 
+  const loadForm = useCallback(async (machineId: string) => {
+    const formData = await fetchForm(machineId);
+    if (formData) {
+      setFound(true);
+
+      const { subForms, fields } = createSubFormsAndFields(formData);
+      dispatch(setForm({ form: formData }));
+      dispatch(setSubForm({ subForms }));
+      dispatch(setField({ BaseFormState: fields, checkList, checkListType }));
+    } else {
+      setFound(false);
+    }
+  }, [fetchForm, checkList, checkListType, dispatch]);
+
   useFocusEffect(
     useCallback(() => {
       fetchData();
-      return () => { dispatch(reset()); };
-    }, [dispatch, fetchData])
+      return () => {
+        dispatch(reset());
+      };
+    }, [fetchData, dispatch])
   );
 
   useFocusEffect(
     useCallback(() => {
-      const loadForm = async () => {
-        if (machineId) {
-          const formData = await fetchForm(machineId);
-          if (found && formData) {
-            const { subForms, fields } = createSubFormsAndFields(formData);
-            dispatch(setForm({ form: formData }));
-            dispatch(setSubForm({ subForms }));
-            dispatch(setField({ BaseFormState: fields, checkList, checkListType }));
-          }
+        if (dataType.length && machineId) {
+            loadForm(machineId);
         }
-      };
-      loadForm();
-    }, [machineId, found, dispatch, fetchForm, createSubFormsAndFields, checkList, checkListType])
-  );
+    }, [machineId, dataType.length, loadForm, machineId])
+);
 
   const { responsive } = useRes();
 
@@ -227,7 +234,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                 <FlatList
                   data={state.subForms}
                   renderItem={({ item, index }) => (
-                    <AccessibleView name="input-form-machine" key={`${item.SFormID}-${index}`} >
+                    <AccessibleView name="input-form-machine" key={`SFormID-${item.SFormID}`}>
                       <Card style={masterdataStyles.card}>
                         <Card.Title title={item.SFormName} titleStyle={masterdataStyles.cardTitle} />
                         <Card.Content style={masterdataStyles.subFormContainer}>
@@ -245,7 +252,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                             };
 
                             return (
-                              <FastField name={fields.MCListID}>
+                              <FastField name={fields.MCListID} key={`SFormID-${item.SFormID}-fastfield${fieldIndex}`}>
                                 {({ field: fastFieldProps }: FieldProps) => {
 
                                   const type = dataType.find(v => v.DTypeID === fields.DTypeID)?.DTypeName
@@ -272,7 +279,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                                   };
 
                                   return (
-                                    <AccessibleView name="contianer-layout2" key={`fieldid-${fields.CListID}-field-${fieldIndex}-${item.SFormID}`} style={containerStyle}>
+                                    <AccessibleView name="contianer-layout2" key={`fastfield-${fields.CListID}-field-${fieldIndex}-${item.SFormID}`} style={containerStyle}>
                                       <Dynamic
                                         field={fields}
                                         values={fastFieldProps.value ?? ""}
@@ -306,7 +313,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                       </Card>
                     </AccessibleView>
                   )}
-                  keyExtractor={(item, index) => `${item.SFormID}-${index}`}
+                  keyExtractor={(item) => item.SFormID.toString()}
                   nestedScrollEnabled={true}
                   ListFooterComponentStyle={{ alignItems: 'center', width: "100%" }}
                   ListFooterComponent={() => (

@@ -119,7 +119,7 @@ const Managepermissions = () => {
       item.IsActive,
       item.UserID,
     ])
-  }, [user, groupUser, debouncedSearchQuery]);
+  }, [userPermission,groupUser]);
 
   const handleNewData = useCallback(() => {
     setInitialValues({
