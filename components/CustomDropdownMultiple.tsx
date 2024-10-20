@@ -34,7 +34,7 @@ const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChan
   }, [processData]);
 
   return (
-    <AccessibleView name="customdropdown-multi" style={masterdataStyles.containerInput}>
+    <AccessibleView name="customdropdown-multi" style={masterdataStyles.commonContainer}>
       <MultiSelect
         mode="modal"
         style={masterdataStyles.dropdown}

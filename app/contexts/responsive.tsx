@@ -10,10 +10,8 @@ interface ResponsiveContextType {
     medium: number;
     large: number;
   };
-  darkMode: boolean;
   fontSize: string;
   setFontSize: (value: string) => void;
-  setDarkMode: (value: boolean) => void;
 }
 
 const ResponsiveContext = createContext<ResponsiveContextType | undefined>(undefined);
@@ -27,20 +25,17 @@ export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children
   const spacingValues = useSpacing();
 
   const [responsive, setResponsive] = useState<"small" | "medium" | "large">("small");
-  const [darkMode, setDarkMode] = useState<boolean>(false);
   const [fontSize, setFontSize] = useState<string>('small');
 
   useEffect(() => {
     const loadSettings = async () => {
-      const storedDarkMode = await AsyncStorage.getItem('darkMode');
       const storedFontSize = await AsyncStorage.getItem('fontSize');
 
-      setDarkMode(storedDarkMode === "darkMode");
       setFontSize(storedFontSize ?? "small");
     };
 
     loadSettings();
-  }, [setDarkMode, setFontSize, AsyncStorage]);
+  }, [setFontSize, AsyncStorage]);
 
   useEffect(() => {
     if (width > spacingValues.breakpoints.large) {
@@ -81,21 +76,15 @@ export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children
     await AsyncStorage.setItem('fontSize', value);
   };
 
-  const handleDarkModeChange = async (value: boolean) => {
-    setDarkMode(value);
-    await AsyncStorage.setItem('darkMode', value ? "darkMode" : "");
-  };
 
   const value = useMemo(
     () => ({
       responsive,
       spacing,
-      darkMode,
       fontSize,
       setFontSize: handleFontSizeChange,
-      setDarkMode: handleDarkModeChange
     }),
-    [responsive, spacing, darkMode, fontSize, setFontSize, setDarkMode]
+    [responsive, spacing, fontSize, setFontSize]
   );
 
   return (

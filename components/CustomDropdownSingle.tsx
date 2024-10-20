@@ -42,7 +42,7 @@ const CustomDropdownSingle = ({
     }, [processData]);
 
     return (
-        <AccessibleView name="customdropdown-single" style={masterdataStyles.containerInput}>
+        <AccessibleView name="customdropdown-single" style={masterdataStyles.commonContainer}>
             <Dropdown
                 style={masterdataStyles.dropdown}
                 placeholderStyle={masterdataStyles.placeholderStyle}

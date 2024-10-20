@@ -3,11 +3,12 @@ import { Text, Switch, StyleSheet, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 import { AccessibleView } from '@/components';
-import { useRes } from '@/app/contexts';
+import { useRes , useTheme } from '@/app/contexts';
 
 const SettingsScreen: React.FC = () => {
-  const { darkMode, spacing, fontSize, setFontSize, setDarkMode } = useRes();
-
+  const { spacing, fontSize, setFontSize,  } = useRes();
+  const {darkMode , setDarkMode } = useTheme();
+  
   useEffect(() => {
     const loadSettings = async () => {
       const savedDarkMode = await AsyncStorage.getItem('darkMode');

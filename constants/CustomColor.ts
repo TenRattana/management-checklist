@@ -35,3 +35,15 @@ export const colors = {
   succeass: palette.green,
   yellow: palette.yellow,
 };
+
+export const dark = {
+  background: palette.dark4,
+  color: palette.light,
+  seconColor: palette.danger
+}
+
+export const light = {
+  background: palette.light,
+  color: palette.dark,
+  seconColor: palette.blue
+}

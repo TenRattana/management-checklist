@@ -320,10 +320,10 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                     <AccessibleView name="form-action-scan" style={[masterdataStyles.containerAction]}>
                       <Pressable
                         onPress={() => handleSubmit()}
-                        disabled={!isValid || !dirty}
+                        // disabled={!isValid || !dirty}
                         style={[
                           masterdataStyles.button,
-                          isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis,
+                          masterdataStyles.backMain,
                         ]}
                       >
                         <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Submit</Text>

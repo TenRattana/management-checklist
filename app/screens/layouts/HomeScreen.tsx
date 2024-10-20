@@ -9,7 +9,6 @@ import { useRes } from "@/app/contexts";
 import { Machine, MatchForm } from '@/typing/type';
 import { useFocusEffect } from "expo-router";
 import { ScanQRProps } from "@/typing/tag";
-// const Customtable = lazy(() => import('@/components/Customtable'));
 
 const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
 
@@ -54,7 +53,7 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
     }, [fetchData])
   );
 
-  useCallback(() => {
+  useEffect(() => {
     console.log("setDebouncedSearchQuery");
 
     const handler = setTimeout(() => {

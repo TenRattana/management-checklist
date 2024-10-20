@@ -93,7 +93,7 @@ const DynamicForm = React.memo(({
     <AccessibleView name="form-layout2" style={{
       flex: 1,
     }}>
-      <Text style={masterdataStyles.text}>{CListName}</Text>
+      <Text style={[masterdataStyles.text, CTypeName === "Text" ? {justifyContent:'flex-start' , alignItems:'center'  , marginVertical:'auto'} : {}]}>{CListName}</Text>
       {renderField()}
     </AccessibleView>
   );

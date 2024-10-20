@@ -1,22 +1,42 @@
-import { useThemeColor } from "@/hooks/useThemeColor";
-import React, { createContext, useContext, ReactNode, useMemo } from "react";
-
-interface ThemeProviderProps {
-  children: ReactNode;
-}
+import React, { createContext, useContext, useState, ReactNode, useEffect, useMemo } from 'react';
+import { dark, light } from '@/constants/CustomColor';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ThemeContextProps {
-  colors: ReturnType<typeof useThemeColor>;
+  theme: typeof dark | typeof light;
+  setDarkMode: (value: boolean) => void;
+  darkMode: boolean;
 }
 
-export const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
+const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const colors = useThemeColor();
+export const ThemeProvider = ({ children }: { children: ReactNode }) => {
+  const [darkMode, setDarkMode] = useState<boolean>(false);
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      const storedDarkMode = await AsyncStorage.getItem('darkMode');
+
+      setDarkMode(storedDarkMode === "darkMode");
+    };
+
+    loadSettings();
+  }, [setDarkMode, AsyncStorage]);
+
+  const handleDarkModeChange = async (value: boolean) => {
+    setDarkMode(value);
+    await AsyncStorage.setItem('darkMode', value ? "darkMode" : "");
+  };
+
+  const theme = darkMode ? dark : light;
 
   const value = useMemo(
-    () => ({ colors }),
-    [colors]
+    () => ({
+      theme,
+      darkMode,
+      setDarkMode: handleDarkModeChange
+    }),
+    [darkMode, setDarkMode]
   );
 
   return (
@@ -27,10 +47,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 };
 
 export const useTheme = () => {
-
   const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error("useTheme must be used within a ThemeProvider");
+  if (!context) {
+    throw new Error('useTheme must be used within a ThemeProvider');
   }
   return context;
 };

@@ -19,39 +19,40 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<Users[]>([]);
   const [groupUser, setGroupUser] = useState<GroupUsers[]>([]);
-  const [session, setSession] = useState<{ UserName: string, GUserName: string }>({ UserName: "", GUserName: "" })
+  const [session, setSession] = useState<{ UserName: string, GUserName: string }>({ UserName: "", GUserName: "" });
   const [loading, setLoading] = useState<boolean>(true);
   const { showSuccess, handleError } = useToast();
   const [screens, setScreens] = useState<{ name: string }[]>([]);
 
   const fetchData = useCallback(async () => {
-
     try {
       const [userResponse, groupUserResponse] = await Promise.all([
         axiosInstance.post('User_service.asmx/GetUsers'),
         axiosInstance.post('GroupUser_service.asmx/GetGroupUsers')
-      ])
-      setUser(userResponse.data.data ?? [])
+      ]);
+      setUser(userResponse.data.data ?? []);
       setGroupUser(groupUserResponse.data.data ?? []);
     } catch (error) {
       handleError(error);
     }
-
-  }, [handleError, setUser, setGroupUser])
+  }, [handleError]);
 
   useEffect(() => {
     console.log("session set");
+    fetchData();
 
-    fetchData()
-    setSession({
+    const newSession = {
       UserName: "Rattana Chomwihok",
       GUserName: "SuperAdmin"
-    })
-    setLoading(false)
-  }, [fetchData, setSession])
+    };
+    setSession(newSession);
+    setLoading(false);
+    
+    axiosInstance.defaults.headers.post["Authorization"] = newSession.UserName;
+
+  }, [fetchData]);
 
   useEffect(() => {
-
     if (session.UserName) {
       if (session.GUserName === "SuperAdmin") {
         setScreens([
@@ -112,7 +113,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setScreens([{ name: "Permission_deny" }]);
       }
     }
-  }, [session, setSession, setScreens]);
+  }, [session]);
 
   const value = useMemo(
     () => ({ session, loading, screens }),
@@ -125,8 +126,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
-
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
