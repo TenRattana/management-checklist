@@ -29,11 +29,11 @@ const Inputs: React.FC<InputProps> = ({
       <TextInput
         mode={mode ||"outlined"}
         placeholder={placeholder}
-        label={!mode && (
+        label={!mode ? (
           <Text style={[masterdataStyles.text]}>
           {label}
         </Text>
-        )}
+        ):undefined}
         style={masterdataStyles.text}
         onChangeText={handleChange}
         onBlur={handleBlur}

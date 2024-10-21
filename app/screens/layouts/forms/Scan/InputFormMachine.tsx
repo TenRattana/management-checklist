@@ -146,7 +146,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
     const shape: any = {};
 
     state.subForms.forEach((subForm: BaseSubForm) => {
-      subForm.Fields.forEach((field: BaseFormState, index: number) => {
+      subForm.Fields.forEach((field: BaseFormState) => {
         const dataTypeName = dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName;
         const checkListTypeName = checkListType.find(item => item.CTypeID === field.CTypeID)?.CTypeName;
 
@@ -155,29 +155,31 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
         if (dataTypeName === "Number") {
           validator = Yup.number()
             .nullable()
-            .typeError(`The ${field.CListName} field a valid number`);
+            .typeError(`The ${field.CListName} field must be a valid number`);
 
-          if (field.MinLength) {
-            validator = validator.min(field.MinLength, `The ${field.CListName} minimum value is ${field.MinLength}`)
+          if (field.MinLength !== undefined) {
+            validator = validator.min(field.MinLength, `The ${field.CListName} minimum value is ${field.MinLength}`);
           }
 
-          if (field.MaxLength) {
-            validator = validator.max(field.MaxLength, `The ${field.CListName} maximum value is ${field.MaxLength}`)
+          if (field.MaxLength !== undefined) {
+            validator = validator.max(field.MaxLength, `The ${field.CListName} maximum value is ${field.MaxLength}`);
           }
 
+          if (field.MinLength !== undefined && field.MinLength < 0) {
+            validator = validator.min(0, `The ${field.CListName} cannot be negative`);
+          }
         }
         else if (dataTypeName === "String") {
 
           if (checkListTypeName === "Checkbox") {
             validator = Yup.array()
               .of(Yup.string())
-              .min(1, `The ${field.CListName} field requires at least one option to be selected`)
+              .min(1, `The ${field.CListName} field requires at least one option to be selected`);
           } else {
             validator = Yup.string()
               .nullable()
-              .typeError(`The ${field.CListName} field a valid string`);;
+              .typeError(`The ${field.CListName} field must be a valid string`);
           }
-
         }
 
         if (field.Required) {
@@ -185,7 +187,6 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
         }
 
         shape[field.MCListID] = validator;
-
       });
     });
 
@@ -235,7 +236,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                       <Card style={masterdataStyles.card}>
                         <Card.Title title={item.SFormName} titleStyle={masterdataStyles.cardTitle} />
                         <Card.Content style={masterdataStyles.subFormContainer}>
-                          {item.Fields?.map((fields: BaseFormState, fieldIndex: number) => {
+                          {item.Fields.map((fields: BaseFormState, fieldIndex: number) => {
 
                             const columns = item.Columns ?? 1;
 
@@ -270,7 +271,6 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                                       }
                                     }
                                   };
-
 
                                   console.log(errors);
 

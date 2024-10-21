@@ -104,7 +104,7 @@ const DynamicForm = React.memo(({
       <HelperText
         type="error"
         visible={error}
-        style={[masterdataStyles.text, masterdataStyles.textError, { opacity: 1, paddingTop: error ? 10 : 0 , display: error ? 'flex' : 'none' }]}
+        style={[masterdataStyles.text, masterdataStyles.textError, { opacity: 1, paddingTop: error ? 10 : 0  }]}
       >
         {errorMessage}
       </HelperText>

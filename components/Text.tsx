@@ -1,18 +1,30 @@
-import React from "react";
-import { Text as DefaultText, StyleSheet, TextProps as DefaultTextProps } from "react-native";
+import React from 'react';
+import { Text as DefaultText, StyleSheet, TextProps as DefaultTextProps } from 'react-native';
 
-interface TextProps extends DefaultTextProps {
+interface CustomTextProps extends DefaultTextProps {
   style?: any;
+  children?: string;
 }
 
-const Text: React.FC<TextProps> = ({ style, ...props }) => {
-  return <DefaultText style={[styles.text, style]} {...props} />;
+const isThai = (text: string): boolean => {
+  const thaiCharRange = /[\u0E00-\u0E7F]/;  
+  return thaiCharRange.test(text);
+};
+
+const Text: React.FC<CustomTextProps> = ({ style, children, ...props }) => {
+  const fontFamily = isThai(children ?? "") ? 'Sarabun' : 'Poppins'; 
+
+  return (
+    <DefaultText style={[styles.text, { fontFamily }, style]} {...props}>
+      {children}
+    </DefaultText>
+  );
 };
 
 export default React.memo(Text)
 
 const styles = StyleSheet.create({
   text: {
-    fontFamily: "Spacemono", 
+    fontSize: 16, 
   },
 });

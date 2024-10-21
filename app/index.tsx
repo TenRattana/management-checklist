@@ -16,6 +16,10 @@ const App = () => {
   const loadFonts = async () => {
     await Font.loadAsync({
       "Spacemono": require("../assets/fonts/SpaceMono-Regular.ttf"),
+      "Poppins": require("../assets/fonts/Poppins-Regular.ttf"),
+      "PoppinsB": require("../assets/fonts/Poppins-SemiBold.ttf"),
+      "Sarabun": require("../assets/fonts/Sarabun-Regular.ttf"),
+      "SarabunB": require("../assets/fonts/Sarabun-Bold.ttf"),
     });
     setFontsLoaded(true);
   };
