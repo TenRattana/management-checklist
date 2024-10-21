@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, Stack } from 'expo-router';
-import { StyleSheet, Text } from 'react-native';
-import { AccessibleView } from "@/components";
+import { StyleSheet } from 'react-native';
+import { AccessibleView ,Text } from "@/components";
 
 const NotFoundScreen = () => {
   console.log("NotFoundScreen");

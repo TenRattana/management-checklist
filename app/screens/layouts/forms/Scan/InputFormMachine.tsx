@@ -2,12 +2,12 @@ import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "@/config/axios";
 import { Card, Divider, HelperText } from "react-native-paper";
-import { Text, FlatList, Pressable, ViewStyle, Dimensions, View } from "react-native";
+import { FlatList, Pressable, ViewStyle, Dimensions } from "react-native";
 import { setForm, setSubForm, setField, reset } from "@/slices";
 import { useToast, useRes } from "@/app/contexts";
 import { BaseSubForm, FormData, BaseFormState, SubForm } from '@/typing/form';
 import { CheckListType, Checklist, GroupCheckListOption, DataType } from '@/typing/type';
-import { AccessibleView, Dynamic, NotFoundScreen } from "@/components";
+import { AccessibleView, Dynamic, NotFoundScreen, Text } from "@/components";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { PreviewProps } from "@/typing/tag";
 import { ScanParams } from "@/typing/tag";
@@ -240,10 +240,9 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                             const columns = item.Columns ?? 1;
 
                             const containerStyle: ViewStyle = {
-                              flexBasis: responsive === "small" ? "100%" : `${98 / columns}%`,
+                              width: responsive === "small" ? "100%" : `${98 / columns}%`,
                               flexGrow: fields.DisplayOrder || 1,
                               padding: 5,
-                              marginHorizontal: 5,
                             };
 
                             return (
@@ -291,14 +290,9 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                                         }}
                                         handleBlur={handleBlur}
                                         groupCheckListOption={groupCheckListOption}
+                                        error={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
+                                        errorMessage={errors[fastFieldProps.name] as string}
                                       />
-                                      <HelperText
-                                        type="error"
-                                        visible={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
-                                        style={[masterdataStyles.text, masterdataStyles.textError, { opacity: 1, paddingTop: Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name]) ? 10 : 0 }]}
-                                      >
-                                        {errors[fastFieldProps.name] as string}
-                                      </HelperText>
                                     </AccessibleView>
                                   );
                                 }}

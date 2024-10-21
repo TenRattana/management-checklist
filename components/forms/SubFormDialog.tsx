@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, Text } from "react-native";
+import { Pressable } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import { Inputs } from "@/components/common";
 import { Portal, Dialog } from "react-native-paper";
@@ -8,6 +8,7 @@ import * as Yup from "yup";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { SubFormDialogProps } from "@/typing/value";
 import { BaseSubForm } from "@/typing/form";
+import Text from "@/components/Text";
 
 const validationSchemaSubForm = Yup.object().shape({
     SFormName: Yup.string().required("The machine group name field is required."),

@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 
 import {
     RenderItemParams,
@@ -8,6 +8,7 @@ import {
     NestableScrollContainer,
     NestableDraggableFlatList,
 } from "react-native-draggable-flatlist";
+import Text from '@/components/Text'
 
 function getColor(i: number, numItems: number = 25) {
     const multiplier = 255 / (numItems - 1);

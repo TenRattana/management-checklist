@@ -5,6 +5,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import AccessibleView from "@/components/AccessibleView";
 import { CustomDropdownSingleProps } from '@/typing/tag'
 import useMasterdataStyles from "@/styles/common/masterdata";
+import Text from "@/components/Text";
 
 const CustomDropdownSingle = ({
     labels,

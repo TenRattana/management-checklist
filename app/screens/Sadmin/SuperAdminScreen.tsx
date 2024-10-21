@@ -1,6 +1,6 @@
 import React from "react";
-import { Text } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
+import Text from '@/components/Text'
 
 const SuperAdminScreen = () => {
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, Text } from "react-native";
+import { Pressable } from "react-native";
 import { useTheme } from "@/app/contexts";
 import AccessibleView from "@/components/AccessibleView";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
@@ -10,6 +10,7 @@ import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { MachineDialogProps, InitialValuesMachine } from '@/typing/value'
 import { GroupMachine } from '@/typing/type'
+import Text from "@/components/Text";
 
 const validationSchema = Yup.object().shape({
     machineGroupId: Yup.string().required("The machine group field is required."),

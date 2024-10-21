@@ -1,9 +1,10 @@
 import React from "react";
-import { TextInput, HelperText, Text } from "react-native-paper";
+import { TextInput, HelperText } from "react-native-paper";
 import { StyleSheet } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import { InputProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
+import Text from "@/components/Text";
 
 const Inputs: React.FC<InputProps> = ({
   placeholder,
@@ -26,13 +27,13 @@ const Inputs: React.FC<InputProps> = ({
       style={masterdataStyles.commonContainer}
     >
       <TextInput
-        mode="outlined"
-        // placeholder={placeholder}
-        // label={(
-        //   <Text style={[masterdataStyles.text]}>
-        //     {label}
-        //   </Text>
-        // )}
+        mode={mode ||"outlined"}
+        placeholder={placeholder}
+        label={!mode && (
+          <Text style={[masterdataStyles.text]}>
+          {label}
+        </Text>
+        )}
         style={masterdataStyles.text}
         onChangeText={handleChange}
         onBlur={handleBlur}

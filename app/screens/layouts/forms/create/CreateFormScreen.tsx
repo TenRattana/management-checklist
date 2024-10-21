@@ -2,21 +2,20 @@ import React, { useState, useEffect, useCallback, useRef, useMemo, useImperative
 import { Dimensions, Pressable, View, PanResponder, FlatList, ViewStyle, Animated, ScrollView } from "react-native";
 import { GestureHandlerRootView, PanGestureHandler } from "react-native-gesture-handler";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
-import { IconButton, Text, Divider, HelperText, Card, Portal } from "react-native-paper";
+import { IconButton, Divider, HelperText, Card, Portal } from "react-native-paper";
 import useCreateformStyle from "@/styles/createform";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import useForm from "@/hooks/custom/useForm";
-import { AccessibleView, Inputs, SaveDialog, Dynamic } from "@/components";
+import { AccessibleView, Inputs, SaveDialog , Text } from "@/components";
 import Dragsubform from "./Dragsubform";
 import Preview from "@/app/screens/layouts/forms/view/Preview";
 import { CreateFormProps } from "@/typing/tag";
 import { BaseForm, BaseFormState, BaseSubForm } from "@/typing/form";
 import { updateForm } from "@/slices";
-import { CheckListType, DataType } from "@/typing/type";
+import { CheckListType } from "@/typing/type";
 import { useRes, useToast } from "@/app/contexts";
 import { defaultDataForm } from "@/slices";
 import * as Yup from 'yup';
-import { FastField, FieldProps, Formik } from "formik";
 import DraggableItem from "./DraggableItem";
 
 const { height: screenHeight } = Dimensions.get('window');

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Text, Switch, StyleSheet, View } from 'react-native';
+import { Switch, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
-import { AccessibleView } from '@/components';
+import { AccessibleView ,Text} from '@/components';
 import { useRes , useTheme } from '@/app/contexts';
 
 const SettingsScreen: React.FC = () => {

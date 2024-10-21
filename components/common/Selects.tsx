@@ -1,10 +1,10 @@
 import React from "react";
 import { Picker } from "@react-native-picker/picker";
 import { HelperText } from "react-native-paper";
-import { Text, StyleSheet } from "react-native";
 import { SelectsProps } from "@/typing/tag";
 import AccessibleView from "@/components/AccessibleView";
 import useMasterdataStyles from "@/styles/common/masterdata";
+import Text from "@/components/Text";
 
 const Selects = ({
   hint,
@@ -50,7 +50,7 @@ const Selects = ({
         </Picker>
       </AccessibleView>
       {hint ? <Text style={masterdataStyles.hint}>{hint}</Text> : false}
-      <HelperText type="error" visible={error} style={masterdataStyles.errorText}>
+      <HelperText type="error" visible={error} style={{ display: error ? 'flex' : 'none', left: -10 }}>
         {errorMessage}
       </HelperText>
     </AccessibleView>

@@ -1,6 +1,5 @@
 import React from "react";
-import { AccessibleView } from "@/components";
-import { Text } from "react-native";
+import { AccessibleView , Text} from "@/components";
 
 const UserScreen = () => {
 

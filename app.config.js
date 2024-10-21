@@ -47,6 +47,9 @@ export default {
       output: "static",
       favicon: "./assets/images/favicon.png",
     },
+    assetBundlePatterns: [
+      "assets/fonts/*",
+    ],
     plugins: [
       "expo-router",
       [

@@ -90,6 +90,8 @@ export interface DynamicFormProps {
   handleChange: (fieldName: string, value: any) => void;
   handleBlur?: () => void;
   groupCheckListOption: GroupCheckListOption[];
+  error?:boolean;
+  errorMessage?:string;
 }
 
 export interface PreviewProps<T extends PreviewParams | ScanParams> {

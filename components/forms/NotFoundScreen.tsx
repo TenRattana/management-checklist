@@ -1,7 +1,8 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 import AccessibleView from "../AccessibleView";
 import { useNavigation } from "@react-navigation/native";
+import Text from "@/components/Text";
 
 const NotFoundScreen = () => {
     const navigation = useNavigation();

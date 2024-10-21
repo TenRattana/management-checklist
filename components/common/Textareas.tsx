@@ -1,9 +1,9 @@
 import React from "react";
-import { Text, StyleSheet } from "react-native";
 import { TextInput, HelperText } from "react-native-paper";
 import { TextareasProps } from "@/typing/tag";
 import AccessibleView from "@/components/AccessibleView";
 import useMasterdataStyles from "@/styles/common/masterdata";
+import Text from "@/components/Text";
 
 const Textareas = ({
     placeholder,
@@ -23,9 +23,9 @@ const Textareas = ({
     return (
         <AccessibleView name="text-areas" style={masterdataStyles.commonContainer}>
             <TextInput
-                mode="outlined"
-                // placeholder={placeholder}
-                // label={label}
+                mode={mode||"outlined"}
+                placeholder={placeholder}
+                label={label}
                 style={masterdataStyles.text}
                 onChangeText={handleChange}
                 onBlur={handleBlur}
@@ -46,7 +46,7 @@ const Textareas = ({
                 id={testId}
             />
             {hint ? <Text style={masterdataStyles.hint}>{hint}</Text> : false}
-            <HelperText type="error" visible={error} style={masterdataStyles.errorText}>
+            <HelperText type="error" visible={error} style={{ display: error ? 'flex' : 'none', left: -10 }}>
                 {errorMessage}
             </HelperText>
         </AccessibleView>

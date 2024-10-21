@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Pressable, Text } from "react-native";
+import { Pressable } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import { Portal, Dialog, HelperText, Switch } from "react-native-paper";
@@ -10,6 +10,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { Users, GroupUsers } from '@/typing/type'
 import { ManagepermissionDialogProps, InitialValuesManagepermission } from '@/typing/value'
 import { Inputs } from "../common";
+import Text from "@/components/Text";
 
 const validationSchema = Yup.object().shape({
     UserName: Yup.string().required("This user field is required"),

@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { Pressable } from "react-native";
-import { Portal, Dialog, Text } from "react-native-paper";
+import { Portal, Dialog } from "react-native-paper";
 import { SaveDialogProps } from "@/typing/value";
 import axiosInstance from "@/config/axios";
 import axios from "axios";
@@ -8,6 +8,7 @@ import { useToast } from "@/app/contexts";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import AccessibleView from "../AccessibleView";
 import { useRouter } from 'expo-router';
+import Text from "@/components/Text";
 
 const SaveDialog = ({
     state,

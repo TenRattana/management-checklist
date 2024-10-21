@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
-import { ScrollView, Pressable, Text } from "react-native";
+import { ScrollView, Pressable } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
-import { AccessibleView, LoadingSpinner, Searchbar, Customtable } from "@/components";
+import { AccessibleView, LoadingSpinner, Searchbar, Customtable ,Text} from "@/components";
 import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
@@ -52,6 +52,22 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
       return () => clearInterval(pollingInterval);
     }, [fetchData])
   );
+
+  // useEffect(() => {
+  //   const intervalId = setInterval(() => {
+  //     if (global.performance && global.performance.memory) {
+  //       const memoryUsage = global.performance.memory;
+  //       console.log(`Memory Usage:
+  //               Total JS Heap Size: ${memoryUsage.totalJSHeapSize / 1024 / 1024} MB,
+  //               Used JS Heap Size: ${memoryUsage.usedJSHeapSize / 1024 / 1024} MB,
+  //               JS Heap Size Limit: ${memoryUsage.jsHeapSizeLimit / 1024 / 1024} MB`);
+  //     } else {
+  //       console.warn('Memory usage information is not available. Consider using alternative monitoring tools.');
+  //     }
+  //   }, 1000);
+
+  //   return () => clearInterval(intervalId);
+  // }, []);
 
   useEffect(() => {
     console.log("setDebouncedSearchQuery");

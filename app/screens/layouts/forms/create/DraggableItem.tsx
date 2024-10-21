@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { HandlerStateChangeEvent, PanGestureHandler } from "react-native-gesture-handler";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, runOnJS } from "react-native-reanimated";
-import { IconButton, Text, Portal } from "react-native-paper";
+import { IconButton, Portal } from "react-native-paper";
 import useCreateformStyle from "@/styles/createform";
 import { CheckListType } from "@/typing/type";
 import { View } from "react-native";
 import { useRes } from "@/app/contexts";
+import { AccessibleView , Text } from "@/components";
 
 const DraggableItem: React.FC<{
     item: CheckListType;

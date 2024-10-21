@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
-import { Text, Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 import { useAuth } from "@/app/contexts/auth";
 import { DrawerContentScrollView } from '@react-navigation/drawer';
+import { Text } from '@/components';
 import MenuSection from './MenuSection';
 
 const CustomDrawerContent = (props: any) => {

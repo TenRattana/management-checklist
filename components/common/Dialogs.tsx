@@ -1,9 +1,10 @@
 import React from "react";
 import { Pressable } from "react-native";
-import { Portal, Dialog, Text } from "react-native-paper";
+import { Portal, Dialog } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import AccessibleView from "@/components/AccessibleView";
 import { DialogsProps } from "@/typing/tag";
+import Text from "@/components/Text";
 
 const Dialogs = ({
     isVisible,

@@ -1,14 +1,16 @@
 import React, { useRef, useMemo, useState, useEffect, useCallback } from "react";
-import { Text, Pressable, Animated, ScrollView, FlatList, Dimensions, Platform } from "react-native";
+import { Pressable, Animated, ScrollView, FlatList, Dimensions, Platform } from "react-native";
 import { DataTable, IconButton } from "react-native-paper";
 import Dialogs from "@/components/common/Dialogs";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useRes, useToast } from "@/app/contexts";
 import AccessibleView from "@/components/AccessibleView";
+import Text from "@/components/Text";
 import { CustomTableProps } from '@/typing/tag';
 import useMasterdataStyles from "@/styles/common/masterdata";
 import useCustomtableStyles from "@/styles/customtable";
 import { savePaginate, loadPaginate } from '@/app/services/storage';
+
 type justifyContent = 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly' | undefined;
 
 const { height: screenHeight } = Dimensions.get('window');
@@ -358,7 +360,7 @@ const CustomTable = ({
                   No data found...
                 </Text>
               )}
-              style={{ maxHeight: screenHeight * (Platform.OS === "web" ? (fontSize === "small" ? 0.51 : fontSize === "medium" ? 0.47 : 0.44) + 0.15 : (fontSize === "small" ? 0.51 : fontSize === "medium" ? 0.47 : 0.44)) }}
+              style={{ maxHeight: screenHeight * (Platform.OS === "web" ? (fontSize === "small" ? 0.51 : fontSize === "medium" ? 0.47 : 0.44) + 0.05 : (fontSize === "small" ? 0.51 : fontSize === "medium" ? 0.47 : 0.44)) }}
             />
 
             <DataTable.Pagination

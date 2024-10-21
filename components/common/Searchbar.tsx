@@ -1,6 +1,7 @@
 import React from 'react';
 import { Searchbar } from 'react-native-paper';
 import useMasterdataStyles from '@/styles/common/masterdata';
+
 interface SeractBarProps {
   value: string;
   onChange: (search: string) => void;

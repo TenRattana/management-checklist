@@ -8,7 +8,7 @@ import {
     updateSubForm,
     deleteSubForm,
 } from "@/slices";
-import { AccessibleView, SaveDialog } from "@/components";
+import { AccessibleView, SaveDialog , Text} from "@/components";
 import SubFormDialog from "@/components/forms/SubFormDialog";
 import useCreateformStyle from "@/styles/createform";
 import {
@@ -18,7 +18,7 @@ import {
     NestableDraggableFlatList,
     ShadowDecorator
 } from "react-native-draggable-flatlist";
-import { IconButton, Text } from "react-native-paper";
+import { IconButton } from "react-native-paper";
 import { runOnJS } from "react-native-reanimated";
 import { spacing } from "@/constants/Spacing";
 import Dragfield from "./Dragfield";

@@ -1,10 +1,11 @@
 import React from "react";
-import { Text } from "react-native";
 import { Selects, Radios, Textareas, Inputs, Checkboxs } from "@/components/common";
 import { CheckListOption } from '@/typing/type';
 import AccessibleView from "../AccessibleView";
 import { DynamicFormProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
+import Text from "@/components/Text";
+import { HelperText } from "react-native-paper";
 
 const DynamicForm = React.memo(({
   field,
@@ -12,6 +13,8 @@ const DynamicForm = React.memo(({
   handleChange,
   handleBlur,
   groupCheckListOption,
+  error,
+  errorMessage
 }: DynamicFormProps) => {
   const { CTypeName, Placeholder, Hint, CListName, MCListID, GCLOptionID } = field;
   const masterdataStyles = useMasterdataStyles()
@@ -30,8 +33,9 @@ const DynamicForm = React.memo(({
       case "Textinput":
         return (
           <Inputs
-            placeholder={Placeholder}
+            // placeholder={Placeholder}
             hint={Hint}
+            mode={"outlined"}
             label={CListName}
             value={values}
             handleChange={(v) => handleChange(MCListID, v)}
@@ -42,8 +46,9 @@ const DynamicForm = React.memo(({
       case "Textarea":
         return (
           <Textareas
-            placeholder={Placeholder}
+            // placeholder={Placeholder}
             hint={Hint}
+            mode={"outlined"}
             label={CListName}
             value={values}
             handleChange={(v) => handleChange(MCListID, v)}
@@ -93,8 +98,16 @@ const DynamicForm = React.memo(({
     <AccessibleView name="form-layout2" style={{
       flex: 1,
     }}>
-      <Text style={[masterdataStyles.text, CTypeName === "Text" ? {justifyContent:'flex-start' , alignItems:'center'  , marginVertical:'auto'} : {}]}>{CListName}</Text>
+      <Text style={[masterdataStyles.text, CTypeName === "Text" ? { justifyContent: 'flex-start', alignItems: 'center', marginVertical: 'auto' } : {}]}>{CListName}</Text>
       {renderField()}
+
+      <HelperText
+        type="error"
+        visible={error}
+        style={[masterdataStyles.text, masterdataStyles.textError, { opacity: 1, paddingTop: error ? 10 : 0 , display: error ? 'flex' : 'none' }]}
+      >
+        {errorMessage}
+      </HelperText>
     </AccessibleView>
   );
 });

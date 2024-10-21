@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Pressable, Text } from "react-native";
+import { Pressable } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme, useRes } from "@/app/contexts";
-import { Customtable, LoadingSpinner, AccessibleView, Searchbar } from "@/components";
+import { Customtable, LoadingSpinner, AccessibleView, Searchbar , Text } from "@/components";
 import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { FormScreenProps } from "@/typing/tag";
@@ -59,7 +59,10 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
             if (action === "changeIndex") {
                 navigation.navigate("Create_form", { formId: item });
             } else if (action === "preIndex") {
-                navigation.navigate("Preview", { formId: item });
+                navigation.navigate("InputFormMachine", {
+                    machineId: "M011",
+                });
+                // navigation.navigate("Preview", { formId: item });
             } else if (action === "copyIndex") {
                 navigation.navigate("Create_form", { formId: item, action: "copy" });
             } else {

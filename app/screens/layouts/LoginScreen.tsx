@@ -1,11 +1,11 @@
 import React, { useState, useCallback } from "react";
 import { Pressable, ActivityIndicator } from "react-native";
-import { Card, Text } from "react-native-paper";
+import { Card } from "react-native-paper";
 import { useAuth } from "../../contexts/auth";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useToast } from "@/app/contexts/toastify";
-import { AccessibleView, Inputs } from "@/components";
+import { AccessibleView, Inputs ,Text } from "@/components";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useFocusEffect } from "expo-router";
 

@@ -1,8 +1,9 @@
 
 import React, { useEffect } from 'react';
-import { Text, Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { IconButton } from 'react-native-paper';
+import Text from '@/components/Text'
 
 const MenuSection = ({ title, isOpen, onToggle, items, navigation }: any) => {
     console.log("MenuSection");

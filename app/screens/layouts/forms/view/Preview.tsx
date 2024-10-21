@@ -1,9 +1,9 @@
 import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef } from "react";
-import { Text, View, ViewStyle, FlatList } from "react-native";
+import {  View, ViewStyle, FlatList } from "react-native";
 import { Card, Divider, HelperText } from "react-native-paper";
 import { useRes } from "@/app/contexts";
 import { BaseFormState, BaseSubForm } from '@/typing/form';
-import { AccessibleView, Dynamic } from "@/components";
+import { AccessibleView, Dynamic ,Text} from "@/components";
 import useForm from "@/hooks/custom/useForm";
 import { FastField, Formik, FieldProps } from "formik";
 import useMasterdataStyles from "@/styles/common/masterdata";

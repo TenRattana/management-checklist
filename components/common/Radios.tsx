@@ -1,9 +1,10 @@
 import React from "react";
-import { Text, Pressable } from "react-native";
+import { Pressable } from "react-native";
 import { RadioButton, HelperText } from "react-native-paper";
 import { RadiosProps } from "@/typing/tag";
 import AccessibleView from "@/components/AccessibleView";
 import useMasterdataStyles from "@/styles/common/masterdata";
+import Text from "@/components/Text";
 
 const Radios = ({
   option,
@@ -48,7 +49,7 @@ const Radios = ({
       </RadioButton.Group>
       {hint ? <Text style={masterdataStyles.hint}>{hint}</Text> : false}
       {error ? (
-        <HelperText type="error" visible={error} style={masterdataStyles.errorText}>
+        <HelperText type="error" visible={error} style={{ display: error ? 'flex' : 'none', left: -10 }}>
           {errorMessage}
         </HelperText>
       ) : false}

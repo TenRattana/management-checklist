@@ -9,7 +9,7 @@ import {
     setDragField
 } from "@/slices";
 import FieldDialog from "@/components/forms/FieldDialog";
-import { IconButton, Text } from "react-native-paper";
+import { IconButton } from "react-native-paper";
 import { NestableDraggableFlatList, RenderItemParams, ScaleDecorator, ShadowDecorator } from "react-native-draggable-flatlist";
 import { runOnJS } from "react-native-reanimated";
 import { spacing } from "@/constants/Spacing";
@@ -17,6 +17,7 @@ import useCreateformStyle from "@/styles/createform";
 import { BaseFormState, RowItemProps } from '@/typing/form'
 import { DragfieldProps } from "@/typing/tag";
 import { useToast } from "@/app/contexts";
+import Text from '@/components/Text'
 
 const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType, checkListType, groupCheckListOption, checkList }) => {
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);

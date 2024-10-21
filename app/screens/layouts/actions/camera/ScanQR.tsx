@@ -1,9 +1,10 @@
 import { Camera } from "expo-camera/legacy";
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { Button, StyleSheet } from "react-native";
 import { ScanQRProps } from "@/typing/tag";
 import { useFocusEffect } from "expo-router";
 import { useToast } from "@/app/contexts";
+import { AccessibleView , Text } from '@/components'
 
 const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
     const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -29,12 +30,12 @@ const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
     }, [scanned, qrValue]);
 
     if (hasPermission === null) {
-        return <View />;
+        return <AccessibleView name="container-scan" />;
     }
 
     if (!hasPermission) {
         return (
-            <View style={styles.container}>
+            <AccessibleView name="container-hasPermission" style={styles.container}>
                 <Text style={{ textAlign: "center" }}>
                     We need your permission to show the camera
                 </Text>
@@ -42,7 +43,7 @@ const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
                     onPress={() => Camera.requestCameraPermissionsAsync()}
                     title="Grant Permission"
                 />
-            </View>
+            </AccessibleView>
         );
     }
 
@@ -68,16 +69,16 @@ const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
     };
 
     return (
-        <View style={styles.container}>
+        <AccessibleView name="container-scan" style={styles.container}>
             {cameraActive && !scanned ? (
                 <Camera style={styles.camera} onBarCodeScanned={handleBarCodeScanned} />
             ) : (
-                <View style={styles.resultContainer}>
+                <AccessibleView name="scan-qr" style={styles.resultContainer}>
                     <Text style={styles.resultText}>Scanned QR Code</Text>
                     <Button title="Scan Again" onPress={() => { setScanned(false); setCameraActive(true); }} />
-                </View>
+                </AccessibleView>
             )}
-        </View>
+        </AccessibleView>
     );
 };
 

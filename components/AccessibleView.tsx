@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { useTheme } from "@/app/contexts"
 
 interface AccessibleViewProps {
-  children: ReactNode;
+  children?: ReactNode;
   name: string;
   style?: ViewStyle | ViewStyle[];
 }
@@ -20,7 +20,7 @@ const AccessibleView = ({ children, name, style }: AccessibleViewProps) => {
       accessible={Platform.OS !== "web"}
       testID={`view-${name}`}
     >
-      {children}
+      {children ?? null}
     </View>
   );
 };
