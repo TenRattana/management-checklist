@@ -31,7 +31,7 @@ export interface InitialValuesCheckListOption extends Active {
   checkListOptionName: string;
 }
 
-export interface InitialValuesGroupCheckList extends Detail, Active {
+export interface InitialValuesGroupCheckList extends  Active {
   groupCheckListOptionId: string;
   groupCheckListOptionName: string;
 }

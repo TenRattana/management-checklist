@@ -115,7 +115,7 @@ const CustomDrawerContent = (props: any) => {
                     {(session.GUserName === "SuperAdmin") && (
                         <>
                             <Pressable
-                                onPress={() => navigation.navigate('Test')}
+                                onPress={() => navigation.navigate('TestScreen')}
                                 style={styles.menuItem}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >

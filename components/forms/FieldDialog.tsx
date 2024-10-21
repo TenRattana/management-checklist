@@ -27,13 +27,13 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
     const [shouldRenderDT, setShouldRenderDT] = useState<boolean>(false);
 
     console.log("FieldDialog");
-    
+
     const validationSchema = Yup.object().shape({
         CListID: Yup.string().required("The checklist field is required."),
         CTypeID: Yup.string().required("The checklist type field is required."),
         Required: Yup.boolean().required("The required field is required."),
         DTypeID: Yup.lazy((value, context) => {
-            const CTypeID = checkListType.find(v => v.CTypeID === context.parent.CTypeID)?.CTypeName; 
+            const CTypeID = checkListType.find(v => v.CTypeID === context.parent.CTypeID)?.CTypeName;
             if (CTypeID && ['Textinput', 'Textarea'].includes(CTypeID)) {
                 return Yup.string().required("DTypeID is required for Text/TextArea.");
             }

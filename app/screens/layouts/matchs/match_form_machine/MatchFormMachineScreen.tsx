@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { ScrollView, Pressable, Text } from "react-native";
+import { Pressable, Text } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar } from "@/components";
@@ -122,7 +122,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
             item.FormID,
             item.MachineID,
         ])
-    }, [machine, debouncedSearchQuery]);
+    }, [matchForm, debouncedSearchQuery]);
 
     const handleNewData = useCallback(() => {
         setInitialValues({
@@ -173,9 +173,9 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
     }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
-        <ScrollView style={{ paddingHorizontal: 15 }}>
-            <Text style={[masterdataStyles.text, masterdataStyles.textBold,
-            { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>Create Match Machine & Form
+        <AccessibleView name="container-checklist" style={{ paddingHorizontal: 15 }}>
+            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}>
+                Create Match Machine & Form
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
@@ -206,7 +206,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
                 forms={forms}
                 dropform={dropform}
             />
-        </ScrollView>
+        </AccessibleView>
     );
 };
 

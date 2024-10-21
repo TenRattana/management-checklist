@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
-import { ScrollView, Pressable, Text } from "react-native";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { Pressable, Text } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
-import { LoadingSpinner, AccessibleView, Searchbar } from "@/components";
+import { LoadingSpinner, AccessibleView, Searchbar, Customtable } from "@/components";
 import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
@@ -10,7 +10,6 @@ import Machine_group_dialog from "@/components/screens/Machine_group_dialog";
 import { GroupMachine } from '@/typing/type'
 import { InitialValuesGroupMachine } from '@/typing/value'
 import { useFocusEffect } from "expo-router";
-const Customtable = lazy(() => import('@/components/Customtable'));
 
 const MachineGroupScreen = () => {
     const [machineGroup, setMachineGroup] = useState<GroupMachine[]>([]);
@@ -138,9 +137,9 @@ const MachineGroupScreen = () => {
     }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
-        <ScrollView style={{ paddingHorizontal: 15 }}>
-            <Text style={[masterdataStyles.text, masterdataStyles.textBold,
-            { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>Create Group Machine
+        <AccessibleView name="container-groupmachine" style={{ paddingHorizontal: 15 }}>
+            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}>
+                Create Group Machine
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
@@ -156,9 +155,7 @@ const MachineGroupScreen = () => {
                     </Pressable>
                 </AccessibleView>
                 <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
-                    <Suspense fallback={<LoadingSpinner />}>
-                        {!isLoading ? <Customtable {...customtableProps} /> : <LoadingSpinner />}
-                    </Suspense>
+                    {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
                 </Card.Content>
             </Card>
 
@@ -170,7 +167,8 @@ const MachineGroupScreen = () => {
                 saveData={saveData}
             />
 
-        </ScrollView>
+        </AccessibleView>
+
     );
 };
 

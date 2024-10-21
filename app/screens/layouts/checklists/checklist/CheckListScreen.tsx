@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { ScrollView, Pressable, Text } from "react-native";
+import { Pressable, Text } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar } from "@/components";
@@ -125,11 +125,11 @@ const CheckListScreen = () => {
     }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
-        <ScrollView style={{ paddingHorizontal: 15 }}>
-            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>
+        <AccessibleView name="container-checklist" style={{ paddingHorizontal: 15 }}>
+            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}>
                 Create Check List
             </Text>
-            <Divider style={{ marginBottom: 20 }} />
+            <Divider style={{ marginBottom: 10 }} />
             <Card style={{ borderRadius: 5 }}>
                 <AccessibleView name="checklist" style={masterdataStyles.containerSearch}>
                     <Searchbar
@@ -139,7 +139,7 @@ const CheckListScreen = () => {
                         testId="search-checklist"
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                        <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Check List</Text>
+                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Create Check List</Text>
                     </Pressable>
                 </AccessibleView>
                 <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
@@ -154,7 +154,7 @@ const CheckListScreen = () => {
                 initialValues={initialValues}
                 saveData={saveData}
             />
-        </ScrollView>
+        </AccessibleView>
     );
 };
 

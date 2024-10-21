@@ -106,13 +106,11 @@ const Preview = forwardRef<any, any>((props, ref) => {
                                             <Card.Content style={[masterdataStyles.subFormContainer]}>
                                                 {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
                                                     const columns = subForm.Columns ?? 1;
-                                                    // const isLastColumn = (fieldIndex + 1) % columns === 0;
 
                                                     const containerStyle: ViewStyle = {
                                                         width: responsive === "small" ? "100%" : `${98 / columns}%`,
                                                         flexGrow: field.DisplayOrder || 1,
                                                         padding: 5,
-                                                        // borderRightWidth: isLastColumn ? 0 : 1,
                                                     };
                                                     return (
                                                         <FastField name={field.MCListID} key={`field-${fieldIndex}-${subForm.Columns}`}>

@@ -1,5 +1,5 @@
 import React, { useRef, useMemo, useState, useEffect, useCallback } from "react";
-import { Text, Pressable, Animated } from "react-native";
+import { Text, Pressable, Animated, ScrollView, FlatList, Dimensions, Platform } from "react-native";
 import { DataTable, IconButton } from "react-native-paper";
 import Dialogs from "@/components/common/Dialogs";
 import { useThemeColor } from "@/hooks/useThemeColor";
@@ -10,6 +10,8 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import useCustomtableStyles from "@/styles/customtable";
 import { savePaginate, loadPaginate } from '@/app/services/storage';
 type justifyContent = 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly' | undefined;
+
+const { height: screenHeight } = Dimensions.get('window');
 
 const CustomTable = ({
   Tabledata,
@@ -33,7 +35,7 @@ const CustomTable = ({
   console.log("CustomTable");
 
   const colors = useThemeColor();
-  const { responsive, spacing } = useRes();
+  const { fontSize, responsive, spacing } = useRes();
   const { handleError } = useToast();
   const customtable = useCustomtableStyles();
   const masterdataStyles = useMasterdataStyles();
@@ -323,7 +325,7 @@ const CustomTable = ({
   }, [renderCellContent, renderActionButton])
 
   return (
-    <AccessibleView name="customtable" style={customtable.containerContent}>
+    <AccessibleView name="customtable">
       {responsive === "small" ?
         filteredData && filteredData.length === 0 ? (
           <Text style={[masterdataStyles.text, { textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }]}>No data found...</Text>
@@ -339,20 +341,25 @@ const CustomTable = ({
                   key={`header-${index}`}
                   sortDirection={sortColumn === index ? sortDirection : undefined}
                   onPress={() => handleSort(index)}
-                  style={{ justifyContent: header.align as justifyContent, flex: flexArr[index] || 1 }}
+                  style={{ justifyContent: header.align as justifyContent, flex: flexArr[index] || 1, marginVertical: spacing.small - 10 }}
+                  textStyle={[masterdataStyles.text]}
                 >
                   {header.label}
                 </DataTable.Title>
               ))}
             </DataTable.Header>
 
-            {filteredData && filteredData.length === 0 ? (
-              <Text style={[masterdataStyles.text, { textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }]}>No data found...</Text>
-            ) : (
-              currentData.map((row, rowIndex) => (
-                renderTableData(row, rowIndex)
-              ))
-            )}
+            <FlatList
+              data={filteredData.length > 0 ? currentData : []}
+              renderItem={({ item, index }) => renderTableData(item, index)}
+              keyExtractor={(item, index) => `row-${index}`}
+              ListEmptyComponent={() => (
+                <Text style={[masterdataStyles.text, { textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }]}>
+                  No data found...
+                </Text>
+              )}
+              style={{ maxHeight: screenHeight * (Platform.OS === "web" ? (fontSize === "small" ? 0.51 : fontSize === "medium" ? 0.47 : 0.44) + 0.15 : (fontSize === "small" ? 0.51 : fontSize === "medium" ? 0.47 : 0.44)) }}
+            />
 
             <DataTable.Pagination
               style={{ paddingTop: 5 }}

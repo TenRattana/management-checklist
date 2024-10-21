@@ -96,7 +96,7 @@ const subFormSlice = createSlice({
         if (matchingForms.length > 0) {
           const updatedFields = matchingForms.map((field, index) => ({
             ...field,
-            displayOrder: field?.DisplayOrder ? index : field.DisplayOrder,
+            DisplayOrder: field?.DisplayOrder ? index : field.DisplayOrder,
             CListName: checkListMap.get(field.CListID) || "",
             CTypeName: checkListTypeMap.get(field.CTypeID) || "",
           }));
@@ -119,7 +119,7 @@ const subFormSlice = createSlice({
         if (matchingForms.length > 0) {
           const updatedFields = matchingForms.map((field, index) => ({
             ...field,
-            displayOrder: index,
+            DisplayOrder: index,
           }));
 
           sub.Fields = updatedFields;
@@ -209,27 +209,37 @@ const subFormSlice = createSlice({
       checkListType: CheckListType[];
       dataType: DataType[];
     }>) => {
-      const { BaseFormState, checkList, checkListType } = action.payload;
+      const { BaseFormState, checkList, checkListType, dataType } = action.payload;
+
+      const formData: BaseFormState = BaseFormState.DTypeID === null
+        ? {
+          ...BaseFormState,
+          DTypeID: dataType.find((v) => v.DTypeName === "String")?.DTypeID ?? "",
+          DTypeValue: undefined,
+          MaxLength: undefined,
+          MinLength: undefined,
+        }
+        : BaseFormState;
 
       state.subForms = state.subForms.map((sub) => {
-        if (sub.SFormID === BaseFormState.SFormID) {
+        if (sub.SFormID === formData.SFormID) {
           const updatedFields = sub.Fields?.map((field) => {
-            if (field.MCListID === BaseFormState.MCListID) {
+            if (field.MCListID === formData.MCListID) {
               return {
-                ...BaseFormState,
+                ...formData,
                 DisplayOrder: field.DisplayOrder,
-                CListName: checkList.find((v) => v.CListID === BaseFormState.CListID)?.CListName,
-                CTypeName: checkListType.find((v) => v.CTypeID === BaseFormState.CTypeID)?.CTypeName,
+                CListName: checkList.find((v) => v.CListID === formData.CListID)?.CListName,
+                CTypeName: checkListType.find((v) => v.CTypeID === formData.CTypeID)?.CTypeName,
               };
             }
             return field;
           }) || [];
 
-          const sortedFields = sortFields(updatedFields);
+          // const sortedFields = sortFields(updatedFields);
 
           return {
             ...sub,
-            Fields: sortedFields,
+            Fields: updatedFields,
           };
         }
         return sub;
@@ -270,6 +280,8 @@ const subFormSlice = createSlice({
       console.log("defaultDataForm");
 
       const { currentField } = action.payload
+
+      console.log(currentField);
 
       state.subForms = state.subForms.map((sub) => {
         if (sub.SFormID === currentField.SFormID) {

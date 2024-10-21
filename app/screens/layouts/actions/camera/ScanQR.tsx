@@ -53,7 +53,7 @@ const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
                     machineId: value,
                 });
                 setScanned(false);
-                setCameraActive(false); // ปิดกล้องเมื่อสแกนเสร็จ
+                setCameraActive(false);
             }
         } catch (error) {
             handleError(error)
@@ -64,7 +64,6 @@ const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
         if (!scanned) {
             setScanned(true);
             setQrValue(data);
-
         }
     };
 

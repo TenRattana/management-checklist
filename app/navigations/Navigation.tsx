@@ -69,6 +69,9 @@ const Navigations = () => {
           key={screen.name}
           name={screen.name}
           component={renderComponent(screen.name as ComponentNames)}
+          options={{
+            headerTitle: ""
+          }}
         />
       )) : (
         <Drawer.Screen name={"Login"} component={LoginScreen} />

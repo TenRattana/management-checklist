@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "@/config/axios";
 import { Card, Divider, HelperText } from "react-native-paper";
-import { Text, FlatList, Pressable, ViewStyle, View } from "react-native";
+import { Text, FlatList, Pressable, ViewStyle, Dimensions, View } from "react-native";
 import { setForm, setSubForm, setField, reset } from "@/slices";
 import { useToast, useRes } from "@/app/contexts";
 import { BaseSubForm, FormData, BaseFormState, SubForm } from '@/typing/form';
@@ -15,6 +15,8 @@ import { useFocusEffect } from "expo-router";
 import { FastField, FieldProps, Formik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigation } from "expo-router";
+
+const { height: screenHeight } = Dimensions.get('window');
 
 const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   const dispatch = useDispatch();
@@ -130,11 +132,11 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
 
   useFocusEffect(
     useCallback(() => {
-        if (dataType.length && machineId) {
-            loadForm(machineId);
-        }
+      if (dataType.length && machineId) {
+        loadForm(machineId);
+      }
     }, [machineId, dataType.length, loadForm, machineId])
-);
+  );
 
   const { responsive } = useRes();
 
@@ -143,19 +145,17 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   const validationSchema = useMemo(() => {
     const shape: any = {};
 
-    state.subForms?.forEach((subForm: BaseSubForm) => {
-      subForm.Fields?.forEach((field: BaseFormState) => {
+    state.subForms.forEach((subForm: BaseSubForm) => {
+      subForm.Fields.forEach((field: BaseFormState, index: number) => {
         const dataTypeName = dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName;
         const checkListTypeName = checkListType.find(item => item.CTypeID === field.CTypeID)?.CTypeName;
 
+        let validator;
+
         if (dataTypeName === "Number") {
-          let validator = Yup.number()
+          validator = Yup.number()
             .nullable()
             .typeError(`The ${field.CListName} field a valid number`);
-
-          if (field.Required) {
-            validator = validator.required(`The ${field.Placeholder} field is required`);
-          }
 
           if (field.MinLength) {
             validator = validator.min(field.MinLength, `The ${field.CListName} minimum value is ${field.MinLength}`)
@@ -165,11 +165,8 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
             validator = validator.max(field.MaxLength, `The ${field.CListName} maximum value is ${field.MaxLength}`)
           }
 
-          shape[field.MCListID] = validator;
         }
         else if (dataTypeName === "String") {
-
-          let validator;
 
           if (checkListTypeName === "Checkbox") {
             validator = Yup.array()
@@ -181,12 +178,14 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
               .typeError(`The ${field.CListName} field a valid string`);;
           }
 
-          if (field.Required) {
-            validator = validator.required(`The ${field.Placeholder} field is required`);
-          }
-
-          shape[field.MCListID] = validator;
         }
+
+        if (field.Required) {
+          validator = validator?.required(`The ${field.CListName} field is required`);
+        }
+
+        shape[field.MCListID] = validator;
+
       });
     });
 
@@ -215,18 +214,16 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   }, [showSuccess, handleError, state.subForms, state.MachineID]);
 
   return found ? (
-    <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { maxHeight: 900, paddingBottom: 30 }]}>
+    <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { maxHeight: screenHeight }]}>
       {!isSubmitted ? (
         <>
-          <Text style={masterdataStyles.title}>{state.FormName || "Content Name"}</Text>
+          <Text style={[masterdataStyles.title, { textAlign: 'center' }]}>{state.FormName || "Content Name"}</Text>
           <Divider />
-          <Text style={masterdataStyles.description}>{state.Description || "Content Description"}</Text>
+          <Text style={[masterdataStyles.description, { textAlign: 'center', paddingVertical: 10 }]}>{state.Description || "Content Description"}</Text>
 
           <Formik
             initialValues={formValues}
             validationSchema={validationSchema}
-            validateOnBlur={true}
-            validateOnChange={false}
             onSubmit={(value) => onFormSubmit(value)}
           >
             {({ handleSubmit, isValid, dirty, errors, touched, setFieldValue, setTouched }) => (
@@ -241,21 +238,18 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                           {item.Fields?.map((fields: BaseFormState, fieldIndex: number) => {
 
                             const columns = item.Columns ?? 1;
-                            // const isLastColumn = (fieldIndex + 1) % columns === 0;
 
                             const containerStyle: ViewStyle = {
                               flexBasis: responsive === "small" ? "100%" : `${98 / columns}%`,
                               flexGrow: fields.DisplayOrder || 1,
                               padding: 5,
-                              // borderRightWidth: isLastColumn ? 0 : 1,
                               marginHorizontal: 5,
                             };
 
                             return (
-                              <FastField name={fields.MCListID} key={`SFormID-${item.SFormID}-fastfield${fieldIndex}`}>
+                              <FastField name={fields.MCListID} key={`SFormID-${item.SFormID}-fastfield-${fieldIndex}`}>
                                 {({ field: fastFieldProps }: FieldProps) => {
-
-                                  const type = dataType.find(v => v.DTypeID === fields.DTypeID)?.DTypeName
+                                  const type = dataType.find(v => v.DTypeID === fields.DTypeID)?.DTypeName;
 
                                   const handleBlur = () => {
                                     if (type === "Number") {
@@ -278,8 +272,11 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                                     }
                                   };
 
+
+                                  console.log(errors);
+
                                   return (
-                                    <AccessibleView name="contianer-layout2" key={`fastfield-${fields.CListID}-field-${fieldIndex}-${item.SFormID}`} style={containerStyle}>
+                                    <AccessibleView name="container-layout2" key={`fastfield-${fields.CListID}-field-${fieldIndex}-${item.SFormID}`} style={containerStyle}>
                                       <Dynamic
                                         field={fields}
                                         values={fastFieldProps.value ?? ""}
@@ -290,23 +287,23 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                                               ...touched,
                                               [fastFieldProps.name]: true,
                                             });
-                                          }, 0)
+                                          }, 0);
                                         }}
                                         handleBlur={handleBlur}
                                         groupCheckListOption={groupCheckListOption}
                                       />
-                                      {Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name]) && (
-                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                          <HelperText type="error" visible={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])} style={{ left: -10 }}>
-                                            {errors[fastFieldProps.name] as string || ""}
-                                          </HelperText>
-                                        </View>
-                                      )}
+                                      <HelperText
+                                        type="error"
+                                        visible={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
+                                        style={[masterdataStyles.text, masterdataStyles.textError, { opacity: 1, paddingTop: Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name]) ? 10 : 0 }]}
+                                      >
+                                        {errors[fastFieldProps.name] as string}
+                                      </HelperText>
                                     </AccessibleView>
-
-                                  )
+                                  );
                                 }}
                               </FastField>
+
                             );
                           })}
                         </Card.Content>
@@ -320,7 +317,6 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                     <AccessibleView name="form-action-scan" style={[masterdataStyles.containerAction]}>
                       <Pressable
                         onPress={() => handleSubmit()}
-                        // disabled={!isValid || !dirty}
                         style={[
                           masterdataStyles.button,
                           masterdataStyles.backMain,
@@ -342,7 +338,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
             setIsSubmitted(false)
             navigation.navigate("ScanQR")
           }} style={masterdataStyles.linkScccess}>
-            <Text style={masterdataStyles.linkTextScccess}>Submit another</Text>
+            <Text style={masterdataStyles.linkTextScccess}>บันทึก</Text>
           </Pressable>
         </AccessibleView>
       )}

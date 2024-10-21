@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Checkbox, HelperText } from "react-native-paper";
-import { Text, StyleSheet, Animated, Pressable } from "react-native";
+import { Text, Pressable } from "react-native";
 import { CheckboxsProps } from "@/typing/tag";
 import AccessibleView from "@/components/AccessibleView";
 import useMasterdataStyles from "@/styles/common/masterdata";
@@ -16,7 +16,6 @@ const Checkboxs = ({
   testId
 }: CheckboxsProps) => {
   const [checkedOptions, setCheckedOptions] = useState<string[]>([]);
-  const [scale] = useState<Animated.Value>(new Animated.Value(1));
   console.log("Checkboxs");
   const masterdataStyles = useMasterdataStyles();
 
@@ -37,21 +36,6 @@ const Checkboxs = ({
     handleChange(newCheckedOptions);
   };
 
-  const animateScaleIn = () => {
-    Animated.spring(scale, {
-      toValue: 1.1,
-      tension: 10,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const animateScaleOut = () => {
-    Animated.spring(scale, {
-      toValue: 1,
-      tension: 10,
-      useNativeDriver: true,
-    }).start();
-  };
 
   if (!option || option.length === 0) {
     return null;
@@ -62,15 +46,13 @@ const Checkboxs = ({
       {option.map((item, index) => (
         <Pressable
           key={index}
-          onPressIn={animateScaleIn}
-          onPressOut={animateScaleOut}
           onPress={() => {
             handleCheckBoxChange(item.value || '');
           }}
           testID={testId}
           id={testId}
         >
-          <Animated.View style={{ transform: [{ scale }] }}>
+          <AccessibleView name="con-checkbox">
             <AccessibleView name="group-checkboxs" style={masterdataStyles.checkboxContainer}>
               <Checkbox
                 status={
@@ -82,11 +64,11 @@ const Checkboxs = ({
               />
               <Text style={masterdataStyles.checkboxLabel}>{item.label}</Text>
             </AccessibleView>
-          </Animated.View>
+          </AccessibleView>
         </Pressable>
       ))}
 
-      {hint && <Text style={masterdataStyles.hint}>{hint}</Text>}
+      {hint ? <Text style={masterdataStyles.hint}>{hint}</Text> : false}
       <HelperText type="error" visible={error} style={{ left: -10 }}>
         {errorMessage}
       </HelperText>

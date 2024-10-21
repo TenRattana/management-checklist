@@ -21,7 +21,6 @@ const ChecklistGroupScreen = () => {
     const [initialValues, setInitialValues] = useState<InitialValuesGroupCheckList>({
         groupCheckListOptionId: "",
         groupCheckListOptionName: "",
-        description: "",
         isActive: true,
     });
 
@@ -60,7 +59,6 @@ const ChecklistGroupScreen = () => {
         const data = {
             GCLOptionID: values.groupCheckListOptionId,
             GCLOptionName: values.groupCheckListOptionName,
-            Description: values.description,
             IsActive: values.isActive,
         };
 
@@ -87,7 +85,6 @@ const ChecklistGroupScreen = () => {
                 setInitialValues({
                     groupCheckListOptionId: groupCheckListOptionData.GCLOptionID ?? "",
                     groupCheckListOptionName: groupCheckListOptionData.GCLOptionName ?? "",
-                    description: groupCheckListOptionData.Description ?? "",
                     isActive: Boolean(groupCheckListOptionData.IsActive),
                 });
                 setIsVisible(true);
@@ -106,7 +103,6 @@ const ChecklistGroupScreen = () => {
     const tableData = useMemo(() => {
         return groupCheckListOption.map((item) => [
             item.GCLOptionName,
-            item.Description,
             item.IsActive,
             item.GCLOptionID,
         ]);
@@ -116,7 +112,6 @@ const ChecklistGroupScreen = () => {
         setInitialValues({
             groupCheckListOptionId: "",
             groupCheckListOptionName: "",
-            description: "",
             isActive: true,
         });
         setIsEditing(false);
@@ -127,20 +122,19 @@ const ChecklistGroupScreen = () => {
         Tabledata: tableData,
         Tablehead: [
             { label: "Group Option Name", align: "flex-start" },
-            { label: "Description", align: "flex-start" },
             { label: "Status", align: "center" },
             { label: "", align: "center" },
         ],
-        flexArr: [3, 3, 1, 1],
-        actionIndex: [{ editIndex: 3, delIndex: 4 }],
+        flexArr: [6, 1, 1],
+        actionIndex: [{ editIndex: 2, delIndex: 3 }],
         handleAction,
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
-        <ScrollView style={{ paddingHorizontal: 15 }}>
-            <Text style={[masterdataStyles.text, masterdataStyles.textBold,
-            { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>Create Group Option
+        <AccessibleView name="container-groupchecklist" style={{ paddingHorizontal: 15 }}>
+            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}>
+                Create Group Option
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
@@ -152,7 +146,7 @@ const ChecklistGroupScreen = () => {
                         testId="search-groupchecklist"
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                        <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Group Option</Text>
+                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Create Group Option</Text>
                     </Pressable>
                 </AccessibleView>
                 <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
@@ -167,7 +161,7 @@ const ChecklistGroupScreen = () => {
                 initialValues={initialValues}
                 saveData={saveData}
             />
-        </ScrollView>
+        </AccessibleView>
     );
 };
 

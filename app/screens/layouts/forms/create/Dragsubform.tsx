@@ -1,6 +1,5 @@
-import React, { useState, useCallback, useRef, useMemo } from "react";
+import React, { useState, useCallback } from "react";
 import {
-    Animated,
     Pressable,
 } from "react-native";
 import {
@@ -12,12 +11,18 @@ import {
 import { AccessibleView, SaveDialog } from "@/components";
 import SubFormDialog from "@/components/forms/SubFormDialog";
 import useCreateformStyle from "@/styles/createform";
-import DraggableFlatList, { ScaleDecorator } from "react-native-draggable-flatlist";
+import {
+    RenderItemParams,
+    ScaleDecorator,
+    NestableScrollContainer,
+    NestableDraggableFlatList,
+    ShadowDecorator
+} from "react-native-draggable-flatlist";
 import { IconButton, Text } from "react-native-paper";
 import { runOnJS } from "react-native-reanimated";
 import { spacing } from "@/constants/Spacing";
 import Dragfield from "./Dragfield";
-import { BaseFormState, BaseSubForm } from '@/typing/form'
+import { BaseSubForm, RowItemProps } from '@/typing/form'
 import { DragsubformProps } from "@/typing/tag";
 import { useToast } from "@/app/contexts";
 
@@ -29,33 +34,8 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
     const createform = useCreateformStyle();
     const { handleError } = useToast();
 
-    const scaleValues = useRef<{ [key: string]: Animated.Value }>({});
-
-    const getScaleValue = (subFormID: string) => {
-        if (!scaleValues.current[subFormID]) {
-            scaleValues.current[subFormID] = new Animated.Value(1);
-        }
-        return scaleValues.current[subFormID];
-    };
-
-    const animatedDefault = useMemo(() => {
-        return { toValue: 1, useNativeDriver: true };
-    }, []);
-
-    const animatedScale = useMemo(() => {
-        return { toValue: 0.95, useNativeDriver: true };
-    }, []);
-
     const handleDropSubForm = (data: Omit<BaseSubForm, 'DisplayOrder'>[]) => {
         runOnJS(dispatch)(setDragSubForm({ data }));
-    };
-
-    const onPressIn = (subFormID: string) => {
-        Animated.spring(getScaleValue(subFormID), animatedScale).start();
-    };
-
-    const onPressOut = (subFormID: string) => {
-        Animated.spring(getScaleValue(subFormID), animatedDefault).start();
     };
 
     const handelSetDialog = useCallback(() => {
@@ -84,54 +64,58 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
         }
     }, [])
 
-
-    const renderSubForm = ({ item, drag, isActive }: { item: BaseSubForm; drag: () => void; isActive: boolean; }) => {
-
+    const RowItem = ({ item, drag, isActive }: RowItemProps<BaseSubForm>) => {
         return (
-            <Animated.View style={{ transform: [{ scale: getScaleValue(item.SFormID) }] }}>
-                <ScaleDecorator>
-                    <AccessibleView name="drag-field-container" style={{ marginBottom: 30 }}>
-                        <Pressable
-                            onPress={() => {
-                                setEditMode(true);
-                                setInitialDialog(true);
-                                handelSubForm(item);
-                            }}
-                            onPressIn={() => onPressIn(item.SFormID)}
-                            onPressOut={() => onPressOut(item.SFormID)}
-                            onLongPress={drag}
-                            disabled={isActive}
-                            style={[
-                                createform.subFormContainer,
-                                isActive ? createform.active : null
-                            ]}
-                            testID={`dg-SF-${item.SFormID}`}
-                        >
-                            <IconButton icon={"credit-card-plus"} size={spacing.large} animated />
-                            <Text style={[createform.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
-                                Sub Form: {item.SFormName}
-                            </Text>
-                            <IconButton icon="chevron-right" size={18} />
-                        </Pressable>
+            <>
+                <Pressable
+                    onPress={() => {
+                        setEditMode(true);
+                        setInitialDialog(true);
+                        handelSubForm(item);
+                    }}
+                    onLongPress={drag}
+                    disabled={isActive}
+                    style={[
+                        createform.subFormContainer,
+                        isActive ? createform.active : null
+                    ]}
+                    testID={`dg-SF-${item.SFormID}`}
+                >
+                    <IconButton icon={"credit-card-plus"} size={spacing.large} animated />
+                    <Text style={[createform.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
+                        Sub Form: {item.SFormName}
+                    </Text>
+                    <IconButton icon="chevron-right" size={18} />
+                </Pressable>
 
-                        <Dragfield
-                            data={item?.Fields ?? []}
-                            SFormID={item.SFormID}
-                            dispatch={dispatch}
-                            checkList={checkList}
-                            dataType={dataType}
-                            checkListType={checkListType}
-                            groupCheckListOption={groupCheckListOption}
-                        />
-                    </AccessibleView>
+                <AccessibleView name="drag-subform" style={{ paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 40 : 0 }}>
+                    <Dragfield
+                        data={item.Fields ?? []}
+                        SFormID={item.SFormID}
+                        dispatch={dispatch}
+                        checkList={checkList}
+                        dataType={dataType}
+                        checkListType={checkListType}
+                        groupCheckListOption={groupCheckListOption}
+                    />
+                </AccessibleView>
+            </>
 
-                </ScaleDecorator>
-            </Animated.View>
         );
-    };
+    }
+
+    const renderSubForm = useCallback((params: RenderItemParams<BaseSubForm>) => {
+        return (
+            <ShadowDecorator>
+                <ScaleDecorator activeScale={0.98}>
+                    <RowItem {...params} />
+                </ScaleDecorator>
+            </ShadowDecorator>
+        );
+    }, []);
 
     return (
-        <>
+        <NestableScrollContainer>
             <Pressable
                 onPress={() => {
                     setInitialDialog(true);
@@ -143,18 +127,15 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                 <Text style={createform.addSubFormText}>Add Sub Form</Text>
             </Pressable>
 
-            <AccessibleView name="drag-subform" style={{ paddingHorizontal: 50, paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 40 : 0 }}>
-                <DraggableFlatList
+            <AccessibleView name="drag-subform" style={{ paddingHorizontal: 30, paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 40 : 0 }}>
+                <NestableDraggableFlatList
                     data={state.subForms}
                     renderItem={renderSubForm}
                     keyExtractor={(item, index) => `SF-${item.SFormID}-${index}`}
                     onDragEnd={({ data }) => handleDropSubForm(data)}
-                    nestedScrollEnabled={true}
                     activationDistance={1}
-                    autoscrollSpeed={30}
                 />
             </AccessibleView>
-
 
             <SubFormDialog
                 isVisible={initialDialog}
@@ -164,9 +145,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                 saveData={handelSaveSubForm}
                 onDelete={(SFormID: string) => dispatch(deleteSubForm({ SFormID }))}
             />
-
-        </>
-
+        </NestableScrollContainer>
     )
 }
 

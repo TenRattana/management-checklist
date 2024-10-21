@@ -26,13 +26,13 @@ const Inputs: React.FC<InputProps> = ({
       style={masterdataStyles.commonContainer}
     >
       <TextInput
-        mode={mode || "outlined"}
-        placeholder={placeholder}
-        label={(
-          <Text style={[masterdataStyles.text]}>
-            {label}
-          </Text>
-        )}
+        mode="outlined"
+        // placeholder={placeholder}
+        // label={(
+        //   <Text style={[masterdataStyles.text]}>
+        //     {label}
+        //   </Text>
+        // )}
         style={masterdataStyles.text}
         onChangeText={handleChange}
         onBlur={handleBlur}
@@ -51,8 +51,8 @@ const Inputs: React.FC<InputProps> = ({
         testID={testId}
         id={testId}
       />
-      {hint && <Text style={masterdataStyles.hint}>{hint}</Text>}
-      <HelperText type="error" visible={error} style={{ left: -10 }}>
+      {hint ? <Text style={masterdataStyles.hint}>{hint}</Text> : false}
+      <HelperText type="error" visible={error} style={{ display: error ? 'flex' : 'none', left: -10 }}>
         {errorMessage}
       </HelperText>
     </AccessibleView>

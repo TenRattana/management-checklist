@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { ScrollView, Pressable, Text, Role } from "react-native";
+import { Pressable, Text, Role } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar } from "@/components";
@@ -119,7 +119,7 @@ const Managepermissions = () => {
       item.IsActive,
       item.UserID,
     ])
-  }, [userPermission,groupUser]);
+  }, [userPermission, groupUser]);
 
   const handleNewData = useCallback(() => {
     setInitialValues({
@@ -152,9 +152,9 @@ const Managepermissions = () => {
   }), [tableData, debouncedSearchQuery, handleAction]);
 
   return (
-    <ScrollView style={{ paddingHorizontal: 15 }}>
-      <Text style={[masterdataStyles.text, masterdataStyles.textBold,
-      { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>List User
+    <AccessibleView name="container-checklist" style={{ paddingHorizontal: 15 }}>
+      <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}>
+        List User
       </Text>
       <Divider style={{ marginBottom: 20 }} />
       <Card style={{ borderRadius: 5 }}>
@@ -183,7 +183,7 @@ const Managepermissions = () => {
         users={user}
         groupUser={groupUser}
       />
-    </ScrollView>
+    </AccessibleView>
   );
 };
 

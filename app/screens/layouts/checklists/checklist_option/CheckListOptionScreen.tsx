@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { ScrollView, Pressable, Text } from "react-native";
+import { Pressable, Text } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar } from "@/components";
@@ -130,7 +130,7 @@ const CheckListOptionScreen = () => {
         Tabledata: tableData,
         Tablehead: [
             { label: "Check List Option Name", align: "flex-start" },
-            { label: "Change Status", align: "center" },
+            { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
         ],
         flexArr: [6, 1, 1],
@@ -140,9 +140,9 @@ const CheckListOptionScreen = () => {
     }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
-        <ScrollView style={{ paddingHorizontal: 15 }}>
-            <Text style={[masterdataStyles.text, masterdataStyles.textBold,
-            { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>Create Option
+        <AccessibleView name="container-checklistoption" style={{ paddingHorizontal: 15 }}>
+            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}>
+                Create Option
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
@@ -162,7 +162,6 @@ const CheckListOptionScreen = () => {
                 </Card.Content>
             </Card>
 
-
             <Checklist_option_dialog
                 isVisible={isVisible}
                 setIsVisible={setIsVisible}
@@ -170,7 +169,7 @@ const CheckListOptionScreen = () => {
                 initialValues={initialValues}
                 saveData={saveData}
             />
-        </ScrollView>
+        </AccessibleView>
     );
 };
 

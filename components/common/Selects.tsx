@@ -25,7 +25,7 @@ const Selects = ({
 
   return (
     <AccessibleView name="selects" style={masterdataStyles.commonContainer}>
-      {label && <Text style={masterdataStyles.label}>{label}</Text>}
+      {label ? <Text style={masterdataStyles.label}>{label}</Text> : false}
       <AccessibleView name="group-selects" style={masterdataStyles.dropdownContainer}>
         <Picker
           selectedValue={value}
@@ -49,7 +49,7 @@ const Selects = ({
           ))}
         </Picker>
       </AccessibleView>
-      {hint && <Text style={masterdataStyles.hint}>{hint}</Text>}
+      {hint ? <Text style={masterdataStyles.hint}>{hint}</Text> : false}
       <HelperText type="error" visible={error} style={masterdataStyles.errorText}>
         {errorMessage}
       </HelperText>

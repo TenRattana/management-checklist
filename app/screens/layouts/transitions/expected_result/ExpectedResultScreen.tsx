@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { ScrollView, Pressable, Text } from "react-native";
+import { Pressable, Text } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar } from "@/components";
@@ -65,7 +65,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
         } catch (error) {
             handleError(error);
         }
-    }, [fetchData, handleError ,expectedResult]);
+    }, [fetchData, handleError, expectedResult]);
 
     const convertToThaiDateTime = (dateString: string) => {
         const date = new Date(dateString);
@@ -106,9 +106,9 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
     }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
-        <ScrollView style={{ paddingHorizontal: 15 }}>
-            <Text style={[masterdataStyles.text, masterdataStyles.textBold,
-            { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>ExpectedResult
+        <AccessibleView name="container-checklist" style={{ paddingHorizontal: 15 }}>
+            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}>
+                ExpectedResult
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
@@ -125,7 +125,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
                 </Card.Content>
             </Card>
 
-        </ScrollView>
+        </AccessibleView>
     );
 };
 

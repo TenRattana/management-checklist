@@ -13,7 +13,7 @@ const validationSchema = Yup.object().shape({
     groupCheckListOptionName: Yup.string().required(
         "The group check list option name field is required."
     ),
-    description: Yup.string().required("The description field is required."),
+    // description: Yup.string().required("The description field is required."),
     isActive: Yup.boolean().required("The active field is required."),
 });
 
@@ -67,7 +67,7 @@ const Checklist_group_dialog = ({ isVisible, setIsVisible, isEditing, initialVal
                                         )}
                                     </FastField >
 
-                                    <FastField name="description">
+                                    {/* <FastField name="description">
                                         {({ field, form }: any) => (
                                             <Inputs
                                                 placeholder="Enter Description"
@@ -80,7 +80,7 @@ const Checklist_group_dialog = ({ isVisible, setIsVisible, isEditing, initialVal
                                                 testId="description-cgd"
                                             />
                                         )}
-                                    </FastField >
+                                    </FastField > */}
 
                                     <AccessibleView name="form-active-cgd" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>

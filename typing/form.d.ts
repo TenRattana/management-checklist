@@ -47,5 +47,9 @@ export interface BaseFormState {
   CTypeName?:string;
   CListName?:string;
 }
-
+export interface RowItemProps <V extends BaseFormState | BaseSubForm> {
+    item: V;
+    drag: () => void;
+    isActive: boolean;
+};
 export type FormConfig = BaseForm | BaseSubForm | BaseFormState;

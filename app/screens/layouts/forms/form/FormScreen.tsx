@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { ScrollView, Pressable, Text } from "react-native";
+import { Pressable, Text } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme, useRes } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar } from "@/components";
@@ -93,10 +93,10 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
         Tablehead: [
             { label: "Form Name", align: "flex-start" },
             { label: "Form Description", align: "flex-start" },
-            { label: "Change Status", align: "center" },
-            { label: "Change Form", align: "center" },
-            { label: "Copy Template", align: "center" },
-            { label: "Preview", align: "center" },
+            { label: "Status", align: "center" },
+            { label: "Change", align: "center" },
+            { label: "Copy", align: "center" },
+            { label: "View", align: "center" },
         ],
         flexArr: [2, 4, 1, 1, 1, 1],
         actionIndex: [{ changeIndex: 3, copyIndex: 4, preIndex: 5 }],
@@ -105,13 +105,13 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
     }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
-        <ScrollView style={{ paddingHorizontal: 15 }}>
-            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>
+        <AccessibleView name="container-form" style={{ paddingHorizontal: 15 }}>
+            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}>
                 List Form
             </Text>
-            <Divider style={{ marginBottom: 20 }} />
+            <Divider style={{ marginBottom: 10 }} />
             <Card style={{ borderRadius: 5 }}>
-                <AccessibleView name="form" style={{ paddingVertical: 20, flexDirection: 'row' }}>
+                <AccessibleView name="form" style={masterdataStyles.containerSearch}>
                     <Searchbar
                         placeholder="Search Form..."
                         value={searchQuery}
@@ -119,14 +119,14 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
                         testId="search-form"
                     />
                     <Pressable onPress={handleNewForm} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                        <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>New Form</Text>
+                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>New Form</Text>
                     </Pressable>
                 </AccessibleView>
                 <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
                     {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
                 </Card.Content>
             </Card>
-        </ScrollView>
+        </AccessibleView>
     );
 };
 

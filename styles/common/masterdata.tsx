@@ -64,7 +64,7 @@ const useMasterdataStyles = () => {
             borderRadius: 8,
             marginVertical: 20,
             marginLeft: responsive === "small" ? "5%" : 30,
-            width: responsive === "small" ? "90%" : 200,
+            minWidth: responsive === "small" ? "90%" : 200,
             height: 45,
             justifyContent: 'center',
             alignItems: 'center'
@@ -89,13 +89,11 @@ const useMasterdataStyles = () => {
             marginVertical: 12,
         },
         containerSearch: {
-            marginVertical: 12,
             flexDirection: 'row',
             flexWrap: 'wrap'
         },
         searchbar: {
             width: responsive === "small" ? "90%" : 400,
-            maxHeight: 60,
             marginVertical: 10,
             marginHorizontal: responsive === "small" ? '5%' : 30,
             borderRadius: 10,
@@ -215,7 +213,8 @@ const useMasterdataStyles = () => {
         },
         cardTitle: {
             fontSize: spacing.small,
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            paddingVertical: 15
         },
         containerScccess: {
             flex: 1,

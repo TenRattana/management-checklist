@@ -97,11 +97,11 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
 
 
   return (
-    <ScrollView style={{ paddingHorizontal: 15 }}>
-      <Text style={[masterdataStyles.text, masterdataStyles.textBold,
-      { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>List Diary
+    <AccessibleView name="container-home" style={{ paddingHorizontal: 15 }}>
+      <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}>
+        List Diary
       </Text>
-      <Divider style={{ marginBottom: 20 }} />
+      <Divider style={{ marginBottom: 10 }} />
       <Card style={{ borderRadius: 5 }}>
         <AccessibleView name="machine" style={masterdataStyles.containerSearch}>
           <Searchbar
@@ -111,16 +111,14 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
             testId="search-list-form"
           />
           <Pressable onPress={handleSacnQR} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-            <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Scan QR</Text>
+            <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Scan QR</Text>
           </Pressable>
         </AccessibleView>
         <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
-          {/* <Suspense fallback={<LoadingSpinner />}> */}
-          {!isLoading ? <Customtable {...customtableProps} /> : <LoadingSpinner />}
-          {/* </Suspense> */}
+          {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
         </Card.Content>
       </Card>
-    </ScrollView>
+    </AccessibleView>
   );
 };
 

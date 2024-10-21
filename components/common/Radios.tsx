@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Text, StyleSheet, Animated, Pressable } from "react-native";
+import React from "react";
+import { Text, Pressable } from "react-native";
 import { RadioButton, HelperText } from "react-native-paper";
 import { RadiosProps } from "@/typing/tag";
 import AccessibleView from "@/components/AccessibleView";
@@ -16,26 +16,9 @@ const Radios = ({
   errorMessage,
   testId
 }: RadiosProps) => {
-  const [scale] = useState<Animated.Value>(new Animated.Value(1));
   console.log("Radios");
 
   const masterdataStyles = useMasterdataStyles()
-
-  const animateScaleIn = () => {
-    Animated.spring(scale, {
-      toValue: 1.2,
-      tension: 10,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const animateScaleOut = () => {
-    Animated.spring(scale, {
-      toValue: 1,
-      tension: 10,
-      useNativeDriver: true,
-    }).start();
-  };
 
   if (!option || option.length === 0) {
     return null;
@@ -51,26 +34,24 @@ const Radios = ({
         {option.map((opt, index) => (
           <Pressable
             key={index}
-            onPressIn={animateScaleIn}
-            onPressOut={animateScaleOut}
             onPress={() => handleChange(opt.value)}
             style={{ flex: 1 }}
             testID={testId}
             id={testId}
           >
-            <Animated.View style={[masterdataStyles.radioItem, { transform: [{ scale }] }]}>
+            <AccessibleView name="con-radio" style={[masterdataStyles.radioItem]}>
               <RadioButton value={opt.value} />
               <Text style={masterdataStyles.radioLabel}>{opt.label}</Text>
-            </Animated.View>
+            </AccessibleView>
           </Pressable>
         ))}
       </RadioButton.Group>
-      {hint && <Text style={masterdataStyles.hint}>{hint}</Text>}
-      {error && (
+      {hint ? <Text style={masterdataStyles.hint}>{hint}</Text> : false}
+      {error ? (
         <HelperText type="error" visible={error} style={masterdataStyles.errorText}>
           {errorMessage}
         </HelperText>
-      )}
+      ) : false}
     </AccessibleView>
   );
 };

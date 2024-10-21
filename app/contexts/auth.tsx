@@ -47,7 +47,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
     setSession(newSession);
     setLoading(false);
-    
+
     axiosInstance.defaults.headers.post["Authorization"] = newSession.UserName;
 
   }, [fetchData]);
@@ -76,7 +76,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           { name: "Setting" },
           { name: "Managepermissions" },
           { name: "SuperAdmin" },
-          { name: "Test" },
+          { name: "TestScreen" },
           { name: "Permission_deny" },
         ]);
       } else if (session.GUserName === "Admin") {

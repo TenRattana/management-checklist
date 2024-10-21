@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { ScrollView, Pressable, Text } from "react-native";
+import { Pressable, Text } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
 import { AccessibleView, Customtable, LoadingSpinner, Searchbar } from "@/components";
@@ -162,9 +162,9 @@ const MachineGroupScreen = () => {
     }, [machineGroup, initialValues.machineGroupId]);
 
     return (
-        <ScrollView style={{ paddingHorizontal: 15 }}>
-            <Text style={[masterdataStyles.text, masterdataStyles.textBold,
-            { fontSize: spacing.large, marginTop: spacing.small, marginBottom: 10 }]}>Create Machine
+        <AccessibleView name="container-mahine" style={{ paddingHorizontal: 15 }}>
+            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}>
+                Create Machine
             </Text>
             <Divider style={{ marginBottom: 20 }} />
             <Card style={{ borderRadius: 5 }}>
@@ -193,7 +193,7 @@ const MachineGroupScreen = () => {
                 dropmachine={dropmachine}
                 machineGroup={machineGroup}
             />
-        </ScrollView>
+        </AccessibleView>
     );
 };
 

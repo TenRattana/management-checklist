@@ -23,9 +23,10 @@ const Textareas = ({
     return (
         <AccessibleView name="text-areas" style={masterdataStyles.commonContainer}>
             <TextInput
-                mode={mode || "outlined"}
-                placeholder={placeholder}
-                label={label}
+                mode="outlined"
+                // placeholder={placeholder}
+                // label={label}
+                style={masterdataStyles.text}
                 onChangeText={handleChange}
                 onBlur={handleBlur}
                 value={value as string}
@@ -44,7 +45,7 @@ const Textareas = ({
                 testID={testId}
                 id={testId}
             />
-            {hint && <Text style={masterdataStyles.hint}>{hint}</Text>}
+            {hint ? <Text style={masterdataStyles.hint}>{hint}</Text> : false}
             <HelperText type="error" visible={error} style={masterdataStyles.errorText}>
                 {errorMessage}
             </HelperText>

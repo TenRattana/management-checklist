@@ -75,12 +75,12 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
 
     const handleDrop = (item: CheckListType, absoluteX: number, absoluteY: number) => {
         const cardIndex = childRef.current.checkCardPosition(absoluteX, absoluteY);
+        const selectedChecklist = checkList.find(v => v.CListID === "CL000") || checkList[0];
+        const selectedDataType = dataType.find(v => v.DTypeName === "String") || dataType[0];
 
         if (cardIndex >= 0) {
             const targetSubForm = state.subForms[cardIndex];
             const currentFieldCount = count;
-            const selectedChecklist = checkList.find(v => v.CListID === "CL000") || checkList[0];
-            const selectedDataType = dataType.find(v => v.DTypeName === "String") || dataType[0];
 
             const newField: BaseFormState = {
                 MCListID: `MCL-ADD-${currentFieldCount}`,
@@ -165,12 +165,14 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
         return Yup.object().shape(shape);
     }, [state.subForms, dataType, checkListType]);
 
+
     return (
         <GestureHandlerRootView style={[createform.container, { maxHeight: screenHeight }]}>
-            <AccessibleView name="container-form" style={[createform.containerL1,]}>
+            <AccessibleView name="container-form" style={[createform.containerL1]}>
+
                 <FlatList
                     data={[{}]}
-                    renderItem={() => selectedIndex === 0 ? (
+                    renderItem={() => selectedIndex === 0 && (
                         <AccessibleView name="container-sagment" style={{ marginHorizontal: 20 }}>
                             <Inputs
                                 placeholder="Enter Content Name"
@@ -202,16 +204,10 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                                 <DraggableItem item={item} onDrop={handleDrop} key={`${item.CTypeID}-${index}`} />
                             ))}
                         </AccessibleView>
-                    ) : (
-                        <Dragsubform navigation={navigation}
-                            state={state}
-                            dispatch={dispatch}
-                            checkList={checkList}
-                            dataType={dataType}
-                            checkListType={checkListType}
-                            groupCheckListOption={groupCheckListOption} />
                     )}
                     keyExtractor={(_, index) => `${index}`}
+                    style={{ flexShrink: 0 }}
+                    contentContainerStyle={{ paddingBottom: 20 }}
                     ListHeaderComponent={() => (
                         <>
                             <SegmentedControl
@@ -225,8 +221,17 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                             />
                         </>
                     )}
-                    contentContainerStyle={{ paddingBottom: 20 }}
                 />
+                {selectedIndex === 1 && (
+                    <Dragsubform navigation={navigation}
+                        state={state}
+                        dispatch={dispatch}
+                        checkList={checkList}
+                        dataType={dataType}
+                        checkListType={checkListType}
+                        groupCheckListOption={groupCheckListOption} />
+                )}
+
             </AccessibleView >
 
             <AccessibleView name="container-preview" style={[createform.containerL2]}>
