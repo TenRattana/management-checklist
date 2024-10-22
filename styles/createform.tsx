@@ -6,7 +6,7 @@ import { useRes } from "@/app/contexts";
 
 const useCreateformStyle = () => {
     const colors = useThemeColor();
-    const { responsive, spacing } = useRes();
+    const { responsive, spacing, fontSize } = useRes();
 
     return StyleSheet.create({
         container: {
@@ -15,8 +15,7 @@ const useCreateformStyle = () => {
         },
         containerL1: {
             display: "flex",
-            flexGrow: 0,
-            width: responsive === "small" ? "100%" : 350,
+            width: responsive === "small" ? "100%" : fontSize === "large" ? 450 : 350,
             backgroundColor: colors.light,
         },
         containerL2: {
@@ -38,11 +37,12 @@ const useCreateformStyle = () => {
             fontSize: spacing.small,
             color: '#00796b',
             marginLeft: 8,
+            paddingVertical: 10
         },
         fieldContainer: {
             paddingHorizontal: 10,
-            height: 60,
-            marginVertical: 3,
+            // height: 60,
+            marginVertical: 5,
             backgroundColor: '#fafafa',
             borderRadius: 8,
             flexDirection: 'row',
@@ -63,6 +63,8 @@ const useCreateformStyle = () => {
         },
         fieldText: {
             fontSize: spacing.small,
+            paddingVertical: 10,
+
         },
         subFormText: {
             fontSize: spacing.small,
@@ -87,6 +89,9 @@ const useCreateformStyle = () => {
             maxHeight: 500,
             overflow: 'scroll',
         },
+        icon: {
+            paddingVertical: 10
+        }
     });
 };
 

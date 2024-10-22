@@ -8,7 +8,7 @@ import {
     updateSubForm,
     deleteSubForm,
 } from "@/slices";
-import { AccessibleView, SaveDialog , Text} from "@/components";
+import { AccessibleView, SaveDialog, Text } from "@/components";
 import SubFormDialog from "@/components/forms/SubFormDialog";
 import useCreateformStyle from "@/styles/createform";
 import {
@@ -30,6 +30,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
     const [initialDialog, setInitialDialog] = useState<boolean>(false)
     const [initialSubForm, setInitialSubForm] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", MachineID: "", Fields: [] });
     const [editMode, setEditMode] = useState<boolean>(false)
+    const createformStyles = useCreateformStyle();
 
     const createform = useCreateformStyle();
     const { handleError } = useToast();
@@ -81,9 +82,9 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                     ]}
                     testID={`dg-SF-${item.SFormID}`}
                 >
-                    <IconButton icon={"credit-card-plus"} size={spacing.large} animated />
+                    <IconButton icon={"credit-card-plus"} size={spacing.large} animated style={createformStyles.icon} />
                     <Text style={[createform.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
-                        Sub Form: {item.SFormName}
+                        {item.SFormName}
                     </Text>
                     <IconButton icon="chevron-right" size={18} />
                 </Pressable>
@@ -115,7 +116,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
     }, []);
 
     return (
-        <NestableScrollContainer>
+        <>
             <Pressable
                 onPress={() => {
                     setInitialDialog(true);
@@ -123,19 +124,21 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                 }}
                 style={[createform.addSubFormButton]}
             >
-                <IconButton icon="plus" size={16} />
+                <IconButton icon="plus" size={spacing.large} style={createformStyles.icon} />
                 <Text style={createform.addSubFormText}>Add Sub Form</Text>
             </Pressable>
 
-            <AccessibleView name="drag-subform" style={{ paddingHorizontal: 30, paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 40 : 0 }}>
-                <NestableDraggableFlatList
-                    data={state.subForms}
-                    renderItem={renderSubForm}
-                    keyExtractor={(item, index) => `SF-${item.SFormID}-${index}`}
-                    onDragEnd={({ data }) => handleDropSubForm(data)}
-                    activationDistance={1}
-                />
-            </AccessibleView>
+            <NestableScrollContainer>
+                <AccessibleView name="drag-subform" style={{ paddingHorizontal: 30, paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 40 : 0 }}>
+                    <NestableDraggableFlatList
+                        data={state.subForms}
+                        renderItem={renderSubForm}
+                        keyExtractor={(item, index) => `SF-${item.SFormID}-${index}`}
+                        onDragEnd={({ data }) => handleDropSubForm(data)}
+                        activationDistance={1}
+                    />
+                </AccessibleView>
+            </NestableScrollContainer>
 
             <SubFormDialog
                 isVisible={initialDialog}
@@ -145,7 +148,8 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                 saveData={handelSaveSubForm}
                 onDelete={(SFormID: string) => dispatch(deleteSubForm({ SFormID }))}
             />
-        </NestableScrollContainer>
+        </>
+
     )
 }
 

@@ -23,10 +23,14 @@ const Textareas = ({
     return (
         <AccessibleView name="text-areas" style={masterdataStyles.commonContainer}>
             <TextInput
-                mode={mode||"outlined"}
+                mode={mode || "outlined"}
                 placeholder={placeholder}
-                label={label}
-                style={masterdataStyles.text}
+                label={!mode ? (
+                    <Text style={[masterdataStyles.text]}>
+                        {label}
+                    </Text>
+                ) : undefined}
+                style={[masterdataStyles.text, { paddingTop: 5 }]}
                 onChangeText={handleChange}
                 onBlur={handleBlur}
                 value={value as string}

@@ -1,15 +1,17 @@
 
 import React, { useState } from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable } from 'react-native';
 import { useAuth } from "@/app/contexts/auth";
 import { DrawerContentScrollView } from '@react-navigation/drawer';
 import { Text } from '@/components';
 import MenuSection from './MenuSection';
+import useMasterdataStyles from "@/styles/common/masterdata";
 
 const CustomDrawerContent = (props: any) => {
     console.log("CustomDrawerContent");
 
     const { navigation } = props;
+    const masterdataStyles = useMasterdataStyles()
 
     const [isMenuListOpen, setIsMenuListOpen] = useState<{ machine: boolean; checklist: boolean; match: boolean }>({
         machine: false,
@@ -31,10 +33,10 @@ const CustomDrawerContent = (props: any) => {
                         <>
                             <Pressable
                                 onPress={() => navigation.navigate('Home')}
-                                style={styles.menuItem}
+                                style={masterdataStyles.menuItem}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
-                                <Text style={styles.menuText}>Home</Text>
+                                <Text style={masterdataStyles.menuText}>Home</Text>
                             </Pressable>
 
                             <MenuSection
@@ -54,61 +56,66 @@ const CustomDrawerContent = (props: any) => {
                                 onToggle={() => setIsMenuListOpen((prev) => ({ ...prev, checklist: !prev.checklist }))}
                                 items={[
                                     { label: 'Check List', navigateTo: 'Checklist' },
-                                    { label: 'Check List Option', navigateTo: 'Checklist_option' },
                                     { label: 'Group Check List', navigateTo: 'Checklist_group' },
-                                ]}
-                                navigation={navigation}
-                            />
-
-                            <MenuSection
-                                title="Match"
-                                isOpen={isMenuListOpen.match}
-                                onToggle={() => setIsMenuListOpen((prev) => ({ ...prev, match: !prev.match }))}
-                                items={[
-                                    { label: 'Match Option & Group Check List', navigateTo: 'Match_checklist_option' },
-                                    { label: 'Match Form & Machine', navigateTo: 'Match_form_machine' },
+                                    { label: 'Check List Option', navigateTo: 'Checklist_option' },
                                 ]}
                                 navigation={navigation}
                             />
 
                             <Pressable
-                                onPress={() => navigation.navigate('Form')}
-                                style={styles.menuItem}
+                                onPress={() => navigation.navigate('Match_checklist_option')}
+                                style={masterdataStyles.menuItem}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
-                                <Text style={styles.menuText}>List Form</Text>
+                                <Text style={masterdataStyles.menuText}>Match Option & Group Check List</Text>
+                            </Pressable>
+
+                            <Pressable
+                                onPress={() => navigation.navigate('Form')}
+                                style={masterdataStyles.menuItem}
+                                android_ripple={{ color: '#f0f0f0' }}
+                            >
+                                <Text style={masterdataStyles.menuText}>List Form</Text>
+                            </Pressable>
+
+                            <Pressable
+                                onPress={() => navigation.navigate('Match_form_machine')}
+                                style={masterdataStyles.menuItem}
+                                android_ripple={{ color: '#f0f0f0' }}
+                            >
+                                <Text style={masterdataStyles.menuText}>Match Form & Machine</Text>
                             </Pressable>
 
                             <Pressable
                                 onPress={() => navigation.navigate('Expected_result')}
-                                style={styles.menuItem}
+                                style={masterdataStyles.menuItem}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
-                                <Text style={styles.menuText}>List Result</Text>
+                                <Text style={masterdataStyles.menuText}>List Result</Text>
                             </Pressable>
 
                             <Pressable
                                 onPress={() => navigation.navigate('ScanQR')}
-                                style={styles.menuItem}
+                                style={masterdataStyles.menuItem}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
-                                <Text style={styles.menuText}>Scan QR Code</Text>
+                                <Text style={masterdataStyles.menuText}>Scan QR Code</Text>
                             </Pressable>
 
                             <Pressable
                                 onPress={() => navigation.navigate('GenerateQR')}
-                                style={styles.menuItem}
+                                style={masterdataStyles.menuItem}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
-                                <Text style={styles.menuText}>Generate QR Code</Text>
+                                <Text style={masterdataStyles.menuText}>Generate QR Code</Text>
                             </Pressable>
 
                             <Pressable
                                 onPress={() => navigation.navigate('Setting')}
-                                style={styles.menuItem}
+                                style={masterdataStyles.menuItem}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
-                                <Text style={styles.menuText}>Setting</Text>
+                                <Text style={masterdataStyles.menuText}>Setting</Text>
                             </Pressable>
                         </>
                     )}
@@ -117,18 +124,18 @@ const CustomDrawerContent = (props: any) => {
                         <>
                             <Pressable
                                 onPress={() => navigation.navigate('TestScreen')}
-                                style={styles.menuItem}
+                                style={masterdataStyles.menuItem}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
-                                <Text style={styles.menuText}>Test</Text>
+                                <Text style={masterdataStyles.menuText}>Test</Text>
                             </Pressable>
 
                             <Pressable
                                 onPress={() => navigation.navigate('Managepermissions')}
-                                style={styles.menuItem}
+                                style={masterdataStyles.menuItem}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
-                                <Text style={styles.menuText}>Managepermissions</Text>
+                                <Text style={masterdataStyles.menuText}>Managepermissions</Text>
                             </Pressable>
                         </>
                     )}
@@ -137,26 +144,26 @@ const CustomDrawerContent = (props: any) => {
                         <>
                             <Pressable
                                 onPress={() => navigation.navigate('Home')}
-                                style={styles.menuItem}
+                                style={masterdataStyles.menuItem}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
-                                <Text style={styles.menuText}>Home</Text>
+                                <Text style={masterdataStyles.menuText}>Home</Text>
                             </Pressable>
 
                             <Pressable
                                 onPress={() => navigation.navigate('ScanQR')}
-                                style={styles.menuItem}
+                                style={masterdataStyles.menuItem}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
-                                <Text style={styles.menuText}>Scan QR Code</Text>
+                                <Text style={masterdataStyles.menuText}>Scan QR Code</Text>
                             </Pressable>
 
                             <Pressable
                                 onPress={() => navigation.navigate('Setting')}
-                                style={styles.menuItem}
+                                style={masterdataStyles.menuItem}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
-                                <Text style={styles.menuText}>Setting</Text>
+                                <Text style={masterdataStyles.menuText}>Setting</Text>
                             </Pressable>
                         </>
                     )}
@@ -169,33 +176,4 @@ const CustomDrawerContent = (props: any) => {
 
 export default React.memo(CustomDrawerContent)
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        paddingVertical: 10,
-    },
-    menuItem: {
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        minHeight: 68,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    menuText: {
-        fontSize: 16,
-    },
-    subMenuItem: {
-        paddingLeft: 40,
-        minHeight: 68,
-        paddingVertical: 10,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    subMenuText: {
-        fontSize: 16,
-        color: '#5e5e5e',
-    },
-});
 

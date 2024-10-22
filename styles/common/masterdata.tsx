@@ -156,8 +156,9 @@ const useMasterdataStyles = () => {
         },
         hint: {
             fontSize: spacing.small - 2,
-            color: "#6e6e6e",
+            color: colors.danger,
             marginTop: 5,
+            paddingLeft: 5
         },
         label: {
             fontSize: spacing.small,
@@ -193,11 +194,11 @@ const useMasterdataStyles = () => {
         title: {
             fontSize: spacing.medium,
             fontWeight: 'bold',
-            marginBottom: 16,
+            marginBottom: 10,
         },
         description: {
             fontSize: spacing.small,
-            marginBottom: 16,
+            marginBottom: 5,
         },
         subFormContainer: {
             marginBottom: 16,
@@ -248,6 +249,29 @@ const useMasterdataStyles = () => {
             paddingHorizontal: 20,
             paddingVertical: 10
 
+        },
+        menuItemNav: {
+            paddingHorizontal: 15,
+            paddingVertical: 10,
+            // minHeight: spacing.large,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+        },
+        menuText: {
+            fontSize: spacing.small,
+        },
+        subMenuItem: {
+            paddingLeft: 40,
+            // minHeight: spacing.large,
+            paddingVertical: 10,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+        },
+        subMenuText: {
+            fontSize: spacing.small,
+            color: '#5e5e5e',
         },
     });
 };

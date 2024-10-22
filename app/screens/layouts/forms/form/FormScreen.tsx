@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Pressable } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast, useTheme, useRes } from "@/app/contexts";
-import { Customtable, LoadingSpinner, AccessibleView, Searchbar , Text } from "@/components";
+import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
 import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { FormScreenProps } from "@/typing/tag";
@@ -107,7 +107,7 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
     return (
         <AccessibleView name="container-form" style={{ paddingHorizontal: 15 }}>
             <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}>
-                List Form
+                Forms
             </Text>
             <Divider style={{ marginBottom: 10 }} />
             <Card style={{ borderRadius: 5 }}>

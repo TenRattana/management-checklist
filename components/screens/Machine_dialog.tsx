@@ -65,7 +65,6 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                                         )}
                                     </FastField>
 
-
                                     <FastField name="machineName">
                                         {({ field, form }: any) => (
                                             <Inputs
@@ -130,8 +129,6 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                                 </AccessibleView>
                             )}
                         </Formik>
-
-
                     )}
                 </Dialog.Content>
             </Dialog>

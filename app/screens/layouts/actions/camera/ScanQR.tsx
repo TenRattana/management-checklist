@@ -4,7 +4,7 @@ import { Button, StyleSheet } from "react-native";
 import { ScanQRProps } from "@/typing/tag";
 import { useFocusEffect } from "expo-router";
 import { useToast } from "@/app/contexts";
-import { AccessibleView , Text } from '@/components'
+import { AccessibleView, Text } from '@/components'
 
 const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
     const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -30,7 +30,7 @@ const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
     }, [scanned, qrValue]);
 
     if (hasPermission === null) {
-        return <AccessibleView name="container-scan" />;
+        return <AccessibleView name="container-scan">{false}</AccessibleView>;
     }
 
     if (!hasPermission) {

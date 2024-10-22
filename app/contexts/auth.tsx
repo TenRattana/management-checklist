@@ -35,7 +35,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       handleError(error);
     }
-  }, [handleError]);
+  }, [axiosInstance, handleError]);
 
   useEffect(() => {
     console.log("session set");
@@ -45,12 +45,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       UserName: "Rattana Chomwihok",
       GUserName: "SuperAdmin"
     };
+
     setSession(newSession);
     setLoading(false);
 
-    axiosInstance.defaults.headers.post["Authorization"] = newSession.UserName;
-
-  }, [fetchData]);
+  }, [axiosInstance, fetchData]);
 
   useEffect(() => {
     if (session.UserName) {

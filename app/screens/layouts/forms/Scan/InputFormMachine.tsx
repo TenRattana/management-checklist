@@ -218,16 +218,13 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
     <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { maxHeight: screenHeight }]}>
       {!isSubmitted ? (
         <>
-          <Text style={[masterdataStyles.title, { textAlign: 'center' }]}>{state.FormName || "Content Name"}</Text>
-          <Divider />
-          <Text style={[masterdataStyles.description, { textAlign: 'center', paddingVertical: 10 }]}>{state.Description || "Content Description"}</Text>
 
           <Formik
             initialValues={formValues}
             validationSchema={validationSchema}
             onSubmit={(value) => onFormSubmit(value)}
           >
-            {({ handleSubmit, isValid, dirty, errors, touched, setFieldValue, setTouched }) => (
+            {({ handleSubmit, isValid, dirty, errors, touched, setFieldValue, setTouched, values }) => (
               <>
                 <FlatList
                   data={state.subForms}
@@ -272,8 +269,6 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                                     }
                                   };
 
-                                  console.log(errors);
-
                                   return (
                                     <AccessibleView name="container-layout2" key={`fastfield-${fields.CListID}-field-${fieldIndex}-${item.SFormID}`} style={containerStyle}>
                                       <Dynamic
@@ -290,7 +285,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                                         }}
                                         handleBlur={handleBlur}
                                         groupCheckListOption={groupCheckListOption}
-                                        error={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
+                                        error={touched[fastFieldProps.name] && Boolean(errors[fastFieldProps.name])}
                                         errorMessage={errors[fastFieldProps.name] as string}
                                       />
                                     </AccessibleView>
@@ -306,17 +301,26 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                   )}
                   keyExtractor={(item) => item.SFormID.toString()}
                   nestedScrollEnabled={true}
+                  ListHeaderComponent={() => (
+                    <>
+                      <Text style={[masterdataStyles.title]}>{state.FormName || "Form Name"}</Text>
+                      <Divider />
+                      <Text style={[masterdataStyles.description]}>{state.Description || "Form Description"}</Text>
+                    </>
+                  )}
                   ListFooterComponentStyle={{ alignItems: 'center', width: "100%" }}
                   ListFooterComponent={() => (
                     <AccessibleView name="form-action-scan" style={[masterdataStyles.containerAction]}>
                       <Pressable
-                        onPress={() => handleSubmit()}
+                        onPress={() => {
+                          handleSubmit();
+                        }}
                         style={[
                           masterdataStyles.button,
                           masterdataStyles.backMain,
                         ]}
                       >
-                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Submit</Text>
+                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>บันทึก</Text>
                       </Pressable>
                     </AccessibleView>
                   )}
@@ -327,12 +331,12 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
         </>
       ) : (
         <AccessibleView name="form-success" style={masterdataStyles.containerScccess}>
-          <Text>Your form has been submitted successfully!</Text>
+          <Text>บันทึกเสร็จสิ้น</Text>
           <Pressable onPress={() => {
             setIsSubmitted(false)
-            navigation.navigate("ScanQR")
+            navigation.navigate("Home")
           }} style={masterdataStyles.linkScccess}>
-            <Text style={masterdataStyles.linkTextScccess}>บันทึก</Text>
+            <Text style={masterdataStyles.linkTextScccess}>กลับหน้าหลัก</Text>
           </Pressable>
         </AccessibleView>
       )}

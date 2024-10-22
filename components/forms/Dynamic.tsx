@@ -6,6 +6,8 @@ import { DynamicFormProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
 import { HelperText } from "react-native-paper";
+import { View } from "react-native";
+import { useRes } from "@/app/contexts";
 
 const DynamicForm = React.memo(({
   field,
@@ -94,6 +96,8 @@ const DynamicForm = React.memo(({
     }
   };
 
+  // console.log(errorMessage);
+  // console.log(error);
   return (
     <AccessibleView name="form-layout2" style={{
       flex: 1,
@@ -101,13 +105,14 @@ const DynamicForm = React.memo(({
       <Text style={[masterdataStyles.text, CTypeName === "Text" ? { justifyContent: 'flex-start', alignItems: 'center', marginVertical: 'auto' } : {}]}>{CListName}</Text>
       {renderField()}
 
-      <HelperText
+      {/* <HelperText
         type="error"
-        visible={error}
-        style={[masterdataStyles.text, masterdataStyles.textError, { opacity: 1, paddingTop: error ? 10 : 0  }]}
-      >
-        {errorMessage}
-      </HelperText>
+        visible={!!errorMessage}
+        style={[masterdataStyles.text, masterdataStyles.textError, { opacity: 1, marginTop: !!errorMessage ? spacing.small - 10 : 0, display: !!errorMessage ? 'flex' : 'none' }]}
+      > */}
+      <Text style={[masterdataStyles.text, masterdataStyles.textError, { display: !!errorMessage ? 'flex' : 'none' }]}>{errorMessage}</Text>
+      {/* </HelperText> */}
+
     </AccessibleView>
   );
 });

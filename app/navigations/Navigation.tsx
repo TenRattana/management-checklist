@@ -1,10 +1,11 @@
-import React, { useState, lazy, Suspense, useRef, useCallback } from 'react';
-import { ActivityIndicator } from 'react-native';
+import React, { useState, lazy, Suspense, useRef, useCallback, useEffect } from 'react';
+import { ActivityIndicator, View, Text } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { HomeScreen, LoginScreen, AdminScreen, SuperAdminScreen, ScanQR, GenerateQR, UserScreen, SettingScreen, Managepermissions } from '@/app/screens';
-import NotFoundScreen from '@/app/+not-found'
+import NotFoundScreen from '@/app/+not-found';
 import { useAuth } from "@/app/contexts/auth";
 import CustomDrawerContent from './custom/CustomDrawer';
+import axiosInstance from '@/config/axios';
 
 const Drawer = createDrawerNavigator();
 
@@ -35,19 +36,24 @@ const components: Record<ComponentNames, () => Promise<{ default: React.Componen
 };
 
 const Navigations = () => {
-  console.log("Navigations");
-
-  const { loading, screens } = useAuth();
+  const { loading, screens, session } = useAuth();
   const [loadedComponents, setLoadedComponents] = useState<Set<string>>(new Set());
   const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
 
-  if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
-  }
+  useEffect(() => {
+    const interceptor = axiosInstance.interceptors.request.use(config => {
+      if (session) {
+        config.headers['Authorization'] = session.UserName;
+      }
+      return config;
+    });
 
-  const renderComponent = (name: ComponentNames) => {
-    console.log("renderComponent");
+    return () => {
+      axiosInstance.interceptors.request.eject(interceptor);
+    };
+  }, [axiosInstance, session]);
 
+  const renderComponent = useCallback((name: ComponentNames) => {
     if (!loadedComponents.has(name)) {
       if (!cachedComponents.current[name]) {
         cachedComponents.current[name] = lazy(components[name]);
@@ -57,14 +63,23 @@ const Navigations = () => {
 
     const Component = cachedComponents.current[name];
     return (props: any) => <Component {...props} />;
-  };
+  }, [loadedComponents]);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       initialRouteName='Home'
     >
-      {!loading && screens && screens.length > 0 ? screens.map(screen => (
+      {!loading && screens.length > 0 ? screens.map(screen => (
         <Drawer.Screen
           key={screen.name}
           name={screen.name}
@@ -74,7 +89,7 @@ const Navigations = () => {
           }}
         />
       )) : (
-        <Drawer.Screen name={"Login"} component={LoginScreen} />
+        <Drawer.Screen name="Login" component={LoginScreen} />
       )}
     </Drawer.Navigator>
   );

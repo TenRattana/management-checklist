@@ -3,7 +3,6 @@ import { Pressable } from "react-native";
 import { Portal, Dialog } from "react-native-paper";
 import { SaveDialogProps } from "@/typing/value";
 import axiosInstance from "@/config/axios";
-import axios from "axios";
 import { useToast } from "@/app/contexts";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import AccessibleView from "../AccessibleView";
@@ -38,7 +37,7 @@ const SaveDialog = ({
         };
 
         try {
-            const response = await axios.post("MatchCheckList_service.asmx/SaveFormCheckList", data);
+            const response = await axiosInstance.post("MatchCheckList_service.asmx/SaveFormCheckList", data);
             messages = (String(response.data.message));
             navigation.navigate("Form", { messages });
         } catch (error) {

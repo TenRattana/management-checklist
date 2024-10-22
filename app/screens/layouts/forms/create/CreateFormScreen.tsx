@@ -6,7 +6,7 @@ import { IconButton, Divider, HelperText, Card, Portal } from "react-native-pape
 import useCreateformStyle from "@/styles/createform";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import useForm from "@/hooks/custom/useForm";
-import { AccessibleView, Inputs, SaveDialog , Text } from "@/components";
+import { AccessibleView, Inputs, SaveDialog, Text } from "@/components";
 import Dragsubform from "./Dragsubform";
 import Preview from "@/app/screens/layouts/forms/view/Preview";
 import { CreateFormProps } from "@/typing/tag";
@@ -169,6 +169,17 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
         <GestureHandlerRootView style={[createform.container, { maxHeight: screenHeight }]}>
             <AccessibleView name="container-form" style={[createform.containerL1]}>
 
+                <SegmentedControl
+                    values={["Form", "Tool"]}
+                    selectedIndex={selectedIndex}
+                    onChange={(event) => {
+                        const newIndex = event.nativeEvent.selectedSegmentIndex;
+                        setSelectedIndex(newIndex);
+                    }}
+
+                    style={{ height: 80, marginBottom: 10, borderRadius: 0 }}
+                />
+
                 <FlatList
                     data={[{}]}
                     renderItem={() => selectedIndex === 0 && (
@@ -204,22 +215,10 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                             ))}
                         </AccessibleView>
                     )}
+                    style={{ display: selectedIndex === 0 ? 'flex' : 'none' }}
                     keyExtractor={(_, index) => `${index}`}
-                    style={{ flexShrink: 0 }}
                     contentContainerStyle={{ paddingBottom: 20 }}
-                    ListHeaderComponent={() => (
-                        <>
-                            <SegmentedControl
-                                values={["Form", "Tool"]}
-                                selectedIndex={selectedIndex}
-                                onChange={(event) => {
-                                    const newIndex = event.nativeEvent.selectedSegmentIndex;
-                                    setSelectedIndex(newIndex);
-                                }}
-                                style={{ height: 80, marginBottom: 10, borderRadius: 0 }}
-                            />
-                        </>
-                    )}
+                // ListHeaderComponentStyle={{ , flexGrow: 1 }}
                 />
                 {selectedIndex === 1 && (
                     <Dragsubform navigation={navigation}

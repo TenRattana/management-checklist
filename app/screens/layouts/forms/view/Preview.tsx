@@ -1,9 +1,9 @@
 import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef } from "react";
-import {  View, ViewStyle, FlatList } from "react-native";
+import { View, ViewStyle, FlatList } from "react-native";
 import { Card, Divider, HelperText } from "react-native-paper";
 import { useRes } from "@/app/contexts";
 import { BaseFormState, BaseSubForm } from '@/typing/form';
-import { AccessibleView, Dynamic ,Text} from "@/components";
+import { AccessibleView, Dynamic, Text } from "@/components";
 import useForm from "@/hooks/custom/useForm";
 import { FastField, Formik, FieldProps } from "formik";
 import useMasterdataStyles from "@/styles/common/masterdata";
@@ -78,9 +78,9 @@ const Preview = forwardRef<any, any>((props, ref) => {
                 data={[{}]}
                 renderItem={() => (
                     <>
-                        <Text style={masterdataStyles.title}>{state.FormName || "Content Name"}</Text>
+                        <Text style={[masterdataStyles.title]}>{state.FormName || "Form Name"}</Text>
                         <Divider />
-                        <Text style={masterdataStyles.description}>{state.Description || "Content Description"}</Text>
+                        <Text style={[masterdataStyles.description, { paddingVertical: 10 }]}>{state.Description || "Form Description"}</Text>
 
                         {state.subForms.map((subForm: BaseSubForm, index: number) => (
                             <Formik

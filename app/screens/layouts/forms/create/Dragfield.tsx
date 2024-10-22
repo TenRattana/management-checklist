@@ -83,7 +83,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
                 style={[createformStyles.fieldContainer, isActive && createformStyles.active]}
                 testID={`dg-FD-${item.SFormID}`}
             >
-                <IconButton icon={checkListType.find((v) => v.CTypeID === item.CTypeID)?.Icon ?? "camera"} size={spacing.large + 5} animated />
+                <IconButton icon={checkListType.find((v) => v.CTypeID === item.CTypeID)?.Icon ?? "camera"} style={createformStyles.icon} size={spacing.large + 5} animated />
                 <Text style={[createformStyles.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
                     {item.CListName}
                 </Text>
