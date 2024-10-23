@@ -45,11 +45,7 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
     useCallback(() => {
       console.log("useFocusEffect");
 
-      const pollingInterval = setInterval(() => {
         fetchData();
-      }, 5000);
-
-      return () => clearInterval(pollingInterval);
     }, [fetchData])
   );
 

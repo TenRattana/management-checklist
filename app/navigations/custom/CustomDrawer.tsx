@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { Pressable } from 'react-native';
 import { useAuth } from "@/app/contexts/auth";
+import { useRes } from '@/app/contexts/responsive';
 import { DrawerContentScrollView } from '@react-navigation/drawer';
-import { Text } from '@/components';
+import { AccessibleView, Text } from '@/components';
 import MenuSection from './MenuSection';
 import useMasterdataStyles from "@/styles/common/masterdata";
 
@@ -11,6 +12,7 @@ const CustomDrawerContent = (props: any) => {
     console.log("CustomDrawerContent");
 
     const { navigation } = props;
+    const {fontSize} = useRes()
     const masterdataStyles = useMasterdataStyles()
 
     const [isMenuListOpen, setIsMenuListOpen] = useState<{ machine: boolean; checklist: boolean; match: boolean }>({
@@ -33,7 +35,7 @@ const CustomDrawerContent = (props: any) => {
                         <>
                             <Pressable
                                 onPress={() => navigation.navigate('Home')}
-                                style={masterdataStyles.menuItem}
+                                style={masterdataStyles.menuItemNav}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
                                 <Text style={masterdataStyles.menuText}>Home</Text>
@@ -64,7 +66,7 @@ const CustomDrawerContent = (props: any) => {
 
                             <Pressable
                                 onPress={() => navigation.navigate('Match_checklist_option')}
-                                style={masterdataStyles.menuItem}
+                                style={masterdataStyles.menuItemNav}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
                                 <Text style={masterdataStyles.menuText}>Match Option & Group Check List</Text>
@@ -72,7 +74,7 @@ const CustomDrawerContent = (props: any) => {
 
                             <Pressable
                                 onPress={() => navigation.navigate('Form')}
-                                style={masterdataStyles.menuItem}
+                                style={masterdataStyles.menuItemNav}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
                                 <Text style={masterdataStyles.menuText}>List Form</Text>
@@ -80,7 +82,7 @@ const CustomDrawerContent = (props: any) => {
 
                             <Pressable
                                 onPress={() => navigation.navigate('Match_form_machine')}
-                                style={masterdataStyles.menuItem}
+                                style={masterdataStyles.menuItemNav}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
                                 <Text style={masterdataStyles.menuText}>Match Form & Machine</Text>
@@ -88,7 +90,7 @@ const CustomDrawerContent = (props: any) => {
 
                             <Pressable
                                 onPress={() => navigation.navigate('Expected_result')}
-                                style={masterdataStyles.menuItem}
+                                style={masterdataStyles.menuItemNav}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
                                 <Text style={masterdataStyles.menuText}>List Result</Text>
@@ -96,7 +98,7 @@ const CustomDrawerContent = (props: any) => {
 
                             <Pressable
                                 onPress={() => navigation.navigate('ScanQR')}
-                                style={masterdataStyles.menuItem}
+                                style={masterdataStyles.menuItemNav}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
                                 <Text style={masterdataStyles.menuText}>Scan QR Code</Text>
@@ -104,7 +106,7 @@ const CustomDrawerContent = (props: any) => {
 
                             <Pressable
                                 onPress={() => navigation.navigate('GenerateQR')}
-                                style={masterdataStyles.menuItem}
+                                style={masterdataStyles.menuItemNav}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
                                 <Text style={masterdataStyles.menuText}>Generate QR Code</Text>
@@ -112,7 +114,7 @@ const CustomDrawerContent = (props: any) => {
 
                             <Pressable
                                 onPress={() => navigation.navigate('Setting')}
-                                style={masterdataStyles.menuItem}
+                                style={masterdataStyles.menuItemNav}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
                                 <Text style={masterdataStyles.menuText}>Setting</Text>
@@ -124,7 +126,7 @@ const CustomDrawerContent = (props: any) => {
                         <>
                             <Pressable
                                 onPress={() => navigation.navigate('TestScreen')}
-                                style={masterdataStyles.menuItem}
+                                style={masterdataStyles.menuItemNav}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
                                 <Text style={masterdataStyles.menuText}>Test</Text>
@@ -132,7 +134,7 @@ const CustomDrawerContent = (props: any) => {
 
                             <Pressable
                                 onPress={() => navigation.navigate('Managepermissions')}
-                                style={masterdataStyles.menuItem}
+                                style={masterdataStyles.menuItemNav}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
                                 <Text style={masterdataStyles.menuText}>Managepermissions</Text>
@@ -144,7 +146,7 @@ const CustomDrawerContent = (props: any) => {
                         <>
                             <Pressable
                                 onPress={() => navigation.navigate('Home')}
-                                style={masterdataStyles.menuItem}
+                                style={masterdataStyles.menuItemNav}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
                                 <Text style={masterdataStyles.menuText}>Home</Text>
@@ -152,7 +154,7 @@ const CustomDrawerContent = (props: any) => {
 
                             <Pressable
                                 onPress={() => navigation.navigate('ScanQR')}
-                                style={masterdataStyles.menuItem}
+                                style={masterdataStyles.menuItemNav}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
                                 <Text style={masterdataStyles.menuText}>Scan QR Code</Text>
@@ -160,7 +162,7 @@ const CustomDrawerContent = (props: any) => {
 
                             <Pressable
                                 onPress={() => navigation.navigate('Setting')}
-                                style={masterdataStyles.menuItem}
+                                style={masterdataStyles.menuItemNav}
                                 android_ripple={{ color: '#f0f0f0' }}
                             >
                                 <Text style={masterdataStyles.menuText}>Setting</Text>

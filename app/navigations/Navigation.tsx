@@ -78,6 +78,7 @@ const Navigations = () => {
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       initialRouteName='Home'
+      
     >
       {!loading && screens.length > 0 ? screens.map(screen => (
         <Drawer.Screen

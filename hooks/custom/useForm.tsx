@@ -14,6 +14,7 @@ const useForm = (route: any) => {
     const [checkList, setCheckList] = useState<Checklist[]>([]);
     const [checkListOption, setCheckListOption] = useState<CheckListOption[]>([]);
     const [groupCheckListOption, setGroupCheckListOption] = useState<GroupCheckListOption[]>([]);
+    const [groupCheckListOptionActive, setGroupCheckListOptionActive] = useState<GroupCheckListOption[]>([]);
     const [checkListType, setCheckListType] = useState<CheckListType[]>([]);
     const [dataType, setDataType] = useState<DataType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -25,10 +26,11 @@ const useForm = (route: any) => {
     const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
-            const [checkLists, checkListOptions, groupCheckListOptions, checkListTypes, dataTypes] = await Promise.all([
+            const [checkLists, checkListOptions, groupCheckListOptions, groupCheckListOptionsActive, checkListTypes, dataTypes] = await Promise.all([
                 axiosInstance.post("CheckList_service.asmx/GetCheckLists"),
                 axiosInstance.post("CheckListOption_service.asmx/GetCheckListOptions"),
                 axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions"),
+                axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptionsActive"),
                 axiosInstance.post("CheckListType_service.asmx/GetCheckListTypes"),
                 axiosInstance.post("DataType_service.asmx/GetDataTypes"),
             ]);
@@ -36,6 +38,7 @@ const useForm = (route: any) => {
             setCheckList(prev => prev.length ? prev : checkLists.data?.data ?? []);
             setCheckListOption(prev => prev.length ? prev : checkListOptions.data?.data ?? []);
             setGroupCheckListOption(prev => prev.length ? prev : groupCheckListOptions.data?.data ?? []);
+            setGroupCheckListOptionActive(prev => prev.length ? prev : groupCheckListOptionsActive.data?.data ?? []);
             setCheckListType(prev => prev.length ? prev : checkListTypes.data?.data ?? []);
             setDataType(prev => prev.length ? prev : dataTypes.data?.data ?? []);
         } catch (error) {
@@ -144,7 +147,7 @@ const useForm = (route: any) => {
         setCheckList,
         checkListType,
         setCheckListType,
-        groupCheckListOption,
+        groupCheckListOption: tableId ? groupCheckListOption : groupCheckListOptionActive,
         setGroupCheckListOption,
         isLoading,
         dispatch,

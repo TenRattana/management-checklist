@@ -5,7 +5,7 @@ import { useRes } from "@/app/contexts";
 
 const useMasterdataStyles = () => {
     const colors = useThemeColor();
-    const { responsive, spacing } = useRes();
+    const { responsive, spacing , fontSize } = useRes();
 
     return StyleSheet.create({
         scrollView: {
@@ -101,8 +101,8 @@ const useMasterdataStyles = () => {
             fontSize: spacing.small,
         },
         menuItem: {
-            marginBottom: 10,
-            borderRadius: 8,
+            minHeight:spacing.small + 30,
+            justifyContent:'center',
             overflow: "hidden",
         },
         menuItemText: {
@@ -253,17 +253,18 @@ const useMasterdataStyles = () => {
         menuItemNav: {
             paddingHorizontal: 15,
             paddingVertical: 10,
-            // minHeight: spacing.large,
+            minHeight: fontSize === "small" ? 50 : fontSize === "medium" ? 60 : 75,
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
         },
         menuText: {
             fontSize: spacing.small,
+            padding:10
         },
         subMenuItem: {
             paddingLeft: 40,
-            // minHeight: spacing.large,
+            minHeight: fontSize === "small" ? 50 : fontSize === "medium" ? 60 : 75,
             paddingVertical: 10,
             flexDirection: 'row',
             justifyContent: 'space-between',

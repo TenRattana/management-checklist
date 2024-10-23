@@ -9,8 +9,8 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 
 const MenuSection = ({ title, isOpen, onToggle, items, navigation }: any) => {
     console.log("MenuSection");
-    const { spacing } = useRes();
-    const itemHeight = 68;
+    const { fontSize , spacing } = useRes();
+    const itemHeight = fontSize === "small" ? 50 : fontSize === "medium" ? 60 : 75
     const height = useSharedValue(0);
     const opacity = useSharedValue(0);
     const totalHeight = items.length * itemHeight;
@@ -41,7 +41,7 @@ const MenuSection = ({ title, isOpen, onToggle, items, navigation }: any) => {
         <>
             <Pressable onPress={() => onToggle()} style={masterdataStyles.menuItemNav}>
                 <Text style={masterdataStyles.menuText}>{title}</Text>
-                <IconButton icon={isOpen ? 'chevron-up' : 'chevron-down'} size={20} />
+                <IconButton icon={isOpen ? 'chevron-up' : 'chevron-down'} size={spacing.large} />
             </Pressable>
             <Animated.View style={[animatedStyle]}>
                 {items.map((item: any) => (
