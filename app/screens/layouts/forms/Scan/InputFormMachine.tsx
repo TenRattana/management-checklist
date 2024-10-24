@@ -12,7 +12,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { PreviewProps } from "@/typing/tag";
 import { ScanParams } from "@/typing/tag";
 import { useFocusEffect } from "expo-router";
-import { FastField, FieldProps, Formik } from 'formik';
+import { FastField, Field, FieldProps, Formik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigation } from "expo-router";
 
@@ -157,11 +157,11 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
             .nullable()
             .typeError(`The ${field.CListName} field must be a valid number`);
 
-          if (field.MinLength !== undefined) {
+          if (field.MinLength !== undefined && (field.MinLength !== null)) {
             validator = validator.min(field.MinLength, `The ${field.CListName} minimum value is ${field.MinLength}`);
           }
 
-          if (field.MaxLength !== undefined) {
+          if (field.MaxLength !== undefined && (field.MaxLength !== null)) {
             validator = validator.max(field.MaxLength, `The ${field.CListName} maximum value is ${field.MaxLength}`);
           }
 
@@ -218,116 +218,112 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
     <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { maxHeight: screenHeight }]}>
       {!isSubmitted ? (
         <>
-
           <Formik
             initialValues={formValues}
             validationSchema={validationSchema}
+            validateOnBlur={true}
+            validateOnChange={false}
             onSubmit={(value) => onFormSubmit(value)}
           >
-            {({ handleSubmit, isValid, dirty, errors, touched, setFieldValue, setTouched, values }) => (
-              <>
-                <FlatList
-                  data={state.subForms}
-                  renderItem={({ item, index }) => (
-                    <AccessibleView name="input-form-machine" key={`SFormID-${item.SFormID}`}>
-                      <Card style={masterdataStyles.card}>
-                        <Card.Title title={item.SFormName} titleStyle={masterdataStyles.cardTitle} />
-                        <Card.Content style={masterdataStyles.subFormContainer}>
-                          {item.Fields.map((fields: BaseFormState, fieldIndex: number) => {
+            {({ handleSubmit, isValid, dirty, errors, touched, setFieldValue, setTouched, values }) => {
 
-                            const columns = item.Columns ?? 1;
 
-                            const containerStyle: ViewStyle = {
-                              width: responsive === "small" ? "100%" : `${98 / columns}%`,
-                              flexGrow: fields.DisplayOrder || 1,
-                              padding: 5,
-                            };
+              const handleBlur = useCallback((fields: BaseFormState, field: any) => {
+                const type = dataType.find(v => v.DTypeID === fields.DTypeID)?.DTypeName;
 
-                            return (
-                              <FastField name={fields.MCListID} key={`SFormID-${item.SFormID}-fastfield-${fieldIndex}`}>
-                                {({ field: fastFieldProps }: FieldProps) => {
-                                  const type = dataType.find(v => v.DTypeID === fields.DTypeID)?.DTypeName;
+                if (type === "Number") {
+                  const numericValue = Number(field.value);
+                  if (!isNaN(numericValue) && Number(fields.DTypeValue) > 0 && numericValue) {
+                    const formattedValue = numericValue.toFixed(Number(fields.DTypeValue));
+                    setFieldValue(field.name, formattedValue);
+                  } else {
+                    setFieldValue(field.name, field.value);
+                  }
+                }
+                setTouched({
+                  ...touched,
+                  [field.name]: true,
+                });
 
-                                  const handleBlur = () => {
-                                    if (type === "Number") {
-                                      const numericValue = Number(fastFieldProps.value);
+              }, []);
 
-                                      if (!isNaN(numericValue) && Number(fields.DTypeValue) > 0 && numericValue) {
-                                        const formattedValue = numericValue.toFixed(Number(fields.DTypeValue));
-                                        setFieldValue(fastFieldProps.name, formattedValue);
-                                        setTouched({
-                                          ...touched,
-                                          [fastFieldProps.name]: true,
-                                        });
-                                      } else if (isNaN(numericValue)) {
-                                        setFieldValue(fastFieldProps.name, fastFieldProps.value);
-                                        setTouched({
-                                          ...touched,
-                                          [fastFieldProps.name]: true,
-                                        });
-                                      }
-                                    }
-                                  };
+              return (
+                <>
+                  <FlatList
+                    data={state.subForms}
+                    renderItem={({ item, index }) => (
+                      <AccessibleView name="input-form-machine" key={`SFormID-${item.SFormID}`}>
+                        <Card style={masterdataStyles.card}>
+                          <Card.Title title={item.SFormName} titleStyle={masterdataStyles.cardTitle} />
+                          <Card.Content style={masterdataStyles.subFormContainer}>
+                            {item.Fields.map((fields: BaseFormState, fieldIndex: number) => {
+                              const columns = item.Columns ?? 1;
 
-                                  return (
-                                    <AccessibleView name="container-layout2" key={`fastfield-${fields.CListID}-field-${fieldIndex}-${item.SFormID}`} style={containerStyle}>
-                                      <Dynamic
-                                        field={fields}
-                                        values={fastFieldProps.value ?? ""}
-                                        handleChange={(fieldname: string, value: any) => {
-                                          setFieldValue(fastFieldProps.name, value);
-                                          setTimeout(() => {
-                                            setTouched({
-                                              ...touched,
-                                              [fastFieldProps.name]: true,
-                                            });
-                                          }, 0);
-                                        }}
-                                        handleBlur={handleBlur}
-                                        groupCheckListOption={groupCheckListOption}
-                                        error={touched[fastFieldProps.name] && Boolean(errors[fastFieldProps.name])}
-                                        errorMessage={errors[fastFieldProps.name] as string}
-                                      />
-                                    </AccessibleView>
-                                  );
-                                }}
-                              </FastField>
+                              const containerStyle: ViewStyle = {
+                                width: responsive === "small" ? "100%" : `${98 / columns}%`,
+                                flexGrow: fields.DisplayOrder || 1,
+                                padding: 5,
+                              };
 
-                            );
-                          })}
-                        </Card.Content>
-                      </Card>
-                    </AccessibleView>
-                  )}
-                  keyExtractor={(item) => item.SFormID.toString()}
-                  nestedScrollEnabled={true}
-                  ListHeaderComponent={() => (
-                    <>
-                      <Text style={[masterdataStyles.title]}>{state.FormName || "Form Name"}</Text>
-                      <Divider />
-                      <Text style={[masterdataStyles.description]}>{state.Description || "Form Description"}</Text>
-                    </>
-                  )}
-                  ListFooterComponentStyle={{ alignItems: 'center', width: "100%" }}
-                  ListFooterComponent={() => (
-                    <AccessibleView name="form-action-scan" style={[masterdataStyles.containerAction]}>
-                      <Pressable
-                        onPress={() => {
-                          handleSubmit();
-                        }}
-                        style={[
-                          masterdataStyles.button,
-                          masterdataStyles.backMain,
-                        ]}
-                      >
-                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>บันทึก</Text>
-                      </Pressable>
-                    </AccessibleView>
-                  )}
-                />
-              </>
-            )}
+                              return (
+                                <Text>A</Text>
+                                // <FastField name={fields.MCListID} key={`SFormID-${item.SFormID}-fastfield-${fieldIndex}`}>
+                                //   {({ field, form }: FieldProps) => {
+                                // return (
+                                // <AccessibleView name="container-layout2" key={`fastfield-${fields.CListID}-field-${fieldIndex}-${item.SFormID}`} style={containerStyle}>
+                                //   <Dynamic
+                                //     field={fields}
+                                //     values={values[] ?? ""}
+                                //     handleChange={(fieldname: string, value: any) => {
+                                //       setFieldValue(fieldname, value);
+                                //     }}
+                                //     handleBlur={handleBlur}
+                                //     groupCheckListOption={groupCheckListOption}
+                                //     error={form.touched[field.name] && Boolean(form.errors[field.name])}
+                                //     errorMessage={form.errors[field.name] as string}
+                                //   />
+                                // </AccessibleView>
+                                // );
+                                //   }}
+                                // </FastField>
+                              );
+                            })}
+                          </Card.Content>
+                        </Card>
+                      </AccessibleView>
+                    )}
+                    keyExtractor={(item) => item.SFormID.toString()}
+                    nestedScrollEnabled={true}
+                    ListHeaderComponent={() => (
+                      <>
+                        <Text style={[masterdataStyles.title]}>{state.FormName || "Form Name"}</Text>
+                        <Divider />
+                        <Text style={[masterdataStyles.description]}>{state.Description || "Form Description"}</Text>
+                      </>
+                    )}
+                    ListFooterComponentStyle={{ alignItems: 'center', width: "100%" }}
+                    ListFooterComponent={() => (
+                      <AccessibleView name="form-action-scan" style={[masterdataStyles.containerAction]}>
+                        <Pressable
+                          onPress={() => {
+                            handleSubmit();
+                          }}
+                          style={[
+                            masterdataStyles.button,
+                            masterdataStyles.backMain,
+                          ]}
+                        >
+                          <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>บันทึก</Text>
+                        </Pressable>
+                      </AccessibleView>
+                    )}
+                  />
+                </>
+              )
+            }}
           </Formik>
+
+
         </>
       ) : (
         <AccessibleView name="form-success" style={masterdataStyles.containerScccess}>
@@ -347,3 +343,114 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
 };
 
 export default InputFormMachine;
+
+
+{/* <Formik
+  initialValues={formValues}
+  validationSchema={validationSchema}
+  onSubmit={(value) => onFormSubmit(value)}
+>
+  {({ handleSubmit, isValid, dirty, errors, touched, setFieldValue, setTouched, values }) => (
+    <>
+      <FlatList
+        data={state.subForms}
+        renderItem={({ item, index }) => (
+          <AccessibleView name="input-form-machine" key={`SFormID-${item.SFormID}`}>
+            <Card style={masterdataStyles.card}>
+              <Card.Title title={item.SFormName} titleStyle={masterdataStyles.cardTitle} />
+              <Card.Content style={masterdataStyles.subFormContainer}>
+                {item.Fields.map((fields: BaseFormState, fieldIndex: number) => {
+
+                  const columns = item.Columns ?? 1;
+
+                  const containerStyle: ViewStyle = {
+                    width: responsive === "small" ? "100%" : `${98 / columns}%`,
+                    flexGrow: fields.DisplayOrder || 1,
+                    padding: 5,
+                  };
+
+                  return (
+                    <FastField name={fields.MCListID} key={`SFormID-${item.SFormID}-fastfield-${fieldIndex}`}>
+                      {({ field: fastFieldProps }: FieldProps) => {
+                        const type = dataType.find(v => v.DTypeID === fields.DTypeID)?.DTypeName;
+
+                        const handleBlur = () => {
+                          if (type === "Number") {
+                            const numericValue = Number(fastFieldProps.value);
+
+                            if (!isNaN(numericValue) && Number(fields.DTypeValue) > 0 && numericValue) {
+                              const formattedValue = numericValue.toFixed(Number(fields.DTypeValue));
+                              setFieldValue(fastFieldProps.name, formattedValue);
+                              setTouched({
+                                ...touched,
+                                [fastFieldProps.name]: true,
+                              });
+                            } else if (isNaN(numericValue)) {
+                              setFieldValue(fastFieldProps.name, fastFieldProps.value);
+                              setTouched({
+                                ...touched,
+                                [fastFieldProps.name]: true,
+                              });
+                            }
+                          }
+                        };
+
+                        return (
+                          <AccessibleView name="container-layout2" key={`fastfield-${fields.CListID}-field-${fieldIndex}-${item.SFormID}`} style={containerStyle}>
+                            <Dynamic
+                              field={fields}
+                              values={fastFieldProps.value ?? ""}
+                              handleChange={(fieldname: string, value: any) => {
+                                setFieldValue(fastFieldProps.name, value);
+                                setTimeout(() => {
+                                  setTouched({
+                                    ...touched,
+                                    [fastFieldProps.name]: true,
+                                  });
+                                }, 0);
+                              }}
+                              handleBlur={handleBlur}
+                              groupCheckListOption={groupCheckListOption}
+                              error={touched[fastFieldProps.name] && Boolean(errors[fastFieldProps.name])}
+                              errorMessage={errors[fastFieldProps.name] as string}
+                            />
+                          </AccessibleView>
+                        );
+                      }}
+                    </FastField>
+
+                  );
+                })}
+              </Card.Content>
+            </Card>
+          </AccessibleView>
+        )}
+        keyExtractor={(item) => item.SFormID.toString()}
+        nestedScrollEnabled={true}
+        ListHeaderComponent={() => (
+          <>
+            <Text style={[masterdataStyles.title]}>{state.FormName || "Form Name"}</Text>
+            <Divider />
+            <Text style={[masterdataStyles.description]}>{state.Description || "Form Description"}</Text>
+          </>
+        )}
+        ListFooterComponentStyle={{ alignItems: 'center', width: "100%" }}
+        ListFooterComponent={() => (
+          <AccessibleView name="form-action-scan" style={[masterdataStyles.containerAction]}>
+            <Pressable
+              onPress={() => {
+                handleSubmit();
+              }}
+              style={[
+                masterdataStyles.button,
+                masterdataStyles.backMain,
+              ]}
+            >
+              <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>บันทึก</Text>
+            </Pressable>
+          </AccessibleView>
+        )}
+      />
+    </>
+  )}
+</Formik> */}

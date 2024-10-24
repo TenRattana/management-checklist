@@ -1,13 +1,10 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Selects, Radios, Textareas, Inputs, Checkboxs } from "@/components/common";
 import { CheckListOption } from '@/typing/type';
 import AccessibleView from "../AccessibleView";
 import { DynamicFormProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
-import { HelperText } from "react-native-paper";
-import { View } from "react-native";
-import { useRes } from "@/app/contexts";
 
 const DynamicForm = React.memo(({
   field,
@@ -18,24 +15,24 @@ const DynamicForm = React.memo(({
   error,
   errorMessage
 }: DynamicFormProps) => {
-  const { CTypeName, Placeholder, Hint, CListName, MCListID, GCLOptionID } = field;
-  const masterdataStyles = useMasterdataStyles()
-  const option = groupCheckListOption
-    .filter(option => option.GCLOptionID === GCLOptionID)
-    .flatMap(v =>
-      v.CheckListOptions?.map((item: CheckListOption) => ({
+  const { CTypeName, Hint, CListName, MCListID, GCLOptionID } = field;
+  const masterdataStyles = useMasterdataStyles();
+
+  const option = useMemo(() =>
+    groupCheckListOption
+      .filter(option => option.GCLOptionID === GCLOptionID)
+      .flatMap(v => v.CheckListOptions?.map((item: CheckListOption) => ({
         label: item.CLOptionName,
         value: item.CLOptionID,
-      })) || []
-    );
-  console.log("DynamicForm");
+      })) || []),
+    [groupCheckListOption, GCLOptionID]
+  );
 
   const renderField = () => {
     switch (CTypeName) {
       case "Textinput":
         return (
           <Inputs
-            // placeholder={Placeholder}
             hint={Hint}
             mode={"outlined"}
             label={CListName}
@@ -48,13 +45,12 @@ const DynamicForm = React.memo(({
       case "Textarea":
         return (
           <Textareas
-            // placeholder={Placeholder}
             hint={Hint}
             mode={"outlined"}
             label={CListName}
             value={values}
             handleChange={(v) => handleChange(MCListID, v)}
-            // handleBlur={handleBlur}
+            handleBlur={handleBlur}
             testId={`inputarea-${MCListID}`}
           />
         );
@@ -64,7 +60,7 @@ const DynamicForm = React.memo(({
             option={option}
             hint={Hint}
             handleChange={(v) => handleChange(MCListID, v)}
-            // handleBlur={handleBlur}
+            handleBlur={handleBlur}
             value={values}
             testId={`radio-${MCListID}`}
           />
@@ -75,7 +71,7 @@ const DynamicForm = React.memo(({
             option={option}
             hint={Hint}
             handleChange={(v) => handleChange(MCListID, v)}
-            // handleBlur={handleBlur}
+            handleBlur={handleBlur}
             value={values}
             testId={`dropdown-${MCListID}`}
           />
@@ -86,7 +82,7 @@ const DynamicForm = React.memo(({
             option={option}
             hint={Hint}
             handleChange={(v) => handleChange(MCListID, v)}
-            // handleBlur={handleBlur}
+            handleBlur={handleBlur}
             value={values}
             testId={`checkbox-${MCListID}`}
           />
@@ -96,23 +92,13 @@ const DynamicForm = React.memo(({
     }
   };
 
-  // console.log(errorMessage);
-  // console.log(error);
   return (
-    <AccessibleView name="form-layout2" style={{
-      flex: 1,
-    }}>
+    <AccessibleView name="form-layout2" style={{ flex: 1 }}>
       <Text style={[masterdataStyles.text, CTypeName === "Text" ? { justifyContent: 'flex-start', alignItems: 'center', marginVertical: 'auto' } : {}]}>{CListName}</Text>
       {renderField()}
-
-      {/* <HelperText
-        type="error"
-        visible={!!errorMessage}
-        style={[masterdataStyles.text, masterdataStyles.textError, { opacity: 1, marginTop: !!errorMessage ? spacing.small - 10 : 0, display: !!errorMessage ? 'flex' : 'none' }]}
-      > */}
-      <Text style={[masterdataStyles.text, masterdataStyles.textError, { display: !!errorMessage ? 'flex' : 'none' }]}>{errorMessage}</Text>
-      {/* </HelperText> */}
-
+      {errorMessage && (
+        <Text style={[masterdataStyles.text, masterdataStyles.textError]}>{errorMessage}</Text>
+      )}
     </AccessibleView>
   );
 });

@@ -45,25 +45,25 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
     useCallback(() => {
       console.log("useFocusEffect");
 
-        fetchData();
+      fetchData();
     }, [fetchData])
   );
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (global.performance && global.performance.memory) {
-        const memoryUsage = global.performance.memory;
-        console.log(`Memory Usage:
-                Total JS Heap Size: ${memoryUsage.totalJSHeapSize / 1024 / 1024} MB,
-                Used JS Heap Size: ${memoryUsage.usedJSHeapSize / 1024 / 1024} MB,
-                JS Heap Size Limit: ${memoryUsage.jsHeapSizeLimit / 1024 / 1024} MB`);
-      } else {
-        console.warn('Memory usage information is not available. Consider using alternative monitoring tools.');
-      }
-    }, 1000);
+  // useEffect(() => {
+  //   const intervalId = setInterval(() => {
+  //     if (global.performance && global.performance.memory) {
+  //       const memoryUsage = global.performance.memory;
+  //       console.log(`Memory Usage:
+  //               Total JS Heap Size: ${memoryUsage.totalJSHeapSize / 1024 / 1024} MB,
+  //               Used JS Heap Size: ${memoryUsage.usedJSHeapSize / 1024 / 1024} MB,
+  //               JS Heap Size Limit: ${memoryUsage.jsHeapSizeLimit / 1024 / 1024} MB`);
+  //     } else {
+  //       console.warn('Memory usage information is not available. Consider using alternative monitoring tools.');
+  //     }
+  //   }, 1000);
 
-    return () => clearInterval(intervalId);
-  }, []);
+  //   return () => clearInterval(intervalId);
+  // }, []);
 
   const tableData = useMemo(() => {
     console.log("tableData");

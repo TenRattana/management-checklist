@@ -164,6 +164,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
         return Yup.object().shape(shape);
     }, [state.subForms, dataType, checkListType]);
 
+    console.log(state);
 
     return (
         <GestureHandlerRootView style={[createform.container, { maxHeight: screenHeight }]}>
