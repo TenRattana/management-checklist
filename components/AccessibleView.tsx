@@ -14,7 +14,7 @@ const AccessibleView = ({ children, name, style }: AccessibleViewProps) => {
 
   return (
     <View
-      style={[style, { backgroundColor: theme.background , color:theme.color }]} 
+      style={[style, { backgroundColor: theme.colors.background }]} 
       accessibilityLabel={name}
       aria-live="polite"
       accessible={Platform.OS !== "web"}
@@ -25,12 +25,12 @@ const AccessibleView = ({ children, name, style }: AccessibleViewProps) => {
   );
 };
 
-const MemoizedAccessibleView = memo(AccessibleView);
-
-MemoizedAccessibleView.propTypes = {
+AccessibleView.propTypes = {
   children: PropTypes.node.isRequired,
   name: PropTypes.string.isRequired,
   style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
 };
+
+const MemoizedAccessibleView = React.memo(AccessibleView);
 
 export default MemoizedAccessibleView;

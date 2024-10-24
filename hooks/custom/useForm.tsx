@@ -20,7 +20,7 @@ const useForm = (route: any) => {
     const [isLoading, setIsLoading] = useState(false);
     const [found, setFound] = useState<boolean>(false);
     const [expectedResult, setExpectedResult] = useState<{ [key: string]: any }>({});
-    const { formId, action, tableId } = route.params || {};
+    const { formId, action, tableId ,machineId } = route.params || {};
     const { handleError } = useToast();
 
     const fetchData = useCallback(async () => {
@@ -48,13 +48,27 @@ const useForm = (route: any) => {
         }
     }, [handleError]);
 
-    const fetchForm = useCallback(async (formId: string) => {
+    const fetchForm = useCallback(async (formId: string , mode:boolean = false) => {
         if (!formId) return null;
+       
         try {
-            const response = await axiosInstance.post("Form_service.asmx/GetForm", { FormID: formId });
-            return response.data?.data[0] || null;
+            let response;
+
+            if (mode) {
+                response = await axiosInstance.post("Form_service.asmx/ScanForm", { MachineID: formId });
+            } else {
+                response = await axiosInstance.post("Form_service.asmx/GetForm", { FormID: formId });
+            }
+        
+            const status = response?.data?.status;
+            const data = response?.data?.data?.[0] || null;
+        
+            setFound(status); 
+
+            return data; 
         } catch (error) {
             handleError(error);
+            setFound(false);
             return null;
         }
     }, [handleError]);
@@ -80,7 +94,21 @@ const useForm = (route: any) => {
         }
     }, [fetchForm, checkList, checkListType, dispatch]);
 
-    const createSubFormsAndFields = useCallback((formData: FormData, expectedResult: { [key: string]: any }) => {
+    const loadFormMachine = useCallback(async (machineId: string) => {
+        const formData = await fetchForm(machineId , true);
+        if (formData) {
+          setFound(true);
+    
+          const { subForms, fields } = createSubFormsAndFields(formData);
+          dispatch(setForm({ form: formData }));
+          dispatch(setSubForm({ subForms }));
+          dispatch(setField({ BaseFormState: fields, checkList, checkListType }));
+        } else {
+          setFound(false);
+        }
+      }, [fetchForm, checkList, checkListType, dispatch]);
+
+    const createSubFormsAndFields = useCallback((formData: FormData, expectedResult?: { [key: string]: any }) => {
         const subForms: SubForm[] = [];
         const fields: BaseFormState[] = [];
 
@@ -130,10 +158,16 @@ const useForm = (route: any) => {
 
     useFocusEffect(
         useCallback(() => {
-            if (dataType.length && formId) {
-                loadForm(formId, tableId);
+            if (dataType.length) {
+                if (formId && !machineId) {
+                    loadForm(formId, tableId);
+                }
+            
+                if (machineId) {
+                    loadFormMachine(machineId);
+                }
             }
-        }, [formId, dataType.length, loadForm, tableId])
+        }, [formId, dataType.length, loadForm, tableId,machineId])
     );
 
     return {
@@ -147,7 +181,7 @@ const useForm = (route: any) => {
         setCheckList,
         checkListType,
         setCheckListType,
-        groupCheckListOption: tableId ? groupCheckListOption : groupCheckListOptionActive,
+        groupCheckListOption: tableId || machineId ? groupCheckListOption : groupCheckListOptionActive,
         setGroupCheckListOption,
         isLoading,
         dispatch,

@@ -18,6 +18,7 @@ const SearchBar = ({ value, onChange, placeholder, testId }: SeractBarProps) => 
       value={value}
       onChangeText={onChange}
       style={masterdataStyles.searchbar}
+      inputStyle={masterdataStyles.text}
       iconColor="#007AFF"
       placeholderTextColor="#a0a0a0"
       testID={testId}

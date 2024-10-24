@@ -1,11 +1,11 @@
 import { StyleSheet } from "react-native";
-import { useThemeColor } from "@/hooks/useThemeColor";
 import { useRes } from "@/app/contexts";
+import { useTheme } from "@/app/contexts";
 
 
 const useMasterdataStyles = () => {
-    const colors = useThemeColor();
-    const { responsive, spacing , fontSize } = useRes();
+    const { responsive, spacing, fontSize } = useRes();
+    const { theme } = useTheme();
 
     return StyleSheet.create({
         scrollView: {
@@ -13,7 +13,7 @@ const useMasterdataStyles = () => {
         },
         text: {
             fontSize: spacing.small,
-            color: colors.text,
+            color: theme.colors.onBackground,
         },
         textItalic: {
             fontStyle: "italic",
@@ -22,16 +22,16 @@ const useMasterdataStyles = () => {
             fontWeight: "bold",
         },
         textMain: {
-            color: colors.main,
+            color: theme.colors.onPrimary,
         },
         textLight: {
-            color: colors.light,
+            color: theme.colors.background,
         },
         textDark: {
-            color: colors.dark,
+            color: theme.colors.onBackground,
         },
         textError: {
-            color: colors.danger,
+            color: theme.colors.error,
         },
         button: {
             width: `${responsive === "small" ? 98 : responsive === "medium" ? 40 : 30}%`,
@@ -43,13 +43,13 @@ const useMasterdataStyles = () => {
             borderRadius: 8,
         },
         backMain: {
-            backgroundColor: colors.main,
+            backgroundColor: theme.colors.primary,
         },
         backLight: {
-            backgroundColor: colors.palette.light,
+            backgroundColor: theme.colors.background,
         },
         backDis: {
-            backgroundColor: colors.disable,
+            backgroundColor: theme.colors.onSecondary,
         },
         containerDialog: {
             width:
@@ -62,12 +62,11 @@ const useMasterdataStyles = () => {
         },
         buttonCreate: {
             borderRadius: 8,
-            marginVertical: 20,
             marginLeft: responsive === "small" ? "5%" : 30,
             minWidth: responsive === "small" ? "90%" : 200,
-            height: 45,
-            justifyContent: 'center',
-            alignItems: 'center'
+            minHeight: 45,
+            padding:15,
+            alignSelf:'center'
         },
         containerSwitch: {
             flexDirection: "row",
@@ -89,20 +88,21 @@ const useMasterdataStyles = () => {
             marginVertical: 12,
         },
         containerSearch: {
+            flex:1,
             flexDirection: 'row',
             flexWrap: 'wrap'
         },
         searchbar: {
             width: responsive === "small" ? "90%" : 400,
-            marginVertical: 10,
+            marginVertical: spacing.small,
             marginHorizontal: responsive === "small" ? '5%' : 30,
             borderRadius: 10,
             elevation: 4,
             fontSize: spacing.small,
         },
         menuItem: {
-            minHeight:spacing.small + 30,
-            justifyContent:'center',
+            minHeight: spacing.small + 30,
+            justifyContent: 'center',
             overflow: "hidden",
         },
         menuItemText: {
@@ -156,7 +156,7 @@ const useMasterdataStyles = () => {
         },
         hint: {
             fontSize: spacing.small - 2,
-            color: colors.danger,
+            color: theme.colors.error,
             marginTop: 5,
             paddingLeft: 5
         },
@@ -243,7 +243,7 @@ const useMasterdataStyles = () => {
             justifyContent: 'center',
             alignItems: 'center',
             borderRadius: 8,
-            backgroundColor: colors.light,
+            backgroundColor: theme.colors.background,
             marginTop: 8,
             marginRight: 12,
             paddingHorizontal: 20,
@@ -260,7 +260,7 @@ const useMasterdataStyles = () => {
         },
         menuText: {
             fontSize: spacing.small,
-            padding:10
+            padding: 10
         },
         subMenuItem: {
             paddingLeft: 40,

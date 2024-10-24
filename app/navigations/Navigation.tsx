@@ -1,11 +1,13 @@
 import React, { useState, lazy, Suspense, useRef, useCallback, useEffect } from 'react';
-import { ActivityIndicator, View, Text } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { HomeScreen, LoginScreen, AdminScreen, SuperAdminScreen, ScanQR, GenerateQR, UserScreen, SettingScreen, Managepermissions } from '@/app/screens';
 import NotFoundScreen from '@/app/+not-found';
 import { useAuth } from "@/app/contexts/auth";
+import { useRes } from "@/app/contexts/responsive";
 import CustomDrawerContent from './custom/CustomDrawer';
 import axiosInstance from '@/config/axios';
+import { Text, AccessibleView } from '@/components';
 
 const Drawer = createDrawerNavigator();
 
@@ -37,8 +39,12 @@ const components: Record<ComponentNames, () => Promise<{ default: React.Componen
 
 const Navigations = () => {
   const { loading, screens, session } = useAuth();
+  const { fontSize } = useRes();
+
   const [loadedComponents, setLoadedComponents] = useState<Set<string>>(new Set());
   const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
+
+  const drawerWidth = fontSize === "small" ? 300 : fontSize === "medium" ? 350 : 400;
 
   useEffect(() => {
     const interceptor = axiosInstance.interceptors.request.use(config => {
@@ -67,18 +73,22 @@ const Navigations = () => {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <AccessibleView name="nav" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color="#0000ff" />
         <Text>Loading...</Text>
-      </View>
+      </AccessibleView>
     );
   }
 
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
+      screenOptions={{
+        drawerStyle: {
+          width: drawerWidth,
+        },
+      }}
       initialRouteName='Home'
-      
     >
       {!loading && screens.length > 0 ? screens.map(screen => (
         <Drawer.Screen

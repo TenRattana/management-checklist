@@ -1,5 +1,6 @@
 import React, { useRef, useMemo, useState, useEffect, useCallback } from "react";
 import { Pressable, Animated, ScrollView, FlatList, Dimensions, Platform } from "react-native";
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { DataTable, IconButton } from "react-native-paper";
 import Dialogs from "@/components/common/Dialogs";
 import { useThemeColor } from "@/hooks/useThemeColor";
@@ -12,8 +13,6 @@ import useCustomtableStyles from "@/styles/customtable";
 import { savePaginate, loadPaginate } from '@/app/services/storage';
 
 type justifyContent = 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly' | undefined;
-
-const { height: screenHeight } = Dimensions.get('window');
 
 const CustomTable = ({
   Tabledata,
@@ -154,7 +153,7 @@ const CustomTable = ({
         </Pressable>
       );
     }
-    return <Text key={`cell-content-${cellIndex}`} style={[masterdataStyles.text, masterdataStyles.textDark]}>{cell}</Text>;
+    return <Text key={`cell-content-${cellIndex}`}>{cell as string}</Text>;
   }, [setDialogAction, setDialogTitle, setDialogData, setDialogMessage, setIsVisible]);
 
 
@@ -250,7 +249,7 @@ const CustomTable = ({
       <AccessibleView name={`row-${rowIndex}`} key={`row-${rowIndex}`} style={[customtable.cardRow, { alignItems: 'flex-start' }]}>
         {Tablehead.map((header, colIndex) => (
           <AccessibleView name={`header-${rowIndex}-${colIndex}`} key={`header-${rowIndex}-${colIndex}`}>
-            <Text style={[masterdataStyles.text, masterdataStyles.textError, { marginVertical: 5 }]}>
+            <Text style={{ marginVertical: 5 }}>
               {header.label}
             </Text>
             {actionIndex.map((actionItem) => {
@@ -330,7 +329,7 @@ const CustomTable = ({
     <AccessibleView name="customtable">
       {responsive === "small" ?
         filteredData && filteredData.length === 0 ? (
-          <Text style={[masterdataStyles.text, { textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }]}>No data found...</Text>
+          <Text style={{ textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }}>No data found...</Text>
         ) : (
           currentData.map((rowData, rowIndex) => (
             renderSmallRes(rowData, rowIndex)
@@ -346,7 +345,7 @@ const CustomTable = ({
                   style={{ justifyContent: header.align as justifyContent, flex: flexArr[index] || 1, marginVertical: spacing.small - 10 }}
                   textStyle={[masterdataStyles.text]}
                 >
-                  {header.label}
+                  <Text style={masterdataStyles.title}>{header.label}</Text>
                 </DataTable.Title>
               ))}
             </DataTable.Header>
@@ -356,11 +355,11 @@ const CustomTable = ({
               renderItem={({ item, index }) => renderTableData(item, index)}
               keyExtractor={(item, index) => `row-${index}`}
               ListEmptyComponent={() => (
-                <Text style={[masterdataStyles.text, { textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }]}>
+                <Text style={{ textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }}>
                   No data found...
                 </Text>
               )}
-              style={{ maxHeight: screenHeight * (Platform.OS === "web" ? (fontSize === "small" ? 0.51 : fontSize === "medium" ? 0.47 : 0.44) + 0.05 : (fontSize === "small" ? 0.51 : fontSize === "medium" ? 0.47 : 0.44)) }}
+              style={{ maxHeight: hp(fontSize === "small" ? '55%' : fontSize === "medium" ? '52%' : '45%') }}
             />
 
             <DataTable.Pagination
@@ -371,7 +370,10 @@ const CustomTable = ({
               label={`Page ${page + 1} of ${Math.ceil(filteredData.length / itemsPerPage)}`}
               numberOfItemsPerPage={itemsPerPage}
               numberOfItemsPerPageList={numberOfItemsPerPageList}
-              onItemsPerPageChange={onItemsPerPageChange}
+              onItemsPerPageChange={(value) => {
+                onItemsPerPageChange(value);
+                savePaginate({ paginate: value });
+              }}
               showFastPaginationControls
               selectPageDropdownLabel={"Rows per page"}
             />

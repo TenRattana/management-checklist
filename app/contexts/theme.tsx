@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useMemo } from 'react';
-import { dark, light } from '@/constants/CustomColor';
+import { MD3DarkTheme, MD3LightTheme, PaperProvider } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ThemeContextProps {
-  theme: typeof dark | typeof light;
+  theme: typeof MD3DarkTheme | typeof MD3LightTheme;
   setDarkMode: (value: boolean) => void;
   darkMode: boolean;
 }
@@ -16,19 +16,17 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const loadSettings = async () => {
       const storedDarkMode = await AsyncStorage.getItem('darkMode');
-
       setDarkMode(storedDarkMode === "darkMode");
     };
-
     loadSettings();
-  }, [setDarkMode, AsyncStorage]);
+  }, []);
 
   const handleDarkModeChange = async (value: boolean) => {
     setDarkMode(value);
     await AsyncStorage.setItem('darkMode', value ? "darkMode" : "");
   };
 
-  const theme = darkMode ? dark : light;
+  const theme = darkMode ? MD3DarkTheme : MD3LightTheme;
 
   const value = useMemo(
     () => ({
@@ -36,12 +34,14 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       darkMode,
       setDarkMode: handleDarkModeChange
     }),
-    [darkMode, setDarkMode]
+    [darkMode]
   );
 
   return (
     <ThemeContext.Provider value={value}>
-      {children}
+      <PaperProvider theme={theme}>
+        {children}
+      </PaperProvider>
     </ThemeContext.Provider>
   );
 };

@@ -1,30 +1,48 @@
 import React from 'react';
-import { Text as DefaultText, StyleSheet, TextProps as DefaultTextProps } from 'react-native';
+import { Text as DefaultText, TextProps as DefaultTextProps } from 'react-native';
+import { useTheme } from '@/app/contexts';
+import { useRes } from '@/app/contexts';
+import PropTypes from 'prop-types';
 
 interface CustomTextProps extends DefaultTextProps {
   style?: any;
-  children?: string;
+  children?: string | string[] | null; 
 }
 
 const isThai = (text: string): boolean => {
-  const thaiCharRange = /[\u0E00-\u0E7F]/;  
+  const thaiCharRange = /[\u0E00-\u0E7F]/;
   return thaiCharRange.test(text);
 };
 
 const Text: React.FC<CustomTextProps> = ({ style, children, ...props }) => {
-  const fontFamily = isThai(children ?? "") ? 'Sarabun' : 'Poppins'; 
+  const { theme } = useTheme();
+  const { spacing } = useRes();
+
+  const textArray = Array.isArray(children) ? children : [children];
 
   return (
-    <DefaultText style={[styles.text, { fontFamily }, style]} {...props}>
-      {children}
-    </DefaultText>
+    <>
+      {textArray.map((child, index) => {
+        if (child === null || child === undefined) return null; 
+        const fontFamily = isThai(child) ? 'Sarabun' : 'Poppins';
+
+        return (
+          <DefaultText
+            key={index}
+            style={[{ fontFamily }, style, { fontSize: spacing.small, color: theme.colors.onBackground }]}
+            {...props}
+          >
+            {child}
+          </DefaultText>
+        );
+      })}
+    </>
   );
 };
 
-export default React.memo(Text)
+Text.propTypes = {
+  style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+  children: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.any]),
+};
 
-const styles = StyleSheet.create({
-  text: {
-    fontSize: 16, 
-  },
-});
+export default React.memo(Text);

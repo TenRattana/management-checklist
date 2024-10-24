@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { PaperProvider } from "react-native-paper";
+import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 import Navigation from "@/app/navigations/Navigation";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Provider } from "react-redux";
 import { store } from "@/stores";
 import { AuthProvider } from "@/app/contexts/auth";
-import { ToastProvider, ResponsiveProvider, ThemeProvider } from "@/app/contexts";
+import { ToastProvider, ResponsiveProvider, useTheme, ThemeProvider } from "@/app/contexts";
 import * as Font from "expo-font";
 import { ActivityIndicator } from "react-native";
 
 const App = () => {
-  console.log("App");
   const [fontsLoaded, setFontsLoaded] = useState(false);
 
   const loadFonts = async () => {
@@ -29,27 +28,45 @@ const App = () => {
   }, []);
 
   if (!fontsLoaded) {
-    return  <ActivityIndicator size="large" color="#0000ff" />;
+    return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
   return (
     <ToastProvider>
       <ResponsiveProvider>
-        <ThemeProvider>
-          <AuthProvider>
-            <GestureHandlerRootView style={{ flex: 1 }}>
-              <PaperProvider>
-                <Provider store={store}>
-                  <Navigation />
-                </Provider>
-              </PaperProvider>
-            </GestureHandlerRootView>
-          </AuthProvider>
-        </ThemeProvider>
+        <AuthProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <ThemeProvider>
+              <ThemedApp />
+            </ThemeProvider>
+          </GestureHandlerRootView>
+        </AuthProvider>
       </ResponsiveProvider>
     </ToastProvider>
-
   );
-}
+};
+
+const CustomTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: '#6200ee', 
+    accent: '#03dac4', 
+    background: '#ffffff', 
+    surface: '#ffffff', 
+    text: '#000000', 
+    
+  },
+};
+
+const ThemedApp = () => {
+  return (
+    <PaperProvider theme={CustomTheme}>
+      <Provider store={store}>
+        <Navigation />
+      </Provider>
+    </PaperProvider>
+  );
+};
 
 export default App;

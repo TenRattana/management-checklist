@@ -1,23 +1,24 @@
 import React from "react";
-import { Pressable } from "react-native";
-import { Portal, Dialog } from "react-native-paper";
+import { Pressable, View } from "react-native";
+import { Portal, Dialog ,Text } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import AccessibleView from "@/components/AccessibleView";
 import { DialogsProps } from "@/typing/tag";
-import Text from "@/components/Text";
 
-const Dialogs = ({
+const Dialogs: React.FC<DialogsProps> = ({
     isVisible,
     setIsVisible,
     actions,
-    title,
-    messages,
+    title = "",
+    messages = "",
     handleDialog,
-    handleBlur,
     data,
-}: DialogsProps) => {
-    // console.log("Dialog_checkble");
-    const masterdataStyles = useMasterdataStyles()
+}) => {
+    const masterdataStyles = useMasterdataStyles();
+    const handleOkPress = () => {
+        handleDialog(actions, data);
+        setIsVisible(false);
+    };
 
     return (
         <AccessibleView name="dialog-container">
@@ -29,46 +30,41 @@ const Dialogs = ({
                 >
                     <Dialog.Icon icon="alert" size={90} />
 
-                    <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { textAlign: "center" }]}>
-                        {title || ""}
+                    <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textDark, { textAlign: "center" }]}>
+                        {title}
                     </Dialog.Title>
-                    <Dialog.Content>
+
+                    <Dialog.Content style={{ padding: 20 }}>
                         <Text
                             variant="bodyMedium"
-                            style={[masterdataStyles.text, { marginTop: 10, paddingTop: 15, textAlign: "center", marginBottom: 10 }]}
+                            style={[masterdataStyles.text, masterdataStyles.textDark ,{ marginTop: 10, textAlign: "center", marginBottom: 10 }]}
                         >
                             You have selected{" "}
                             <Text style={[masterdataStyles.textBold, masterdataStyles.textError]}>
-                                {messages || ""}
+                                {messages}
                             </Text>
                             . Please confirm your action.
                         </Text>
 
-                        <AccessibleView name="dialog-action" style={masterdataStyles.containerAction}>
+                        <View style={[masterdataStyles.containerAction,{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }]}>
                             <Pressable
-                                onPress={() => {
-                                    handleDialog(actions, data);
-                                    setIsVisible(false);
-                                }}
-                                style={[
-                                    masterdataStyles.button,
-                                    masterdataStyles.backMain,
-                                ]}
+                                onPress={handleOkPress}
+                                style={[masterdataStyles.button, masterdataStyles.backMain, { flex: 1, marginRight: 5 }]}
                             >
-                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>
+                                <Text>
                                     Ok
                                 </Text>
                             </Pressable>
 
                             <Pressable
                                 onPress={() => setIsVisible(false)}
-                                style={[masterdataStyles.button, masterdataStyles.backDis]}
+                                style={[masterdataStyles.button, masterdataStyles.backDis, { flex: 1, marginLeft: 5 }]}
                             >
-                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>
+                                <Text>
                                     Cancel
                                 </Text>
                             </Pressable>
-                        </AccessibleView>
+                        </View>
                     </Dialog.Content>
                 </Dialog>
             </Portal>

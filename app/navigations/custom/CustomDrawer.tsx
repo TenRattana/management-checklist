@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Pressable } from 'react-native';
 import { useAuth } from "@/app/contexts/auth";
@@ -9,11 +8,10 @@ import MenuSection from './MenuSection';
 import useMasterdataStyles from "@/styles/common/masterdata";
 
 const CustomDrawerContent = (props: any) => {
-    console.log("CustomDrawerContent");
-
     const { navigation } = props;
-    const {fontSize} = useRes()
-    const masterdataStyles = useMasterdataStyles()
+    const { fontSize } = useRes();
+    const masterdataStyles = useMasterdataStyles();
+    const { session, loading } = useAuth();
 
     const [isMenuListOpen, setIsMenuListOpen] = useState<{ machine: boolean; checklist: boolean; match: boolean }>({
         machine: false,
@@ -21,25 +19,29 @@ const CustomDrawerContent = (props: any) => {
         match: false,
     });
 
-    const { session, loading } = useAuth();
-
     if (loading) {
         return null;
     }
 
+    const renderPressable = (label: string, navigateTo: string) => (
+        <Pressable
+            onPress={() => navigation.navigate(navigateTo)}
+            style={masterdataStyles.menuItemNav}
+            android_ripple={{ color: '#f0f0f0' }}
+        >
+            <Text style={masterdataStyles.menuText}>{label}</Text>
+        </Pressable>
+    );
+
+
     return (
         <DrawerContentScrollView {...props}>
             {session.UserName && (
-                <>
+                <AccessibleView name="container-customnav" style={{ flex: 1 }}>
+
                     {(session.GUserName === "SuperAdmin" || session.GUserName === "Admin") && (
                         <>
-                            <Pressable
-                                onPress={() => navigation.navigate('Home')}
-                                style={masterdataStyles.menuItemNav}
-                                android_ripple={{ color: '#f0f0f0' }}
-                            >
-                                <Text style={masterdataStyles.menuText}>Home</Text>
-                            </Pressable>
+                            {renderPressable('Home', 'Home')}
 
                             <MenuSection
                                 title="Machine"
@@ -64,118 +66,34 @@ const CustomDrawerContent = (props: any) => {
                                 navigation={navigation}
                             />
 
-                            <Pressable
-                                onPress={() => navigation.navigate('Match_checklist_option')}
-                                style={masterdataStyles.menuItemNav}
-                                android_ripple={{ color: '#f0f0f0' }}
-                            >
-                                <Text style={masterdataStyles.menuText}>Match Option & Group Check List</Text>
-                            </Pressable>
-
-                            <Pressable
-                                onPress={() => navigation.navigate('Form')}
-                                style={masterdataStyles.menuItemNav}
-                                android_ripple={{ color: '#f0f0f0' }}
-                            >
-                                <Text style={masterdataStyles.menuText}>List Form</Text>
-                            </Pressable>
-
-                            <Pressable
-                                onPress={() => navigation.navigate('Match_form_machine')}
-                                style={masterdataStyles.menuItemNav}
-                                android_ripple={{ color: '#f0f0f0' }}
-                            >
-                                <Text style={masterdataStyles.menuText}>Match Form & Machine</Text>
-                            </Pressable>
-
-                            <Pressable
-                                onPress={() => navigation.navigate('Expected_result')}
-                                style={masterdataStyles.menuItemNav}
-                                android_ripple={{ color: '#f0f0f0' }}
-                            >
-                                <Text style={masterdataStyles.menuText}>List Result</Text>
-                            </Pressable>
-
-                            <Pressable
-                                onPress={() => navigation.navigate('ScanQR')}
-                                style={masterdataStyles.menuItemNav}
-                                android_ripple={{ color: '#f0f0f0' }}
-                            >
-                                <Text style={masterdataStyles.menuText}>Scan QR Code</Text>
-                            </Pressable>
-
-                            <Pressable
-                                onPress={() => navigation.navigate('GenerateQR')}
-                                style={masterdataStyles.menuItemNav}
-                                android_ripple={{ color: '#f0f0f0' }}
-                            >
-                                <Text style={masterdataStyles.menuText}>Generate QR Code</Text>
-                            </Pressable>
-
-                            <Pressable
-                                onPress={() => navigation.navigate('Setting')}
-                                style={masterdataStyles.menuItemNav}
-                                android_ripple={{ color: '#f0f0f0' }}
-                            >
-                                <Text style={masterdataStyles.menuText}>Setting</Text>
-                            </Pressable>
+                            {renderPressable('Match Option & Group Check List', 'Match_checklist_option')}
+                            {renderPressable('List Form', 'Form')}
+                            {renderPressable('Match Form & Machine', 'Match_form_machine')}
+                            {renderPressable('List Result', 'Expected_result')}
+                            {renderPressable('Scan QR Code', 'ScanQR')}
+                            {renderPressable('Generate QR Code', 'GenerateQR')}
+                            {renderPressable('Setting', 'Setting')}
                         </>
                     )}
 
-                    {(session.GUserName === "SuperAdmin") && (
+                    {session.GUserName === "SuperAdmin" && (
                         <>
-                            <Pressable
-                                onPress={() => navigation.navigate('TestScreen')}
-                                style={masterdataStyles.menuItemNav}
-                                android_ripple={{ color: '#f0f0f0' }}
-                            >
-                                <Text style={masterdataStyles.menuText}>Test</Text>
-                            </Pressable>
-
-                            <Pressable
-                                onPress={() => navigation.navigate('Managepermissions')}
-                                style={masterdataStyles.menuItemNav}
-                                android_ripple={{ color: '#f0f0f0' }}
-                            >
-                                <Text style={masterdataStyles.menuText}>Managepermissions</Text>
-                            </Pressable>
+                            {renderPressable('Test', 'TestScreen')}
+                            {renderPressable('Managepermissions', 'Managepermissions')}
                         </>
                     )}
 
-                    {(session.GUserName === "GeneralUser") && (
+                    {session.GUserName === "GeneralUser" && (
                         <>
-                            <Pressable
-                                onPress={() => navigation.navigate('Home')}
-                                style={masterdataStyles.menuItemNav}
-                                android_ripple={{ color: '#f0f0f0' }}
-                            >
-                                <Text style={masterdataStyles.menuText}>Home</Text>
-                            </Pressable>
-
-                            <Pressable
-                                onPress={() => navigation.navigate('ScanQR')}
-                                style={masterdataStyles.menuItemNav}
-                                android_ripple={{ color: '#f0f0f0' }}
-                            >
-                                <Text style={masterdataStyles.menuText}>Scan QR Code</Text>
-                            </Pressable>
-
-                            <Pressable
-                                onPress={() => navigation.navigate('Setting')}
-                                style={masterdataStyles.menuItemNav}
-                                android_ripple={{ color: '#f0f0f0' }}
-                            >
-                                <Text style={masterdataStyles.menuText}>Setting</Text>
-                            </Pressable>
+                            {renderPressable('Home', 'Home')}
+                            {renderPressable('Scan QR Code', 'ScanQR')}
+                            {renderPressable('Setting', 'Setting')}
                         </>
                     )}
-                </>
+                </AccessibleView>
             )}
-
         </DrawerContentScrollView>
     );
 }
 
-export default React.memo(CustomDrawerContent)
-
-
+export default React.memo(CustomDrawerContent);
