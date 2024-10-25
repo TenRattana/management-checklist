@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
-import { Customtable, LoadingSpinner, AccessibleView, Searchbar , Text } from "@/components";
+import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
 import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
@@ -173,13 +173,13 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
     }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
-        <AccessibleView name="container-checklist" style={{ paddingHorizontal: 15 }}>
-            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}>
-                Create Match Machine & Form
-            </Text>
-            <Divider style={{ marginBottom: 20 }} />
-            <Card style={{ borderRadius: 5 }}>
-                <AccessibleView name="match-form-machine" style={masterdataStyles.containerSearch}>
+        <AccessibleView name="container-checklist">
+            <Card style={[{ borderRadius: 0, flex: 1 }]}>
+                <Card.Title
+                    title="Create Match Machine & Form"
+                    titleStyle={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}
+                />
+                <View id="container-search" style={masterdataStyles.containerSearch}>
                     <Searchbar
                         placeholder="Search Macht Form Machine..."
                         value={searchQuery}
@@ -187,10 +187,10 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
                         testId="search-match-form-machine"
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                        <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Match Machine & Form</Text>
+                        <Text style={[masterdataStyles.textBold]}>Create Match Machine & Form</Text>
                     </Pressable>
-                </AccessibleView>
-                <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
+                </View>
+                <Card.Content style={{ padding: 2, paddingVertical: 10, flex: 1 }}>
                     {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
                 </Card.Content>
             </Card>

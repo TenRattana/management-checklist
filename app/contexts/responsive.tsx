@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo, useCallback } from "react";
 import { useWindowDimensions } from "react-native";
 import { useSpacing } from "@/hooks/useSpacing";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -21,6 +21,8 @@ interface ResponsiveProviderProps {
 }
 
 export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children }) => {
+  console.log("ResponsiveProvider");
+
   const { width } = useWindowDimensions();
   const spacingValues = useSpacing();
 
@@ -30,7 +32,6 @@ export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children
   useEffect(() => {
     const loadSettings = async () => {
       const storedFontSize = await AsyncStorage.getItem('fontSize');
-
       setFontSize(storedFontSize ?? "small");
     };
 
@@ -71,21 +72,17 @@ export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children
     }
   }, [fontSize, spacingValues]);
 
-  const handleFontSizeChange = async (value: string) => {
+  const handleFontSizeChange = useCallback(async (value: string) => {
     setFontSize(value);
     await AsyncStorage.setItem('fontSize', value);
-  };
+  }, []);
 
-
-  const value = useMemo(
-    () => ({
-      responsive,
-      spacing,
-      fontSize,
-      setFontSize: handleFontSizeChange,
-    }),
-    [responsive, spacing, fontSize, setFontSize]
-  );
+  const value = useMemo(() => ({
+    responsive,
+    spacing,
+    fontSize,
+    setFontSize: handleFontSizeChange,
+  }), [responsive, spacing, fontSize, setFontSize]);
 
   return (
     <ResponsiveContext.Provider value={value}>
@@ -95,6 +92,8 @@ export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children
 };
 
 export const useRes = (): ResponsiveContextType => {
+  console.log("useRes");
+
   const context = useContext(ResponsiveContext);
   if (context === undefined) {
     throw new Error("useRes must be used within a ResponsiveProvider");

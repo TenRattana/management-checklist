@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import axiosInstance from "@/config/axios";
-import { useToast, useTheme, useRes } from "@/app/contexts";
-import { Customtable, LoadingSpinner, AccessibleView, Searchbar ,Text } from "@/components";
-import { Card, Divider } from "react-native-paper";
+import { useToast, useRes } from "@/app/contexts";
+import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
+import { Card, Divider, useTheme } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Match_checklist_option from "@/components/screens/Match_checklist_option_dialog";
 import { CheckListOption, MatchCheckListOption, GroupCheckListOption, } from '@/typing/type'
@@ -183,13 +183,13 @@ const MatchCheckListOptionScreen = () => {
     }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
-        <AccessibleView name="container-matchchecklist" style={{ paddingHorizontal: 15 }}>
-            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}>
-                Create Match Group & Option
-            </Text>
-            <Divider style={{ marginBottom: 20 }} />
-            <Card style={{ borderRadius: 5 }}>
-                <AccessibleView name="match-check-list-option" style={masterdataStyles.containerSearch}>
+        <AccessibleView name="container-matchchecklist">
+            <Card style={[{ borderRadius: 0, flex: 1 }]}>
+                <Card.Title
+                    title="Create Match Group & Option"
+                    titleStyle={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}
+                />
+                <View id="container-search" style={masterdataStyles.containerSearch}>
                     <Searchbar
                         placeholder="Search Match Checklist Machine..."
                         value={searchQuery}
@@ -197,10 +197,10 @@ const MatchCheckListOptionScreen = () => {
                         testId="search-match-checklist"
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                        <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Match Group & Option</Text>
+                        <Text style={[masterdataStyles.textBold]}>Create Match Group & Option</Text>
                     </Pressable>
-                </AccessibleView>
-                <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
+                </View>
+                <Card.Content style={{ padding: 2, paddingVertical: 10, flex: 1 }}>
                     {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
                 </Card.Content>
             </Card>

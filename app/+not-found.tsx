@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { Link, Stack } from 'expo-router';
 import { StyleSheet } from 'react-native';
-import { AccessibleView ,Text } from "@/components";
+import { AccessibleView, Text } from "@/components";
 
 const NotFoundScreen = () => {
   console.log("NotFoundScreen");
@@ -10,8 +10,8 @@ const NotFoundScreen = () => {
     <>
       <Stack.Screen options={{ title: 'Oops!' }} />
       <AccessibleView name="not-found" style={styles.container}>
-        <Text style={styles.title}>This screen doesn't exist.</Text>
-        <Link href="/" style={styles.link}>
+        <Text style={styles.title}>Permission denied.</Text>
+        <Link href="/screens/layouts/HomeScreen" style={styles.link}>
           <Text style={styles.linkText}>Go to Login screen!</Text>
         </Link>
       </AccessibleView>

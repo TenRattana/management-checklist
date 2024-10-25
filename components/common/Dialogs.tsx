@@ -1,6 +1,6 @@
 import React from "react";
 import { Pressable, View } from "react-native";
-import { Portal, Dialog ,Text } from "react-native-paper";
+import { Portal, Dialog, Text } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import AccessibleView from "@/components/AccessibleView";
 import { DialogsProps } from "@/typing/tag";
@@ -21,7 +21,7 @@ const Dialogs: React.FC<DialogsProps> = ({
     };
 
     return (
-        <AccessibleView name="dialog-container">
+        <AccessibleView name="dialog-container" style={{ display: isVisible ? 'flex' : 'none' }}>
             <Portal>
                 <Dialog
                     visible={isVisible}
@@ -37,7 +37,7 @@ const Dialogs: React.FC<DialogsProps> = ({
                     <Dialog.Content style={{ padding: 20 }}>
                         <Text
                             variant="bodyMedium"
-                            style={[masterdataStyles.text, masterdataStyles.textDark ,{ marginTop: 10, textAlign: "center", marginBottom: 10 }]}
+                            style={[masterdataStyles.text, masterdataStyles.textDark, { marginTop: 10, textAlign: "center", marginBottom: 10 }]}
                         >
                             You have selected{" "}
                             <Text style={[masterdataStyles.textBold, masterdataStyles.textError]}>
@@ -46,7 +46,7 @@ const Dialogs: React.FC<DialogsProps> = ({
                             . Please confirm your action.
                         </Text>
 
-                        <View style={[masterdataStyles.containerAction,{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }]}>
+                        <View style={[masterdataStyles.containerAction, { flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }]}>
                             <Pressable
                                 onPress={handleOkPress}
                                 style={[masterdataStyles.button, masterdataStyles.backMain, { flex: 1, marginRight: 5 }]}

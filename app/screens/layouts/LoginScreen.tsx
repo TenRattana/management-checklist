@@ -5,7 +5,7 @@ import { useAuth } from "../../contexts/auth";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useToast } from "@/app/contexts/toastify";
-import { AccessibleView, Inputs ,Text } from "@/components";
+import { AccessibleView, Inputs, Text } from "@/components";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useFocusEffect } from "expo-router";
 
@@ -14,21 +14,20 @@ const validationSchema = Yup.object().shape({
 });
 
 const LoginScreen = () => {
-  const { showSuccess, showError } = useToast();
+  const { handleError } = useToast();
   const [initialValues, setInitialValues] = useState({ username: "" });
   const [loading, setLoading] = useState(false);
-
-  const handleSuccess = useCallback(() => {
-    showSuccess("Operation was successful!");
-  }, []);
-
-  const handleError = useCallback(() => {
-    showError(["There was an error!"]);
-  }, []);
+  const { login } = useAuth()
 
   const handleLogin = useCallback(async (values: { username: string }) => {
     setLoading(true);
-    setLoading(false);
+    try {
+      login(values.username)
+    } catch (error) {
+      handleError(error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useFocusEffect(
@@ -72,6 +71,7 @@ const LoginScreen = () => {
                   error={touched.username && Boolean(errors.username)}
                   errorMessage={touched.username ? errors.username : ""}
                   name="username"
+                  testId="username"
                 />
 
                 <AccessibleView name="login-action">

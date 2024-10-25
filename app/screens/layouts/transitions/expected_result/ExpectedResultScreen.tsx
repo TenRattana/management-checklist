@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
-import { Customtable, LoadingSpinner, AccessibleView, Searchbar,Text } from "@/components";
+import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
 import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import { ExpectedResult } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
 import { useFocusEffect } from "expo-router";
+import { View } from "react-native";
 
 const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => {
     const [expectedResult, setExpectedResult] = useState<ExpectedResult[]>([]);
@@ -105,25 +106,24 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
     }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
-        <AccessibleView name="container-checklist" style={{ paddingHorizontal: 15 }}>
-            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}>
-                ExpectedResult
-            </Text>
-            <Divider style={{ marginBottom: 20 }} />
-            <Card style={{ borderRadius: 5 }}>
-                <AccessibleView name="expected-result" style={masterdataStyles.containerSearch}>
+        <AccessibleView name="container-checklist">
+            <Card style={[{ borderRadius: 0, flex: 1 }]}>
+                <Card.Title
+                    title="ExpectedResult"
+                    titleStyle={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}
+                />
+                <View id="container-search" style={masterdataStyles.containerSearch}>
                     <Searchbar
                         placeholder="Search Expected Result..."
                         value={searchQuery}
                         onChange={setSearchQuery}
                         testId="search-er"
                     />
-                </AccessibleView>
-                <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
+                </View>
+                <Card.Content style={{ padding: 2, paddingVertical: 10, flex: 1 }}>
                     {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
                 </Card.Content>
             </Card>
-
         </AccessibleView>
     );
 };

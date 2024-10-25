@@ -3,8 +3,7 @@ import { Pressable, Animated, ScrollView, FlatList, Dimensions, Platform } from 
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { DataTable, IconButton } from "react-native-paper";
 import Dialogs from "@/components/common/Dialogs";
-import { useThemeColor } from "@/hooks/useThemeColor";
-import { useRes, useToast } from "@/app/contexts";
+import { useRes, useToast, useTheme } from "@/app/contexts";
 import AccessibleView from "@/components/AccessibleView";
 import Text from "@/components/Text";
 import { CustomTableProps } from '@/typing/tag';
@@ -33,9 +32,11 @@ const CustomTable = ({
   const [dialogMessage, setDialogMessage] = useState<string>("");
   const [dialogTitle, setDialogTitle] = useState<string>("");
   const [dialogData, setDialogData] = useState<string>("");
+  const [displayData, setDisplayData] = useState<(string | number | boolean)[][]>([]);
+
   console.log("CustomTable");
 
-  const colors = useThemeColor();
+  const { theme } = useTheme();
   const { fontSize, responsive, spacing } = useRes();
   const { handleError } = useToast();
   const customtable = useCustomtableStyles();
@@ -54,7 +55,7 @@ const CustomTable = ({
 
   useEffect(() => {
     setPage(0);
-  }, [itemsPerPage, searchQuery, sortColumn, sortDirection]);
+  }, [Tabledata, itemsPerPage]);
 
   const handleSort = useCallback((columnIndex: number) => {
     setSortColumn(prev => (prev === columnIndex ? null : columnIndex));
@@ -100,12 +101,10 @@ const CustomTable = ({
     }
   }, [handleAction]);
 
-  const currentData = useMemo(() => {
-    console.log("currentData");
-    if (!filteredData) return [];
-
-    return filteredData.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
+  useEffect(() => {
+    setDisplayData(filteredData.slice(page * itemsPerPage, (page + 1) * itemsPerPage));
   }, [filteredData, page, itemsPerPage]);
+
 
   const renderCellContent = useCallback((
     cell: string | number | boolean,
@@ -147,7 +146,7 @@ const CustomTable = ({
             <IconButton
               icon={cell ? "toggle-switch" : "toggle-switch-off-outline"}
               size={(responsive === "small" ? spacing.large : spacing.large) + 10}
-              iconColor={cell ? colors.succeass : colors.main}
+              iconColor={cell ? theme.colors.green : theme.colors.secondary}
             />
           </Animated.View>
         </Pressable>
@@ -183,7 +182,7 @@ const CustomTable = ({
           <IconButton
             icon="pencil-box"
             size={(responsive === "small" ? spacing.large : spacing.large) + 5}
-            iconColor={colors.main}
+            iconColor={theme.colors.blue}
           />
         );
         break;
@@ -192,7 +191,7 @@ const CustomTable = ({
           <IconButton
             icon="pencil-box"
             size={(responsive === "small" ? spacing.large : spacing.large) + 5}
-            iconColor={colors.main}
+            iconColor={theme.colors.blue}
           />
         );
         break;
@@ -201,7 +200,7 @@ const CustomTable = ({
           <IconButton
             icon="trash-can"
             size={(responsive === "small" ? spacing.large : spacing.large) + 5}
-            iconColor={colors.danger}
+            iconColor={theme.colors.error}
           />
         );
         break;
@@ -210,7 +209,7 @@ const CustomTable = ({
           <IconButton
             icon="tooltip-edit"
             size={(responsive === "small" ? spacing.large : spacing.large) + 5}
-            iconColor={colors.danger}
+            iconColor={theme.colors.yellow}
           />
         );
         break;
@@ -219,7 +218,7 @@ const CustomTable = ({
           <IconButton
             icon="content-copy"
             size={(responsive === "small" ? spacing.large : spacing.large) + 5}
-            iconColor={colors.danger}
+            iconColor={theme.colors.yellow}
           />
         );
         break;
@@ -228,7 +227,7 @@ const CustomTable = ({
           <IconButton
             icon="file-find"
             size={(responsive === "small" ? spacing.large : spacing.large) + 5}
-            iconColor={colors.danger}
+            iconColor={theme.colors.yellow}
           />
         );
         break;
@@ -261,14 +260,14 @@ const CustomTable = ({
                 ? filteredEntries.map(([key]) => {
                   if (key === "editIndex" || key === "delIndex") {
                     return (
-                      <AccessibleView name={`action-${rowIndex}`} key={`action-${rowIndex}`} style={customtable.eventColumn}>
+                      <AccessibleView name={`action-${rowIndex}-${colIndex}`} key={`action-${rowIndex}-${colIndex}`} style={customtable.eventColumn}>
                         {key === "editIndex" && renderActionButton(rowData[colIndex] as string, "editIndex", rowData, rowIndex)}
                         {key === "delIndex" && renderActionButton(rowData[colIndex] as string, "delIndex", rowData, rowIndex)}
                       </AccessibleView>
                     );
                   } else {
                     return (
-                      <AccessibleView name={`action-${rowIndex}`} key={`action-${rowIndex}`} style={customtable.eventColumn}>
+                      <AccessibleView name={`action-${rowIndex}-${colIndex}`} key={`action-${rowIndex}-${colIndex}`} style={customtable.eventColumn}>
                         {renderActionButton(rowData[colIndex] as string, key, rowData, rowIndex)}
                       </AccessibleView>
                     )
@@ -303,14 +302,14 @@ const CustomTable = ({
                   ? filteredEntries.map(([key]) => {
                     if (key === "editIndex" || key === "delIndex") {
                       return (
-                        <AccessibleView name={`action-${rowIndex}`} key={`action-${rowIndex}`} style={customtable.eventColumn}>
+                        <AccessibleView name={`action-${rowIndex}-${key}`} key={`action-${rowIndex}`} style={customtable.eventColumn}>
                           {renderActionButton(row[cellIndex] as string, "editIndex", row, rowIndex)}
                           {renderActionButton(row[cellIndex] as string, "delIndex", row, rowIndex)}
                         </AccessibleView>
                       );
                     } else {
                       return (
-                        <AccessibleView name={`action-${rowIndex}`} key={`action-${rowIndex}`} style={customtable.eventColumn}>
+                        <AccessibleView name={`action-${rowIndex}-${key}`} key={`action-${rowIndex}`} style={customtable.eventColumn}>
                           {renderActionButton(row[cellIndex] as string, key, row, rowIndex)}
                         </AccessibleView>
                       )
@@ -325,17 +324,29 @@ const CustomTable = ({
     )
   }, [renderCellContent, renderActionButton])
 
+
   return (
-    <AccessibleView name="customtable">
-      {responsive === "small" ?
-        filteredData && filteredData.length === 0 ? (
-          <Text style={{ textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }}>No data found...</Text>
-        ) : (
-          currentData.map((rowData, rowIndex) => (
-            renderSmallRes(rowData, rowIndex)
-          ))
-        ) : (
-          <DataTable>
+    <AccessibleView name="customtable" style={customtable.containerContent}>
+      {responsive === "small" ? (
+        <AccessibleView name="" style={{ display: responsive === "small" ? 'flex' : 'none' }}>
+          {filteredData && filteredData.length === 0 ? (
+            <Text style={{ textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }}>No data found...</Text>
+          ) : (
+            <FlatList
+              data={filteredData.length > 0 ? displayData : []}
+              renderItem={({ item, index }) => renderSmallRes(item, index)}
+              keyExtractor={(item, index) => `row-${index}`}
+              ListEmptyComponent={() => (
+                <Text style={{ textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }}>
+                  No data found...
+                </Text>
+              )}
+              contentContainerStyle={{ flexGrow: 1 }}
+            />)}
+        </AccessibleView>
+      )
+        : (
+          <DataTable style={{ flex: 1, display: responsive === "medium" || responsive === "large" ? 'flex' : 'none' }}>
             <DataTable.Header>
               {Tablehead.map((header, index) => (
                 <DataTable.Title
@@ -351,7 +362,7 @@ const CustomTable = ({
             </DataTable.Header>
 
             <FlatList
-              data={filteredData.length > 0 ? currentData : []}
+              data={filteredData.length > 0 ? displayData : []}
               renderItem={({ item, index }) => renderTableData(item, index)}
               keyExtractor={(item, index) => `row-${index}`}
               ListEmptyComponent={() => (
@@ -359,7 +370,7 @@ const CustomTable = ({
                   No data found...
                 </Text>
               )}
-              style={{ maxHeight: hp(fontSize === "small" ? '55%' : fontSize === "medium" ? '52%' : '45%') }}
+              contentContainerStyle={{ flexGrow: 1, paddingBottom: 10 }}
             />
 
             <DataTable.Pagination

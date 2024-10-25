@@ -1,7 +1,7 @@
 import React, { ReactNode, memo } from "react";
-import { View, Platform, ViewStyle } from "react-native";
+import { View, Platform, ViewStyle, SafeAreaView } from "react-native";
 import PropTypes from "prop-types";
-import { useTheme } from "@/app/contexts"
+import { useTheme } from "react-native-paper";
 
 interface AccessibleViewProps {
   children?: ReactNode;
@@ -10,15 +10,16 @@ interface AccessibleViewProps {
 }
 
 const AccessibleView = ({ children, name, style }: AccessibleViewProps) => {
-  const { theme } = useTheme(); 
+  const theme = useTheme();
 
   return (
     <View
-      style={[style, { backgroundColor: theme.colors.background }]} 
+      style={[style, { flex: 1 }]}
       accessibilityLabel={name}
       aria-live="polite"
       accessible={Platform.OS !== "web"}
       testID={`view-${name}`}
+      id={name}
     >
       {children ?? null}
     </View>

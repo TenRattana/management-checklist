@@ -1,12 +1,12 @@
 import React from 'react';
 import { Text as DefaultText, TextProps as DefaultTextProps } from 'react-native';
-import { useTheme } from '@/app/contexts';
 import { useRes } from '@/app/contexts';
 import PropTypes from 'prop-types';
+import { useTheme } from 'react-native-paper';
 
 interface CustomTextProps extends DefaultTextProps {
   style?: any;
-  children?: string | string[] | null; 
+  children?: string | string[] | null;
 }
 
 const isThai = (text: string): boolean => {
@@ -15,7 +15,7 @@ const isThai = (text: string): boolean => {
 };
 
 const Text: React.FC<CustomTextProps> = ({ style, children, ...props }) => {
-  const { theme } = useTheme();
+  const theme = useTheme();
   const { spacing } = useRes();
 
   const textArray = Array.isArray(children) ? children : [children];
@@ -23,7 +23,7 @@ const Text: React.FC<CustomTextProps> = ({ style, children, ...props }) => {
   return (
     <>
       {textArray.map((child, index) => {
-        if (child === null || child === undefined) return null; 
+        if (child === null || child === undefined) return null;
         const fontFamily = isThai(child) ? 'Sarabun' : 'Poppins';
 
         return (

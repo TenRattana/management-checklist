@@ -1,14 +1,45 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useMemo } from 'react';
-import { MD3DarkTheme, MD3LightTheme, PaperProvider } from 'react-native-paper';
+import { MD3LightTheme, PaperProvider, DefaultTheme, MD3DarkTheme } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ThemeContextProps {
-  theme: typeof MD3DarkTheme | typeof MD3LightTheme;
+  theme: typeof CustomDarkTheme | typeof CustomLightTheme;
   setDarkMode: (value: boolean) => void;
   darkMode: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
+
+
+const CustomLightTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: '#6200ee',
+    accent: '#03dac4',
+    background: '#ffffff',
+    surface: '#ffffff',
+    text: '#000000',
+    green: "#ffb11e",
+    yellow: "#bea400",
+    blue: "rgb(20, 148, 255)",
+  },
+};
+
+const CustomDarkTheme = {
+  ...MD3DarkTheme,
+  colors: {
+    ...MD3DarkTheme.colors,
+    primary: '#bb86fc',
+    accent: '#03dac4',
+    background: '#121212',
+    surface: '#121212',
+    text: '#ffffff',
+    green: "#ffb11e",
+    yellow: "#bea400",
+    blue: "rgb(20, 148, 255)",
+  },
+};
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [darkMode, setDarkMode] = useState<boolean>(false);
@@ -22,11 +53,13 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const handleDarkModeChange = async (value: boolean) => {
+    console.log(value);
+
     setDarkMode(value);
     await AsyncStorage.setItem('darkMode', value ? "darkMode" : "");
   };
 
-  const theme = darkMode ? MD3DarkTheme : MD3LightTheme;
+  const theme = darkMode ? CustomDarkTheme : CustomLightTheme;
 
   const value = useMemo(
     () => ({

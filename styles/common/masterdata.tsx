@@ -1,11 +1,11 @@
 import { StyleSheet } from "react-native";
 import { useRes } from "@/app/contexts";
-import { useTheme } from "@/app/contexts";
+import { useTheme } from "react-native-paper";
 
 
 const useMasterdataStyles = () => {
     const { responsive, spacing, fontSize } = useRes();
-    const { theme } = useTheme();
+    const theme = useTheme();
 
     return StyleSheet.create({
         scrollView: {
@@ -61,12 +61,15 @@ const useMasterdataStyles = () => {
             alignSelf: "center",
         },
         buttonCreate: {
+            // height: 100,
+
             borderRadius: 8,
             marginLeft: responsive === "small" ? "5%" : 30,
             minWidth: responsive === "small" ? "90%" : 200,
-            minHeight: 45,
-            padding:15,
-            alignSelf:'center'
+            justifyContent: 'center',
+            padding: 15,
+            alignSelf: 'center',
+            marginVertical: 10
         },
         containerSwitch: {
             flexDirection: "row",
@@ -88,17 +91,17 @@ const useMasterdataStyles = () => {
             marginVertical: 12,
         },
         containerSearch: {
-            flex:1,
             flexDirection: 'row',
-            flexWrap: 'wrap'
+            flexWrap: 'wrap',
+            height: 100
         },
         searchbar: {
             width: responsive === "small" ? "90%" : 400,
             marginVertical: spacing.small,
             marginHorizontal: responsive === "small" ? '5%' : 30,
             borderRadius: 10,
-            elevation: 4,
             fontSize: spacing.small,
+            backgroundColor: theme.colors.background
         },
         menuItem: {
             minHeight: spacing.small + 30,
@@ -248,7 +251,6 @@ const useMasterdataStyles = () => {
             marginRight: 12,
             paddingHorizontal: 20,
             paddingVertical: 10
-
         },
         menuItemNav: {
             paddingHorizontal: 15,
@@ -273,6 +275,26 @@ const useMasterdataStyles = () => {
         subMenuText: {
             fontSize: spacing.small,
             color: '#5e5e5e',
+        },
+        settingItem: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingVertical: 15,
+            paddingHorizontal: 20,
+            marginHorizontal: 20,
+            marginVertical: 10,
+            borderRadius: 8,
+            borderColor: theme.colors.onBackground,
+            borderWidth: 1,
+        },
+        settingText: {
+            fontWeight: '500',
+        },
+        pickerContainer: {
+            width: 150,
+            borderWidth: 1,
+            borderRadius: 8,
         },
     });
 };

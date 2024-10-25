@@ -1,11 +1,11 @@
 import { StyleSheet } from "react-native";
-import { useThemeColor } from "@/hooks/useThemeColor";
+import { useTheme } from "react-native-paper";
 import { useSpacing } from "@/hooks/useSpacing";
 import { useRes } from "@/app/contexts";
 
 
 const useCreateformStyle = () => {
-    const colors = useThemeColor();
+    const theme = useTheme();
     const { responsive, spacing, fontSize } = useRes();
 
     return StyleSheet.create({
@@ -16,7 +16,7 @@ const useCreateformStyle = () => {
         containerL1: {
             display: "flex",
             width: responsive === "small" ? "100%" : fontSize === "large" ? 450 : 350,
-            backgroundColor: colors.light,
+            backgroundColor: theme.colors.background,
         },
         containerL2: {
             display: "flex",
@@ -82,7 +82,7 @@ const useCreateformStyle = () => {
             margin: 16,
         },
         saveButtonText: {
-            color: colors.light,
+            color: theme.colors.background,
             fontSize: spacing.small,
         },
         scrollableContainer: {

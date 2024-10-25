@@ -9,7 +9,6 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 
 const CustomDrawerContent = (props: any) => {
     const { navigation } = props;
-    const { fontSize } = useRes();
     const masterdataStyles = useMasterdataStyles();
     const { session, loading } = useAuth();
 
@@ -37,8 +36,7 @@ const CustomDrawerContent = (props: any) => {
     return (
         <DrawerContentScrollView {...props}>
             {session.UserName && (
-                <AccessibleView name="container-customnav" style={{ flex: 1 }}>
-
+                <>
                     {(session.GUserName === "SuperAdmin" || session.GUserName === "Admin") && (
                         <>
                             {renderPressable('Home', 'Home')}
@@ -90,7 +88,7 @@ const CustomDrawerContent = (props: any) => {
                             {renderPressable('Setting', 'Setting')}
                         </>
                     )}
-                </AccessibleView>
+                </>
             )}
         </DrawerContentScrollView>
     );

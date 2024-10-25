@@ -1,11 +1,10 @@
 import { StyleSheet } from "react-native";
-import { useThemeColor } from "@/hooks/useThemeColor";
 import { useSpacing } from "@/hooks/useSpacing";
 import { useRes } from "@/app/contexts";
-
+import { useTheme } from "react-native-paper";
 
 const useCustomtableStyles = () => {
-    const colors = useThemeColor();
+    const theme = useTheme();
     const { responsive, spacing } = useRes();
 
     return StyleSheet.create({
@@ -13,7 +12,7 @@ const useCustomtableStyles = () => {
             width: responsive === "small" ? "100%" : "95%",
             alignSelf: "center",
             marginVertical: 10,
-            backgroundColor: colors.background,
+            backgroundColor: theme.colors.background,
             overflow: "hidden",
         },
         containerContent: {
@@ -28,18 +27,18 @@ const useCustomtableStyles = () => {
             marginVertical: spacing.small,
             borderRadius: 2,
             borderWidth: 1,
-            borderColor: colors.warning,
+            borderColor: theme.colors.surfaceVariant,
         },
         row: {
             height: responsive === "small" ? 50 : responsive === "medium" ? 60 : 70,
             borderBottomWidth: 1,
-            borderBottomColor: colors.background,
+            borderBottomColor: theme.colors.background,
             paddingVertical: responsive === "small" ? 5 : 10,
         },
         icon: {
             margin: responsive === "small" ? 0 : 5,
         },
-        iconAction: { backgroundColor: responsive !== "small" ? colors.light : "rgba(247, 243, 249, 1)" },
+        iconAction: { backgroundColor: responsive !== "small" ? theme.colors.background : "rgba(247, 243, 249, 1)" },
 
     });
 };

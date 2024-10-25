@@ -1,13 +1,14 @@
 import React, { useState, lazy, Suspense, useRef, useCallback, useEffect } from 'react';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, SafeAreaView, ScrollView } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { HomeScreen, LoginScreen, AdminScreen, SuperAdminScreen, ScanQR, GenerateQR, UserScreen, SettingScreen, Managepermissions } from '@/app/screens';
 import NotFoundScreen from '@/app/+not-found';
 import { useAuth } from "@/app/contexts/auth";
 import { useRes } from "@/app/contexts/responsive";
-import CustomDrawerContent from './custom/CustomDrawer';
+import CustomDrawerContent from '../../components/navigation/CustomDrawer';
 import axiosInstance from '@/config/axios';
 import { Text, AccessibleView } from '@/components';
+import { useTheme } from 'react-native-paper';
 
 const Drawer = createDrawerNavigator();
 
@@ -37,11 +38,13 @@ const components: Record<ComponentNames, () => Promise<{ default: React.Componen
   Checklist_group: () => import('@/app/screens/layouts/checklists/checklist_group/ChecklistGroupScreen'),
 };
 
-const Navigations = () => {
+const Navigation = () => {
   const { loading, screens, session } = useAuth();
   const { fontSize } = useRes();
 
-  const [loadedComponents, setLoadedComponents] = useState<Set<string>>(new Set());
+  const theme = useTheme()
+
+  const [loadedComponents, setLoadedComponents] = useState(new Set<string>());
   const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
 
   const drawerWidth = fontSize === "small" ? 300 : fontSize === "medium" ? 350 : 400;
@@ -57,18 +60,21 @@ const Navigations = () => {
     return () => {
       axiosInstance.interceptors.request.eject(interceptor);
     };
-  }, [axiosInstance, session]);
+  }, [session]);
 
   const renderComponent = useCallback((name: ComponentNames) => {
     if (!loadedComponents.has(name)) {
-      if (!cachedComponents.current[name]) {
-        cachedComponents.current[name] = lazy(components[name]);
-      }
-      loadedComponents.add(name);
+      const LazyComponent = lazy(components[name]);
+      cachedComponents.current[name] = LazyComponent;
+      setLoadedComponents((prev) => new Set(prev).add(name));
     }
 
     const Component = cachedComponents.current[name];
-    return (props: any) => <Component {...props} />;
+    return (props: any) => (
+      <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+        <Component {...props} />
+      </Suspense>
+    );
   }, [loadedComponents]);
 
   if (loading) {
@@ -79,31 +85,40 @@ const Navigations = () => {
       </AccessibleView>
     );
   }
+  console.log(screens);
 
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
         drawerStyle: {
+          backgroundColor: theme.colors.background,
           width: drawerWidth,
         },
       }}
       initialRouteName='Home'
+      id='nav'
     >
-      {!loading && screens.length > 0 ? screens.map(screen => (
-        <Drawer.Screen
-          key={screen.name}
-          name={screen.name}
-          component={renderComponent(screen.name as ComponentNames)}
-          options={{
-            headerTitle: ""
-          }}
-        />
-      )) : (
+      {screens.length > 0 ? (
+        screens.map(screen => (
+          <Drawer.Screen
+            key={screen.name}
+            name={screen.name}
+            component={renderComponent(screen.name as ComponentNames)}
+            options={{
+              headerTitle: "",
+              unmountOnBlur: true,
+              drawerLabel: screen.name,
+            }}
+
+          />
+        ))
+      ) : (
         <Drawer.Screen name="Login" component={LoginScreen} />
       )}
     </Drawer.Navigator>
+
   );
 };
 
-export default React.memo(Navigations);
+export default React.memo(Navigation)

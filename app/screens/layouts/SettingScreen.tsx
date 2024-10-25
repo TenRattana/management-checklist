@@ -1,14 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { Switch, StyleSheet } from 'react-native';
+import React, { useEffect } from 'react';
+import { Switch, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
-import { AccessibleView ,Text} from '@/components';
-import { useRes , useTheme } from '@/app/contexts';
+import { AccessibleView, Text } from '@/components';
+import useMasterdataStyles from '@/styles/common/masterdata';
+import { useRes, useTheme } from '@/app/contexts';
 
 const SettingsScreen: React.FC = () => {
-  const { spacing, fontSize, setFontSize,  } = useRes();
-  const {darkMode , setDarkMode } = useTheme();
-  
+  const { spacing, fontSize, setFontSize, } = useRes();
+  const { darkMode, setDarkMode } = useTheme();
+
+  console.log(darkMode);
+  const masterdataStyles = useMasterdataStyles()
+
   useEffect(() => {
     const loadSettings = async () => {
       const savedDarkMode = await AsyncStorage.getItem('darkMode');
@@ -33,69 +37,36 @@ const SettingsScreen: React.FC = () => {
   };
 
   return (
-    <AccessibleView name="setting" style={[styles.container]}>
-      <Text style={[styles.title]}>Settings</Text>
+    <AccessibleView name="setting" style={[masterdataStyles.container]}>
+      <Text style={[masterdataStyles.textBold, { textAlign: 'center', paddingVertical: 30 }]}>Settings</Text>
 
-      <AccessibleView name="setting-mode" style={[styles.settingItem]}>
-        <Text style={[styles.settingText, { fontSize: spacing.small }]}>Dark Mode</Text>
+      <View id="setting-mode" style={[masterdataStyles.settingItem]}>
+        <Text style={[masterdataStyles.settingText, { fontSize: spacing.small }]}>Dark Mode</Text>
         <Switch
           onValueChange={toggleSwitch}
           value={darkMode}
           thumbColor={darkMode ? "#00000e" : "#f4f3f4"}
           trackColor={{ false: "#767577", true: "#81b0ff" }}
         />
-      </AccessibleView>
+      </View>
 
-      <AccessibleView name="setting-font" style={[styles.settingItem]}>
-        <Text style={[styles.settingText, { fontSize: spacing.small }]}>Font Size</Text>
-        <AccessibleView name="Picker" style={[styles.pickerContainer]}>
+      <View id="setting-font" style={[masterdataStyles.settingItem]}>
+        <Text style={[masterdataStyles.settingText, { fontSize: spacing.small }]}>Font Size</Text>
+        <AccessibleView name="Picker" style={[masterdataStyles.pickerContainer]}>
           <Picker
             selectedValue={fontSize}
-            style={[styles.picker]}
+            style={[masterdataStyles.picker]}
             onValueChange={handleFontSizeChange}
+            id='picker-font'
           >
             <Picker.Item label="Small" value="small" />
             <Picker.Item label="Medium" value="medium" />
             <Picker.Item label="Large" value="large" />
           </Picker>
         </AccessibleView>
-      </AccessibleView>
+      </View>
     </AccessibleView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  title: {
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  settingItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 15,
-    paddingHorizontal: 10,
-    marginVertical: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  settingText: {
-    fontWeight: '500',
-  },
-  pickerContainer: {
-    width: 150,
-    borderWidth: 1,
-    borderRadius: 8,
-  },
-  picker: {
-    height: 50,
-    width: '100%',
-  },
-});
 
 export default SettingsScreen;

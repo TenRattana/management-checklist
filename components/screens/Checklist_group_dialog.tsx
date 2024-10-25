@@ -1,9 +1,8 @@
 import React from "react";
 import { Pressable } from "react-native";
-import { useTheme } from "@/app/contexts";
 import AccessibleView from "@/components/AccessibleView";
 import { Inputs } from "@/components/common";
-import { Portal, Switch, Dialog } from "react-native-paper";
+import { Portal, Switch, Dialog, useTheme } from "react-native-paper";
 import { FastField, Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";

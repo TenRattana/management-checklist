@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
-import { AccessibleView, Customtable, LoadingSpinner, Searchbar ,Text} from "@/components";
+import { AccessibleView, Customtable, LoadingSpinner, Searchbar, Text } from "@/components";
 import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
@@ -162,13 +162,13 @@ const MachineGroupScreen = () => {
     }, [machineGroup, initialValues.machineGroupId]);
 
     return (
-        <AccessibleView name="container-mahine" style={{ paddingHorizontal: 15 }}>
-            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}>
-                Create Machine
-            </Text>
-            <Divider style={{ marginBottom: 20 }} />
-            <Card style={{ borderRadius: 5 }}>
-                <AccessibleView name="machine" style={masterdataStyles.containerSearch}>
+        <AccessibleView name="container-mahine">
+            <Card style={[{ borderRadius: 0, flex: 1 }]}>
+                <Card.Title
+                    title="Create Machine"
+                    titleStyle={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}
+                />
+                <View id="container-search" style={masterdataStyles.containerSearch}>
                     <Searchbar
                         placeholder="Search Machine..."
                         value={searchQuery}
@@ -176,10 +176,10 @@ const MachineGroupScreen = () => {
                         testId="search-machine"
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                        <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Create Machine</Text>
+                        <Text style={[masterdataStyles.textBold]}>Create Machine</Text>
                     </Pressable>
-                </AccessibleView>
-                <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
+                </View>
+                <Card.Content style={{ padding: 2, paddingVertical: 10, flex: 1 }}>
                     {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
                 </Card.Content>
             </Card>
