@@ -5,6 +5,7 @@ import AccessibleView from "../AccessibleView";
 import { DynamicFormProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
+import { View } from "react-native";
 
 const DynamicForm = React.memo(({
   field,
@@ -93,13 +94,10 @@ const DynamicForm = React.memo(({
   };
 
   return (
-    <AccessibleView name="form-layout2" style={{ flex: 1 }}>
+    <View id="form-layout2">
       <Text style={[masterdataStyles.text, CTypeName === "Text" ? { justifyContent: 'flex-start', alignItems: 'center', marginVertical: 'auto' } : {}]}>{CListName}</Text>
       {renderField()}
-      {errorMessage && (
-        <Text style={[masterdataStyles.text, masterdataStyles.textError]}>{errorMessage}</Text>
-      )}
-    </AccessibleView>
+    </View>
   );
 });
 

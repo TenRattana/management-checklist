@@ -65,7 +65,7 @@ const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChan
           />
         )}
         renderRightIcon={() => (
-          <AccessibleView name="customdropdown-single-right-icon" style={{ flexDirection: "row" }}>
+          <View id="customdropdown-single-right-icon">
             {Array.isArray(value) && value.length > 0 ? (
               <IconButton
                 style={masterdataStyles.icon}
@@ -79,7 +79,7 @@ const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChan
               <IconButton style={masterdataStyles.icon} icon="chevron-down" size={30} />
             )}
             {iconRight ?? false}
-          </AccessibleView>
+          </View>
         )}
         renderSelectedItem={(item, unSelect) => (
           <Pressable onPress={() => unSelect && unSelect(item)}>

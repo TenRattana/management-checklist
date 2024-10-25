@@ -168,6 +168,7 @@ const MachineGroupScreen = () => {
                     title="Create Machine"
                     titleStyle={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}
                 />
+                {/* <Divider/> */}
                 <View id="container-search" style={masterdataStyles.containerSearch}>
                     <Searchbar
                         placeholder="Search Machine..."
@@ -176,7 +177,7 @@ const MachineGroupScreen = () => {
                         testId="search-machine"
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                        <Text style={[masterdataStyles.textBold]}>Create Machine</Text>
+                        <Text style={[masterdataStyles.textBold, { textAlign: 'center' }]}>Create Machine</Text>
                     </Pressable>
                 </View>
                 <Card.Content style={{ padding: 2, paddingVertical: 10, flex: 1 }}>

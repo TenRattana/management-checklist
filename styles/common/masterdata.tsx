@@ -43,7 +43,7 @@ const useMasterdataStyles = () => {
             borderRadius: 8,
         },
         backMain: {
-            backgroundColor: theme.colors.primary,
+            backgroundColor: theme.colors.blue,
         },
         backLight: {
             backgroundColor: theme.colors.background,
@@ -114,6 +114,7 @@ const useMasterdataStyles = () => {
             fontWeight: "500",
         },
         dropdown: {
+            flex:1,
             height: 50,
             borderBottomColor: 'gray',
             borderBottomWidth: 0.5,
@@ -192,7 +193,8 @@ const useMasterdataStyles = () => {
         },
         container: {
             flex: 1,
-            paddingHorizontal: 10
+            paddingHorizontal: 10,
+            backgroundColor:theme.colors.background
         },
         title: {
             fontSize: spacing.medium,

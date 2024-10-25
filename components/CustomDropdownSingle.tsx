@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { IconButton, HelperText } from "react-native-paper";
 import { Dropdown } from 'react-native-element-dropdown';
 import AccessibleView from "@/components/AccessibleView";
@@ -69,7 +69,7 @@ const CustomDropdownSingle = ({
                     />
                 )}
                 renderRightIcon={() => (
-                    <AccessibleView name="customdropdown-single-right-icon" style={{ flexDirection: "row" }}>
+                    <View id="customdropdown-single-right-icon" >
                         {value ? (
                             <IconButton
                                 style={masterdataStyles.icon}
@@ -83,7 +83,7 @@ const CustomDropdownSingle = ({
                             <IconButton style={masterdataStyles.icon} icon="chevron-down" size={30} />
                         )}
                         {iconRight ?? false}
-                    </AccessibleView>
+                    </View>
                 )}
                 testID={testId}
             />

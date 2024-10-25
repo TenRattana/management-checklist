@@ -16,18 +16,16 @@ const useCreateformStyle = () => {
         containerL1: {
             display: "flex",
             width: responsive === "small" ? "100%" : fontSize === "large" ? 450 : 350,
-            backgroundColor: theme.colors.background,
+            backgroundColor: theme.colors.onSurfaceVariant,
+            
         },
         containerL2: {
             display: "flex",
-            flex: 1,
-            margin: 10,
-            padding: 5
         },
         addSubFormButton: {
             margin: 16,
             marginVertical: 8,
-            backgroundColor: '#e0f7fa',
+            backgroundColor: theme.colors.onSecondary,
             borderRadius: 8,
             flexDirection: 'row',
             alignItems: 'center',
@@ -35,7 +33,7 @@ const useCreateformStyle = () => {
         },
         addSubFormText: {
             fontSize: spacing.small,
-            color: '#00796b',
+            color: theme.colors.onTertiary,
             marginLeft: 8,
             paddingVertical: 10
         },
@@ -43,7 +41,7 @@ const useCreateformStyle = () => {
             paddingHorizontal: 10,
             // height: 60,
             marginVertical: 5,
-            backgroundColor: '#fafafa',
+            backgroundColor: theme.colors.onSecondary,
             borderRadius: 8,
             flexDirection: 'row',
             alignItems: 'center',
@@ -52,14 +50,14 @@ const useCreateformStyle = () => {
         subFormContainer: {
             padding: 16,
             marginVertical: 8,
-            backgroundColor: '#f0f0f0',
+            backgroundColor: theme.colors.onSecondary,
             borderRadius: 8,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
         },
         active: {
-            backgroundColor: '#d0f0d0',
+            backgroundColor: theme.colors.onTertiary,
         },
         fieldText: {
             fontSize: spacing.small,
@@ -73,7 +71,7 @@ const useCreateformStyle = () => {
             paddingHorizontal: 10,
             height: 60,
             marginVertical: 3,
-            backgroundColor: '#00796b',
+            backgroundColor: theme.colors.onTertiary,
             borderRadius: 8,
             flexDirection: 'row',
             alignItems: 'center',

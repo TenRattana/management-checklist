@@ -18,8 +18,6 @@ import { defaultDataForm } from "@/slices";
 import * as Yup from 'yup';
 import DraggableItem from "./DraggableItem";
 
-const { height: screenHeight } = Dimensions.get('window');
-
 interface FormValues {
     [key: string]: any;
 }
@@ -167,8 +165,8 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
     console.log(state);
 
     return (
-        <GestureHandlerRootView style={[createform.container, { maxHeight: screenHeight }]}>
-            <AccessibleView name="container-form" style={[createform.containerL1]}>
+        <GestureHandlerRootView style={[createform.container, { flex: 1 }]}>
+            <View id="container-form" style={[createform.containerL1]}>
 
                 <SegmentedControl
                     values={["Form", "Tool"]}
@@ -190,12 +188,14 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                                 label="Content Name"
                                 handleChange={(value) => handleChange("FormName", value)}
                                 value={initialForm.FormName}
+                                testId="form-name"
                             />
                             <Inputs
                                 placeholder="Enter Description"
                                 label="Description"
                                 handleChange={(value) => handleChange("Description", value)}
                                 value={initialForm.Description}
+                                testId="form-description"
                             />
 
                             <Pressable
@@ -231,7 +231,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                         groupCheckListOption={groupCheckListOption} />
                 )}
 
-            </AccessibleView >
+            </View >
 
             <AccessibleView name="container-preview" style={[createform.containerL2]}>
                 <Preview

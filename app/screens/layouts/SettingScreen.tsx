@@ -52,7 +52,7 @@ const SettingsScreen: React.FC = () => {
 
       <View id="setting-font" style={[masterdataStyles.settingItem]}>
         <Text style={[masterdataStyles.settingText, { fontSize: spacing.small }]}>Font Size</Text>
-        <AccessibleView name="Picker" style={[masterdataStyles.pickerContainer]}>
+        <View id="Picker" style={[masterdataStyles.pickerContainer]}>
           <Picker
             selectedValue={fontSize}
             style={[masterdataStyles.picker]}
@@ -63,7 +63,7 @@ const SettingsScreen: React.FC = () => {
             <Picker.Item label="Medium" value="medium" />
             <Picker.Item label="Large" value="large" />
           </Picker>
-        </AccessibleView>
+        </View>
       </View>
     </AccessibleView>
   );

@@ -59,7 +59,11 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
             if (action === "changeIndex") {
                 navigation.navigate("Create_form", { formId: item });
             } else if (action === "preIndex") {
-                navigation.navigate("Preview", { formId: item });
+                navigation.navigate("InputFormMachine", {
+                    machineId: "M001",
+                });
+
+                // navigation.navigate("Preview", { formId: item });
             } else if (action === "copyIndex") {
                 navigation.navigate("Create_form", { formId: item, action: "copy" });
             } else {
@@ -119,7 +123,7 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
                         testId="search-form"
                     />
                     <Pressable onPress={handleNewForm} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                        <Text style={[masterdataStyles.textBold]}>New Form</Text>
+                    <Text style={[masterdataStyles.textBold, { textAlign: 'center' }]}>New Form</Text>
                     </Pressable>
                 </View>
                 <Card.Content style={{ padding: 2, paddingVertical: 10, flex: 1 }}>

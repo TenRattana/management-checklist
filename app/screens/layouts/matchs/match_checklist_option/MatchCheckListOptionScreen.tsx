@@ -197,7 +197,7 @@ const MatchCheckListOptionScreen = () => {
                         testId="search-match-checklist"
                     />
                     <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                        <Text style={[masterdataStyles.textBold]}>Create Match Group & Option</Text>
+                    <Text style={[masterdataStyles.textBold, { textAlign: 'center' }]}>Create Match Group & Option</Text>
                     </Pressable>
                 </View>
                 <Card.Content style={{ padding: 2, paddingVertical: 10, flex: 1 }}>
