@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
-import { ScrollView, Pressable } from "react-native";
+import { ScrollView, Pressable, View } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
 import { AccessibleView, LoadingSpinner, Searchbar, Customtable, Text } from "@/components";
@@ -82,23 +82,18 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
 
   return (
     <AccessibleView name="container-home">
-      <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}>
-        Home
-      </Text>
-      <Divider style={{ marginBottom: 10 }} />
-      <Card style={{ borderRadius: 5 }}>
-        <AccessibleView name="machine" style={masterdataStyles.containerSearch}>
-          <Searchbar
-            placeholder="Search List Form..."
-            value={searchQuery}
-            onChange={setSearchQuery}
-            testId="search-list-form"
-          />
+      <Card style={[{ borderRadius: 0, flex: 1 }]}>
+        <Card.Title
+          title="Home"
+          titleStyle={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}
+        />
+        <View id="container-search" style={masterdataStyles.containerSearch}>
           <Pressable onPress={handleSacnQR} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-            <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Scan QR Code</Text>
+            <Text style={[masterdataStyles.textBold]}>Scan QR Code</Text>
           </Pressable>
-        </AccessibleView>
+        </View>
       </Card>
+
     </AccessibleView>
   );
 };
