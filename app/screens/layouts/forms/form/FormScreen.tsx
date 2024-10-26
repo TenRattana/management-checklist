@@ -19,7 +19,7 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
-    const { spacing } = useRes();
+    const { spacing, fontSize } = useRes();
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -59,11 +59,7 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
             if (action === "changeIndex") {
                 navigation.navigate("Create_form", { formId: item });
             } else if (action === "preIndex") {
-                navigation.navigate("InputFormMachine", {
-                    machineId: "M001",
-                });
-
-                // navigation.navigate("Preview", { formId: item });
+                navigation.navigate("Preview", { formId: item });
             } else if (action === "copyIndex") {
                 navigation.navigate("Create_form", { formId: item, action: "copy" });
             } else {
@@ -109,27 +105,25 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
     }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
-        <AccessibleView name="container-form">
-            <Card style={[{ borderRadius: 0, flex: 1 }]}>
-                <Card.Title
-                    title="Forms"
-                    titleStyle={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}
+        <AccessibleView name="container-form" style={{ flex: 1 }}>
+            <Card.Title
+                title="Forms"
+                titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
+            />
+            <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
+                <Searchbar
+                    placeholder="Search Form..."
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    testId="search-form"
                 />
-                <View id="container-search" style={masterdataStyles.containerSearch}>
-                    <Searchbar
-                        placeholder="Search Form..."
-                        value={searchQuery}
-                        onChange={setSearchQuery}
-                        testId="search-form"
-                    />
-                    <Pressable onPress={handleNewForm} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                <Pressable onPress={handleNewForm} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                     <Text style={[masterdataStyles.textBold, { textAlign: 'center' }]}>New Form</Text>
-                    </Pressable>
-                </View>
-                <Card.Content style={{ padding: 2, paddingVertical: 10, flex: 1 }}>
-                    {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
-                </Card.Content>
-            </Card>
+                </Pressable>
+            </AccessibleView>
+            <Card.Content style={{ padding: 2, paddingVertical: 10, flex: 1 }}>
+                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+            </Card.Content>
         </AccessibleView>
     );
 };

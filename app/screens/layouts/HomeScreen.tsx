@@ -21,7 +21,7 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
 
   const masterdataStyles = useMasterdataStyles();
   const { handleError } = useToast();
-  const { spacing } = useRes();
+  const { spacing, fontSize } = useRes();
 
   const fetchData = useCallback(async () => {
     console.log("fetchData");
@@ -81,18 +81,16 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
 
 
   return (
-    <AccessibleView name="container-home">
-      <Card style={[{ borderRadius: 0, flex: 1 }]}>
-        <Card.Title
-          title="Home"
-          titleStyle={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}
-        />
-        <View id="container-search" style={masterdataStyles.containerSearch}>
-          <Pressable onPress={handleSacnQR} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-            <Text style={[masterdataStyles.textBold]}>Scan QR Code</Text>
-          </Pressable>
-        </View>
-      </Card>
+    <AccessibleView name="container-home" style={{ flex: 1 }}>
+      <Card.Title
+        title="Home"
+        titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
+      />
+      <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
+        <Pressable onPress={handleSacnQR} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+          <Text style={[masterdataStyles.textBold]}>Scan QR Code</Text>
+        </Pressable>
+      </AccessibleView>
 
     </AccessibleView>
   );

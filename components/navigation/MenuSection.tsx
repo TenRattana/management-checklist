@@ -5,11 +5,21 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-na
 import { IconButton } from 'react-native-paper';
 import Text from '@/components/Text'
 import { useRes } from '@/app/contexts';
-import useMasterdataStyles from "@/styles/common/masterdata";
+import useMasterdataStyles from "@/styles/common/masterdata"
+import { DrawerContentComponentProps } from '@react-navigation/drawer';
+import { DrawerNavigationHelpers } from '@react-navigation/drawer/lib/typescript/src/types';
 
-const MenuSection = ({ title, isOpen, onToggle, items, navigation }: any) => {
+interface MenuSectionProps {
+    title: string;
+    isOpen: boolean;
+    onToggle: () => void;
+    items: { label: string; navigateTo: string }[];
+    navigation: DrawerNavigationHelpers
+}
+
+const MenuSection = ({ title, isOpen, onToggle, items, navigation }: MenuSectionProps) => {
     console.log("MenuSection");
-    const { fontSize , spacing } = useRes();
+    const { fontSize, spacing } = useRes();
     const itemHeight = fontSize === "small" ? 50 : fontSize === "medium" ? 60 : 75
     const height = useSharedValue(0);
     const opacity = useSharedValue(0);

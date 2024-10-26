@@ -6,6 +6,7 @@ import { ToastProvider, AuthProvider, ResponsiveProvider, ThemeProvider, useThem
 import * as Font from "expo-font";
 import { Stack } from 'expo-router';
 
+
 SplashScreen.preventAutoHideAsync();
 
 const SetTheme = () => {
@@ -15,7 +16,7 @@ const SetTheme = () => {
 
     return (
         <PaperProvider theme={theme}>
-            <Stack screenOptions={{ headerShown: false }} />
+            <Stack screenOptions={{ headerShown: false, headerTitle: "" }} />
         </PaperProvider>
     );
 }
@@ -45,15 +46,15 @@ const RootLayout = () => {
     console.log("RootLayout rendered");
 
     return (
-        <ResponsiveProvider>
-            <ThemeProvider>
+        <ThemeProvider>
+            <ResponsiveProvider>
                 <ToastProvider>
                     <AuthProvider>
                         <SetTheme />
                     </AuthProvider>
                 </ToastProvider>
-            </ThemeProvider>
-        </ResponsiveProvider>
+            </ResponsiveProvider>
+        </ThemeProvider>
     );
 };
 

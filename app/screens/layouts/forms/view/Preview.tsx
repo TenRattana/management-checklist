@@ -33,6 +33,8 @@ const Preview = forwardRef<any, any>((props, ref) => {
         cardRefs.current.forEach((cardRef, index) => {
             if (cardRef) {
                 cardRef.measureInWindow((x, y, width, height) => {
+                    console.log(x, y);
+
                     positions.push({ x, y, width: width + 350, height: height + 16 });
                 });
             }
@@ -41,8 +43,10 @@ const Preview = forwardRef<any, any>((props, ref) => {
     };
 
     useEffect(() => {
-        updateCardPositions();
-    }, [state.subForms]);
+        setTimeout(() => {
+            updateCardPositions()
+        }, 100)
+    }, [state]);
 
     useImperativeHandle(ref, () => ({
         getCardPosition: (callback: (x: number, y: number) => void) => {
@@ -78,119 +82,119 @@ const Preview = forwardRef<any, any>((props, ref) => {
                 data={[{}]}
                 renderItem={() => (
                     <>
-                        <Text style={[masterdataStyles.title]}>{state.FormName || "Form Name"}</Text>
+                        <Text style={[masterdataStyles.title, masterdataStyles.text]}>{state.FormName || "Form Name"}</Text>
                         <Divider />
-                        <Text style={[masterdataStyles.description, { paddingVertical: 10 }]}>{state.Description || "Form Description"}</Text>
+                        <Text style={[masterdataStyles.description, masterdataStyles.text, { paddingVertical: 10 }]}>{state.Description || "Form Description"}</Text>
 
                         {state.subForms.map((subForm: BaseSubForm, index: number) => (
-                           <Formik
-                           initialValues={formValues}
-                           validationSchema={validationSchema}
-                           validateOnBlur={true}
-                           validateOnChange={false}
-                           onSubmit={(value) => console.log(value)}
-                           enableReinitialize={true}
-                           key={subForm.SFormID + subForm.Columns + JSON.stringify(subForm.Fields)}
-                       >
-                           {({ errors, touched, setFieldValue, setTouched, setFieldError }) => (
-                               <>
-                                   <Card
-                                       style={masterdataStyles.card}
-                                       ref={(el) => (cardRefs.current[index] = el)}
-                                       key={subForm.SFormID}
-                                   >
-                                       <Card.Title
-                                           title={subForm.SFormName}
-                                           titleStyle={masterdataStyles.cardTitle}
-                                       />
-                                       <Card.Content style={[masterdataStyles.subFormContainer]}>
-                                           {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
-                                               const columns = subForm.Columns ?? 1;
-                       
-                                               const containerStyle: ViewStyle = {
-                                                   width: responsive === "small" ? "100%" : `${98 / columns}%`,
-                                                   flexGrow: field.DisplayOrder || 1,
-                                                   padding: 5,
-                                               };
-                       
-                                               return (
-                                                   <Field name={field.MCListID} key={`field-${fieldIndex}-${subForm.Columns}`}>
-                                                       {({ field: fastFieldProps }: FieldProps) => {
-                       
-                                                           const type = dataType.find(v => v.DTypeID === field.DTypeID)?.DTypeName;
-                       
-                                                           const handleBlur = () => {
-                                                               if (type === "Number") {
-                                                                   const numericValue = Number(fastFieldProps.value);
-                       
-                                                                   if (!isNaN(numericValue) && Number(field.DTypeValue) > 0 && numericValue) {
-                                                                       const formattedValue = numericValue.toFixed(Number(field.DTypeValue));
-                                                                       setFieldValue(fastFieldProps.name, formattedValue);
-                                                                       setTouched({
-                                                                           ...touched,
-                                                                           [fastFieldProps.name]: true,
-                                                                       });
-                                                                   } else if (isNaN(numericValue)) {
-                                                                       setFieldValue(fastFieldProps.name, fastFieldProps.value);
-                                                                       setTouched({
-                                                                           ...touched,
-                                                                           [fastFieldProps.name]: true,
-                                                                       });
-                                                                   }
-                                                               }
-                                                           };
-                       
-                                                           const handleCloseError = () => {
-                                                               setTouched({ ...touched, [fastFieldProps.name]: false });
-                                                               setFieldError(fastFieldProps.name, '');  
-                                                           };
-                       
-                                                           return (
-                                                               <View id="container-layout2" style={containerStyle}>
-                                                                   <Dynamic
-                                                                       field={field}
-                                                                       values={String(fastFieldProps.value)}
-                                                                       handleChange={(fieldname: string, value: any) => {
-                                                                           setFieldValue(fastFieldProps.name, value);
-                                                                           setTimeout(() => {
-                                                                               setTouched({
-                                                                                   ...touched,
-                                                                                   [fastFieldProps.name]: true,
-                                                                               });
-                                                                           }, 0);
-                                                                       }}
-                                                                       handleBlur={handleBlur}
-                                                                       groupCheckListOption={groupCheckListOption}
-                                                                   />
-                                                                   {Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name]) && (
-                                                                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                                           <HelperText
-                                                                               type="error"
-                                                                               visible={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
-                                                                               style={{ left: -10 }}
-                                                                           >
-                                                                               {errors[fastFieldProps.name] as string || ""}
-                                                                           </HelperText>
-                                                                           <Text
-                                                                               style={[masterdataStyles.text, masterdataStyles.errorText]}
-                                                                               onPress={handleCloseError}  
-                                                                           >
-                                                                               Close
-                                                                           </Text>
-                                                                       </View>
-                                                                   )}
-                                                               </View>
-                                                           );
-                                                       }}
-                                                   </Field>
-                                               );
-                                           })}
-                                       </Card.Content>
-                                   </Card>
-                               </>
-                           )}
-                       </Formik>
-                       
+                            <Formik
+                                initialValues={formValues}
+                                validationSchema={validationSchema}
+                                validateOnBlur={true}
+                                validateOnChange={false}
+                                onSubmit={(value) => console.log(value)}
+                                enableReinitialize={true}
+                                key={subForm.SFormID + subForm.Columns + JSON.stringify(subForm.Fields)}
+                            >
+                                {({ errors, touched, setFieldValue, setTouched, setFieldError }) => (
+                                    <>
+                                        <Card
+                                            style={masterdataStyles.card}
+                                            ref={(el) => (cardRefs.current[index] = el)}
+                                            key={subForm.SFormID}
+                                        >
+                                            <Card.Title
+                                                title={subForm.SFormName}
+                                                titleStyle={masterdataStyles.cardTitle}
+                                            />
+                                            <Card.Content style={[masterdataStyles.subFormContainer]}>
+                                                {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
+                                                    const columns = subForm.Columns ?? 1;
+
+                                                    const containerStyle: ViewStyle = {
+                                                        width: responsive === "small" ? "100%" : `${98 / columns}%`,
+                                                        flexGrow: field.DisplayOrder || 1,
+                                                        padding: 5,
+                                                    };
+
+                                                    return (
+                                                        <Field name={field.MCListID} key={`field-${fieldIndex}-${subForm.Columns}`}>
+                                                            {({ field: fastFieldProps }: FieldProps) => {
+
+                                                                const type = dataType.find(v => v.DTypeID === field.DTypeID)?.DTypeName;
+
+                                                                const handleBlur = () => {
+                                                                    if (type === "Number") {
+                                                                        const numericValue = Number(fastFieldProps.value);
+
+                                                                        if (!isNaN(numericValue) && Number(field.DTypeValue) > 0 && numericValue) {
+                                                                            const formattedValue = numericValue.toFixed(Number(field.DTypeValue));
+                                                                            setFieldValue(fastFieldProps.name, formattedValue);
+                                                                            setTouched({
+                                                                                ...touched,
+                                                                                [fastFieldProps.name]: true,
+                                                                            });
+                                                                        } else if (isNaN(numericValue)) {
+                                                                            setFieldValue(fastFieldProps.name, fastFieldProps.value);
+                                                                            setTouched({
+                                                                                ...touched,
+                                                                                [fastFieldProps.name]: true,
+                                                                            });
+                                                                        }
+                                                                    }
+                                                                };
+
+                                                                const handleCloseError = () => {
+                                                                    setTouched({ ...touched, [fastFieldProps.name]: false });
+                                                                    setFieldError(fastFieldProps.name, '');
+                                                                };
+
+                                                                return (
+                                                                    <View id="container-layout2" style={containerStyle}>
+                                                                        <Dynamic
+                                                                            field={field}
+                                                                            values={String(fastFieldProps.value)}
+                                                                            handleChange={(fieldname: string, value: any) => {
+                                                                                setFieldValue(fastFieldProps.name, value);
+                                                                                setTimeout(() => {
+                                                                                    setTouched({
+                                                                                        ...touched,
+                                                                                        [fastFieldProps.name]: true,
+                                                                                    });
+                                                                                }, 0);
+                                                                            }}
+                                                                            handleBlur={handleBlur}
+                                                                            groupCheckListOption={groupCheckListOption}
+                                                                        />
+                                                                        {Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name]) && (
+                                                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                                                <HelperText
+                                                                                    type="error"
+                                                                                    visible={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
+                                                                                    style={{ left: -10 }}
+                                                                                >
+                                                                                    {errors[fastFieldProps.name] as string || ""}
+                                                                                </HelperText>
+                                                                                <Text
+                                                                                    style={[masterdataStyles.text, masterdataStyles.errorText]}
+                                                                                    onPress={handleCloseError}
+                                                                                >
+                                                                                    Close
+                                                                                </Text>
+                                                                            </View>
+                                                                        )}
+                                                                    </View>
+                                                                );
+                                                            }}
+                                                        </Field>
+                                                    );
+                                                })}
+                                            </Card.Content>
+                                        </Card>
+                                    </>
+                                )}
+                            </Formik>
+
                         )
                         )}
                     </>

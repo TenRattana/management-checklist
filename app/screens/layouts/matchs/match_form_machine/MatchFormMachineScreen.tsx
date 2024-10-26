@@ -27,7 +27,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
-    const { spacing } = useRes();
+    const { spacing, fontSize } = useRes();
 
     const fetchData = useCallback(async () => {
         setIsLoading(true);
@@ -173,27 +173,25 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
     }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
-        <AccessibleView name="container-checklist">
-            <Card style={[{ borderRadius: 0, flex: 1 }]}>
-                <Card.Title
-                    title="Create Match Machine & Form"
-                    titleStyle={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}
+        <AccessibleView name="container-checklist" style={{ flex: 1 }}>
+            <Card.Title
+                title="Create Match Machine & Form"
+                titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
+            />
+            <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
+                <Searchbar
+                    placeholder="Search Macht Form Machine..."
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    testId="search-match-form-machine"
                 />
-                <View id="container-search" style={masterdataStyles.containerSearch}>
-                    <Searchbar
-                        placeholder="Search Macht Form Machine..."
-                        value={searchQuery}
-                        onChange={setSearchQuery}
-                        testId="search-match-form-machine"
-                    />
-                    <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                     <Text style={[masterdataStyles.textBold, { textAlign: 'center' }]}>Create Match Machine & Form</Text>
-                    </Pressable>
-                </View>
-                <Card.Content style={{ padding: 2, paddingVertical: 10, flex: 1 }}>
-                    {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
-                </Card.Content>
-            </Card>
+                </Pressable>
+            </AccessibleView>
+            <Card.Content style={{ padding: 2, flex: 1 }}>
+                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+            </Card.Content>
 
             <Match_form_machine_dialog
                 isVisible={isVisible}

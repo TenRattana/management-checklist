@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import { RadioButton, HelperText } from "react-native-paper";
 import { RadiosProps } from "@/typing/tag";
 import AccessibleView from "@/components/AccessibleView";
@@ -26,7 +26,7 @@ const Radios = ({
   }
 
   return (
-    <AccessibleView name="radios" style={masterdataStyles.commonContainer}>
+    <View id="radios" style={masterdataStyles.commonContainer}>
       {label && <Text style={masterdataStyles.label}>{label}</Text>}
       <RadioButton.Group
         onValueChange={handleChange}
@@ -40,10 +40,10 @@ const Radios = ({
             testID={testId}
             id={testId}
           >
-            <AccessibleView name="con-radio" style={[masterdataStyles.radioItem]}>
+            <View id="con-radio" style={[masterdataStyles.radioItem]}>
               <RadioButton value={opt.value} />
               <Text style={masterdataStyles.radioLabel}>{opt.label}</Text>
-            </AccessibleView>
+            </View>
           </Pressable>
         ))}
       </RadioButton.Group>
@@ -53,7 +53,7 @@ const Radios = ({
           {errorMessage}
         </HelperText>
       ) : false}
-    </AccessibleView>
+    </View>
   );
 };
 

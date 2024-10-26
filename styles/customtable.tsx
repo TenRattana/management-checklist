@@ -15,8 +15,6 @@ const useCustomtableStyles = () => {
             backgroundColor: theme.colors.background,
             overflow: "hidden",
         },
-        containerContent: {
-        },
         eventColumn: {
             flexDirection: 'row',
         },

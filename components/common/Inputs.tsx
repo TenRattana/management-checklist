@@ -1,6 +1,6 @@
 import React from "react";
 import { TextInput, HelperText } from "react-native-paper";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import { InputProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
@@ -22,18 +22,18 @@ const Inputs: React.FC<InputProps> = ({
   const masterdataStyles = useMasterdataStyles();
 
   return (
-    <AccessibleView
-      name="inputs"
+    <View
+      id="inputs"
       style={masterdataStyles.commonContainer}
     >
       <TextInput
-        mode={mode ||"outlined"}
+        mode={mode || "outlined"}
         placeholder={placeholder}
         label={!mode ? (
           <Text style={[masterdataStyles.text]}>
-          {label}
-        </Text>
-        ):undefined}
+            {label}
+          </Text>
+        ) : undefined}
         style={masterdataStyles.text}
         onChangeText={handleChange}
         onBlur={handleBlur}
@@ -56,7 +56,7 @@ const Inputs: React.FC<InputProps> = ({
       <HelperText type="error" visible={error} style={{ display: error ? 'flex' : 'none', left: -10 }}>
         {errorMessage}
       </HelperText>
-    </AccessibleView>
+    </View>
   );
 };
 

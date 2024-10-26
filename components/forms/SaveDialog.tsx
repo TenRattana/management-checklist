@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import { Portal, Dialog } from "react-native-paper";
 import { SaveDialogProps } from "@/typing/value";
 import axiosInstance from "@/config/axios";
@@ -70,7 +70,7 @@ const SaveDialog = ({
                         You are about to save the form. Are you sure?
                     </Text>
 
-                    <AccessibleView name="sd" style={masterdataStyles.containerAction}>
+                    <View id="sd" style={masterdataStyles.containerAction}>
                         <Pressable
                             onPress={() => saveForm()}
                             style={[
@@ -104,7 +104,7 @@ const SaveDialog = ({
                                 Cancel
                             </Text>
                         </Pressable>
-                    </AccessibleView>
+                    </View>
                 </Dialog.Content>
             </Dialog>
         </Portal>

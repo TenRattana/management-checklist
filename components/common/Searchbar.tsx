@@ -1,7 +1,8 @@
 import React from 'react';
 import { Searchbar } from 'react-native-paper';
 import useMasterdataStyles from '@/styles/common/masterdata';
-import { useTheme } from '@/app/contexts';
+import { useTheme, useRes } from '@/app/contexts';
+
 interface SeractBarProps {
   value: string;
   onChange: (search: string) => void;
@@ -12,7 +13,7 @@ interface SeractBarProps {
 const SearchBar = ({ value, onChange, placeholder, testId }: SeractBarProps) => {
   console.log("SearchBar");
   const { theme } = useTheme();
-
+  const { spacing } = useRes()
   const masterdataStyles = useMasterdataStyles()
 
   return (
@@ -21,9 +22,9 @@ const SearchBar = ({ value, onChange, placeholder, testId }: SeractBarProps) => 
       value={value}
       onChangeText={onChange}
       style={masterdataStyles.searchbar}
-      inputStyle={{ color: theme.colors.onBackground }}
+      inputStyle={{ color: theme.colors.background, fontSize: spacing.small }}
       iconColor="#007AFF"
-      placeholderTextColor={theme.colors.onBackground}
+      placeholderTextColor={theme.colors.background}
       testID={testId}
       id={testId}
     />

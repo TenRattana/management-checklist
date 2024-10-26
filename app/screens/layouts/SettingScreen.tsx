@@ -18,7 +18,7 @@ const SettingsScreen: React.FC = () => {
       const savedDarkMode = await AsyncStorage.getItem('darkMode');
       const savedFontSize = await AsyncStorage.getItem('fontSize');
 
-      if (savedDarkMode !== null) setDarkMode(savedDarkMode === 'true');
+      if (savedDarkMode !== null) setDarkMode(savedDarkMode === 'darkMode');
       if (savedFontSize) setFontSize(savedFontSize);
     };
 
@@ -27,8 +27,10 @@ const SettingsScreen: React.FC = () => {
 
   const toggleSwitch = async () => {
     const newDarkMode = !darkMode;
+    console.log(newDarkMode);
+
     setDarkMode(newDarkMode);
-    await AsyncStorage.setItem('darkMode', String(newDarkMode));
+    await AsyncStorage.setItem('darkMode', String(newDarkMode ? 'darkMode' : ''));
   };
 
   const handleFontSizeChange = async (size: string) => {

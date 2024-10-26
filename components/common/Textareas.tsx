@@ -4,6 +4,7 @@ import { TextareasProps } from "@/typing/tag";
 import AccessibleView from "@/components/AccessibleView";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
+import { View } from "react-native";
 
 const Textareas = ({
     placeholder,
@@ -21,7 +22,7 @@ const Textareas = ({
     const masterdataStyles = useMasterdataStyles()
 
     return (
-        <AccessibleView name="text-areas" style={masterdataStyles.commonContainer}>
+        <View id="text-areas" style={masterdataStyles.commonContainer}>
             <TextInput
                 mode={mode || "outlined"}
                 placeholder={placeholder}
@@ -53,7 +54,7 @@ const Textareas = ({
             <HelperText type="error" visible={error} style={{ display: error ? 'flex' : 'none', left: -10 }}>
                 {errorMessage}
             </HelperText>
-        </AccessibleView>
+        </View>
     );
 };
 

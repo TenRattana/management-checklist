@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Pressable, ActivityIndicator } from "react-native";
+import { Pressable, ActivityIndicator, View } from "react-native";
 import { Card } from "react-native-paper";
 import { useAuth } from "../../contexts/auth";
 import { Formik } from "formik";
@@ -8,6 +8,7 @@ import { useToast } from "@/app/contexts/toastify";
 import { AccessibleView, Inputs, Text } from "@/components";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useFocusEffect } from "expo-router";
+import { useRes } from "@/app/contexts";
 
 const validationSchema = Yup.object().shape({
   username: Yup.string().required("The username field is required."),
@@ -18,6 +19,8 @@ const LoginScreen = () => {
   const [initialValues, setInitialValues] = useState({ username: "" });
   const [loading, setLoading] = useState(false);
   const { login } = useAuth()
+  const { spacing } = useRes();
+  const masterdataStyles = useMasterdataStyles()
 
   const handleLogin = useCallback(async (values: { username: string }) => {
     setLoading(true);
@@ -37,13 +40,14 @@ const LoginScreen = () => {
       };
     }, [])
   );
-  const masterdataStyles = useMasterdataStyles()
 
   return (
-    <AccessibleView name="Login Screen">
-      <Card>
-        <Card.Title title="Login" />
-        <Card.Content>
+    <AccessibleView name="Login Screen" style={{ paddingHorizontal: 30, marginTop: 100 }}>
+      <Card style={[{ height: 250 }]}>
+        <Card.Title title="Login"
+          titleStyle={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}
+        />
+        <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
           <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
@@ -61,7 +65,7 @@ const LoginScreen = () => {
               isValid,
               dirty,
             }) => (
-              <AccessibleView name="login">
+              <View id="login">
                 <Inputs
                   placeholder="Enter Username"
                   label="Username"
@@ -74,23 +78,20 @@ const LoginScreen = () => {
                   testId="username"
                 />
 
-                <AccessibleView name="login-action">
+                <View id="login-action" style={{ justifyContent: 'center', alignItems: 'center' }}>
                   <Pressable
                     onPress={() => handleSubmit()}
                     disabled={!isValid || !dirty || loading}
-                    style={[
-                      masterdataStyles.button,
-                      isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis,
-                    ]}
+                    style={[isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis, masterdataStyles.buttonCreate]}
                   >
                     {loading ? (
                       <ActivityIndicator />
                     ) : (
-                      <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Login</Text>
+                      <Text style={[masterdataStyles.textBold, { textAlign: 'center' }]}>Login</Text>
                     )}
                   </Pressable>
-                </AccessibleView>
-              </AccessibleView>
+                </View>
+              </View>
             )}
           </Formik>
         </Card.Content>

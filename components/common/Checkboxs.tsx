@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Checkbox, HelperText } from "react-native-paper";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import { CheckboxsProps } from "@/typing/tag";
 import AccessibleView from "@/components/AccessibleView";
 import Text from "@/components/Text";
@@ -43,7 +43,7 @@ const Checkboxs = ({
   }
 
   return (
-    <AccessibleView name="checkboxs" style={masterdataStyles.commonContainer}>
+    <View id="checkboxs" style={masterdataStyles.commonContainer}>
       {option.map((item, index) => (
         <Pressable
           key={index}
@@ -53,8 +53,8 @@ const Checkboxs = ({
           testID={testId}
           id={testId}
         >
-          <AccessibleView name="con-checkbox">
-            <AccessibleView name="group-checkboxs" style={masterdataStyles.checkboxContainer}>
+          <View id="con-checkbox">
+            <View id="group-checkboxs" style={masterdataStyles.checkboxContainer}>
               <Checkbox
                 status={
                   checkedOptions.includes(item.value || '') ? "checked" : "unchecked"
@@ -64,8 +64,8 @@ const Checkboxs = ({
                 }}
               />
               <Text style={masterdataStyles.checkboxLabel}>{item.label}</Text>
-            </AccessibleView>
-          </AccessibleView>
+            </View>
+          </View>
         </Pressable>
       ))}
 
@@ -73,7 +73,7 @@ const Checkboxs = ({
       <HelperText type="error" visible={error} style={{ display: error ? 'flex' : 'none', left: -10 }}>
         {errorMessage}
       </HelperText>
-    </AccessibleView>
+    </View>
   );
 };
 

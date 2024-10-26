@@ -92,8 +92,6 @@ export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children
 };
 
 export const useRes = (): ResponsiveContextType => {
-  console.log("useRes");
-
   const context = useContext(ResponsiveContext);
   if (context === undefined) {
     throw new Error("useRes must be used within a ResponsiveProvider");

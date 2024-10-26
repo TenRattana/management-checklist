@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { Pressable } from 'react-native';
 import { useAuth } from "@/app/contexts/auth";
 import { useRes } from '@/app/contexts/responsive';
-import { DrawerContentScrollView } from '@react-navigation/drawer';
+import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
 import { AccessibleView, Text } from '@/components';
 import MenuSection from './MenuSection';
 import useMasterdataStyles from "@/styles/common/masterdata";
 
-const CustomDrawerContent = (props: any) => {
-    const { navigation } = props;
+const CustomDrawerContent = (props: DrawerContentComponentProps) => {
+    const { navigation } = props
     const masterdataStyles = useMasterdataStyles();
     const { session, loading } = useAuth();
 

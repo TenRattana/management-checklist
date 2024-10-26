@@ -1,11 +1,10 @@
 import { StyleSheet } from "react-native";
-import { useTheme } from "react-native-paper";
 import { useSpacing } from "@/hooks/useSpacing";
-import { useRes } from "@/app/contexts";
+import { useRes, useTheme } from "@/app/contexts";
 
 
 const useCreateformStyle = () => {
-    const theme = useTheme();
+    const { theme } = useTheme();
     const { responsive, spacing, fontSize } = useRes();
 
     return StyleSheet.create({
@@ -15,17 +14,16 @@ const useCreateformStyle = () => {
         },
         containerL1: {
             display: "flex",
-            width: responsive === "small" ? "100%" : fontSize === "large" ? 450 : 350,
-            backgroundColor: theme.colors.onSurfaceVariant,
-            
+            width: responsive === "small" ? "100%" : fontSize === "large" ? 400 : 350,
         },
         containerL2: {
             display: "flex",
+            flex: 1,
         },
         addSubFormButton: {
             margin: 16,
             marginVertical: 8,
-            backgroundColor: theme.colors.onSecondary,
+            backgroundColor: theme.colors.onBackground,
             borderRadius: 8,
             flexDirection: 'row',
             alignItems: 'center',
@@ -41,7 +39,7 @@ const useCreateformStyle = () => {
             paddingHorizontal: 10,
             // height: 60,
             marginVertical: 5,
-            backgroundColor: theme.colors.onSecondary,
+            backgroundColor: theme.colors.tertiaryContainer,
             borderRadius: 8,
             flexDirection: 'row',
             alignItems: 'center',
@@ -66,12 +64,13 @@ const useCreateformStyle = () => {
         },
         subFormText: {
             fontSize: spacing.small,
+            color: theme.colors.onBackground
         },
         saveButton: {
             paddingHorizontal: 10,
             height: 60,
             marginVertical: 3,
-            backgroundColor: theme.colors.onTertiary,
+            backgroundColor: theme.colors.secondary,
             borderRadius: 8,
             flexDirection: 'row',
             alignItems: 'center',
@@ -79,9 +78,8 @@ const useCreateformStyle = () => {
             padding: 16,
             margin: 16,
         },
-        saveButtonText: {
-            color: theme.colors.background,
-            fontSize: spacing.small,
+        saveText: {
+            color: theme.colors.background
         },
         scrollableContainer: {
             maxHeight: 500,

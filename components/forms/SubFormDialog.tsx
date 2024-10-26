@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import { Inputs } from "@/components/common";
 import { Portal, Dialog } from "react-native-paper";
@@ -70,7 +70,7 @@ const SubFormDialog = ({
                                 isValid,
                                 dirty,
                             }) => (
-                                <AccessibleView name="sfd">
+                                <View id="sfd">
                                     <Inputs
                                         placeholder="Enter Sub Form Name"
                                         label="Sub Form Name"
@@ -91,7 +91,7 @@ const SubFormDialog = ({
                                         errorMessage={touched.Columns ? errors.Columns : ""}
                                     />
 
-                                    <AccessibleView name="sfd-action" style={masterdataStyles.containerAction}>
+                                    <View id="sfd-action" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}
@@ -150,8 +150,8 @@ const SubFormDialog = ({
                                                 Cancel
                                             </Text>
                                         </Pressable>
-                                    </AccessibleView>
-                                </AccessibleView>
+                                    </View>
+                                </View>
                             )}
                         </Formik>
                     )}

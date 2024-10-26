@@ -29,7 +29,7 @@ const MachineGroupScreen = () => {
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
-    const { spacing } = useRes();
+    const { spacing, fontSize } = useRes();
 
     const fetchData = useCallback(async () => {
         setIsLoading(true);
@@ -162,28 +162,25 @@ const MachineGroupScreen = () => {
     }, [machineGroup, initialValues.machineGroupId]);
 
     return (
-        <AccessibleView name="container-mahine">
-            <Card style={[{ borderRadius: 0, flex: 1 }]}>
-                <Card.Title
-                    title="Create Machine"
-                    titleStyle={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}
+        <AccessibleView name="container-mahine" style={{ flex: 1 }}>
+            <Card.Title
+                title="Create Machine"
+                titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
+            />
+            <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
+                <Searchbar
+                    placeholder="Search Machine..."
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    testId="search-machine"
                 />
-                {/* <Divider/> */}
-                <View id="container-search" style={masterdataStyles.containerSearch}>
-                    <Searchbar
-                        placeholder="Search Machine..."
-                        value={searchQuery}
-                        onChange={setSearchQuery}
-                        testId="search-machine"
-                    />
-                    <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                        <Text style={[masterdataStyles.textBold, { textAlign: 'center' }]}>Create Machine</Text>
-                    </Pressable>
-                </View>
-                <Card.Content style={{ padding: 2, paddingVertical: 10, flex: 1 }}>
-                    {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
-                </Card.Content>
-            </Card>
+                <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                    <Text style={[masterdataStyles.textBold, { textAlign: 'center' }]}>Create Machine</Text>
+                </Pressable>
+            </AccessibleView>
+            <Card.Content style={{ padding: 2, flex: 1 }}>
+                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+            </Card.Content>
 
             <Machine_dialog
                 isVisible={isVisible}

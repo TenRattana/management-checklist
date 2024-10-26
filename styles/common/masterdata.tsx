@@ -1,11 +1,11 @@
 import { StyleSheet } from "react-native";
 import { useRes } from "@/app/contexts";
-import { useTheme } from "react-native-paper";
+import { useTheme } from "@/app/contexts";
 
 
 const useMasterdataStyles = () => {
     const { responsive, spacing, fontSize } = useRes();
-    const theme = useTheme();
+    const { theme } = useTheme();
 
     return StyleSheet.create({
         scrollView: {
@@ -101,7 +101,7 @@ const useMasterdataStyles = () => {
             marginHorizontal: responsive === "small" ? '5%' : 30,
             borderRadius: 10,
             fontSize: spacing.small,
-            backgroundColor: theme.colors.background
+            backgroundColor: theme.colors.onBackground
         },
         menuItem: {
             minHeight: spacing.small + 30,
@@ -114,7 +114,7 @@ const useMasterdataStyles = () => {
             fontWeight: "500",
         },
         dropdown: {
-            flex:1,
+            flex: 1,
             height: 50,
             borderBottomColor: 'gray',
             borderBottomWidth: 0.5,
@@ -194,7 +194,7 @@ const useMasterdataStyles = () => {
         container: {
             flex: 1,
             paddingHorizontal: 10,
-            backgroundColor:theme.colors.background
+            backgroundColor: theme.colors.background
         },
         title: {
             fontSize: spacing.medium,
@@ -264,7 +264,8 @@ const useMasterdataStyles = () => {
         },
         menuText: {
             fontSize: spacing.small,
-            padding: 10
+            padding: 10,
+            color: theme.colors.onBackground
         },
         subMenuItem: {
             paddingLeft: 40,
@@ -276,7 +277,7 @@ const useMasterdataStyles = () => {
         },
         subMenuText: {
             fontSize: spacing.small,
-            color: '#5e5e5e',
+            color: theme.colors.onBackground,
         },
         settingItem: {
             flexDirection: 'row',

@@ -9,6 +9,7 @@ import CustomDrawerContent from '../../components/navigation/CustomDrawer';
 import axiosInstance from '@/config/axios';
 import { Text, AccessibleView } from '@/components';
 import { useTheme } from 'react-native-paper';
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
 
 const Drawer = createDrawerNavigator();
 
@@ -37,6 +38,7 @@ const components: Record<ComponentNames, () => Promise<{ default: React.Componen
   Checklist_option: () => import('@/app/screens/layouts/checklists/checklist_option/CheckListOptionScreen'),
   Checklist_group: () => import('@/app/screens/layouts/checklists/checklist_group/ChecklistGroupScreen'),
 };
+
 
 const Navigation = () => {
   const { loading, screens, session } = useAuth();
@@ -96,7 +98,6 @@ const Navigation = () => {
           width: drawerWidth,
         },
       }}
-      initialRouteName='Home'
       id='nav'
     >
       {screens.length > 0 ? (
@@ -110,14 +111,12 @@ const Navigation = () => {
               unmountOnBlur: true,
               drawerLabel: screen.name,
             }}
-
           />
         ))
       ) : (
         <Drawer.Screen name="Login" component={LoginScreen} />
       )}
     </Drawer.Navigator>
-
   );
 };
 

@@ -27,7 +27,7 @@ const MachineGroupScreen = () => {
     const masterdataStyles = useMasterdataStyles();
 
     const { showSuccess, handleError } = useToast();
-    const { spacing } = useRes();
+    const { spacing, fontSize } = useRes();
 
     const fetchData = useCallback(async () => {
         setIsLoading(true);
@@ -137,27 +137,25 @@ const MachineGroupScreen = () => {
     }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
-        <AccessibleView name="container-groupmachine">
-            <Card style={[{ borderRadius: 0, flex: 1 }]}>
-                <Card.Title
-                    title="Create Group Machine"
-                    titleStyle={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}
+        <AccessibleView name="container-groupmachine" style={{ flex: 1 }}>
+            <Card.Title
+                title="Create Group Machine"
+                titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
+            />
+            <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
+                <Searchbar
+                    placeholder="Search Machine Group..."
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    testId="search-machine-group"
                 />
-                <View id="container-search" style={masterdataStyles.containerSearch}>
-                    <Searchbar
-                        placeholder="Search Machine Group..."
-                        value={searchQuery}
-                        onChange={setSearchQuery}
-                        testId="search-machine-group"
-                    />
-                    <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                     <Text style={[masterdataStyles.textBold, { textAlign: 'center' }]}>Create Group Machine</Text>
-                    </Pressable>
-                </View>
-                <Card.Content style={{ padding: 2, paddingVertical: 10, flex: 1 }}>
-                    {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
-                </Card.Content>
-            </Card>
+                </Pressable>
+            </AccessibleView>
+            <Card.Content style={{ padding: 2, flex: 1 }}>
+                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+            </Card.Content>
 
             <Machine_group_dialog
                 isVisible={isVisible}

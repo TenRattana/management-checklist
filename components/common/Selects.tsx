@@ -5,6 +5,7 @@ import { SelectsProps } from "@/typing/tag";
 import AccessibleView from "@/components/AccessibleView";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
+import { View } from "react-native";
 
 const Selects = ({
   hint,
@@ -24,7 +25,7 @@ const Selects = ({
   const masterdataStyles = useMasterdataStyles()
 
   return (
-    <AccessibleView name="selects" style={masterdataStyles.commonContainer}>
+    <View id="selects" style={masterdataStyles.commonContainer}>
       {label ? <Text style={masterdataStyles.label}>{label}</Text> : false}
       <AccessibleView name="group-selects" style={masterdataStyles.dropdownContainer}>
         <Picker
@@ -45,6 +46,7 @@ const Selects = ({
               key={`value-${index}`}
               label={item.label}
               value={item.value}
+              style={masterdataStyles.text}
             />
           ))}
         </Picker>
@@ -53,7 +55,7 @@ const Selects = ({
       <HelperText type="error" visible={error} style={{ display: error ? 'flex' : 'none', left: -10 }}>
         {errorMessage}
       </HelperText>
-    </AccessibleView>
+    </View>
   );
 };
 

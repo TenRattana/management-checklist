@@ -25,12 +25,14 @@ import Dragfield from "./Dragfield";
 import { BaseSubForm, RowItemProps } from '@/typing/form'
 import { DragsubformProps } from "@/typing/tag";
 import { useToast } from "@/app/contexts";
+import useMasterdataStyles from "@/styles/common/masterdata";
 
 const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, checkListType, groupCheckListOption, checkList, navigation }) => {
     const [initialDialog, setInitialDialog] = useState<boolean>(false)
     const [initialSubForm, setInitialSubForm] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", MachineID: "", Fields: [] });
     const [editMode, setEditMode] = useState<boolean>(false)
     const createformStyles = useCreateformStyle();
+    const masterdataStyles = useMasterdataStyles()
 
     const createform = useCreateformStyle();
     const { handleError } = useToast();
@@ -125,7 +127,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                 style={[createform.addSubFormButton]}
             >
                 <IconButton icon="plus" size={spacing.large} style={createformStyles.icon} />
-                <Text style={createform.addSubFormText}>Add Sub Form</Text>
+                <Text style={[masterdataStyles.textLight, createform.addSubFormText]}>Add Sub Form</Text>
             </Pressable>
 
             <NestableScrollContainer>

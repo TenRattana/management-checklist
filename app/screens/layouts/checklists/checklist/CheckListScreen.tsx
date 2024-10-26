@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, SafeAreaView, View } from "react-native";
 import axiosInstance from "@/config/axios";
-import { useToast } from "@/app/contexts";
+import { useToast, useTheme } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
-import { Card, Divider, useTheme } from "react-native-paper";
+import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Checklist_dialog from "@/components/screens/Checklist_dialog";
@@ -26,7 +26,7 @@ const CheckListScreen = () => {
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
-    const { spacing } = useRes();
+    const { spacing, fontSize } = useRes();
 
     const fetchData = useCallback(async () => {
         setIsLoading(true);
@@ -125,27 +125,25 @@ const CheckListScreen = () => {
     }), [tableData, debouncedSearchQuery, handleAction]);
 
     return (
-        <AccessibleView name="container-checklist">
-            <Card style={[{ borderRadius: 0, flex: 1 }]}>
-                <Card.Title
-                    title="Create Check List"
-                    titleStyle={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}
+        <AccessibleView name="container-checklist" style={{ flex: 1 }}>
+            <Card.Title
+                title="Create Check List"
+                titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
+            />
+            <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
+                <Searchbar
+                    placeholder="Search Checklist..."
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    testId="search-checklist"
                 />
-                <View id="container-search" style={masterdataStyles.containerSearch}>
-                    <Searchbar
-                        placeholder="Search Checklist..."
-                        value={searchQuery}
-                        onChange={setSearchQuery}
-                        testId="search-checklist"
-                    />
-                    <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                     <Text style={[masterdataStyles.textBold, { textAlign: 'center' }]}>Create Check List</Text>
-                    </Pressable>
-                </View>
-                <Card.Content style={{ padding: 2, paddingVertical: 10, flex: 1 }}>
-                    {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
-                </Card.Content>
-            </Card>
+                </Pressable>
+            </AccessibleView>
+            <Card.Content style={{ padding: 2, flex: 1 }}>
+                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+            </Card.Content>
 
             <Checklist_dialog
                 isVisible={isVisible}
