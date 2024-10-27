@@ -42,7 +42,7 @@ const LoginScreen = () => {
   );
 
   return (
-    <AccessibleView name="Login Screen" style={{ paddingHorizontal: 30, marginTop: 100 }}>
+    <View id="Login Screen" style={{ paddingHorizontal: 30, marginTop: 100 }}>
       <Card style={[{ height: 250 }]}>
         <Card.Title title="Login"
           titleStyle={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}
@@ -96,7 +96,7 @@ const LoginScreen = () => {
           </Formik>
         </Card.Content>
       </Card>
-    </AccessibleView>
+    </View>
   );
 };
 

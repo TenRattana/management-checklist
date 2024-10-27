@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import { Inputs } from "@/components/common";
 import { Portal, Switch, Dialog, useTheme } from "react-native-paper";
@@ -13,13 +13,11 @@ const validationSchema = Yup.object().shape({
     groupCheckListOptionName: Yup.string().required(
         "The group check list option name field is required."
     ),
-    // description: Yup.string().required("The description field is required."),
     isActive: Yup.boolean().required("The active field is required."),
 });
 
 const Checklist_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }: ChecklistGroupDialogProps<InitialValuesGroupCheckList>) => {
     const masterdataStyles = useMasterdataStyles()
-    // const { colors } = useTheme()
     console.log("Checklist_group_dialog");
 
     return (
@@ -50,7 +48,7 @@ const Checklist_group_dialog = ({ isVisible, setIsVisible, isEditing, initialVal
                             onSubmit={(values: InitialValuesGroupCheckList) => saveData(values)}
                         >
                             {({ values, handleSubmit, setFieldValue, isValid, dirty }) => (
-                                <AccessibleView name="form-cgd">
+                                <View id="form-cgd">
 
                                     <FastField name="groupCheckListOptionName">
                                         {({ field, form }: any) => (
@@ -67,22 +65,7 @@ const Checklist_group_dialog = ({ isVisible, setIsVisible, isEditing, initialVal
                                         )}
                                     </FastField >
 
-                                    {/* <FastField name="description">
-                                        {({ field, form }: any) => (
-                                            <Inputs
-                                                placeholder="Enter Description"
-                                                label="Description"
-                                                handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                value={field.value}
-                                                error={form.touched.description && Boolean(form.errors.description)}
-                                                errorMessage={form.touched.description ? form.errors.description : ""}
-                                                testId="description-cgd"
-                                            />
-                                        )}
-                                    </FastField > */}
-
-                                    <AccessibleView name="form-active-cgd" style={masterdataStyles.containerSwitch}>
+                                    <View id="form-active-cgd" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                             Status: {values.isActive ? "Active" : "Inactive"}
                                         </Text>
@@ -93,14 +76,15 @@ const Checklist_group_dialog = ({ isVisible, setIsVisible, isEditing, initialVal
                                             onValueChange={(v: boolean) => { setFieldValue("isActive", v); }}
                                             testID="isActive-cgd"
                                         />
-                                    </AccessibleView>
-                                    <AccessibleView name="form-action-cgd" style={masterdataStyles.containerAction}>
+                                    </View>
+                                    <View id="form-action-cgd" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}
                                             style={[
                                                 masterdataStyles.button,
-                                                isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis,
+                                                masterdataStyles.backMain,
+                                                { opacity: isValid && dirty ? 1: 0.5 }
                                             ]}
                                             testID="Save-cgd"
                                         >
@@ -109,8 +93,8 @@ const Checklist_group_dialog = ({ isVisible, setIsVisible, isEditing, initialVal
                                         <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-cgd">
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Cancel</Text>
                                         </Pressable>
-                                    </AccessibleView>
-                                </AccessibleView>
+                                    </View>
+                                </View>
                             )}
                         </Formik>
                     )}

@@ -52,7 +52,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
 
     const handleAction = useCallback(async (action?: string, item?: string) => {
         const data = expectedResult.find((v) => v.TableID === item);
-
+        
         try {
             if (action === "preIndex") {
                 if (data) {

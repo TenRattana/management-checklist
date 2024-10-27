@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import { Inputs } from "@/components/common";
@@ -39,7 +39,7 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                             onSubmit={(values: InitialValuesMachine) => saveData(values)}
                         >
                             {({ values, handleSubmit, setFieldValue, dirty, isValid }) => (
-                                <AccessibleView name="form-md">
+                                <View id="form-md">
                                     <FastField name="machineGroupId">
                                         {({ field, form }: any) => (
                                             <CustomDropdownSingle
@@ -94,7 +94,7 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                                         )}
                                     </FastField>
 
-                                    <AccessibleView name="form-active-md" style={masterdataStyles.containerSwitch}>
+                                    <View id="form-active-md" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                             Status: {values.isActive ? "Active" : "Inactive"}
                                         </Text>
@@ -107,15 +107,16 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                                             }}
                                             testID="isActive-md"
                                         />
-                                    </AccessibleView>
+                                    </View>
 
-                                    <AccessibleView name="form-action-md" style={masterdataStyles.containerAction}>
+                                    <View id="form-action-md" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}
                                             style={[
                                                 masterdataStyles.button,
-                                                isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis,
+                                                masterdataStyles.backMain,
+                                                { opacity: isValid && dirty ? 1: 0.5 }
                                             ]}
                                             testID="Save-md"
                                         >
@@ -124,8 +125,8 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                                         <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-md">
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Cancel</Text>
                                         </Pressable>
-                                    </AccessibleView>
-                                </AccessibleView>
+                                    </View>
+                                </View>
                             )}
                         </Formik>
                     )}

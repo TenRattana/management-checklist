@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import { Inputs } from "@/components/common";
 import { Portal, Switch, Dialog, useTheme } from "react-native-paper";
@@ -41,7 +41,7 @@ const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValue
                             onSubmit={(values: InitialValuesGroupMachine) => saveData(values)}
                         >
                             {({ handleChange, handleBlur, values, errors, touched, handleSubmit, setFieldValue, isValid, dirty }) => (
-                                <AccessibleView name="form-mgd">
+                                <View id="form-mgd">
                                     <FastField name="machineGroupName">
                                         {({ field, form }: any) => (
                                             <Inputs
@@ -72,7 +72,7 @@ const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValue
                                         )}
                                     </FastField >
 
-                                    <AccessibleView name="form-active-mgd" style={masterdataStyles.containerSwitch}>
+                                    <View id="form-active-mgd" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                             Status: {values.isActive ? "Active" : "Inactive"}
                                         </Text>
@@ -85,14 +85,15 @@ const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValue
                                             }}
                                             testID="isActive-mgd"
                                         />
-                                    </AccessibleView>
-                                    <AccessibleView name="form-action-mgd" style={masterdataStyles.containerAction}>
+                                    </View>
+                                    <View id="form-action-mgd" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}
                                             style={[
                                                 masterdataStyles.button,
-                                                isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis,
+                                                masterdataStyles.backMain,
+                                                { opacity: isValid && dirty ? 1: 0.5 }
                                             ]}
                                             testID="Save-mgd"
                                         >
@@ -101,8 +102,8 @@ const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValue
                                         <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-mgd">
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Cancel</Text>
                                         </Pressable>
-                                    </AccessibleView>
-                                </AccessibleView>
+                                    </View>
+                                </View>
                             )}
                         </Formik>
                     )}

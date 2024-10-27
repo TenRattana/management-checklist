@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import { Inputs } from "@/components/common";
 import { Portal, Switch, Dialog, useTheme } from "react-native-paper";
@@ -8,6 +8,7 @@ import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { CheckListDialogProps, InitialValuesChecklist } from '@/typing/value'
 import Text from "@/components/Text";
+import { opacity } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 
 const validationSchema = Yup.object().shape({
     checkListName: Yup.string().required("Check list name is required."),
@@ -41,7 +42,7 @@ const Checklist_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, s
                                 onSubmit={(values: InitialValuesChecklist) => saveData(values)}
                             >
                                 {({ values, handleSubmit, setFieldValue, dirty, isValid }) => (
-                                    <AccessibleView name="form-cd">
+                                    <View id="form-cd">
 
                                         <FastField name="checkListName">
                                             {({ field, form }: any) => (
@@ -58,7 +59,7 @@ const Checklist_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, s
                                             )}
                                         </FastField >
 
-                                        <AccessibleView name="form-active-cd" style={masterdataStyles.containerSwitch}>
+                                        <View id="form-active-cd" style={masterdataStyles.containerSwitch}>
                                             <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                                 Status: {values.isActive ? "Active" : "Inactive"}
                                             </Text>
@@ -71,14 +72,15 @@ const Checklist_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, s
                                                 }}
                                                 testID="isActive-cd"
                                             />
-                                        </AccessibleView>
-                                        <AccessibleView name="form-action-cd" style={masterdataStyles.containerAction}>
+                                        </View>
+                                        <View id="form-action-cd" style={masterdataStyles.containerAction}>
                                             <Pressable
                                                 onPress={() => handleSubmit()}
                                                 disabled={!isValid || !dirty}
                                                 style={[
                                                     masterdataStyles.button,
-                                                    isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis,
+                                                    masterdataStyles.backMain,
+                                                    { opacity: isValid && dirty ? 1: 0.5 }
                                                 ]}
                                                 testID="Save-cd"
                                             >
@@ -89,8 +91,8 @@ const Checklist_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, s
                                             <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-cd">
                                                 <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Cancel</Text>
                                             </Pressable>
-                                        </AccessibleView>
-                                    </AccessibleView>
+                                        </View>
+                                    </View>
                                 )}
                             </Formik>
                         )}

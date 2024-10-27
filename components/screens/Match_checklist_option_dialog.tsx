@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import CustomDropdownMultiple from "@/components/CustomDropdownMultiple";
@@ -55,7 +55,7 @@ const Match_checklist_option = ({
                             onSubmit={(values: InitialValuesMatchCheckListOption) => saveData(values)}
                         >
                             {({ values, errors, touched, handleSubmit, setFieldValue, dirty, isValid }) => (
-                                <AccessibleView name="form-mcod">
+                                <View id="form-mcod">
 
                                     <FastField name="groupCheckListOptionId">
                                         {({ field, form }: any) => (
@@ -107,7 +107,7 @@ const Match_checklist_option = ({
                                         )}
                                     </FastField>
 
-                                    <AccessibleView name="form-active-mcod" style={masterdataStyles.containerSwitch}>
+                                    <View id="form-active-mcod" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                             Status: {values.isActive ? "Active" : "Inactive"}
                                         </Text>
@@ -120,14 +120,15 @@ const Match_checklist_option = ({
                                             }}
                                             testID="isActive-mcod"
                                         />
-                                    </AccessibleView>
+                                    </View>
                                     <AccessibleView name="form-action-mcod" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}
                                             style={[
                                                 masterdataStyles.button,
-                                                isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis,
+                                                masterdataStyles.backMain,
+                                                { opacity: isValid && dirty ? 1: 0.5 }
                                             ]}
                                             testID="Save-mcod"
                                         >
@@ -137,7 +138,7 @@ const Match_checklist_option = ({
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Cancel</Text>
                                         </Pressable>
                                     </AccessibleView>
-                                </AccessibleView>
+                                </View>
                             )}
                         </Formik>
                     )}

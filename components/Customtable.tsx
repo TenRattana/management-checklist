@@ -12,6 +12,8 @@ import { savePaginate, loadPaginate } from '@/app/services/storage';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+type justifyContent = 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly' | undefined;
+
 const CustomTable = ({
   Tabledata,
   Tablehead,
@@ -112,9 +114,10 @@ const CustomTable = ({
     return <Text key={`cell-content-${cellIndex}`}>{cell as string}</Text>;
   }, [theme.colors, animations]);
 
-  const renderActionButton = useCallback((data: string | number | boolean, action: string, row: (string | number | boolean)[], rowIndex: number) => {
+  const renderActionButton = useCallback((data: string, action: string, row: (string | number | boolean)[], rowIndex: number) => {
     const handlePress = () => {
       setDialogAction(action);
+      setDialogData(data);
       setDialogTitle(action === "editIndex" ? "Edit" : action === "delIndex" ? "Delete" : "");
       setDialogMessage(`${row[0]}`);
       setIsVisible(true);
@@ -122,11 +125,14 @@ const CustomTable = ({
 
     let icon;
     switch (action) {
+      case "editOnlyIndex":
+        icon = <IconButton icon="pencil-box" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.blue} />
+        break;
       case "editIndex":
-        icon = <IconButton icon="pencil-box" size={spacing.large + 5} iconColor={theme.colors.blue} />;
+        icon = <IconButton icon="pencil-box" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.blue} />;
         break;
       case "delIndex":
-        icon = <IconButton icon="trash-can" size={spacing.large + 5} iconColor={theme.colors.error} />;
+        icon = <IconButton icon="trash-can" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.error} />;
         break;
       case "changeIndex":
         icon = <IconButton icon="tooltip-edit" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.yellow} />
@@ -146,7 +152,7 @@ const CustomTable = ({
         {icon}
       </Pressable>
     );
-  }, [theme.colors, customtable.eventCell]);
+  }, [handleDialog, setDialogAction, setDialogTitle, setDialogMessage, setIsVisible]);
 
   const renderSmallRes = useCallback((rowData: (string | number | boolean)[], rowIndex: number) => {
     return (
@@ -158,12 +164,20 @@ const CustomTable = ({
               const filteredEntries = Object.entries(actionItem).filter(([, value]) => value === colIndex);
               return filteredEntries.length > 0
                 ? filteredEntries.map(([key]) => {
-                  return (
-                    <AccessibleView name={`action-${rowIndex}-${colIndex}`} key={`action-${rowIndex}-${colIndex}`} style={customtable.eventColumn}>
-                      {key === "editIndex" && renderActionButton(rowData[colIndex], "editIndex", rowData, rowIndex)}
-                      {key === "delIndex" && renderActionButton(rowData[colIndex], "delIndex", rowData, rowIndex)}
-                    </AccessibleView>
-                  );
+                  if (key === "editIndex" || key === "delIndex") {
+                    return (
+                      <AccessibleView name={`action-${rowIndex}-${colIndex}`} key={`action-${rowIndex}-${colIndex}`} style={customtable.eventColumn}>
+                        {key === "editIndex" && renderActionButton(rowData[colIndex] as string, "editIndex", rowData, rowIndex)}
+                        {key === "delIndex" && renderActionButton(rowData[colIndex] as string, "delIndex", rowData, rowIndex)}
+                      </AccessibleView>
+                    );
+                  } else {
+                    return (
+                      <AccessibleView name={`action-${rowIndex}-${colIndex}`} key={`action-${rowIndex}-${colIndex}`} style={customtable.eventColumn}>
+                        {renderActionButton(rowData[colIndex] as string, key, rowData, rowIndex)}
+                      </AccessibleView>
+                    )
+                  }
                 })
                 : renderCellContent(rowData[colIndex], colIndex, rowData, rowIndex);
             })}
@@ -176,18 +190,32 @@ const CustomTable = ({
   const renderTableData = useCallback((row: (string | number | boolean)[], rowIndex: number) => {
     return (
       <DataTable.Row key={`row-${rowIndex}`}>
+
         {row.map((cell, cellIndex) => {
+          const Align: justifyContent = Tablehead[cellIndex]?.align as justifyContent;
+          const justifyContent = {
+            justifyContent: Align,
+          };
           return (
-            <DataTable.Cell key={`cell-${rowIndex}-${cellIndex}`} style={{ flex: flexArr[cellIndex] || 1 }}>
+            <DataTable.Cell key={`cell-${rowIndex}-${cellIndex}`} style={[justifyContent, { flex: flexArr[cellIndex] || 1 }]}>
               {actionIndex.map(actionItem => {
                 const filteredEntries = Object.entries(actionItem).filter(([, value]) => value === cellIndex);
                 return filteredEntries.length > 0
                   ? filteredEntries.map(([key]) => {
-                    return (
-                      <AccessibleView name={`action-${rowIndex}-${key}`} key={`action-${rowIndex}`} style={customtable.eventColumn}>
-                        {renderActionButton(row[cellIndex], key, row, rowIndex)}
-                      </AccessibleView>
-                    );
+                    if (key === "editIndex" || key === "delIndex") {
+                      return (
+                        <AccessibleView name={`action-${rowIndex}-${key}`} key={`action-${rowIndex}`} style={customtable.eventColumn}>
+                          {renderActionButton(row[cellIndex] as string, "editIndex", row, rowIndex)}
+                          {renderActionButton(row[cellIndex] as string, "delIndex", row, rowIndex)}
+                        </AccessibleView>
+                      );
+                    } else {
+                      return (
+                        <AccessibleView name={`action-${rowIndex}-${key}`} key={`action-${rowIndex}`} style={customtable.eventColumn}>
+                          {renderActionButton(row[cellIndex] as string, key, row, rowIndex)}
+                        </AccessibleView>
+                      )
+                    }
                   })
                   : renderCellContent(cell, cellIndex, row, rowIndex);
               })}

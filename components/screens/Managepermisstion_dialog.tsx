@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import { Portal, Dialog, HelperText, Switch } from "react-native-paper";
@@ -40,7 +40,7 @@ const Managepermisstion_dialog = ({ isVisible, setIsVisible, isEditing, initialV
                             onSubmit={(values: InitialValuesManagepermission) => saveData(values)}
                         >
                             {({ values, handleSubmit, dirty, isValid, setFieldValue }) => (
-                                <AccessibleView name="form-managed">
+                                <View id="form-managed">
                                     <FastField name="UserName">
                                         {({ field, form }: any) => (
                                             <CustomDropdownSingle
@@ -89,7 +89,7 @@ const Managepermisstion_dialog = ({ isVisible, setIsVisible, isEditing, initialV
                                         )}
                                     </FastField>
 
-                                    <AccessibleView name="form-active-md" style={masterdataStyles.containerSwitch}>
+                                    <View id="form-active-md" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                             Status: {values.IsActive ? "Active" : "Inactive"}
                                         </Text>
@@ -102,15 +102,16 @@ const Managepermisstion_dialog = ({ isVisible, setIsVisible, isEditing, initialV
                                             }}
                                             testID="IsActive-managed"
                                         />
-                                    </AccessibleView>
+                                    </View>
 
-                                    <AccessibleView name="form-action-managed" style={masterdataStyles.containerAction}>
+                                    <View id="form-action-managed" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}
                                             style={[
                                                 masterdataStyles.button,
-                                                isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis,
+                                                masterdataStyles.backMain,
+                                                { opacity: isValid && dirty ? 1: 0.5 }
                                             ]}
                                             testID="Save-managed"
                                         >
@@ -119,8 +120,8 @@ const Managepermisstion_dialog = ({ isVisible, setIsVisible, isEditing, initialV
                                         <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-managed">
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Cancel</Text>
                                         </Pressable>
-                                    </AccessibleView>
-                                </AccessibleView>
+                                    </View>
+                                </View>
                             )}
                         </Formik>
                     )}

@@ -64,7 +64,7 @@ const DraggableItem: React.FC<{
             <View>
                 <Animated.View style={[itemAnimatedStyle, { opacity: isDragging ? 0 : 1 }]}>
                     <View style={[{ marginHorizontal: 10, flexDirection: "row", alignItems: "center" }, createform.addSubFormButton]}>
-                        <IconButton icon={item.Icon} size={spacing.large + 5} animated />
+                        <IconButton icon={item.Icon} size={spacing.large + 5} animated style={createform.icon}/>
                         <Text style={[createform.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
                             {item.CTypeName}
                         </Text>

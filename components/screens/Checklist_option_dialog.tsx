@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import { Inputs } from "@/components/common";
 import { Portal, Switch, Dialog, useTheme } from "react-native-paper";
@@ -42,7 +42,7 @@ const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialVa
                             onSubmit={(values: InitialValuesCheckListOption) => saveData(values)}
                         >
                             {({ values, handleSubmit, setFieldValue, dirty, isValid }) => (
-                                <AccessibleView name="form-cod">
+                                <View id="form-cod">
 
                                     <FastField name="checkListOptionName">
                                         {({ field, form }: any) => (
@@ -59,7 +59,7 @@ const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialVa
                                         )}
                                     </FastField >
 
-                                    <AccessibleView name="form-active-cod" style={masterdataStyles.containerSwitch}>
+                                    <View id="form-active-cod" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                             Status: {values.isActive ? "Active" : "Inactive"}
                                         </Text>
@@ -72,14 +72,15 @@ const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialVa
                                             }}
                                             testID="isActive-cod"
                                         />
-                                    </AccessibleView>
-                                    <AccessibleView name="form-action-cod" style={masterdataStyles.containerAction}>
+                                    </View>
+                                    <View id="form-action-cod" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}
                                             style={[
                                                 masterdataStyles.button,
-                                                isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis,
+                                                masterdataStyles.backMain,
+                                                { opacity: isValid && dirty ? 1: 0.5 }
                                             ]}
                                             testID="Save-cod"
                                         >
@@ -90,8 +91,8 @@ const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialVa
                                         <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-cod">
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Cancel</Text>
                                         </Pressable>
-                                    </AccessibleView>
-                                </AccessibleView>
+                                    </View>
+                                </View>
                             )}
                         </Formik>
                     )}

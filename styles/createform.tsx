@@ -60,6 +60,7 @@ const useCreateformStyle = () => {
         fieldText: {
             fontSize: spacing.small,
             paddingVertical: 10,
+            color: theme.colors.background
 
         },
         subFormText: {
@@ -86,7 +87,8 @@ const useCreateformStyle = () => {
             overflow: 'scroll',
         },
         icon: {
-            paddingVertical: 10
+            paddingVertical: 10,
+            backgroundColor:theme.colors.background
         }
     });
 };

@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import { Portal, Dialog, HelperText, useTheme } from "react-native-paper";
@@ -38,7 +38,7 @@ const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initial
                             onSubmit={(values: InitialValuesMatchFormMachine) => saveData(values, isEditing)}
                         >
                             {({ handleSubmit, dirty, isValid }) => (
-                                <AccessibleView name="form-mfmd">
+                                <View id="form-mfmd">
                                     <FastField name="machineId">
                                         {({ field, form }: any) => (
                                             <CustomDropdownSingle
@@ -89,13 +89,14 @@ const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initial
                                         )}
                                     </FastField>
 
-                                    <AccessibleView name="form-action-mfmd" style={masterdataStyles.containerAction}>
+                                    <View id="form-action-mfmd" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}
                                             style={[
                                                 masterdataStyles.button,
-                                                isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis,
+                                                masterdataStyles.backMain,
+                                                { opacity: isValid && dirty ? 1: 0.5 }
                                             ]}
                                             testID="Save-mfmd"
                                         >
@@ -104,8 +105,8 @@ const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initial
                                         <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-mfmd">
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Cancel</Text>
                                         </Pressable>
-                                    </AccessibleView>
-                                </AccessibleView>
+                                    </View>
+                                </View>
                             )}
                         </Formik>
                     )}

@@ -43,7 +43,7 @@ const CustomDropdownSingle = ({
     }, [processData]);
 
     return (
-        <AccessibleView name="customdropdown-single" style={masterdataStyles.commonContainer}>
+        <View id="customdropdown-single" style={masterdataStyles.commonContainer}>
             <Dropdown
                 style={masterdataStyles.dropdown}
                 placeholderStyle={masterdataStyles.placeholderStyle}
@@ -90,7 +90,7 @@ const CustomDropdownSingle = ({
             <HelperText type="error" visible={error} style={{ left: -10 }}>
                 {errorMessage}
             </HelperText>
-        </AccessibleView>
+        </View>
     );
 };
 
