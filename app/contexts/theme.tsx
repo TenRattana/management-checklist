@@ -23,6 +23,7 @@ const CustomLightTheme = {
     green: "#ffb11e",
     yellow: "#bea400",
     blue: "rgb(20, 148, 255)",
+    fff: '#fff'
   },
 };
 
@@ -38,6 +39,7 @@ const CustomDarkTheme = {
     green: "#ffb11e",
     yellow: "#bea400",
     blue: "rgb(20, 148, 255)",
+    fff: '#fff'
   },
 };
 

@@ -24,7 +24,7 @@ import { spacing } from "@/constants/Spacing";
 import Dragfield from "./Dragfield";
 import { BaseSubForm, RowItemProps } from '@/typing/form'
 import { DragsubformProps } from "@/typing/tag";
-import { useToast } from "@/app/contexts";
+import { useTheme, useToast } from "@/app/contexts";
 import useMasterdataStyles from "@/styles/common/masterdata";
 
 const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, checkListType, groupCheckListOption, checkList, navigation }) => {
@@ -33,7 +33,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
     const [editMode, setEditMode] = useState<boolean>(false)
     const createformStyles = useCreateformStyle();
     const masterdataStyles = useMasterdataStyles()
-
+    const { theme } = useTheme()
     const createform = useCreateformStyle();
     const { handleError } = useToast();
 
@@ -84,11 +84,11 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                     ]}
                     testID={`dg-SF-${item.SFormID}`}
                 >
-                    <IconButton icon={"credit-card-plus"} size={spacing.large} animated style={createformStyles.icon} />
+                    <IconButton icon={"credit-card-plus"} iconColor={theme.colors.background} size={spacing.large} style={createformStyles.icon} animated />
                     <Text style={[createform.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
                         {item.SFormName}
                     </Text>
-                    <IconButton icon="chevron-right" size={18} />
+                    <IconButton icon="chevron-right" iconColor={theme.colors.background} size={spacing.large} style={createformStyles.icon} animated />
                 </Pressable>
 
                 <AccessibleView name="drag-subform" style={{ paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 40 : 0 }}>
@@ -126,12 +126,12 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                 }}
                 style={[createform.addSubFormButton]}
             >
-                <IconButton icon="plus" size={spacing.large} style={createformStyles.icon} />
+                <IconButton icon="plus" iconColor={theme.colors.background} size={spacing.large} style={createformStyles.icon} animated />
                 <Text style={[masterdataStyles.textLight, createform.addSubFormText]}>Add Sub Form</Text>
             </Pressable>
 
             <NestableScrollContainer>
-                <AccessibleView name="drag-subform" style={{ paddingHorizontal: 30, paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 40 : 0 }}>
+                <AccessibleView name="drag-subform" style={{ paddingHorizontal: 40, paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 20 : 0 }}>
                     <NestableDraggableFlatList
                         data={state.subForms}
                         renderItem={renderSubForm}

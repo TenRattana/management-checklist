@@ -16,7 +16,7 @@ import { spacing } from "@/constants/Spacing";
 import useCreateformStyle from "@/styles/createform";
 import { BaseFormState, RowItemProps } from '@/typing/form'
 import { DragfieldProps } from "@/typing/tag";
-import { useToast } from "@/app/contexts";
+import { useTheme, useToast } from "@/app/contexts";
 import Text from '@/components/Text'
 
 const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType, checkListType, groupCheckListOption, checkList }) => {
@@ -28,7 +28,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [count, setCount] = useState<number>(0)
     const { handleError } = useToast();
-
+    const { theme } = useTheme()
     const createformStyles = useCreateformStyle();
 
     const handleDropField = (data: Omit<BaseFormState, 'DisplayOrder'>[]) => {
@@ -83,11 +83,11 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
                 style={[createformStyles.fieldContainer, isActive && createformStyles.active]}
                 testID={`dg-FD-${item.SFormID}`}
             >
-                <IconButton icon={checkListType.find((v) => v.CTypeID === item.CTypeID)?.Icon ?? "camera"} style={createformStyles.icon} size={spacing.large + 5} animated />
+                <IconButton icon={checkListType.find((v) => v.CTypeID === item.CTypeID)?.Icon ?? "camera"} style={createformStyles.icon} iconColor={theme.colors.background} size={spacing.large} animated />
                 <Text style={[createformStyles.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
                     {item.CListName}
                 </Text>
-                <IconButton icon="chevron-right" size={18} />
+                <IconButton icon="chevron-right" iconColor={theme.colors.background} size={spacing.large} style={createformStyles.icon} animated />
             </Pressable>
         );
     }
@@ -118,7 +118,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
                 }}
                 style={[createformStyles.fieldContainer, { justifyContent: "center", opacity: 0.5 }]}
             >
-                <IconButton icon="plus" size={16} />
+                <IconButton icon="plus" iconColor={theme.colors.background} size={spacing.large} style={createformStyles.icon} animated />
                 <Text style={createformStyles.addSubFormText}>Add Field</Text>
             </Pressable>
 

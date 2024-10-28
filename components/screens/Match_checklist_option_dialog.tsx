@@ -121,14 +121,14 @@ const Match_checklist_option = ({
                                             testID="isActive-mcod"
                                         />
                                     </View>
-                                    <AccessibleView name="form-action-mcod" style={masterdataStyles.containerAction}>
+                                    <View id="form-action-mcod" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}
                                             style={[
                                                 masterdataStyles.button,
                                                 masterdataStyles.backMain,
-                                                { opacity: isValid && dirty ? 1: 0.5 }
+                                                { opacity: isValid && dirty ? 1 : 0.5 }
                                             ]}
                                             testID="Save-mcod"
                                         >
@@ -137,7 +137,7 @@ const Match_checklist_option = ({
                                         <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-mcod">
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Cancel</Text>
                                         </Pressable>
-                                    </AccessibleView>
+                                    </View>
                                 </View>
                             )}
                         </Formik>

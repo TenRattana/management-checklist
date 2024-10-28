@@ -11,6 +11,10 @@ const useMasterdataStyles = () => {
         scrollView: {
             flex: 1,
         },
+        textFFF: {
+            color: theme.colors.fff,
+            fontSize: spacing.small,
+        },
         text: {
             fontSize: spacing.small,
             color: theme.colors.onBackground,
@@ -93,7 +97,8 @@ const useMasterdataStyles = () => {
         containerSearch: {
             flexDirection: 'row',
             flexWrap: 'wrap',
-            height: 100
+            height: 100,
+            marginBottom: responsive === "small" ? 50 : 0
         },
         searchbar: {
             width: responsive === "small" ? "90%" : 400,
@@ -114,7 +119,7 @@ const useMasterdataStyles = () => {
             fontWeight: "500",
         },
         dropdown: {
-            flex: 1,
+            // flex: 1,
             height: 50,
             borderBottomColor: 'gray',
             borderBottomWidth: 0.5,
@@ -157,12 +162,13 @@ const useMasterdataStyles = () => {
         checkboxLabel: {
             fontSize: spacing.small,
             marginLeft: 8,
+            color: theme.colors.onBackground
         },
         hint: {
             fontSize: spacing.small - 2,
             color: theme.colors.error,
-            marginTop: 5,
-            paddingLeft: 5
+            marginTop: fontSize === "large" ? 10 : 5,
+            paddingLeft: fontSize === "large" ? 7 : 5,
         },
         label: {
             fontSize: spacing.small,
@@ -176,9 +182,13 @@ const useMasterdataStyles = () => {
         },
         radioLabel: {
             fontSize: spacing.small,
+            color: theme.colors.onBackground
         },
         errorText: {
-            marginTop: 5,
+            left: -10,
+            fontSize: spacing.small,
+            marginVertical: fontSize === "large" ? 5 : 2,
+            paddingTop: fontSize === "large" ? 7 : 5
         },
         dropdownContainer: {
             borderWidth: 1,
@@ -190,6 +200,8 @@ const useMasterdataStyles = () => {
             height: 50,
             width: '100%',
             fontSize: spacing.small,
+            color: theme.colors.background,
+            backgroundColor: theme.colors.onBackground
         },
         container: {
             flex: 1,
@@ -199,11 +211,11 @@ const useMasterdataStyles = () => {
         title: {
             fontSize: spacing.medium,
             fontWeight: 'bold',
-            marginBottom: 10,
+            paddingHorizontal: fontSize === "large" ? 10 : 5
         },
         description: {
             fontSize: spacing.small,
-            marginBottom: 5,
+            paddingHorizontal: fontSize === "large" ? 10 : 5,
         },
         subFormContainer: {
             marginBottom: 16,
@@ -293,11 +305,14 @@ const useMasterdataStyles = () => {
         },
         settingText: {
             fontWeight: '500',
+            fontSize: spacing.small,
+            color: theme.colors.onBackground
         },
         pickerContainer: {
             width: 150,
             borderWidth: 1,
             borderRadius: 8,
+            backgroundColor: theme.colors.onBackground
         },
     });
 };

@@ -17,15 +17,11 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  console.log("Home");
-
   const masterdataStyles = useMasterdataStyles();
   const { handleError } = useToast();
   const { spacing, fontSize } = useRes();
 
   const fetchData = useCallback(async () => {
-    console.log("fetchData");
-
     setIsLoading(true);
     try {
       const [machineResponse, matchFormResponse] = await Promise.all([
@@ -43,15 +39,11 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
-      console.log("useFocusEffect");
-
       fetchData();
     }, [fetchData])
   );
 
   const tableData = useMemo(() => {
-    console.log("tableData");
-
     return matchForm.map((item) => [
       item.MachineName,
       item.FormName,
@@ -64,8 +56,6 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
   }, []);
 
   const customtableProps = useMemo(() => {
-    console.log("customtableProps")
-
     return {
       Tabledata: tableData,
       Tablehead: [
@@ -88,7 +78,7 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
       />
       <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
         <Pressable onPress={handleSacnQR} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-          <Text style={[masterdataStyles.textBold]}>Scan QR Code</Text>
+          <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Scan QR Code</Text>
         </Pressable>
       </AccessibleView>
 

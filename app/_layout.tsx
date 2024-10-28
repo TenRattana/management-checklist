@@ -11,8 +11,6 @@ SplashScreen.preventAutoHideAsync();
 
 const SetTheme = () => {
     const { theme } = useTheme();
-    const { screens } = useAuth();
-    console.log(screens);
 
     return (
         <PaperProvider theme={theme}>

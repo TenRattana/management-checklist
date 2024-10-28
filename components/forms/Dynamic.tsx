@@ -4,8 +4,9 @@ import { CheckListOption } from '@/typing/type';
 import AccessibleView from "../AccessibleView";
 import { DynamicFormProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import Text from "@/components/Text";
 import { View } from "react-native";
+import { useTheme } from "@/app/contexts";
+import { Text } from "react-native-paper";
 
 const DynamicForm = React.memo(({
   field,
@@ -14,10 +15,11 @@ const DynamicForm = React.memo(({
   handleBlur,
   groupCheckListOption,
   error,
-  errorMessage
+  errorMessages
 }: DynamicFormProps) => {
-  const { CTypeName, Hint, CListName, MCListID, GCLOptionID } = field;
+  const { CTypeName, Hint, CListName, MCListID, GCLOptionID, Required } = field;
   const masterdataStyles = useMasterdataStyles();
+  const { theme } = useTheme()
 
   const option = useMemo(() =>
     groupCheckListOption
@@ -34,7 +36,7 @@ const DynamicForm = React.memo(({
       case "Textinput":
         return (
           <Inputs
-            hint={Hint}
+            hint={error ? errorMessages?.[MCListID] as string || "" : ""}
             mode={"outlined"}
             label={CListName}
             value={values}
@@ -46,7 +48,7 @@ const DynamicForm = React.memo(({
       case "Textarea":
         return (
           <Textareas
-            hint={Hint}
+            hint={error ? errorMessages?.[MCListID] as string || "" : ""}
             mode={"outlined"}
             label={CListName}
             value={values}
@@ -59,7 +61,7 @@ const DynamicForm = React.memo(({
         return (
           <Radios
             option={option}
-            hint={Hint}
+            hint={error ? errorMessages?.[MCListID] as string || "" : ""}
             handleChange={(v) => handleChange(MCListID, v)}
             handleBlur={handleBlur}
             value={values}
@@ -70,7 +72,7 @@ const DynamicForm = React.memo(({
         return (
           <Selects
             option={option}
-            hint={Hint}
+            hint={error ? errorMessages?.[MCListID] as string || "" : ""}
             handleChange={(v) => handleChange(MCListID, v)}
             handleBlur={handleBlur}
             value={values}
@@ -81,7 +83,7 @@ const DynamicForm = React.memo(({
         return (
           <Checkboxs
             option={option}
-            hint={Hint}
+            hint={error ? errorMessages?.[MCListID] as string || "" : ""}
             handleChange={(v) => handleChange(MCListID, v)}
             handleBlur={handleBlur}
             value={values}
@@ -95,7 +97,13 @@ const DynamicForm = React.memo(({
 
   return (
     <View id="form-layout2">
-      <Text style={[masterdataStyles.text, CTypeName === "Text" ? { justifyContent: 'flex-start', alignItems: 'center', marginVertical: 'auto' } : {}]}>{CListName}</Text>
+      <Text
+        variant="bodyMedium"
+        style={[masterdataStyles.text, CTypeName === "Text" ? { justifyContent: 'flex-start', alignItems: 'center', marginVertical: 'auto' } : {}]}
+      >
+        {CListName} {" "}
+        {Required && <Text style={{ color: theme.colors.error }}>(*)</Text>}
+      </Text>
       {renderField()}
     </View>
   );

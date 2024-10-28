@@ -1,5 +1,5 @@
 import React, { useState, lazy, Suspense, useRef, useCallback, useEffect } from 'react';
-import { ActivityIndicator, SafeAreaView, ScrollView } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { HomeScreen, LoginScreen, AdminScreen, SuperAdminScreen, ScanQR, GenerateQR, UserScreen, SettingScreen, Managepermissions } from '@/app/screens';
 import NotFoundScreen from '@/app/+not-found';
@@ -8,8 +8,7 @@ import { useRes } from "@/app/contexts/responsive";
 import CustomDrawerContent from '../../components/navigation/CustomDrawer';
 import axiosInstance from '@/config/axios';
 import { Text, AccessibleView } from '@/components';
-import { useTheme } from 'react-native-paper';
-import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
+import { useTheme } from '../contexts';
 
 const Drawer = createDrawerNavigator();
 
@@ -44,7 +43,7 @@ const Navigation = () => {
   const { loading, screens, session } = useAuth();
   const { fontSize } = useRes();
 
-  const theme = useTheme()
+  const { theme } = useTheme()
 
   const [loadedComponents, setLoadedComponents] = useState(new Set<string>());
   const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
@@ -87,7 +86,6 @@ const Navigation = () => {
       </AccessibleView>
     );
   }
-  console.log(screens);
 
   return (
     <Drawer.Navigator

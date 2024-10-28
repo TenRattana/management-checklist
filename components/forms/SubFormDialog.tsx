@@ -12,7 +12,7 @@ import Text from "@/components/Text";
 
 const validationSchemaSubForm = Yup.object().shape({
     SFormName: Yup.string().required("The machine group name field is required."),
-    Columns: Yup.number().required("The columns field is required."),
+    Columns: Yup.number().typeError(`The column field must be a valid number`).required("The columns field is required."),
 });
 
 const SubFormDialog = ({
@@ -97,9 +97,8 @@ const SubFormDialog = ({
                                             disabled={!isValid || !dirty}
                                             style={[
                                                 masterdataStyles.button,
-                                                isValid && dirty
-                                                    ? masterdataStyles.backMain
-                                                    : masterdataStyles.backDis,
+                                                masterdataStyles.backMain,
+                                                { opacity: isValid && dirty ? 1 : 0.5 }
                                             ]}
                                         >
                                             <Text

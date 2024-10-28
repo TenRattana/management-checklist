@@ -15,6 +15,8 @@ const useCreateformStyle = () => {
         containerL1: {
             display: "flex",
             width: responsive === "small" ? "100%" : fontSize === "large" ? 400 : 350,
+            borderColor: theme.colors.onBackground,
+            borderRightWidth: 1
         },
         containerL2: {
             display: "flex",
@@ -23,7 +25,7 @@ const useCreateformStyle = () => {
         addSubFormButton: {
             margin: 16,
             marginVertical: 8,
-            backgroundColor: theme.colors.onBackground,
+            backgroundColor: theme.colors.blue,
             borderRadius: 8,
             flexDirection: 'row',
             alignItems: 'center',
@@ -39,7 +41,7 @@ const useCreateformStyle = () => {
             paddingHorizontal: 10,
             // height: 60,
             marginVertical: 5,
-            backgroundColor: theme.colors.tertiaryContainer,
+            backgroundColor: theme.colors.onBackground,
             borderRadius: 8,
             flexDirection: 'row',
             alignItems: 'center',
@@ -48,7 +50,7 @@ const useCreateformStyle = () => {
         subFormContainer: {
             padding: 16,
             marginVertical: 8,
-            backgroundColor: theme.colors.onSecondary,
+            backgroundColor: theme.colors.onBackground,
             borderRadius: 8,
             flexDirection: 'row',
             alignItems: 'center',
@@ -71,7 +73,7 @@ const useCreateformStyle = () => {
             paddingHorizontal: 10,
             height: 60,
             marginVertical: 3,
-            backgroundColor: theme.colors.secondary,
+            backgroundColor: theme.colors.onBackground,
             borderRadius: 8,
             flexDirection: 'row',
             alignItems: 'center',
@@ -80,7 +82,8 @@ const useCreateformStyle = () => {
             margin: 16,
         },
         saveText: {
-            color: theme.colors.background
+            color: theme.colors.background,
+            fontSize: spacing.small
         },
         scrollableContainer: {
             maxHeight: 500,
@@ -88,7 +91,6 @@ const useCreateformStyle = () => {
         },
         icon: {
             paddingVertical: 10,
-            backgroundColor:theme.colors.background
         }
     });
 };

@@ -145,7 +145,7 @@ const ChecklistGroupScreen = () => {
                     testId="search-groupchecklist"
                 />
                 <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textBold, { textAlign: 'center' }]}>Create Group Option</Text>
+                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>Create Group Option</Text>
                 </Pressable>
             </AccessibleView>
             <Card.Content style={{ padding: 2, flex: 1 }}>

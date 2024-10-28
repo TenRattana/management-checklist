@@ -29,7 +29,7 @@ const Text: React.FC<CustomTextProps> = ({ style, children, ...props }) => {
         return (
           <DefaultText
             key={index}
-            style={[{ fontFamily }, style, { fontSize: spacing.small }]}
+            style={[{ fontFamily }, style]}
             {...props}
           >
             {child}

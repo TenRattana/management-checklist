@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo, useImperativeHandle } from "react";
-import { Dimensions, Pressable, View, PanResponder, FlatList, ViewStyle, Animated, ScrollView } from "react-native";
-import { GestureHandlerRootView, PanGestureHandler } from "react-native-gesture-handler";
+import { Pressable, FlatList, ViewStyle, Animated, ScrollView } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
-import { IconButton, Divider, HelperText, Card, Portal } from "react-native-paper";
+import { Divider } from "react-native-paper";
 import useCreateformStyle from "@/styles/createform";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import useForm from "@/hooks/custom/useForm";
@@ -13,28 +13,24 @@ import { CreateFormProps } from "@/typing/tag";
 import { BaseForm, BaseFormState, BaseSubForm } from "@/typing/form";
 import { updateForm } from "@/slices";
 import { CheckListType } from "@/typing/type";
-import { useRes, useToast } from "@/app/contexts";
+import { useRes, useToast, useTheme } from "@/app/contexts";
 import { defaultDataForm } from "@/slices";
 import * as Yup from 'yup';
 import DraggableItem from "./DraggableItem";
 
-interface FormValues {
-    [key: string]: any;
-}
 
 const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
     const { state, dispatch, checkList, groupCheckListOption, checkListType, dataType } = useForm(route);
     const createform = useCreateformStyle();
 
     const [count, setCount] = useState<number>(0)
-
+    const { theme } = useTheme()
+    const { spacing, responsive } = useRes()
     const { handleError } = useToast()
     const masterdataStyles = useMasterdataStyles();
     const createformStyles = useCreateformStyle();
 
-    const [formValues, setFormValues] = useState<FormValues>({});
     const [initialSaveDialog, setInitialSaveDialog] = useState(false);
-    const { responsive } = useRes();
 
     const formRef = useRef<BaseForm>({
         FormID: "",
@@ -72,9 +68,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
 
     const handleDrop = (item: CheckListType, absoluteX: number, absoluteY: number) => {
         const cardIndex = childRef.current.checkCardPosition(absoluteX, absoluteY);
-        console.log(cardIndex);
-        console.log(absoluteX);
-        console.log(absoluteY);
 
         const selectedChecklist = checkList.find(v => v.CListID === "CL000") || checkList[0];
         const selectedDataType = dataType.find(v => v.DTypeName === "String") || dataType[0];
@@ -166,8 +159,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
         return Yup.object().shape(shape);
     }, [state.subForms, dataType, checkListType]);
 
-    console.log(state);
-
     return (
         <GestureHandlerRootView style={[createform.container, { flex: 1 }]}>
             <AccessibleView name="container-form" style={[createform.containerL1]}>
@@ -178,8 +169,9 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                         const newIndex = event.nativeEvent.selectedSegmentIndex;
                         setSelectedIndex(newIndex);
                     }}
-
-                    style={{ height: 80, borderRadius: 0 }}
+                    style={{ height: 80, borderRadius: 0, backgroundColor: theme.colors.onBackground }}
+                    fontStyle={{ color: theme.colors.background }}
+                    activeFontStyle={{ color: theme.colors.onBackground, fontWeight: "bold", fontSize: spacing.small }}
                 />
 
                 <FlatList
@@ -187,15 +179,15 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                     renderItem={() => selectedIndex === 0 && (
                         <AccessibleView name="container-sagment" style={{ paddingHorizontal: 20, paddingTop: 10 }}>
                             <Inputs
-                                placeholder="Enter Content Name"
-                                label="Content Name"
+                                placeholder="Enter Form Name"
+                                label="Form Name"
                                 handleChange={(value) => handleChange("FormName", value)}
                                 value={initialForm.FormName}
                                 testId="form-name"
                             />
                             <Inputs
-                                placeholder="Enter Description"
-                                label="Description"
+                                placeholder="Enter Form Description"
+                                label="Form Description"
                                 handleChange={(value) => handleChange("Description", value)}
                                 value={initialForm.Description}
                                 testId="form-description"
@@ -210,22 +202,35 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                                 <Text style={createform.saveText}>Save Form</Text>
                             </Pressable>
 
-                            <Divider bold style={[{ marginVertical: 10 }, masterdataStyles.backMain]} />
+                            {responsive !== "small" && (
+                                <>
+                                    <Divider bold style={[{ marginVertical: 10, height: 5, backgroundColor: theme.colors.onBackground }]} />
 
-                            <Text style={[masterdataStyles.title, masterdataStyles.text, { textAlign: 'center', paddingTop: 10 }]}>Menu List Type</Text>
+                                    <Text style={[masterdataStyles.title, { textAlign: 'center' }]}>Menu List Type</Text>
+                                    {checkListType.map((item, index) => (
+                                        <DraggableItem item={item} onDrop={handleDrop} key={`${item.CTypeID}-${index}`} />
+                                    ))}
+                                </>
+                            )}
 
-                            {checkListType.map((item, index) => (
-                                <DraggableItem item={item} onDrop={handleDrop} key={`${item.CTypeID}-${index}`} />
-                            ))}
                         </AccessibleView>
                     )}
                     style={{ display: selectedIndex === 0 ? 'flex' : 'none' }}
                     keyExtractor={(_, index) => `${index}`}
                     contentContainerStyle={{ flexGrow: 1 }}
-                // ListHeaderComponentStyle={{ , flexGrow: 1 }}
                 />
-                {selectedIndex === 1 && (
-                    <AccessibleView name="selectedIndex-1" style={{ display: selectedIndex === 1 ? 'flex' : 'none' }}>
+                {responsive !== "small" ? selectedIndex === 1 && (
+                    <AccessibleView name="selectedIndex-1" style={{ display: selectedIndex === 1 ? 'flex' : 'none', flex: 1 }}>
+                        <Dragsubform navigation={navigation}
+                            state={state}
+                            dispatch={dispatch}
+                            checkList={checkList}
+                            dataType={dataType}
+                            checkListType={checkListType}
+                            groupCheckListOption={groupCheckListOption} />
+                    </AccessibleView>
+                ) : selectedIndex === 1 && (
+                    <AccessibleView name="selectedIndex-1" style={{ display: selectedIndex === 1 ? 'flex' : 'none', maxHeight: 500 }}>
                         <Dragsubform navigation={navigation}
                             state={state}
                             dispatch={dispatch}
@@ -235,7 +240,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                             groupCheckListOption={groupCheckListOption} />
                     </AccessibleView>
                 )}
-
             </AccessibleView>
 
             <AccessibleView name="container-preview" style={[createform.containerL2]}>
@@ -245,6 +249,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                     validationSchema={validationSchema}
                 />
             </AccessibleView>
+
 
             <SaveDialog
                 state={state}

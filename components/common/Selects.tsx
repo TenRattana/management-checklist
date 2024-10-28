@@ -6,6 +6,7 @@ import AccessibleView from "@/components/AccessibleView";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
 import { View } from "react-native";
+import { useTheme } from "@/app/contexts";
 
 const Selects = ({
   hint,
@@ -23,6 +24,7 @@ const Selects = ({
   }
   console.log("Selects");
   const masterdataStyles = useMasterdataStyles()
+  const { theme } = useTheme();
 
   return (
     <View id="selects" style={masterdataStyles.commonContainer}>
@@ -52,7 +54,7 @@ const Selects = ({
         </Picker>
       </AccessibleView>
       {hint ? <Text style={masterdataStyles.hint}>{hint}</Text> : false}
-      <HelperText type="error" visible={error} style={{ display: error ? 'flex' : 'none', left: -10 }}>
+      <HelperText type="error" visible={error} style={[{ display: error ? 'flex' : 'none' }, masterdataStyles.errorText]}>
         {errorMessage}
       </HelperText>
     </View>

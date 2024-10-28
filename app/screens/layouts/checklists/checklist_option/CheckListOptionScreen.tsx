@@ -153,7 +153,7 @@ const CheckListOptionScreen = () => {
                     testId="search-checklist-option"
                 />
                 <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textBold, { textAlign: 'center' }]}>Create Option</Text>
+                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>Create Option</Text>
                 </Pressable>
             </AccessibleView>
             <Card.Content style={{ padding: 2, flex: 1 }}>

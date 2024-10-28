@@ -1,7 +1,7 @@
 import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef } from "react";
 import { View, ViewStyle, FlatList } from "react-native";
 import { Card, Divider, HelperText } from "react-native-paper";
-import { useRes } from "@/app/contexts";
+import { useRes, useTheme } from "@/app/contexts";
 import { BaseFormState, BaseSubForm } from '@/typing/form';
 import { AccessibleView, Dynamic, Text } from "@/components";
 import useForm from "@/hooks/custom/useForm";
@@ -20,7 +20,7 @@ const Preview = forwardRef<any, any>((props, ref) => {
     const cardRef = useRef<View>(null);
     const { responsive } = useRes();
     const [formValues, setFormValues] = useState<FormValues>({});
-
+    const { theme } = useTheme()
     const cardRefs = useRef<(View | null)[]>([]);
     const cardPositions = useRef<{ x: number; y: number; width: number; height: number }[]>([]);
 
@@ -33,8 +33,6 @@ const Preview = forwardRef<any, any>((props, ref) => {
         cardRefs.current.forEach((cardRef, index) => {
             if (cardRef) {
                 cardRef.measureInWindow((x, y, width, height) => {
-                    console.log(x, y);
-
                     positions.push({ x, y, width: width + 350, height: height + 16 });
                 });
             }
@@ -82,9 +80,9 @@ const Preview = forwardRef<any, any>((props, ref) => {
                 data={[{}]}
                 renderItem={() => (
                     <>
-                        <Text style={[masterdataStyles.title, masterdataStyles.text]}>{state.FormName || "Form Name"}</Text>
+                        <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
                         <Divider />
-                        <Text style={[masterdataStyles.description, masterdataStyles.text, { paddingVertical: 10 }]}>{state.Description || "Form Description"}</Text>
+                        <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
 
                         {state.subForms.map((subForm: BaseSubForm, index: number) => (
                             <Formik
@@ -165,24 +163,9 @@ const Preview = forwardRef<any, any>((props, ref) => {
                                                                             }}
                                                                             handleBlur={handleBlur}
                                                                             groupCheckListOption={groupCheckListOption}
+                                                                            error={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
+                                                                            errorMessages={errors}
                                                                         />
-                                                                        {Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name]) && (
-                                                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                                                <HelperText
-                                                                                    type="error"
-                                                                                    visible={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
-                                                                                    style={{ left: -10 }}
-                                                                                >
-                                                                                    {errors[fastFieldProps.name] as string || ""}
-                                                                                </HelperText>
-                                                                                <Text
-                                                                                    style={[masterdataStyles.text, masterdataStyles.errorText]}
-                                                                                    onPress={handleCloseError}
-                                                                                >
-                                                                                    Close
-                                                                                </Text>
-                                                                            </View>
-                                                                        )}
                                                                     </View>
                                                                 );
                                                             }}

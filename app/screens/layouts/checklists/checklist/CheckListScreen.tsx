@@ -138,7 +138,7 @@ const CheckListScreen = () => {
                     testId="search-checklist"
                 />
                 <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textBold, { textAlign: 'center' }]}>Create Check List</Text>
+                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>Create Check List</Text>
                 </Pressable>
             </AccessibleView>
             <Card.Content style={{ padding: 2, flex: 1 }}>

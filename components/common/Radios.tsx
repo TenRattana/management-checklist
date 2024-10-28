@@ -49,7 +49,7 @@ const Radios = ({
       </RadioButton.Group>
       {hint ? <Text style={masterdataStyles.hint}>{hint}</Text> : false}
       {error ? (
-        <HelperText type="error" visible={error} style={{ display: error ? 'flex' : 'none', left: -10 }}>
+        <HelperText type="error" visible={error} style={[{ display: error ? 'flex' : 'none' }, masterdataStyles.errorText]}>
           {errorMessage}
         </HelperText>
       ) : false}

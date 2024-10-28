@@ -186,7 +186,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
                     testId="search-match-form-machine"
                 />
                 <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textBold, { textAlign: 'center' }]}>Create Match Machine & Form</Text>
+                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>Create Match Machine & Form</Text>
                 </Pressable>
             </AccessibleView>
             <Card.Content style={{ padding: 2, flex: 1 }}>

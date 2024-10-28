@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { HandlerStateChangeEvent, PanGestureHandler } from "react-native-gesture-handler";
+import { GestureEvent, HandlerStateChangeEvent, PanGestureHandler, PanGestureHandlerEventPayload } from "react-native-gesture-handler";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, runOnJS } from "react-native-reanimated";
 import { IconButton, Portal } from "react-native-paper";
 import useCreateformStyle from "@/styles/createform";
 import { CheckListType } from "@/typing/type";
 import { View } from "react-native";
-import { useRes } from "@/app/contexts";
-import { AccessibleView , Text } from "@/components";
+import { useRes, useTheme } from "@/app/contexts";
+import { Text } from "@/components";
 
 const DraggableItem: React.FC<{
     item: CheckListType;
@@ -33,8 +33,8 @@ const DraggableItem: React.FC<{
 
     const createform = useCreateformStyle();
     const { spacing } = useRes();
-
-    const onGestureEvent = (e: any) => {
+    const { theme } = useTheme()
+    const onGestureEvent = (e: GestureEvent<PanGestureHandlerEventPayload>) => {
         const { translationX, translationY, absoluteX, absoluteY } = e.nativeEvent;
 
         if (!isDragging) {
@@ -64,7 +64,7 @@ const DraggableItem: React.FC<{
             <View>
                 <Animated.View style={[itemAnimatedStyle, { opacity: isDragging ? 0 : 1 }]}>
                     <View style={[{ marginHorizontal: 10, flexDirection: "row", alignItems: "center" }, createform.addSubFormButton]}>
-                        <IconButton icon={item.Icon} size={spacing.large + 5} animated style={createform.icon}/>
+                        <IconButton icon={item.Icon} iconColor={theme.colors.background} size={spacing.large} style={createform.icon} animated />
                         <Text style={[createform.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
                             {item.CTypeName}
                         </Text>
@@ -73,7 +73,7 @@ const DraggableItem: React.FC<{
                 {isDragging && (
                     <Portal>
                         <Animated.View style={portalAnimatedStyle}>
-                            <IconButton icon={item.Icon} size={spacing.large + 5} animated />
+                            <IconButton icon={item.Icon} iconColor={theme.colors.onBackground} size={spacing.large} style={createform.icon} animated />
                             <Text style={[createform.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
                                 {item.CTypeName}
                             </Text>

@@ -111,7 +111,7 @@ const CustomTable = ({
         </Pressable>
       );
     }
-    return <Text key={`cell-content-${cellIndex}`}>{cell as string}</Text>;
+    return <Text key={`cell-content-${cellIndex}`} style={masterdataStyles.text}>{cell as string}</Text>;
   }, [theme.colors, animations]);
 
   const renderActionButton = useCallback((data: string, action: string, row: (string | number | boolean)[], rowIndex: number) => {
@@ -167,8 +167,9 @@ const CustomTable = ({
                   if (key === "editIndex" || key === "delIndex") {
                     return (
                       <AccessibleView name={`action-${rowIndex}-${colIndex}`} key={`action-${rowIndex}-${colIndex}`} style={customtable.eventColumn}>
-                        {key === "editIndex" && renderActionButton(rowData[colIndex] as string, "editIndex", rowData, rowIndex)}
-                        {key === "delIndex" && renderActionButton(rowData[colIndex] as string, "delIndex", rowData, rowIndex)}
+                        <Text style={[masterdataStyles.text, { alignSelf: "center", }]}>Action : </Text>
+                        {renderActionButton(rowData[colIndex] as string, "editIndex", rowData, rowIndex)}
+                        {renderActionButton(rowData[colIndex] as string, "delIndex", rowData, rowIndex)}
                       </AccessibleView>
                     );
                   } else {
@@ -229,16 +230,16 @@ const CustomTable = ({
   return (
     <AccessibleView name="customtable" style={{ flex: 1 }} >
       {responsive === "small" ? (
-        <AccessibleView name="small" style={{ marginTop: 60 }}>
+        <AccessibleView name="small" style={{ flex: 1, marginTop: 20 }} >
           {filteredData.length === 0 ? (
-            <Text style={{ textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }}>No data found...</Text>
+            <Text style={[{ textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }, masterdataStyles.text]}>No data found...</Text>
           ) : (
             <FlatList
               data={filteredData.length > 0 ? displayData : []}
               renderItem={({ item, index }) => renderSmallRes(item, index)}
               keyExtractor={(item, index) => `row-${index}`}
               ListEmptyComponent={() => (
-                <Text style={{ textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }}>No data found...</Text>
+                <Text style={[{ textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }, masterdataStyles.text]}>No data found...</Text>
               )}
               contentContainerStyle={{ flexGrow: 1 }}
             />
@@ -248,16 +249,22 @@ const CustomTable = ({
         <AccessibleView name="data" style={{ flex: 1 }}>
           <DataTable>
             <DataTable.Header>
-              {Tablehead.map((header, index) => (
-                <DataTable.Title
-                  key={`header-${index}`}
-                  onPress={() => handleSort(index)}
-                  style={{ flex: flexArr[index] || 1 }}
-                >
-                  <Text style={masterdataStyles.textBold}>{header.label}</Text>
-                  {sortColumn === index && (sortDirection === "ascending" ? " ▲" : " ▼")}
-                </DataTable.Title>
-              ))}
+              {Tablehead.map((header, index) => {
+                const Align: justifyContent = Tablehead[index]?.align as justifyContent;
+                const justifyContent = {
+                  justifyContent: Align,
+                };
+                return (
+                  <DataTable.Title
+                    key={`header-${index}`}
+                    onPress={() => handleSort(index)}
+                    style={[{ flex: flexArr[index] || 1 }, justifyContent]}
+                  >
+                    <Text style={[masterdataStyles.textBold, masterdataStyles.text]}>{header.label}</Text>
+                    {sortColumn === index && (sortDirection === "ascending" ? " ▲" : " ▼")}
+                  </DataTable.Title>
+                )
+              })}
             </DataTable.Header>
           </DataTable>
 
@@ -304,7 +311,4 @@ const CustomTable = ({
   );
 };
 
-export default CustomTable;
-
-
-{/*  */ }
+export default React.memo(CustomTable);

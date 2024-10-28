@@ -14,6 +14,7 @@ import {
   GroupCheckListOption,
 } from "./type";
 import * as Yup from 'yup';
+import { FormikErrors } from "formik";
 
 export type CreateFormParams = { formId: string };
 export type FormParams = { messages: string };
@@ -91,7 +92,7 @@ export interface DynamicFormProps {
   handleBlur?: () => void;
   groupCheckListOption: GroupCheckListOption[];
   error?:boolean;
-  errorMessage?:string;
+  errorMessages?:FormikErrors<{[key: string]: any;}>;
 }
 
 export interface PreviewProps<T extends PreviewParams | ScanParams> {

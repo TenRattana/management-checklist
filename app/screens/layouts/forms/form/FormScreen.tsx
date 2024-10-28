@@ -118,7 +118,7 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
                     testId="search-form"
                 />
                 <Pressable onPress={handleNewForm} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textBold, { textAlign: 'center' }]}>New Form</Text>
+                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>New Form</Text>
                 </Pressable>
             </AccessibleView>
             <Card.Content style={{ padding: 2, paddingVertical: 10, flex: 1 }}>

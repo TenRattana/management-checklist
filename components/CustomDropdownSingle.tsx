@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import { IconButton, HelperText } from "react-native-paper";
 import { Dropdown } from 'react-native-element-dropdown';
-import AccessibleView from "@/components/AccessibleView";
 import { CustomDropdownSingleProps } from '@/typing/tag'
 import useMasterdataStyles from "@/styles/common/masterdata";
-import Text from "@/components/Text";
+import { useRes } from "@/app/contexts";
 
 const CustomDropdownSingle = ({
     labels,
@@ -23,6 +22,7 @@ const CustomDropdownSingle = ({
 }: CustomDropdownSingleProps) => {
     const [options, setOptions] = useState<{ label?: string; value?: string; icon?: () => JSX.Element }[]>([]);
     const masterdataStyles = useMasterdataStyles();
+    const { spacing, fontSize } = useRes();
 
     console.log("CustomDropdownSingleProps");
 
@@ -45,6 +45,7 @@ const CustomDropdownSingle = ({
     return (
         <View id="customdropdown-single" style={masterdataStyles.commonContainer}>
             <Dropdown
+                mode="modal"
                 style={masterdataStyles.dropdown}
                 placeholderStyle={masterdataStyles.placeholderStyle}
                 selectedTextStyle={masterdataStyles.selectedTextStyle}
@@ -87,7 +88,7 @@ const CustomDropdownSingle = ({
                 )}
                 testID={testId}
             />
-            <HelperText type="error" visible={error} style={{ left: -10 }}>
+            <HelperText type="error" visible={error} style={[{ display: error ? 'flex' : 'none' }, masterdataStyles.errorText]}>
                 {errorMessage}
             </HelperText>
         </View>

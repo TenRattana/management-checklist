@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Switch, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
@@ -10,7 +10,6 @@ const SettingsScreen: React.FC = () => {
   const { spacing, fontSize, setFontSize, } = useRes();
   const { darkMode, setDarkMode } = useTheme();
 
-  console.log(darkMode);
   const masterdataStyles = useMasterdataStyles()
 
   useEffect(() => {
@@ -27,8 +26,6 @@ const SettingsScreen: React.FC = () => {
 
   const toggleSwitch = async () => {
     const newDarkMode = !darkMode;
-    console.log(newDarkMode);
-
     setDarkMode(newDarkMode);
     await AsyncStorage.setItem('darkMode', String(newDarkMode ? 'darkMode' : ''));
   };
@@ -38,22 +35,32 @@ const SettingsScreen: React.FC = () => {
     await AsyncStorage.setItem('fontSize', size);
   };
 
-  return (
-    <AccessibleView name="setting" style={[masterdataStyles.container]}>
-      <Text style={[masterdataStyles.textBold, { textAlign: 'center', paddingVertical: 30 }]}>Settings</Text>
-
-      <View id="setting-mode" style={[masterdataStyles.settingItem]}>
-        <Text style={[masterdataStyles.settingText, { fontSize: spacing.small }]}>Dark Mode</Text>
+  const MySwitch = useMemo(() => {
+    return (
+      <View>
         <Switch
           onValueChange={toggleSwitch}
           value={darkMode}
-          thumbColor={darkMode ? "#00000e" : "#f4f3f4"}
+          thumbColor={darkMode ? "#fff" : "#000"}
           trackColor={{ false: "#767577", true: "#81b0ff" }}
+          style={{ transform: [{ scale: 1.5 }] }}
         />
+      </View>
+    );
+  }, [toggleSwitch, darkMode]);
+  console.log(spacing);
+
+  return (
+    <AccessibleView name="setting" style={[masterdataStyles.container]}>
+      <Text style={[masterdataStyles.textBold, { textAlign: 'center', paddingVertical: 30, fontSize: spacing.large }]}>Settings</Text>
+
+      <View id="setting-mode" style={[masterdataStyles.settingItem]}>
+        <Text style={[masterdataStyles.settingText]}>Dark Mode</Text>
+        {MySwitch}
       </View>
 
       <View id="setting-font" style={[masterdataStyles.settingItem]}>
-        <Text style={[masterdataStyles.settingText, { fontSize: spacing.small }]}>Font Size</Text>
+        <Text style={[masterdataStyles.settingText]}>Font Size</Text>
         <View id="Picker" style={[masterdataStyles.pickerContainer]}>
           <Picker
             selectedValue={fontSize}

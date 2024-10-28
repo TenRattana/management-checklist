@@ -19,7 +19,7 @@ const LoginScreen = () => {
   const [initialValues, setInitialValues] = useState({ username: "" });
   const [loading, setLoading] = useState(false);
   const { login } = useAuth()
-  const { spacing } = useRes();
+  const { spacing, fontSize } = useRes();
   const masterdataStyles = useMasterdataStyles()
 
   const handleLogin = useCallback(async (values: { username: string }) => {
@@ -45,7 +45,7 @@ const LoginScreen = () => {
     <View id="Login Screen" style={{ paddingHorizontal: 30, marginTop: 100 }}>
       <Card style={[{ height: 250 }]}>
         <Card.Title title="Login"
-          titleStyle={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}
+          titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
         />
         <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
           <Formik
@@ -82,12 +82,16 @@ const LoginScreen = () => {
                   <Pressable
                     onPress={() => handleSubmit()}
                     disabled={!isValid || !dirty || loading}
-                    style={[isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis, masterdataStyles.buttonCreate]}
+                    style={[
+                      masterdataStyles.button,
+                      masterdataStyles.backMain,
+                      { opacity: isValid && dirty ? 1 : 0.5 }
+                    ]}
                   >
                     {loading ? (
                       <ActivityIndicator />
                     ) : (
-                      <Text style={[masterdataStyles.textBold, { textAlign: 'center' }]}>Login</Text>
+                      <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>Login</Text>
                     )}
                   </Pressable>
                 </View>

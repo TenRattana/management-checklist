@@ -150,7 +150,7 @@ const MachineGroupScreen = () => {
                     testId="search-machine-group"
                 />
                 <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textBold, { textAlign: 'center' }]}>Create Group Machine</Text>
+                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>Create Group Machine</Text>
                 </Pressable>
             </AccessibleView>
             <Card.Content style={{ padding: 2, flex: 1 }}>

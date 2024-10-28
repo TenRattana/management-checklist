@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Pressable, ScrollView } from "react-native";
-import AccessibleView from "@/components/AccessibleView";
+import { Pressable, ScrollView, View } from "react-native";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import { Inputs } from "@/components/common";
 import { Portal, Dialog, HelperText, Switch, IconButton, useTheme } from "react-native-paper";
 import { Formik, FastField } from "formik";
 import Checklist_dialog from "../screens/Checklist_dialog";
-import { useToast } from "@/app/contexts";
+import { useRes, useToast } from "@/app/contexts";
 import axiosInstance from "@/config/axios";
-import axios from "axios";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
@@ -26,8 +24,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
 
     const [shouldRender, setShouldRender] = useState<string>("");
     const [shouldRenderDT, setShouldRenderDT] = useState<boolean>(false);
-
-    console.log("FieldDialog");
+    const { fontSize } = useRes()
 
     const validationSchema = Yup.object().shape({
         CListID: Yup.string().required("The checklist field is required."),
@@ -65,7 +62,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
         }
     };
 
-    const itemHeight = 100;
+    const itemHeight = fontSize === "small" ? 70 : fontSize === "medium" ? 80 : 100
     const itemHeightN = itemHeight * 3
 
     const opacityT = useSharedValue(0);
@@ -191,7 +188,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                 }, [values.DTypeID]);
 
                                 return (
-                                    <AccessibleView name="form-fd">
+                                    <View id="form-fd">
 
                                         <ScrollView
                                             contentContainerStyle={{ paddingBottom: 5, paddingHorizontal: 10 }}
@@ -383,7 +380,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                             </FastField >
 
 
-                                            <AccessibleView name="form-active-fd" style={masterdataStyles.containerSwitch}>
+                                            <View id="form-active-fd" style={masterdataStyles.containerSwitch}>
                                                 <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                                     Required: {values.Required ? "Notnull" : "Nullable"}
                                                 </Text>
@@ -395,10 +392,10 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                         setFieldValue("Required", v);
                                                     }}
                                                 />
-                                            </AccessibleView>
+                                            </View>
                                         </ScrollView>
 
-                                        <AccessibleView name="form-action-fd" style={masterdataStyles.containerAction}>
+                                        <View id="form-action-fd" style={masterdataStyles.containerAction}>
                                             <Pressable
                                                 onPress={() => handleSubmit()}
                                                 disabled={!isValid || !dirty}
@@ -434,9 +431,9 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                     Cancel
                                                 </Text>
                                             </Pressable>
-                                        </AccessibleView>
+                                        </View>
 
-                                    </AccessibleView>
+                                    </View>
                                 );
                             }}
                         </Formik>

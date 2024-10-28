@@ -2,19 +2,16 @@ import React, { useState, useCallback, useEffect, useMemo } from "react";
 import axiosInstance from "@/config/axios";
 import { Card, Divider, HelperText } from "react-native-paper";
 import { FlatList, Pressable, ViewStyle, Dimensions, View } from "react-native";
-import { useToast, useRes } from "@/app/contexts";
+import { useToast, useRes, useTheme } from "@/app/contexts";
 import { BaseSubForm, FormData, BaseFormState, SubForm } from '@/typing/form';
 import { AccessibleView, Dynamic, NotFoundScreen, Text } from "@/components";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { PreviewProps } from "@/typing/tag";
 import { ScanParams } from "@/typing/tag";
-import { useFocusEffect } from "expo-router";
 import { FastField, Field, FieldProps, Formik } from 'formik';
 import * as Yup from 'yup';
-import { useNavigation } from "expo-router";
+import { Stack, useNavigation } from "expo-router";
 import useForm from "@/hooks/custom/useForm";
-
-const { height: screenHeight } = Dimensions.get('window');
 
 const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   const { state, dispatch, checkList, groupCheckListOption, checkListType, dataType, found } = useForm(route);
@@ -25,6 +22,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   const masterdataStyles = useMasterdataStyles();
   const { showSuccess, handleError } = useToast();
   const { responsive } = useRes();
+  const { theme } = useTheme()
 
   const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
 
@@ -100,6 +98,8 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
 
   return found ? (
     <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]}>
+      <Stack.Screen options={{ headerTitle: 'Oops!' }} />
+
       <Formik
         initialValues={formValues}
         validationSchema={validationSchema}
@@ -108,18 +108,16 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
         onSubmit={(values) => onFormSubmit(values)}
         enableReinitialize={true}
       >
-        {({ handleSubmit, errors, touched, setFieldValue, setTouched ,values }) => (
+        {({ handleSubmit, errors, touched, setFieldValue, setTouched, values, dirty, isValid }) => (
           <>
             {!isSubmitted ? (
               <FlatList
                 data={[{}]}
                 renderItem={() => (
                   <>
-                  {console.log(values)}
-                  
-                    <Text style={[masterdataStyles.title]}>{state.FormName || "Form Name"}</Text>
+                    <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
                     <Divider />
-                    <Text style={[masterdataStyles.description, { paddingVertical: 10 }]}>{state.Description || "Form Description"}</Text>
+                    <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
 
                     {state.subForms.map((subForm: BaseSubForm, index: number) => (
                       <Card style={masterdataStyles.card} key={subForm.SFormID}>
@@ -163,7 +161,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                                     <View id="container-layout2" style={containerStyle}>
                                       <Dynamic
                                         field={field}
-                                        values={String(fastFieldProps.value)}
+                                        values={String(fastFieldProps.value ?? "")}
                                         handleChange={(fieldname: string, value: any) => {
                                           setFieldValue(fastFieldProps.name, value);
                                           setTimeout(() => {
@@ -175,18 +173,9 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                                         }}
                                         handleBlur={handleBlur}
                                         groupCheckListOption={groupCheckListOption}
+                                        error={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
+                                        errorMessages={errors}
                                       />
-                                      {Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name]) && (
-                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                          <HelperText
-                                            type="error"
-                                            visible={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
-                                            style={{ left: -10 }}
-                                          >
-                                            {errors[fastFieldProps.name] as string || ""}
-                                          </HelperText>
-                                        </View>
-                                      )}
                                     </View>
                                   );
                                 }}
@@ -202,23 +191,28 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                 contentContainerStyle={{ paddingBottom: 20 }}
                 ListFooterComponent={() => (
                   <AccessibleView name="form-action-scan" style={[masterdataStyles.containerAction]}>
-                  <Pressable
-                    onPress={() => handleSubmit()}
-                    style={[masterdataStyles.button, masterdataStyles.backMain]}
-                  >
-                    <Text style={masterdataStyles.textBold}>Submit Form</Text>
-                  </Pressable>
-                </AccessibleView>
+                    <Pressable
+                      onPress={() => handleSubmit()}
+                      disabled={!isValid || !dirty}
+                      style={[
+                        masterdataStyles.button,
+                        masterdataStyles.backMain,
+                        { opacity: isValid && dirty ? 1 : 0.5 }
+                      ]}
+                    >
+                      <Text style={[masterdataStyles.textBold, masterdataStyles.textFFF]}>Submit Form</Text>
+                    </Pressable>
+                  </AccessibleView>
                 )}
               />
             ) : (
               <AccessibleView name="form-success" style={masterdataStyles.containerScccess}>
-                <Text>บันทึกเสร็จสิ้น</Text>
+                <Text style={masterdataStyles.text}>บันทึกเสร็จสิ้น</Text>
                 <Pressable onPress={() => {
                   setIsSubmitted(false);
                   navigation.goBack();
                 }} style={masterdataStyles.button}>
-                  <Text>กลับไปยังหน้าก่อนหน้า</Text>
+                  <Text style={[masterdataStyles.textBold, masterdataStyles.text, { color: theme.colors.blue }]}>กลับไปยังหน้าก่อนหน้า</Text>
                 </Pressable>
               </AccessibleView>
             )}

@@ -34,8 +34,6 @@ const MenuSection = ({ title, isOpen, onToggle, items, navigation }: MenuSection
     }));
 
     useEffect(() => {
-        console.log("isOpen");
-
         if (isOpen) {
             opacity.value = withTiming(1, { duration: 300 });
             height.value = withTiming(totalHeight, { duration: 300 });
