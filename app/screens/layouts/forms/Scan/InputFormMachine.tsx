@@ -114,6 +114,9 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
           )
         }}
       />
+      <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
+      <Divider />
+      <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
 
       <Formik
         initialValues={formValues}
@@ -235,7 +238,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
       </Formik>
     </AccessibleView>
   ) : (
-    <NotFoundScreen />
+    <NotFoundScreen navigation={navigation}/>
   );
 };
 

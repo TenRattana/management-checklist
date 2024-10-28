@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
-import { ScrollView, Pressable, View } from "react-native";
+import { ScrollView, Pressable, View, StyleSheet } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
 import { AccessibleView, LoadingSpinner, Searchbar, Customtable, Text } from "@/components";
@@ -71,14 +71,10 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
 
 
   return (
-    <AccessibleView name="container-home" style={{ flex: 1 }}>
-      <Card.Title
-        title="Home"
-        titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
-      />
+    <AccessibleView name="container-home" style={styles.container}>
       <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
         <Pressable onPress={handleSacnQR} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-          <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Scan QR Code</Text>
+          <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>Scan QR Code</Text>
         </Pressable>
       </AccessibleView>
 
@@ -87,3 +83,19 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
 };
 
 export default React.memo(HomeScreen);
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  link: {
+    marginTop: 15,
+    paddingVertical: 15,
+  },
+  linkText: {
+    color: '#1e90ff',
+  },
+});

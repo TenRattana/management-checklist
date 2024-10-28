@@ -19,7 +19,7 @@ import * as Yup from 'yup';
 import DraggableItem from "./DraggableItem";
 
 
-const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
+const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigation }) => {
     const { state, dispatch, checkList, groupCheckListOption, checkListType, dataType } = useForm(route);
     const createform = useCreateformStyle();
 
@@ -42,16 +42,17 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
     const [initialForm, setInitialForm] = useState<BaseForm>(formRef.current);
     const [selectedIndex, setSelectedIndex] = useState(0);
 
+    const newForm = useMemo(() => ({
+        FormID: state.FormID || "",
+        FormName: state.FormName || "",
+        Description: state.Description || "",
+        MachineID: state.MachineID || "",
+    }), [state.FormID, state.FormName, state.Description, state.MachineID]);
+    
     useEffect(() => {
-        const newForm: BaseForm = {
-            FormID: state.FormID || "",
-            FormName: state.FormName || "",
-            Description: state.Description || "",
-            MachineID: state.MachineID || "",
-        };
         setInitialForm(newForm);
         formRef.current = newForm;
-    }, [state]);
+    }, [newForm]);
 
     const handleChange = useCallback((fieldName: keyof BaseForm, value: string) => {
         const newForm = { ...formRef.current, [fieldName]: value };
@@ -68,45 +69,50 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
 
     const handleDrop = (item: CheckListType, absoluteX: number, absoluteY: number) => {
         const cardIndex = childRef.current.checkCardPosition(absoluteX, absoluteY);
-
+        
         const selectedChecklist = checkList.find(v => v.CListID === "CL000") || checkList[0];
         const selectedDataType = dataType.find(v => v.DTypeName === "String") || dataType[0];
-
+        
         if (cardIndex >= 0) {
             const targetSubForm = state.subForms[cardIndex];
-            const currentFieldCount = count;
-
-            const newField: BaseFormState = {
-                MCListID: `MCL-ADD-${currentFieldCount}`,
-                CListID: selectedChecklist.CListID,
-                GCLOptionID: "",
-                CTypeID: item.CTypeID,
-                DTypeID: selectedDataType.DTypeID,
-                SFormID: targetSubForm.SFormID,
-                Required: false,
-                Placeholder: "Empty content",
-                Hint: "Empty content",
-                EResult: "",
-                CListName: selectedChecklist.CListName,
-                CTypeName: item.CTypeName,
-                DTypeValue: undefined,
-                MinLength: undefined,
-                MaxLength: undefined
-            };
-
-            newField.GCLOptionID = ["Dropdown", "Radio", "Checkbox"].includes(item.CTypeName)
-                ? (groupCheckListOption.find(v => v.GCLOptionID === "GCLO000") || groupCheckListOption[0])?.GCLOptionID
-                : undefined;
-
-            try {
-                dispatch(defaultDataForm({ currentField: newField }));
-
-                setCount(count + 1)
-            } catch (error) {
-                handleError(error)
-            }
+    
+            setCount(prevCount => {
+                const currentFieldCount = prevCount; 
+                console.log(currentFieldCount);
+    
+                const newField: BaseFormState = {
+                    MCListID: `MCL-ADD-${currentFieldCount}`,
+                    CListID: selectedChecklist.CListID,
+                    GCLOptionID: "",
+                    CTypeID: item.CTypeID,
+                    DTypeID: selectedDataType.DTypeID,
+                    SFormID: targetSubForm.SFormID,
+                    Required: false,
+                    Placeholder: "Empty content",
+                    Hint: "Empty content",
+                    EResult: "",
+                    CListName: selectedChecklist.CListName,
+                    CTypeName: item.CTypeName,
+                    DTypeValue: undefined,
+                    MinLength: undefined,
+                    MaxLength: undefined
+                };
+    
+                newField.GCLOptionID = ["Dropdown", "Radio", "Checkbox"].includes(item.CTypeName)
+                    ? (groupCheckListOption.find(v => v.GCLOptionID === "GCLO000") || groupCheckListOption[0])?.GCLOptionID
+                    : undefined;
+    
+                try {
+                    dispatch(defaultDataForm({ currentField: newField }));
+                } catch (error) {
+                    handleError(error);
+                }
+    
+                return currentFieldCount + 1; 
+            });
         }
     };
+    
 
     const validationSchema = useMemo(() => {
         const shape: any = {};
@@ -258,6 +264,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
         </GestureHandlerRootView >
 
     );
-};
+});
 
 export default CreateFormScreen;

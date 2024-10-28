@@ -6,7 +6,7 @@ import AccessibleView from "@/components/AccessibleView";
 import Text from "@/components/Text";
 import useMasterdataStyles from "@/styles/common/masterdata";
 
-const Checkboxs = ({
+const Checkboxs : React.FC<CheckboxsProps>= React.memo(({
   option,
   value,
   handleChange,
@@ -15,7 +15,7 @@ const Checkboxs = ({
   error,
   errorMessage,
   testId
-}: CheckboxsProps) => {
+}) => {
   const [checkedOptions, setCheckedOptions] = useState<string[]>([]);
   const masterdataStyles = useMasterdataStyles();
 
@@ -66,6 +66,6 @@ const Checkboxs = ({
       </HelperText>
     </View>
   );
-};
+});
 
 export default React.memo(Checkboxs);

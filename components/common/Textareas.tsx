@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo }  from "react";
 import { TextInput, HelperText } from "react-native-paper";
 import { TextareasProps } from "@/typing/tag";
 import AccessibleView from "@/components/AccessibleView";
@@ -6,7 +6,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
 import { View } from "react-native";
 
-const Textareas = ({
+const Textareas :React.FC<TextareasProps> = React.memo(({
     placeholder,
     label,
     error,
@@ -17,24 +17,24 @@ const Textareas = ({
     mode,
     hint,
     testId
-}: TextareasProps) => {
+}) => {
     console.log("Textareas");
     const masterdataStyles = useMasterdataStyles()
 
+    const formattedLabel = useMemo(() => {
+        return mode ? undefined : <Text style={masterdataStyles.text}>{label}</Text>;
+      }, [label, mode]);
+    
     return (
         <View id="text-areas" style={masterdataStyles.commonContainer}>
             <TextInput
                 mode={mode || "outlined"}
                 placeholder={placeholder}
-                label={!mode ? (
-                    <Text style={[masterdataStyles.text]}>
-                        {label}
-                    </Text>
-                ) : undefined}
+                label={formattedLabel}
                 style={[masterdataStyles.text, { paddingTop: 5 }]}
                 onChangeText={handleChange}
                 onBlur={handleBlur}
-                value={value as string}
+                value={String(value)}
                 multiline
                 numberOfLines={4}
                 right={
@@ -56,6 +56,6 @@ const Textareas = ({
             </HelperText>
         </View>
     );
-};
+});
 
 export default Textareas;

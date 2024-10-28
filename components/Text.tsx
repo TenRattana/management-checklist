@@ -17,13 +17,12 @@ const isThai = (text: string): boolean => {
 const Text: React.FC<CustomTextProps> = ({ style, children, ...props }) => {
   const theme = useTheme();
   const { spacing } = useRes();
-
   const textArray = Array.isArray(children) ? children : [children];
 
   return (
-    <>
+    <React.Fragment>
       {textArray.map((child, index) => {
-        if (child === null || child === undefined) return null;
+        if (child == null) return null;
         const fontFamily = isThai(child) ? 'Sarabun' : 'Poppins';
 
         return (
@@ -36,7 +35,7 @@ const Text: React.FC<CustomTextProps> = ({ style, children, ...props }) => {
           </DefaultText>
         );
       })}
-    </>
+    </React.Fragment>
   );
 };
 

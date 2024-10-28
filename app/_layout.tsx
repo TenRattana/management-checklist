@@ -14,7 +14,7 @@ const SetTheme = () => {
 
     return (
         <PaperProvider theme={theme}>
-            <Stack screenOptions={{ headerShown: false, headerTitle: "" }} />
+            <Stack screenOptions={{ headerShown: false}} />
         </PaperProvider>
     );
 }

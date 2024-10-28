@@ -95,7 +95,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
     const renderField = useCallback((params: RenderItemParams<BaseFormState>) => {
         return (
             <ShadowDecorator>
-                <ScaleDecorator activeScale={0.98}>
+                <ScaleDecorator activeScale={0.90}>
                     <RowItem {...params} />
                 </ScaleDecorator>
             </ShadowDecorator>

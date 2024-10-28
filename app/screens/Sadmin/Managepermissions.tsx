@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Pressable, Role } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
-import { Customtable, LoadingSpinner, AccessibleView, Searchbar ,Text } from "@/components";
+import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
 import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
@@ -29,7 +29,7 @@ const Managepermissions = () => {
 
   const masterdataStyles = useMasterdataStyles();
   const { showSuccess, handleError } = useToast();
-  const { spacing } = useRes();
+  const { spacing, fontSize } = useRes();
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -152,27 +152,25 @@ const Managepermissions = () => {
   }), [tableData, debouncedSearchQuery, handleAction]);
 
   return (
-    <AccessibleView name="container-checklist" style={{ paddingHorizontal: 15 }}>
-      <Text style={[masterdataStyles.text, masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small - 10 }]}>
-        List User
-      </Text>
-      <Divider style={{ marginBottom: 20 }} />
-      <Card style={{ borderRadius: 5 }}>
-        <AccessibleView name="match-form-machine" style={masterdataStyles.containerSearch}>
-          <Searchbar
-            placeholder="Search User..."
-            value={searchQuery}
-            onChange={setSearchQuery}
-            testId="search-user"
-          />
-          <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-            <Text style={[masterdataStyles.textBold, masterdataStyles.textLight]}>Add Permission</Text>
-          </Pressable>
-        </AccessibleView>
-        <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
-          {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
-        </Card.Content>
-      </Card>
+    <AccessibleView name="container-checklist" style={{ flex: 1 }}>
+      <Card.Title
+        title="List User"
+        titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
+      />
+      <AccessibleView name="match-form-machine" style={masterdataStyles.containerSearch}>
+        <Searchbar
+          placeholder="Search User..."
+          value={searchQuery}
+          onChange={setSearchQuery}
+          testId="search-user"
+        />
+        <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+          <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>Add Permission</Text>
+        </Pressable>
+      </AccessibleView>
+      <Card.Content style={{ padding: 2, flex: 1 }}>
+        {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+      </Card.Content>
 
       <Managepermisstion_dialog
         isVisible={isVisible}

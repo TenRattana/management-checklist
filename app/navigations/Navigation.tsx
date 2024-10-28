@@ -1,13 +1,12 @@
 import React, { useState, lazy, Suspense, useRef, useCallback, useEffect } from 'react';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { HomeScreen, LoginScreen, ScanQR, GenerateQR, SettingScreen } from '@/app/screens';
 import NotFoundScreen from '@/app/+not-found';
 import { useAuth } from "@/app/contexts/auth";
 import { useRes } from "@/app/contexts/responsive";
-import CustomDrawerContent from '../../components/navigation/CustomDrawer';
+import CustomDrawerContent from '@/components/navigation/CustomDrawer';
 import axiosInstance from '@/config/axios';
-import { Text, AccessibleView } from '@/components';
 import { useTheme } from '../contexts';
 
 const Drawer = createDrawerNavigator();
@@ -80,10 +79,9 @@ const Navigation = () => {
 
   if (loading) {
     return (
-      <AccessibleView name="nav" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View id="Loading">
         <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Loading...</Text>
-      </AccessibleView>
+      </View>
     );
   }
 
@@ -95,6 +93,7 @@ const Navigation = () => {
           backgroundColor: theme.colors.background,
           width: drawerWidth,
         },
+        unmountOnBlur: true,
       }}
       id='nav'
     >
@@ -105,14 +104,13 @@ const Navigation = () => {
             name={screen.name}
             component={renderComponent(screen.name as ComponentNames)}
             options={{
-              headerTitle: "",
-              unmountOnBlur: true,
               drawerLabel: screen.name,
             }}
           />
         ))
       ) : (
-        <Drawer.Screen name="Login" component={LoginScreen} />
+        <Drawer.Screen name="Login"
+          component={LoginScreen} />
       )}
     </Drawer.Navigator>
   );

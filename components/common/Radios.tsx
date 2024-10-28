@@ -6,7 +6,7 @@ import AccessibleView from "@/components/AccessibleView";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
 
-const Radios = ({
+const Radios :React.FC<RadiosProps> = React.memo(({
   option,
   value,
   handleChange,
@@ -16,7 +16,7 @@ const Radios = ({
   error,
   errorMessage,
   testId
-}: RadiosProps) => {
+}) => {
   console.log("Radios");
 
   const masterdataStyles = useMasterdataStyles()
@@ -55,6 +55,6 @@ const Radios = ({
       ) : false}
     </View>
   );
-};
+});
 
 export default Radios;

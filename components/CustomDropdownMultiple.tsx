@@ -43,7 +43,8 @@ const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChan
         selectedTextStyle={masterdataStyles.selectedTextStyle}
         inputSearchStyle={masterdataStyles.inputSearchStyle}
         iconStyle={masterdataStyles.iconStyle}
-        itemTextStyle={[masterdataStyles.text, masterdataStyles.textDark]}
+        itemTextStyle={masterdataStyles.text}
+        containerStyle={masterdataStyles.backLight}
         data={options}
         search
         // maxHeight={500}

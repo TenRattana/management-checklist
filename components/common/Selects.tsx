@@ -8,7 +8,7 @@ import Text from "@/components/Text";
 import { View } from "react-native";
 import { useTheme } from "@/app/contexts";
 
-const Selects = ({
+const Selects:React.FC<SelectsProps> = React.memo(({
   hint,
   option,
   value,
@@ -18,7 +18,7 @@ const Selects = ({
   error,
   errorMessage,
   testId
-}: SelectsProps) => {
+}) => {
   if (!option || option.length === 0) {
     return null;
   }
@@ -59,6 +59,6 @@ const Selects = ({
       </HelperText>
     </View>
   );
-};
+});
 
 export default Selects;

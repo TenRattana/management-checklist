@@ -112,7 +112,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
     const renderSubForm = useCallback((params: RenderItemParams<BaseSubForm>) => {
         return (
             <ShadowDecorator>
-                <ScaleDecorator activeScale={0.98}>
+                <ScaleDecorator activeScale={0.90}>
                     <RowItem {...params} />
                 </ScaleDecorator>
             </ShadowDecorator>

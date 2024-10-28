@@ -57,7 +57,7 @@ const useCreateformStyle = () => {
             justifyContent: 'space-between',
         },
         active: {
-            backgroundColor: theme.colors.onTertiary,
+            opacity: 0.8
         },
         fieldText: {
             fontSize: spacing.small,

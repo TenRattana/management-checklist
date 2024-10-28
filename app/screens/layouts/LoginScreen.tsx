@@ -14,42 +14,40 @@ const validationSchema = Yup.object().shape({
   username: Yup.string().required("The username field is required."),
 });
 
-const LoginScreen = () => {
+const LoginScreen: React.FC = React.memo(() => {
   const { handleError } = useToast();
-  const [initialValues, setInitialValues] = useState({ username: "" });
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth()
+  const { login } = useAuth();
   const { spacing, fontSize } = useRes();
-  const masterdataStyles = useMasterdataStyles()
+  const masterdataStyles = useMasterdataStyles();
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = useCallback(async (values: { username: string }) => {
     setLoading(true);
     try {
-      login(values.username)
+      await login(values.username);
     } catch (error) {
       handleError(error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [login, handleError]);
 
   useFocusEffect(
     useCallback(() => {
-      return () => {
-        setInitialValues({ username: "" });
-      };
+      return () => {};
     }, [])
   );
 
   return (
-    <View id="Login Screen" style={{ paddingHorizontal: 30, marginTop: 100 }}>
-      <Card style={[{ height: 250 }]}>
-        <Card.Title title="Login"
+    <View style={{ paddingHorizontal: 30, marginTop: 100 }}>
+      <Card style={{ height: 250 }}>
+        <Card.Title 
+          title="Login"
           titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
         />
         <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
           <Formik
-            initialValues={initialValues}
+            initialValues={{ username: "" }}
             validationSchema={validationSchema}
             validateOnBlur={false}
             validateOnChange={true}
@@ -65,7 +63,7 @@ const LoginScreen = () => {
               isValid,
               dirty,
             }) => (
-              <View id="login">
+              <View>
                 <Inputs
                   placeholder="Enter Username"
                   label="Username"
@@ -78,7 +76,7 @@ const LoginScreen = () => {
                   testId="username"
                 />
 
-                <View id="login-action" style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                   <Pressable
                     onPress={() => handleSubmit()}
                     disabled={!isValid || !dirty || loading}
@@ -102,6 +100,6 @@ const LoginScreen = () => {
       </Card>
     </View>
   );
-};
+});
 
-export default React.memo(LoginScreen);
+export default LoginScreen;
