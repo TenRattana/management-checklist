@@ -8,7 +8,7 @@ import { useRes, useTheme } from '@/app/contexts';
 
 const SettingsScreen: React.FC = () => {
   const { spacing, fontSize, setFontSize, } = useRes();
-  const { darkMode, setDarkMode } = useTheme();
+  const { darkMode, setDarkMode, theme } = useTheme();
 
   const masterdataStyles = useMasterdataStyles()
 
@@ -52,7 +52,7 @@ const SettingsScreen: React.FC = () => {
 
   return (
     <AccessibleView name="setting" style={[masterdataStyles.container]}>
-      <Text style={[masterdataStyles.textBold, { textAlign: 'center', paddingVertical: 30, fontSize: spacing.large }]}>Settings</Text>
+      <Text style={[masterdataStyles.textBold, masterdataStyles.text, { textAlign: 'center', paddingVertical: 30, fontSize: spacing.large }]}>Settings</Text>
 
       <View id="setting-mode" style={[masterdataStyles.settingItem]}>
         <Text style={[masterdataStyles.settingText]}>Dark Mode</Text>

@@ -1,7 +1,7 @@
 import React, { useState, lazy, Suspense, useRef, useCallback, useEffect } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { HomeScreen, LoginScreen, AdminScreen, SuperAdminScreen, ScanQR, GenerateQR, UserScreen, SettingScreen, Managepermissions } from '@/app/screens';
+import { HomeScreen, LoginScreen, ScanQR, GenerateQR, SettingScreen } from '@/app/screens';
 import NotFoundScreen from '@/app/+not-found';
 import { useAuth } from "@/app/contexts/auth";
 import { useRes } from "@/app/contexts/responsive";

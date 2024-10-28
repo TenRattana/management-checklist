@@ -3,17 +3,23 @@ import { Pressable, StyleSheet } from 'react-native';
 import AccessibleView from "../AccessibleView";
 import { useNavigation } from "@react-navigation/native";
 import Text from "@/components/Text";
+import { useTheme, useRes } from '@/app/contexts';
+import useMasterdataStyles from '@/styles/common/masterdata';
 
 const NotFoundScreen = () => {
     const navigation = useNavigation();
+    const { theme } = useTheme();
+    const { spacing } = useRes()
+    const masterdataStyles = useMasterdataStyles()
+
     console.log("NotFoundScreen");
 
     return (
         <>
             <AccessibleView name="notfound" style={styles.container}>
-                <Text style={styles.title}>This form doesn't exist.</Text>
+                <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>This form doesn't exist.</Text>
                 <Pressable style={styles.link} onPress={() => navigation.navigate("ScanQR")}>
-                    <Text style={styles.linkText}>Scan again!</Text>
+                    <Text style={[styles.linkText, { fontSize: spacing.small }]}>Scan again!</Text>
                 </Pressable>
             </AccessibleView>
         </>
@@ -28,11 +34,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         padding: 20,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
     },
     link: {
         marginTop: 15,
