@@ -200,8 +200,8 @@ const useMasterdataStyles = () => {
             height: 50,
             width: '100%',
             fontSize: spacing.small,
-            color: theme.colors.background,
-            backgroundColor: theme.colors.onBackground
+            color: theme.colors.onBackground,
+            backgroundColor: theme.colors.background
         },
         container: {
             flex: 1,

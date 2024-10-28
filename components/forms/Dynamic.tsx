@@ -84,7 +84,7 @@ const DynamicForm = React.memo(({
           <Checkboxs
             option={option}
             hint={error ? errorMessages?.[MCListID] as string || "" : ""}
-            handleChange={(v) => handleChange(MCListID, v)}
+            handleChange={(value) => handleChange(MCListID, value.split(','))}
             handleBlur={handleBlur}
             value={values}
             testId={`checkbox-${MCListID}`}

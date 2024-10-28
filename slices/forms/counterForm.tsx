@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { BaseSubForm, BaseFormState, Form, BaseForm } from '@/typing/form'
-import { Checklist, CheckListType, DataType } from '@/typing/type'
+import { Checklist, CheckListType, DataType, GroupMachine, Machine } from '@/typing/type'
 
 
 const initialState: Form = {
@@ -8,6 +8,7 @@ const initialState: Form = {
   FormName: "",
   Description: "",
   MachineID: "",
+  MachineName: "",
   subForms: []
 };
 
@@ -42,6 +43,7 @@ const subFormSlice = createSlice({
       state.FormName = form?.FormName || "";
       state.Description = form?.Description || "";
       state.MachineID = form?.MachineID || "";
+      state.MachineName = form?.MachineName;
     },
     updateForm: (state, action: PayloadAction<{ form?: BaseForm }>) => {
       console.log("setForm");

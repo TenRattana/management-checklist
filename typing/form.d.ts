@@ -5,6 +5,7 @@ export interface BaseForm {
   FormName: string;
   Description: string;
   MachineID: string;
+  MachineName?: string;
 }
 
 export interface Form extends BaseForm {
@@ -40,8 +41,8 @@ export interface BaseFormState {
   Required: boolean;
   MinLength?: number;
   MaxLength?: number;
-  Placeholder: string;
-  Hint: string;
+  Placeholder?: string;
+  Hint?: string;
   DisplayOrder?: number;
   EResult?: any;
   CTypeName?:string;

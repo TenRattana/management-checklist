@@ -17,26 +17,24 @@ const Checkboxs = ({
   testId
 }: CheckboxsProps) => {
   const [checkedOptions, setCheckedOptions] = useState<string[]>([]);
-  console.log("Checkboxs");
   const masterdataStyles = useMasterdataStyles();
 
   useEffect(() => {
-    if (Array.isArray(value)) {
-      setCheckedOptions(value);
+    if (typeof value === 'string') {
+      setCheckedOptions(value.split(','));
     } else {
-      setCheckedOptions(value ? [value] : []);
+      setCheckedOptions(value || []);
     }
-  }, [value]);
+  }, [value, setCheckedOptions]);
 
-  const handleCheckBoxChange = (value: string) => {
-    const newCheckedOptions = checkedOptions.includes(value)
-      ? checkedOptions.filter((item) => item !== value)
-      : [...checkedOptions, value];
+  const handleCheckBoxChange = (itemValue: string) => {
+    const newCheckedOptions = checkedOptions.includes(itemValue)
+      ? checkedOptions.filter((item) => item !== itemValue)
+      : [...new Set([...checkedOptions, itemValue])];
 
     setCheckedOptions(newCheckedOptions);
-    handleChange(newCheckedOptions);
+    handleChange(newCheckedOptions.join(','));
   };
-
 
   if (!option || option.length === 0) {
     return null;
@@ -47,21 +45,14 @@ const Checkboxs = ({
       {option.map((item, index) => (
         <Pressable
           key={index}
-          onPress={() => {
-            handleCheckBoxChange(item.value || '');
-          }}
+          onPress={() => handleCheckBoxChange(item.value || '')}
           testID={testId}
-          id={testId}
         >
           <View id="con-checkbox">
             <View id="group-checkboxs" style={masterdataStyles.checkboxContainer}>
               <Checkbox
-                status={
-                  checkedOptions.includes(item.value || '') ? "checked" : "unchecked"
-                }
-                onPress={() => {
-                  handleCheckBoxChange(item.value || '');
-                }}
+                status={checkedOptions.includes(item.value || '') ? "checked" : "unchecked"}
+                onPress={() => handleCheckBoxChange(item.value || '')}
               />
               <Text style={masterdataStyles.checkboxLabel}>{item.label}</Text>
             </View>
@@ -69,7 +60,7 @@ const Checkboxs = ({
         </Pressable>
       ))}
 
-      {hint ? <Text style={masterdataStyles.hint}>{hint}</Text> : false}
+      {hint ? <Text style={masterdataStyles.hint}>{hint}</Text> : null}
       <HelperText type="error" visible={error} style={[{ display: error ? 'flex' : 'none' }, masterdataStyles.errorText]}>
         {errorMessage}
       </HelperText>

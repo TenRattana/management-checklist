@@ -6,7 +6,7 @@ import {
   TextInputFocusEventData,
 } from "react-native";
 import { NavigationProp, RouteProp } from "@react-navigation/native";
-import { Form } from "./form";
+import { Form , BaseFormState } from "./form";
 import {
   DataType,
   Checklist,

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { GestureEvent, HandlerStateChangeEvent, PanGestureHandler, PanGestureHandlerEventPayload } from "react-native-gesture-handler";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, runOnJS } from "react-native-reanimated";
 import { IconButton, Portal } from "react-native-paper";
@@ -34,7 +34,8 @@ const DraggableItem: React.FC<{
     const createform = useCreateformStyle();
     const { spacing } = useRes();
     const { theme } = useTheme()
-    const onGestureEvent = (e: GestureEvent<PanGestureHandlerEventPayload>) => {
+
+    const onGestureEvent = useCallback((e: GestureEvent<PanGestureHandlerEventPayload>) => {
         const { translationX, translationY, absoluteX, absoluteY } = e.nativeEvent;
 
         if (!isDragging) {
@@ -44,9 +45,9 @@ const DraggableItem: React.FC<{
         itemTranslateX.value = translationX;
         itemTranslateY.value = translationY;
         setIsDragging(true);
-    };
+    }, [setStartPosition, setIsDragging]);
 
-    const onGestureEnd = (e: HandlerStateChangeEvent) => {
+    const onGestureEnd = useCallback((e: HandlerStateChangeEvent) => {
         const { absoluteX, absoluteY } = e.nativeEvent;
 
         if (startPosition && !isNaN(absoluteX) && !isNaN(absoluteY)) {
@@ -57,7 +58,7 @@ const DraggableItem: React.FC<{
         itemTranslateY.value = withSpring(0);
         setIsDragging(false);
         setStartPosition(null);
-    };
+    }, [runOnJS, setIsDragging, setStartPosition]);
 
     return (
         <PanGestureHandler onGestureEvent={onGestureEvent} onEnded={onGestureEnd}>

@@ -349,48 +349,17 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                 </Animated.View>
                                             )}
 
-                                            <FastField name="Placeholder">
-                                                {({ field, form }: any) => (
-                                                    <Inputs
-                                                        placeholder="Enter Placeholder"
-                                                        label="Placeholder"
-                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                        handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                        value={field.value}
-                                                        error={form.touched.Placeholder && Boolean(form.errors.Placeholder)}
-                                                        errorMessage={form.touched.Placeholder ? form.errors.Placeholder : ""}
-                                                        testId={`Placeholder-form`}
-                                                    />
-                                                )}
-                                            </FastField >
-
-                                            <FastField name="Hint">
-                                                {({ field, form }: any) => (
-                                                    <Inputs
-                                                        placeholder="Enter Hint"
-                                                        label="Hint"
-                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                        handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                        value={field.value}
-                                                        error={form.touched.Hint && Boolean(form.errors.Hint)}
-                                                        errorMessage={form.touched.Hint ? form.errors.Hint : ""}
-                                                        testId={`Hint-form`}
-                                                    />
-                                                )}
-                                            </FastField >
-
-
                                             <View id="form-active-fd" style={masterdataStyles.containerSwitch}>
                                                 <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
-                                                    Required: {values.Required ? "Notnull" : "Nullable"}
+                                                    Required: {values.Required ? "Yes" : "No"}
                                                 </Text>
                                                 <Switch
                                                     style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                                    // color={values.Required ? colors.succeass : colors.disable}
                                                     value={values.Required}
                                                     onValueChange={(v: boolean) => {
                                                         setFieldValue("Required", v);
                                                     }}
+                                                    id="Required-form"
                                                 />
                                             </View>
                                         </ScrollView>
@@ -401,7 +370,8 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                 disabled={!isValid || !dirty}
                                                 style={[
                                                     masterdataStyles.button,
-                                                    isValid && dirty ? masterdataStyles.backMain : masterdataStyles.backDis,
+                                                    masterdataStyles.backMain,
+                                                    { opacity: isValid && dirty ? 1 : 0.5 }
                                                 ]}
                                             >
                                                 <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>

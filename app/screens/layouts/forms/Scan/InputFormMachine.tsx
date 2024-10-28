@@ -81,7 +81,9 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
       MachineID: state.MachineID,
       Fields: subForm?.Fields?.map((field: BaseFormState) => ({
         ...field,
-        EResult: values[field.MCListID] || "",
+        EResult: Array.isArray(values[field.MCListID])
+          ? values[field.MCListID].join(',')
+          : values[field.MCListID] || "",
       })),
     }));
 
@@ -98,7 +100,20 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
 
   return found ? (
     <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]}>
-      <Stack.Screen options={{ headerTitle: 'Oops!' }} />
+      <Stack.Screen
+        options={{
+          headerTitle: () => (
+            <Text style={[{ fontSize: 18, fontWeight: "500" }]}>{state.MachineName || "Default Machine Name"}</Text>
+          ),
+          headerRight: () => (
+            <View style={{ alignItems: 'center', justifyContent: 'center', paddingRight: 20 }}>
+              <Text style={[{ fontSize: 18, fontWeight: "500" }]}>
+                {state.FormName || "Form Name"}
+              </Text>
+            </View>
+          )
+        }}
+      />
 
       <Formik
         initialValues={formValues}
@@ -115,9 +130,6 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                 data={[{}]}
                 renderItem={() => (
                   <>
-                    <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
-                    <Divider />
-                    <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
 
                     {state.subForms.map((subForm: BaseSubForm, index: number) => (
                       <Card style={masterdataStyles.card} key={subForm.SFormID}>
@@ -161,7 +173,9 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                                     <View id="container-layout2" style={containerStyle}>
                                       <Dynamic
                                         field={field}
-                                        values={String(fastFieldProps.value ?? "")}
+                                        values={field.CTypeName === "Checkbox"
+                                          ? fastFieldProps.value?.filter((value: string) => value !== '') || []
+                                          : String(fastFieldProps.value ?? '')}
                                         handleChange={(fieldname: string, value: any) => {
                                           setFieldValue(fastFieldProps.name, value);
                                           setTimeout(() => {

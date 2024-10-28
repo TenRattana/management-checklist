@@ -7,6 +7,7 @@ import { AccessibleView, Dynamic, Text } from "@/components";
 import useForm from "@/hooks/custom/useForm";
 import { FastField, Formik, FieldProps, Field } from "formik";
 import useMasterdataStyles from "@/styles/common/masterdata";
+import { Stack } from "expo-router";
 
 interface FormValues {
     [key: string]: any;
@@ -76,13 +77,23 @@ const Preview = forwardRef<any, any>((props, ref) => {
 
     return (
         <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]}>
+            <Stack.Screen
+                options={{
+                    headerTitle: state.MachineName ?? "",
+                    headerRight: () => (
+                        <View style={{ alignItems: 'center', justifyContent: 'center', paddingRight: 20 }}>
+                            <Text style={[{ fontSize: 18, fontWeight: "500" }]}>
+                                {state.FormName || "Form Name"}
+                            </Text>
+                        </View>
+                    )
+                }}
+            />
+
             <FlatList
                 data={[{}]}
                 renderItem={() => (
                     <>
-                        <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
-                        <Divider />
-                        <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
 
                         {state.subForms.map((subForm: BaseSubForm, index: number) => (
                             <Formik
@@ -140,11 +151,6 @@ const Preview = forwardRef<any, any>((props, ref) => {
                                                                             });
                                                                         }
                                                                     }
-                                                                };
-
-                                                                const handleCloseError = () => {
-                                                                    setTouched({ ...touched, [fastFieldProps.name]: false });
-                                                                    setFieldError(fastFieldProps.name, '');
                                                                 };
 
                                                                 return (
