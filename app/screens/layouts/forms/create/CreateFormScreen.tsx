@@ -159,6 +159,51 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
         return Yup.object().shape(shape);
     }, [state.subForms, dataType, checkListType]);
 
+    const renderItem = useMemo(() => {
+        if (selectedIndex === 0) {
+            return (
+                <AccessibleView name="container-sagment" style={{ paddingHorizontal: 20, paddingTop: 10 }}>
+                    <Inputs
+                        placeholder="Enter Form Name"
+                        label="Form Name"
+                        handleChange={(value) => handleChange("FormName", value)}
+                        value={initialForm.FormName}
+                        testId="form-name"
+                    />
+                    <Inputs
+                        placeholder="Enter Form Description"
+                        label="Form Description"
+                        handleChange={(value) => handleChange("Description", value)}
+                        value={initialForm.Description}
+                        testId="form-description"
+                    />
+
+                    <Pressable
+                        onPress={() => {
+                            setInitialSaveDialog(true);
+                        }}
+                        style={[createformStyles.saveButton, { justifyContent: "center" }]}
+                    >
+                        <Text style={createform.saveText}>Save Form</Text>
+                    </Pressable>
+
+                    {responsive !== "small" && (
+                        <>
+                            <Divider bold style={[{ marginVertical: 10, height: 5, backgroundColor: theme.colors.onBackground }]} />
+
+                            <Text style={[masterdataStyles.title, { textAlign: 'center' }]}>Menu List Type</Text>
+                            {checkListType.map((item, index) => (
+                                <DraggableItem item={item} onDrop={handleDrop} key={`${item.CTypeID}-${index}`} />
+                            ))}
+                        </>
+                    )}
+                </AccessibleView>
+            );
+        }
+        return null;
+    }, [selectedIndex, initialForm, handleChange, setInitialSaveDialog, checkListType, responsive, theme]);
+
+
     return (
         <GestureHandlerRootView style={[createform.container, { flex: 1 }]}>
             <AccessibleView name="container-form" style={[createform.containerL1]}>
@@ -175,70 +220,23 @@ const CreateFormScreen: React.FC<CreateFormProps> = ({ route, navigation }) => {
                 />
 
                 <FlatList
-                    data={[{}]}
-                    renderItem={() => selectedIndex === 0 && (
-                        <AccessibleView name="container-sagment" style={{ paddingHorizontal: 20, paddingTop: 10 }}>
-                            <Inputs
-                                placeholder="Enter Form Name"
-                                label="Form Name"
-                                handleChange={(value) => handleChange("FormName", value)}
-                                value={initialForm.FormName}
-                                testId="form-name"
-                            />
-                            <Inputs
-                                placeholder="Enter Form Description"
-                                label="Form Description"
-                                handleChange={(value) => handleChange("Description", value)}
-                                value={initialForm.Description}
-                                testId="form-description"
-                            />
-
-                            <Pressable
-                                onPress={() => {
-                                    setInitialSaveDialog(true);
-                                }}
-                                style={[createformStyles.saveButton, { justifyContent: "center" }]}
-                            >
-                                <Text style={createform.saveText}>Save Form</Text>
-                            </Pressable>
-
-                            {responsive !== "small" && (
-                                <>
-                                    <Divider bold style={[{ marginVertical: 10, height: 5, backgroundColor: theme.colors.onBackground }]} />
-
-                                    <Text style={[masterdataStyles.title, { textAlign: 'center' }]}>Menu List Type</Text>
-                                    {checkListType.map((item, index) => (
-                                        <DraggableItem item={item} onDrop={handleDrop} key={`${item.CTypeID}-${index}`} />
-                                    ))}
-                                </>
-                            )}
-
-                        </AccessibleView>
-                    )}
+                    data={selectedIndex === 0 ? [1] : []}
+                    renderItem={() => renderItem}
+                    keyExtractor={() => "unique-key"}
                     style={{ display: selectedIndex === 0 ? 'flex' : 'none' }}
-                    keyExtractor={(_, index) => `${index}`}
-                    contentContainerStyle={{ flexGrow: 1 }}
+                    contentContainerStyle={{ flexGrow: selectedIndex === 0 ? 1 : undefined }}
                 />
-                {responsive !== "small" ? selectedIndex === 1 && (
-                    <AccessibleView name="selectedIndex-1" style={{ display: selectedIndex === 1 ? 'flex' : 'none', flex: 1 }}>
-                        <Dragsubform navigation={navigation}
-                            state={state}
-                            dispatch={dispatch}
-                            checkList={checkList}
-                            dataType={dataType}
-                            checkListType={checkListType}
-                            groupCheckListOption={groupCheckListOption} />
-                    </AccessibleView>
-                ) : selectedIndex === 1 && (
-                    <AccessibleView name="selectedIndex-1" style={{ display: selectedIndex === 1 ? 'flex' : 'none', maxHeight: 500 }}>
-                        <Dragsubform navigation={navigation}
-                            state={state}
-                            dispatch={dispatch}
-                            checkList={checkList}
-                            dataType={dataType}
-                            checkListType={checkListType}
-                            groupCheckListOption={groupCheckListOption} />
-                    </AccessibleView>
+
+                {selectedIndex === 1 && (
+                    <Dragsubform navigation={navigation}
+                        state={state}
+                        dispatch={dispatch}
+                        checkList={checkList}
+                        dataType={dataType}
+                        checkListType={checkListType}
+                        groupCheckListOption={groupCheckListOption}
+                        selectedIndex={selectedIndex}
+                    />
                 )}
             </AccessibleView>
 

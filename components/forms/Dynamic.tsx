@@ -8,7 +8,7 @@ import { View } from "react-native";
 import { useTheme } from "@/app/contexts";
 import { Text } from "react-native-paper";
 
-const DynamicForm = React.memo(({
+const DynamicForm = ({
   field,
   values,
   handleChange,
@@ -107,6 +107,6 @@ const DynamicForm = React.memo(({
       {renderField()}
     </View>
   );
-});
+};
 
-export default DynamicForm;
+export default React.memo(DynamicForm);

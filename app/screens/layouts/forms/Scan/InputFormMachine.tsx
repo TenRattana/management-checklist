@@ -144,7 +144,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                             };
 
                             return (
-                              <Field name={field.MCListID} key={`field-${fieldIndex}-${subForm.Columns}`}>
+                              <FastField name={field.MCListID} key={`field-${fieldIndex}-${subForm.Columns}-${field.MCListID}`}>
                                 {({ field: fastFieldProps }: FieldProps) => {
                                   const type = dataType.find(v => v.DTypeID === field.DTypeID)?.DTypeName;
 
@@ -193,7 +193,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                                     </View>
                                   );
                                 }}
-                              </Field>
+                              </FastField>
                             );
                           })}
                         </Card.Content>

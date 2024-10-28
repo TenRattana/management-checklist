@@ -150,6 +150,7 @@ export interface DragsubformProps {
   checkListType: CheckListType[];
   groupCheckListOption: GroupCheckListOption[];
   navigation: NavigationProp<any>;
+  selectedIndex:number;
 }
   // validationSchema: Yup.ObjectSchema<{[x: string]: any;},Yup.AnyObject,{[x: string]: any;},"" >;
 
