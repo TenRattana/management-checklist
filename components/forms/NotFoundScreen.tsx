@@ -1,13 +1,12 @@
 import React from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import AccessibleView from "../AccessibleView";
-import { useNavigation } from "@react-navigation/native";
 import Text from "@/components/Text";
 import { useTheme, useRes } from '@/app/contexts';
 import useMasterdataStyles from '@/styles/common/masterdata';
+import { NavigationProp } from '@react-navigation/native';
 
-const NotFoundScreen = () => {
-    const navigation = useNavigation();
+const NotFoundScreen = ({ navigation }: { navigation: NavigationProp<any> }) => {
     const { theme } = useTheme();
     const { spacing } = useRes()
     const masterdataStyles = useMasterdataStyles()
