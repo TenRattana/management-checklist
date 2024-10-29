@@ -12,8 +12,6 @@ import { InitialValuesMachine } from '@/typing/value';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 
 const fetchMachines = async (): Promise<Machine[]> => {
-    console.log("FM");
-
     const response = await axiosInstance.post("Machine_service.asmx/GetMachines");
     return response.data.data ?? [];
 };
@@ -40,7 +38,6 @@ const MachineGroupScreen: React.FC = () => {
         description: "",
         isActive: true,
     });
-
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
@@ -53,19 +50,10 @@ const MachineGroupScreen: React.FC = () => {
         onSuccess: (data) => {
             showSuccess(data.message);
             queryClient.invalidateQueries('machines');
+            queryClient.getQueryCache()
         },
         onError: handleError,
     });
-
-    useCallback(() => {
-        const handler = setTimeout(() => {
-            setDebouncedSearchQuery(searchQuery);
-        }, 500);
-
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [searchQuery]);
 
     const saveData = useCallback(async (values: InitialValuesMachine) => {
         const data = {
@@ -102,6 +90,15 @@ const MachineGroupScreen: React.FC = () => {
             handleError(error);
         }
     }, [handleError, queryClient]);
+
+    React.useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 500);
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchQuery]);
 
     const tableData = useMemo(() => {
         return machines.map((item) => [
@@ -142,9 +139,7 @@ const MachineGroupScreen: React.FC = () => {
 
     const dropmachine = useMemo(() => {
         return Array.isArray(machineGroups)
-            ? machineGroups.filter(
-                (v) => v.IsActive || v.GMachineID === initialValues.machineGroupId
-            )
+            ? machineGroups.filter(v => v.IsActive || v.GMachineID === initialValues.machineGroupId)
             : [];
     }, [machineGroups, initialValues.machineGroupId]);
 

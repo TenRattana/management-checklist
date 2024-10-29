@@ -6,6 +6,7 @@ import { ToastProvider, AuthProvider, ResponsiveProvider, ThemeProvider, useThem
 import { QueryClient, QueryClientProvider } from 'react-query';
 import * as Font from "expo-font";
 import { Stack } from 'expo-router';
+import { ReactQueryDevtools } from 'react-query/devtools';
 
 const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();
@@ -48,6 +49,7 @@ const RootLayout = () => {
                     <QueryClientProvider client={queryClient}>
                         <AuthProvider>
                             <SetTheme />
+                            <ReactQueryDevtools initialIsOpen={true}/>
                         </AuthProvider>
                     </QueryClientProvider>
                 </ToastProvider>

@@ -1,27 +1,33 @@
 import { configureStore } from "@reduxjs/toolkit";
 import counterForm from "@/slices/forms/counterForm";
-import counterPrefix from '@/slices/prefix/counterPrefix'
+import counterPrefix from '@/slices/prefix/counterPrefix';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
-const formPersist = {
+const formPersistConfig = {
   key: 'form',
   storage,
 };
 
-const prefixPersist = {
+const prefixPersistConfig = {
   key: 'prefix',
   storage,
 };
 
-const formReducer = persistReducer(formPersist, counterForm);
-const prefixReducer = persistReducer(prefixPersist, counterPrefix);
+const formReducer = persistReducer(formPersistConfig, counterForm);
+const prefixReducer = persistReducer(prefixPersistConfig, counterPrefix);
 
 const store = configureStore({
   reducer: {
     form: formReducer,
-    prefix: prefixReducer
+    prefix: prefixReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+      },
+    }),
 });
 
 const persistor = persistStore(store);

@@ -1,22 +1,21 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
 import { LoadingSpinner, AccessibleView, Searchbar, Customtable, Text } from "@/components";
-import { Card, Divider } from "react-native-paper";
+import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Machine_group_dialog from "@/components/screens/Machine_group_dialog";
-import { GroupMachine } from '@/typing/type'
-import { InitialValuesGroupMachine } from '@/typing/value'
-import { useFocusEffect } from "expo-router";
+import { GroupMachine } from '@/typing/type';
+import { InitialValuesGroupMachine } from '@/typing/value';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useSelector } from 'react-redux';
 
 const MachineGroupScreen = () => {
-    const [machineGroup, setMachineGroup] = useState<GroupMachine[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [initialValues, setInitialValues] = useState<InitialValuesGroupMachine>({
         machineGroupId: "",
@@ -24,34 +23,52 @@ const MachineGroupScreen = () => {
         description: "",
         isActive: true,
     });
+    
     const masterdataStyles = useMasterdataStyles();
-
+    const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
+    const queryClient = useQueryClient();
 
-    const fetchData = useCallback(async () => {
-        setIsLoading(true);
-
-        try {
-            const response = await axiosInstance.post("GroupMachine_service.asmx/GetGroupMachines");
-            setMachineGroup(response.data.data ?? []);
-        } catch (error) {
-            handleError(error);
-        } finally {
-            setIsLoading(false);
+    const fetchMachineGroups = async (): Promise<GroupMachine[]> => {
+        console.time("Fetch Machine Groups");
+        const response = await axiosInstance.post("GroupMachine_service.asmx/GetGroupMachines");
+        console.timeEnd("Fetch Machine Groups");
+        return response.data.data ?? [];
+    };
+    
+    const saveGroupMachine = async (data: GroupMachine): Promise<{ message: string }> => {
+        const response = await axiosInstance.post("GroupMachine_service.asmx/SaveGroupMachine", data);
+        return response.data;
+    };
+    
+    const { data: machineGroups = [], isLoading, isError, error } = useQuery<GroupMachine[], Error>(
+        'machineGroups',
+        fetchMachineGroups,
+        {
+            refetchOnWindowFocus: false,
+            staleTime: 30000, // ข้อมูลจะถือว่าใหม่อยู่ 30 วินาที
+            cacheTime: 60000, // ข้อมูลจะถูกเก็บใน cache 1 นาที
         }
-    }, [handleError]);
-
-    useFocusEffect(
-        useCallback(() => {
-            fetchData();
-        }, [fetchData])
     );
+
+    console.log(isLoading);
+    console.log(isError);
+    console.log(error);
+    console.log(machineGroups);
+    
+    const mutation = useMutation(saveGroupMachine, {
+        onSuccess: (data) => {
+            showSuccess(data.message);
+            queryClient.invalidateQueries('machineGroups');
+        },
+        onError: handleError,
+    });
 
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearchQuery(searchQuery);
-        }, 500);
+        }, 300); // ลดเวลาลงเป็น 300 มิลลิวินาที
 
         return () => {
             clearTimeout(handler);
@@ -60,22 +77,15 @@ const MachineGroupScreen = () => {
 
     const saveData = useCallback(async (values: InitialValuesGroupMachine) => {
         const data = {
+            Prefix: state.GroupMachine ?? "",
             GMachineID: values.machineGroupId ?? "",
             GMachineName: values.machineGroupName,
             Description: values.description,
-            isActive: values.isActive,
+            IsActive: values.isActive,
         };
 
-        try {
-            const response = await axiosInstance.post("GroupMachine_service.asmx/SaveGroupMachine", data);
-            setIsVisible(!response.data.status);
-            showSuccess(String(response.data.message));
-
-            await fetchData()
-        } catch (error) {
-            handleError(error);
-        }
-    }, [fetchData, handleError]);
+        mutation.mutate(data);
+    }, [mutation]);
 
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
@@ -94,22 +104,21 @@ const MachineGroupScreen = () => {
                 const endpoint = action === "activeIndex" ? "ChangeGroupMachine" : "DeleteGroupMachine";
                 const response = await axiosInstance.post(`GroupMachine_service.asmx/${endpoint}`, { GMachineID: item });
                 showSuccess(String(response.data.message));
-
-                await fetchData()
+                queryClient.invalidateQueries('machineGroups');
             }
         } catch (error) {
             handleError(error);
         }
-    }, [fetchData, handleError]);
+    }, [queryClient, handleError]);
 
     const tableData = useMemo(() => {
-        return machineGroup.map(item => [
+        return machineGroups.map(item => [
             item.GMachineName,
             item.Description,
             item.IsActive,
             item.GMachineID,
         ]);
-    }, [machineGroup, debouncedSearchQuery]);
+    }, [machineGroups, debouncedSearchQuery]);
 
     const handleNewData = useCallback(() => {
         setInitialValues({
@@ -136,6 +145,14 @@ const MachineGroupScreen = () => {
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);
 
+    if (isLoading) {
+        return <LoadingSpinner />;
+    }
+
+    if (isError) {
+        return <Text>Error: {error.message}</Text>;
+    }
+
     return (
         <AccessibleView name="container-groupmachine" style={{ flex: 1 }}>
             <Card.Title
@@ -154,7 +171,7 @@ const MachineGroupScreen = () => {
                 </Pressable>
             </AccessibleView>
             <Card.Content style={{ padding: 2, flex: 1 }}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+                <Customtable {...customtableProps} />
             </Card.Content>
 
             <Machine_group_dialog
@@ -164,9 +181,7 @@ const MachineGroupScreen = () => {
                 initialValues={initialValues}
                 saveData={saveData}
             />
-
         </AccessibleView>
-
     );
 };
 
