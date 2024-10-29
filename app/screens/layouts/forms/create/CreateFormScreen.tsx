@@ -20,7 +20,7 @@ import DraggableItem from "./DraggableItem";
 
 
 const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigation }) => {
-    const { state, dispatch, checkList, groupCheckListOption, checkListType, dataType } = useForm(route);
+    const { state, dispatch, checkList, groupCheckListOption, checkListType, dataType, validationSchema } = useForm(route);
     const createform = useCreateformStyle();
 
     const [count, setCount] = useState<number>(0)
@@ -113,58 +113,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
         }
     };
 
-
-    const validationSchema = useMemo(() => {
-        const shape: any = {};
-
-        state.subForms?.forEach((subForm: BaseSubForm) => {
-            subForm.Fields?.forEach((field: BaseFormState) => {
-                const dataTypeName = dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName;
-                const checkListTypeName = checkListType.find(item => item.CTypeID === field.CTypeID)?.CTypeName;
-
-                if (dataTypeName === "Number") {
-                    let validator = Yup.number()
-                        .nullable()
-                        .typeError(`The ${field.CListName} field requires a valid number`);
-
-                    if (field.Required) {
-                        validator = validator.required(`The ${field.Placeholder} field is required`);
-                    }
-
-                    if (field.MinLength) {
-                        validator = validator.min(field.MinLength, `The ${field.CListName} minimum value is ${field.MinLength}`);
-                    }
-
-                    if (field.MaxLength) {
-                        validator = validator.max(field.MaxLength, `The ${field.CListName} maximum value is ${field.MaxLength}`);
-                    }
-
-                    shape[field.MCListID] = validator;
-                } else if (dataTypeName === "String") {
-                    let validator;
-
-                    if (checkListTypeName === "Checkbox") {
-                        validator = Yup.array()
-                            .of(Yup.string())
-                            .min(1, `The ${field.CListName} field requires at least one option to be selected`);
-                    } else {
-                        validator = Yup.string()
-                            .nullable()
-                            .typeError(`The ${field.CListName} field requires a valid string`);
-                    }
-
-                    if (field.Required) {
-                        validator = validator.required(`The ${field.Placeholder} field is required`);
-                    }
-
-                    shape[field.MCListID] = validator;
-                }
-            });
-        });
-
-        return Yup.object().shape(shape);
-    }, [state.subForms, dataType, checkListType]);
-
     const renderItem = useMemo(() => {
         if (selectedIndex === 0) {
             return (
@@ -190,7 +138,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                         }}
                         style={[createformStyles.saveButton, { justifyContent: "center" }]}
                     >
-                        <Text style={createform.saveText}>Save Form</Text>
+                        <Text style={masterdataStyles.textFFF}>Save Form</Text>
                     </Pressable>
 
                 </AccessibleView>
@@ -210,9 +158,9 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                         const newIndex = event.nativeEvent.selectedSegmentIndex;
                         setSelectedIndex(newIndex);
                     }}
-                    style={{ height: 80, borderRadius: 0, backgroundColor: theme.colors.onBackground }}
-                    fontStyle={{ color: theme.colors.background }}
-                    activeFontStyle={{ color: theme.colors.onBackground, fontWeight: "bold", fontSize: spacing.small }}
+                    style={{ height: 80, borderRadius: 0 }}
+                    fontStyle={{ fontSize: spacing.small }}
+                    activeFontStyle={{ fontWeight: "bold" }}
                 />
 
                 <FlatList
@@ -224,12 +172,14 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                     ListFooterComponentStyle={{ paddingHorizontal: 20 }}
                     ListFooterComponent={() => (
                         <>
-                            <Divider bold style={[{ marginVertical: 10, height: 5, backgroundColor: theme.colors.onBackground }]} />
+                            <Divider bold style={[{ marginVertical: 10, height: 2, backgroundColor: theme.colors.onBackground }]} />
 
-                            <Text style={[masterdataStyles.title, { textAlign: 'center' }]}>Menu List Type</Text>
+                            <Text style={[masterdataStyles.title, { textAlign: 'center', color: theme.colors.onBackground }]}>Menu List Type</Text>
                             {checkListType.map((item, index) => (
                                 <DraggableItem item={item} onDrop={handleDrop} key={`${item.CTypeID}-${index}`} />
                             ))}
+
+                            {/* <Divider bold style={[{ marginVertical: 10, height: 2, backgroundColor: theme.colors.onBackground }]} /> */}
                         </>
                     )}
                 />

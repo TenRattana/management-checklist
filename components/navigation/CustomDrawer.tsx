@@ -1,9 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { useAuth } from "@/app/contexts/auth";
-import { useRes } from '@/app/contexts/responsive';
 import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
-import { AccessibleView, Text } from '@/components';
+import { Text } from '@/components';
 import MenuSection from './MenuSection';
 import useMasterdataStyles from "@/styles/common/masterdata";
 
@@ -75,6 +74,8 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                                 {renderPressable('Scan QR Code', 'ScanQR')}
                                 {renderPressable('Generate QR Code', 'GenerateQR')}
                                 {renderPressable('Setting', 'Setting')}
+                                {renderPressable('Configulation', 'Config')}
+
                             </>
                         )}
 

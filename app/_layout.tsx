@@ -3,10 +3,11 @@ import { ActivityIndicator } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
 import * as SplashScreen from 'expo-splash-screen';
 import { ToastProvider, AuthProvider, ResponsiveProvider, ThemeProvider, useTheme, useAuth } from "@/app/contexts";
+import { QueryClient, QueryClientProvider } from 'react-query';
 import * as Font from "expo-font";
 import { Stack } from 'expo-router';
 
-
+const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();
 
 const SetTheme = () => {
@@ -14,7 +15,7 @@ const SetTheme = () => {
 
     return (
         <PaperProvider theme={theme}>
-            <Stack screenOptions={{ headerShown: false}} />
+            <Stack screenOptions={{ headerShown: false }} />
         </PaperProvider>
     );
 }
@@ -24,11 +25,8 @@ const RootLayout = () => {
 
     const loadFonts = async () => {
         await Font.loadAsync({
-            "Spacemono": require("../assets/fonts/SpaceMono-Regular.ttf"),
             "Poppins": require("../assets/fonts/Poppins-Regular.ttf"),
-            "PoppinsB": require("../assets/fonts/Poppins-SemiBold.ttf"),
             "Sarabun": require("../assets/fonts/Sarabun-Regular.ttf"),
-            "SarabunB": require("../assets/fonts/Sarabun-Bold.ttf"),
         });
         setFontsLoaded(true);
     };
@@ -47,9 +45,11 @@ const RootLayout = () => {
         <ThemeProvider>
             <ResponsiveProvider>
                 <ToastProvider>
-                    <AuthProvider>
-                        <SetTheme />
-                    </AuthProvider>
+                    <QueryClientProvider client={queryClient}>
+                        <AuthProvider>
+                            <SetTheme />
+                        </AuthProvider>
+                    </QueryClientProvider>
                 </ToastProvider>
             </ResponsiveProvider>
         </ThemeProvider>

@@ -5,6 +5,7 @@ import AccessibleView from "@/components/AccessibleView";
 import { InputProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
+import { useRes, useTheme } from "@/app/contexts";
 
 const Inputs: React.FC<InputProps> = React.memo(({
   placeholder,
@@ -16,7 +17,8 @@ const Inputs: React.FC<InputProps> = React.memo(({
   handleBlur,
   hint,
   mode,
-  testId
+  testId,
+  textColor
 }) => {
   const masterdataStyles = useMasterdataStyles();
 
@@ -24,6 +26,8 @@ const Inputs: React.FC<InputProps> = React.memo(({
     return mode ? undefined : <Text style={masterdataStyles.text}>{label}</Text>;
   }, [label, mode]);
 
+  const { spacing } = useRes()
+  const { theme } = useTheme()
   return (
     <View
       id="inputs"
@@ -33,7 +37,8 @@ const Inputs: React.FC<InputProps> = React.memo(({
         mode={mode || "outlined"}
         placeholder={placeholder}
         label={formattedLabel}
-        style={masterdataStyles.text}
+        textColor={textColor ? textColor : theme.colors.onBackground}
+        style={{ fontSize: spacing.small }}
         onChangeText={handleChange}
         onBlur={handleBlur}
         value={String(value)}
@@ -45,7 +50,6 @@ const Inputs: React.FC<InputProps> = React.memo(({
             />
           ) : undefined
         }
-        contentStyle={masterdataStyles.text}
         error={error}
         enterKeyHint="done"
         testID={testId}

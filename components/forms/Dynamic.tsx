@@ -15,11 +15,23 @@ const DynamicForm = ({
   handleBlur,
   groupCheckListOption,
   error,
-  errorMessages
+  errorMessages,
+  type
 }: DynamicFormProps) => {
-  const { CTypeName, Hint, CListName, MCListID, GCLOptionID, Required } = field;
+  const { CTypeName, CListName, MCListID, GCLOptionID, Required, MinLength, MaxLength } = field;
   const masterdataStyles = useMasterdataStyles();
   const { theme } = useTheme()
+  let textColor = theme.colors.onBackground;
+
+  if (type === "Number") {
+    const numericValue = Number(values);
+
+    if (Number(MinLength) > numericValue) {
+      textColor = theme.colors.yellow;
+    } else if (Number(MaxLength) < numericValue) {
+      textColor = theme.colors.error;
+    }
+  }
 
   const option = useMemo(() =>
     groupCheckListOption
@@ -43,6 +55,7 @@ const DynamicForm = ({
             handleChange={(v) => handleChange(MCListID, v)}
             handleBlur={handleBlur}
             testId={`input-${MCListID}`}
+            textColor={textColor}
           />
         );
       case "Textarea":
@@ -55,6 +68,7 @@ const DynamicForm = ({
             handleChange={(v) => handleChange(MCListID, v)}
             handleBlur={handleBlur}
             testId={`inputarea-${MCListID}`}
+            textColor={textColor}
           />
         );
       case "Radio":

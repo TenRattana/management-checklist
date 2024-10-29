@@ -296,7 +296,7 @@ const useMasterdataStyles = () => {
         settingItem: {
             flexDirection: 'row',
             justifyContent: 'space-between',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             paddingVertical: 15,
             paddingHorizontal: 20,
             marginHorizontal: 20,
@@ -307,6 +307,7 @@ const useMasterdataStyles = () => {
         },
         settingText: {
             fontWeight: '500',
+            paddingVertical: 10,
             fontSize: spacing.small,
             color: theme.colors.onBackground
         },
@@ -316,6 +317,25 @@ const useMasterdataStyles = () => {
             borderRadius: 8,
             backgroundColor: theme.colors.onBackground
         },
+        configPrefix: {
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            paddingVertical: 15,
+            paddingHorizontal: 20,
+            marginHorizontal: 20,
+            marginVertical: 10,
+            borderRadius: 8,
+            borderColor: theme.colors.onBackground,
+            borderWidth: 1,
+        },
+        configPrefixText: {
+            flex: 1,
+            fontWeight: '500',
+            paddingVertical: 10,
+            fontSize: spacing.small,
+            color: theme.colors.onBackground,
+            alignContent: 'center'
+        }
     });
 };
 

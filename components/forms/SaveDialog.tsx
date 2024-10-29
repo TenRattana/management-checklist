@@ -80,9 +80,8 @@ const SaveDialog = ({
                         >
                             <Text
                                 style={[
-                                    masterdataStyles.text,
+                                    masterdataStyles.textFFF,
                                     masterdataStyles.textBold,
-                                    masterdataStyles.textLight,
                                 ]}>
                                 Save
                             </Text>
@@ -97,9 +96,8 @@ const SaveDialog = ({
                         >
                             <Text
                                 style={[
-                                    masterdataStyles.text,
+                                    masterdataStyles.textFFF,
                                     masterdataStyles.textBold,
-                                    masterdataStyles.textLight,
                                 ]}>
                                 Cancel
                             </Text>

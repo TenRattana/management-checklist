@@ -14,7 +14,7 @@ const isThai = (text: string): boolean => {
   return thaiCharRange.test(text);
 };
 
-const Text: React.FC<CustomTextProps> = ({ style, children, ...props }) => {
+const Text: React.FC<CustomTextProps> = React.memo(({ style, children, ...props }) => {
   const theme = useTheme();
   const { spacing } = useRes();
   const textArray = Array.isArray(children) ? children : [children];
@@ -37,11 +37,11 @@ const Text: React.FC<CustomTextProps> = ({ style, children, ...props }) => {
       })}
     </React.Fragment>
   );
-};
+});
 
 Text.propTypes = {
   style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
   children: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.any]),
 };
 
-export default React.memo(Text);
+export default Text;

@@ -14,7 +14,7 @@ import { Stack, useNavigation } from "expo-router";
 import useForm from "@/hooks/custom/useForm";
 
 const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
-  const { state, dispatch, checkList, groupCheckListOption, checkListType, dataType, found } = useForm(route);
+  const { state, dispatch, checkList, groupCheckListOption, checkListType, dataType, found, validationSchema } = useForm(route);
   const navigation = useNavigation();
 
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -25,55 +25,6 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   const { theme } = useTheme()
 
   const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
-
-  const validationSchema = useMemo(() => {
-    const shape: any = {};
-
-    state.subForms.forEach((subForm: BaseSubForm) => {
-      subForm.Fields.forEach((field: BaseFormState) => {
-        const dataTypeName = dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName;
-        const checkListTypeName = checkListType.find(item => item.CTypeID === field.CTypeID)?.CTypeName;
-
-        let validator;
-
-        if (dataTypeName === "Number") {
-          validator = Yup.number()
-            .nullable()
-            .typeError(`The ${field.CListName} field must be a valid number`);
-
-          if (field.MinLength !== undefined && field.MinLength !== null) {
-            validator = validator.min(field.MinLength, `The ${field.CListName} minimum value is ${field.MinLength}`);
-          }
-
-          if (field.MaxLength !== undefined && field.MaxLength !== null) {
-            validator = validator.max(field.MaxLength, `The ${field.CListName} maximum value is ${field.MaxLength}`);
-          }
-
-          if (field.MinLength !== undefined && field.MinLength < 0) {
-            validator = validator.min(0, `The ${field.CListName} cannot be negative`);
-          }
-        } else if (dataTypeName === "String") {
-          if (checkListTypeName === "Checkbox") {
-            validator = Yup.array()
-              .of(Yup.string())
-              .min(1, `The ${field.CListName} field requires at least one option to be selected`);
-          } else {
-            validator = Yup.string()
-              .nullable()
-              .typeError(`The ${field.CListName} field must be a valid string`);
-          }
-        }
-
-        if (field.Required) {
-          validator = validator?.required(`The ${field.CListName} field is required`);
-        }
-
-        shape[field.MCListID] = validator;
-      });
-    });
-
-    return Yup.object().shape(shape);
-  }, [state.subForms, dataType, checkListType]);
 
   const onFormSubmit = useCallback(async (values: { [key: string]: any }) => {
     const updatedSubForms = state.subForms.map((subForm: BaseSubForm) => ({
@@ -238,7 +189,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
       </Formik>
     </AccessibleView>
   ) : (
-    <NotFoundScreen navigation={navigation}/>
+    <NotFoundScreen navigation={navigation} />
   );
 };
 

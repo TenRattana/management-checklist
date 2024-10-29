@@ -24,7 +24,7 @@ import { spacing } from "@/constants/Spacing";
 import Dragfield from "./Dragfield";
 import { BaseSubForm, RowItemProps } from '@/typing/form'
 import { DragsubformProps } from "@/typing/tag";
-import { useTheme, useToast } from "@/app/contexts";
+import { useRes, useTheme, useToast } from "@/app/contexts";
 import useMasterdataStyles from "@/styles/common/masterdata";
 
 const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, checkListType, groupCheckListOption, checkList, navigation, selectedIndex }) => {
@@ -33,6 +33,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
     const [editMode, setEditMode] = useState<boolean>(false)
     const createformStyles = useCreateformStyle();
     const masterdataStyles = useMasterdataStyles()
+    const { fontSize } = useRes()
     const { theme } = useTheme()
     const createform = useCreateformStyle();
     const { handleError } = useToast();
@@ -129,12 +130,12 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                     }}
                     style={[createform.addSubFormButton]}
                 >
-                    <IconButton icon="plus" iconColor={theme.colors.background} size={spacing.large} style={createformStyles.icon} animated />
-                    <Text style={[masterdataStyles.textLight, createform.addSubFormText]}>Add Sub Form</Text>
+                    <IconButton icon="plus" iconColor={theme.colors.fff} size={spacing.large} style={createformStyles.icon} animated />
+                    <Text style={[masterdataStyles.textFFF, { marginLeft: 8, paddingVertical: 10 }]}>Add Sub Form</Text>
                 </Pressable>
 
                 <NestableScrollContainer>
-                    <AccessibleView name="drag-subform" style={{ paddingHorizontal: 40, paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 20 : 0 }}>
+                    <AccessibleView name="drag-subform" style={{ paddingHorizontal: fontSize === "large" ? 30 : 25, paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 20 : 0 }}>
                         <NestableDraggableFlatList
                             data={state.subForms}
                             renderItem={renderSubForm}

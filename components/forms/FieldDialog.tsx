@@ -351,7 +351,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
 
                                             <View id="form-active-fd" style={masterdataStyles.containerSwitch}>
                                                 <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
-                                                    Required: {values.Required ? "Yes" : "No"}
+                                                    Require: {values.Required ? "Yes" : "No"}
                                                 </Text>
                                                 <Switch
                                                     style={{ transform: [{ scale: 1.1 }], top: 2 }}

@@ -11,8 +11,13 @@ export interface GroupMachine {
 export interface Machine {
   GMachineID: string;
   MachineID: string;
+  FormID?: string;
+  MachineCode?: string;
   MachineName: string;
   Description: string;
+  Building?:string;
+  Floor?:string;
+  Area?:string;
   IsActive: boolean;
 }
 
@@ -87,7 +92,7 @@ export interface Users {
 export interface UsersPermission {
   UserID: string;
   UserName: string;
-  GUserID : string;
+  GUserID: string;
   IsActive: boolean;
 }
 
@@ -96,9 +101,26 @@ export interface Userset {
 }
 
 export interface GroupUsers {
-  GUserID: string; 
-  GUserName:string;
+  GUserID: string;
+  GUserName: string;
   IsActive: boolean;
+}
+
+export interface Prefixs {
+  GroupMachine: string;
+  Location: string;
+  Machine: string;
+  CheckList: string;
+  GroupCheckList: string;
+  CheckListOption: string;
+  MatchCheckListOption: string;
+  MatchFormMachine: string;
+  Form: string;
+  ExpectedResult: string;
+}
+
+export interface AppProps extends Prefixs {
+  AppName: string;
 }
 
 export type TypeConfig =
@@ -114,4 +136,4 @@ export type TypeConfig =
   | MatchCheckListOption
   | Users
   | GroupUsers
-  | UsersPermission ;
+  | UsersPermission;

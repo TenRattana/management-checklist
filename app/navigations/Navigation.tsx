@@ -1,25 +1,28 @@
 import React, { useState, lazy, Suspense, useRef, useCallback, useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { HomeScreen, LoginScreen, ScanQR, GenerateQR, SettingScreen } from '@/app/screens';
+import { HomeScreen, LoginScreen, ScanQR, GenerateQR, SettingScreen, ConfigulationScreen } from '@/app/screens';
 import NotFoundScreen from '@/app/+not-found';
 import { useAuth } from "@/app/contexts/auth";
 import { useRes } from "@/app/contexts/responsive";
 import CustomDrawerContent from '@/components/navigation/CustomDrawer';
 import axiosInstance from '@/config/axios';
 import { useTheme } from '../contexts';
+import { useDispatch, useSelector } from "react-redux";
 
 const Drawer = createDrawerNavigator();
 
 type ComponentNames = 'TestScreen' | 'Form' | 'Expected_result' | 'Create_form' | 'Machine_group' |
   'Machine' | 'Match_checklist_option' | 'Match_form_machine' | 'Checklist' |
-  'InputFormMachine' | 'Preview' | 'Checklist_option' | 'Checklist_group' | 'ScanQR' | 'GenerateQR' | 'Setting' | 'Managepermissions' | 'NotFoundScreen' | 'Home';
+  'InputFormMachine' | 'Preview' | 'Checklist_option' | 'Checklist_group' | 'ScanQR' | 'GenerateQR' | 'Setting' | 'Managepermissions' | 'NotFoundScreen' | 'Home' |
+  'Config';
 
 const components: Record<ComponentNames, () => Promise<{ default: React.ComponentType<any> }>> = {
   Home: () => Promise.resolve({ default: HomeScreen }),
   ScanQR: () => Promise.resolve({ default: ScanQR }),
   GenerateQR: () => Promise.resolve({ default: GenerateQR }),
   Setting: () => Promise.resolve({ default: SettingScreen }),
+  Config: () => Promise.resolve({ default: ConfigulationScreen }),
   NotFoundScreen: () => Promise.resolve({ default: NotFoundScreen }),
   TestScreen: () => import('@/app/screens/TestScreen'),
   Form: () => import('@/app/screens/layouts/forms/form/FormScreen'),
@@ -39,6 +42,7 @@ const components: Record<ComponentNames, () => Promise<{ default: React.Componen
 
 
 const Navigation = () => {
+  const state = useSelector((state: any) => state.prefix);
   const { loading, screens, session } = useAuth();
   const { fontSize } = useRes();
 
@@ -104,7 +108,7 @@ const Navigation = () => {
             name={screen.name}
             component={renderComponent(screen.name as ComponentNames)}
             options={{
-              headerTitle: "",
+              headerTitle: state.AppName || "",
               drawerLabel: screen.name,
             }}
           />

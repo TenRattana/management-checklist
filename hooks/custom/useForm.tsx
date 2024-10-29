@@ -1,11 +1,12 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "@/config/axios";
 import { setForm, setSubForm, setField, reset } from "@/slices";
 import { useToast } from "@/app/contexts";
 import { useFocusEffect } from "@react-navigation/native";
-import { SubForm, FormData, BaseFormState, BaseForm } from '@/typing/form';
+import { SubForm, FormData, BaseFormState, BaseForm, BaseSubForm } from '@/typing/form';
 import { CheckListType, CheckListOption, Checklist, DataType, GroupCheckListOption, Machine } from '@/typing/type';
+import * as Yup from 'yup';
 
 const useForm = (route: any) => {
     const dispatch = useDispatch();
@@ -184,6 +185,63 @@ const useForm = (route: any) => {
         }, [formId, dataType.length, loadForm, tableId, machineId])
     );
 
+    const validationSchema = useMemo(() => {
+        const shape: any = {};
+
+        state.subForms.forEach((subForm: BaseSubForm) => {
+            subForm.Fields.forEach((field: BaseFormState) => {
+                const dataTypeName = dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName;
+                const checkListTypeName = checkListType.find(item => item.CTypeID === field.CTypeID)?.CTypeName;
+
+                let validator;
+
+                if (dataTypeName === "Number") {
+                    validator = Yup.number()
+                        .nullable()
+                        .typeError(`The ${field.CListName} field must be a valid number`);
+
+                    if (field.MinLength !== undefined && field.MinLength !== null) {
+                        validator = validator.test(
+                            'min-length',
+                            `The ${field.CListName} minimum control value is ${field.MinLength}`,
+                            value => value === undefined || value === null || Number(value) >= Number(field.MinLength)
+                        );
+                    }
+
+                    if (field.MaxLength !== undefined && field.MaxLength !== null) {
+                        validator = validator.test(
+                            'max-length',
+                            `The ${field.CListName} maximum control value is ${field.MaxLength}`,
+                            value => value === undefined || value === null || Number(value) <= Number(field.MaxLength)
+                        );
+                    }
+
+                    if (field.MinLength !== undefined && field.MinLength < 0) {
+                        validator = validator.min(0, `The ${field.CListName} cannot be negative`);
+                    }
+                } else if (dataTypeName === "String") {
+                    if (checkListTypeName === "Checkbox") {
+                        validator = Yup.array()
+                            .of(Yup.string())
+                            .min(1, `The ${field.CListName} field requires at least one option to be selected`);
+                    } else {
+                        validator = Yup.string()
+                            .nullable()
+                            .typeError(`The ${field.CListName} field must be a valid string`);
+                    }
+                }
+
+                if (field.Required) {
+                    validator = validator?.required(`The ${field.CListName} field is required`);
+                }
+
+                shape[field.MCListID] = validator;
+            });
+        });
+
+        return Yup.object().shape(shape);
+    }, [state.subForms, dataType, checkListType]);
+
     return {
         found,
         state,
@@ -201,6 +259,7 @@ const useForm = (route: any) => {
         isLoading,
         dispatch,
         fetchData,
+        validationSchema
     };
 };
 

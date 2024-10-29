@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { BaseSubForm, BaseFormState, Form, BaseForm } from '@/typing/form'
-import { Checklist, CheckListType, DataType, GroupMachine, Machine } from '@/typing/type'
+import { Checklist, CheckListType, DataType } from '@/typing/type'
 
 
 const initialState: Form = {

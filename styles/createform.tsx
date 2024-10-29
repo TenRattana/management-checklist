@@ -14,7 +14,7 @@ const useCreateformStyle = () => {
         },
         containerL1: {
             display: "flex",
-            width: responsive === "small" ? "100%" : fontSize === "large" ? 400 : 350,
+            width: responsive === "small" ? "100%" : fontSize === "large" ? 430 : 370,
             borderColor: theme.colors.onBackground,
             borderRightWidth: 1
         },
@@ -25,17 +25,11 @@ const useCreateformStyle = () => {
         addSubFormButton: {
             margin: 16,
             marginVertical: 8,
-            backgroundColor: theme.colors.blue,
+            backgroundColor: theme.colors.yellow,
             borderRadius: 8,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
-        },
-        addSubFormText: {
-            fontSize: spacing.small,
-            color: theme.colors.onTertiary,
-            marginLeft: 8,
-            paddingVertical: 10
         },
         fieldContainer: {
             paddingHorizontal: 10,
@@ -73,7 +67,7 @@ const useCreateformStyle = () => {
             paddingHorizontal: 10,
             height: 60,
             marginVertical: 3,
-            backgroundColor: theme.colors.onBackground,
+            backgroundColor: theme.colors.blue,
             borderRadius: 8,
             flexDirection: 'row',
             alignItems: 'center',

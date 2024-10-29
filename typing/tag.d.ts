@@ -57,6 +57,7 @@ export interface InputProps extends Event, DefaultProps {
   mode?: "outlined" | "flat";
   lefticon?: string;
   name?: string;
+  textColor?:string;
 }
 
 export interface RadiosProps extends Event, DefaultProps {
@@ -74,6 +75,7 @@ export interface CheckboxsProps extends Event, DefaultProps {
 export interface TextareasProps extends Event, DefaultProps {
   placeholder?: string;
   mode?: "outlined" | "flat";
+  textColor?:string;
 }
 export interface CustomDropdownSingleProps extends Event, DefaultProps {
   labels: string;
@@ -93,6 +95,7 @@ export interface DynamicFormProps {
   groupCheckListOption: GroupCheckListOption[];
   error?:boolean;
   errorMessages?:FormikErrors<{[key: string]: any;}>;
+  type?:string;
 }
 
 export interface PreviewProps<T extends PreviewParams | ScanParams> {

@@ -103,9 +103,8 @@ const SubFormDialog = ({
                                         >
                                             <Text
                                                 style={[
-                                                    masterdataStyles.text,
+                                                    masterdataStyles.textFFF,
                                                     masterdataStyles.textBold,
-                                                    masterdataStyles.textLight,
                                                 ]}
                                             >
                                                 {isEditing ? "Update SubForm" : "Add SubForm"}
@@ -122,9 +121,8 @@ const SubFormDialog = ({
                                             >
                                                 <Text
                                                     style={[
-                                                        masterdataStyles.text,
+                                                        masterdataStyles.textFFF,
                                                         masterdataStyles.textBold,
-                                                        masterdataStyles.textLight,
                                                     ]}
                                                 >
                                                     Delete sub form
@@ -141,9 +139,8 @@ const SubFormDialog = ({
                                         >
                                             <Text
                                                 style={[
-                                                    masterdataStyles.text,
+                                                    masterdataStyles.textFFF,
                                                     masterdataStyles.textBold,
-                                                    masterdataStyles.textLight,
                                                 ]}
                                             >
                                                 Cancel

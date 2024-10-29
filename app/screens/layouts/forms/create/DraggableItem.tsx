@@ -7,6 +7,7 @@ import { CheckListType } from "@/typing/type";
 import { View } from "react-native";
 import { useRes, useTheme } from "@/app/contexts";
 import { Text } from "@/components";
+import useMasterdataStyles from "@/styles/common/masterdata";
 
 const DraggableItem: React.FC<{
     item: CheckListType;
@@ -32,6 +33,8 @@ const DraggableItem: React.FC<{
     }));
 
     const createform = useCreateformStyle();
+    const masterdataStyles = useMasterdataStyles()
+
     const { spacing } = useRes();
     const { theme } = useTheme();
 
@@ -65,8 +68,8 @@ const DraggableItem: React.FC<{
             <View>
                 <Animated.View style={[itemAnimatedStyle, { opacity: isDragging ? 0 : 1 }]}>
                     <View style={[{ marginHorizontal: 10, flexDirection: "row", alignItems: "center" }, createform.addSubFormButton]}>
-                        <IconButton icon={item.Icon} iconColor={theme.colors.background} size={spacing.large} style={createform.icon} animated />
-                        <Text style={[createform.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
+                        <IconButton icon={item.Icon} iconColor={theme.colors.fff} size={spacing.large} style={createform.icon} animated />
+                        <Text style={[masterdataStyles.textFFF, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
                             {item.CTypeName}
                         </Text>
                     </View>

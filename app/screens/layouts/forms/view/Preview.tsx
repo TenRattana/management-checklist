@@ -147,6 +147,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                                                                                 ...touched,
                                                                                 [fastFieldProps.name]: true,
                                                                             });
+
                                                                         } else if (isNaN(numericValue)) {
                                                                             setFieldValue(fastFieldProps.name, fastFieldProps.value);
                                                                             setTouched({
@@ -175,6 +176,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                                                                             groupCheckListOption={groupCheckListOption}
                                                                             error={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
                                                                             errorMessages={errors}
+                                                                            type={type}
                                                                         />
                                                                     </View>
                                                                 );

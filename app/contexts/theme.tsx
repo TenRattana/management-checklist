@@ -21,7 +21,7 @@ const CustomLightTheme = {
     surface: '#ffffff',
     text: '#000000',
     green: "#ffb11e",
-    yellow: "#bea400",
+    yellow: "#c8c400",
     blue: "rgb(20, 148, 255)",
     fff: '#fff'
   },
@@ -37,7 +37,7 @@ const CustomDarkTheme = {
     surface: '#121212',
     text: '#ffffff',
     green: "#ffb11e",
-    yellow: "#bea400",
+    yellow: "#c8c400",
     blue: "rgb(20, 148, 255)",
     fff: '#fff'
   },
