@@ -129,11 +129,11 @@ const useMasterdataStyles = () => {
         },
         placeholderStyle: {
             fontSize: spacing.small,
-            color:theme.colors.onBackground
+            color: theme.colors.onBackground
         },
         selectedTextStyle: {
             fontSize: spacing.small,
-            color:theme.colors.onBackground
+            color: theme.colors.onBackground
         },
         iconStyle: {
             width: 20,

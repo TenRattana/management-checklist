@@ -8,7 +8,7 @@ import Text from "@/components/Text";
 import { View } from "react-native";
 import { useTheme } from "@/app/contexts";
 
-const Selects:React.FC<SelectsProps> = React.memo(({
+const Selects: React.FC<SelectsProps> = React.memo(({
   hint,
   option,
   value,
@@ -41,14 +41,12 @@ const Selects:React.FC<SelectsProps> = React.memo(({
         >
           <Picker.Item label="Select..."
             value=""
-            style={masterdataStyles.text}
           />
           {option.map((item, index) => (
             <Picker.Item
               key={`value-${index}`}
               label={item.label}
               value={item.value}
-              style={masterdataStyles.text}
             />
           ))}
         </Picker>

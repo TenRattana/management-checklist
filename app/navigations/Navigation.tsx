@@ -104,6 +104,7 @@ const Navigation = () => {
             name={screen.name}
             component={renderComponent(screen.name as ComponentNames)}
             options={{
+              headerTitle: "",
               drawerLabel: screen.name,
             }}
           />

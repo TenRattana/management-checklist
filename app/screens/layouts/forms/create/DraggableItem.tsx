@@ -11,7 +11,7 @@ import { Text } from "@/components";
 const DraggableItem: React.FC<{
     item: CheckListType;
     onDrop: (item: CheckListType, absoluteX: number, absoluteY: number) => void;
-}> = ({ item, onDrop }) => {
+}> = React.memo(({ item, onDrop }) => {
     const itemTranslateX = useSharedValue(0);
     const itemTranslateY = useSharedValue(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -84,6 +84,6 @@ const DraggableItem: React.FC<{
             </View>
         </PanGestureHandler>
     );
-};
+});
 
-export default React.memo(DraggableItem);
+export default DraggableItem;

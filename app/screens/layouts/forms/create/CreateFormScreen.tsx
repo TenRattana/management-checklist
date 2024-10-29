@@ -48,7 +48,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
         Description: state.Description || "",
         MachineID: state.MachineID || "",
     }), [state.FormID, state.FormName, state.Description, state.MachineID]);
-    
+
     useEffect(() => {
         setInitialForm(newForm);
         formRef.current = newForm;
@@ -69,17 +69,17 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
 
     const handleDrop = (item: CheckListType, absoluteX: number, absoluteY: number) => {
         const cardIndex = childRef.current.checkCardPosition(absoluteX, absoluteY);
-        
+
         const selectedChecklist = checkList.find(v => v.CListID === "CL000") || checkList[0];
         const selectedDataType = dataType.find(v => v.DTypeName === "String") || dataType[0];
-        
+
         if (cardIndex >= 0) {
             const targetSubForm = state.subForms[cardIndex];
-    
+
             setCount(prevCount => {
-                const currentFieldCount = prevCount; 
+                const currentFieldCount = prevCount;
                 console.log(currentFieldCount);
-    
+
                 const newField: BaseFormState = {
                     MCListID: `MCL-ADD-${currentFieldCount}`,
                     CListID: selectedChecklist.CListID,
@@ -97,22 +97,22 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                     MinLength: undefined,
                     MaxLength: undefined
                 };
-    
+
                 newField.GCLOptionID = ["Dropdown", "Radio", "Checkbox"].includes(item.CTypeName)
                     ? (groupCheckListOption.find(v => v.GCLOptionID === "GCLO000") || groupCheckListOption[0])?.GCLOptionID
                     : undefined;
-    
+
                 try {
                     dispatch(defaultDataForm({ currentField: newField }));
                 } catch (error) {
                     handleError(error);
                 }
-    
-                return currentFieldCount + 1; 
+
+                return currentFieldCount + 1;
             });
         }
     };
-    
+
 
     const validationSchema = useMemo(() => {
         const shape: any = {};
@@ -193,16 +193,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                         <Text style={createform.saveText}>Save Form</Text>
                     </Pressable>
 
-                    {responsive !== "small" && (
-                        <>
-                            <Divider bold style={[{ marginVertical: 10, height: 5, backgroundColor: theme.colors.onBackground }]} />
-
-                            <Text style={[masterdataStyles.title, { textAlign: 'center' }]}>Menu List Type</Text>
-                            {checkListType.map((item, index) => (
-                                <DraggableItem item={item} onDrop={handleDrop} key={`${item.CTypeID}-${index}`} />
-                            ))}
-                        </>
-                    )}
                 </AccessibleView>
             );
         }
@@ -228,9 +218,20 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                 <FlatList
                     data={selectedIndex === 0 ? [1] : []}
                     renderItem={() => renderItem}
-                    keyExtractor={() => "unique-key"}
+                    keyExtractor={(index) => `unique-key-${index}`}
                     style={{ display: selectedIndex === 0 ? 'flex' : 'none' }}
                     contentContainerStyle={{ flexGrow: selectedIndex === 0 ? 1 : undefined }}
+                    ListFooterComponentStyle={{ paddingHorizontal: 20 }}
+                    ListFooterComponent={() => (
+                        <>
+                            <Divider bold style={[{ marginVertical: 10, height: 5, backgroundColor: theme.colors.onBackground }]} />
+
+                            <Text style={[masterdataStyles.title, { textAlign: 'center' }]}>Menu List Type</Text>
+                            {checkListType.map((item, index) => (
+                                <DraggableItem item={item} onDrop={handleDrop} key={`${item.CTypeID}-${index}`} />
+                            ))}
+                        </>
+                    )}
                 />
 
                 {selectedIndex === 1 && (

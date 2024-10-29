@@ -13,7 +13,7 @@ interface FormValues {
     [key: string]: any;
 }
 
-const Preview = forwardRef<any, any>((props, ref) => {
+const Preview = React.memo(forwardRef<any, any>((props, ref) => {
     const { route, validationSchema } = props;
     const { state, groupCheckListOption, dataType } = useForm(route);
 
@@ -199,6 +199,6 @@ const Preview = forwardRef<any, any>((props, ref) => {
             />
         </AccessibleView>
     );
-});
+}));
 
-export default React.memo(Preview);
+export default Preview;

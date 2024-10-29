@@ -41,7 +41,7 @@ const useCreateformStyle = () => {
             paddingHorizontal: 10,
             // height: 60,
             marginVertical: 5,
-            backgroundColor: theme.colors.onBackground,
+            backgroundColor: theme.colors.outline,
             borderRadius: 8,
             flexDirection: 'row',
             alignItems: 'center',
