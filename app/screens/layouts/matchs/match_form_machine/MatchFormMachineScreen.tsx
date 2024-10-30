@@ -10,15 +10,33 @@ import Match_form_machine_dialog from "@/components/screens/Match_form_machine_d
 import { Form, MatchForm, Machine } from '@/typing/type'
 import { InitialValuesMatchFormMachine } from '@/typing/value'
 import { useFocusEffect } from "expo-router";
+import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useSelector } from "react-redux";
+
+const fetchMachines = async (): Promise<Machine[]> => {
+    const response = await axiosInstance.post("Machine_service.asmx/GetMachines");
+    return response.data.data ?? [];
+};
+
+const fetchForm = async (): Promise<Form[]> => {
+    const response = await axiosInstance.post("Form_service.asmx/GetForms");
+    return response.data.data ?? [];
+};
+
+const fetchMatchFormMchines = async (): Promise<MatchForm[]> => {
+    const response = await axiosInstance.post("MatchFormMachine_service.asmx/GetMatchFormMachines");
+    return response.data.data ?? [];
+};
+
+const SaveMatchFormMachine = async (data: MatchForm): Promise<{ message: string }> => {
+    const response = await axiosInstance.post("MatchFormMachine_service.asmx/SaveMatchFormMachine", data);
+    return response.data;
+};
 
 const MatchFormMachineScreen = ({ navigation }: any) => {
-    const [forms, setForm] = useState<Form[]>([]);
-    const [machine, setMachine] = useState<Machine[]>([]);
-    const [matchForm, setMatchForm] = useState<MatchForm[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [initialValues, setInitialValues] = useState<InitialValuesMatchFormMachine>({
         machineId: "",
@@ -28,36 +46,43 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
+    const state = useSelector((state: any) => state.prefix);
+    const queryClient = useQueryClient();
 
-    const fetchData = useCallback(async () => {
-        setIsLoading(true);
+    const { data: machine = [] } = useQuery<Machine[], Error>(
+        'machines',
+        fetchMachines,
+        {
+            refetchOnWindowFocus: false,
+        });
 
-        try {
-            const [machineResponse, formResponse, matchFormResponse] = await Promise.all([
-                axiosInstance.post("Machine_service.asmx/GetMachines"),
-                axiosInstance.post("Form_service.asmx/GetForms"),
-                axiosInstance.post("MatchFormMachine_service.asmx/GetMatchFormMachines"),
-            ]);
-            setMachine(machineResponse.data.data ?? []);
-            setForm(formResponse.data.data ?? []);
-            setMatchForm(matchFormResponse.data.data ?? []);
-        } catch (error) {
-            handleError(error);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [handleError]);
+    const { data: forms = [] } = useQuery<Form[], Error>(
+        'form',
+        fetchForm,
+        {
+            refetchOnWindowFocus: false,
+        });
+    const { data: matchForm = [], isLoading } = useQuery<MatchForm[], Error>(
+        'matchForm',
+        fetchMatchFormMchines,
+        {
+            refetchOnWindowFocus: false,
+        });
 
-    useFocusEffect(
-        useCallback(() => {
-            fetchData();
-        }, [fetchData])
-    );
+    const mutation = useMutation(SaveMatchFormMachine, {
+        onSuccess: (data) => {
+            showSuccess(data.message);
+            setIsVisible(false)
+            queryClient.invalidateQueries('matchForm');
+            queryClient.getQueryCache()
+        },
+        onError: handleError,
+    });
 
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearchQuery(searchQuery);
-        }, 500);
+        }, 300);
 
         return () => {
             clearTimeout(handler);
@@ -71,16 +96,8 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
             Mode: status ? "edit" : "add"
         };
 
-        try {
-            const response = await axiosInstance.post("MatchFormMachine_service.asmx/SaveMatchFormMachine", data);
-            setIsVisible(!response.data.status);
-            showSuccess(String(response.data.message));
-
-            await fetchData();
-        } catch (error) {
-            handleError(error);
-        }
-    }, [fetchData, handleError]);
+        mutation.mutate(data);
+    }, [mutation]);
 
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
@@ -105,13 +122,12 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
                 const endpoint = action === "activeIndex" ? "ChangeMatchFormMachine" : "DeleteMatchFormMachine";
                 const response = await axiosInstance.post(`MatchFormMachine_service.asmx/${endpoint}`, { MachineID: item });
                 showSuccess(String(response.data.message));
-
-                await fetchData();
+                queryClient.invalidateQueries('matchForm');
             }
         } catch (error) {
             handleError(error);
         }
-    }, [fetchData, handleError]);
+    }, [handleError, queryClient]);
 
     const tableData = useMemo(() => {
         return matchForm.map((item) => [
@@ -169,6 +185,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
             },
         ],
         handleAction,
+        showMessage: 2,
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);
 

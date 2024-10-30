@@ -1,49 +1,41 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Pressable, SafeAreaView, View } from "react-native";
+import { Pressable } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast, useRes } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
-import { Card, Divider, useTheme } from "react-native-paper";
+import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { FormScreenProps } from "@/typing/tag";
 import { Form } from "@/typing/type";
-import { useFocusEffect } from "expo-router";
+import { useQuery, useQueryClient } from 'react-query';
+
+const fetchForm = async (): Promise<Form[]> => {
+    const response = await axiosInstance.post("Form_service.asmx/GetForms");
+    return response.data.data ?? [];
+};
 
 const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
-    const [form, setForm] = useState<Form[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [show, setShow] = useState<boolean>(false)
     const { messages } = route.params || {};
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
+    const queryClient = useQueryClient();
 
-    const fetchData = async () => {
-        setIsLoading(true);
-        try {
-            const formResponse = await axiosInstance.post("Form_service.asmx/GetForms");
-            setForm(formResponse.data.data ?? []);
-        } catch (error) {
-            handleError(error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    useFocusEffect(
-        useCallback(() => {
-            fetchData();
-            // return () => setShow(true)
-        }, [])
-    );
+    const { data: form = [], isLoading } = useQuery<Form[], Error>(
+        'form',
+        fetchForm,
+        {
+            refetchOnWindowFocus: false,
+        });
 
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearchQuery(searchQuery);
-        }, 500);
+        }, 300);
         return () => clearTimeout(handler);
     }, [searchQuery]);
 
@@ -66,12 +58,12 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
                 const endpoint = action === "activeIndex" ? "ChangeForm" : "DeleteForm";
                 const response = await axiosInstance.post(`Form_service.asmx/${endpoint}`, { FormID: item });
                 showSuccess(String(response.data.message));
-                await fetchData();
+                queryClient.invalidateQueries('form');
             }
         } catch (error) {
             handleError(error);
         }
-    }, [navigation, fetchData]);
+    }, [handleError, queryClient]);
 
     const handleNewForm = () => {
         navigation.navigate("Create_form");
@@ -79,6 +71,7 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
 
     const tableData = useMemo(() => {
         return form.map((item) => [
+            item.Disables,
             item.FormName,
             item.Description,
             item.IsActive,
@@ -91,6 +84,7 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
+            { label: "disable", align: "flex-start" },
             { label: "Form Name", align: "flex-start" },
             { label: "Form Description", align: "flex-start" },
             { label: "Status", align: "center" },
@@ -98,9 +92,10 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
             { label: "Copy", align: "center" },
             { label: "View", align: "center" },
         ],
-        flexArr: [2, 4, 1, 1, 1, 1],
-        actionIndex: [{ changeIndex: 3, copyIndex: 4, preIndex: 5 }],
+        flexArr: [0, 2, 4, 1, 1, 1, 1],
+        actionIndex: [{ disables: 0, changeIndex: 3, copyIndex: 4, preIndex: 5 }],
         handleAction,
+        showMessage: 1,
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);
 

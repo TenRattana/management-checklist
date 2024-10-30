@@ -1,16 +1,15 @@
 
 import React from "react";
 import { Pressable, View } from "react-native";
-import AccessibleView from "@/components/AccessibleView";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
-import { Portal, Dialog, HelperText, Switch } from "react-native-paper";
+import { Portal, Dialog, Switch } from "react-native-paper";
 import { Formik, FastField } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { Users, GroupUsers } from '@/typing/type'
 import { ManagepermissionDialogProps, InitialValuesManagepermission } from '@/typing/value'
-import { Inputs } from "../common";
 import Text from "@/components/Text";
+import { useTheme } from "@/app/contexts";
 
 const validationSchema = Yup.object().shape({
     UserName: Yup.string().required("This user field is required"),
@@ -21,7 +20,7 @@ const validationSchema = Yup.object().shape({
 
 const Managepermisstion_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData, users, groupUser }: ManagepermissionDialogProps<InitialValuesManagepermission, Users, GroupUsers>) => {
     const masterdataStyles = useMasterdataStyles()
-    // const { colors } = useTheme()
+    const { theme } = useTheme()
     console.log("Managepermisstion_dialog");
 
     return (
@@ -95,8 +94,9 @@ const Managepermisstion_dialog = ({ isVisible, setIsVisible, isEditing, initialV
                                         </Text>
                                         <Switch
                                             style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                            // color={values.isActive ? colors.succeass : colors.disable}
+                                            color={values.disables ? theme.colors.inversePrimary : theme.colors.onPrimaryContainer}
                                             value={values.IsActive}
+                                            disabled={Boolean(values.disables)}
                                             onValueChange={(v: boolean) => {
                                                 setFieldValue("IsActive", v);
                                             }}
@@ -111,7 +111,7 @@ const Managepermisstion_dialog = ({ isVisible, setIsVisible, isEditing, initialV
                                             style={[
                                                 masterdataStyles.button,
                                                 masterdataStyles.backMain,
-                                                { opacity: isValid && dirty ? 1: 0.5 }
+                                                { opacity: isValid && dirty ? 1 : 0.5 }
                                             ]}
                                             testID="Save-managed"
                                         >

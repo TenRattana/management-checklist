@@ -1,8 +1,18 @@
 import { saveUserData, loadUserData, removeUserData } from '@/app/services/storage';
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from "react";
 import axiosInstance from '@/config/axios';
-import { useToast } from "@/app/contexts/toastify";
 import { GroupUsers, UsersPermission } from '@/typing/type';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
+
+const fetchUserPermission = async (): Promise<UsersPermission[]> => {
+  const response = await axiosInstance.post('User_service.asmx/GetUsersPermission');
+  return response.data.data ?? [];
+};
+
+const fetchGroupUser = async (): Promise<GroupUsers[]> => {
+  const response = await axiosInstance.post('GroupUser_service.asmx/GetGroupUsers');
+  return response.data.data ?? [];
+};
 
 interface AuthContextType {
   session: { UserID: string, UserName: string, GUserID: string, GUserName: string, IsActive: boolean };
@@ -19,33 +29,25 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   console.log("AuthProvider");
-
-  const [user, setUser] = useState<UsersPermission[]>([]);
-  const [groupUser, setGroupUser] = useState<GroupUsers[]>([]);
   const [session, setSession] = useState<{ UserID: string, UserName: string, GUserID: string, GUserName: string, IsActive: boolean }>({ UserID: "", UserName: "", GUserID: "", GUserName: "", IsActive: false });
   const [loading, setLoading] = useState<boolean>(true);
-  const { showSuccess, handleError } = useToast();
   const [screens, setScreens] = useState<{ name: string }[]>([]);
 
-  const fetchData = useCallback(async () => {
-    try {
-      const [userResponse, groupUserResponse] = await Promise.all([
-        axiosInstance.post('User_service.asmx/GetUsersPermission'),
-        axiosInstance.post('GroupUser_service.asmx/GetGroupUsers')
-      ]);
-      setUser(userResponse.data.data ?? []);
-      setGroupUser(groupUserResponse.data.data ?? []);
-    } catch (error) {
-      handleError(error);
-    }
-  }, [handleError]);
+  const { data: user = [] } = useQuery<UsersPermission[], Error>(
+    'userPermission',
+    fetchUserPermission,
+    {
+      refetchOnWindowFocus: false,
+    });
+  const { data: groupUser = [] } = useQuery<GroupUsers[], Error>(
+    'groupUser',
+    fetchGroupUser,
+    {
+      refetchOnWindowFocus: false,
+    });
 
-  useEffect(() => {
-    fetchData().finally(() => setLoading(false));
-  }, [fetchData]);
-
-  const updateSession = (username: string) => {
-    const userData = user.find(v => v.UserName === username);
+  const updateSession = useCallback((UserName: string) => {
+    const userData = user.find(v => v.UserName === UserName);
     if (userData) {
       const newSession = {
         UserID: userData.UserID,
@@ -54,9 +56,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         GUserName: groupUser.find(v => v.GUserID === userData.GUserID)?.GUserName || "",
         IsActive: userData.IsActive
       };
+      saveUserData(userData)
       setSession(newSession);
     }
-  };
+    setLoading(false)
+  }, [user, groupUser, setSession]);
+
+  useEffect(() => {
+    loadUserData().then(userInfo => {
+      if (userInfo) {
+        updateSession(userInfo.UserName);
+      }
+    });
+  }, [loadUserData, updateSession]);
 
   const login = useCallback((username: string) => {
     updateSession(username);

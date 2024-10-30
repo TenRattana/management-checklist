@@ -9,15 +9,33 @@ import Match_checklist_option from "@/components/screens/Match_checklist_option_
 import { CheckListOption, MatchCheckListOption, GroupCheckListOption, } from '@/typing/type'
 import { InitialValuesMatchCheckListOption } from '@/typing/value'
 import { useFocusEffect } from "expo-router";
+import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useSelector } from "react-redux";
+
+const fetchCheckListOptions = async (): Promise<CheckListOption[]> => {
+    const response = await axiosInstance.post("CheckListOption_service.asmx/GetCheckListOptions");
+    return response.data.data ?? [];
+};
+
+const fetchGroupCheckListOptions = async (): Promise<GroupCheckListOption[]> => {
+    const response = await axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions");
+    return response.data.data ?? [];
+};
+const fetchMatchCheckListOptions = async (): Promise<MatchCheckListOption[]> => {
+    const response = await axiosInstance.post("MatchCheckListOption_service.asmx/GetMatchCheckListOptions");
+    return response.data.data ?? [];
+};
+
+const saveMatchCheckListOptions = async (data: MatchCheckListOption): Promise<{ message: string }> => {
+    const response = await axiosInstance.post("MatchCheckListOption_service.asmx/SaveMatchCheckListOption", data);
+    return response.data;
+};
+
 
 const MatchCheckListOptionScreen = () => {
-    const [checkListOption, setCheckListOption] = useState<CheckListOption[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
-    const [groupCheckListOption, setGroupCheckListOption] = useState<GroupCheckListOption[]>([]);
-    const [matchCheckListOption, setMatchCheckListOption] = useState<MatchCheckListOption[]>([]);
     const [isEditing, setIsEditing] = useState<boolean>(false);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [isLoadingButton, setIsLoadingButton] = useState<boolean>(false);
     const [initialValues, setInitialValues] = useState<InitialValuesMatchCheckListOption>({
@@ -25,46 +43,50 @@ const MatchCheckListOptionScreen = () => {
         checkListOptionId: [],
         groupCheckListOptionId: "",
         isActive: true,
+        disables: false
     });
 
     const masterdataStyles = useMasterdataStyles();
+    const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
+    const queryClient = useQueryClient();
 
-    const fetchData = useCallback(async () => {
-        setIsLoading(true);
+    const { data: checkListOption = [] } = useQuery<CheckListOption[], Error>(
+        'checkListOption',
+        fetchCheckListOptions,
+        {
+            refetchOnWindowFocus: false,
+        });
 
-        try {
-            const [
-                checkListOptionResponse,
-                groupCheckListOptionResponse,
-                matchCheckListOptionResponse,
-            ] = await Promise.all([
-                axiosInstance.post("CheckListOption_service.asmx/GetCheckListOptions"),
-                axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions"),
-                axiosInstance.post("MatchCheckListOption_service.asmx/GetMatchCheckListOptions"),
-            ]);
+    const { data: groupCheckListOption = [] } = useQuery<GroupCheckListOption[], Error>(
+        'groupCheckListOption',
+        fetchGroupCheckListOptions,
+        {
+            refetchOnWindowFocus: false,
+        });
 
-            setCheckListOption(checkListOptionResponse.data.data ?? []);
-            setGroupCheckListOption(groupCheckListOptionResponse.data.data ?? []);
-            setMatchCheckListOption(matchCheckListOptionResponse.data.data ?? []);
-        } catch (error) {
-            handleError(error);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [handleError]);
+    const { data: matchCheckListOption = [], isLoading } = useQuery<MatchCheckListOption[], Error>(
+        'matchCheckListOption',
+        fetchMatchCheckListOptions,
+        {
+            refetchOnWindowFocus: false,
+        });
 
-    useFocusEffect(
-        useCallback(() => {
-            fetchData();
-        }, [fetchData])
-    );
+    const mutation = useMutation(saveMatchCheckListOptions, {
+        onSuccess: (data) => {
+            showSuccess(data.message);
+            setIsVisible(false)
+            queryClient.invalidateQueries('machines');
+            queryClient.getQueryCache()
+        },
+        onError: handleError,
+    });
 
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearchQuery(searchQuery);
-        }, 500);
+        }, 300);
 
         return () => {
             clearTimeout(handler);
@@ -75,24 +97,15 @@ const MatchCheckListOptionScreen = () => {
         setIsLoadingButton(true);
 
         const data = {
+            Prefix: state.MatchCheckListOption ?? "",
             MCLOptionID: values.matchCheckListOptionId,
             GCLOptionID: values.groupCheckListOptionId,
             CLOptionID: JSON.stringify(values.checkListOptionId),
-            isActive: values.isActive,
+            IsActive: values.isActive,
         };
 
-        try {
-            const response = await axiosInstance.post("MatchCheckListOption_service.asmx/SaveMatchCheckListOption", data);
-            setIsVisible(!response.data.status);
-            showSuccess(String(response.data.message));
-
-            await fetchData();
-        } catch (error) {
-            handleError(error);
-        } finally {
-            setIsLoadingButton(false);
-        }
-    }, [fetchData, handleError]);
+        mutation.mutate(data);
+    }, [mutation]);
 
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
@@ -107,6 +120,7 @@ const MatchCheckListOptionScreen = () => {
                     groupCheckListOptionId: matchCheckListOption.GCLOptionID ?? "",
                     checkListOptionId: option,
                     isActive: Boolean(matchCheckListOption.IsActive),
+                    disables: Boolean(matchCheckListOption.Disables),
                 });
                 setIsEditing(true);
                 setIsVisible(true);
@@ -114,13 +128,12 @@ const MatchCheckListOptionScreen = () => {
                 const endpoint = action === "activeIndex" ? "ChangeMatchCheckListOption" : "DeleteMatchCheckListOption";
                 const response = await axiosInstance.post(`MatchCheckListOption_service.asmx/${endpoint}`, { MCLOptionID: item });
                 showSuccess(String(response.data.message));
-
-                await fetchData();
+                queryClient.invalidateQueries('machines');
             }
         } catch (error) {
             handleError(error);
         }
-    }, [fetchData, handleError]);
+    }, [handleError, queryClient]);
 
     const tableData = useMemo(() => {
         return matchCheckListOption.flatMap((item) =>
@@ -142,6 +155,7 @@ const MatchCheckListOptionScreen = () => {
             checkListOptionId: [],
             groupCheckListOptionId: "",
             isActive: true,
+            disables: false
         });
         setIsEditing(false);
         setIsVisible(true);

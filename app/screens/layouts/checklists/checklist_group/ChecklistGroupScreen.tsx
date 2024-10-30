@@ -9,68 +9,73 @@ import { useRes } from "@/app/contexts";
 import Checklist_group_dialog from "@/components/screens/Checklist_group_dialog";
 import { GroupCheckListOption } from '@/typing/type'
 import { InitialValuesGroupCheckList } from '@/typing/value'
-import { useFocusEffect } from "expo-router";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useSelector } from "react-redux";
+
+const fetchGroupCheckListOption = async (): Promise<GroupCheckListOption[]> => {
+    const response = await axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions");
+    return response.data.data ?? [];
+};
+
+const saveGroupCheckListOption = async (data: GroupCheckListOption): Promise<{ message: string }> => {
+    const response = await axiosInstance.post("GroupCheckListOption_service.asmx/SaveGroupCheckListOption", data);
+    return response.data;
+};
 
 const ChecklistGroupScreen = () => {
-    const [groupCheckListOption, setGroupCheckListOption] = useState<GroupCheckListOption[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [initialValues, setInitialValues] = useState<InitialValuesGroupCheckList>({
         groupCheckListOptionId: "",
         groupCheckListOptionName: "",
         isActive: true,
+        disables: false
     });
 
     const masterdataStyles = useMasterdataStyles();
 
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
+    const queryClient = useQueryClient();
+    const state = useSelector((state: any) => state.prefix);
 
-    const fetchData = useCallback(async () => {
-        setIsLoading(true);
+    const { data: groupCheckListOption = [], isLoading } = useQuery<GroupCheckListOption[], Error>(
+        'groupCheckListOption',
+        fetchGroupCheckListOption,
+        {
+            refetchOnWindowFocus: false,
+        });
 
-        try {
-            const response = await axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions");
-            setGroupCheckListOption(response.data.data ?? []);
-        } catch (error) {
-            handleError(error);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [handleError]);
-
-    useFocusEffect(
-        useCallback(() => {
-            fetchData();
-        }, [fetchData])
-    );
+    const mutation = useMutation(saveGroupCheckListOption, {
+        onSuccess: (data) => {
+            showSuccess(data.message);
+            setIsVisible(false)
+            queryClient.invalidateQueries('groupCheckListOption');
+            queryClient.getQueryCache()
+        },
+        onError: handleError,
+    });
 
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearchQuery(searchQuery);
-        }, 500);
+        }, 300);
         return () => clearTimeout(handler);
     }, [searchQuery]);
 
     const saveData = useCallback(async (values: InitialValuesGroupCheckList) => {
         const data = {
+            Prefix: state.GroupCheckListOption ?? "",
             GCLOptionID: values.groupCheckListOptionId,
             GCLOptionName: values.groupCheckListOptionName,
             IsActive: values.isActive,
+            Disables: values.disables,
         };
 
-        try {
-            const response = await axiosInstance.post("GroupCheckListOption_service.asmx/SaveGroupCheckListOption", data);
-            showSuccess(String(response.data.message));
-            setIsVisible(!response.data.status);
-            await fetchData()
-        } catch (error) {
-            handleError(error);
-        }
-    }, [fetchData, handleError]);
+        mutation.mutate(data);
+    }, [mutation]);
 
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
@@ -86,6 +91,7 @@ const ChecklistGroupScreen = () => {
                     groupCheckListOptionId: groupCheckListOptionData.GCLOptionID ?? "",
                     groupCheckListOptionName: groupCheckListOptionData.GCLOptionName ?? "",
                     isActive: Boolean(groupCheckListOptionData.IsActive),
+                    disables: Boolean(groupCheckListOptionData.Disables)
                 });
                 setIsVisible(true);
                 setIsEditing(true);
@@ -93,15 +99,16 @@ const ChecklistGroupScreen = () => {
                 const endpoint = action === "activeIndex" ? "ChangeGroupCheckListOption" : "DeleteGroupCheckListOption";
                 const response = await axiosInstance.post(`GroupCheckListOption_service.asmx/${endpoint}`, { GCLOptionID: item });
                 showSuccess(String(response.data.message));
-                await fetchData()
+                queryClient.invalidateQueries('groupCheckListOption');
             }
         } catch (error) {
             handleError(error);
         }
-    }, [fetchData, handleError]);
+    }, [handleError, queryClient]);
 
     const tableData = useMemo(() => {
         return groupCheckListOption.map((item) => [
+            item.Disables,
             item.GCLOptionName,
             item.IsActive,
             item.GCLOptionID,
@@ -113,6 +120,7 @@ const ChecklistGroupScreen = () => {
             groupCheckListOptionId: "",
             groupCheckListOptionName: "",
             isActive: true,
+            disables: false
         });
         setIsEditing(false);
         setIsVisible(true);
@@ -121,13 +129,15 @@ const ChecklistGroupScreen = () => {
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
+            { label: "disable", align: "flex-start" },
             { label: "Group Option Name", align: "flex-start" },
             { label: "Status", align: "center" },
             { label: "", align: "center" },
         ],
-        flexArr: [6, 1, 1],
-        actionIndex: [{ editIndex: 2, delIndex: 3 }],
+        flexArr: [0, 6, 1, 1],
+        actionIndex: [{ disables: 0, editIndex: 3, delIndex: 4 }],
         handleAction,
+        showMessage: 1,
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);
 

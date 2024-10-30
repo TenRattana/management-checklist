@@ -1,13 +1,13 @@
 import React from "react";
 import { Pressable, View } from "react-native";
-import AccessibleView from "@/components/AccessibleView";
 import { Inputs } from "@/components/common";
-import { Portal, Switch, Dialog, useTheme } from "react-native-paper";
+import { Portal, Switch, Dialog } from "react-native-paper";
 import { FastField, Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { GroupMachineDialogProps, InitialValuesGroupMachine } from '@/typing/value'
 import Text from "@/components/Text";
+import { useTheme } from "@/app/contexts";
 
 const validationSchema = Yup.object().shape({
     machineGroupName: Yup.string().required("The machine group name field is required."),
@@ -17,7 +17,7 @@ const validationSchema = Yup.object().shape({
 
 const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }: GroupMachineDialogProps<InitialValuesGroupMachine>) => {
     const masterdataStyles = useMasterdataStyles()
-    // const { colors } = useTheme()
+    const { theme } = useTheme()
     console.log("Machine_group_dialog");
 
     return (
@@ -78,7 +78,8 @@ const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValue
                                         </Text>
                                         <Switch
                                             style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                            // color={values.isActive ? colors.succeass : colors.disable}
+                                            color={values.disables ? theme.colors.inversePrimary : theme.colors.onPrimaryContainer}
+                                            disabled={Boolean(values.disables)}
                                             value={values.isActive}
                                             onValueChange={(v: boolean) => {
                                                 setFieldValue("isActive", v);
@@ -93,7 +94,7 @@ const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValue
                                             style={[
                                                 masterdataStyles.button,
                                                 masterdataStyles.backMain,
-                                                { opacity: isValid && dirty ? 1: 0.5 }
+                                                { opacity: isValid && dirty ? 1 : 0.5 }
                                             ]}
                                             testID="Save-mgd"
                                         >

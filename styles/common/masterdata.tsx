@@ -15,6 +15,10 @@ const useMasterdataStyles = () => {
             color: theme.colors.fff,
             fontSize: spacing.small,
         },
+        textQR: {
+            fontSize: spacing.small - 3,
+            color: theme.colors.onBackground,
+        },
         text: {
             fontSize: spacing.small,
             color: theme.colors.onBackground,

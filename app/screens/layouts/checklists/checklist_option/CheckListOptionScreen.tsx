@@ -1,56 +1,66 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
-import { Card, Divider, useTheme } from "react-native-paper";
+import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Checklist_option_dialog from "@/components/screens/Checklist_option_dialog";
 import { CheckListOption } from '@/typing/type'
 import { InitialValuesCheckListOption } from '@/typing/value'
-import { useFocusEffect } from "expo-router";
+import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useSelector } from "react-redux";
+
+const fetchCheckListOption = async (): Promise<CheckListOption[]> => {
+    const response = await axiosInstance.post("CheckListOption_service.asmx/GetCheckListOptions");
+    return response.data.data ?? [];
+};
+
+const saveCheckListOption = async (data: CheckListOption): Promise<{ message: string }> => {
+    const response = await axiosInstance.post("CheckListOption_service.asmx/SaveCheckListOption", data);
+    return response.data;
+};
 
 const CheckListOptionScreen = () => {
-    const [checkListOption, setCheckListOption] = useState<CheckListOption[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [initialValues, setInitialValues] = useState<InitialValuesCheckListOption>({
         checkListOptionId: "",
         checkListOptionName: "",
         isActive: true,
+        disables: false
     });
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
+    const queryClient = useQueryClient();
+    const state = useSelector((state: any) => state.prefix);
 
-    const fetchData = useCallback(async () => {
-        setIsLoading(true);
+    const { data: checkListOption = [], isLoading } = useQuery<CheckListOption[], Error>(
+        'checkListOption',
+        fetchCheckListOption,
+        {
+            refetchOnWindowFocus: false,
+        });
 
-        try {
-            const response = await axiosInstance.post("CheckListOption_service.asmx/GetCheckListOptions");
-            setCheckListOption(response.data.data ?? []);
-        } catch (error) {
-            handleError(error);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [handleError]);
-
-    useFocusEffect(
-        useCallback(() => {
-            fetchData();
-        }, [fetchData])
-    );
+    const mutation = useMutation(saveCheckListOption, {
+        onSuccess: (data) => {
+            showSuccess(data.message);
+            setIsVisible(false)
+            queryClient.invalidateQueries('checkListOption');
+            queryClient.getQueryCache()
+        },
+        onError: handleError,
+    });
 
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearchQuery(searchQuery);
-        }, 500);
+        }, 300);
 
         return () => {
             clearTimeout(handler);
@@ -60,24 +70,15 @@ const CheckListOptionScreen = () => {
     const saveData = useCallback(async (values: InitialValuesCheckListOption) => {
 
         const data = {
+            Prefix: state.CheckListOption ?? "",
             CLOptionID: values.checkListOptionId,
             CLOptionName: values.checkListOptionName,
-            isActive: values.isActive,
+            IsActive: values.isActive,
+            Disables: values.disables,
         };
 
-        try {
-            const response = await axiosInstance.post(
-                "CheckListOption_service.asmx/SaveCheckListOption",
-                data
-            );
-            setIsVisible(!response.data.status);
-            showSuccess(String(response.data.message))
-
-            await fetchData();
-        } catch (error) {
-            handleError(error)
-        }
-    }, [fetchData, handleError]);
+        mutation.mutate(data);
+    }, [mutation]);
 
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
@@ -93,6 +94,7 @@ const CheckListOptionScreen = () => {
                     checkListOptionId: checkListOptionData.CLOptionID ?? "",
                     checkListOptionName: checkListOptionData.CLOptionName ?? "",
                     isActive: Boolean(checkListOptionData.IsActive),
+                    disables: Boolean(checkListOptionData.Disables),
                 });
                 setIsVisible(true);
                 setIsEditing(true);
@@ -100,16 +102,16 @@ const CheckListOptionScreen = () => {
                 const endpoint = action === "activeIndex" ? "ChangeCheckListOption" : "DeleteCheckListOption";
                 const response = await axiosInstance.post(`CheckListOption_service.asmx/${endpoint}`, { CLOptionID: item });
                 showSuccess(String(response.data.message));
-
-                await fetchData()
+                queryClient.invalidateQueries('checkListOption');
             }
         } catch (error) {
             handleError(error)
         }
-    }, [fetchData, handleError]);
+    }, [handleError, queryClient]);
 
     const tableData = useMemo(() => {
         return checkListOption.map(item => [
+            item.Disables,
             item.CLOptionName,
             item.IsActive,
             item.CLOptionID,
@@ -121,6 +123,7 @@ const CheckListOptionScreen = () => {
             checkListOptionId: "",
             checkListOptionName: "",
             isActive: true,
+            disables: false
         });
         setIsEditing(false);
         setIsVisible(true);
@@ -129,13 +132,15 @@ const CheckListOptionScreen = () => {
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
+            { label: "disable", align: "flex-start" },
             { label: "Check List Option Name", align: "flex-start" },
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
         ],
-        flexArr: [6, 1, 1],
-        actionIndex: [{ editIndex: 2, delIndex: 3 }],
+        flexArr: [0, 6, 1, 1],
+        actionIndex: [{ disables: 0, editIndex: 3, delIndex: 4 }],
         handleAction,
+        showMessage: 1,
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);
 

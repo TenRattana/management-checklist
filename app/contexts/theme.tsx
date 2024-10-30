@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useMemo } from 'react';
-import { MD3LightTheme, PaperProvider, DefaultTheme, MD3DarkTheme } from 'react-native-paper';
+import { PaperProvider, DefaultTheme, MD3DarkTheme } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ThemeContextProps {

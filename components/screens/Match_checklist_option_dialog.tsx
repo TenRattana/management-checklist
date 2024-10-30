@@ -1,15 +1,15 @@
 import React, { useMemo } from "react";
 import { Pressable, View } from "react-native";
-import AccessibleView from "@/components/AccessibleView";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import CustomDropdownMultiple from "@/components/CustomDropdownMultiple";
-import { Portal, Switch, Dialog, HelperText, Chip, useTheme } from "react-native-paper";
+import { Portal, Switch, Dialog } from "react-native-paper";
 import { Formik, FastField } from "formik";
 import * as Yup from 'yup';
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { CheckListOption, GroupCheckListOption } from '@/typing/type';
 import { InitialValuesMatchCheckListOption, MatchChecklistOptionProps } from '@/typing/value';
 import Text from "@/components/Text";
+import { useTheme } from "@/app/contexts";
 
 const validationSchema = Yup.object().shape({
     groupCheckListOptionId: Yup.string().required("This group check list field is required"),
@@ -33,8 +33,7 @@ const Match_checklist_option = ({
     console.log("Match_checklist_option");
 
     const masterdataStyles = useMasterdataStyles();
-    // const { colors } = useTheme();
-
+    const { theme } = useTheme()
     const filteredData = useMemo(() => {
         return !isEditing ? checkListOption.filter((v) => v.IsActive) : dropcheckListOption;
     }, [isEditing, checkListOption, dropcheckListOption]);
@@ -113,8 +112,9 @@ const Match_checklist_option = ({
                                         </Text>
                                         <Switch
                                             style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                            // color={values.isActive ? colors.succeass : colors.disable}
+                                            color={values.disables ? theme.colors.inversePrimary : theme.colors.onPrimaryContainer}
                                             value={values.isActive}
+                                            disabled={Boolean(values.disables)}
                                             onValueChange={(v: boolean) => {
                                                 setFieldValue("isActive", v);
                                             }}

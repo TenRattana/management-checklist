@@ -1,8 +1,6 @@
 import React from 'react';
 import { Text as DefaultText, TextProps as DefaultTextProps } from 'react-native';
-import { useRes } from '@/app/contexts';
 import PropTypes from 'prop-types';
-import { useTheme } from 'react-native-paper';
 
 interface CustomTextProps extends DefaultTextProps {
   style?: any;
@@ -15,8 +13,6 @@ const isThai = (text: string): boolean => {
 };
 
 const Text: React.FC<CustomTextProps> = React.memo(({ style, children, ...props }) => {
-  const theme = useTheme();
-  const { spacing } = useRes();
   const textArray = Array.isArray(children) ? children : [children];
 
   return (

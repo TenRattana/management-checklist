@@ -13,27 +13,37 @@ export interface Detail {
 export interface InitialValuesMachine extends Detail, Active {
   machineGroupId?: string;
   machineId: string;
+  machineCode:string | null;
+  formId:string | null;
+  building:string | null;
+  floor:string | null;
+  area:string | null;
   machineName: string;
+  disables:boolean;
 }
 
 export interface InitialValuesGroupMachine extends Detail, Active {
   machineGroupId: string;
   machineGroupName: string;
+  disables: boolean; 
 }
 
 export interface InitialValuesChecklist extends Active {
   checkListId: string;
   checkListName: string;
+  disables:boolean;
 }
 
 export interface InitialValuesCheckListOption extends Active {
   checkListOptionId: string;
   checkListOptionName: string;
+  disables:boolean;
 }
 
 export interface InitialValuesGroupCheckList extends  Active {
   groupCheckListOptionId: string;
   groupCheckListOptionName: string;
+  disables:boolean;
 }
 
 export interface InitialValuesMatchFormMachine {
@@ -46,6 +56,7 @@ export interface InitialValuesMatchCheckListOption extends Active {
   matchCheckListOptionId: string;
   checkListOptionId: string[];
   groupCheckListOptionId: string;
+  disables:boolean;
 }
 
 export interface InitialValuesManagepermission {
@@ -53,6 +64,7 @@ export interface InitialValuesManagepermission {
   UserName: string;
   GUserID: string;
   IsActive: boolean;
+  disables:boolean;
 }
 
 type Values =

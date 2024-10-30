@@ -6,19 +6,21 @@ export interface GroupMachine {
   GMachineName: string;
   Description: string;
   IsActive: boolean;
+  Disables: boolean;
 }
 
 export interface Machine {
   GMachineID: string;
   MachineID: string;
-  FormID?: string;
-  MachineCode?: string;
+  FormID: string | null;
+  MachineCode: string | null;
   MachineName: string;
   Description: string;
-  Building?:string;
-  Floor?:string;
-  Area?:string;
+  Building: string | null;
+  Floor: string | null;
+  Area: string | null;
   IsActive: boolean;
+  Disables: boolean;
 }
 
 export interface CheckListType {
@@ -26,12 +28,14 @@ export interface CheckListType {
   CTypeName: string;
   Icon: string;
   IsActive: boolean;
+  Disables: boolean;
 }
 
 export interface CheckListOption {
   CLOptionName: string;
   IsActive: boolean;
   CLOptionID: string;
+  Disables: boolean;
 }
 
 export interface DataType {
@@ -45,14 +49,15 @@ export interface Checklist {
   CListID: string;
   CListName: string;
   IsActive: boolean;
+  Disables: boolean;
 }
 
 export interface GroupCheckListOption {
   GCLOptionID: string;
   GCLOptionName: string;
-  Description: string;
   IsActive: boolean;
   CheckListOptions?: CheckListOption[];
+  Disables: boolean;
 }
 
 export interface Form {
@@ -60,6 +65,7 @@ export interface Form {
   FormName: string;
   IsActive: boolean;
   Description: string;
+  Disables:boolean;
 }
 
 export interface MatchForm {
@@ -76,6 +82,7 @@ export interface MatchCheckListOption {
   CheckListOptions: Array<{ CLOptionID: string }>;
   IsActive: boolean;
   GCLOptionName: string;
+  Disables:boolean;
 }
 
 export interface ExpectedResult {
@@ -94,6 +101,7 @@ export interface UsersPermission {
   UserName: string;
   GUserID: string;
   IsActive: boolean;
+  Disables: boolean;
 }
 
 export interface Userset {

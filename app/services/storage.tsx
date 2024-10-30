@@ -1,12 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { UsersPermission } from '@/typing/type';
 const USER_KEY = '@user_data';
 const PAGINATE = '@paginate';
-
-interface UserData {
-    username: string;
-    role: string | null;
-}
 
 interface PAGINATE {
     paginate: number;
@@ -29,7 +24,7 @@ export const loadPaginate = async () => {
     }
 }
 
-export const saveUserData = async (userData: UserData) => {
+export const saveUserData = async (userData: UsersPermission) => {
     try {
         await AsyncStorage.setItem(USER_KEY, JSON.stringify(userData));
     } catch (error) {

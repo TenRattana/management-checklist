@@ -12,6 +12,18 @@ import { InitialValuesGroupMachine } from '@/typing/value';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
 
+const fetchMachineGroups = async (): Promise<GroupMachine[]> => {
+    console.time("Fetch Machine Groups");
+    const response = await axiosInstance.post("GroupMachine_service.asmx/GetGroupMachines");
+    console.timeEnd("Fetch Machine Groups");
+    return response.data.data ?? [];
+};
+
+const saveGroupMachine = async (data: GroupMachine): Promise<{ message: string }> => {
+    const response = await axiosInstance.post("GroupMachine_service.asmx/SaveGroupMachine", data);
+    return response.data;
+};
+
 const MachineGroupScreen = () => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
@@ -22,45 +34,29 @@ const MachineGroupScreen = () => {
         machineGroupName: "",
         description: "",
         isActive: true,
+        disables: false
     });
-    
+
     const masterdataStyles = useMasterdataStyles();
     const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
 
-    const fetchMachineGroups = async (): Promise<GroupMachine[]> => {
-        console.time("Fetch Machine Groups");
-        const response = await axiosInstance.post("GroupMachine_service.asmx/GetGroupMachines");
-        console.timeEnd("Fetch Machine Groups");
-        return response.data.data ?? [];
-    };
-    
-    const saveGroupMachine = async (data: GroupMachine): Promise<{ message: string }> => {
-        const response = await axiosInstance.post("GroupMachine_service.asmx/SaveGroupMachine", data);
-        return response.data;
-    };
-    
     const { data: machineGroups = [], isLoading, isError, error } = useQuery<GroupMachine[], Error>(
         'machineGroups',
         fetchMachineGroups,
         {
             refetchOnWindowFocus: false,
-            staleTime: 30000, // ข้อมูลจะถือว่าใหม่อยู่ 30 วินาที
-            cacheTime: 60000, // ข้อมูลจะถูกเก็บใน cache 1 นาที
         }
     );
 
-    console.log(isLoading);
-    console.log(isError);
-    console.log(error);
-    console.log(machineGroups);
-    
     const mutation = useMutation(saveGroupMachine, {
         onSuccess: (data) => {
             showSuccess(data.message);
+            setIsVisible(false)
             queryClient.invalidateQueries('machineGroups');
+            queryClient.getQueryCache()
         },
         onError: handleError,
     });
@@ -68,7 +64,7 @@ const MachineGroupScreen = () => {
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearchQuery(searchQuery);
-        }, 300); // ลดเวลาลงเป็น 300 มิลลิวินาที
+        }, 300);
 
         return () => {
             clearTimeout(handler);
@@ -82,6 +78,7 @@ const MachineGroupScreen = () => {
             GMachineName: values.machineGroupName,
             Description: values.description,
             IsActive: values.isActive,
+            Disables: values.disables
         };
 
         mutation.mutate(data);
@@ -97,6 +94,7 @@ const MachineGroupScreen = () => {
                     machineGroupName: machineGroupData.GMachineName ?? "",
                     description: machineGroupData.Description ?? "",
                     isActive: Boolean(machineGroupData.IsActive),
+                    disables: Boolean(machineGroupData.Disables)
                 });
                 setIsEditing(true);
                 setIsVisible(true);
@@ -113,6 +111,7 @@ const MachineGroupScreen = () => {
 
     const tableData = useMemo(() => {
         return machineGroups.map(item => [
+            item.Disables,
             item.GMachineName,
             item.Description,
             item.IsActive,
@@ -126,6 +125,7 @@ const MachineGroupScreen = () => {
             machineGroupName: "",
             description: "",
             isActive: true,
+            disables: false,
         });
         setIsEditing(false);
         setIsVisible(true);
@@ -134,13 +134,15 @@ const MachineGroupScreen = () => {
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
+            { label: "disable", align: "flex-start" },
             { label: "Machine Group Name", align: "flex-start" },
             { label: "Description", align: "flex-start" },
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
         ],
-        flexArr: [3, 3, 1, 1, 1],
-        actionIndex: [{ editIndex: 3, delIndex: 4 }],
+        flexArr: [0, 3, 3, 1, 1, 1],
+        actionIndex: [{ disables: 0, editIndex: 4, delIndex: 5 }],
+        showMessage: 1,
         handleAction,
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);
@@ -171,7 +173,7 @@ const MachineGroupScreen = () => {
                 </Pressable>
             </AccessibleView>
             <Card.Content style={{ padding: 2, flex: 1 }}>
-                <Customtable {...customtableProps} />
+                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
             </Card.Content>
 
             <Machine_group_dialog

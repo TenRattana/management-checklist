@@ -2,48 +2,38 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
-import { Card, Divider } from "react-native-paper";
+import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import { ExpectedResult } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
-import { useFocusEffect } from "expo-router";
-import { View } from "react-native";
+import { useQuery, useQueryClient } from 'react-query';
+
+const fetchExpectedResults = async (): Promise<ExpectedResult[]> => {
+    const response = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResults");
+    return response.data.data ?? [];
+};
 
 const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => {
-    const [expectedResult, setExpectedResult] = useState<ExpectedResult[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
-    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
+    const queryClient = useQueryClient();
 
-    const fetchData = useCallback(async () => {
-        setIsLoading(true);
-
-        try {
-            const expectedResultResponse = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResults");
-            setExpectedResult(expectedResultResponse.data.data ?? []);
-            showSuccess(String(expectedResultResponse.data.message))
-        } catch (error) {
-            handleError(error);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [handleError]);
-
-    useFocusEffect(
-        useCallback(() => {
-            fetchData();
-        }, [fetchData])
-    );
+    const { data: expectedResult = [], isLoading } = useQuery<ExpectedResult[], Error>(
+        'expectedResult',
+        fetchExpectedResults,
+        {
+            refetchOnWindowFocus: false,
+        });
 
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearchQuery(searchQuery);
-        }, 500);
+        }, 300);
 
         return () => {
             clearTimeout(handler);
@@ -52,7 +42,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
 
     const handleAction = useCallback(async (action?: string, item?: string) => {
         const data = expectedResult.find((v) => v.TableID === item);
-        
+
         try {
             if (action === "preIndex") {
                 if (data) {
@@ -65,7 +55,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
         } catch (error) {
             handleError(error);
         }
-    }, [fetchData, handleError, expectedResult]);
+    }, [handleError, expectedResult]);
 
     const convertToThaiDateTime = (dateString: string) => {
         const date = new Date(dateString);
@@ -102,6 +92,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
             },
         ],
         handleAction,
+        showMessage: 2,
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);
 

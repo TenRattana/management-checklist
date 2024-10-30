@@ -105,18 +105,19 @@ const RenderFormik: React.FC<{ field: string; setEdit: (v: boolean) => void; }> 
 const ConfigItem: React.FC<ConfigItemProps> = ({ label, value, editable, onEdit }) => {
     const { theme } = useTheme();
     const { spacing } = useRes();
+    const masterdataStyles = useMasterdataStyles();
 
     return (
         <View style={styles.row}>
-            <Text variant='labelMedium' style={styles.configPrefixText}>
+            <Text variant='labelMedium' style={[styles.configPrefixText, masterdataStyles.settingText,]}>
                 {label}: {editable ? <RenderFormik field={label === "Program Display" ? "AppName" : label} setEdit={onEdit} /> : value}
             </Text>
             {!editable && (
                 <IconButton
                     icon="pencil-box"
-                    onPress={() => onEdit(true)} 
+                    onPress={() => onEdit(true)}
                     iconColor={theme.colors.blue}
-                    size={spacing.large}
+                    size={spacing.large + 5}
                 />
             )}
         </View>
@@ -137,7 +138,7 @@ const Configuration: React.FC = React.memo(() => {
         Form: false,
         ExpectedResult: false
     });
-    
+
     const masterdataStyles = useMasterdataStyles();
     const { spacing } = useRes();
 
@@ -162,7 +163,7 @@ const Configuration: React.FC = React.memo(() => {
                         label={item}
                         value={state[item]}
                         editable={edit[item]}
-                        onEdit={(v: boolean) => setEdit(prev => ({ ...prev, [item]: v }))} 
+                        onEdit={(v: boolean) => setEdit(prev => ({ ...prev, [item]: v }))}
                     />
                 ))}
             </View>

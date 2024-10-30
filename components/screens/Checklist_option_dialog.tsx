@@ -1,13 +1,13 @@
 import React from "react";
 import { Pressable, View } from "react-native";
-import AccessibleView from "@/components/AccessibleView";
 import { Inputs } from "@/components/common";
-import { Portal, Switch, Dialog, useTheme } from "react-native-paper";
+import { Portal, Switch, Dialog } from "react-native-paper";
 import { FastField, Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { InitialValuesCheckListOption, CheckListOptionProps } from '@/typing/value'
 import Text from "@/components/Text";
+import { useTheme } from "@/app/contexts";
 
 const validationSchema = Yup.object().shape({
     checkListOptionName: Yup.string().required(
@@ -18,7 +18,7 @@ const validationSchema = Yup.object().shape({
 
 const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }: CheckListOptionProps<InitialValuesCheckListOption>) => {
     const masterdataStyles = useMasterdataStyles()
-    // const { colors } = useTheme()
+    const { theme } = useTheme()
     console.log("Checklist_option_dialog");
 
     return (
@@ -65,8 +65,9 @@ const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialVa
                                         </Text>
                                         <Switch
                                             style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                            // color={values.isActive ? colors.succeass : colors.disable}
+                                            color={values.disables ? theme.colors.inversePrimary : theme.colors.onPrimaryContainer}
                                             value={values.isActive}
+                                            disabled={Boolean(values.disables)}
                                             onValueChange={(v: boolean) => {
                                                 setFieldValue("isActive", v);
                                             }}
@@ -80,7 +81,7 @@ const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialVa
                                             style={[
                                                 masterdataStyles.button,
                                                 masterdataStyles.backMain,
-                                                { opacity: isValid && dirty ? 1: 0.5 }
+                                                { opacity: isValid && dirty ? 1 : 0.5 }
                                             ]}
                                             testID="Save-cod"
                                         >

@@ -49,7 +49,7 @@ const RootLayout = () => {
                     <QueryClientProvider client={queryClient}>
                         <AuthProvider>
                             <SetTheme />
-                            <ReactQueryDevtools initialIsOpen={true}/>
+                            <ReactQueryDevtools initialIsOpen={true} />
                         </AuthProvider>
                     </QueryClientProvider>
                 </ToastProvider>

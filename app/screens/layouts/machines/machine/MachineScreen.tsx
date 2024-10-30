@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { Pressable } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
@@ -10,6 +10,7 @@ import Machine_dialog from "@/components/screens/Machine_dialog";
 import { Machine, GroupMachine } from '@/typing/type';
 import { InitialValuesMachine } from '@/typing/value';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useSelector } from "react-redux";
 
 const fetchMachines = async (): Promise<Machine[]> => {
     const response = await axiosInstance.post("Machine_service.asmx/GetMachines");
@@ -34,34 +35,69 @@ const MachineGroupScreen: React.FC = () => {
     const [initialValues, setInitialValues] = useState<InitialValuesMachine>({
         machineId: "",
         machineGroupId: "",
+        machineCode: "",
+        formId: "",
+        building: "",
+        floor: "",
+        area: "",
         machineName: "",
         description: "",
         isActive: true,
+        disables: false
     });
     const masterdataStyles = useMasterdataStyles();
+    const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
 
-    const { data: machines = [], isLoading: isLoadingMachines } = useQuery<Machine[], Error>('machines', fetchMachines);
-    const { data: machineGroups = [] } = useQuery<GroupMachine[], Error>('machineGroups', fetchMachineGroups);
+    const { data: machines = [], isLoading } = useQuery<Machine[], Error>(
+        'machines',
+        fetchMachines,
+        {
+            refetchOnWindowFocus: false,
+        });
+
+    const { data: machineGroups = [] } = useQuery<GroupMachine[], Error>(
+        'machineGroups',
+        fetchMachineGroups,
+        {
+            refetchOnWindowFocus: false,
+        });
 
     const mutation = useMutation(saveMachine, {
         onSuccess: (data) => {
             showSuccess(data.message);
+            setIsVisible(false)
             queryClient.invalidateQueries('machines');
             queryClient.getQueryCache()
         },
         onError: handleError,
     });
 
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 300);
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchQuery]);
+
     const saveData = useCallback(async (values: InitialValuesMachine) => {
         const data = {
+            Prefix: state.Machine ?? "",
             MachineID: values.machineId,
             GMachineID: values.machineGroupId ?? "",
+            MachineCode: values.machineCode,
+            Building: values.building,
+            Floor: values.floor,
+            Area: values.area,
             MachineName: values.machineName,
             Description: values.description,
             IsActive: values.isActive,
+            Disables: values.disables,
+            FormID: values.formId
         };
         mutation.mutate(data);
     }, [mutation]);
@@ -75,15 +111,21 @@ const MachineGroupScreen: React.FC = () => {
                     machineId: machineData.MachineID ?? "",
                     machineGroupId: machineData.GMachineID ?? "",
                     machineName: machineData.MachineName ?? "",
+                    formId: machineData.FormID ?? "",
+                    machineCode: machineData.MachineCode ?? "",
+                    building: machineData.Building ?? "",
+                    floor: machineData.Floor ?? "",
+                    area: machineData.Area ?? "",
                     description: machineData.Description ?? "",
                     isActive: Boolean(machineData.IsActive),
+                    disables: Boolean(machineData.Disables),
                 });
                 setIsEditing(true);
                 setIsVisible(true);
             } else {
                 const endpoint = action === "activeIndex" ? "ChangeMachine" : "DeleteMachine";
-                await axiosInstance.post(`Machine_service.asmx/${endpoint}`, { MachineID: item });
-                showSuccess("Action completed successfully.");
+                const response = await axiosInstance.post(`Machine_service.asmx/${endpoint}`, { MachineID: item });
+                showSuccess(String(response.data.message));
                 queryClient.invalidateQueries('machines');
             }
         } catch (error) {
@@ -91,21 +133,13 @@ const MachineGroupScreen: React.FC = () => {
         }
     }, [handleError, queryClient]);
 
-    React.useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedSearchQuery(searchQuery);
-        }, 500);
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [searchQuery]);
-
     const tableData = useMemo(() => {
         return machines.map((item) => [
+            item.Disables,
             machineGroups.find((group) => group.GMachineID === item.GMachineID)?.GMachineName || "",
             item.MachineName,
             item.Description,
-            item.IsActive ? "Active" : "Inactive",
+            item.IsActive,
             item.MachineID,
         ]);
     }, [machines, machineGroups, debouncedSearchQuery]);
@@ -114,9 +148,15 @@ const MachineGroupScreen: React.FC = () => {
         setInitialValues({
             machineId: "",
             machineGroupId: "",
+            machineCode: "",
+            formId: "",
+            building: "",
+            floor: "",
+            area: "",
             machineName: "",
             description: "",
             isActive: true,
+            disables: false
         });
         setIsEditing(false);
         setIsVisible(true);
@@ -125,15 +165,17 @@ const MachineGroupScreen: React.FC = () => {
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
+            { label: "disable", align: "flex-start" },
             { label: "Machine Group Name", align: "flex-start" },
             { label: "Machine Name", align: "flex-start" },
             { label: "Description", align: "flex-start" },
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
         ],
-        flexArr: [2, 2, 2, 1, 1],
-        actionIndex: [{ editIndex: 4, delIndex: 5 }],
+        flexArr: [0, 2, 2, 2, 1, 1],
+        actionIndex: [{ disables: 0, editIndex: 5, delIndex: 6 }],
         handleAction,
+        showMessage: 2,
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);
 
@@ -161,7 +203,7 @@ const MachineGroupScreen: React.FC = () => {
                 </Pressable>
             </AccessibleView>
             <Card.Content style={{ padding: 2, flex: 1 }}>
-                {isLoadingMachines ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
             </Card.Content>
 
             <Machine_dialog

@@ -1,5 +1,5 @@
-import React, { ReactNode, memo } from "react";
-import { View, Platform, ViewStyle, SafeAreaView, Dimensions } from "react-native";
+import React, { ReactNode } from "react";
+import { View, Platform, ViewStyle } from "react-native";
 import PropTypes from "prop-types";
 import { useTheme } from "@/app/contexts";
 interface AccessibleViewProps {
@@ -26,7 +26,7 @@ const AccessibleView = ({ children, name, style }: AccessibleViewProps) => {
 };
 
 AccessibleView.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.oneOfType([PropTypes.any]),
   name: PropTypes.string.isRequired,
   style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
 };

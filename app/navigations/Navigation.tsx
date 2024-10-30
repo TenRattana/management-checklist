@@ -1,7 +1,7 @@
 import React, { useState, lazy, Suspense, useRef, useCallback, useEffect } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { HomeScreen, LoginScreen, ScanQR, GenerateQR, SettingScreen, ConfigulationScreen, MachineGroupScreen, MachineScreen } from '@/app/screens';
+import { HomeScreen, LoginScreen, ScanQR, GenerateQR, SettingScreen, ConfigulationScreen, MachineGroupScreen, MachineScreen, CheckListScreen, ChecklistGroupScreen, CheckListOptionScreen } from '@/app/screens';
 import NotFoundScreen from '@/app/+not-found';
 import { useAuth } from "@/app/contexts/auth";
 import { useRes } from "@/app/contexts/responsive";
@@ -12,12 +12,12 @@ import { useSelector } from "react-redux";
 
 const Drawer = createDrawerNavigator();
 
-type ComponentNames = 'TestScreen' | 'Form' | 'Expected_result' | 'Create_form' |
-  'Machine' | 'Match_checklist_option' | 'Match_form_machine' | 'Checklist' |
-  'InputFormMachine' | 'Preview' | 'Checklist_option' | 'Checklist_group' | 'ScanQR' | 'GenerateQR' | 'Setting' | 'Managepermissions' | 'NotFoundScreen' | 'Home' |
+type ComponentNames = 'TestScreen' | 'Form' | 'Expected_result' | 'Create_form' | 'Match_checklist_option' | 'Match_form_machine' |
+  'InputFormMachine' | 'Preview' | 'ScanQR' | 'GenerateQR' | 'Setting' | 'Managepermissions' | 'NotFoundScreen' | 'Home' |
   'Config';
 
-  type ComponentNameNoLazy = 'Machine_group';
+type ComponentNameNoLazy = 'Machine_group' | 'Machine' | 'Checklist' | 'Home' | 'ScanQR' | 'GenerateQR' | 'Setting'
+  | 'Config' | 'NotFoundScreen' | 'Checklist_option' | 'Checklist_group';
 
 const components: Record<ComponentNames, () => Promise<{ default: React.ComponentType<any> }>> = {
   Home: () => Promise.resolve({ default: HomeScreen }),
@@ -30,28 +30,33 @@ const components: Record<ComponentNames, () => Promise<{ default: React.Componen
   Form: () => import('@/app/screens/layouts/forms/form/FormScreen'),
   Expected_result: () => import('@/app/screens/layouts/transitions/expected_result/ExpectedResultScreen'),
   Create_form: () => import('@/app/screens/layouts/forms/create/CreateFormScreen'),
-  Machine: () => import('@/app/screens/layouts/machines/machine/MachineScreen'),
   Match_checklist_option: () => import('@/app/screens/layouts/matchs/match_checklist_option/MatchCheckListOptionScreen'),
   Match_form_machine: () => import('@/app/screens/layouts/matchs/match_form_machine/MatchFormMachineScreen'),
-  Checklist: () => import('@/app/screens/layouts/checklists/checklist/CheckListScreen'),
   Managepermissions: () => import('@/app/screens/SAdmin/Managepermissions'),
   InputFormMachine: () => import('@/app/screens/layouts/forms/Scan/InputFormMachine'),
   Preview: () => import('@/app/screens/layouts/forms/view/Preview'),
-  Checklist_option: () => import('@/app/screens/layouts/checklists/checklist_option/CheckListOptionScreen'),
-  Checklist_group: () => import('@/app/screens/layouts/checklists/checklist_group/ChecklistGroupScreen'),
 };
 
 const nonLazyComponents: Record<ComponentNameNoLazy, React.ComponentType<any>> = {
   Machine_group: MachineGroupScreen,
+  Machine: MachineScreen,
+  Checklist: CheckListScreen,
+  Checklist_group: ChecklistGroupScreen,
+  Checklist_option: CheckListOptionScreen,
+  Home: HomeScreen,
+  ScanQR: ScanQR,
+  GenerateQR: GenerateQR,
+  Setting: SettingScreen,
+  Config: ConfigulationScreen,
+  NotFoundScreen: NotFoundScreen,
 };
 
 const Navigation = () => {
   const state = useSelector((state: any) => state.prefix);
-  const { loading, screens, session } = useAuth();
+  const { screens, session } = useAuth();
   const { fontSize } = useRes();
   const { theme } = useTheme();
 
-  const [loadedComponents, setLoadedComponents] = useState(new Set<string>());
   const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
 
   const drawerWidth = fontSize === "small" ? 300 : fontSize === "medium" ? 350 : 400;

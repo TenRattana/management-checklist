@@ -21,6 +21,7 @@ const CustomTable = ({
   handleAction,
   actionIndex,
   searchQuery,
+  showMessage
 }: CustomTableProps) => {
   const [page, setPage] = useState<number>(0);
   const [numberOfItemsPerPageList] = useState([10, 20, 50]);
@@ -88,15 +89,15 @@ const CustomTable = ({
     }
   }, [handleAction]);
 
-  const renderCellContent = useCallback((cell: string | number | boolean, cellIndex: number, row: (string | number | boolean)[], rowIndex: number) => {
+  const renderCellContent = useCallback((cell: string | number | boolean, cellIndex: number, row: (string | number | boolean)[], rowIndex: number, Canedit: string | number | boolean | undefined) => {
     if (typeof cell === "boolean") {
       const handlePress = () => {
         const status = row[cellIndex] ? "Inactive" : "Active";
         setDialogAction("activeIndex");
         setDialogTitle("Change Status");
         setDialogData(row[cellIndex + 1] as string);
-        setDialogMessage(`${row[0]}  ${status}`);
-        setIsVisible(true);
+        setDialogMessage(`${row[showMessage ?? 0]}  ${status}`);
+        setIsVisible(Boolean(!Canedit));
       };
 
       return (
@@ -106,21 +107,22 @@ const CustomTable = ({
               icon={cell ? "toggle-switch" : "toggle-switch-off-outline"}
               size={spacing.large + 10}
               iconColor={cell ? theme.colors.green : theme.colors.secondary}
+              disabled={Boolean(Canedit)}
             />
           </Animated.View>
         </Pressable>
       );
     }
-    return <Text key={`cell-content-${cellIndex}`} style={masterdataStyles.text}>{cell as string}</Text>;
+    return <Text key={`cell-content-${cellIndex}`} style={masterdataStyles.text}>{String(cell)}</Text>;
   }, [theme.colors, animations]);
 
-  const renderActionButton = useCallback((data: string, action: string, row: (string | number | boolean)[], rowIndex: number) => {
+  const renderActionButton = useCallback((data: string, action: string, row: (string | number | boolean)[], rowIndex: number, Canedit: string | number | boolean | undefined) => {
     const handlePress = () => {
       setDialogAction(action);
       setDialogData(data);
       setDialogTitle(action === "editIndex" ? "Edit" : action === "delIndex" ? "Delete" : "");
-      setDialogMessage(`${row[0]}`);
-      setIsVisible(true);
+      setDialogMessage(`${row[showMessage ?? 0]}`);
+      setIsVisible((Boolean(!Canedit) || action === "editIndex"));
     };
 
     let icon;
@@ -132,10 +134,10 @@ const CustomTable = ({
         icon = <IconButton icon="pencil-box" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.blue} />;
         break;
       case "delIndex":
-        icon = <IconButton icon="trash-can" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.error} />;
+        icon = <IconButton icon="trash-can" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.error} disabled={Boolean(Canedit)} />;
         break;
       case "changeIndex":
-        icon = <IconButton icon="tooltip-edit" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.yellow} />
+        icon = <IconButton icon="tooltip-edit" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.yellow} disabled={Boolean(Canedit)} />
         break;
       case "copyIndex":
         icon = <IconButton icon="content-copy" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.yellow} />
@@ -168,19 +170,19 @@ const CustomTable = ({
                     return (
                       <AccessibleView name={`action-${rowIndex}-${colIndex}`} key={`action-${rowIndex}-${colIndex}`} style={customtable.eventColumn}>
                         <Text style={[masterdataStyles.text, { alignSelf: "center", }]}>Action : </Text>
-                        {renderActionButton(rowData[colIndex] as string, "editIndex", rowData, rowIndex)}
-                        {renderActionButton(rowData[colIndex] as string, "delIndex", rowData, rowIndex)}
+                        {renderActionButton(rowData[colIndex] as string, "editIndex", rowData, rowIndex, rowData[actionItem.disables])}
+                        {renderActionButton(rowData[colIndex] as string, "delIndex", rowData, rowIndex, rowData[actionItem.disables])}
                       </AccessibleView>
                     );
                   } else {
                     return (
                       <AccessibleView name={`action-${rowIndex}-${colIndex}`} key={`action-${rowIndex}-${colIndex}`} style={customtable.eventColumn}>
-                        {renderActionButton(rowData[colIndex] as string, key, rowData, rowIndex)}
+                        {renderActionButton(rowData[colIndex] as string, key, rowData, rowIndex, rowData[actionItem.disables])}
                       </AccessibleView>
                     )
                   }
                 })
-                : renderCellContent(rowData[colIndex], colIndex, rowData, rowIndex);
+                : renderCellContent(rowData[colIndex], colIndex, rowData, rowIndex, rowData[actionItem.disables]);
             })}
           </AccessibleView>
         ))}
@@ -198,7 +200,7 @@ const CustomTable = ({
             justifyContent: Align,
           };
           return (
-            <DataTable.Cell key={`cell-${rowIndex}-${cellIndex}`} style={[justifyContent, { flex: flexArr[cellIndex] || 1 }]}>
+            <DataTable.Cell key={`cell-${rowIndex}-${cellIndex}`} style={[justifyContent, { flex: flexArr[cellIndex] || 0 }]}>
               {actionIndex.map(actionItem => {
                 const filteredEntries = Object.entries(actionItem).filter(([, value]) => value === cellIndex);
                 return filteredEntries.length > 0
@@ -206,19 +208,19 @@ const CustomTable = ({
                     if (key === "editIndex" || key === "delIndex") {
                       return (
                         <AccessibleView name={`action-${rowIndex}-${key}`} key={`action-${rowIndex}`} style={customtable.eventColumn}>
-                          {renderActionButton(row[cellIndex] as string, "editIndex", row, rowIndex)}
-                          {renderActionButton(row[cellIndex] as string, "delIndex", row, rowIndex)}
+                          {renderActionButton(row[cellIndex] as string, "editIndex", row, rowIndex, row[actionItem.disables])}
+                          {renderActionButton(row[cellIndex] as string, "delIndex", row, rowIndex, row[actionItem.disables])}
                         </AccessibleView>
                       );
                     } else {
                       return (
                         <AccessibleView name={`action-${rowIndex}-${key}`} key={`action-${rowIndex}`} style={customtable.eventColumn}>
-                          {renderActionButton(row[cellIndex] as string, key, row, rowIndex)}
+                          {renderActionButton(row[cellIndex] as string, key, row, rowIndex, row[actionItem.disablesit])}
                         </AccessibleView>
                       )
                     }
                   })
-                  : renderCellContent(cell, cellIndex, row, rowIndex);
+                  : renderCellContent(cell, cellIndex, row, rowIndex, row[actionItem.disables]);
               })}
             </DataTable.Cell>
           );
@@ -258,7 +260,7 @@ const CustomTable = ({
                   <DataTable.Title
                     key={`header-${index}`}
                     onPress={() => handleSort(index)}
-                    style={[{ flex: flexArr[index] || 1 }, justifyContent]}
+                    style={[{ flex: flexArr[index] || 0 }, justifyContent]}
                   >
                     <Text style={[masterdataStyles.textBold, masterdataStyles.text]}>{header.label}</Text>
                     {sortColumn === index && (sortDirection === "ascending" ? " ▲" : " ▼")}
