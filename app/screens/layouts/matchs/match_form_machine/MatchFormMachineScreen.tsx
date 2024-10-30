@@ -33,7 +33,7 @@ const SaveMatchFormMachine = async (data: MatchForm): Promise<{ message: string 
     return response.data;
 };
 
-const MatchFormMachineScreen = ({ navigation }: any) => {
+const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -223,7 +223,7 @@ const MatchFormMachineScreen = ({ navigation }: any) => {
             />
         </AccessibleView>
     );
-};
+});
 
-export default React.memo(MatchFormMachineScreen);
+export default MatchFormMachineScreen;
 

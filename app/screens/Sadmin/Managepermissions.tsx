@@ -11,7 +11,7 @@ import { Users, GroupUsers, UsersPermission } from '@/typing/type'
 import { InitialValuesManagepermission } from '@/typing/value'
 import { useFocusEffect } from "expo-router";
 
-const Managepermissions = () => {
+const Managepermissions = React.memo(() => {
   const [user, setUser] = useState<Users[]>([]);
   const [userPermission, setUserPermission] = useState<UsersPermission[]>([]);
   const [groupUser, setGroupUser] = useState<GroupUsers[]>([]);
@@ -25,6 +25,7 @@ const Managepermissions = () => {
     UserName: "",
     IsActive: true,
     GUserID: "",
+    disables:false
   });
 
   const masterdataStyles = useMasterdataStyles();
@@ -96,7 +97,8 @@ const Managepermissions = () => {
           UserID: userData.UserID,
           UserName: userData.UserName ?? "",
           GUserID: userData.GUserID ?? "",
-          IsActive: userData.IsActive
+          IsActive: userData.IsActive,
+          disables: Boolean(userData.Disables),
         });
         setIsVisible(true);
         setIsEditing(true);
@@ -127,6 +129,7 @@ const Managepermissions = () => {
       UserName: "",
       IsActive: true,
       GUserID: "",
+      disables:false
     });
     setIsEditing(false);
     setIsVisible(true);
@@ -148,6 +151,7 @@ const Managepermissions = () => {
       },
     ],
     handleAction,
+    showMessage:2,
     searchQuery: debouncedSearchQuery,
   }), [tableData, debouncedSearchQuery, handleAction]);
 
@@ -183,6 +187,6 @@ const Managepermissions = () => {
       />
     </AccessibleView>
   );
-};
+});
 
-export default React.memo(Managepermissions)
+export default Managepermissions

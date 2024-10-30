@@ -4,7 +4,7 @@ import { AccessibleView, Text } from "@/components";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { ScanQRProps } from "@/typing/tag";
 
-const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
+const HomeScreen: React.FC<ScanQRProps> = React.memo(({ navigation }) => {
   const masterdataStyles = useMasterdataStyles();
 
   const handleSacnQR = useCallback(() => {
@@ -22,9 +22,9 @@ const HomeScreen: React.FC<ScanQRProps> = ({ navigation }) => {
 
     </AccessibleView>
   );
-};
+});
 
-export default React.memo(HomeScreen);
+export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {

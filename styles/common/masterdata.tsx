@@ -106,7 +106,11 @@ const useMasterdataStyles = () => {
         },
         searchbar: {
             width: responsive === "small" ? "90%" : 400,
-            marginVertical: spacing.small,
+            justifyContent:'center',
+            alignContent:'center',
+            alignItems:'center',
+            alignSelf:'center',
+            height:spacing.small+40,
             marginHorizontal: responsive === "small" ? '5%' : 30,
             borderRadius: 10,
             fontSize: spacing.small,

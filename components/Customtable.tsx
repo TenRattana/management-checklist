@@ -161,7 +161,7 @@ const CustomTable = ({
       <AccessibleView name={`row-${rowIndex}`} key={`row-${rowIndex}`} style={[customtable.cardRow, { alignItems: 'flex-start' }]}>
         {Tablehead.map((header, colIndex) => (
           <AccessibleView name={`header-${rowIndex}-${colIndex}`} key={`header-${rowIndex}-${colIndex}`}>
-            <Text style={{ marginVertical: 5 }}>{header.label}</Text>
+            <Text style={[{ marginVertical: 5 },masterdataStyles.text]}>{header.label}</Text>
             {actionIndex.map(actionItem => {
               const filteredEntries = Object.entries(actionItem).filter(([, value]) => value === colIndex);
               return filteredEntries.length > 0

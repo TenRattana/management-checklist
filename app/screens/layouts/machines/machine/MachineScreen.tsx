@@ -27,7 +27,7 @@ const saveMachine = async (data: Machine): Promise<{ message: string }> => {
     return response.data;
 };
 
-const MachineGroupScreen: React.FC = () => {
+const MachineGroupScreen: React.FC = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -45,6 +45,7 @@ const MachineGroupScreen: React.FC = () => {
         isActive: true,
         disables: false
     });
+
     const masterdataStyles = useMasterdataStyles();
     const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
@@ -55,22 +56,23 @@ const MachineGroupScreen: React.FC = () => {
         'machines',
         fetchMachines,
         {
-            refetchOnWindowFocus: false,
-        });
+            refetchOnWindowFocus: true,
+        }
+    );
 
     const { data: machineGroups = [] } = useQuery<GroupMachine[], Error>(
         'machineGroups',
         fetchMachineGroups,
         {
-            refetchOnWindowFocus: false,
-        });
+            refetchOnWindowFocus: true,
+        }
+    );
 
     const mutation = useMutation(saveMachine, {
         onSuccess: (data) => {
             showSuccess(data.message);
             setIsVisible(false)
             queryClient.invalidateQueries('machines');
-            queryClient.getQueryCache()
         },
         onError: handleError,
     });
@@ -100,7 +102,7 @@ const MachineGroupScreen: React.FC = () => {
             FormID: values.formId
         };
         mutation.mutate(data);
-    }, [mutation]);
+    }, [mutation, state]);
 
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
@@ -165,7 +167,7 @@ const MachineGroupScreen: React.FC = () => {
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
-            { label: "disable", align: "flex-start" },
+            { label: "Disable", align: "flex-start" },
             { label: "Machine Group Name", align: "flex-start" },
             { label: "Machine Name", align: "flex-start" },
             { label: "Description", align: "flex-start" },
@@ -180,9 +182,7 @@ const MachineGroupScreen: React.FC = () => {
     }), [tableData, debouncedSearchQuery, handleAction]);
 
     const dropmachine = useMemo(() => {
-        return Array.isArray(machineGroups)
-            ? machineGroups.filter(v => v.IsActive || v.GMachineID === initialValues.machineGroupId)
-            : [];
+        return machineGroups.filter(v => v.IsActive || v.GMachineID === initialValues.machineGroupId);
     }, [machineGroups, initialValues.machineGroupId]);
 
     return (
@@ -217,6 +217,6 @@ const MachineGroupScreen: React.FC = () => {
             />
         </AccessibleView>
     );
-};
+});
 
-export default React.memo(MachineGroupScreen);
+export default MachineGroupScreen;

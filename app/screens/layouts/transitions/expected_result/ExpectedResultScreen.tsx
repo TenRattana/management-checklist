@@ -14,7 +14,7 @@ const fetchExpectedResults = async (): Promise<ExpectedResult[]> => {
     return response.data.data ?? [];
 };
 
-const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => {
+const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
 
@@ -115,7 +115,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = ({ navigation }) => 
             </Card.Content>
         </AccessibleView>
     );
-};
+});
 
-export default React.memo(ExpectedResultScreen);
+export default ExpectedResultScreen;
 

@@ -22,7 +22,7 @@ const saveGroupCheckListOption = async (data: GroupCheckListOption): Promise<{ m
     return response.data;
 };
 
-const ChecklistGroupScreen = () => {
+const ChecklistGroupScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -171,6 +171,6 @@ const ChecklistGroupScreen = () => {
             />
         </AccessibleView>
     );
-};
+});
 
-export default React.memo(ChecklistGroupScreen);
+export default ChecklistGroupScreen;

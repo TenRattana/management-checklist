@@ -13,9 +13,7 @@ import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
 
 const fetchMachineGroups = async (): Promise<GroupMachine[]> => {
-    console.time("Fetch Machine Groups");
     const response = await axiosInstance.post("GroupMachine_service.asmx/GetGroupMachines");
-    console.timeEnd("Fetch Machine Groups");
     return response.data.data ?? [];
 };
 
@@ -24,7 +22,7 @@ const saveGroupMachine = async (data: GroupMachine): Promise<{ message: string }
     return response.data;
 };
 
-const MachineGroupScreen = () => {
+const MachineGroupScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -47,7 +45,7 @@ const MachineGroupScreen = () => {
         'machineGroups',
         fetchMachineGroups,
         {
-            refetchOnWindowFocus: false,
+            refetchOnWindowFocus: true,
         }
     );
 
@@ -56,7 +54,6 @@ const MachineGroupScreen = () => {
             showSuccess(data.message);
             setIsVisible(false)
             queryClient.invalidateQueries('machineGroups');
-            queryClient.getQueryCache()
         },
         onError: handleError,
     });
@@ -82,7 +79,7 @@ const MachineGroupScreen = () => {
         };
 
         mutation.mutate(data);
-    }, [mutation]);
+    }, [mutation, state]);
 
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
@@ -107,7 +104,7 @@ const MachineGroupScreen = () => {
         } catch (error) {
             handleError(error);
         }
-    }, [queryClient, handleError]);
+    }, [handleError, queryClient]);
 
     const tableData = useMemo(() => {
         return machineGroups.map(item => [
@@ -134,7 +131,7 @@ const MachineGroupScreen = () => {
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
-            { label: "disable", align: "flex-start" },
+            { label: "Disable", align: "flex-start" },
             { label: "Machine Group Name", align: "flex-start" },
             { label: "Description", align: "flex-start" },
             { label: "Status", align: "center" },
@@ -146,14 +143,6 @@ const MachineGroupScreen = () => {
         handleAction,
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);
-
-    if (isLoading) {
-        return <LoadingSpinner />;
-    }
-
-    if (isError) {
-        return <Text>Error: {error.message}</Text>;
-    }
 
     return (
         <AccessibleView name="container-groupmachine" style={{ flex: 1 }}>
@@ -185,6 +174,6 @@ const MachineGroupScreen = () => {
             />
         </AccessibleView>
     );
-};
+});
 
-export default React.memo(MachineGroupScreen);
+export default MachineGroupScreen;

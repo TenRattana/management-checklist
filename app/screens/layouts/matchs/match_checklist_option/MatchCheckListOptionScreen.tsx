@@ -32,7 +32,7 @@ const saveMatchCheckListOptions = async (data: MatchCheckListOption): Promise<{ 
 };
 
 
-const MatchCheckListOptionScreen = () => {
+const MatchCheckListOptionScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -231,6 +231,6 @@ const MatchCheckListOptionScreen = () => {
 
         </AccessibleView>
     );
-};
+});
 
-export default React.memo(MatchCheckListOptionScreen);
+export default MatchCheckListOptionScreen;

@@ -115,10 +115,10 @@ const Managepermisstion_dialog = ({ isVisible, setIsVisible, isEditing, initialV
                                             ]}
                                             testID="Save-managed"
                                         >
-                                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Save</Text>
+                                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Save</Text>
                                         </Pressable>
                                         <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-managed">
-                                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Cancel</Text>
+                                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Cancel</Text>
                                         </Pressable>
                                     </View>
                                 </View>

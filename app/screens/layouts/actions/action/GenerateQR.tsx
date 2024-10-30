@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { Inputs } from "@/components";
 
-const GenerateQR = () => {
+const GenerateQR = React.memo(() => {
     const [qrValue, setQrValue] = useState<string>("");
 
     const generateQR = (value: string) => {
@@ -32,7 +32,7 @@ const GenerateQR = () => {
             {generateQR(qrValue)}
         </View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {
@@ -47,4 +47,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default React.memo(GenerateQR);
+export default GenerateQR;

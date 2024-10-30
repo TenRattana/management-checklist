@@ -14,7 +14,7 @@ const fetchForm = async (): Promise<Form[]> => {
     return response.data.data ?? [];
 };
 
-const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
+const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [show, setShow] = useState<boolean>(false)
@@ -121,6 +121,6 @@ const FormScreen: React.FC<FormScreenProps> = ({ navigation, route }) => {
             </Card.Content>
         </AccessibleView>
     );
-};
+});
 
-export default React.memo(FormScreen);
+export default FormScreen;

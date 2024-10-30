@@ -23,7 +23,7 @@ const saveCheckList = async (data: Checklist): Promise<{ message: string }> => {
     return response.data;
 };
 
-const CheckListScreen = () => {
+const CheckListScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -167,6 +167,6 @@ const CheckListScreen = () => {
             />
         </AccessibleView>
     );
-};
+});
 
-export default React.memo(CheckListScreen);
+export default CheckListScreen;

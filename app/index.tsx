@@ -7,21 +7,21 @@ import Navigation from "./navigations/Navigation";
 import { PersistGate } from 'redux-persist/integration/react';
 import { CustomErrorBoundary } from "@/config/errors";
 
-const App: React.FC = () => {
-  const fallback = (error: Error, retry: () => void) => (
-    <View>
-      <Text>Error: {error.message}</Text>
-      <Button title="Try Again" onPress={retry} />
-    </View>
-  );
+const App = () => {
+  // const fallback = (error: Error, retry: () => void) => (
+  //   <View>
+  //     <Text>Error: {error.message}</Text>
+  //     <Button title="Try Again" onPress={retry} />
+  //   </View>
+  // );
 
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <GestureHandlerRootView style={{ flex: 1 }}>
-          <CustomErrorBoundary fallback={fallback}>
+          {/* <CustomErrorBoundary fallback={fallback}> */}
             <Navigation />
-          </CustomErrorBoundary>
+          {/* </CustomErrorBoundary> */}
         </GestureHandlerRootView>
       </PersistGate>
     </Provider>

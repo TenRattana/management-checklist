@@ -22,7 +22,7 @@ const SearchBar = ({ value, onChange, placeholder, testId }: SeractBarProps) => 
       value={value}
       onChangeText={onChange}
       style={masterdataStyles.searchbar}
-      inputStyle={{ color: theme.colors.background, fontSize: spacing.small }}
+      inputStyle={[masterdataStyles.textLight,{fontSize:spacing.medium}]}
       iconColor="#007AFF"
       placeholderTextColor={theme.colors.background}
       testID={testId}

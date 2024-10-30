@@ -85,12 +85,12 @@ const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialVa
                                             ]}
                                             testID="Save-cod"
                                         >
-                                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>
+                                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
                                                 Save
                                             </Text>
                                         </Pressable>
                                         <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-cod">
-                                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>Cancel</Text>
+                                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Cancel</Text>
                                         </Pressable>
                                     </View>
                                 </View>
