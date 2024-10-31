@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast, useRes } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
-import { Card, Divider, useTheme } from "react-native-paper";
+import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Match_checklist_option from "@/components/screens/Match_checklist_option_dialog";
 import { CheckListOption, MatchCheckListOption, GroupCheckListOption, } from '@/typing/type'
 import { InitialValuesMatchCheckListOption } from '@/typing/value'
-import { useFocusEffect } from "expo-router";
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSelector } from "react-redux";
 
@@ -26,7 +25,7 @@ const fetchMatchCheckListOptions = async (): Promise<MatchCheckListOption[]> => 
     return response.data.data ?? [];
 };
 
-const saveMatchCheckListOptions = async (data: MatchCheckListOption): Promise<{ message: string }> => {
+const saveMatchCheckListOptions = async (data: { Prefix: any; MCLOptionID: string; GCLOptionID: string; CLOptionID: string; IsActive: boolean; Disables: boolean; }): Promise<{ message: string }> => {
     const response = await axiosInstance.post("MatchCheckListOption_service.asmx/SaveMatchCheckListOption", data);
     return response.data;
 };
@@ -37,7 +36,6 @@ const MatchCheckListOptionScreen = React.memo(() => {
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isVisible, setIsVisible] = useState<boolean>(false);
-    const [isLoadingButton, setIsLoadingButton] = useState<boolean>(false);
     const [initialValues, setInitialValues] = useState<InitialValuesMatchCheckListOption>({
         matchCheckListOptionId: "",
         checkListOptionId: [],
@@ -56,29 +54,28 @@ const MatchCheckListOptionScreen = React.memo(() => {
         'checkListOption',
         fetchCheckListOptions,
         {
-            refetchOnWindowFocus: false,
+            refetchOnWindowFocus: true,
         });
 
     const { data: groupCheckListOption = [] } = useQuery<GroupCheckListOption[], Error>(
         'groupCheckListOption',
         fetchGroupCheckListOptions,
         {
-            refetchOnWindowFocus: false,
+            refetchOnWindowFocus: true,
         });
 
     const { data: matchCheckListOption = [], isLoading } = useQuery<MatchCheckListOption[], Error>(
         'matchCheckListOption',
         fetchMatchCheckListOptions,
         {
-            refetchOnWindowFocus: false,
+            refetchOnWindowFocus: true,
         });
 
     const mutation = useMutation(saveMatchCheckListOptions, {
         onSuccess: (data) => {
             showSuccess(data.message);
             setIsVisible(false)
-            queryClient.invalidateQueries('machines');
-            queryClient.getQueryCache()
+            queryClient.invalidateQueries('matchCheckListOption');
         },
         onError: handleError,
     });
@@ -94,14 +91,13 @@ const MatchCheckListOptionScreen = React.memo(() => {
     }, [searchQuery]);
 
     const saveData = useCallback(async (values: InitialValuesMatchCheckListOption) => {
-        setIsLoadingButton(true);
-
         const data = {
             Prefix: state.MatchCheckListOption ?? "",
             MCLOptionID: values.matchCheckListOptionId,
             GCLOptionID: values.groupCheckListOptionId,
             CLOptionID: JSON.stringify(values.checkListOptionId),
             IsActive: values.isActive,
+            Disables: values.disables
         };
 
         mutation.mutate(data);
@@ -128,7 +124,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
                 const endpoint = action === "activeIndex" ? "ChangeMatchCheckListOption" : "DeleteMatchCheckListOption";
                 const response = await axiosInstance.post(`MatchCheckListOption_service.asmx/${endpoint}`, { MCLOptionID: item });
                 showSuccess(String(response.data.message));
-                queryClient.invalidateQueries('machines');
+                queryClient.invalidateQueries('matchCheckListOption');
             }
         } catch (error) {
             handleError(error);
@@ -140,6 +136,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
             item.CheckListOptions.map(option => {
                 const matchedOption = checkListOption.find(group => group.CLOptionID === option.CLOptionID);
                 return [
+                    item.Disables,
                     item.GCLOptionName,
                     matchedOption?.CLOptionName || "",
                     item.IsActive,
@@ -180,18 +177,21 @@ const MatchCheckListOptionScreen = React.memo(() => {
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
+            { label: "Disable", align: "flex-start" },
             { label: "Group Name", align: "flex-start" },
             { label: "Option Name", align: "flex-start" },
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
         ],
-        flexArr: [3, 3, 1, 1],
+        flexArr: [0, 3, 3, 1, 1],
         actionIndex: [
             {
-                editIndex: 3,
-                delIndex: 4,
+                disables: 0,
+                editIndex: 4,
+                delIndex: 5,
             },
         ],
+        showMessage: 1,
         handleAction,
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);

@@ -35,16 +35,16 @@ const CheckListOptionScreen = React.memo(() => {
     });
 
     const masterdataStyles = useMasterdataStyles();
+    const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
-    const state = useSelector((state: any) => state.prefix);
 
     const { data: checkListOption = [], isLoading } = useQuery<CheckListOption[], Error>(
         'checkListOption',
         fetchCheckListOption,
         {
-            refetchOnWindowFocus: false,
+            refetchOnWindowFocus: true,
         });
 
     const mutation = useMutation(saveCheckListOption, {
@@ -52,7 +52,6 @@ const CheckListOptionScreen = React.memo(() => {
             showSuccess(data.message);
             setIsVisible(false)
             queryClient.invalidateQueries('checkListOption');
-            queryClient.getQueryCache()
         },
         onError: handleError,
     });
@@ -68,7 +67,6 @@ const CheckListOptionScreen = React.memo(() => {
     }, [searchQuery]);
 
     const saveData = useCallback(async (values: InitialValuesCheckListOption) => {
-
         const data = {
             Prefix: state.CheckListOption ?? "",
             CLOptionID: values.checkListOptionId,
@@ -132,15 +130,15 @@ const CheckListOptionScreen = React.memo(() => {
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
-            { label: "disable", align: "flex-start" },
+            { label: "Disable", align: "flex-start" },
             { label: "Check List Option Name", align: "flex-start" },
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
         ],
         flexArr: [0, 6, 1, 1],
         actionIndex: [{ disables: 0, editIndex: 3, delIndex: 4 }],
-        handleAction,
         showMessage: 1,
+        handleAction,
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);
 

@@ -36,16 +36,16 @@ const CheckListScreen = React.memo(() => {
     });
 
     const masterdataStyles = useMasterdataStyles();
+    const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
-    const state = useSelector((state: any) => state.prefix);
 
     const { data: checkList = [], isLoading } = useQuery<Checklist[], Error>(
         'checkList',
         fetchCheckList,
         {
-            refetchOnWindowFocus: false,
+            refetchOnWindowFocus: true,
         }
     );
 
@@ -54,7 +54,6 @@ const CheckListScreen = React.memo(() => {
             showSuccess(data.message);
             setIsVisible(false)
             queryClient.invalidateQueries('checkList');
-            queryClient.getQueryCache()
         },
         onError: handleError,
     });

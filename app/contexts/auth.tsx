@@ -2,7 +2,7 @@ import { saveUserData, loadUserData, removeUserData } from '@/app/services/stora
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from "react";
 import axiosInstance from '@/config/axios';
 import { GroupUsers, UsersPermission } from '@/typing/type';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 
 const fetchUserPermission = async (): Promise<UsersPermission[]> => {
   const response = await axiosInstance.post('User_service.asmx/GetUsersPermission');
@@ -31,19 +31,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   console.log("AuthProvider");
   const [session, setSession] = useState<{ UserID: string, UserName: string, GUserID: string, GUserName: string, IsActive: boolean }>({ UserID: "", UserName: "", GUserID: "", GUserName: "", IsActive: false });
   const [loading, setLoading] = useState<boolean>(true);
-  const [screens, setScreens] = useState<{ name: string }[]>([]);
+  const [screens, setScreens] = useState<{ name: string }[]>([{ name: "Permission_deny" }]);
 
   const { data: user = [] } = useQuery<UsersPermission[], Error>(
     'userPermission',
     fetchUserPermission,
     {
       refetchOnWindowFocus: false,
-    });
+      keepPreviousData: true,
+    }
+  );
+
   const { data: groupUser = [] } = useQuery<GroupUsers[], Error>(
     'groupUser',
     fetchGroupUser,
     {
       refetchOnWindowFocus: false,
+      keepPreviousData: true,
+      staleTime: 1000 * 60 * 5,
+      cacheTime: 1000 * 60 * 10
     });
 
   const updateSession = useCallback((UserName: string) => {
@@ -77,7 +83,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     if (session.UserName) {
       const screenMapping: Record<string, string[]> = {
-        SuperAdmin: ["Home", "Machine_group", "Machine", "Checklist", "Checklist_option", "Checklist_group", "Match_checklist_option", "Match_form_machine", "Create_form", "Expected_result", "Form", "User", "Preview", "Admin", "ScanQR", "GenerateQR", "InputFormMachine", "Setting", "Managepermissions", "SuperAdmin", "TestScreen", "Permission_deny", "Config"],
+        SuperAdmin: ["Home", "Machine_group", "Machine", "Checklist", "Checklist_option", "Checklist_group", "Match_checklist_option", "Match_form_machine", "Create_form", "Expected_result", "Form", "User", "Preview", "Admin", "ScanQR", "GenerateQR", "InputFormMachine", "Setting", "Managepermissions", "SuperAdmin", "Permission_deny", "Config"],
         Admin: ["Home", "Machine_group", "Machine", "Checklist", "Checklist_option", "Checklist_group", "Match_checklist_option", "Match_form_machine", "Create_form", "Expected_result", "Form", "User", "Preview", "Admin", "ScanQR", "GenerateQR", "InputFormMachine", "Setting", "Permission_deny", "Config"],
         GeneralUser: ["Home", "ScanQR", "InputFormMachine", "Setting", "Permission_deny"]
       };

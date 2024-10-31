@@ -133,7 +133,7 @@ export interface CustomTableProps {
   handleAction?: (action?: string, data?: string) => void;
   actionIndex: { [key: string]: number }[];
   searchQuery: string;
-  showMessage:number;
+  showMessage:number | Array;
 }
 
 export interface DragfieldProps {

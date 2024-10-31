@@ -1,4 +1,4 @@
-import React, { useState, lazy, Suspense, useRef, useCallback, useEffect } from 'react';
+import React, { lazy, Suspense, useRef, useCallback, useEffect } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import {
@@ -30,7 +30,6 @@ import { useSelector } from "react-redux";
 const Drawer = createDrawerNavigator();
 
 type ComponentNames =
-  | 'TestScreen'
   | 'Create_form'
   | 'InputFormMachine'
   | 'Preview';
@@ -54,7 +53,6 @@ type ComponentNameNoLazy =
   | 'Managepermissions';
 
 const components: Record<ComponentNames, () => Promise<{ default: React.ComponentType<any> }>> = {
-  TestScreen: () => import('@/app/screens/TestScreen'),
   Create_form: () => import('@/app/screens/layouts/forms/create/CreateFormScreen'),
   InputFormMachine: () => import('@/app/screens/layouts/forms/Scan/InputFormMachine'),
   Preview: () => import('@/app/screens/layouts/forms/view/Preview'),
@@ -100,7 +98,7 @@ const Navigation: React.FC = () => {
     return () => {
       axiosInstance.interceptors.request.eject(interceptor);
     };
-  }, [session]); 
+  }, [session]);
 
   const renderComponent = useCallback((name: ComponentNames | ComponentNameNoLazy) => {
     if (name in nonLazyComponents) {
@@ -147,7 +145,7 @@ const Navigation: React.FC = () => {
       }}
       id='nav'
     >
-      {screens.length > 0 ? (
+      {screens && screens.length > 1 ? (
         screens.map(screen => (
           <Drawer.Screen
             key={screen.name}

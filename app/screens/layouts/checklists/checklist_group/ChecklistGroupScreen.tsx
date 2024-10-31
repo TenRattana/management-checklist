@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
-import { Card, Divider, useTheme } from "react-native-paper";
+import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Checklist_group_dialog from "@/components/screens/Checklist_group_dialog";
@@ -35,17 +35,16 @@ const ChecklistGroupScreen = React.memo(() => {
     });
 
     const masterdataStyles = useMasterdataStyles();
-
+    const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
-    const state = useSelector((state: any) => state.prefix);
 
     const { data: groupCheckListOption = [], isLoading } = useQuery<GroupCheckListOption[], Error>(
         'groupCheckListOption',
         fetchGroupCheckListOption,
         {
-            refetchOnWindowFocus: false,
+            refetchOnWindowFocus: true,
         });
 
     const mutation = useMutation(saveGroupCheckListOption, {
@@ -53,7 +52,6 @@ const ChecklistGroupScreen = React.memo(() => {
             showSuccess(data.message);
             setIsVisible(false)
             queryClient.invalidateQueries('groupCheckListOption');
-            queryClient.getQueryCache()
         },
         onError: handleError,
     });
@@ -62,7 +60,10 @@ const ChecklistGroupScreen = React.memo(() => {
         const handler = setTimeout(() => {
             setDebouncedSearchQuery(searchQuery);
         }, 300);
-        return () => clearTimeout(handler);
+
+        return () => {
+            clearTimeout(handler);
+        };
     }, [searchQuery]);
 
     const saveData = useCallback(async (values: InitialValuesGroupCheckList) => {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
 import * as SplashScreen from 'expo-splash-screen';
-import { ToastProvider, AuthProvider, ResponsiveProvider, ThemeProvider, useTheme, useAuth } from "@/app/contexts";
+import { ToastProvider, AuthProvider, ResponsiveProvider, ThemeProvider, useTheme } from "@/app/contexts";
 import { QueryClient, QueryClientProvider } from 'react-query';
 import * as Font from "expo-font";
 import { Stack } from 'expo-router';
@@ -24,17 +24,29 @@ const SetTheme = () => {
 const RootLayout = () => {
     const [fontsLoaded, setFontsLoaded] = useState(false);
 
-    const loadFonts = async () => {
-        await Font.loadAsync({
-            "Poppins": require("../assets/fonts/Poppins-Regular.ttf"),
-            "Sarabun": require("../assets/fonts/Sarabun-Regular.ttf"),
-        });
-        setFontsLoaded(true);
-    };
+    useEffect(() => {
+        const prepare = async () => {
+            try {
+                await Font.loadAsync({
+                    "Poppins": require("../assets/fonts/Poppins-Regular.ttf"),
+                    "Sarabun": require("../assets/fonts/Sarabun-Regular.ttf"),
+                });
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            } catch (error) {
+                console.warn('Error loading fonts:', error);
+            } finally {
+                setFontsLoaded(true);
+            }
+        };
+
+        prepare();
+    }, []);
 
     useEffect(() => {
-        loadFonts();
-    }, []);
+        if (fontsLoaded) {
+            SplashScreen.hideAsync();
+        }
+    }, [fontsLoaded]);
 
     if (!fontsLoaded) {
         return <ActivityIndicator size="large" color="#0000ff" />;
@@ -49,7 +61,6 @@ const RootLayout = () => {
                     <QueryClientProvider client={queryClient}>
                         <AuthProvider>
                             <SetTheme />
-                            <ReactQueryDevtools initialIsOpen={true} />
                         </AuthProvider>
                     </QueryClientProvider>
                 </ToastProvider>

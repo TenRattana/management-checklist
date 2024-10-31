@@ -101,7 +101,6 @@ export interface UsersPermission {
   UserName: string;
   GUserID: string;
   IsActive: boolean;
-  Disables: boolean;
 }
 
 export interface Userset {
@@ -125,6 +124,7 @@ export interface Prefixs {
   MatchFormMachine: string;
   Form: string;
   ExpectedResult: string;
+  UsersPermission: string;
 }
 
 export interface AppProps extends Prefixs {

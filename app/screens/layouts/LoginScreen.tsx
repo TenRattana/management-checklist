@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Pressable, ActivityIndicator, View } from "react-native";
+import { Pressable, ActivityIndicator } from "react-native";
 import { Card } from "react-native-paper";
 import { useAuth } from "../../contexts/auth";
 import { Formik } from "formik";
@@ -34,14 +34,14 @@ const LoginScreen: React.FC = React.memo(() => {
 
   useFocusEffect(
     useCallback(() => {
-      return () => {};
+      return () => { };
     }, [])
   );
 
   return (
-    <View style={{ paddingHorizontal: 30, marginTop: 100 }}>
+    <AccessibleView name="login-container" style={{ paddingHorizontal: 30, marginTop: 100 }}>
       <Card style={{ height: 250 }}>
-        <Card.Title 
+        <Card.Title
           title="Login"
           titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
         />
@@ -63,7 +63,7 @@ const LoginScreen: React.FC = React.memo(() => {
               isValid,
               dirty,
             }) => (
-              <View>
+              <AccessibleView name="login">
                 <Inputs
                   placeholder="Enter Username"
                   label="Username"
@@ -76,7 +76,7 @@ const LoginScreen: React.FC = React.memo(() => {
                   testId="username"
                 />
 
-                <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <AccessibleView name="action-login" style={{ justifyContent: 'center', alignItems: 'center' }}>
                   <Pressable
                     onPress={() => handleSubmit()}
                     disabled={!isValid || !dirty || loading}
@@ -92,13 +92,13 @@ const LoginScreen: React.FC = React.memo(() => {
                       <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>Login</Text>
                     )}
                   </Pressable>
-                </View>
-              </View>
+                </AccessibleView>
+              </AccessibleView>
             )}
           </Formik>
         </Card.Content>
       </Card>
-    </View>
+    </AccessibleView>
   );
 });
 

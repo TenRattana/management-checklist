@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
-import { Card, Divider } from "react-native-paper";
+import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Match_form_machine_dialog from "@/components/screens/Match_form_machine_dialog";
 import { Form, MatchForm, Machine } from '@/typing/type'
 import { InitialValuesMatchFormMachine } from '@/typing/value'
-import { useFocusEffect } from "expo-router";
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSelector } from "react-redux";
 
@@ -28,7 +27,7 @@ const fetchMatchFormMchines = async (): Promise<MatchForm[]> => {
     return response.data.data ?? [];
 };
 
-const SaveMatchFormMachine = async (data: MatchForm): Promise<{ message: string }> => {
+const SaveMatchFormMachine = async (data: { Prefix: any; MachineID: string; FormID: string; Mode: string; }): Promise<{ message: string }> => {
     const response = await axiosInstance.post("MatchFormMachine_service.asmx/SaveMatchFormMachine", data);
     return response.data;
 };
@@ -44,9 +43,9 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
     });
 
     const masterdataStyles = useMasterdataStyles();
+    const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
-    const state = useSelector((state: any) => state.prefix);
     const queryClient = useQueryClient();
 
     const { data: machine = [] } = useQuery<Machine[], Error>(
@@ -74,7 +73,6 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
             showSuccess(data.message);
             setIsVisible(false)
             queryClient.invalidateQueries('matchForm');
-            queryClient.getQueryCache()
         },
         onError: handleError,
     });
@@ -91,6 +89,7 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
 
     const saveData = useCallback(async (values: InitialValuesMatchFormMachine, status: boolean) => {
         const data = {
+            Prefix: state.MatchFormMachine ?? "",
             MachineID: values.machineId,
             FormID: values.formId,
             Mode: status ? "edit" : "add"
@@ -169,8 +168,8 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
         Tablehead: [
             { label: "Machine Name", align: "flex-start" },
             { label: "Form Name", align: "flex-start" },
-            { label: "Change Form", align: "center" },
-            { label: "Copy Template", align: "center" },
+            { label: "Change", align: "center" },
+            { label: "Copy", align: "center" },
             { label: "Preview", align: "center" },
             { label: "", align: "flex-end" }
         ],
@@ -185,7 +184,7 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
             },
         ],
         handleAction,
-        showMessage: 2,
+        showMessage: [0, 1],
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);
 

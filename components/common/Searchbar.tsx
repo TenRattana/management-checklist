@@ -16,13 +16,20 @@ const SearchBar = ({ value, onChange, placeholder, testId }: SeractBarProps) => 
   const { spacing } = useRes()
   const masterdataStyles = useMasterdataStyles()
 
+  const isThai = (text: string): boolean => {
+    const thaiCharRange = /[\u0E00-\u0E7F]/;
+    return thaiCharRange.test(text);
+  };
+
+  const fontFamily = isThai(value) ? 'Sarabun' : 'Poppins';
+
   return (
     <Searchbar
       placeholder={placeholder}
       value={value}
       onChangeText={onChange}
       style={masterdataStyles.searchbar}
-      inputStyle={[masterdataStyles.textLight,{fontSize:spacing.medium}]}
+      inputStyle={[masterdataStyles.textLight, { fontSize: spacing.small, fontWeight: '400', fontFamily }]}
       iconColor="#007AFF"
       placeholderTextColor={theme.colors.background}
       testID={testId}

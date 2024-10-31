@@ -96,7 +96,8 @@ const CustomTable = ({
         setDialogAction("activeIndex");
         setDialogTitle("Change Status");
         setDialogData(row[cellIndex + 1] as string);
-        setDialogMessage(`${row[showMessage ?? 0]}  ${status}`);
+        const message = Array.isArray(showMessage) ? showMessage.map(key => row[key]).join(" ") : row[showMessage];
+        setDialogMessage(String(`${message} ${status}`));
         setIsVisible(Boolean(!Canedit));
       };
 
@@ -121,7 +122,8 @@ const CustomTable = ({
       setDialogAction(action);
       setDialogData(data);
       setDialogTitle(action === "editIndex" ? "Edit" : action === "delIndex" ? "Delete" : "");
-      setDialogMessage(`${row[showMessage ?? 0]}`);
+      const message = Array.isArray(showMessage) ? showMessage.map(key => row[key]).join(" : ") : row[showMessage];
+      setDialogMessage(String(message));
       setIsVisible((Boolean(!Canedit) || action === "editIndex"));
     };
 
@@ -137,13 +139,13 @@ const CustomTable = ({
         icon = <IconButton icon="trash-can" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.error} disabled={Boolean(Canedit)} />;
         break;
       case "changeIndex":
-        icon = <IconButton icon="tooltip-edit" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.yellow} disabled={Boolean(Canedit)} />
+        icon = <IconButton icon="tooltip-edit" size={(responsive === "small" ? spacing.large : spacing.large)} iconColor={theme.colors.yellow} disabled={Boolean(Canedit)} />
         break;
       case "copyIndex":
-        icon = <IconButton icon="content-copy" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.yellow} />
+        icon = <IconButton icon="content-copy" size={(responsive === "small" ? spacing.large : spacing.large)} iconColor={theme.colors.yellow} />
         break;
       case "preIndex":
-        icon = <IconButton icon="file-find" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.yellow} />
+        icon = <IconButton icon="file-find" size={(responsive === "small" ? spacing.large : spacing.large) + 2} iconColor={theme.colors.yellow} />
         break;
       default:
         return null;
@@ -161,7 +163,7 @@ const CustomTable = ({
       <AccessibleView name={`row-${rowIndex}`} key={`row-${rowIndex}`} style={[customtable.cardRow, { alignItems: 'flex-start' }]}>
         {Tablehead.map((header, colIndex) => (
           <AccessibleView name={`header-${rowIndex}-${colIndex}`} key={`header-${rowIndex}-${colIndex}`}>
-            <Text style={[{ marginVertical: 5 },masterdataStyles.text]}>{header.label}</Text>
+            <Text style={[{ marginVertical: 5 }, masterdataStyles.text]}>{header.label}</Text>
             {actionIndex.map(actionItem => {
               const filteredEntries = Object.entries(actionItem).filter(([, value]) => value === colIndex);
               return filteredEntries.length > 0
@@ -281,6 +283,8 @@ const CustomTable = ({
             )}
             contentContainerStyle={{ flexGrow: 1 }}
             nestedScrollEnabled={true}
+            removeClippedSubviews
+            initialNumToRender={10}
             showsVerticalScrollIndicator={true}
           />
           <DataTable.Pagination

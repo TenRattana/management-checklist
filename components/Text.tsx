@@ -12,32 +12,39 @@ const isThai = (text: string): boolean => {
   return thaiCharRange.test(text);
 };
 
-const Text: React.FC<CustomTextProps> = React.memo(({ style, children, ...props }) => {
-  const textArray = Array.isArray(children) ? children : [children];
+class Text extends React.Component<CustomTextProps> {
+  static propTypes = {
+    style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+    children: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.any]),
+  };
 
-  return (
-    <React.Fragment>
-      {textArray.map((child, index) => {
-        if (child == null) return null;
-        const fontFamily = isThai(child) ? 'Sarabun' : 'Poppins';
+  shouldComponentUpdate(nextProps: CustomTextProps) {
+    return nextProps.style !== this.props.style || nextProps.children !== this.props.children;
+  }
 
-        return (
-          <DefaultText
-            key={index}
-            style={[{ fontFamily }, style]}
-            {...props}
-          >
-            {child}
-          </DefaultText>
-        );
-      })}
-    </React.Fragment>
-  );
-});
+  render() {
+    const { style, children, ...props } = this.props;
 
-Text.propTypes = {
-  style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
-  children: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.any]),
-};
+    return (
+      <>
+        {React.Children.map(children, (child, index) => {
+          if (child == null) return null;
+
+          const fontFamily = isThai(String(child)) ? 'Sarabun' : 'Poppins';
+
+          return (
+            <DefaultText
+              key={index}
+              style={[{ fontFamily }, style]}
+              {...props}
+            >
+              {child}
+            </DefaultText>
+          );
+        })}
+      </>
+    );
+  }
+}
 
 export default Text;

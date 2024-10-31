@@ -64,7 +64,6 @@ export interface InitialValuesManagepermission {
   UserName: string;
   GUserID: string;
   IsActive: boolean;
-  disables:boolean;
 }
 
 type Values =

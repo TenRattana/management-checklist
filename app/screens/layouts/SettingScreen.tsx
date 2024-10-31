@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { Switch, View } from 'react-native';
+import { Switch } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 import { AccessibleView, Text } from '@/components';
@@ -37,7 +37,7 @@ const SettingsScreen: React.FC = () => {
 
   const MySwitch = useMemo(() => {
     return (
-      <View>
+      <AccessibleView name="container-switch" style={{ alignSelf: 'center', alignItems: 'center' }}>
         <Switch
           onValueChange={toggleSwitch}
           value={darkMode}
@@ -45,7 +45,7 @@ const SettingsScreen: React.FC = () => {
           trackColor={{ false: "#767577", true: "#81b0ff" }}
           style={{ transform: [{ scale: 1.5 }] }}
         />
-      </View>
+      </AccessibleView>
     );
   }, [toggleSwitch, darkMode]);
   console.log(spacing);
@@ -54,14 +54,14 @@ const SettingsScreen: React.FC = () => {
     <AccessibleView name="setting" style={[masterdataStyles.container]}>
       <Text style={[masterdataStyles.textBold, masterdataStyles.text, { textAlign: 'center', paddingVertical: 30, fontSize: spacing.large }]}>Settings</Text>
 
-      <View id="setting-mode" style={[masterdataStyles.settingItem]}>
+      <AccessibleView name="setting-mode" style={[masterdataStyles.settingItem]}>
         <Text style={[masterdataStyles.settingText]}>Dark Mode</Text>
         {MySwitch}
-      </View>
+      </AccessibleView>
 
-      <View id="setting-font" style={[masterdataStyles.settingItem]}>
+      <AccessibleView name="setting-font" style={[masterdataStyles.settingItem]}>
         <Text style={[masterdataStyles.settingText]}>Font Size</Text>
-        <View id="Picker" style={[masterdataStyles.pickerContainer]}>
+        <AccessibleView name="Picker" style={[masterdataStyles.pickerContainer]}>
           <Picker
             selectedValue={fontSize}
             style={[masterdataStyles.picker]}
@@ -72,8 +72,8 @@ const SettingsScreen: React.FC = () => {
             <Picker.Item label="Medium" value="medium" />
             <Picker.Item label="Large" value="large" />
           </Picker>
-        </View>
-      </View>
+        </AccessibleView>
+      </AccessibleView>
     </AccessibleView>
   );
 };

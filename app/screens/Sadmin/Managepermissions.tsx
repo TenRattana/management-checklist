@@ -1,66 +1,96 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Pressable, Role } from "react-native";
+import { Pressable } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
-import { Card, Divider } from "react-native-paper";
+import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import Managepermisstion_dialog from "@/components/screens/Managepermisstion_dialog";
 import { Users, GroupUsers, UsersPermission } from '@/typing/type'
 import { InitialValuesManagepermission } from '@/typing/value'
-import { useFocusEffect } from "expo-router";
+import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useSelector } from 'react-redux';
+
+const fetchUsers = async (): Promise<Users[]> => {
+  const response = await axiosInstance.post("User_service.asmx/GetUsers");
+  return response.data.data ?? [];
+};
+
+const fetchGroupUser = async (): Promise<GroupUsers[]> => {
+  const response = await axiosInstance.post("GroupMachine_service.asmx/GetGroupMachines");
+  return response.data.data ?? [];
+};
+
+const fetchUserPermission = async (): Promise<UsersPermission[]> => {
+  const response = await axiosInstance.post("User_service.asmx/GetUsersPermission");
+  return response.data.data ?? [];
+};
+
+const saveUserPermission = async (data: { Prefix: any; UserID: string | undefined; UserName: string; GUserID: string; IsActive: boolean; }): Promise<{ message: string }> => {
+  const response = await axiosInstance.post("User_service.asmx/SaveUser", data);
+  return response.data;
+};
 
 const Managepermissions = React.memo(() => {
-  const [user, setUser] = useState<Users[]>([]);
-  const [userPermission, setUserPermission] = useState<UsersPermission[]>([]);
-  const [groupUser, setGroupUser] = useState<GroupUsers[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [initialValues, setInitialValues] = useState<InitialValuesManagepermission>({
     UserID: "",
     UserName: "",
     IsActive: true,
     GUserID: "",
-    disables:false
   });
 
   const masterdataStyles = useMasterdataStyles();
+  const state = useSelector((state: any) => state.prefix);
   const { showSuccess, handleError } = useToast();
   const { spacing, fontSize } = useRes();
+  const queryClient = useQueryClient();
 
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-
-    try {
-      const [userResponse, groupUserResponse, userPermission] = await Promise.all([
-        axiosInstance.post("User_service.asmx/GetUsers"),
-        axiosInstance.post("GroupUser_service.asmx/GetGroupUsers"),
-        axiosInstance.post("User_service.asmx/GetUsersPermission")
-      ]);
-      setUser(userResponse.data.data ?? []);
-      setGroupUser(groupUserResponse.data.data ?? []);
-      setUserPermission(userPermission.data.data ?? [])
-    } catch (error) {
-      handleError(error);
-    } finally {
-      setIsLoading(false);
+  const { data: userPermission = [], isLoading } = useQuery<UsersPermission[], Error>(
+    'userPermission',
+    fetchUserPermission,
+    {
+      refetchOnWindowFocus: true,
     }
-  }, [handleError]);
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchData();
-    }, [fetchData])
   );
+
+  const { data: user = [] } = useQuery<Users[], Error>(
+    'user',
+    fetchUsers,
+    {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      staleTime: 1000 * 60 * 5,
+      cacheTime: 1000 * 60 * 10
+    });
+
+  const { data: groupUser = [] } = useQuery<GroupUsers[], Error>(
+    'groupUser',
+    fetchGroupUser,
+    {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      staleTime: 1000 * 60 * 5,
+      cacheTime: 1000 * 60 * 10
+    });
+
+  const mutation = useMutation(saveUserPermission, {
+    onSuccess: (data) => {
+      showSuccess(data.message);
+      setIsVisible(false)
+      queryClient.invalidateQueries('userPermission');
+    },
+    onError: handleError,
+  });
 
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
-    }, 500);
+    }, 300);
 
     return () => {
       clearTimeout(handler);
@@ -69,22 +99,15 @@ const Managepermissions = React.memo(() => {
 
   const saveData = useCallback(async (values: InitialValuesManagepermission) => {
     const data = {
+      Prefix: state.UsersPermission ?? "",
       UserID: values.UserID,
       UserName: values.UserName,
       GUserID: values.GUserID,
       IsActive: values.IsActive
     };
 
-    try {
-      const response = await axiosInstance.post("User_service.asmx/SaveUser", data);
-      setIsVisible(!response.data.status);
-      showSuccess(String(response.data.message));
-
-      await fetchData();
-    } catch (error) {
-      handleError(error);
-    }
-  }, [fetchData, handleError]);
+    mutation.mutate(data);
+  }, [mutation, state]);
 
   const handleAction = useCallback(async (action?: string, item?: string) => {
     try {
@@ -98,7 +121,6 @@ const Managepermissions = React.memo(() => {
           UserName: userData.UserName ?? "",
           GUserID: userData.GUserID ?? "",
           IsActive: userData.IsActive,
-          disables: Boolean(userData.Disables),
         });
         setIsVisible(true);
         setIsEditing(true);
@@ -106,13 +128,12 @@ const Managepermissions = React.memo(() => {
         const endpoint = action === "activeIndex" ? "ChangeUser" : "DeleteUser";
         const response = await axiosInstance.post(`User_service.asmx/${endpoint}`, { UserID: item });
         showSuccess(String(response.data.message));
-
-        await fetchData();
+        queryClient.invalidateQueries('machineGroups');
       }
     } catch (error) {
       handleError(error);
     }
-  }, [fetchData, handleError]);
+  }, [handleError, queryClient]);
 
   const tableData = useMemo(() => {
     return userPermission.map((item) => [
@@ -129,11 +150,10 @@ const Managepermissions = React.memo(() => {
       UserName: "",
       IsActive: true,
       GUserID: "",
-      disables:false
     });
     setIsEditing(false);
     setIsVisible(true);
-  }, []);
+  }, [setInitialValues, setIsEditing, setIsVisible]);
 
   const customtableProps = useMemo(() => ({
     Tabledata: tableData,
@@ -151,7 +171,7 @@ const Managepermissions = React.memo(() => {
       },
     ],
     handleAction,
-    showMessage:2,
+    showMessage: 1,
     searchQuery: debouncedSearchQuery,
   }), [tableData, debouncedSearchQuery, handleAction]);
 

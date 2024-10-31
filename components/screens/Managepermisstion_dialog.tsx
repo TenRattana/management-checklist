@@ -94,9 +94,8 @@ const Managepermisstion_dialog = ({ isVisible, setIsVisible, isEditing, initialV
                                         </Text>
                                         <Switch
                                             style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                            color={values.disables ? theme.colors.inversePrimary : theme.colors.onPrimaryContainer}
+                                            color={theme.colors.inversePrimary}
                                             value={values.IsActive}
-                                            disabled={Boolean(values.disables)}
                                             onValueChange={(v: boolean) => {
                                                 setFieldValue("IsActive", v);
                                             }}

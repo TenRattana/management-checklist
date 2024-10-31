@@ -13,6 +13,7 @@ const initialState: AppProps = {
     MatchFormMachine: "MFM",
     Form: "F",
     ExpectedResult: "ER",
+    UsersPermission: "U"
 };
 
 const prefixSlice = createSlice({
@@ -74,6 +75,11 @@ const prefixSlice = createSlice({
 
             state.ExpectedResult = ExpectedResult || "";
         },
+        setPrefixUsersPermission: (state, action: PayloadAction<{ UsersPermission?: string }>) => {
+            const { UsersPermission } = action.payload;
+
+            state.UsersPermission = UsersPermission || "";
+        },
     },
 
 });
@@ -90,6 +96,7 @@ export const {
     setPrefixMachine,
     setPrefixMatchCheckListOption,
     setPrefixMatchFormMachine,
+    setPrefixUsersPermission
 } = prefixSlice.actions;
 
 export default prefixSlice.reducer;

@@ -17,6 +17,7 @@ import {
     setPrefixMachine,
     setPrefixMatchCheckListOption,
     setPrefixMatchFormMachine,
+    setPrefixUsersPermission,
     setAppName
 } from "@/slices";
 
@@ -69,6 +70,9 @@ const RenderFormik: React.FC<{ field: string; setEdit: (v: boolean) => void; }> 
                         break;
                     case 'MatchFormMachine':
                         dispatch(setPrefixMatchFormMachine({ MatchFormMachine: values[field] }));
+                        break;
+                    case 'UsersPermission':
+                        dispatch(setPrefixUsersPermission({ UsersPermission: values[field] }));
                         break;
                     default:
                         break;
@@ -157,7 +161,7 @@ const Configuration: React.FC = React.memo(() => {
 
             <View id="config-prefix" style={masterdataStyles.configPrefix}>
                 <Text style={[masterdataStyles.settingText, masterdataStyles.textBold]}>Fix Prefixes</Text>
-                {['GroupMachine', 'Machine', 'CheckList', 'GroupCheckList', 'CheckListOption', 'MatchCheckListOption', 'MatchFormMachine', 'Form', 'ExpectedResult'].map((item) => (
+                {['GroupMachine', 'Machine', 'CheckList', 'GroupCheckList', 'CheckListOption', 'MatchCheckListOption', 'MatchFormMachine', 'Form', 'ExpectedResult', 'UsersPermission'].map((item) => (
                     <ConfigItem
                         key={item}
                         label={item}

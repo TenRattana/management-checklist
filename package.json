@@ -11,7 +11,8 @@
     "test": "jest --watchAll",
     "lint": "expo lint",
     "tsc": "tsc --watch",
-    "build": "webpack --config webpack.config.js"
+    "build": "webpack --config webpack.config.js",
+    "format": "prettier --write ."
   },
   "jest": {
     "preset": "jest-expo"

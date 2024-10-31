@@ -52,7 +52,7 @@ const MachineGroupScreen: React.FC = React.memo(() => {
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
 
-    const { data: machines = [], isLoading } = useQuery<Machine[], Error>(
+    const { data: machines = [], isLoading, } = useQuery<Machine[], Error>(
         'machines',
         fetchMachines,
         {
@@ -73,6 +73,7 @@ const MachineGroupScreen: React.FC = React.memo(() => {
             showSuccess(data.message);
             setIsVisible(false)
             queryClient.invalidateQueries('machines');
+            queryClient.refetchQueries('machineGroups');
         },
         onError: handleError,
     });
@@ -129,6 +130,7 @@ const MachineGroupScreen: React.FC = React.memo(() => {
                 const response = await axiosInstance.post(`Machine_service.asmx/${endpoint}`, { MachineID: item });
                 showSuccess(String(response.data.message));
                 queryClient.invalidateQueries('machines');
+                queryClient.refetchQueries('machineGroups');
             }
         } catch (error) {
             handleError(error);

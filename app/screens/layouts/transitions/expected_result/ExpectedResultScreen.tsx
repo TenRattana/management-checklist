@@ -7,7 +7,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts";
 import { ExpectedResult } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 
 const fetchExpectedResults = async (): Promise<ExpectedResult[]> => {
     const response = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResults");
@@ -21,13 +21,12 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
-    const queryClient = useQueryClient();
 
     const { data: expectedResult = [], isLoading } = useQuery<ExpectedResult[], Error>(
         'expectedResult',
         fetchExpectedResults,
         {
-            refetchOnWindowFocus: false,
+            refetchOnWindowFocus: true,
         });
 
     useEffect(() => {
@@ -92,7 +91,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
             },
         ],
         handleAction,
-        showMessage: 2,
+        showMessage: [0, 1],
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);
 

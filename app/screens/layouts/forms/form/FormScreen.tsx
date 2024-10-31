@@ -29,14 +29,17 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
         'form',
         fetchForm,
         {
-            refetchOnWindowFocus: false,
+            refetchOnWindowFocus: true,
         });
 
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearchQuery(searchQuery);
         }, 300);
-        return () => clearTimeout(handler);
+
+        return () => {
+            clearTimeout(handler);
+        };
     }, [searchQuery]);
 
     useEffect(() => {
@@ -84,7 +87,7 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
-            { label: "disable", align: "flex-start" },
+            { label: "Disable", align: "flex-start" },
             { label: "Form Name", align: "flex-start" },
             { label: "Form Description", align: "flex-start" },
             { label: "Status", align: "center" },
@@ -93,9 +96,9 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
             { label: "View", align: "center" },
         ],
         flexArr: [0, 2, 4, 1, 1, 1, 1],
-        actionIndex: [{ disables: 0, changeIndex: 3, copyIndex: 4, preIndex: 5 }],
-        handleAction,
+        actionIndex: [{ disables: 0, changeIndex: 4, copyIndex: 5, preIndex: 6 }],
         showMessage: 1,
+        handleAction,
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);
 
