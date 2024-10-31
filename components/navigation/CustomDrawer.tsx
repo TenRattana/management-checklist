@@ -81,7 +81,6 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
 
                         {session.GUserName === "SuperAdmin" && (
                             <>
-                                {renderPressable('Test', 'TestScreen')}
                                 {renderPressable('Managepermissions', 'Managepermissions')}
                             </>
                         )}
