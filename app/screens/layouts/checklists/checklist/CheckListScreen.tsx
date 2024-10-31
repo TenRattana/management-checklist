@@ -124,7 +124,7 @@ const CheckListScreen = React.memo(() => {
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
-            { label: "disable", align: "flex-start" },
+            { label: "", align: "flex-start" },
             { label: "Check List Name", align: "flex-start" },
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },

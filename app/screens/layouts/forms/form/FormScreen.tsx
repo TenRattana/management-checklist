@@ -87,7 +87,7 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
-            { label: "Disable", align: "flex-start" },
+            { label: "", align: "flex-start" },
             { label: "Form Name", align: "flex-start" },
             { label: "Form Description", align: "flex-start" },
             { label: "Status", align: "center" },

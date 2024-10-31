@@ -130,7 +130,7 @@ const ChecklistGroupScreen = React.memo(() => {
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
-            { label: "disable", align: "flex-start" },
+            { label: "", align: "flex-start" },
             { label: "Group Option Name", align: "flex-start" },
             { label: "Status", align: "center" },
             { label: "", align: "center" },

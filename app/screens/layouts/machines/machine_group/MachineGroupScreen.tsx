@@ -131,7 +131,7 @@ const MachineGroupScreen = React.memo(() => {
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
-            { label: "Disable", align: "flex-start" },
+            { label: "", align: "flex-start" },
             { label: "Machine Group Name", align: "flex-start" },
             { label: "Description", align: "flex-start" },
             { label: "Status", align: "center" },

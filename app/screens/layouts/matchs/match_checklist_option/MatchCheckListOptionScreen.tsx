@@ -177,7 +177,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
-            { label: "Disable", align: "flex-start" },
+            { label: "", align: "flex-start" },
             { label: "Group Name", align: "flex-start" },
             { label: "Option Name", align: "flex-start" },
             { label: "Status", align: "center" },

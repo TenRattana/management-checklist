@@ -130,7 +130,7 @@ const CheckListOptionScreen = React.memo(() => {
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
-            { label: "Disable", align: "flex-start" },
+            { label: "", align: "flex-start" },
             { label: "Check List Option Name", align: "flex-start" },
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
