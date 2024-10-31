@@ -7,7 +7,7 @@ import { useRes, useTheme } from "@/app/contexts";
 import { Formik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import useMasterdataStyles from "@/styles/common/masterdata";
 
 interface CreateForm {
@@ -19,7 +19,7 @@ interface CreateForm {
 
 const ConfigItemForm: React.FC<CreateForm> = ({ label, value, editable, onEdit }) => {
     const { theme } = useTheme();
-    const { spacing } = useRes();
+    const { spacing , fontSize} = useRes();
     const masterdataStyles = useMasterdataStyles();
 
     return (
@@ -33,6 +33,7 @@ const ConfigItemForm: React.FC<CreateForm> = ({ label, value, editable, onEdit }
                     onPress={() => onEdit(true)}
                     iconColor={theme.colors.blue}
                     size={spacing.large + 5}
+                    style={styles.iconButton}
                 />
             )}
         </AccessibleView>
@@ -42,7 +43,7 @@ const ConfigItemForm: React.FC<CreateForm> = ({ label, value, editable, onEdit }
 const RenderFormik: React.FC<{ field: string; setEdit: (v: boolean) => void; }> = React.memo(({ field, setEdit }) => {
     const dispatch = useDispatch();
     const state = useSelector((state: any) => state.form);
-    const { spacing } = useRes();
+    const { spacing , fontSize } = useRes();
     const { theme } = useTheme();
 
     return (
@@ -61,21 +62,25 @@ const RenderFormik: React.FC<{ field: string; setEdit: (v: boolean) => void; }> 
         >
             {({ handleSubmit, errors, touched, setFieldValue, setTouched, values }) => (
                 <Animated.View entering={FadeIn} exiting={FadeOut} style={styles.formContainer}>
-                    <Inputs
-                        placeholder={`Enter ${field}`}
-                        label={field}
-                        handleChange={(value) => setFieldValue(field, value)}
-                        handleBlur={() => setTouched({ ...touched, [field]: true })}
-                        value={values[field]}
-                        error={touched[field] && Boolean(errors[field])}
-                        errorMessage={String(errors[field])}
-                        testId={`${field}-cf`}
-                    />
+                    <View style={{ width: fontSize === "large" ?'70%':fontSize === "medium" ? '75%' : '90%' }}>
+                        <Inputs
+                            placeholder={`Enter ${field}`}
+                            label={field}
+                            handleChange={(value) => setFieldValue(field, value)}
+                            handleBlur={() => setTouched({ ...touched, [field]: true })}
+                            value={values[field]}
+                            error={touched[field] && Boolean(errors[field])}
+                            errorMessage={String(errors[field])}
+                            testId={`${field}-cf`}
+                        />
+                    </View>
+
                     <IconButton
                         icon="check"
                         onPress={() => handleSubmit()}
                         iconColor={theme.colors.green}
-                        size={spacing.large + 5}
+                        size={spacing.large}
+                        style={styles.iconButton}
                     />
                 </Animated.View>
             )}
@@ -92,24 +97,32 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginVertical: 10,
-        paddingVertical: 10,
+        paddingVertical: 12,
         paddingHorizontal: 15,
-        borderRadius: 8,
-        backgroundColor: '#f9f9f9',
+        borderRadius: 10,
+        backgroundColor: '#ffffff',
+        borderColor: '#e0e0e0',
+        borderWidth: 1,
         shadowColor: '#000',
         shadowOpacity: 0.1,
-        shadowRadius: 5,
-        elevation: 2,
+        shadowRadius: 8,
+        elevation: 3,
     },
     configPrefixText: {
         flex: 1,
         marginRight: 10,
         fontWeight: '600',
         fontSize: 16,
+        color: '#333',
     },
     formContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         flex: 1,
+        paddingHorizontal: 5,
+    },
+    iconButton: {
+        padding: 0,
+        margin: 0
     },
 });

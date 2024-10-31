@@ -83,7 +83,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
         if (selectedIndex === 0) {
             return (
                 <>
-                    <AccessibleView name="container-formname" style={{ marginHorizontal: 10 }}>
+                    <AccessibleView name="container-formname" style={{ marginHorizontal: 10 ,marginTop:20}}>
                         {['FormName', 'Description'].map((item) => (
                             <ConfigItemForm
                                 key={item}
