@@ -67,10 +67,11 @@ const Match_checklist_option = ({
                                                     : dropgroupCheckListOption}
                                                 value={field.value}
                                                 handleChange={(value) => {
-                                                    form.setFieldValue(field.name, value.value);
+                                                    const stringValue = (value as { value: string }).value;
+                                                    form.setFieldValue(field.name, stringValue);
                                                     setTimeout(() => {
                                                         form.setFieldTouched(field.name, true);
-                                                    }, 0)
+                                                    }, 0);
                                                 }}
                                                 handleBlur={() => {
                                                     form.setFieldTouched(field.name, true);

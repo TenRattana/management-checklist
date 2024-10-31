@@ -49,10 +49,11 @@ const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initial
                                                     ? machine.filter((v) => v.IsActive) : dropmachine || []}
                                                 value={field.value}
                                                 handleChange={(value) => {
-                                                    form.setFieldValue(field.name, value.value);
+                                                    const stringValue = (value as { value: string }).value;
+                                                    form.setFieldValue(field.name, stringValue);
                                                     setTimeout(() => {
                                                         form.setFieldTouched(field.name, true);
-                                                    }, 0)
+                                                    }, 0);
                                                 }}
                                                 handleBlur={() => {
                                                     form.setFieldTouched(field.name, true);
@@ -74,10 +75,11 @@ const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initial
                                                     ? forms.filter((v) => v.IsActive) : dropform || []}
                                                 value={field.value}
                                                 handleChange={(value) => {
-                                                    form.setFieldValue(field.name, value.value);
+                                                    const stringValue = (value as { value: string }).value;
+                                                    form.setFieldValue(field.name, stringValue);
                                                     setTimeout(() => {
                                                         form.setFieldTouched(field.name, true);
-                                                    }, 0)
+                                                    }, 0);
                                                 }}
                                                 handleBlur={() => {
                                                     form.setFieldTouched(field.name, true);

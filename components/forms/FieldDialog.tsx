@@ -18,7 +18,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
     , checkListType, dataType, checkList, groupCheckListOption, dropcheckList, dropcheckListType, dropdataType, dropgroupCheckListOption
 }: FieldDialogProps) => {
     const [isVisibleCL, setIsVisibleCL] = useState<boolean>(false)
-    const [initialValueCL, setInitialValueCL] = useState<InitialValuesChecklist>({ checkListId: "", checkListName: "", isActive: false })
+    const [initialValueCL, setInitialValueCL] = useState<InitialValuesChecklist>({ checkListId: "", checkListName: "", isActive: false, disables: false })
     const masterdataStyles = useMasterdataStyles()
     const { showSuccess, handleError } = useToast();
 
@@ -204,10 +204,11 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                         data={editMode ? checkList : dropcheckList}
                                                         value={field.value}
                                                         handleChange={(value) => {
-                                                            form.setFieldValue(field.name, value.value);
+                                                            const stringValue = (value as { value: string }).value; 
+                                                            form.setFieldValue(field.name, stringValue);
                                                             setTimeout(() => {
                                                                 form.setFieldTouched(field.name, true);
-                                                            }, 0)
+                                                            }, 0);
                                                         }}
                                                         handleBlur={() => {
                                                             form.setFieldTouched(field.name, true);
@@ -228,10 +229,11 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                         data={editMode ? checkListType : dropcheckListType}
                                                         value={field.value}
                                                         handleChange={(value) => {
-                                                            form.setFieldValue(field.name, value.value);
+                                                            const stringValue = (value as { value: string }).value; 
+                                                            form.setFieldValue(field.name, stringValue);
                                                             setTimeout(() => {
                                                                 form.setFieldTouched(field.name, true);
-                                                            }, 0)
+                                                            }, 0);
                                                         }}
                                                         handleBlur={() => {
                                                             form.setFieldTouched(field.name, true);
@@ -254,10 +256,11 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                                 data={editMode ? groupCheckListOption : dropgroupCheckListOption}
                                                                 value={field.value}
                                                                 handleChange={(value) => {
-                                                                    form.setFieldValue(field.name, value.value);
+                                                                    const stringValue = (value as { value: string }).value; 
+                                                                    form.setFieldValue(field.name, stringValue);
                                                                     setTimeout(() => {
                                                                         form.setFieldTouched(field.name, true);
-                                                                    }, 0)
+                                                                    }, 0);
                                                                 }}
                                                                 handleBlur={() => {
                                                                     form.setFieldTouched(field.name, true);
@@ -282,10 +285,11 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                                 data={editMode ? dataType : dropdataType}
                                                                 value={field.value}
                                                                 handleChange={(value) => {
-                                                                    form.setFieldValue(field.name, value.value);
+                                                                    const stringValue = (value as { value: string }).value; 
+                                                                    form.setFieldValue(field.name, stringValue);
                                                                     setTimeout(() => {
                                                                         form.setFieldTouched(field.name, true);
-                                                                    }, 0)
+                                                                    }, 0);
                                                                 }}
                                                                 handleBlur={() => {
                                                                     form.setFieldTouched(field.name, true);
@@ -416,7 +420,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                 isVisible={isVisibleCL}
                 setIsVisible={() => {
                     setIsVisibleCL(false);
-                    setInitialValueCL({ checkListId: "", checkListName: "", isActive: false });
+                    setInitialValueCL({ checkListId: "", checkListName: "", isActive: false, disables: false });
                 }}
                 initialValues={initialValueCL}
                 saveData={saveDataCheckList}

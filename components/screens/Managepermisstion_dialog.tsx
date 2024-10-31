@@ -49,10 +49,11 @@ const Managepermisstion_dialog = ({ isVisible, setIsVisible, isEditing, initialV
                                                 data={users}
                                                 value={field.value}
                                                 handleChange={(value) => {
-                                                    form.setFieldValue(field.name, value.value);
+                                                    const stringValue = (value as { value: string }).value;
+                                                    form.setFieldValue(field.name, stringValue);
                                                     setTimeout(() => {
                                                         form.setFieldTouched(field.name, true);
-                                                    }, 0)
+                                                    }, 0);
                                                 }}
                                                 handleBlur={() => {
                                                     form.setFieldTouched(field.name, true);
@@ -73,10 +74,11 @@ const Managepermisstion_dialog = ({ isVisible, setIsVisible, isEditing, initialV
                                                 data={groupUser}
                                                 value={field.value}
                                                 handleChange={(value) => {
-                                                    form.setFieldValue(field.name, value.value);
+                                                    const stringValue = (value as { value: string }).value;
+                                                    form.setFieldValue(field.name, stringValue);
                                                     setTimeout(() => {
                                                         form.setFieldTouched(field.name, true);
-                                                    }, 0)
+                                                    }, 0);
                                                 }}
                                                 handleBlur={() => {
                                                     form.setFieldTouched(field.name, true);

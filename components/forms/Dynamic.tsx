@@ -98,7 +98,7 @@ const DynamicForm = ({
           <Checkboxs
             option={option}
             hint={error ? errorMessages?.[MCListID] as string || "" : ""}
-            handleChange={(value) => handleChange(MCListID, value.split(','))}
+            handleChange={(value: string | any) => handleChange(MCListID, (value as string).split(','))}
             handleBlur={handleBlur}
             value={values}
             testId={`checkbox-${MCListID}`}

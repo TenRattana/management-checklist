@@ -27,7 +27,7 @@ const GenerateQR = React.memo(() => {
                 placeholder=""
                 label="QR Code Example"
                 value={qrValue}
-                handleChange={handleChange}
+                handleChange={handleChange as any}
             />
             {generateQR(qrValue)}
         </View>

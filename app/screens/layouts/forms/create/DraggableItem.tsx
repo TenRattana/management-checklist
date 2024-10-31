@@ -53,8 +53,8 @@ const DraggableItem: React.FC<{
     const onGestureEnd = (e: HandlerStateChangeEvent) => {
         const { absoluteX, absoluteY } = e.nativeEvent;
 
-        if (startPosition && !isNaN(absoluteX) && !isNaN(absoluteY)) {
-            runOnJS(onDrop)(item, absoluteX, absoluteY);
+        if (startPosition && !isNaN(Number(absoluteX)) && !isNaN(Number(absoluteY))) {
+            runOnJS(onDrop)(item, Number(absoluteX), Number(absoluteY));
         }
 
         itemTranslateX.value = withSpring(0);

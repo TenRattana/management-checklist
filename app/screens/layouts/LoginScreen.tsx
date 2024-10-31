@@ -68,7 +68,7 @@ const LoginScreen: React.FC = React.memo(() => {
                 <Inputs
                   placeholder="Enter Username"
                   label="Username"
-                  handleChange={handleChange("username")}
+                  handleChange={handleChange("username") as any}
                   handleBlur={handleBlur("username")}
                   value={values.username}
                   error={touched.username && Boolean(errors.username)}

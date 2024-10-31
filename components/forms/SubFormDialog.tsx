@@ -1,14 +1,14 @@
 import React from "react";
 import { Pressable, View } from "react-native";
-import AccessibleView from "@/components/AccessibleView";
 import { Inputs } from "@/components/common";
 import { Portal, Dialog } from "react-native-paper";
-import { Formik } from "formik";
+import { FastField, Formik } from "formik";
 import * as Yup from "yup";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { SubFormDialogProps } from "@/typing/value";
 import { BaseSubForm } from "@/typing/form";
 import Text from "@/components/Text";
+import { AccessibleView } from "..";
 
 const validationSchemaSubForm = Yup.object().shape({
     SFormName: Yup.string().required("The machine group name field is required."),
@@ -70,28 +70,38 @@ const SubFormDialog = ({
                                 isValid,
                                 dirty,
                             }) => (
-                                <View id="sfd">
-                                    <Inputs
-                                        placeholder="Enter Sub Form Name"
-                                        label="Sub Form Name"
-                                        handleChange={handleChange("SFormName")}
-                                        handleBlur={handleBlur("SFormName")}
-                                        value={values.SFormName}
-                                        error={touched.SFormName && Boolean(errors.SFormName)}
-                                        errorMessage={touched.SFormName ? errors.SFormName : ""}
-                                    />
+                                <AccessibleView name="sfd">
+                                    <FastField name="SFormName">
+                                        {({ field, form }: any) => (
+                                            <Inputs
+                                                placeholder="Enter Sub Form Name"
+                                                label="Sub Form Name"
+                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                value={String(field.value ?? "")}
+                                                error={form.touched.SFormName && Boolean(form.errors.SFormName)}
+                                                errorMessage={form.touched.SFormName ? form.errors.SFormName : ""}
+                                                testId={`SFormName-sform`}
+                                            />
+                                        )}
+                                    </FastField >
 
-                                    <Inputs
-                                        placeholder="Enter Columns"
-                                        label="Columns"
-                                        handleChange={handleChange("Columns")}
-                                        handleBlur={handleBlur("Columns")}
-                                        value={String(values.Columns ?? "")}
-                                        error={touched.Columns && Boolean(errors.Columns)}
-                                        errorMessage={touched.Columns ? errors.Columns : ""}
-                                    />
+                                    <FastField name="Columns">
+                                        {({ field, form }: any) => (
+                                            <Inputs
+                                                placeholder="Enter Columns"
+                                                label="Columns"
+                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                value={String(field.value ?? "")}
+                                                error={form.touched.Columns && Boolean(form.errors.Columns)}
+                                                errorMessage={form.touched.Columns ? form.errors.Columns : ""}
+                                                testId={`Columns-sform`}
+                                            />
+                                        )}
+                                    </FastField >
 
-                                    <View id="sfd-action" style={masterdataStyles.containerAction}>
+                                    <AccessibleView name="sfd-action" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}
@@ -146,8 +156,8 @@ const SubFormDialog = ({
                                                 Cancel
                                             </Text>
                                         </Pressable>
-                                    </View>
-                                </View>
+                                    </AccessibleView>
+                                </AccessibleView>
                             )}
                         </Formik>
                     )}

@@ -100,7 +100,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                             return (
                               <FastField name={field.MCListID} key={`field-${fieldIndex}-${subForm.Columns}-${field.MCListID}`}>
                                 {({ field: fastFieldProps }: FieldProps) => {
-                                  const type = dataType.find(v => v.DTypeID === field.DTypeID)?.DTypeName;
+                                  const type = dataType?.find(v => v.DTypeID === field.DTypeID)?.DTypeName;
 
                                   const handleBlur = () => {
                                     if (type === "Number") {
@@ -140,7 +140,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                                           }, 0);
                                         }}
                                         handleBlur={handleBlur}
-                                        groupCheckListOption={groupCheckListOption}
+                                        groupCheckListOption={groupCheckListOption ?? []}
                                         error={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
                                         errorMessages={errors}
                                       />
