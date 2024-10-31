@@ -16,8 +16,6 @@ import { useRes, useTheme } from "@/app/contexts";
 import { defaultDataForm } from "@/slices";
 import DraggableItem from "./DraggableItem";
 
-
-
 const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigation }) => {
     const { state, dispatch, checkList, groupCheckListOption, checkListType, dataType, validationSchema } = useForm(route);
     const createform = useCreateformStyle();
@@ -80,7 +78,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
             dispatch(defaultDataForm({ currentField: newField }));
         }
     };
-
 
     const renderItem = () => {
         if (selectedIndex === 0) {

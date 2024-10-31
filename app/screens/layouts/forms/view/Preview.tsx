@@ -77,7 +77,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
 
     return (
         <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]}>
-            {/* <Stack.Screen
+            <Stack.Screen
                 options={{
                     headerTitle: state.MachineName ?? "",
                     headerRight: () => (
@@ -88,11 +88,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                         </View>
                     )
                 }}
-            /> */}
-
-            {/* <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
-            <Divider />
-            <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text> */}
+            />
 
             <FlatList
                 data={[{}]}
@@ -131,7 +127,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                                                 <Field name={field.MCListID} key={`field-${fieldIndex}-${subForm.Columns}`}>
                                                     {({ field: fastFieldProps }: FieldProps) => {
 
-                                                        const type = dataType.find(v => v.DTypeID === field.DTypeID)?.DTypeName;
+                                                        const type = dataType?.find(v => v.DTypeID === field.DTypeID)?.DTypeName;
 
                                                         const handleBlur = () => {
                                                             if (type === "Number") {
@@ -159,7 +155,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                                                             <View id="container-layout2" style={containerStyle}>
                                                                 <Dynamic
                                                                     field={field}
-                                                                    values={String(fastFieldProps.value)}
+                                                                    values={String(fastFieldProps.value ?? "")}
                                                                     handleChange={(fieldname: string, value: any) => {
                                                                         setFieldValue(fastFieldProps.name, value);
                                                                         setTimeout(() => {
@@ -170,7 +166,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                                                                         }, 0);
                                                                     }}
                                                                     handleBlur={handleBlur}
-                                                                    groupCheckListOption={groupCheckListOption}
+                                                                    groupCheckListOption={groupCheckListOption ?? []}
                                                                     error={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
                                                                     errorMessages={errors}
                                                                     type={type}
@@ -188,6 +184,13 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                     </Formik>
 
                 )
+                )}
+                ListHeaderComponent={() => (
+                    <>
+                    <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
+                    <Divider />
+                    <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
+                    </>
                 )}
                 keyExtractor={(_, index) => `index-preview-${index}`}
                 onScroll={handleScroll}

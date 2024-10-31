@@ -18,6 +18,7 @@ import { BaseFormState, RowItemProps } from '@/typing/form'
 import { DragfieldProps } from "@/typing/tag";
 import { useTheme, useToast } from "@/app/contexts";
 import Text from '@/components/Text'
+import useMasterdataStyles from "@/styles/common/masterdata";
 
 const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType, checkListType, groupCheckListOption, checkList }) => {
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
@@ -30,6 +31,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
     const { handleError } = useToast();
     const { theme } = useTheme()
     const createformStyles = useCreateformStyle();
+    const masterdataStyles = useMasterdataStyles()
 
     const handleDropField = (data: Omit<BaseFormState, 'DisplayOrder'>[]) => {
         runOnJS(dispatch)(setDragField({ data }));
@@ -119,7 +121,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
                 style={[createformStyles.fieldContainer, { justifyContent: "center", opacity: 0.5 }]}
             >
                 <IconButton icon="plus" iconColor={theme.colors.background} size={spacing.large} style={createformStyles.icon} animated />
-                <Text style={createformStyles.addSubFormText}>Add Field</Text>
+                <Text style={[masterdataStyles.textFFF, { marginLeft: 8, paddingVertical: 10 }]}>Add Field</Text>
             </Pressable>
 
             <FieldDialog
