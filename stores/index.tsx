@@ -1,17 +1,18 @@
+// src/store/index.ts
 import { configureStore } from "@reduxjs/toolkit";
 import counterForm from "@/slices/forms/counterForm";
 import counterPrefix from '@/slices/prefix/counterPrefix';
 import { persistStore, persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
+import { createPersistStorage } from './noopstorage'; // Import your function
 
 const formPersistConfig = {
   key: 'form',
-  storage,
+  storage: createPersistStorage(), // Use the function here
 };
 
 const prefixPersistConfig = {
   key: 'prefix',
-  storage,
+  storage: createPersistStorage(), // Use the function here
 };
 
 const formReducer = persistReducer(formPersistConfig, counterForm);

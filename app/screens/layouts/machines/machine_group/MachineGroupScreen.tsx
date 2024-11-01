@@ -17,7 +17,13 @@ const fetchMachineGroups = async (): Promise<GroupMachine[]> => {
     return response.data.data ?? [];
 };
 
-const saveGroupMachine = async (data: GroupMachine): Promise<{ message: string }> => {
+const saveGroupMachine = async (data: {
+    Prefix: any;
+    GMachineID: string;
+    GMachineName: string;
+    Description: string;
+    IsActive: boolean;
+}): Promise<{ message: string }> => {
     const response = await axiosInstance.post("GroupMachine_service.asmx/SaveGroupMachine", data);
     return response.data;
 };
@@ -75,7 +81,6 @@ const MachineGroupScreen = React.memo(() => {
             GMachineName: values.machineGroupName,
             Description: values.description,
             IsActive: values.isActive,
-            Disables: values.disables
         };
 
         mutation.mutate(data);

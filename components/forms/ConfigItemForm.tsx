@@ -1,5 +1,5 @@
 import React from "react";
-import { IconButton, Text } from "react-native-paper";
+import { IconButton } from "react-native-paper";
 import AccessibleView from "@/components/AccessibleView";
 import Inputs from "@/components/common/Inputs";
 import { updateFormName, updateFormDescription } from "@/slices";
@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { StyleSheet, View } from "react-native";
 import useMasterdataStyles from "@/styles/common/masterdata";
+import Text from "@/components/Text";
 
 interface CreateForm {
     label: string;
@@ -19,23 +20,25 @@ interface CreateForm {
 
 const ConfigItemForm: React.FC<CreateForm> = ({ label, value, editable, onEdit }) => {
     const { theme } = useTheme();
-    const { spacing , fontSize} = useRes();
+    const { spacing, fontSize } = useRes();
     const masterdataStyles = useMasterdataStyles();
 
     return (
         <AccessibleView name="" style={styles.container}>
-            <Text variant='labelMedium' style={[styles.configPrefixText, masterdataStyles.settingText]} ellipsizeMode="tail" numberOfLines={1}>
-                {editable ? <RenderFormik field={label} setEdit={onEdit} /> : `${label}: ${value}`}
-            </Text>
-            {!editable && (
-                <IconButton
-                    icon="pencil-box"
-                    onPress={() => onEdit(true)}
-                    iconColor={theme.colors.blue}
-                    size={spacing.large + 5}
-                    style={styles.iconButton}
-                />
-            )}
+            {editable ? <RenderFormik field={label} setEdit={onEdit} /> :
+                <>
+                    <Text style={[styles.configPrefixText, masterdataStyles.settingText]} ellipsizeMode="tail" numberOfLines={1}>
+                        {`${label} : ${!editable ? value : ""}`}
+                    </Text>
+                    <IconButton
+                        icon="pencil-box"
+                        onPress={() => onEdit(true)}
+                        iconColor={theme.colors.blue}
+                        size={spacing.large + 5}
+                        style={styles.iconButton}
+                    />
+                </>
+            }
         </AccessibleView>
     );
 };
@@ -43,7 +46,7 @@ const ConfigItemForm: React.FC<CreateForm> = ({ label, value, editable, onEdit }
 const RenderFormik: React.FC<{ field: string; setEdit: (v: boolean) => void; }> = React.memo(({ field, setEdit }) => {
     const dispatch = useDispatch();
     const state = useSelector((state: any) => state.form);
-    const { spacing , fontSize } = useRes();
+    const { spacing, fontSize } = useRes();
     const { theme } = useTheme();
 
     return (
@@ -62,13 +65,13 @@ const RenderFormik: React.FC<{ field: string; setEdit: (v: boolean) => void; }> 
         >
             {({ handleSubmit, errors, touched, setFieldValue, setTouched, values }) => (
                 <Animated.View entering={FadeIn} exiting={FadeOut} style={styles.formContainer}>
-                    <View style={{ width: fontSize === "large" ?'70%':fontSize === "medium" ? '75%' : '90%' }}>
+                    <View style={[{ width: fontSize === "large" ? 300 : 250 }]}>
                         <Inputs
                             placeholder={`Enter ${field}`}
                             label={field}
                             handleChange={(value) => setFieldValue(field, value)}
                             handleBlur={() => setTouched({ ...touched, [field]: true })}
-                            value={values[field]}
+                            value={String(values[field] ?? "")}
                             error={touched[field] && Boolean(errors[field])}
                             errorMessage={String(errors[field])}
                             testId={`${field}-cf`}
@@ -92,24 +95,16 @@ export default React.memo(ConfigItemForm);
 
 const styles = StyleSheet.create({
     container: {
-        width: '100%',
+        flex: 1,
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexBasis: '100%',
         alignItems: 'center',
+        justifyContent: 'space-between',
         marginVertical: 10,
         paddingVertical: 12,
         paddingHorizontal: 15,
-        borderRadius: 10,
-        backgroundColor: '#ffffff',
-        borderColor: '#e0e0e0',
-        borderWidth: 1,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 3,
     },
     configPrefixText: {
-        flex: 1,
         marginRight: 10,
         fontWeight: '600',
         fontSize: 16,
