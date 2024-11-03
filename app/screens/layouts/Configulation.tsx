@@ -13,6 +13,7 @@ import {
     setPrefixCheckListOption,
     setPrefixExpectedResult,
     setPrefixForm,
+    setPrefixSubForm,
     setPrefixGroupCheckList,
     setPrefixMachine,
     setPrefixMatchCheckListOption,
@@ -58,6 +59,9 @@ const RenderFormik: React.FC<{ field: string; setEdit: (v: boolean) => void; }> 
                         break;
                     case 'Form':
                         dispatch(setPrefixForm({ Form: values[field] }));
+                        break;
+                    case 'SubForm':
+                        dispatch(setPrefixSubForm({ SubForm: values[field] }));
                         break;
                     case 'GroupCheckList':
                         dispatch(setPrefixGroupCheckList({ GroupCheckList: values[field] }));
@@ -140,6 +144,7 @@ const Configuration: React.FC = React.memo(() => {
         MatchCheckListOption: false,
         MatchFormMachine: false,
         Form: false,
+        SubForm:false,
         ExpectedResult: false
     });
 
@@ -161,7 +166,7 @@ const Configuration: React.FC = React.memo(() => {
 
             <View id="config-prefix" style={masterdataStyles.configPrefix}>
                 <Text style={[masterdataStyles.settingText, masterdataStyles.textBold]}>Fix Prefixes</Text>
-                {['GroupMachine', 'Machine', 'CheckList', 'GroupCheckList', 'CheckListOption', 'MatchCheckListOption', 'MatchFormMachine', 'Form', 'ExpectedResult', 'UsersPermission'].map((item) => (
+                {['GroupMachine', 'Machine', 'CheckList', 'GroupCheckList', 'CheckListOption', 'MatchCheckListOption', 'MatchFormMachine', 'Form', 'SubForm', 'ExpectedResult', 'UsersPermission'].map((item) => (
                     <ConfigItem
                         key={item}
                         label={item}

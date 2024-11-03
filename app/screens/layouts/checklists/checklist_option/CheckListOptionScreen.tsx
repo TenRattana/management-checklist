@@ -17,7 +17,13 @@ const fetchCheckListOption = async (): Promise<CheckListOption[]> => {
     return response.data.data ?? [];
 };
 
-const saveCheckListOption = async (data: CheckListOption): Promise<{ message: string }> => {
+const saveCheckListOption = async (data: {
+    Prefix: any;
+    CLOptionID: string;
+    CLOptionName: string;
+    IsActive: boolean;
+    Disables: boolean;
+}): Promise<{ message: string }> => {
     const response = await axiosInstance.post("CheckListOption_service.asmx/SaveCheckListOption", data);
     return response.data;
 };

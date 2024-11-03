@@ -1,47 +1,16 @@
 import React, { useState, useCallback, useMemo } from "react";
 import axiosInstance from "@/config/axios";
-import { setForm, setSubForm, setField } from "@/slices";
+import { setForm, setSubForm, setField, reset } from "@/slices";
 import { useToast } from "@/app/contexts";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from "react-redux";
 import { SubForm, FormData, BaseFormState, BaseForm, BaseSubForm } from '@/typing/form';
 import { CheckListType, CheckListOption, Checklist, DataType, GroupCheckListOption, Machine } from '@/typing/type';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { ActivityIndicator } from "react-native";
+import { useQuery, useQueryClient } from 'react-query';
 
-const fetchCheckList = async (): Promise<Checklist[]> => {
-    const response = await axiosInstance.post("CheckList_service.asmx/GetCheckLists");
-    return response.data.data ?? [];
-};
-
-const fetchCheckListOption = async (): Promise<CheckListOption[]> => {
-    const response = await axiosInstance.post("CheckListOption_service.asmx/GetCheckListOptions");
-    return response.data.data ?? [];
-};
-
-const fetchGroupChecklistOption = async (): Promise<GroupCheckListOption[]> => {
-    const response = await axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions");
-    return response.data.data ?? [];
-};
-
-const fetchGroupCheckListOptionActive = async (): Promise<GroupCheckListOption[]> => {
-    const response = await axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptionsActive");
-    return response.data.data ?? [];
-};
-
-const fetchCheckListType = async (): Promise<CheckListType[]> => {
-    const response = await axiosInstance.post("CheckListType_service.asmx/GetCheckListTypes");
-    return response.data.data ?? [];
-};
-
-const fetchDataType = async (): Promise<DataType[]> => {
-    const response = await axiosInstance.post("DataType_service.asmx/GetDataTypes");
-    return response.data.data ?? [];
-};
-
-const fetchMachine = async (): Promise<Machine[]> => {
-    const response = await axiosInstance.post("Machine_service.asmx/GetMachines");
+const fetchData = async (serviceName: string, methodName: string) => {
+    const response = await axiosInstance.post(`${serviceName}_service.asmx/${methodName}`);
     return response.data.data ?? [];
 };
 
@@ -52,38 +21,29 @@ const useForm = (route: any) => {
 
     const [found, setFound] = useState<boolean>(false);
     const [expectedResult, setExpectedResult] = useState<{ [key: string]: any }>({});
-
     const { handleError } = useToast();
     const queryClient = useQueryClient();
 
     const fetchAllData = useCallback(async () => {
         try {
-            const [
-                checkList,
-                checkListOption,
-                groupCheckListOption,
-                groupCheckListOptionActive,
-                checkListType,
-                dataType,
-                machine
-            ] = await Promise.all([
-                fetchCheckList(),
-                fetchCheckListOption(),
-                fetchGroupChecklistOption(),
-                fetchGroupCheckListOptionActive(),
-                fetchCheckListType(),
-                fetchDataType(),
-                fetchMachine()
+            const data = await Promise.all([
+                fetchData("CheckList", "GetCheckLists"),
+                fetchData("CheckListOption", "GetCheckListOptions"),
+                fetchData("GroupCheckListOption", "GetGroupCheckListOptions"),
+                fetchData("GroupCheckListOption", "GetGroupCheckListOptionsActive"),
+                fetchData("CheckListType", "GetCheckListTypes"),
+                fetchData("DataType", "GetDataTypes"),
+                fetchData("Machine", "GetMachines")
             ]);
 
             return {
-                checkList,
-                checkListOption,
-                groupCheckListOption,
-                groupCheckListOptionActive,
-                checkListType,
-                dataType,
-                machine
+                checkList: data[0],
+                checkListOption: data[1],
+                groupCheckListOption: data[2],
+                groupCheckListOptionActive: data[3],
+                checkListType: data[4],
+                dataType: data[5],
+                machine: data[6]
             };
         } catch (error) {
             handleError(error);
@@ -91,21 +51,21 @@ const useForm = (route: any) => {
         }
     }, [handleError]);
 
-    const { data, isLoading } = useQuery('allData', fetchAllData);
+    const { data, isLoading } = useQuery('allData', fetchAllData, {
+        refetchOnWindowFocus: false,
+    });
 
     const { checkList, checkListOption, groupCheckListOption, groupCheckListOptionActive, checkListType, dataType, machine } = data || {};
 
-    const fetchForm = useCallback(async (formId: string, mode: boolean = false) => {
+    const fetchForm = useCallback(async (formId: string, isMachine: boolean = false) => {
         if (!formId) return null;
-        console.log(formId);
-
         try {
-            const response = await axiosInstance.post(mode ? "Form_service.asmx/ScanForm" : "Form_service.asmx/GetForm", { FormID: formId });
-            const status = response?.data?.status;
-            const formData = response?.data?.data?.[0] || null;
-
-            setFound(status);
-            return formData;
+            const response = await axiosInstance.post(
+                isMachine ? "Form_service.asmx/ScanForm" : "Form_service.asmx/GetForm",
+                { FormID: formId }
+            );
+            setFound(response?.data?.status);
+            return response?.data?.data?.[0] || null;
         } catch (error) {
             handleError(error);
             setFound(false);
@@ -154,16 +114,19 @@ const useForm = (route: any) => {
 
     const loadForm = useCallback(async (formId: string, tableId?: string) => {
         if (tableId) {
-            const expectedResultResponse = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResult", { TableID: tableId });
-            setExpectedResult(expectedResultResponse.data?.data[0] || []);
+            try {
+                const response = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResult", { TableID: tableId });
+                setExpectedResult(response.data?.data[0] || []);
+            } catch (error) {
+                handleError(error);
+            }
         }
 
         const formData = await fetchForm(formId);
         if (formData) {
             setFound(true);
-
             const { subForms, fields } = createSubFormsAndFields(formData, expectedResult);
-            const foundMachine = machine?.find(v => v.MachineID === formData.MachineID);
+            const foundMachine = machine.find((v: Machine) => v.MachineID === formData.MachineID);
             formData['MachineName'] = foundMachine ? foundMachine.MachineName : "";
 
             dispatch(setForm({ form: action === "copy" ? {} : formData }));
@@ -178,9 +141,8 @@ const useForm = (route: any) => {
         const formData = await fetchForm(machineId, true);
         if (formData) {
             setFound(true);
-
             const { subForms, fields } = createSubFormsAndFields(formData);
-            const foundMachine = machine?.find(v => v.MachineID === formData.MachineID);
+            const foundMachine = machine.find((v: Machine) => v.MachineID === formData.MachineID);
             formData['MachineName'] = foundMachine ? foundMachine.MachineName : "";
 
             dispatch(setForm({ form: formData }));
@@ -189,21 +151,16 @@ const useForm = (route: any) => {
         } else {
             setFound(false);
         }
-    }, [fetchForm, checkList, checkListType, dispatch, machine]);
+    }, [fetchForm, createSubFormsAndFields, dispatch, checkList, checkListType, machine]);
 
     useFocusEffect(
         useCallback(() => {
-            if (isLoading) {
-                console.log(isLoading);
-
-                if (formId && !machineId) {
-                    loadForm(formId, tableId);
-                }
-                if (machineId) {
-                    loadFormMachine(machineId);
-                }
+            if (!isLoading && (formId || machineId)) {
+                formId && !machineId && loadForm(formId, tableId);
+                machineId && loadFormMachine(machineId);
             }
-        }, [isLoading, formId, tableId, machineId, dispatch])
+            return () => {dispatch(reset())}
+        }, [isLoading, formId, machineId, tableId, loadForm, loadFormMachine])
     );
 
     const validationSchema = useMemo(() => {
@@ -212,8 +169,8 @@ const useForm = (route: any) => {
 
             state.subForms.forEach((subForm: BaseSubForm) => {
                 subForm.Fields.forEach((field: BaseFormState) => {
-                    const dataTypeName = dataType?.find(item => item.DTypeID === field.DTypeID)?.DTypeName;
-                    const checkListTypeName = checkListType?.find(item => item.CTypeID === field.CTypeID)?.CTypeName;
+                    const dataTypeName = dataType.find((item: DataType) => item.DTypeID === field.DTypeID)?.DTypeName;
+                    const checkListTypeName = checkListType.find((item: CheckListType) => item.CTypeID === field.CTypeID)?.CTypeName;
 
                     let validator;
 
@@ -263,7 +220,7 @@ const useForm = (route: any) => {
 
             return Yup.object().shape(shape);
         }
-    }, [state.subForms, isLoading]);
+    }, [state.subForms, isLoading, dataType, checkListType]);
 
     return {
         found,

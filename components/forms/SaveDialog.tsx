@@ -8,6 +8,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import AccessibleView from "../AccessibleView";
 import { useRouter } from 'expo-router';
 import Text from "@/components/Text";
+import { useSelector } from "react-redux";
 
 const SaveDialog = ({
     state,
@@ -15,6 +16,7 @@ const SaveDialog = ({
     setIsVisible,
     navigation
 }: SaveDialogProps & { navigation: any }) => {
+    const prefix = useSelector((state: any) => state.prefix);
     const { handleError } = useToast();
     const masterdataStyles = useMasterdataStyles();
     console.log("SaveDialog");
@@ -32,6 +34,8 @@ const SaveDialog = ({
         }
 
         const data = {
+            PrefixForm: prefix.Form,
+            PrefixSForm: prefix.SubForm,
             SubFormData: JSON.stringify(state.subForms),
             FormData: JSON.stringify(form),
         };

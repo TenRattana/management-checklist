@@ -70,7 +70,7 @@ const SubFormDialog = ({
                                 isValid,
                                 dirty,
                             }) => (
-                                <AccessibleView name="sfd">
+                                <View id="sfd">
                                     <FastField name="SFormName">
                                         {({ field, form }: any) => (
                                             <Inputs
@@ -101,7 +101,7 @@ const SubFormDialog = ({
                                         )}
                                     </FastField >
 
-                                    <AccessibleView name="sfd-action" style={masterdataStyles.containerAction}>
+                                    <View id="sfd-action" style={masterdataStyles.containerAction}>
                                         <Pressable
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}
@@ -156,8 +156,8 @@ const SubFormDialog = ({
                                                 Cancel
                                             </Text>
                                         </Pressable>
-                                    </AccessibleView>
-                                </AccessibleView>
+                                    </View>
+                                </View>
                             )}
                         </Formik>
                     )}

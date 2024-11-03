@@ -192,3 +192,47 @@ export interface FieldDialogProps {
   dropdataType: DataType[];
   dropgroupCheckListOption: GroupCheckListOption[];
 }
+
+export interface ActionProps {
+  data: string;
+  action: string;
+  row: (string | number | boolean)[];
+  rowIndex: number;
+  Canedit: string | number | boolean | undefined;
+}
+
+export interface CellProps {
+  cell: string | number | boolean;
+  cellIndex: number;
+  row: (string | number | boolean)[];
+  rowIndex: number;
+  Canedit: string | number | boolean | undefined;
+}
+
+export interface HandelPrssProps {
+  action: string;
+  data: string;
+  message: (string | number | boolean)[];
+  visible?: boolean;
+}
+export interface CustomtableSmallProps {
+  displayData: (string | number | boolean)[][];
+  Tablehead: { label?: string; align?: string }[];
+  actionIndex: { [key: string]: number }[];
+  showMessage: number | any;
+  handleDialog: (action?: string, data?: string) => void
+}
+
+export interface CustomtableDataProps {
+  actionIndex: { [key: string]: number | string }[];
+  flexArr: number[];
+  Tablehead: { label?: string; align?: string }[];
+  displayData: (string | number | boolean)[][];
+  page: number;
+  itemsPerPage: number;
+  setPage: (value: React.SetStateAction<number>) => void;
+  numberOfItemsPerPageList: number[];
+  onItemsPerPageChange: (value: React.SetStateAction<number>) => void
+  handleDialog: (action?: string, data?: string) => void;
+  showMessage: number;
+}

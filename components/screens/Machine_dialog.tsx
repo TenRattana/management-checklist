@@ -12,6 +12,7 @@ import Text from "@/components/Text";
 import { useTheme } from "@/app/contexts";
 import QRCode from "react-native-qrcode-svg";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { Platform } from "react-native";
 
 const validationSchema = Yup.object().shape({
     machineGroupId: Yup.string().required("The machine group field is required."),
@@ -32,7 +33,11 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                     {isEditing ? "Edit" : "Create"}
                 </Dialog.Title>
                 <Dialog.Content>
-
+                    <Text
+                        style={[masterdataStyles.text, { paddingLeft: 10 }]}
+                    >
+                        {isEditing ? "Edit the details of the machine." : "Enter the details for the new machine."}
+                    </Text>
                     {isVisible && (
                         <Formik
                             initialValues={initialValues}
@@ -43,13 +48,13 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                         >
                             {({ values, handleSubmit, setFieldValue, dirty, isValid }) => (
                                 <View id="form-md" style={{ flexDirection: 'row' }}>
-
                                     <View style={{ flex: values.machineId ? 1 : undefined }}>
-                                        {values.machineId && (
-                                            <View style={{ flex: 1 }}>
-
-
-                                                <View style={{ flex: 1, alignItems: 'center', marginTop: '30%' }}>
+                                        <ScrollView
+                                            contentContainerStyle={{ marginTop: '10%', paddingBottom: 5, paddingHorizontal: 10 }}
+                                            showsVerticalScrollIndicator={false}
+                                        >
+                                            {values.machineId ? (
+                                                <View style={{ flexGrow: 1, alignItems: 'center' }}>
                                                     <QRCode
                                                         value={values.machineId || "No input"}
                                                         size={180}
@@ -68,18 +73,13 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                                                         value={values.machineId}
                                                         contentStyle={{ borderRadius: 10 }}
                                                         style={[masterdataStyles.text, { width: '70%', backgroundColor: theme.colors.background }]}
-                                                    // right={<TextInput.Icon icon="content-copy" />}
                                                     />
                                                 </View>
-                                            </View>
-                                        )}
+                                            ): false}
+                                        </ScrollView>
                                     </View>
-                                    <View style={{ flex: 2, maxHeight: hp('50%') }}>
-                                        <Text
-                                            style={[masterdataStyles.text, { marginBottom: 10, paddingLeft: 10 }]}
-                                        >
-                                            {isEditing ? "Edit the details of the machine." : "Enter the details for the new machine."}
-                                        </Text>
+
+                                    <View style={{ flex: 2, flexGrow: 2, maxHeight: hp(Platform.OS === "web" ? '50%' : '70&') }}>
                                         <ScrollView
                                             contentContainerStyle={{ paddingBottom: 5, paddingHorizontal: 10 }}
                                             showsVerticalScrollIndicator={false}

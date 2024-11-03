@@ -17,7 +17,13 @@ const fetchGroupCheckListOption = async (): Promise<GroupCheckListOption[]> => {
     return response.data.data ?? [];
 };
 
-const saveGroupCheckListOption = async (data: GroupCheckListOption): Promise<{ message: string }> => {
+const saveGroupCheckListOption = async (data: {
+    Prefix: any;
+    GCLOptionID: string;
+    GCLOptionName: string;
+    IsActive: boolean;
+    Disables: boolean;
+}): Promise<{ message: string }> => {
     const response = await axiosInstance.post("GroupCheckListOption_service.asmx/SaveGroupCheckListOption", data);
     return response.data;
 };
@@ -68,7 +74,7 @@ const ChecklistGroupScreen = React.memo(() => {
 
     const saveData = useCallback(async (values: InitialValuesGroupCheckList) => {
         const data = {
-            Prefix: state.GroupCheckListOption ?? "",
+            Prefix: state.GroupCheckList ?? "",
             GCLOptionID: values.groupCheckListOptionId,
             GCLOptionName: values.groupCheckListOptionName,
             IsActive: values.isActive,

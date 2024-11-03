@@ -12,6 +12,7 @@ const initialState: AppProps = {
     MatchCheckListOption: "MCLO",
     MatchFormMachine: "MFM",
     Form: "F",
+    SubForm: "SF",
     ExpectedResult: "ER",
     UsersPermission: "U"
 };
@@ -70,6 +71,11 @@ const prefixSlice = createSlice({
 
             state.Form = Form || "";
         },
+        setPrefixSubForm: (state, action: PayloadAction<{ SubForm?: string }>) => {
+            const { SubForm } = action.payload;
+
+            state.SubForm = SubForm || "";
+        },
         setPrefixExpectedResult: (state, action: PayloadAction<{ ExpectedResult?: string }>) => {
             const { ExpectedResult } = action.payload;
 
@@ -91,6 +97,7 @@ export const {
     setPrefixCheckListOption,
     setPrefixExpectedResult,
     setPrefixForm,
+    setPrefixSubForm,
     setPrefixGroupCheckList,
     setPrefixLocation,
     setPrefixMachine,

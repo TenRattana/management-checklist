@@ -21,8 +21,6 @@ interface ResponsiveProviderProps {
 }
 
 export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children }) => {
-  console.log("ResponsiveProvider");
-
   const { width } = useWindowDimensions();
   const spacingValues = useSpacing();
 

@@ -123,6 +123,7 @@ export interface Prefixs {
   MatchCheckListOption: string;
   MatchFormMachine: string;
   Form: string;
+  SubForm:string;
   ExpectedResult: string;
   UsersPermission: string;
 }
@@ -140,6 +141,7 @@ export type TypeConfig =
   | DataType
   | GroupCheckListOption
   | Form
+  | SubForm
   | MatchForm
   | MatchCheckListOption
   | Users

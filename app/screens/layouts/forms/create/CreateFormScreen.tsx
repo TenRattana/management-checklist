@@ -11,13 +11,13 @@ import Dragsubform from "./Dragsubform";
 import Preview from "@/app/screens/layouts/forms/view/Preview";
 import { CreateFormProps } from "@/typing/tag";
 import { BaseForm, BaseFormState } from "@/typing/form";
-import { CheckListType } from "@/typing/type";
+import { Checklist, CheckListType, DataType, GroupCheckListOption, Machine } from "@/typing/type";
 import { useRes, useTheme } from "@/app/contexts";
 import { defaultDataForm } from "@/slices";
 import DraggableItem from "./DraggableItem";
 
 const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigation }) => {
-    const { state, dispatch, checkList, groupCheckListOption, checkListType, dataType, validationSchema } = useForm(route);
+    const { state, dispatch, checkList, groupCheckListOption, checkListType, dataType, validationSchema, isLoading } = useForm(route);
     const createform = useCreateformStyle();
     const { theme } = useTheme();
     const { spacing } = useRes();
@@ -49,8 +49,8 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
 
     const handleDrop = (item: CheckListType, absoluteX: number, absoluteY: number) => {
         const cardIndex = childRef.current.checkCardPosition(absoluteX, absoluteY);
-        const selectedChecklist = checkList?.find(v => v.CListID === "CL000") || checkList?.[0];
-        const selectedDataType = dataType?.find(v => v.DTypeName === "String") || dataType?.[0];
+        const selectedChecklist = checkList.find((v: Checklist) => v.CListID === "CL000") || checkList?.[0];
+        const selectedDataType = dataType.find((v: DataType) => v.DTypeName === "String") || dataType?.[0];
 
 
         if (cardIndex >= 0) {
@@ -59,7 +59,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                 MCListID: `MCL-ADD-${Math.random()}`,
                 CListID: selectedChecklist?.CListID ?? "",
                 GCLOptionID: ["Dropdown", "Radio", "Checkbox"].includes(item.CTypeName)
-                    ? (groupCheckListOption?.find(v => v.GCLOptionID === "GCLO000") || groupCheckListOption?.[0])?.GCLOptionID
+                    ? (groupCheckListOption.find((v: GroupCheckListOption) => v.GCLOptionID === "GCLO000") || groupCheckListOption?.[0])?.GCLOptionID
                     : undefined,
                 CTypeID: item.CTypeID,
                 DTypeID: selectedDataType?.DTypeID ?? "",
@@ -83,7 +83,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
         if (selectedIndex === 0) {
             return (
                 <>
-                    <AccessibleView name="container-formname" style={{ marginHorizontal: 10 ,marginTop:20}}>
+                    <AccessibleView name="container-formname" style={{ marginHorizontal: 10, marginTop: 20 }}>
                         {['FormName', 'Description'].map((item) => (
                             <ConfigItemForm
                                 key={item}
@@ -130,9 +130,14 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                         <>
                             <Divider bold style={[{ marginVertical: 10, height: 2, backgroundColor: theme.colors.onBackground }]} />
                             <Text style={[masterdataStyles.title, { textAlign: 'center', color: theme.colors.onBackground }]}>Menu List Type</Text>
-                            {checkListType?.map((item, index) => (
-                                <DraggableItem item={item} onDrop={handleDrop} key={`${item.CTypeID}-${index}`} />
-                            ))}
+
+                            {Array.isArray(checkListType) && checkListType.length > 0 ? (
+                                checkListType.map((item: CheckListType, index: number) => (
+                                    <DraggableItem item={item} onDrop={handleDrop} key={`${item.CTypeID}-${index}`} />
+                                ))
+                            ) : (
+                                <Text style={{ textAlign: 'center', color: theme.colors.onBackground }}>No items available</Text>
+                            )}
                         </>
                     )}
                 />
@@ -149,6 +154,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                         selectedIndex={selectedIndex}
                     />
                 )}
+
             </AccessibleView>
 
             <AccessibleView name="container-preview" style={[createform.containerL2]}>

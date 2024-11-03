@@ -44,7 +44,9 @@ const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChan
         inputSearchStyle={masterdataStyles.inputSearchStyle}
         iconStyle={masterdataStyles.iconStyle}
         itemTextStyle={masterdataStyles.text}
-        containerStyle={masterdataStyles.backLight}
+        activeColor={masterdataStyles.backMain.backgroundColor}
+        containerStyle={[masterdataStyles.backLight]}
+        searchPlaceholderTextColor={masterdataStyles.text.color}
         data={options}
         search
         // maxHeight={500}
@@ -55,7 +57,6 @@ const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChan
         value={value as string[]}
         onChange={handleChange}
         onBlur={handleBlur}
-        activeColor={masterdataStyles.backMain.backgroundColor}
         alwaysRenderSelectedItem
         showsVerticalScrollIndicator
         renderLeftIcon={() => (
