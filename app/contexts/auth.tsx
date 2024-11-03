@@ -31,7 +31,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   console.log("AuthProvider");
   const [session, setSession] = useState<{ UserID: string, UserName: string, GUserID: string, GUserName: string, IsActive: boolean }>({ UserID: "", UserName: "", GUserID: "", GUserName: "", IsActive: false });
   const [loading, setLoading] = useState<boolean>(true);
-  const [screens, setScreens] = useState<{ name: string }[]>([{ name: "Permission_deny" }]);
+  const [screens, setScreens] = useState<{ name: string }[]>([]);
 
   const { data: user = [] } = useQuery<UsersPermission[], Error>(
     'userPermission',
@@ -88,7 +88,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         GeneralUser: ["Home", "ScanQR", "InputFormMachine", "Setting", "Permission_deny"]
       };
 
-      setScreens(screenMapping[session.GUserName] ? screenMapping[session.GUserName].map(name => ({ name })) : [{ name: "Permission_deny" }]);
+      const permittedScreens = screenMapping[session.GUserName] || [];
+      setScreens(permittedScreens.map(name => ({ name })));
+
+      if (permittedScreens.length === 0) {
+        setScreens([{ name: "Permission_deny" }]);
+      }
     }
   }, [session]);
 

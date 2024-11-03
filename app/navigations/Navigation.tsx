@@ -3,7 +3,7 @@ import { ActivityIndicator } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import {
   HomeScreen,
-  LoginScreen,
+  // LoginScreen,
   ScanQR,
   GenerateQR,
   SettingScreen,
@@ -43,7 +43,7 @@ type ComponentNameNoLazy =
   | 'GenerateQR'
   | 'Setting'
   | 'Config'
-  | 'NotFoundScreen'
+  | 'Permission_deny'
   | 'Checklist_option'
   | 'Checklist_group'
   | 'Form'
@@ -69,12 +69,12 @@ const nonLazyComponents: Record<ComponentNameNoLazy, React.ComponentType<any>> =
   Match_checklist_option: MatchCheckListOptionScreen,
   Match_form_machine: MatchFormMachineScreen,
   Managepermissions: Managepermissions,
-  Home: HomeScreen,
   ScanQR: ScanQR,
   GenerateQR: GenerateQR,
   Setting: SettingScreen,
   Config: ConfigulationScreen,
-  NotFoundScreen: NotFoundScreen,
+  Permission_deny: NotFoundScreen,
+  Home: HomeScreen,
 };
 
 const Navigation: React.FC = () => {
@@ -86,6 +86,7 @@ const Navigation: React.FC = () => {
   const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
 
   const drawerWidth = fontSize === "small" ? 300 : fontSize === "medium" ? 350 : 400;
+  const initialRoute = session.UserName ? "Home" : "Permission_deny";
 
   useEffect(() => {
     const interceptor = axiosInstance.interceptors.request.use(config => {
@@ -101,12 +102,18 @@ const Navigation: React.FC = () => {
   }, [session]);
 
   const renderComponent = useCallback((name: ComponentNames | ComponentNameNoLazy) => {
+    console.log(name);
+    
     if (name in nonLazyComponents) {
+      console.log("nonLazyComponents");
+      
       const Component = nonLazyComponents[name as ComponentNameNoLazy];
       return (props: any) => <Component {...props} />;
     }
 
     if (cachedComponents.current[name]) {
+      console.log("cachedComponents nonLazyComponents");
+
       const Component = cachedComponents.current[name];
       return (props: any) => (
         <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
@@ -116,6 +123,8 @@ const Navigation: React.FC = () => {
     }
 
     if (name in components) {
+      console.log("components");
+
       const LazyComponent = lazy(components[name as ComponentNames]);
       cachedComponents.current[name] = LazyComponent;
 
@@ -143,9 +152,10 @@ const Navigation: React.FC = () => {
         },
         unmountOnBlur: true,
       }}
+      initialRouteName={initialRoute}
       id='nav'
     >
-      {screens && screens.length > 1 ? (
+      {session.UserName && screens.length > 0 ? (
         screens.map(screen => (
           <Drawer.Screen
             key={screen.name}
@@ -158,7 +168,13 @@ const Navigation: React.FC = () => {
           />
         ))
       ) : (
-        <Drawer.Screen name="Login" component={LoginScreen} />
+        <Drawer.Screen
+          name="Permission_deny"
+          component={NotFoundScreen}
+          options={{
+            drawerLabel: 'Permission Denied',
+          }}
+        />
       )}
     </Drawer.Navigator>
   );

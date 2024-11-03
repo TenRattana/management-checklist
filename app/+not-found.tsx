@@ -11,9 +11,7 @@ const NotFoundScreen = () => {
       <Stack.Screen options={{ title: 'Oops!' }} />
       <AccessibleView name="not-found" style={styles.container}>
         <Text style={styles.title}>Permission denied.</Text>
-        <Link href="/screens/layouts/HomeScreen" style={styles.link}>
-          <Text style={styles.linkText}>Go to Login screen!</Text>
-        </Link>
+        <Text style={styles.linkText}>Contact to Admin!</Text>
       </AccessibleView>
     </>
   );

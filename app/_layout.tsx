@@ -6,7 +6,8 @@ import { ToastProvider, AuthProvider, ResponsiveProvider, ThemeProvider, useThem
 import { QueryClient, QueryClientProvider } from 'react-query';
 import * as Font from "expo-font";
 import { Stack } from 'expo-router';
-import { ReactQueryDevtools } from 'react-query/devtools';
+import { Provider } from "react-redux";
+import { store } from "@/stores";
 
 const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();
@@ -16,7 +17,9 @@ const SetTheme = () => {
 
     return (
         <PaperProvider theme={theme}>
-            <Stack screenOptions={{ headerShown: false }} />
+            <Provider store={store}>
+                <Stack screenOptions={{ headerShown: false }} />
+            </Provider>
         </PaperProvider>
     );
 }
