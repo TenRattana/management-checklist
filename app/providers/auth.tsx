@@ -93,7 +93,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         const userInfo = await loadUserData();
         if (userInfo) {
-          console.log(userInfo);
           updateSession(userInfo.UserName);
         }
       } catch (error) {

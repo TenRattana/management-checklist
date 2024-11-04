@@ -1,27 +1,25 @@
-import React, { useEffect } from 'react';
-import { Stack } from 'expo-router';
+import React from 'react';
 import { StyleSheet } from 'react-native';
 import { AccessibleView, Text } from "@/components";
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { useTheme } from '@/app/contexts';
 
-const NotFoundScreen = () => {
+const PermissionDeny = React.memo(() => {
   console.log("NotFoundScreen");
   const masterdataStyle = useMasterdataStyles();
   const { theme } = useTheme();
 
   return (
     <>
-      <Stack.Screen options={{ title: "Opss!" }} />
       <AccessibleView name="not-found" style={styles.container}>
         <Text style={[masterdataStyle.title, { color: theme.colors.onBackground }]}>Permission denied.</Text>
         <Text style={styles.linkText}>Contact to Admin!</Text>
       </AccessibleView>
     </>
   );
-}
+})
 
-export default React.memo(NotFoundScreen)
+export default PermissionDeny
 
 const styles = StyleSheet.create({
   container: {

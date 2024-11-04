@@ -189,7 +189,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
       </Formik>
     </AccessibleView>
   ) : (
-    <NotFoundScreen navigation={navigation} />
+    <NotFoundScreen />
   );
 };
 

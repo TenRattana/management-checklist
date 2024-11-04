@@ -4,9 +4,8 @@ import AccessibleView from "../AccessibleView";
 import Text from "@/components/Text";
 import { useTheme, useRes } from '@/app/contexts';
 import useMasterdataStyles from '@/styles/common/masterdata';
-import { NavigationProp } from '@react-navigation/native';
 
-const NotFoundScreen = ({ navigation }: { navigation: NavigationProp<any> }) => {
+const NotFoundScreen = () => {
     const { theme } = useTheme();
     const { spacing } = useRes()
     const masterdataStyles = useMasterdataStyles()
@@ -17,7 +16,7 @@ const NotFoundScreen = ({ navigation }: { navigation: NavigationProp<any> }) => 
         <>
             <AccessibleView name="notfound" style={styles.container}>
                 <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>This form doesn't exist.</Text>
-                <Pressable style={styles.link} onPress={() => navigation.navigate("ScanQR")}>
+                <Pressable style={styles.link}>
                     <Text style={[styles.linkText, { fontSize: spacing.small }]}>Scan again!</Text>
                 </Pressable>
             </AccessibleView>
