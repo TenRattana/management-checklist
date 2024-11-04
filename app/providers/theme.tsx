@@ -2,13 +2,13 @@ import React, { createContext, useContext, useState, ReactNode, useEffect, useMe
 import { PaperProvider, DefaultTheme, MD3DarkTheme } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-interface ThemeContextProps {
+export interface ThemeContextProps {
   theme: typeof CustomDarkTheme | typeof CustomLightTheme;
   setDarkMode: (value: boolean) => void;
   darkMode: boolean;
 }
 
-const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
+export const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
 
 
 const CustomLightTheme = {
@@ -79,12 +79,4 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       </PaperProvider>
     </ThemeContext.Provider>
   );
-};
-
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
 };

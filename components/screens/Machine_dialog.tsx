@@ -75,7 +75,7 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                                                         style={[masterdataStyles.text, { width: '70%', backgroundColor: theme.colors.background }]}
                                                     />
                                                 </View>
-                                            ): false}
+                                            ) : false}
                                         </ScrollView>
                                     </View>
 

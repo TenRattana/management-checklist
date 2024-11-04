@@ -1,10 +1,8 @@
 import { StyleSheet } from "react-native";
-import { useSpacing } from "@/hooks/useSpacing";
-import { useRes } from "@/app/contexts";
-import { useTheme } from "react-native-paper";
+import { useRes, useTheme } from "@/app/contexts";
 
 const useCustomtableStyles = () => {
-    const theme = useTheme();
+    const { theme } = useTheme();
     const { responsive, spacing } = useRes();
 
     return StyleSheet.create({

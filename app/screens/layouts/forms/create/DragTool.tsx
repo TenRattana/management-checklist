@@ -1,16 +1,12 @@
-import React, { useState, useRef } from "react";
-import { Dimensions, FlatList, View } from "react-native";
+import React, { useState } from "react";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, runOnJS } from "react-native-reanimated";
-import { GestureHandlerRootView, PanGestureHandler, PanGestureHandlerGestureEvent, ScrollView } from "react-native-gesture-handler";
+import { PanGestureHandler } from "react-native-gesture-handler";
 import { IconButton } from "react-native-paper";
 import useCreateformStyle from "@/styles/createform";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { AccessibleView ,Text } from "@/components";
+import { AccessibleView, Text } from "@/components";
 import { CheckListType } from "@/typing/type";
 import { useRes } from "@/app/contexts";
-import { useDispatch, useSelector } from "react-redux";
-
-const { width, height } = Dimensions.get("window");
 
 const DraggableItem: React.FC<{
     item: CheckListType;

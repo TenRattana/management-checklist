@@ -8,6 +8,7 @@ import useForm from "@/hooks/custom/useForm";
 import { FastField, Formik, FieldProps, Field } from "formik";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { Stack } from "expo-router";
+import { DataType } from "@/typing/type";
 
 interface FormValues {
     [key: string]: any;
@@ -127,7 +128,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                                                 <Field name={field.MCListID} key={`field-${fieldIndex}-${subForm.Columns}`}>
                                                     {({ field: fastFieldProps }: FieldProps) => {
 
-                                                        const type = dataType?.find(v => v.DTypeID === field.DTypeID)?.DTypeName;
+                                                        const type = dataType.find((v: DataType) => v.DTypeID === field.DTypeID)?.DTypeName;
 
                                                         const handleBlur = () => {
                                                             if (type === "Number") {
@@ -187,9 +188,9 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                 )}
                 ListHeaderComponent={() => (
                     <>
-                    <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
-                    <Divider />
-                    <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
+                        <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
+                        <Divider />
+                        <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
                     </>
                 )}
                 keyExtractor={(_, index) => `index-preview-${index}`}

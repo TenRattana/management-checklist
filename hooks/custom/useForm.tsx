@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import axiosInstance from "@/config/axios";
 import { setForm, setSubForm, setField, reset } from "@/slices";
 import { useToast } from "@/app/contexts";
@@ -159,7 +159,7 @@ const useForm = (route: any) => {
                 formId && !machineId && loadForm(formId, tableId);
                 machineId && loadFormMachine(machineId);
             }
-            return () => {dispatch(reset())}
+            return () => { dispatch(reset()) }
         }, [isLoading, formId, machineId, tableId, loadForm, loadFormMachine])
     );
 

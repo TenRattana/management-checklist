@@ -1,14 +1,12 @@
 import React, { useState, useCallback } from "react";
 import { Pressable, ActivityIndicator, View } from "react-native";
 import { Card } from "react-native-paper";
-import { useAuth } from "../../contexts/auth";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { useToast } from "@/app/contexts/toastify";
 import { AccessibleView, Inputs, Text } from "@/components";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useFocusEffect } from "expo-router";
-import { useRes, useTheme } from "@/app/contexts";
+import { useAuth, useRes, useTheme, useToast } from "@/app/contexts";
 
 const validationSchema = Yup.object().shape({
   username: Yup.string().required("The username field is required."),
@@ -40,8 +38,8 @@ const LoginScreen: React.FC = React.memo(() => {
   );
 
   return (
-    <AccessibleView name="login-container" style={{ flex:1,paddingHorizontal: 30 ,backgroundColor: theme.colors.onBackground }}>
-      <Card style={{ height: 250 , marginTop: 100, marginHorizontal:50 }}>
+    <AccessibleView name="login-container" style={{ flex: 1, paddingHorizontal: 30, backgroundColor: theme.colors.onBackground }}>
+      <Card style={{ height: 250, marginTop: 100, marginHorizontal: 50 }}>
         <Card.Title
           title="Login"
           titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}

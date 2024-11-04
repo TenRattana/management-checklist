@@ -3,7 +3,6 @@ import { ActivityIndicator } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import {
   HomeScreen,
-  // LoginScreen,
   ScanQR,
   GenerateQR,
   SettingScreen,
@@ -20,12 +19,10 @@ import {
   Managepermissions,
 } from '@/app/screens';
 import NotFoundScreen from '@/app/+not-found';
-import { useAuth } from "@/app/contexts/auth";
-import { useRes } from "@/app/contexts/responsive";
 import CustomDrawerContent from '@/components/navigation/CustomDrawer';
 import axiosInstance from '@/config/axios';
-import { useTheme } from '../contexts';
 import { useSelector } from "react-redux";
+import { useAuth, useRes, useTheme } from '@/app/contexts';
 
 const Drawer = createDrawerNavigator();
 
@@ -78,20 +75,21 @@ const nonLazyComponents: Record<ComponentNameNoLazy, React.ComponentType<any>> =
 };
 
 const Navigation: React.FC = () => {
-  const state = useSelector((state: any) => state.prefix);
-  const { screens, session } = useAuth();
+  const prefix = useSelector((state: any) => state.prefix);
+  const user = useSelector((state: any) => state.user);
+  const screens = user.screens;
+  const { loading } = useAuth();
   const { fontSize } = useRes();
   const { theme } = useTheme();
 
   const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
 
   const drawerWidth = fontSize === "small" ? 300 : fontSize === "medium" ? 350 : 400;
-  const initialRoute = session.UserName ? "Home" : "Permission_deny";
 
   useEffect(() => {
     const interceptor = axiosInstance.interceptors.request.use(config => {
-      if (session) {
-        config.headers['Authorization'] = session.UserName;
+      if (user.isAuthenticated) {
+        config.headers['Authorization'] = user.username;
       }
       return config;
     });
@@ -99,32 +97,15 @@ const Navigation: React.FC = () => {
     return () => {
       axiosInstance.interceptors.request.eject(interceptor);
     };
-  }, [session]);
+  }, [user]);
 
   const renderComponent = useCallback((name: ComponentNames | ComponentNameNoLazy) => {
-    console.log(name);
-    
+    console.log("name", name);
+
     if (name in nonLazyComponents) {
-      console.log("nonLazyComponents");
-      
       const Component = nonLazyComponents[name as ComponentNameNoLazy];
       return (props: any) => <Component {...props} />;
-    }
-
-    if (cachedComponents.current[name]) {
-      console.log("cachedComponents nonLazyComponents");
-
-      const Component = cachedComponents.current[name];
-      return (props: any) => (
-        <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
-          <Component {...props} />
-        </Suspense>
-      );
-    }
-
-    if (name in components) {
-      console.log("components");
-
+    } else if (name in components) {
       const LazyComponent = lazy(components[name as ComponentNames]);
       cachedComponents.current[name] = LazyComponent;
 
@@ -142,7 +123,9 @@ const Navigation: React.FC = () => {
     );
   }, []);
 
-  return (
+  if (loading) return <ActivityIndicator size="large" color="#0000ff" />;
+
+  return user.isAuthenticated ? (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
@@ -152,17 +135,17 @@ const Navigation: React.FC = () => {
         },
         unmountOnBlur: true,
       }}
-      initialRouteName={initialRoute}
       id='nav'
+      key={'nav'}
     >
-      {session.UserName && screens.length > 0 ? (
-        screens.map(screen => (
+      {screens.length > 0 ? (
+        screens.map((screen: { name: string }) => (
           <Drawer.Screen
             key={screen.name}
             name={screen.name}
             component={renderComponent(screen.name as (ComponentNames | ComponentNameNoLazy))}
             options={{
-              headerTitle: state.AppName || "",
+              headerTitle: prefix.AppName || "",
               drawerLabel: screen.name,
             }}
           />
@@ -176,8 +159,9 @@ const Navigation: React.FC = () => {
           }}
         />
       )}
+
     </Drawer.Navigator>
-  );
+  ) : false
 };
 
 export default React.memo(Navigation);

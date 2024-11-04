@@ -1,6 +1,5 @@
 import { StyleSheet } from "react-native";
-import { useRes } from "@/app/contexts";
-import { useTheme } from "@/app/contexts";
+import { useRes, useTheme } from "@/app/contexts";
 
 
 const useMasterdataStyles = () => {
@@ -131,7 +130,7 @@ const useMasterdataStyles = () => {
             height: 50,
             borderBottomColor: 'gray',
             borderBottomWidth: 0.5,
-            
+
         },
         icon: {
             marginRight: 5,
@@ -151,7 +150,7 @@ const useMasterdataStyles = () => {
         inputSearchStyle: {
             height: 40,
             fontSize: spacing.small,
-            color:theme.colors.onBackground
+            color: theme.colors.onBackground
         },
         chipContainer: {
             flexDirection: 'row',

@@ -1,16 +1,20 @@
-import React, { useCallback } from 'react';
-import { Link, Stack } from 'expo-router';
+import React from 'react';
+import { Stack } from 'expo-router';
 import { StyleSheet } from 'react-native';
 import { AccessibleView, Text } from "@/components";
+import useMasterdataStyles from '@/styles/common/masterdata';
+import { useTheme } from '@/app/contexts';
 
 const NotFoundScreen = () => {
   console.log("NotFoundScreen");
+  const masterdataStyle = useMasterdataStyles();
+  const { theme } = useTheme();
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Oops!' }} />
+      <Stack.Screen options={{ headerShown: true }} />
       <AccessibleView name="not-found" style={styles.container}>
-        <Text style={styles.title}>Permission denied.</Text>
+        <Text style={[masterdataStyle.title, { color: theme.colors.onBackground }]}>Permission denied.</Text>
         <Text style={styles.linkText}>Contact to Admin!</Text>
       </AccessibleView>
     </>
@@ -25,11 +29,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
   },
   link: {
     marginTop: 15,

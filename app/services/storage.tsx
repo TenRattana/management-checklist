@@ -1,32 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { UsersPermission } from '@/typing/type';
-const USER_KEY = '@user_data';
-const PAGINATE = '@paginate';
+const USER_KEY = 'user';
 
-interface PAGINATE {
-    paginate: number;
+interface UsersPermissionProps {
+    UserName: string;
 }
 
-export const savePaginate = async (paginate: PAGINATE) => {
+export const saveUserData = async (UserName: UsersPermissionProps) => {
     try {
-        await AsyncStorage.setItem(PAGINATE, JSON.stringify(paginate));
-    } catch (error) {
-        console.error('Failed to save pagination data', error);
-    }
-}
-
-export const loadPaginate = async () => {
-    try {
-        const jsonValue = await AsyncStorage.getItem(PAGINATE);
-        return jsonValue != null ? JSON.parse(jsonValue) : null;
-    } catch (error) {
-        console.error('Failed to load pagination data', error);
-    }
-}
-
-export const saveUserData = async (userData: UsersPermission) => {
-    try {
-        await AsyncStorage.setItem(USER_KEY, JSON.stringify(userData));
+        await AsyncStorage.setItem(USER_KEY, JSON.stringify(UserName));
     } catch (error) {
         console.error('Failed to save user data', error);
     }

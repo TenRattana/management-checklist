@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
 import * as SplashScreen from 'expo-splash-screen';
-import { ToastProvider, AuthProvider, ResponsiveProvider, ThemeProvider, useTheme } from "@/app/contexts";
+import { ToastProvider, AuthProvider, ResponsiveProvider, ThemeProvider } from "@/app/providers";
 import { QueryClient, QueryClientProvider } from 'react-query';
 import * as Font from "expo-font";
 import { Stack } from 'expo-router';
 import { Provider } from "react-redux";
 import { store } from "@/stores";
+import { useTheme } from '@/app/contexts';
 
 const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();
@@ -17,9 +18,7 @@ const SetTheme = () => {
 
     return (
         <PaperProvider theme={theme}>
-            <Provider store={store}>
-                <Stack screenOptions={{ headerShown: false }} />
-            </Provider>
+            <Stack screenOptions={{ headerShown: false }} />
         </PaperProvider>
     );
 }
@@ -61,11 +60,13 @@ const RootLayout = () => {
         <ThemeProvider>
             <ResponsiveProvider>
                 <ToastProvider>
-                    <QueryClientProvider client={queryClient}>
-                        <AuthProvider>
-                            <SetTheme />
-                        </AuthProvider>
-                    </QueryClientProvider>
+                    <Provider store={store}>
+                        <QueryClientProvider client={queryClient}>
+                            <AuthProvider>
+                                <SetTheme />
+                            </AuthProvider>
+                        </QueryClientProvider>
+                    </Provider>
                 </ToastProvider>
             </ResponsiveProvider>
         </ThemeProvider>

@@ -228,11 +228,6 @@ export interface CustomtableDataProps {
   flexArr: number[];
   Tablehead: { label?: string; align?: string }[];
   displayData: (string | number | boolean)[][];
-  page: number;
-  itemsPerPage: number;
-  setPage: (value: React.SetStateAction<number>) => void;
-  numberOfItemsPerPageList: number[];
-  onItemsPerPageChange: (value: React.SetStateAction<number>) => void
   handleDialog: (action?: string, data?: string) => void;
   showMessage: number;
 }

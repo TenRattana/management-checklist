@@ -114,8 +114,8 @@ export interface GroupUsers {
 }
 
 export interface Prefixs {
+  AppID:string;
   GroupMachine: string;
-  Location: string;
   Machine: string;
   CheckList: string;
   GroupCheckList: string;

@@ -5,30 +5,13 @@ import CustomtableHead from "./table/CustomtableHead";
 import CustomtableSmall from "./table/CustomtableSmall";
 import CustomtableData from "./table/CustomtableData";
 import { CustomTableProps } from '@/typing/tag';
-import { loadPaginate } from '@/app/services/storage';
 
 const CustomTable = ({ Tabledata, Tablehead, flexArr, handleAction, actionIndex, searchQuery, showMessage }: CustomTableProps) => {
-  const [page, setPage] = useState<number>(0);
-  const [numberOfItemsPerPageList] = useState([10, 20, 50]);
-  const [itemsPerPage, onItemsPerPageChange] = useState(numberOfItemsPerPageList[0]);
   const [sortColumn, setSortColumn] = useState<number | null>(null);
   const [sortDirection, setSortDirection] = useState<"ascending" | "descending" | undefined>(undefined);
   const [displayData, setDisplayData] = useState<(string | number | boolean)[][]>([]);
 
   const { responsive } = useRes();
-
-
-  useEffect(() => {
-    const loadPagination = async () => {
-      const paginate = await loadPaginate();
-      if (paginate) onItemsPerPageChange(paginate.paginate);
-    };
-    loadPagination();
-  }, []);
-
-  useEffect(() => {
-    setPage(0);
-  }, [Tabledata, itemsPerPage]);
 
   const handleSort = useCallback((columnIndex: number) => {
     setSortColumn(prev => (prev === columnIndex ? null : columnIndex));
@@ -56,8 +39,8 @@ const CustomTable = ({ Tabledata, Tablehead, flexArr, handleAction, actionIndex,
   }, [sortedData, searchQuery]);
 
   useEffect(() => {
-    setDisplayData(filteredData.slice(page * itemsPerPage, (page + 1) * itemsPerPage));
-  }, [filteredData, page, itemsPerPage]);
+    setDisplayData(filteredData);
+  }, [filteredData]);
 
   const handleDialog = useCallback((action?: string, data?: string) => {
     if (handleAction) {
@@ -91,18 +74,13 @@ const CustomTable = ({ Tabledata, Tablehead, flexArr, handleAction, actionIndex,
             actionIndex={actionIndex}
             displayData={displayData}
             flexArr={flexArr}
-            itemsPerPage={itemsPerPage}
-            numberOfItemsPerPageList={numberOfItemsPerPageList}
-            onItemsPerPageChange={onItemsPerPageChange}
-            page={page}
-            setPage={setPage}
             handleDialog={handleDialog}
             showMessage={showMessage}
           />
 
         </AccessibleView>
       }
-    
+
     </AccessibleView>
   );
 };

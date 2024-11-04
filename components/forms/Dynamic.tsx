@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import { Selects, Radios, Textareas, Inputs, Checkboxs } from "@/components/common";
 import { CheckListOption } from '@/typing/type';
-import AccessibleView from "../AccessibleView";
 import { DynamicFormProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { View } from "react-native";

@@ -4,7 +4,6 @@ import { DataTable } from "react-native-paper";
 import AccessibleView from "@/components/AccessibleView";
 import Text from "@/components/Text";
 import useCustomtableStyles from "@/styles/customtable";
-import CustomtablePaginate from "./CustomtablePaginate";
 import Cellcontent from "./Contents/Cellcontent";
 import { Dialogs } from "../common";
 import { HandelPrssProps } from "@/typing/tag";
@@ -13,7 +12,7 @@ import { CustomtableDataProps } from "@/typing/tag";
 
 type justifyContent = 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly' | undefined;
 
-const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead, flexArr, actionIndex, displayData, page, itemsPerPage, setPage, numberOfItemsPerPageList, onItemsPerPageChange, handleDialog, showMessage }) => {
+const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead, flexArr, actionIndex, displayData, handleDialog, showMessage }) => {
     const customtable = useCustomtableStyles();
 
     const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -113,19 +112,8 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                 )}
                 contentContainerStyle={{ flexGrow: 1 }}
                 nestedScrollEnabled={true}
-                removeClippedSubviews
-                initialNumToRender={itemsPerPage}
                 showsVerticalScrollIndicator={true}
-                ListFooterComponent={() => (
-                    <CustomtablePaginate
-                        displayData={displayData}
-                        itemsPerPage={itemsPerPage}
-                        numberOfItemsPerPageList={numberOfItemsPerPageList}
-                        onItemsPerPageChange={onItemsPerPageChange}
-                        page={page}
-                        setPage={setPage}
-                    />
-                )}
+                removeClippedSubviews
             />
 
             <Dialogs

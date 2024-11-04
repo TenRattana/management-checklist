@@ -1,11 +1,10 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { Pressable } from "react-native";
 import axiosInstance from "@/config/axios";
-import { useToast } from "@/app/contexts";
+import { useToast, useRes } from "@/app/contexts";
 import { AccessibleView, Customtable, LoadingSpinner, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { useRes } from "@/app/contexts";
 import Machine_dialog from "@/components/screens/Machine_dialog";
 import { Machine, GroupMachine } from '@/typing/type';
 import { InitialValuesMachine } from '@/typing/value';

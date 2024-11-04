@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Pressable } from "react-native";
 import axiosInstance from "@/config/axios";
-import { useToast } from "@/app/contexts";
+import { useToast, useRes } from "@/app/contexts";
 import { LoadingSpinner, AccessibleView, Searchbar, Customtable, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { useRes } from "@/app/contexts";
 import Machine_group_dialog from "@/components/screens/Machine_group_dialog";
 import { GroupMachine } from '@/typing/type';
 import { InitialValuesGroupMachine } from '@/typing/value';
@@ -40,26 +39,35 @@ const MachineGroupScreen = React.memo(() => {
         isActive: true,
         disables: false
     });
-
+    const [machineGroups, setMachineGroups] = useState<GroupMachine[]>([])
+    const [isLoading, setLoading] = useState<boolean>(true)
     const masterdataStyles = useMasterdataStyles();
     const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
 
-    const { data: machineGroups = [], isLoading, isError, error } = useQuery<GroupMachine[], Error>(
-        'machineGroups',
-        fetchMachineGroups,
-        {
-            refetchOnWindowFocus: true,
+    const fetchData = async () => {
+        try {
+            const data = await fetchMachineGroups();
+            setMachineGroups(data);
+        } catch (error) {
+            handleError(error);
+        } finally {
+            setLoading(false);
         }
-    );
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     const mutation = useMutation(saveGroupMachine, {
         onSuccess: (data) => {
             showSuccess(data.message);
             setIsVisible(false)
             queryClient.invalidateQueries('machineGroups');
+            fetchData();
         },
         onError: handleError,
     });
@@ -104,7 +112,7 @@ const MachineGroupScreen = React.memo(() => {
                 const endpoint = action === "activeIndex" ? "ChangeGroupMachine" : "DeleteGroupMachine";
                 const response = await axiosInstance.post(`GroupMachine_service.asmx/${endpoint}`, { GMachineID: item });
                 showSuccess(String(response.data.message));
-                queryClient.invalidateQueries('machineGroups');
+                await fetchData();
             }
         } catch (error) {
             handleError(error);

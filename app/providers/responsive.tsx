@@ -3,7 +3,7 @@ import { useWindowDimensions } from "react-native";
 import { useSpacing } from "@/hooks/useSpacing";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-interface ResponsiveContextType {
+export interface ResponsiveContextType {
   responsive: "small" | "medium" | "large";
   spacing: {
     small: number;
@@ -14,7 +14,7 @@ interface ResponsiveContextType {
   setFontSize: (value: string) => void;
 }
 
-const ResponsiveContext = createContext<ResponsiveContextType | undefined>(undefined);
+export const ResponsiveContext = createContext<ResponsiveContextType | undefined>(undefined);
 
 interface ResponsiveProviderProps {
   children: ReactNode;
@@ -89,10 +89,3 @@ export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children
   );
 };
 
-export const useRes = (): ResponsiveContextType => {
-  const context = useContext(ResponsiveContext);
-  if (context === undefined) {
-    throw new Error("useRes must be used within a ResponsiveProvider");
-  }
-  return context;
-};

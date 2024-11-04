@@ -2,7 +2,7 @@ import React, { createContext, useContext, ReactNode, useCallback, useMemo } fro
 import ToastManager, { Toast } from "toastify-react-native";
 import axios from "axios";
 
-interface ToastContextProps {
+export interface ToastContextProps {
   showSuccess: (message: string) => void;
   showError: (messages: string[]) => void;
   handleError: (error: unknown) => void;
@@ -12,7 +12,7 @@ interface ToastProviderProps {
   children: ReactNode;
 }
 
-const ToastContext = createContext<ToastContextProps | undefined>(undefined);
+export const ToastContext = createContext<ToastContextProps | undefined>(undefined);
 
 export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
   console.log("ToastProvider");
@@ -51,12 +51,4 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
       {children}
     </ToastContext.Provider>
   );
-};
-
-export const useToast = () => {
-  const context = useContext(ToastContext);
-  if (!context) {
-    throw new Error("useToast must be used within a ToastProvider");
-  }
-  return context;
 };

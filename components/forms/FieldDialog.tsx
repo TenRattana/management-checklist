@@ -204,7 +204,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                         data={editMode ? checkList : dropcheckList}
                                                         value={field.value}
                                                         handleChange={(value) => {
-                                                            const stringValue = (value as { value: string }).value; 
+                                                            const stringValue = (value as { value: string }).value;
                                                             form.setFieldValue(field.name, stringValue);
                                                             setTimeout(() => {
                                                                 form.setFieldTouched(field.name, true);
@@ -229,7 +229,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                         data={editMode ? checkListType : dropcheckListType}
                                                         value={field.value}
                                                         handleChange={(value) => {
-                                                            const stringValue = (value as { value: string }).value; 
+                                                            const stringValue = (value as { value: string }).value;
                                                             form.setFieldValue(field.name, stringValue);
                                                             setTimeout(() => {
                                                                 form.setFieldTouched(field.name, true);
@@ -256,7 +256,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                                 data={editMode ? groupCheckListOption : dropgroupCheckListOption}
                                                                 value={field.value}
                                                                 handleChange={(value) => {
-                                                                    const stringValue = (value as { value: string }).value; 
+                                                                    const stringValue = (value as { value: string }).value;
                                                                     form.setFieldValue(field.name, stringValue);
                                                                     setTimeout(() => {
                                                                         form.setFieldTouched(field.name, true);
@@ -285,7 +285,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                                 data={editMode ? dataType : dropdataType}
                                                                 value={field.value}
                                                                 handleChange={(value) => {
-                                                                    const stringValue = (value as { value: string }).value; 
+                                                                    const stringValue = (value as { value: string }).value;
                                                                     form.setFieldValue(field.name, stringValue);
                                                                     setTimeout(() => {
                                                                         form.setFieldTouched(field.name, true);

@@ -144,7 +144,7 @@ const Configuration: React.FC = React.memo(() => {
         MatchCheckListOption: false,
         MatchFormMachine: false,
         Form: false,
-        SubForm:false,
+        SubForm: false,
         ExpectedResult: false
     });
 

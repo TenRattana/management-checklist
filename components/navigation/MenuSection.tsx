@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Pressable } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
 import { IconButton } from 'react-native-paper';
 import Text from '@/components/Text';
 import { useRes } from '@/app/contexts';
@@ -29,13 +29,17 @@ const MenuSection = React.memo(({ title, isOpen, onToggle, items, navigation }: 
         overflow: 'hidden',
     }), [height, opacity]);
 
+    const setOpacity = (value: number) => {
+        opacity.value = value;
+    };
+
     useEffect(() => {
         if (isOpen) {
-            opacity.value = withTiming(1, { duration: 300 });
+            runOnJS(setOpacity)(1);
             height.value = withTiming(totalHeight, { duration: 300 });
         } else {
             setTimeout(() => {
-                opacity.value = withTiming(0, { duration: 300 });
+                runOnJS(setOpacity)(0);
                 height.value = withTiming(0, { duration: 300 });
             }, 300);
         }

@@ -1,20 +1,20 @@
-import React, { useState, useCallback, useEffect, useMemo } from "react";
+import React, { useState, useCallback } from "react";
 import axiosInstance from "@/config/axios";
-import { Card, Divider, HelperText } from "react-native-paper";
-import { FlatList, Pressable, ViewStyle, Dimensions, View } from "react-native";
+import { Card, Divider } from "react-native-paper";
+import { FlatList, Pressable, ViewStyle, View } from "react-native";
 import { useToast, useRes, useTheme } from "@/app/contexts";
-import { BaseSubForm, FormData, BaseFormState, SubForm } from '@/typing/form';
+import { BaseSubForm, BaseFormState } from '@/typing/form';
 import { AccessibleView, Dynamic, NotFoundScreen, Text } from "@/components";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { PreviewProps } from "@/typing/tag";
 import { ScanParams } from "@/typing/tag";
-import { FastField, Field, FieldProps, Formik } from 'formik';
-import * as Yup from 'yup';
+import { FastField, FieldProps, Formik } from 'formik';
 import { Stack, useNavigation } from "expo-router";
 import useForm from "@/hooks/custom/useForm";
+import { DataType } from "@/typing/type";
 
 const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
-  const { state, dispatch, checkList, groupCheckListOption, checkListType, dataType, found, validationSchema } = useForm(route);
+  const { state, groupCheckListOption, dataType, found, validationSchema } = useForm(route);
   const navigation = useNavigation();
 
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -100,7 +100,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                             return (
                               <FastField name={field.MCListID} key={`field-${fieldIndex}-${subForm.Columns}-${field.MCListID}`}>
                                 {({ field: fastFieldProps }: FieldProps) => {
-                                  const type = dataType?.find(v => v.DTypeID === field.DTypeID)?.DTypeName;
+                                  const type = dataType.find((v: DataType) => v.DTypeID === field.DTypeID)?.DTypeName;
 
                                   const handleBlur = () => {
                                     if (type === "Number") {
