@@ -45,7 +45,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
             { label: 'Machine', navigateTo: 'Machine' },
         ];
         const hasMachinePermission = machineItems.some(item =>
-            screens.some((screen: { name: string }) => screen.name === item.navigateTo)
+            screens.some((screen: { name: string; route: string; permissions: string[] }) => screen.name === item.navigateTo)
         );
 
         if (hasMachinePermission) {
@@ -56,7 +56,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                     isOpen={isMenuListOpen.machine}
                     onToggle={() => setIsMenuListOpen((prev) => ({ ...prev, machine: !prev.machine }))}
                     items={machineItems.filter(item =>
-                        screens.some((screen: { name: string }) => screen.name === item.navigateTo)
+                        screens.some((screen: { name: string; route: string; permissions: string[] }) => screen.name === item.navigateTo)
                     )}
                     navigation={navigation}
                 />
@@ -72,7 +72,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
             { label: 'Check List Option', navigateTo: 'Checklist_option' },
         ];
         const hasChecklistPermission = checklistItems.some(item =>
-            screens.some((screen: { name: string }) => screen.name === item.navigateTo)
+            screens.some((screen: { name: string; route: string; permissions: string[] }) => screen.name === item.navigateTo)
         );
 
         if (hasChecklistPermission) {
@@ -83,7 +83,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                     isOpen={isMenuListOpen.checklist}
                     onToggle={() => setIsMenuListOpen((prev) => ({ ...prev, checklist: !prev.checklist }))}
                     items={checklistItems.filter(item =>
-                        screens.some((screen: { name: string }) => screen.name === item.navigateTo)
+                        screens.some((screen: { name: string; route: string; permissions: string[] }) => screen.name === item.navigateTo)
                     )}
                     navigation={navigation}
                 />
@@ -98,15 +98,21 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
         <DrawerContentScrollView {...props}>
             {user.isAuthenticated && (
                 <>
-                    {renderPressable('Home', 'Home')}
+                    {screens.map((screen: { name: string; route: string; permissions: string[] }) => {
+                        const { name, route } = screen;
+
+                        return renderPressable(name, route);
+                    })}
+
+                    {/* {renderPressable('Home', 'Home')}
                     {renderMachineMenu()}
                     {renderChecklistMenu()}
 
                     {additionalScreens.map(screenName =>
-                        screens.some((screen: { name: string }) => screen.name === screenName)
+                        screens.some((screen: { name: string; route: string; permissions: string[] }) => screen.name === screenName)
                     )}
 
-                    {screens.map((screen: { name: string }) => {
+                    {screens.map((screen: { name: string; route: string; permissions: string[] }) => {
                         const { name } = screen;
 
                         if (!["Machine_group", "Machine", "Checklist", "Checklist_group", "Checklist_option", "Home", ...additionalScreens].includes(name)) {
@@ -114,7 +120,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                         }
 
                         return null;
-                    })}
+                    })} */}
                 </>
             )}
         </DrawerContentScrollView>

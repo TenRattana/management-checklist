@@ -6,22 +6,34 @@ import { ToastProvider, AuthProvider, ResponsiveProvider, ThemeProvider } from "
 import { QueryClient, QueryClientProvider } from 'react-query';
 import * as Font from "expo-font";
 import { Stack } from 'expo-router';
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import { store } from "@/stores";
-import { useTheme } from '@/app/contexts';
+import { useAuth, useTheme } from '@/app/contexts';
+import RouteGuard from './guard/GuardRoute';
 
 const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();
 
 const SetTheme = () => {
     const { theme } = useTheme();
+    const user = useSelector((state: any) => state.user);
+    const screens = user.screens || [];
+    const { loading } = useAuth();
 
     return (
         <PaperProvider theme={theme}>
-            <Stack screenOptions={{ headerShown: false }} />
+            {loading && user.isAuthenticated && (
+                screens.map((screen: { name: string; route: string; permissions: string[] }) => {
+                    return (
+                        <RouteGuard key={screen.name} permissions={screen.permissions} route={screen.route} name={screen.name}>
+                            <Stack />
+                        </RouteGuard>
+                    );
+                })
+            )}
         </PaperProvider>
     );
-}
+};
 
 const RootLayout = () => {
     const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -51,10 +63,8 @@ const RootLayout = () => {
     }, [fontsLoaded]);
 
     if (!fontsLoaded) {
-        return <ActivityIndicator size="large" color="#0000ff" />;
+        return <ActivityIndicator size="large" color="#0000ff" style={{ alignContent: 'center', justifyContent: 'center', height: '100%' }} />;
     }
-
-    console.log("RootLayout rendered");
 
     return (
         <ThemeProvider>
