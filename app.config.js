@@ -24,11 +24,11 @@ export default {
     slug: "m_checklist",
     version: "1.0.0",
     orientation: "landscape",
-    icon: "./assets/images/Icon.jpg",
+    icon: "./assets/images/Icon-app.png",
     scheme: "myapp",
     userInterfaceStyle: "automatic",
     splash: {
-      image: "./assets/images/splash.gif",
+      image: "./assets/images/Icon-app.png",
       resizeMode: "contain",
       backgroundColor: "#000",
     },
@@ -37,7 +37,7 @@ export default {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/images/adaptive-icon.png",
+        foregroundImage: "./assets/images/Icon-app.png",
         backgroundColor: "#ffffff",
       },
       package: "com.m_checklist_test",
@@ -45,7 +45,7 @@ export default {
     web: {
       bundler: "metro",
       output: "static",
-      favicon: "./assets/images/favicon.png",
+      favicon: "./assets/images/Icon-app.png",
       packagerOpts: {
         dev: false,
       },

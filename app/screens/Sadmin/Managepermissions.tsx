@@ -17,7 +17,7 @@ const fetchUsers = async (): Promise<Users[]> => {
 };
 
 const fetchGroupUser = async (): Promise<GroupUsers[]> => {
-  const response = await axiosInstance.post("GroupMachine_service.asmx/GetGroupMachines");
+  const response = await axiosInstance.post('GroupUser_service.asmx/GetGroupUsers');
   return response.data.data ?? [];
 };
 

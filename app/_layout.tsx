@@ -65,11 +65,12 @@ const RootLayout = () => {
                 await Asset.loadAsync([
                     require('../assets/images/bgs.jpg'),
                     require('../assets/images/Icon.jpg'),
+                    require('../assets/images/Icon-app.png'),
                 ]);
 
                 await new Promise(resolve => setTimeout(resolve, 2000));
 
-                ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL);
+                // ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL);
             } catch (error) {
                 console.warn('Error loading fonts:', error);
             } finally {

@@ -54,10 +54,7 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
             if (action === "changeIndex") {
                 navigation.navigate("Create_form", { formId: item });
             } else if (action === "preIndex") {
-                navigation.navigate("InputFormMachine", {
-                    machineId: "M00000002",
-                });
-                // navigation.navigate("Preview", { formId: item });
+                navigation.navigate("Preview", { formId: item });
             } else if (action === "copyIndex") {
                 navigation.navigate("Create_form", { formId: item, action: "copy" });
             } else {
