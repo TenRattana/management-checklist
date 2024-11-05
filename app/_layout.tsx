@@ -6,18 +6,29 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import * as Font from "expo-font";
 import { Provider } from "react-redux";
 import { store } from "@/stores";
-import App from './app'; 
+import { Stack } from 'expo-router';
+import { PaperProvider } from 'react-native-paper';
+import { useTheme } from './contexts';
 
 console.log("Root");
 
 const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();
 
+const SetTheme = () => {
+    const { theme } = useTheme();
+
+    return (
+        <PaperProvider theme={theme}>
+            <Stack screenOptions={{ headerShown: false }} />
+        </PaperProvider>
+    );
+}
 const RootLayout = () => {
     const [fontsLoaded, setFontsLoaded] = useState(false);
 
     console.log("RootLayout is being rendered");
-    
+
     useEffect(() => {
         const prepare = async () => {
             try {
@@ -53,7 +64,7 @@ const RootLayout = () => {
                     <Provider store={store}>
                         <QueryClientProvider client={queryClient}>
                             <AuthProvider>
-                                <App />  
+                                <SetTheme />
                             </AuthProvider>
                         </QueryClientProvider>
                     </Provider>

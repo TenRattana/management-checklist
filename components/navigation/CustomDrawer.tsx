@@ -1,24 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
+import { useAuth } from "@/app/contexts";
 import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
 import { Text } from '@/components';
 import MenuSection from './MenuSection';
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useSelector } from 'react-redux';
-import { useAuth } from '@/app/contexts';
 
 const CustomDrawerContent = (props: DrawerContentComponentProps) => {
-    const masterdataStyles = useMasterdataStyles();
-    const { loading } = useAuth();
     const { navigation } = props;
-
+    const masterdataStyles = useMasterdataStyles();
     const user = useSelector((state: any) => state.user);
-    const screens = user.screens;
+    const { loading } = useAuth();
 
     const [isMenuListOpen, setIsMenuListOpen] = useState({
         machine: false,
         checklist: false,
+        match: false,
     });
+
+    console.log("CustomDrawerContent");
 
     if (loading) {
         return (
@@ -30,7 +31,6 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
 
     const renderPressable = (label: string, navigateTo: string) => (
         <Pressable
-            key={label}
             onPress={() => navigation.navigate(navigateTo)}
             style={masterdataStyles.menuItemNav}
             android_ripple={{ color: '#f0f0f0' }}
@@ -39,90 +39,68 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
         </Pressable>
     );
 
-    const renderMachineMenu = () => {
-        const machineItems = [
-            { label: 'Machine Group', navigateTo: 'Machine_group' },
-            { label: 'Machine', navigateTo: 'Machine' },
-        ];
-        const hasMachinePermission = machineItems.some(item =>
-            screens.some((screen: { name: string; route: string; permissions: string[] }) => screen.name === item.navigateTo)
-        );
-
-        if (hasMachinePermission) {
-            return (
-                <MenuSection
-                    key="machineSection"
-                    title="Machine"
-                    isOpen={isMenuListOpen.machine}
-                    onToggle={() => setIsMenuListOpen((prev) => ({ ...prev, machine: !prev.machine }))}
-                    items={machineItems.filter(item =>
-                        screens.some((screen: { name: string; route: string; permissions: string[] }) => screen.name === item.navigateTo)
-                    )}
-                    navigation={navigation}
-                />
-            );
-        }
-        return null;
-    };
-
-    const renderChecklistMenu = () => {
-        const checklistItems = [
-            { label: 'Check List', navigateTo: 'Checklist' },
-            { label: 'Group Check List', navigateTo: 'Checklist_group' },
-            { label: 'Check List Option', navigateTo: 'Checklist_option' },
-        ];
-        const hasChecklistPermission = checklistItems.some(item =>
-            screens.some((screen: { name: string; route: string; permissions: string[] }) => screen.name === item.navigateTo)
-        );
-
-        if (hasChecklistPermission) {
-            return (
-                <MenuSection
-                    key="checklistSection"
-                    title="Check List"
-                    isOpen={isMenuListOpen.checklist}
-                    onToggle={() => setIsMenuListOpen((prev) => ({ ...prev, checklist: !prev.checklist }))}
-                    items={checklistItems.filter(item =>
-                        screens.some((screen: { name: string; route: string; permissions: string[] }) => screen.name === item.navigateTo)
-                    )}
-                    navigation={navigation}
-                />
-            );
-        }
-        return null;
-    };
-
-    const additionalScreens = ["Create_form", "Preview", "Permission_deny"];
+    console.log(user.username);
 
     return (
         <DrawerContentScrollView {...props}>
-            {user.isAuthenticated && (
-                <>
-                    {screens.map((screen: { name: string; route: string; permissions: string[] }) => {
-                        const { name, route } = screen;
+            <>
+                {user.username && (
+                    <>
+                        {(user.role === "SuperAdmin" || user.role === "Admin") && (
+                            <>
+                                {renderPressable('Home', 'Home')}
 
-                        return renderPressable(name, route);
-                    })}
+                                <MenuSection
+                                    title="Machine"
+                                    isOpen={isMenuListOpen.machine}
+                                    onToggle={() => setIsMenuListOpen((prev) => ({ ...prev, machine: !prev.machine }))}
+                                    items={[
+                                        { label: 'Machine Group', navigateTo: 'Machine_group' },
+                                        { label: 'Machine', navigateTo: 'Machine' },
+                                    ]}
+                                    navigation={navigation}
+                                />
 
-                    {/* {renderPressable('Home', 'Home')}
-                    {renderMachineMenu()}
-                    {renderChecklistMenu()}
+                                <MenuSection
+                                    title="Check List"
+                                    isOpen={isMenuListOpen.checklist}
+                                    onToggle={() => setIsMenuListOpen((prev) => ({ ...prev, checklist: !prev.checklist }))}
+                                    items={[
+                                        { label: 'Check List', navigateTo: 'Checklist' },
+                                        { label: 'Group Check List', navigateTo: 'Checklist_group' },
+                                        { label: 'Check List Option', navigateTo: 'Checklist_option' },
+                                    ]}
+                                    navigation={navigation}
+                                />
 
-                    {additionalScreens.map(screenName =>
-                        screens.some((screen: { name: string; route: string; permissions: string[] }) => screen.name === screenName)
-                    )}
+                                {renderPressable('Match Option & Group Check List', 'Match_checklist_option')}
+                                {renderPressable('List Form', 'Form')}
+                                {renderPressable('Match Form & Machine', 'Match_form_machine')}
+                                {renderPressable('List Result', 'Expected_result')}
+                                {renderPressable('Scan QR Code', 'ScanQR')}
+                                {renderPressable('Generate QR Code', 'GenerateQR')}
+                                {renderPressable('Setting', 'Setting')}
+                                {renderPressable('Configulation', 'Config')}
 
-                    {screens.map((screen: { name: string; route: string; permissions: string[] }) => {
-                        const { name } = screen;
+                            </>
+                        )}
 
-                        if (!["Machine_group", "Machine", "Checklist", "Checklist_group", "Checklist_option", "Home", ...additionalScreens].includes(name)) {
-                            return renderPressable(name.replaceAll("_", " "), name);
-                        }
+                        {user.role === "SuperAdmin" && (
+                            <>
+                                {renderPressable('Managepermissions', 'Managepermissions')}
+                            </>
+                        )}
 
-                        return null;
-                    })} */}
-                </>
-            )}
+                        {user.role === "GeneralUser" && (
+                            <>
+                                {renderPressable('Home', 'Home')}
+                                {renderPressable('Scan QR Code', 'ScanQR')}
+                                {renderPressable('Setting', 'Setting')}
+                            </>
+                        )}
+                    </>
+                )}
+            </>
         </DrawerContentScrollView>
     );
 }
