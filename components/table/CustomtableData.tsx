@@ -26,7 +26,7 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
         setDialogData(String(data));
         setDialogTitle(action === "editIndex" ? "Edit" : action === "delIndex" ? "Delete" : "");
         const messages = Array.isArray(showMessage) ? showMessage.map(key => message[key]).join(" ") : message[showMessage];
-        setDialogMessage(String(`${messages} ${status}`));
+        setDialogMessage(String(`${messages}`));
         setIsVisible((visible || action === "editIndex" || action === "changeIndex" || action === "copyIndex" || action === "preIndex"));
     }, [setDialogAction, setDialogData, setDialogTitle, setDialogMessage, setIsVisible, showMessage]);
 

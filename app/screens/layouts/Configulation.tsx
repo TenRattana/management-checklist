@@ -3,9 +3,9 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik } from 'formik';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { IconButton, Text } from 'react-native-paper';
+import { IconButton } from 'react-native-paper';
 import { useRes, useTheme } from '@/app/contexts';
-import { Inputs } from '@/components';
+import { AccessibleView, Inputs, Text } from '@/components';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import {
     setPrefixGroupMachine,
@@ -86,17 +86,20 @@ const RenderFormik: React.FC<{ field: string; setEdit: (v: boolean) => void; }> 
         >
             {({ handleSubmit, errors, touched, setFieldValue, setTouched, values }) => (
                 <Animated.View entering={FadeIn} exiting={FadeOut}>
-                    <View style={styles.row}>
-                        <Inputs
-                            placeholder={`Enter ${field}`}
-                            label={field}
-                            handleChange={(value) => setFieldValue(field, value)}
-                            handleBlur={() => setTouched({ ...touched, [field]: true })}
-                            value={values[field]}
-                            error={touched[field] && Boolean(errors[field])}
-                            errorMessage={String(errors[field])}
-                            testId={`${field}-cf`}
-                        />
+                    <View style={[styles.row, { width: 600 }]}>
+                        <View style={{ flex: 1 }}>
+                            <Inputs
+                                placeholder={`Enter ${field}`}
+                                label={field}
+                                handleChange={(value) => setFieldValue(field, value)}
+                                handleBlur={() => setTouched({ ...touched, [field]: true })}
+                                value={values[field]}
+                                error={touched[field] && Boolean(errors[field])}
+                                errorMessage={String(errors[field])}
+                                testId={`${field}-cf`}
+                            />
+                        </View>
+
                         <IconButton
                             icon="pencil-box"
                             onPress={() => handleSubmit()}
@@ -116,19 +119,31 @@ const ConfigItem: React.FC<ConfigItemProps> = ({ label, value, editable, onEdit 
     const masterdataStyles = useMasterdataStyles();
 
     return (
-        <View style={styles.row}>
-            <Text variant='labelMedium' style={[styles.configPrefixText, masterdataStyles.settingText,]}>
-                {label}: {editable ? <RenderFormik field={label === "Program Display" ? "AppName" : label} setEdit={onEdit} /> : value}
-            </Text>
-            {!editable && (
-                <IconButton
-                    icon="pencil-box"
-                    onPress={() => onEdit(true)}
-                    iconColor={theme.colors.blue}
-                    size={spacing.large + 5}
-                />
-            )}
-        </View>
+        <AccessibleView name="" style={[styles.row, { flexBasis: '100%' }]}>
+            {editable ? <>
+                <View style={{ flexGrow: 1 }}>
+                    <Text style={[masterdataStyles.settingText]} ellipsizeMode="tail" numberOfLines={1}>
+                        {`${label} : ${!editable ? value : ""}`}
+                    </Text>
+                </View>
+                <View style={{ flexGrow: 10 }}>
+                    <RenderFormik field={label === "Program Display" ? "AppName" : label} setEdit={onEdit} />
+                </View>
+            </> :
+                <>
+                    <Text style={[styles.configPrefixText, masterdataStyles.settingText, { width: 500 }]} ellipsizeMode="tail" numberOfLines={1}>
+                        {`${label} : ${!editable ? value : ""}`}
+                    </Text>
+                    <IconButton
+                        icon="pencil-box"
+                        onPress={() => onEdit(true)}
+                        iconColor={theme.colors.blue}
+                        size={spacing.large + 5}
+                        style={[styles.iconButton, { width: 100 }]}
+                    />
+                </>
+            }
+        </AccessibleView>
     );
 };
 
@@ -156,6 +171,8 @@ const Configuration: React.FC = React.memo(() => {
             <Text style={[masterdataStyles.textBold, masterdataStyles.text, { textAlign: 'center', paddingVertical: 30, fontSize: spacing.large }]}>Configuration</Text>
 
             <View id="config-app" style={masterdataStyles.configPrefix}>
+                <Text style={[masterdataStyles.settingText, masterdataStyles.textBold]}>App Name</Text>
+
                 <ConfigItem
                     label="Program Display"
                     value={state.AppName}
@@ -184,7 +201,7 @@ export default Configuration;
 
 const styles = StyleSheet.create({
     row: {
-        width: '100%',
+        flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -193,5 +210,9 @@ const styles = StyleSheet.create({
     configPrefixText: {
         flex: 1,
         marginRight: 10,
+    },
+    iconButton: {
+        padding: 0,
+        margin: 0
     },
 });

@@ -20,6 +20,8 @@ const SetTheme = () => {
     const currentRouteName = useSegments().join('/');
     const user = useSelector((state: any) => state.user);
 
+    console.log(user);
+
     useEffect(() => {
         if (user) {
             const interceptor = axiosInstance.interceptors.request.use(config => {

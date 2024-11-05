@@ -50,7 +50,7 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
                                 <View id="form-md" style={{ flexDirection: 'row' }}>
                                     <View style={{ flex: values.machineId ? 1 : undefined }}>
                                         <ScrollView
-                                            contentContainerStyle={{ marginTop: '10%', paddingBottom: 5, paddingHorizontal: 10 }}
+                                            contentContainerStyle={{ marginTop: '50%', paddingBottom: 5, paddingHorizontal: 10 }}
                                             showsVerticalScrollIndicator={false}
                                         >
                                             {values.machineId ? (
