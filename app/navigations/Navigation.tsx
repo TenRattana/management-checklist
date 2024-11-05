@@ -3,7 +3,6 @@ import { ActivityIndicator } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import {
     HomeScreen,
-    // LoginScreen,
     ScanQR,
     GenerateQR,
     SettingScreen,
@@ -20,9 +19,8 @@ import {
     Managepermissions,
 } from '@/app/screens';
 import PermissionDeny from '../screens/layouts/PermissionDeny';
-import { useAuth, useRes } from "@/app/contexts";
+import { useRes } from "@/app/contexts";
 import CustomDrawerContent from '@/components/navigation/CustomDrawer';
-import axiosInstance from '@/config/axios';
 import { useTheme } from '../contexts';
 import { useSelector } from "react-redux";
 
@@ -79,83 +77,66 @@ const nonLazyComponents: Record<ComponentNameNoLazy, React.ComponentType<any>> =
 const Navigation: React.FC = () => {
     const state = useSelector((state: any) => state.prefix);
     const user = useSelector((state: any) => state.user);
-    const screens = user.screen
     const { fontSize } = useRes();
     const { theme } = useTheme();
-    const { loading } = useAuth()
 
     const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
 
     const drawerWidth = fontSize === "small" ? 300 : fontSize === "medium" ? 350 : 400;
-    const initialRoute = user.username ? "Home" : "Permission_deny";
 
-    useEffect(() => {
-        const interceptor = axiosInstance.interceptors.request.use(config => {
-            if (user) {
-                config.headers['Authorization'] = user.username;
-            }
-            return config;
-        });
-
-        return () => {
-            axiosInstance.interceptors.request.eject(interceptor);
-        };
-    }, [user]);
+    const initialRoute: string = user?.username && user?.screen?.length > 0 ? "Home" : "Permission_deny";
 
     const renderComponent = useCallback((name: ComponentNames | ComponentNameNoLazy) => {
         console.log(name);
 
         if (name in nonLazyComponents) {
-            console.log("nonLazyComponents");
-
             const Component = nonLazyComponents[name as ComponentNameNoLazy];
             return (props: any) => <Component {...props} />;
         }
 
         if (cachedComponents.current[name]) {
-            console.log("cachedComponents nonLazyComponents");
-
             const Component = cachedComponents.current[name];
             return (props: any) => (
-                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />} >
                     <Component {...props} />
                 </Suspense>
             );
         }
 
         if (name in components) {
-            console.log("components");
-
             const LazyComponent = lazy(components[name as ComponentNames]);
             cachedComponents.current[name] = LazyComponent;
 
             return (props: any) => (
-                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />} >
                     <LazyComponent {...props} />
                 </Suspense>
             );
         }
 
         return (props: any) => (
-            <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+            <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />} >
                 <PermissionDeny {...props} />
             </Suspense>
         );
     }, []);
-    console.log(screens);
 
     return (
         <Drawer.Navigator
-            drawerContent={(props) => <CustomDrawerContent {...props} />}
+            drawerContent={(props) => <CustomDrawerContent {...props} initialRouteName={initialRoute} />}
             screenOptions={{
                 drawerStyle: {
                     backgroundColor: theme.colors.background,
                     width: drawerWidth,
                 },
                 unmountOnBlur: true,
+                drawerHideStatusBarOnOpen: true,
+                drawerStatusBarAnimation: 'slide',
+                // keyboardDismissMode: 'none',
+                freezeOnBlur: true
             }}
             initialRouteName={initialRoute}
-            id='nav'
+            id="nav"
         >
             {user.username && user.screen.length > 0 ? (
                 user.screen.map((screen: { name: string }) => (

@@ -91,10 +91,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const loadUserDataAsync = async () => {
       try {
-        const userInfo = await loadUserData();
-        if (userInfo) {
-          updateSession(userInfo.UserName);
-        }
+        updateSession("Rattana Chomwihok");
+        // const userInfo = await loadUserData();
+        // if (userInfo) {
+        //   updateSession(userInfo.UserName);
+        // }
       } catch (error) {
         console.error("Error loading user data:", error);
       } finally {

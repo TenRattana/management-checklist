@@ -1,9 +1,18 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { string } from "yup";
 
-const superAdminScreens = ["view_home", "view_login"]
-const adminScreens = ["view_home"]
-const generalUserScreens = ["view_home"]
+const superAdminScreens = [
+    "view_home", "view_login", "view_machine_group", "view_machine", "view_checklist"
+    , "view_checklist_option", "view_checklist_group", "view_match_checklist_option", "view_match_form_machine", "create_form"
+    , "view_expected_result", "view_form", "view_preview", "view_scan_qr", "generate_qr", "input_form_machine", "manage_settings"
+    , "manage_permissions", "view_config"
+]
+const adminScreens = [
+    "view_home", "view_machine_group", "view_machine", "view_checklist"
+    , "view_checklist_option", "view_checklist_group", "view_match_checklist_option", "view_match_form_machine", "create_form"
+    , "view_expected_result", "view_form", "view_preview", "view_scan_qr", "generate_qr", "input_form_machine", "manage_settings"
+    , "view_config"
+]
+const generalUserScreens = ["view_home", "view_scan_qr", "input_form_machine", "manage_settings"]
 
 const getPermissionRole = (role: string) => {
     switch (role) {
@@ -29,8 +38,6 @@ const setScreen = (GUserName: string) => {
     return permittedScreens.map(name => ({ name }))
 
 }
-
-
 interface User {
     username: string;
     role: string;
@@ -61,7 +68,6 @@ const middlewareStore = createSlice({
     reducers: {
         setUser: (state, action: PayloadAction<{ user: UserPayload }>) => {
             const { user } = action.payload;
-
             state.username = user.UserName;
             state.role = user.GUserName;
             state.isAuthenticated = true;

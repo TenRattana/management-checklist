@@ -4,30 +4,53 @@ import * as SplashScreen from 'expo-splash-screen';
 import { ToastProvider, AuthProvider, ResponsiveProvider, ThemeProvider } from "@/app/providers";
 import { QueryClient, QueryClientProvider } from 'react-query';
 import * as Font from "expo-font";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import { store } from "@/stores";
-import { Stack } from 'expo-router';
+import { Slot, Stack, useSegments } from 'expo-router';
 import { PaperProvider } from 'react-native-paper';
 import { useTheme } from './contexts';
-
-console.log("Root");
+import RouteGuard from './guard/GuardRoute';
+import axiosInstance from '@/config/axios';
 
 const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();
 
 const SetTheme = () => {
     const { theme } = useTheme();
+    const currentRouteName = useSegments().join('/');
+    const user = useSelector((state: any) => state.user);
 
-    return (
-        <PaperProvider theme={theme}>
-            <Stack screenOptions={{ headerShown: false }} />
-        </PaperProvider>
-    );
+    useEffect(() => {
+        if (user) {
+            const interceptor = axiosInstance.interceptors.request.use(config => {
+                config.headers['Authorization'] = user.username;
+                return config;
+            });
+
+            return () => {
+                axiosInstance.interceptors.request.eject(interceptor);
+            };
+        }
+    }, [user]);
+
+    if (currentRouteName) {
+        return (
+            <PaperProvider theme={theme}>
+                <RouteGuard route={currentRouteName}>
+                    <Slot screenOptions={{ headerShown: false }} />
+                </RouteGuard>
+            </PaperProvider>
+        );
+    } else {
+        return (
+            <PaperProvider theme={theme}>
+                <Stack screenOptions={{ headerShown: false }} />
+            </PaperProvider>
+        );
+    }
 }
 const RootLayout = () => {
     const [fontsLoaded, setFontsLoaded] = useState(false);
-
-    console.log("RootLayout is being rendered");
 
     useEffect(() => {
         const prepare = async () => {
