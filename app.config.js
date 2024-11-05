@@ -24,13 +24,13 @@ export default {
     slug: "m_checklist",
     version: "1.0.0",
     orientation: "landscape",
-    icon: "./assets/images/icon.png",
+    icon: "./assets/images/Icon.jpg",
     scheme: "myapp",
     userInterfaceStyle: "automatic",
     splash: {
-      image: "./assets/images/splash.png",
+      image: "./assets/images/splash.gif",
       resizeMode: "contain",
-      backgroundColor: "#ffffff",
+      backgroundColor: "#000",
     },
     ios: {
       supportsTablet: true,
@@ -47,20 +47,17 @@ export default {
       output: "static",
       favicon: "./assets/images/favicon.png",
       packagerOpts: {
-        dev: false
-      }
+        dev: false,
+      },
     },
-    assetBundlePatterns: [
-      "assets/fonts/*",
-    ],
+    assetBundlePatterns: ["assets/fonts/*"],
     plugins: [
       "expo-router",
       [
         "expo-camera",
         {
-          cameraPermission: "Allow $(PRODUCT_NAME) to access your camera",
-          microphonePermission:
-            "Allow $(PRODUCT_NAME) to access your microphone",
+          cameraPermission: "Allow PMChecklist to access your camera",
+          microphonePermission: "Allow PMChecklist to access your microphone",
           recordAudioAndroid: true,
         },
       ],

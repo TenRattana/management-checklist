@@ -19,7 +19,6 @@ const validationSchema = Yup.object().shape({
 const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }: CheckListOptionProps<InitialValuesCheckListOption>) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
-    console.log("Checklist_option_dialog");
 
     return (
         <Portal>
@@ -33,6 +32,11 @@ const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialVa
                     {isEditing ? "Edit" : "Create"}
                 </Dialog.Title>
                 <Dialog.Content>
+                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginBottom: 10, paddingLeft: 10 }]}>
+                        {isEditing
+                            ? "Edit the details of the check list option."
+                            : "Enter the details for the new check list option."}
+                    </Text>
                     {isVisible && (
                         <Formik
                             initialValues={initialValues}
@@ -48,7 +52,7 @@ const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialVa
                                         {({ field, form }: any) => (
                                             <Inputs
                                                 placeholder="Enter Check List Option"
-                                                label="Machine Check List Option"
+                                                label="Check List Option"
                                                 handleChange={(value) => form.setFieldValue(field.name, value)}
                                                 handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
                                                 value={field.value}

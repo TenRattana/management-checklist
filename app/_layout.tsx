@@ -11,6 +11,9 @@ import { PaperProvider } from 'react-native-paper';
 import { useTheme } from './contexts';
 import RouteGuard from './guard/GuardRoute';
 import axiosInstance from '@/config/axios';
+import { Asset } from 'expo-asset';
+import { StatusBar, setStatusBarStyle } from 'expo-status-bar';
+import * as ScreenOrientation from 'expo-screen-orientation';
 
 const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();
@@ -19,8 +22,6 @@ const SetTheme = () => {
     const { theme } = useTheme();
     const currentRouteName = useSegments().join('/');
     const user = useSelector((state: any) => state.user);
-
-    console.log(user);
 
     useEffect(() => {
         if (user) {
@@ -61,13 +62,24 @@ const RootLayout = () => {
                     "Poppins": require("../assets/fonts/Poppins-Regular.ttf"),
                     "Sarabun": require("../assets/fonts/Sarabun-Regular.ttf"),
                 });
+                await Asset.loadAsync([
+                    require('../assets/images/bgs.jpg'),
+                    require('../assets/images/Icon.jpg'),
+                ]);
+
                 await new Promise(resolve => setTimeout(resolve, 2000));
+
+                ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL);
             } catch (error) {
                 console.warn('Error loading fonts:', error);
             } finally {
                 setFontsLoaded(true);
             }
         };
+
+        setTimeout(() => {
+            setStatusBarStyle("light");
+        }, 0);
 
         prepare();
     }, []);
@@ -89,6 +101,7 @@ const RootLayout = () => {
                     <Provider store={store}>
                         <QueryClientProvider client={queryClient}>
                             <AuthProvider>
+                                <StatusBar style="light" hidden={true} />
                                 <SetTheme />
                             </AuthProvider>
                         </QueryClientProvider>

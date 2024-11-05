@@ -18,7 +18,6 @@ const validationSchema = Yup.object().shape({
 const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }: GroupMachineDialogProps<InitialValuesGroupMachine>) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
-    console.log("Machine_group_dialog");
 
     return (
         <Portal>
@@ -32,6 +31,12 @@ const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValue
                     {isEditing ? "Edit" : "Create"}
                 </Dialog.Title>
                 <Dialog.Content>
+
+                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginBottom: 10, paddingLeft: 10 }]}>
+                        {isEditing
+                            ? "Edit the details of the group machine."
+                            : "Enter the details for the new group machine."}
+                    </Text>
                     {isVisible && (
                         <Formik
                             initialValues={initialValues}

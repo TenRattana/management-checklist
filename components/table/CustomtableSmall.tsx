@@ -31,17 +31,17 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
 
     const renderSmallRes = useCallback((rowData: (string | number | boolean)[], rowIndex: number) => {
         return (
-            <AccessibleView name={`container-${rowIndex}`} key={`row-${rowIndex}`} style={[customtable.cardRow, { alignItems: 'flex-start' }]}>
+            <AccessibleView name={`container-${rowIndex}`} style={[customtable.cardRow, { alignItems: 'flex-start' }]}>
                 {Tablehead.map((header, colIndex) => (
-                    <AccessibleView name={`header-${rowIndex}-${colIndex}`} key={`header-${rowIndex}-${colIndex}`}>
+                    <AccessibleView name={`header-${rowIndex}-${colIndex}`} key={`cell-${rowIndex}-${colIndex}`} style={{ flex: 1, paddingTop: -10 }}>
                         <Text style={[{ marginVertical: 5 }, masterdataStyles.text]}>{header.label}</Text>
-                        {actionIndex.map(actionItem => {
+                        {actionIndex.map((actionItem, index) => {
                             const filteredEntries = Object.entries(actionItem).filter(([, value]) => value === colIndex);
                             return filteredEntries.length > 0
                                 ? filteredEntries.map(([key]) => {
                                     if (key === "editIndex" || key === "delIndex") {
                                         return (
-                                            <AccessibleView name={`action-${rowIndex}-${colIndex}`} key={`action-${rowIndex}-${colIndex}`} style={customtable.eventColumn}>
+                                            <AccessibleView name={`action-${rowIndex}-${colIndex}`} key={`action-${rowIndex}-${colIndex}-${key}`} style={customtable.eventColumn}>
                                                 <Text style={[masterdataStyles.text, { alignSelf: "center", }]}>Action : </Text>
                                                 <Actioncontent
                                                     data={String(rowData[colIndex])}
@@ -63,7 +63,7 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
                                         );
                                     } else {
                                         return (
-                                            <AccessibleView name={`action-${rowIndex}-${colIndex}`} key={`action-${rowIndex}-${colIndex}`} style={customtable.eventColumn}>
+                                            <AccessibleView name={`anoter-action-${rowIndex}-${key}-${index}`} key={`action-${rowIndex}-${colIndex}-${key}`} style={customtable.eventColumn}>
                                                 <Actioncontent
                                                     data={String(rowData[colIndex])}
                                                     action={key}
@@ -77,6 +77,7 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
                                     }
                                 })
                                 : <Cellcontent
+                                    key={`cellcontent-${rowIndex}-${index}`}
                                     cell={rowData[colIndex]}
                                     cellIndex={colIndex}
                                     row={rowData}
@@ -92,20 +93,21 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
     }, [actionIndex, Tablehead]);
 
     return (
-        <AccessibleView name="small" style={{ flex: 1, marginTop: 20 }} >
-            {displayData && displayData.length === 0 ? (
-                <Text style={[{ textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }, masterdataStyles.text]}>No data found...</Text>
-            ) : (
-                <FlatList
-                    data={displayData.length > 0 ? displayData : []}
-                    renderItem={({ item, index }) => renderSmallRes(item, index)}
-                    keyExtractor={(_, index) => `row-${index}`}
-                    ListEmptyComponent={() => (
-                        <Text style={[{ textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }, masterdataStyles.text]}>No data found...</Text>
-                    )}
-                    contentContainerStyle={{ flexGrow: 1 }}
-                />
-            )}
+        <>
+            <FlatList
+                data={displayData.length > 0 ? displayData : []}
+                renderItem={({ item, index }) => renderSmallRes(item, index)}
+                keyExtractor={(_, index) => `row-${index}`}
+                ListEmptyComponent={() => (
+                    <Text style={[masterdataStyles.text, { textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }]}>
+                        No data found...
+                    </Text>
+                )}
+                contentContainerStyle={{ flexGrow: 1 }}
+                nestedScrollEnabled={true}
+                showsVerticalScrollIndicator={true}
+                removeClippedSubviews
+            />
 
             <Dialogs
                 isVisible={isVisible}
@@ -116,7 +118,7 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
                 messages={dialogMessage}
                 data={dialogData}
             />
-        </AccessibleView>
+        </>
     )
 })
 

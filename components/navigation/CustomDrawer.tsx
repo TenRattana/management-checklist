@@ -22,8 +22,6 @@ const CustomDrawerContent: React.FC<CustomDrawerProps> = (props) => {
         match: false,
     });
 
-    console.log("CustomDrawerContent");
-
     useEffect(() => {
         if (initialRouteName) {
             navigation.navigate(initialRouteName);
@@ -47,8 +45,6 @@ const CustomDrawerContent: React.FC<CustomDrawerProps> = (props) => {
             <Text style={masterdataStyles.menuText}>{label}</Text>
         </Pressable>
     );
-
-    console.log(user.username);
 
     return user.username ? (
         <DrawerContentScrollView {...props} style={{ flex: 1 }}>

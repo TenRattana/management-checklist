@@ -30,8 +30,6 @@ const Match_checklist_option = ({
     groupCheckListOption,
     dropgroupCheckListOption,
 }: MatchChecklistOptionProps<InitialValuesMatchCheckListOption, CheckListOption, GroupCheckListOption>) => {
-    console.log("Match_checklist_option");
-
     const masterdataStyles = useMasterdataStyles();
     const { theme } = useTheme()
     const filteredData = useMemo(() => {
@@ -45,6 +43,12 @@ const Match_checklist_option = ({
                     {isEditing ? "Edit" : "Create"}
                 </Dialog.Title>
                 <Dialog.Content>
+
+                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginBottom: 10, paddingLeft: 10 }]}>
+                        {isEditing
+                            ? "Edit the details of the match check list option & group check list option."
+                            : "Enter the details for the match check list option & group check list option."}
+                    </Text>
                     {isVisible && (
                         <Formik
                             initialValues={initialValues}

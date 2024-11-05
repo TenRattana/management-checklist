@@ -2,11 +2,10 @@ import React from "react";
 import { Pressable, View } from "react-native";
 import { RadioButton, HelperText } from "react-native-paper";
 import { RadiosProps } from "@/typing/tag";
-import AccessibleView from "@/components/AccessibleView";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
 
-const Radios :React.FC<RadiosProps> = React.memo(({
+const Radios: React.FC<RadiosProps> = React.memo(({
   option,
   value,
   handleChange,
@@ -17,8 +16,6 @@ const Radios :React.FC<RadiosProps> = React.memo(({
   errorMessage,
   testId
 }) => {
-  console.log("Radios");
-
   const masterdataStyles = useMasterdataStyles()
 
   if (!option || option.length === 0) {

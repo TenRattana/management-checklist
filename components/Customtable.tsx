@@ -60,7 +60,7 @@ const CustomTable = ({ Tabledata, Tablehead, flexArr, handleAction, actionIndex,
 
         />
       ) :
-        <AccessibleView name="data" style={{ flex: 1 }}>
+        <AccessibleView name="data" style={{ flex: 1, paddingHorizontal: 10 }}>
           <CustomtableHead
             Tablehead={Tablehead}
             flexArr={flexArr}

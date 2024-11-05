@@ -5,7 +5,6 @@ import useMasterdataStyles from '@/styles/common/masterdata';
 import { useTheme } from '@/app/contexts';
 
 const PermissionDeny = React.memo(() => {
-  console.log("NotFoundScreen");
   const masterdataStyle = useMasterdataStyles();
   const { theme } = useTheme();
 

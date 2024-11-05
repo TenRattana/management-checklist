@@ -8,7 +8,6 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { SubFormDialogProps } from "@/typing/value";
 import { BaseSubForm } from "@/typing/form";
 import Text from "@/components/Text";
-import { AccessibleView } from "..";
 
 const validationSchemaSubForm = Yup.object().shape({
     SFormName: Yup.string().required("The machine group name field is required."),
@@ -24,7 +23,6 @@ const SubFormDialog = ({
     onDelete,
 }: SubFormDialogProps<BaseSubForm>) => {
     const masterdataStyles = useMasterdataStyles();
-    console.log("SubFormDialog");
 
     return (
         <Portal>

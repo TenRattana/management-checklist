@@ -15,8 +15,6 @@ interface ToastProviderProps {
 export const ToastContext = createContext<ToastContextProps | undefined>(undefined);
 
 export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
-  console.log("ToastProvider");
-
   const showSuccess = useCallback((message: string) => {
     Toast.success(message);
   }, [Toast]);

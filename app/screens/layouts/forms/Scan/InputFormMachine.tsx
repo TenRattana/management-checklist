@@ -12,10 +12,12 @@ import { FastField, FieldProps, Formik } from 'formik';
 import { Stack, useNavigation } from "expo-router";
 import useForm from "@/hooks/custom/useForm";
 import { DataType } from "@/typing/type";
+import { useSelector } from "react-redux";
 
 const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
   const { state, groupCheckListOption, dataType, found, validationSchema } = useForm(route);
   const navigation = useNavigation();
+  const prefix = useSelector((state: any) => state.prefix);
 
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -38,7 +40,10 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
       })),
     }));
 
-    const data = { FormData: JSON.stringify(updatedSubForms) };
+    const data = {
+      Prefix: prefix.ExpectedResult,
+      FormData: JSON.stringify(updatedSubForms)
+    };
 
     try {
       const response = await axiosInstance.post("ExpectedResult_service.asmx/SaveExpectedResult", data);
@@ -65,9 +70,14 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
           )
         }}
       />
-      <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
-      <Divider />
-      <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
+      {!isSubmitted ? (
+        <>
+          <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
+          <Divider />
+          <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
+        </>
+      ) : false}
+
 
       <Formik
         initialValues={formValues}
@@ -122,6 +132,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                                       }
                                     }
                                   };
+                                  console.log(errors);
 
                                   return (
                                     <View id="container-layout2" style={containerStyle}>
@@ -143,6 +154,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                                         groupCheckListOption={groupCheckListOption ?? []}
                                         error={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
                                         errorMessages={errors}
+                                        type={type}
                                       />
                                     </View>
                                   );

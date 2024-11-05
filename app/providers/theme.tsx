@@ -55,8 +55,6 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const handleDarkModeChange = async (value: boolean) => {
-    console.log(value);
-
     setDarkMode(value);
     await AsyncStorage.setItem('darkMode', value ? "darkMode" : "");
   };

@@ -21,7 +21,6 @@ const validationSchema = Yup.object().shape({
 const Managepermisstion_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData, users, groupUser }: ManagepermissionDialogProps<InitialValuesManagepermission, Users, GroupUsers>) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
-    console.log("Managepermisstion_dialog");
 
     return (
         <Portal>

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik } from 'formik';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { IconButton } from 'react-native-paper';
-import { useRes, useTheme } from '@/app/contexts';
+import { useRes, useTheme, useToast } from '@/app/contexts';
 import { AccessibleView, Inputs, Text } from '@/components';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import {
@@ -21,6 +21,9 @@ import {
     setPrefixUsersPermission,
     setAppName
 } from "@/slices";
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import axiosInstance from '@/config/axios';
+import { AppProps } from '@/typing/type'
 
 interface ConfigItemProps {
     label: string;
@@ -29,64 +32,83 @@ interface ConfigItemProps {
     onEdit: (v: boolean) => void;
 }
 
+const saveAppconfig = async (data: AppProps): Promise<{ message: string }> => {
+    const response = await axiosInstance.post("AppConfig_service.asmx/SaveAppConfig", data);
+    return response.data;
+};
+
 const RenderFormik: React.FC<{ field: string; setEdit: (v: boolean) => void; }> = React.memo(({ field, setEdit }) => {
     const dispatch = useDispatch();
     const state = useSelector((state: any) => state.prefix);
     const { spacing } = useRes();
     const { theme } = useTheme();
+    const { handleError } = useToast()
+    const queryClient = useQueryClient();
+
+    const mutation = useMutation(saveAppconfig, {
+        onSuccess: () => {
+            queryClient.invalidateQueries('appConfig');
+        },
+        onError: handleError,
+    });
+
+    const handleSubmit = useCallback((values: { [x: string]: any; }) => {
+        switch (field) {
+            case 'AppName':
+                dispatch(setAppName({ AppName: values[field] }));
+                break;
+            case 'GroupMachine':
+                dispatch(setPrefixGroupMachine({ GroupMachine: values[field] }));
+                break;
+            case 'CheckList':
+                dispatch(setPrefixCheckList({ CheckList: values[field] }));
+                break;
+            case 'CheckListOption':
+                dispatch(setPrefixCheckListOption({ CheckListOption: values[field] }));
+                break;
+            case 'ExpectedResult':
+                dispatch(setPrefixExpectedResult({ ExpectedResult: values[field] }));
+                break;
+            case 'Form':
+                dispatch(setPrefixForm({ Form: values[field] }));
+                break;
+            case 'SubForm':
+                dispatch(setPrefixSubForm({ SubForm: values[field] }));
+                break;
+            case 'GroupCheckList':
+                dispatch(setPrefixGroupCheckList({ GroupCheckList: values[field] }));
+                break;
+            case 'Machine':
+                dispatch(setPrefixMachine({ Machine: values[field] }));
+                break;
+            case 'MatchCheckListOption':
+                dispatch(setPrefixMatchCheckListOption({ MatchCheckListOption: values[field] }));
+                break;
+            case 'MatchFormMachine':
+                dispatch(setPrefixMatchFormMachine({ MatchFormMachine: values[field] }));
+                break;
+            case 'UsersPermission':
+                dispatch(setPrefixUsersPermission({ UsersPermission: values[field] }));
+                break;
+            default:
+                break;
+        }
+        const data = { ...state, [field]: values[field] }
+        mutation.mutate(data)
+
+        setEdit(false);
+    }, [dispatch, field])
 
     return (
         <Formik
             initialValues={{ [field]: state[field] }}
             validateOnBlur={true}
             validateOnChange={false}
-            onSubmit={(values) => {
-                switch (field) {
-                    case 'AppName':
-                        dispatch(setAppName({ AppName: values[field] }));
-                        break;
-                    case 'GroupMachine':
-                        dispatch(setPrefixGroupMachine({ GroupMachine: values[field] }));
-                        break;
-                    case 'CheckList':
-                        dispatch(setPrefixCheckList({ CheckList: values[field] }));
-                        break;
-                    case 'CheckListOption':
-                        dispatch(setPrefixCheckListOption({ CheckListOption: values[field] }));
-                        break;
-                    case 'ExpectedResult':
-                        dispatch(setPrefixExpectedResult({ ExpectedResult: values[field] }));
-                        break;
-                    case 'Form':
-                        dispatch(setPrefixForm({ Form: values[field] }));
-                        break;
-                    case 'SubForm':
-                        dispatch(setPrefixSubForm({ SubForm: values[field] }));
-                        break;
-                    case 'GroupCheckList':
-                        dispatch(setPrefixGroupCheckList({ GroupCheckList: values[field] }));
-                        break;
-                    case 'Machine':
-                        dispatch(setPrefixMachine({ Machine: values[field] }));
-                        break;
-                    case 'MatchCheckListOption':
-                        dispatch(setPrefixMatchCheckListOption({ MatchCheckListOption: values[field] }));
-                        break;
-                    case 'MatchFormMachine':
-                        dispatch(setPrefixMatchFormMachine({ MatchFormMachine: values[field] }));
-                        break;
-                    case 'UsersPermission':
-                        dispatch(setPrefixUsersPermission({ UsersPermission: values[field] }));
-                        break;
-                    default:
-                        break;
-                }
-                setEdit(false);
-            }}
+            onSubmit={(values) => handleSubmit(values)}
         >
             {({ handleSubmit, errors, touched, setFieldValue, setTouched, values }) => (
                 <Animated.View entering={FadeIn} exiting={FadeOut}>
-                    <View style={[styles.row, { width: 600 }]}>
+                    <View style={[styles.row]}>
                         <View style={{ flex: 1 }}>
                             <Inputs
                                 placeholder={`Enter ${field}`}

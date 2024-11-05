@@ -9,11 +9,13 @@ import { Dialogs } from "../common";
 import { HandelPrssProps } from "@/typing/tag";
 import Actioncontent from "./Contents/Actioncontent";
 import { CustomtableDataProps } from "@/typing/tag";
+import useMasterdataStyles from "@/styles/common/masterdata";
 
 type justifyContent = 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly' | undefined;
 
 const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead, flexArr, actionIndex, displayData, handleDialog, showMessage }) => {
     const customtable = useCustomtableStyles();
+    const masterdataStyles = useMasterdataStyles();
 
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [dialogAction, setDialogAction] = useState<string>("");
@@ -106,7 +108,7 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                 renderItem={({ item, index }) => renderTableData(item, index)}
                 keyExtractor={(item, index) => `key-${index}`}
                 ListEmptyComponent={() => (
-                    <Text style={{ textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }}>
+                    <Text style={[masterdataStyles.text, { textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }]}>
                         No data found...
                     </Text>
                 )}

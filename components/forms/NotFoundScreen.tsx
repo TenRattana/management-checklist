@@ -10,8 +10,6 @@ const NotFoundScreen = () => {
     const { spacing } = useRes()
     const masterdataStyles = useMasterdataStyles()
 
-    console.log("NotFoundScreen");
-
     return (
         <>
             <AccessibleView name="notfound" style={styles.container}>

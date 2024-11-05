@@ -1,12 +1,11 @@
-import React, { useMemo }  from "react";
+import React, { useMemo } from "react";
 import { TextInput, HelperText } from "react-native-paper";
 import { TextareasProps } from "@/typing/tag";
-import AccessibleView from "@/components/AccessibleView";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
 import { View } from "react-native";
 
-const Textareas :React.FC<TextareasProps> = React.memo(({
+const Textareas: React.FC<TextareasProps> = React.memo(({
     placeholder,
     label,
     error,
@@ -18,13 +17,12 @@ const Textareas :React.FC<TextareasProps> = React.memo(({
     hint,
     testId
 }) => {
-    console.log("Textareas");
     const masterdataStyles = useMasterdataStyles()
 
     const formattedLabel = useMemo(() => {
         return mode ? undefined : <Text style={masterdataStyles.text}>{label}</Text>;
-      }, [label, mode]);
-    
+    }, [label, mode]);
+
     return (
         <View id="text-areas" style={masterdataStyles.commonContainer}>
             <TextInput

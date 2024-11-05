@@ -106,7 +106,6 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                     />
                 </AccessibleView>
             </>
-
         );
     }
 
@@ -152,7 +151,10 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                     isEditing={editMode}
                     initialValues={initialSubForm}
                     saveData={handelSaveSubForm}
-                    onDelete={(SFormID: string) => dispatch(deleteSubForm({ SFormID }))}
+                    onDelete={(SFormID: string) => {
+                        runOnJS(dispatch)(deleteSubForm({ SFormID }));
+                        handelSetDialog();
+                    }}
                 />
             </>
         )

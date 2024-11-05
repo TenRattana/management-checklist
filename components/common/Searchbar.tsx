@@ -11,7 +11,6 @@ interface SeractBarProps {
 }
 
 const SearchBar = ({ value, onChange, placeholder, testId }: SeractBarProps) => {
-  console.log("SearchBar");
   const { theme } = useTheme();
   const { spacing } = useRes()
   const masterdataStyles = useMasterdataStyles()

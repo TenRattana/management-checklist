@@ -87,8 +87,6 @@ const Navigation: React.FC = () => {
     const initialRoute: string = user?.username && user?.screen?.length > 0 ? "Home" : "Permission_deny";
 
     const renderComponent = useCallback((name: ComponentNames | ComponentNameNoLazy) => {
-        console.log(name);
-
         if (name in nonLazyComponents) {
             const Component = nonLazyComponents[name as ComponentNameNoLazy];
             return (props: any) => <Component {...props} />;
@@ -132,7 +130,6 @@ const Navigation: React.FC = () => {
                 unmountOnBlur: true,
                 drawerHideStatusBarOnOpen: true,
                 drawerStatusBarAnimation: 'slide',
-                // keyboardDismissMode: 'none',
                 freezeOnBlur: true
             }}
             initialRouteName={initialRoute}

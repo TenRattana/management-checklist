@@ -89,6 +89,8 @@ export interface ExpectedResult {
   TableID: string;
   MachineID: string;
   MachineName: string;
+  UserID:string;
+  UserName:string;
   FormID: string;
   FormName: string;
   CreateDate: string;

@@ -22,7 +22,7 @@ const useCustomtableStyles = () => {
         cardRow: {
             flex: 1,
             paddingHorizontal: spacing.medium,
-            marginVertical: spacing.small,
+            marginVertical: 10,
             borderRadius: 2,
             borderWidth: 1,
             borderColor: theme.colors.surfaceVariant,

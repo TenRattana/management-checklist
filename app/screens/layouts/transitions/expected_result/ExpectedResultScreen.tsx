@@ -70,6 +70,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
         return expectedResult.map((item) => [
             item.MachineName,
             item.FormName,
+            item.UserName ?? "-",
             convertToThaiDateTime(item.CreateDate),
             item.TableID,
         ]);
@@ -80,13 +81,14 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
         Tablehead: [
             { label: "Machine Name", align: "flex-start" },
             { label: "Form Name", align: "flex-start" },
+            { label: "User", align: "flex-start" },
             { label: "Time Submit", align: "flex-start" },
             { label: "Preview", align: "center" },
         ],
-        flexArr: [3, 3, 3, 1],
+        flexArr: [3, 3, 2, 3, 1],
         actionIndex: [
             {
-                preIndex: 3,
+                preIndex: 4,
             },
         ],
         handleAction,

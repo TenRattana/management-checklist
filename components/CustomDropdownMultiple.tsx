@@ -3,7 +3,6 @@ import { IconButton } from "react-native-paper";
 import { MultiSelect } from 'react-native-element-dropdown';
 import AccessibleView from "@/components/AccessibleView";
 import { CustomDropdownMultiProps } from '@/typing/tag';
-import { useRes } from "@/app/contexts";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { Pressable, View } from "react-native";
 import Text from "@/components/Text";
@@ -11,12 +10,7 @@ import Text from "@/components/Text";
 const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChange, lefticon, iconRight, testId, handleBlur }: CustomDropdownMultiProps) => {
   const [options, setOptions] = useState<{ label?: string; value?: string; icon?: () => JSX.Element }[]>([]);
 
-  console.log("Value", value);
-
   const masterdataStyles = useMasterdataStyles();
-
-  const { spacing } = useRes();
-  console.log("CustomDropdownMultiple");
 
   const processData = useCallback(() => {
     if (data && Array.isArray(data)) {

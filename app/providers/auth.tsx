@@ -4,7 +4,7 @@ import axiosInstance from '@/config/axios';
 import { AppProps, GroupUsers, UsersPermission } from '@/typing/type';
 import { useQuery } from 'react-query';
 import { useDispatch } from 'react-redux';
-import { setUser, setApp } from "@/slices";
+import { setUser, setApp, logout } from "@/slices";
 
 const fetchAppConfig = async (): Promise<AppProps> => {
   const response = await axiosInstance.post('AppConfig_service.asmx/GetAppConfigs');
@@ -83,15 +83,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         GUserName: groupUser.find(v => v.GUserID === userData.GUserID)?.GUserName || "",
         IsActive: userData.IsActive
       };
-      saveUserData({ UserName: newSession.UserName });
       dispatch(setUser({ user: newSession }));
+    } else {
+      dispatch(logout());
     }
+    saveUserData({ UserName: UserName });
   }, [user, groupUser]);
 
   useEffect(() => {
     const loadUserDataAsync = async () => {
       try {
         updateSession("Rattana Chomwihok");
+
         // const userInfo = await loadUserData();
         // if (userInfo) {
         //   updateSession(userInfo.UserName);

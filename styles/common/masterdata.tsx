@@ -59,17 +59,10 @@ const useMasterdataStyles = () => {
             backgroundColor: theme.colors.onSecondary,
         },
         containerDialog: {
-            width:
-                responsive === "small"
-                    ? "80%"
-                    : responsive === "medium"
-                        ? "70%"
-                        : "60%",
+            width: '80%',
             alignSelf: "center",
         },
         buttonCreate: {
-            // height: 100,
-
             borderRadius: 8,
             marginLeft: responsive === "small" ? "5%" : 30,
             minWidth: responsive === "small" ? "90%" : 200,

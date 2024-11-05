@@ -48,7 +48,6 @@ const SettingsScreen: React.FC = () => {
       </AccessibleView>
     );
   }, [toggleSwitch, darkMode]);
-  console.log(spacing);
 
   return (
     <AccessibleView name="setting" style={[masterdataStyles.container]}>

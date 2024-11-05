@@ -6,7 +6,6 @@ import AccessibleView from "@/components/AccessibleView";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
 import { View } from "react-native";
-import { useTheme } from "@/app/contexts";
 
 const Selects: React.FC<SelectsProps> = React.memo(({
   hint,
@@ -22,9 +21,7 @@ const Selects: React.FC<SelectsProps> = React.memo(({
   if (!option || option.length === 0) {
     return null;
   }
-  console.log("Selects");
   const masterdataStyles = useMasterdataStyles()
-  const { theme } = useTheme();
 
   return (
     <View id="selects" style={masterdataStyles.commonContainer}>

@@ -10,7 +10,7 @@ import {
 } from "@/slices";
 import FieldDialog from "@/components/forms/FieldDialog";
 import { IconButton } from "react-native-paper";
-import { NestableDraggableFlatList, RenderItemParams, ScaleDecorator, ShadowDecorator } from "react-native-draggable-flatlist";
+import { NestableDraggableFlatList, NestableScrollContainer, RenderItemParams, ScaleDecorator, ShadowDecorator } from "react-native-draggable-flatlist";
 import { runOnJS } from "react-native-reanimated";
 import { spacing } from "@/constants/Spacing";
 import useCreateformStyle from "@/styles/createform";
@@ -106,13 +106,16 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
 
     return (
         <>
-            <NestableDraggableFlatList
-                data={data}
-                renderItem={renderField}
-                keyExtractor={(item, index) => `FD-${item.SFormID}-${index}`}
-                onDragEnd={({ data }) => handleDropField(data)}
-                activationDistance={1}
-            />
+            <NestableScrollContainer>
+                <NestableDraggableFlatList
+                    data={data}
+                    renderItem={renderField}
+                    keyExtractor={(item, index) => `FD-${item.SFormID}-${index}`}
+                    onDragEnd={({ data }) => handleDropField(data)}
+                    activationDistance={1}
+                />
+            </NestableScrollContainer>
+
             <Pressable
                 onPress={() => {
                     handleDialogToggle();
@@ -141,7 +144,6 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
                 dropgroupCheckListOption={dropgroupCheckListOption}
             />
         </>
-
     );
 }
 

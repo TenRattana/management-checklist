@@ -7,6 +7,3 @@ export { default as CustomDropdownMultiple } from "./CustomDropdownMultiple";
 export { default as Customtable } from "./Customtable";
 export { default as CustomtableHead } from "./table/CustomtableHead";
 export { default as CustomtableSmall } from "./table/CustomtableSmall";
-
-console.log("conponent");
-

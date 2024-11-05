@@ -1,12 +1,10 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import { Pressable, View } from "react-native";
 import { Portal, Dialog } from "react-native-paper";
 import { SaveDialogProps } from "@/typing/value";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import AccessibleView from "../AccessibleView";
-import { useRouter } from 'expo-router';
 import Text from "@/components/Text";
 import { useSelector } from "react-redux";
 
@@ -19,9 +17,6 @@ const SaveDialog = ({
     const prefix = useSelector((state: any) => state.prefix);
     const { handleError } = useToast();
     const masterdataStyles = useMasterdataStyles();
-    console.log("SaveDialog");
-
-    const router = useRouter();
 
     const saveForm = useCallback(async () => {
         let messages = ""

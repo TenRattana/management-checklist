@@ -28,7 +28,7 @@ const Dialogs: React.FC<DialogsProps> = ({
                 <Dialog
                     visible={isVisible}
                     onDismiss={() => setIsVisible(false)}
-                    style={masterdataStyles.containerDialog}
+                    style={[{ width: '60%', alignSelf: 'center' }]}
                 >
                     <Dialog.Icon icon="alert" size={90} />
 
