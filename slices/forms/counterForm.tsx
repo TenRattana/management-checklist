@@ -35,7 +35,6 @@ const subFormSlice = createSlice({
   initialState,
   reducers: {
     setForm: (state, action: PayloadAction<{ form?: BaseForm }>) => {
-      console.log("setForm");
 
       const { form } = action.payload;
 
@@ -56,7 +55,6 @@ const subFormSlice = createSlice({
       state.Description = form || "";
     },
     setSubForm: (state, action: PayloadAction<{ subForms: BaseSubForm[] }>) => {
-      console.log("setSubForm");
 
       const { subForms } = action.payload;
 
@@ -70,7 +68,6 @@ const subFormSlice = createSlice({
       sortSubForms(state.subForms);
     },
     setDragSubForm: (state, action: PayloadAction<{ data: Omit<BaseSubForm, 'DisplayOrder'>[] }>) => {
-      console.log("setDragSubForm");
 
       const { data } = action.payload;
 
@@ -87,7 +84,6 @@ const subFormSlice = createSlice({
       checkList: Checklist[];
       checkListType: CheckListType[];
     }>) => {
-      console.log("setField");
 
       const { BaseFormState, checkList, checkListType } = action.payload;
 
@@ -113,7 +109,6 @@ const subFormSlice = createSlice({
       sortSubForms(state.subForms);
     },
     setDragField: (state, action: PayloadAction<{ data: Omit<BaseFormState, 'DisplayOrder'>[] }>) => {
-      console.log("setDragField");
 
       const { data } = action.payload;
 
@@ -131,7 +126,6 @@ const subFormSlice = createSlice({
       });
     },
     addSubForm: (state, action: PayloadAction<{ subForm: BaseSubForm }>) => {
-      console.log("addSubForm");
 
       const { subForm } = action.payload;
 
@@ -144,7 +138,6 @@ const subFormSlice = createSlice({
       sortSubForms(state.subForms);
     },
     updateSubForm: (state, action: PayloadAction<{ subForm: BaseSubForm }>) => {
-      console.log("updateSubForm");
 
       const { subForm } = action.payload;
 
@@ -162,7 +155,6 @@ const subFormSlice = createSlice({
       sortSubForms(state.subForms);
     },
     deleteSubForm: (state, action: PayloadAction<{ SFormID: string }>) => {
-      console.log("deleteSubForm");
 
       const { SFormID } = action.payload;
       state.subForms = state.subForms.filter((subForm) => subForm.SFormID !== SFormID);
@@ -174,8 +166,6 @@ const subFormSlice = createSlice({
       dataType: DataType[];
     }>) => {
       const { BaseFormState, checkList, checkListType, dataType } = action.payload;
-      console.log("addField");
-      console.log(BaseFormState);
 
       const formData: BaseFormState = BaseFormState.DTypeID === null
         ? {
@@ -239,8 +229,6 @@ const subFormSlice = createSlice({
             return field;
           }) || [];
 
-          // const sortedFields = sortFields(updatedFields);
-
           return {
             ...sub,
             Fields: updatedFields,
@@ -272,11 +260,8 @@ const subFormSlice = createSlice({
     defaultDataForm: (state, action: PayloadAction<{
       currentField: BaseFormState;
     }>) => {
-      console.log("defaultDataForm");
 
       const { currentField } = action.payload
-
-      console.log(currentField);
 
       state.subForms = state.subForms.map((sub) => {
         if (sub.SFormID === currentField.SFormID) {
@@ -319,5 +304,3 @@ export const {
 } = subFormSlice.actions;
 
 export default subFormSlice.reducer;
-
-console.log("slices/forms");

@@ -199,27 +199,8 @@ const useForm = (route: any) => {
                     validator = Yup.number()
                         .nullable()
                         .typeError(`The ${field.CListName} field must be a valid number`);
-
-                    if (field.MinLength !== undefined && field.MinLength !== null) {
-                        validator = validator.test(
-                            'min-length',
-                            `The ${field.CListName} minimum control value is ${field.MinLength}`,
-                            value => value === undefined || value === null || Number(value) >= Number(field.MinLength)
-                        );
-                    }
-
-                    if (field.MaxLength !== undefined && field.MaxLength !== null) {
-                        validator = validator.test(
-                            'max-length',
-                            `The ${field.CListName} maximum control value is ${field.MaxLength}`,
-                            value => value === undefined || value === null || Number(value) <= Number(field.MaxLength)
-                        );
-                    }
-
-                    if (field.MinLength !== undefined && field.MinLength < 0) {
-                        validator = validator.min(0, `The ${field.CListName} cannot be negative`);
-                    }
-                } else if (dataTypeName === "String") {
+                        
+                }else if (dataTypeName === "String") {
                     if (checkListTypeName === "Checkbox") {
                         validator = Yup.array()
                             .of(Yup.string())

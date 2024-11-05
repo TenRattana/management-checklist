@@ -15,7 +15,8 @@ const DynamicForm = ({
   groupCheckListOption,
   error,
   errorMessages,
-  type
+  type,
+  warning
 }: DynamicFormProps) => {
   const { CTypeName, CListName, MCListID, GCLOptionID, Required, MinLength, MaxLength } = field;
   const masterdataStyles = useMasterdataStyles();
@@ -47,7 +48,7 @@ const DynamicForm = ({
       case "Textinput":
         return (
           <Inputs
-            hint={error ? errorMessages?.[MCListID] as string || "" : ""}
+            hint={error ? errorMessages?.[MCListID] as string || "" : warning ? warning?.[MCListID] : ""}
             mode={"outlined"}
             label={CListName}
             value={values}
@@ -60,7 +61,7 @@ const DynamicForm = ({
       case "Textarea":
         return (
           <Textareas
-            hint={error ? errorMessages?.[MCListID] as string || "" : ""}
+            hint={error ? errorMessages?.[MCListID] as string || "" : warning?.[MCListID] ? warning?.[MCListID] : ""}
             mode={"outlined"}
             label={CListName}
             value={values}
@@ -97,7 +98,13 @@ const DynamicForm = ({
           <Checkboxs
             option={option}
             hint={error ? errorMessages?.[MCListID] as string || "" : ""}
-            handleChange={(value: string | any) => handleChange(MCListID, (value as string).split(','))}
+            handleChange={(value: string | string[]) => {
+              const processedValues = Array.isArray(value) 
+              ? value.filter((v: string) => v.trim() !== '') 
+              : value.split(',').filter((v: string) => v.trim() !== ''); 
+      
+              handleChange(MCListID, processedValues)
+            }}
             handleBlur={handleBlur}
             value={values}
             testId={`checkbox-${MCListID}`}

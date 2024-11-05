@@ -183,7 +183,6 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                             </>
                         )}
                     </Formik>
-
                 )
                 )}
                 ListHeaderComponent={() => (

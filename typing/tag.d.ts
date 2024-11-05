@@ -96,6 +96,7 @@ export interface DynamicFormProps {
   error?:boolean;
   errorMessages?:FormikErrors<{[key: string]: any;}>;
   type?:string;
+  warning?:{ [key: string]: string | undefined } = {}
 }
 
 export interface PreviewProps<T extends PreviewParams | ScanParams> {

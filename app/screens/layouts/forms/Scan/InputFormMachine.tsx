@@ -8,7 +8,7 @@ import { AccessibleView, Dynamic, NotFoundScreen, Text } from "@/components";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { PreviewProps } from "@/typing/tag";
 import { ScanParams } from "@/typing/tag";
-import { FastField, FieldProps, Formik } from 'formik';
+import { FastField, Field, FieldProps, Formik } from 'formik';
 import { Stack, useNavigation } from "expo-router";
 import useForm from "@/hooks/custom/useForm";
 import { DataType } from "@/typing/type";
@@ -78,12 +78,11 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
         </>
       ) : false}
 
-
       <Formik
         initialValues={formValues}
         validationSchema={validationSchema}
-        validateOnBlur={true}
-        validateOnChange={false}
+        validateOnBlur={false}
+        validateOnChange={true}
         onSubmit={(values) => onFormSubmit(values)}
         enableReinitialize={true}
       >
@@ -108,9 +107,21 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                             };
 
                             return (
-                              <FastField name={field.MCListID} key={`field-${fieldIndex}-${subForm.Columns}-${field.MCListID}`}>
+                              <Field name={field.MCListID} key={`field-${fieldIndex}-${subForm.Columns}-${field.MCListID}`}>
                                 {({ field: fastFieldProps }: FieldProps) => {
                                   const type = dataType.find((v: DataType) => v.DTypeID === field.DTypeID)?.DTypeName;
+
+                                  const warnings: { [key: string]: string | undefined } = {};
+
+                                  if (field.MinLength !== undefined && field.MinLength !== null && !errors[fastFieldProps.name] && touched[fastFieldProps.name] && fastFieldProps.value < field.MinLength) {
+                                    warnings[fastFieldProps.name] = `The ${field.CListName} minimum recommended value is ${field.MinLength}`;
+                                  } else if (field.MaxLength !== undefined && field.MaxLength !== null && !errors[fastFieldProps.name] && touched[fastFieldProps.name] && fastFieldProps.value > field.MaxLength) {
+                                    warnings[fastFieldProps.name] = `The ${field.CListName} maximum recommended value is ${field.MaxLength}`;
+                                  } else if (field.MinLength !== undefined && field.MinLength < 0 && !errors[fastFieldProps.name] && touched[fastFieldProps.name] && fastFieldProps.value < field.MinLength) {
+                                    warnings[fastFieldProps.name] = `The ${field.CListName} maximum recommended value is ${field.MaxLength}`;
+                                  } else {
+                                    warnings[fastFieldProps.name] = undefined;
+                                  }
 
                                   const handleBlur = () => {
                                     if (type === "Number") {
@@ -130,17 +141,22 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                                           [fastFieldProps.name]: true,
                                         });
                                       }
+
+
                                     }
                                   };
-                                  console.log(errors);
 
                                   return (
                                     <View id="container-layout2" style={containerStyle}>
                                       <Dynamic
                                         field={field}
-                                        values={field.CTypeName === "Checkbox"
-                                          ? fastFieldProps.value?.filter((value: string) => value !== '') || []
-                                          : String(fastFieldProps.value ?? '')}
+                                        values={
+                                          field.CTypeName === "Checkbox"
+                                          ? (Array.isArray(fastFieldProps.value) 
+                                              ? fastFieldProps.value.filter((value: string) => value.trim() !== '') 
+                                              : undefined)
+                                          : String(fastFieldProps.value ?? '')
+                                        }
                                         handleChange={(fieldname: string, value: any) => {
                                           setFieldValue(fastFieldProps.name, value);
                                           setTimeout(() => {
@@ -154,12 +170,13 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                                         groupCheckListOption={groupCheckListOption ?? []}
                                         error={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
                                         errorMessages={errors}
+                                        warning={warnings}
                                         type={type}
                                       />
                                     </View>
                                   );
                                 }}
-                              </FastField>
+                              </Field>
                             );
                           })}
                         </Card.Content>
