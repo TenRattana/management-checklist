@@ -120,7 +120,7 @@ const DynamicForm = ({
     <View id="form-layout2">
       <Text
         variant="bodyMedium"
-        style={[masterdataStyles.text, CTypeName === "Text" ? { justifyContent: 'flex-start', alignItems: 'center', marginVertical: 20, paddingHorizontal: 20 } : {}, { paddingTop: fontSize === "large" ? 15 : 5 }]}
+        style={[masterdataStyles.text, CTypeName === "Text" ? { justifyContent: 'flex-start', alignItems: 'center', marginVertical: fontSize === "large" ? 10 : 5, paddingHorizontal: 20 } : {}, { paddingTop: fontSize === "large" ? 15 : 5 }]}
       >
         {CListName} {" "}
         {Required && <Text style={{ color: theme.colors.error }}>(*)</Text>}
