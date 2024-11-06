@@ -1,7 +1,7 @@
 import React, { createContext, useContext, ReactNode, useCallback, useMemo } from "react";
 import ToastManager, { Toast } from "toastify-react-native";
 import axios from "axios";
-
+import { useRes } from "../contexts";
 export interface ToastContextProps {
   showSuccess: (message: string) => void;
   showError: (messages: string[]) => void;
@@ -15,6 +15,8 @@ interface ToastProviderProps {
 export const ToastContext = createContext<ToastContextProps | undefined>(undefined);
 
 export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
+  const { spacing } = useRes();
+
   const showSuccess = useCallback((message: string) => {
     Toast.success(message);
   }, [Toast]);
@@ -45,7 +47,9 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
 
   return (
     <ToastContext.Provider value={value}>
-      <ToastManager />
+      <ToastManager
+        textStyle={{ fontSize: spacing.small }}
+      />
       {children}
     </ToastContext.Provider>
   );

@@ -111,7 +111,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
         <GestureHandlerRootView style={[createform.container, { flex: 1 }]}>
             <AccessibleView name="container-form" style={[createform.containerL1]}>
                 <SegmentedControl
-                    values={["Form", "Tool"]}
+                    values={["Tool", "Form"]}
                     selectedIndex={selectedIndex}
                     onChange={(event) => setSelectedIndex(event.nativeEvent.selectedSegmentIndex)}
                     style={{ height: 80, borderRadius: 0 }}

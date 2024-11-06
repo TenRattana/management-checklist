@@ -21,7 +21,8 @@ const Cellcontent = React.memo(({ cell, cellIndex, row, rowIndex, Canedit, handl
                 action: "activeIndex",
                 data: String(row[cellIndex + 1]),
                 message: row,
-                visible: Boolean(!Canedit)
+                visible: Boolean(!Canedit),
+                Change: "Change Status"
             }
             )} key={`cell-content-${cellIndex}`}>
                 <IconButton

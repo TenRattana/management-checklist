@@ -44,7 +44,7 @@ const Actioncontent = React.memo(({ data, action, row, rowIndex, Canedit, handle
             action: action,
             data: data,
             message: row,
-            visible: Boolean(!Canedit)
+            visible: Boolean(!Canedit),
         }
         )} key={`action-${action}`} style={customtable.eventCell}>
             {icon}

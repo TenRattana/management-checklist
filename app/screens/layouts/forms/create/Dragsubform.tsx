@@ -122,6 +122,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
     if (isSelectedIndex1) {
         return (
             <>
+
                 <Pressable
                     onPress={() => {
                         setInitialDialog(true);
@@ -145,6 +146,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                     </AccessibleView>
                 </NestableScrollContainer>
 
+
                 <SubFormDialog
                     isVisible={initialDialog}
                     setIsVisible={handelSetDialog}
@@ -156,7 +158,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                         handelSetDialog();
                     }}
                 />
-            </>
+            </ >
         )
     }
     return null

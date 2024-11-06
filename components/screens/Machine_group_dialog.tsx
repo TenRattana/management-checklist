@@ -10,9 +10,9 @@ import Text from "@/components/Text";
 import { useTheme } from "@/app/contexts";
 
 const validationSchema = Yup.object().shape({
-    machineGroupName: Yup.string().required("The machine group name field is required."),
+    machineGroupName: Yup.string().required("The group machine name field is required."),
     description: Yup.string().required("The description field is required."),
-    isActive: Yup.boolean().required("The active field is required."),
+    isActive: Yup.boolean().required("The status field is required."),
 });
 
 const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }: GroupMachineDialogProps<InitialValuesGroupMachine>) => {
@@ -50,8 +50,8 @@ const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValue
                                     <FastField name="machineGroupName">
                                         {({ field, form }: any) => (
                                             <Inputs
-                                                placeholder="Enter Machine Group Name"
-                                                label="Machine Group Name"
+                                                placeholder="Enter Group Machine Name"
+                                                label="Group Machine Name"
                                                 handleChange={(value) => form.setFieldValue(field.name, value)}
                                                 handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
                                                 value={field.value}

@@ -215,6 +215,7 @@ export interface HandelPrssProps {
   data: string;
   message: (string | number | boolean)[];
   visible?: boolean;
+  Change?:string;
 }
 export interface CustomtableSmallProps {
   displayData: (string | number | boolean)[][];

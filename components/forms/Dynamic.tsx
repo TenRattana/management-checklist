@@ -4,7 +4,7 @@ import { CheckListOption } from '@/typing/type';
 import { DynamicFormProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { View } from "react-native";
-import { useTheme } from "@/app/contexts";
+import { useRes, useTheme } from "@/app/contexts";
 import { Text } from "react-native-paper";
 
 const DynamicForm = ({
@@ -21,6 +21,7 @@ const DynamicForm = ({
   const { CTypeName, CListName, MCListID, GCLOptionID, Required, MinLength, MaxLength } = field;
   const masterdataStyles = useMasterdataStyles();
   const { theme } = useTheme()
+  const { fontSize } = useRes()
   let textColor = theme.colors.onBackground;
 
   if (type === "Number") {
@@ -99,10 +100,10 @@ const DynamicForm = ({
             option={option}
             hint={error ? errorMessages?.[MCListID] as string || "" : ""}
             handleChange={(value: string | string[]) => {
-              const processedValues = Array.isArray(value) 
-              ? value.filter((v: string) => v.trim() !== '') 
-              : value.split(',').filter((v: string) => v.trim() !== ''); 
-      
+              const processedValues = Array.isArray(value)
+                ? value.filter((v: string) => v.trim() !== '')
+                : value.split(',').filter((v: string) => v.trim() !== '');
+
               handleChange(MCListID, processedValues)
             }}
             handleBlur={handleBlur}
@@ -119,7 +120,7 @@ const DynamicForm = ({
     <View id="form-layout2">
       <Text
         variant="bodyMedium"
-        style={[masterdataStyles.text, CTypeName === "Text" ? { justifyContent: 'flex-start', alignItems: 'center', marginVertical: 'auto' } : {}]}
+        style={[masterdataStyles.text, CTypeName === "Text" ? { justifyContent: 'flex-start', alignItems: 'center', marginVertical: 20, paddingHorizontal: 20 } : {}, { paddingTop: fontSize === "large" ? 15 : 5 }]}
       >
         {CListName} {" "}
         {Required && <Text style={{ color: theme.colors.error }}>(*)</Text>}

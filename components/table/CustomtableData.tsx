@@ -23,10 +23,10 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
     const [dialogTitle, setDialogTitle] = useState<string>("");
     const [dialogData, setDialogData] = useState<string>("");
 
-    const handlePress = useCallback(({ action, data, message, visible }: HandelPrssProps) => {
+    const handlePress = useCallback(({ action, data, message, visible, Change }: HandelPrssProps) => {
         setDialogAction(action);
         setDialogData(String(data));
-        setDialogTitle(action === "editIndex" ? "Edit" : action === "delIndex" ? "Delete" : "");
+        setDialogTitle(Change ? Change : action === "editIndex" ? "Edit" : action === "delIndex" ? "Delete" : "");
         const messages = Array.isArray(showMessage) ? showMessage.map(key => message[key]).join(" ") : message[showMessage];
         setDialogMessage(String(`${messages}`));
         setIsVisible((visible || action === "editIndex" || action === "changeIndex" || action === "copyIndex" || action === "preIndex"));

@@ -15,10 +15,10 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { Platform } from "react-native";
 
 const validationSchema = Yup.object().shape({
-    machineGroupId: Yup.string().required("The machine group field is required."),
+    machineGroupId: Yup.string().required("The group machine field is required."),
     machineName: Yup.string().required("The machine name field is required."),
     description: Yup.string().required("The description field is required."),
-    isActive: Yup.boolean().required("The active field is required."),
+    isActive: Yup.boolean().required("The status field is required."),
 });
 
 const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData, dropmachine, machineGroup = [] }: MachineDialogProps<InitialValuesMachine, GroupMachine>) => {

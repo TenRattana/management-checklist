@@ -13,7 +13,6 @@ import RouteGuard from './guard/GuardRoute';
 import axiosInstance from '@/config/axios';
 import { Asset } from 'expo-asset';
 import { StatusBar, setStatusBarStyle } from 'expo-status-bar';
-import * as ScreenOrientation from 'expo-screen-orientation';
 
 const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();
@@ -70,7 +69,6 @@ const RootLayout = () => {
 
                 await new Promise(resolve => setTimeout(resolve, 2000));
 
-                // ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL);
             } catch (error) {
                 console.warn('Error loading fonts:', error);
             } finally {
