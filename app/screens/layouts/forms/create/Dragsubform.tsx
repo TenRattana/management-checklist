@@ -1,6 +1,8 @@
 import React, { useState, useCallback } from "react";
 import {
+    Platform,
     Pressable,
+    ScrollView,
 } from "react-native";
 import {
     setDragSubForm,
@@ -133,17 +135,24 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                     <Text style={[masterdataStyles.textFFF, { marginLeft: 8, paddingVertical: 10 }]}>Add Sub Form</Text>
                 </Pressable>
 
-                <NestableScrollContainer>
-                    <AccessibleView name="drag-subform" style={{ paddingHorizontal: fontSize === "large" ? 30 : 25, paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 20 : 0 }}>
-                        <NestableDraggableFlatList
-                            data={state.subForms}
-                            renderItem={renderSubForm}
-                            keyExtractor={(item, index) => `SF-${item.SFormID}-${index}`}
-                            onDragEnd={({ data }) => handleDropSubForm(data)}
-                            activationDistance={1}
-                        />
-                    </AccessibleView>
+                {/* <NestableScrollContainer> */}
+                <NestableScrollContainer
+                    style={{
+                        paddingHorizontal: fontSize === "large" ? 30 : 25,
+                        paddingTop: 5,
+                        paddingBottom: state.subForms.length > 0 ? 20 : 0,
+                    }}
+                >
+                    <NestableDraggableFlatList
+                        data={state.subForms}
+                        renderItem={renderSubForm}
+                        keyExtractor={(item, index) => `SF-${item.SFormID}-${index}`}
+                        onDragEnd={({ data }) => handleDropSubForm(data)}
+                        activationDistance={10}  // Adjust for sensitivity
+                        scrollEnabled={true}
+                    />
                 </NestableScrollContainer>
+                {/* </NestableScrollContainer> */}
 
                 <SubFormDialog
                     isVisible={initialDialog}
