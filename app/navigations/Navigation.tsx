@@ -23,6 +23,7 @@ import { useRes } from "@/app/contexts";
 import CustomDrawerContent from '@/components/navigation/CustomDrawer';
 import { useTheme } from '../contexts';
 import { useSelector } from "react-redux";
+import TestComponent from '../screens/TestComponent';
 
 const Drawer = createDrawerNavigator();
 
@@ -47,7 +48,8 @@ type ComponentNameNoLazy =
     | 'Expected_result'
     | 'Match_checklist_option'
     | 'Match_form_machine'
-    | 'Managepermissions';
+    | 'Managepermissions'
+    | 'Test';
 
 const components: Record<ComponentNames, () => Promise<{ default: React.ComponentType<any> }>> = {
     Create_form: () => import('@/app/screens/layouts/forms/create/CreateFormScreen'),
@@ -72,6 +74,7 @@ const nonLazyComponents: Record<ComponentNameNoLazy, React.ComponentType<any>> =
     Config: ConfigulationScreen,
     Permission_deny: PermissionDeny,
     Home: HomeScreen,
+    Test: TestComponent
 };
 
 const Navigation: React.FC = () => {

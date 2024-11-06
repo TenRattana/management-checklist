@@ -33,7 +33,6 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
     const [initialDialog, setInitialDialog] = useState<boolean>(false)
     const [initialSubForm, setInitialSubForm] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", MachineID: "", Fields: [] });
     const [editMode, setEditMode] = useState<boolean>(false)
-    const createformStyles = useCreateformStyle();
     const masterdataStyles = useMasterdataStyles()
     const { fontSize } = useRes()
     const { theme } = useTheme()
@@ -89,11 +88,11 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                     ]}
                     testID={`dg-SF-${item.SFormID}`}
                 >
-                    <IconButton icon={"credit-card-plus"} iconColor={theme.colors.fff} size={spacing.large} style={createformStyles.icon} animated />
+                    <IconButton icon={"credit-card-plus"} iconColor={theme.colors.fff} size={spacing.large} style={createform.icon} animated />
                     <Text style={[createform.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
                         {item.SFormName}
                     </Text>
-                    <IconButton icon="chevron-right" iconColor={theme.colors.fff} size={spacing.large} style={createformStyles.icon} animated />
+                    <IconButton icon="chevron-right" iconColor={theme.colors.fff} size={spacing.large} style={createform.icon} animated />
                 </Pressable>
 
                 <AccessibleView name="drag-subform" style={{ paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 40 : 0 }}>
@@ -131,7 +130,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                     }}
                     style={[createform.addSubFormButton]}
                 >
-                    <IconButton icon="plus" iconColor={theme.colors.fff} size={spacing.large} style={createformStyles.icon} animated />
+                    <IconButton icon="plus" iconColor={theme.colors.fff} size={spacing.large} style={createform.icon} animated />
                     <Text style={[masterdataStyles.textFFF, { marginLeft: 8, paddingVertical: 10 }]}>Add Sub Form</Text>
                 </Pressable>
 

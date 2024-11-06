@@ -90,6 +90,7 @@ const CustomDrawerContent: React.FC<CustomDrawerProps> = (props) => {
                 {user.role === "SuperAdmin" && (
                     <>
                         {renderPressable('Managepermissions', 'Managepermissions')}
+                        {renderPressable('Test', 'Test')}
                     </>
                 )}
 
