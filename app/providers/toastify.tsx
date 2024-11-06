@@ -15,7 +15,7 @@ interface ToastProviderProps {
 export const ToastContext = createContext<ToastContextProps | undefined>(undefined);
 
 export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
-  const { spacing } = useRes();
+  const { spacing , fontSize } = useRes();
 
   const showSuccess = useCallback((message: string) => {
     Toast.success(message);
@@ -48,7 +48,15 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
   return (
     <ToastContext.Provider value={value}>
       <ToastManager
-        textStyle={{ fontSize: spacing.small }}
+        textStyle={{ fontSize: spacing.small ,lineHeight: spacing.medium,}}
+        height={fontSize === "large" ? 180 : 80}
+        style={{
+          paddingHorizontal: 16, 
+          paddingVertical: 8, 
+          borderRadius: 8, 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+        }}
       />
       {children}
     </ToastContext.Provider>
