@@ -67,7 +67,7 @@ const DraggableItem: React.FC<{
         <PanGestureHandler onGestureEvent={onGestureEvent} onEnded={onGestureEnd}>
             <View>
                 <Animated.View style={[itemAnimatedStyle, { opacity: isDragging ? 0 : 1 }]}>
-                    <View style={[{ marginHorizontal: 10, flexDirection: "row", alignItems: "center" }, createform.addSubFormButton]}>
+                    <View style={[{ marginHorizontal: 10, flexDirection: "row", alignItems: "center" }, createform.addItem]}>
                         <IconButton icon={item.Icon} iconColor={theme.colors.fff} size={spacing.large} style={createform.icon} animated />
                         <Text style={[masterdataStyles.textFFF, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
                             {item.CTypeName}

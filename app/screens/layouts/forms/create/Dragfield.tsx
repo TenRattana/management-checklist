@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
 import {
     Pressable,
+    ScrollView,
 } from "react-native";
 import {
     addField,
@@ -39,7 +40,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
 
     const handleDialogToggle = useCallback(() => {
         setIsEditing(false);
-        setDialogVisible(prev => !prev);
+        setDialogVisible((prev) => !prev);
     }, []);
 
     const handleField = (item?: BaseFormState) => {
@@ -85,11 +86,11 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
                 style={[createformStyles.fieldContainer, isActive && createformStyles.active]}
                 testID={`dg-FD-${item.SFormID}`}
             >
-                <IconButton icon={checkListType.find((v) => v.CTypeID === item.CTypeID)?.Icon ?? "camera"} style={createformStyles.icon} iconColor={theme.colors.background} size={spacing.large} animated />
+                <IconButton icon={checkListType.find((v) => v.CTypeID === item.CTypeID)?.Icon ?? "camera"} style={createformStyles.icon} iconColor={theme.colors.fff} size={spacing.large} animated />
                 <Text style={[createformStyles.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
                     {item.CListName}
                 </Text>
-                <IconButton icon="chevron-right" iconColor={theme.colors.background} size={spacing.large} style={createformStyles.icon} animated />
+                <IconButton icon="chevron-right" iconColor={theme.colors.fff} size={spacing.large} style={createformStyles.icon} animated />
             </Pressable>
         );
     }
@@ -121,9 +122,9 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
                     handleDialogToggle();
                     handleField();
                 }}
-                style={[createformStyles.fieldContainer, { justifyContent: "center", opacity: 0.5 }]}
+                style={[createformStyles.fieldContainer, { justifyContent: "center", opacity: 0.8 }]}
             >
-                <IconButton icon="plus" iconColor={theme.colors.background} size={spacing.large} style={createformStyles.icon} animated />
+                <IconButton icon="plus" iconColor={theme.colors.fff} size={spacing.large} style={createformStyles.icon} animated />
                 <Text style={[masterdataStyles.textFFF, { marginLeft: 8, paddingVertical: 10 }]}>Add Field</Text>
             </Pressable>
 

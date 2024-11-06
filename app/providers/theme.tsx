@@ -23,7 +23,10 @@ const CustomLightTheme = {
     green: "#ffb11e",
     yellow: "#c8c400",
     blue: "rgb(20, 148, 255)",
-    fff: '#fff'
+    fff: '#fff',
+    drag: '#37AFE1',
+    subform: '#6439FF',
+    field: '#4F75FF'
   },
 };
 
@@ -39,7 +42,10 @@ const CustomDarkTheme = {
     green: "#ffb11e",
     yellow: "#c8c400",
     blue: "rgb(20, 148, 255)",
-    fff: '#fff'
+    fff: '#fff',
+    drag: '#37AFE1',
+    subform: '#071952',
+    field: '#088395'
   },
 };
 

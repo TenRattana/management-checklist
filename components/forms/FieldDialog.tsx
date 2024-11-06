@@ -378,8 +378,8 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                     { opacity: isValid && dirty ? 1 : 0.5 }
                                                 ]}
                                             >
-                                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>
-                                                    {editMode ? "Update SubForm" : "Add SubForm"}
+                                                <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
+                                                    {editMode ? "Update Field" : "Add Field"}
                                                 </Text>
                                             </Pressable>
 
@@ -391,8 +391,8 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                     }}
                                                     style={[masterdataStyles.button, masterdataStyles.backMain]}
                                                 >
-                                                    <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>
-                                                        Delete sub form
+                                                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
+                                                        Delete Field
                                                     </Text>
                                                 </Pressable>
                                             )}
@@ -401,7 +401,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                 onPress={() => setShowDialogs()}
                                                 style={[masterdataStyles.button, masterdataStyles.backMain]}
                                             >
-                                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textLight]}>
+                                                <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
                                                     Cancel
                                                 </Text>
                                             </Pressable>

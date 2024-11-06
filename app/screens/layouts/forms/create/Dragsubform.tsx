@@ -11,7 +11,7 @@ import {
 import { AccessibleView, SaveDialog, Text } from "@/components";
 import SubFormDialog from "@/components/forms/SubFormDialog";
 import useCreateformStyle from "@/styles/createform";
-import {
+import DraggableFlatList, {
     RenderItemParams,
     ScaleDecorator,
     NestableScrollContainer,
@@ -68,7 +68,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
         } finally {
             handelSetDialog()
         }
-    }, [])
+    }, [dispatch, handleError, handelSetDialog]);
 
     const RowItem = ({ item, drag, isActive }: RowItemProps<BaseSubForm>) => {
         return (
@@ -87,11 +87,11 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                     ]}
                     testID={`dg-SF-${item.SFormID}`}
                 >
-                    <IconButton icon={"credit-card-plus"} iconColor={theme.colors.background} size={spacing.large} style={createformStyles.icon} animated />
+                    <IconButton icon={"credit-card-plus"} iconColor={theme.colors.fff} size={spacing.large} style={createformStyles.icon} animated />
                     <Text style={[createform.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
                         {item.SFormName}
                     </Text>
-                    <IconButton icon="chevron-right" iconColor={theme.colors.background} size={spacing.large} style={createformStyles.icon} animated />
+                    <IconButton icon="chevron-right" iconColor={theme.colors.fff} size={spacing.large} style={createformStyles.icon} animated />
                 </Pressable>
 
                 <AccessibleView name="drag-subform" style={{ paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 40 : 0 }}>
@@ -122,7 +122,6 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
     if (isSelectedIndex1) {
         return (
             <>
-
                 <Pressable
                     onPress={() => {
                         setInitialDialog(true);
@@ -146,7 +145,6 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                     </AccessibleView>
                 </NestableScrollContainer>
 
-
                 <SubFormDialog
                     isVisible={initialDialog}
                     setIsVisible={handelSetDialog}
@@ -158,6 +156,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                         handelSetDialog();
                     }}
                 />
+
             </ >
         )
     }
