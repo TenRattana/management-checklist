@@ -25,6 +25,11 @@ const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initial
                     {isEditing ? "Edit" : "Create"}
                 </Dialog.Title>
                 <Dialog.Content>
+                    <Text
+                        style={[masterdataStyles.text, { paddingLeft: 10 }]}
+                    >
+                        {isEditing ? "Edit the details of the match form & machine." : "Enter the details for the new match form & machine.."}
+                    </Text>
                     {isVisible && (
                         <Formik
                             initialValues={initialValues}
