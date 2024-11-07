@@ -169,7 +169,7 @@ const MachineGroupScreen: React.FC = React.memo(() => {
         Tabledata: tableData,
         Tablehead: [
             { label: "", align: "flex-start" },
-            { label: "Machine Group Name", align: "flex-start" },
+            { label: "Group Machine Name", align: "flex-start" },
             { label: "Machine Name", align: "flex-start" },
             { label: "Description", align: "flex-start" },
             { label: "Status", align: "center" },

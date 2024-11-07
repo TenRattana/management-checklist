@@ -29,6 +29,11 @@ const Managepermisstion_dialog = ({ isVisible, setIsVisible, isEditing, initialV
                     {isEditing ? "Edit" : "Create"}
                 </Dialog.Title>
                 <Dialog.Content>
+                    <Text
+                        style={[masterdataStyles.text, { paddingLeft: 10 }]}
+                    >
+                        {isEditing ? "Edit the details of the user." : "Enter the details for the new user.."}
+                    </Text>
                     {isVisible && (
                         <Formik
                             initialValues={initialValues}
