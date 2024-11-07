@@ -309,7 +309,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                         {({ field, form }: any) => (
                                                             <Inputs
                                                                 placeholder="Digis Value"
-                                                                label="DTypeValue"
+                                                                label="Digit number"
                                                                 handleChange={(value) => form.setFieldValue(field.name, value)}
                                                                 handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
                                                                 value={String(field.value ?? "")}

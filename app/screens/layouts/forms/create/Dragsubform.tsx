@@ -134,7 +134,6 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                     <Text style={[masterdataStyles.textFFF, { marginLeft: 8, paddingVertical: 10 }]}>Add Sub Form</Text>
                 </Pressable>
 
-                {/* <NestableScrollContainer> */}
                 <NestableScrollContainer
                     style={{
                         paddingHorizontal: fontSize === "large" ? 30 : 25,
@@ -147,11 +146,9 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                         renderItem={renderSubForm}
                         keyExtractor={(item, index) => `SF-${item.SFormID}-${index}`}
                         onDragEnd={({ data }) => handleDropSubForm(data)}
-                        activationDistance={10}  // Adjust for sensitivity
-                        scrollEnabled={true}
+                        activationDistance={10}
                     />
                 </NestableScrollContainer>
-                {/* </NestableScrollContainer> */}
 
                 <SubFormDialog
                     isVisible={initialDialog}
