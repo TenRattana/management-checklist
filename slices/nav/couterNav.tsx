@@ -75,6 +75,8 @@ const middlewareStore = createSlice({
             state.username = user.UserName;
             state.role = user.GUserName;
             state.isAuthenticated = true;
+            console.log(user);
+
             state.permissions = getPermissionRole(user.GUserName)
             state.screen = setScreen(user.GUserName)
         },

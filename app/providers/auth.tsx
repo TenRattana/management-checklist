@@ -93,7 +93,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const loadUserDataAsync = async () => {
       try {
-        updateSession("Rattana Chomwihok");
+        updateSession("ACC_04");
 
         // const userInfo = await loadUserData();
         // if (userInfo) {

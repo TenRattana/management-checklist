@@ -99,6 +99,17 @@ const CustomDrawerContent: React.FC<CustomDrawerProps> = (props) => {
                     <>
                         {renderPressable('Home', 'Home')}
                         {renderPressable('Scan QR Code', 'ScanQR')}
+                        {renderPressable('List Result', 'Expected_result')}
+                        {renderPressable('Setting', 'Setting')}
+                    </>
+                )}
+
+                {user.role === "Head" && (
+                    <>
+                        {renderPressable('Home', 'Home')}
+                        {renderPressable('Scan QR Code', 'ScanQR')}
+                        {renderPressable('List Result', 'Expected_result')}
+                        {renderPressable('List Approve', 'Approve')}
                         {renderPressable('Setting', 'Setting')}
                     </>
                 )}
