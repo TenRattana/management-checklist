@@ -18,20 +18,20 @@ const DynamicForm = ({
   type,
   warning
 }: DynamicFormProps) => {
-  const { CTypeName, CListName, MCListID, GCLOptionID, Required, MinLength, MaxLength } = field;
+  const { CTypeName, CListName, MCListID, GCLOptionID, Required, Important, ImportantList } = field;
   const masterdataStyles = useMasterdataStyles();
   const { theme } = useTheme()
   const { fontSize } = useRes()
   let textColor = theme.colors.onBackground;
 
-  if (type === "Number") {
+  if (Important) {
     const numericValue = Number(values);
 
-    if (Number(MinLength) > numericValue) {
-      textColor = theme.colors.yellow;
-    } else if (Number(MaxLength) < numericValue) {
-      textColor = theme.colors.error;
-    }
+    // if (Number(ImportantList?.MinLength) > numericValue) {
+    //   textColor = theme.colors.yellow;
+    // } else if (Number(ImportantList?.MaxLength) < numericValue) {
+    //   textColor = theme.colors.error;
+    // }
   }
 
   const option = useMemo(() =>

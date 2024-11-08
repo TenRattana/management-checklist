@@ -149,13 +149,14 @@ const useForm = (route: any) => {
                     DTypeValue: itemOption.DTypeValue,
                     SFormID: itemOption.SFormID,
                     Required: itemOption.Required,
-                    MinLength: itemOption.MinLength,
-                    MaxLength: itemOption.MaxLength,
+                    Important: itemOption.Important,
+                    ImportantList: itemOption.ImportantList,
                     Placeholder: itemOption.Placeholder,
                     Hint: itemOption.Hint,
                     DisplayOrder: itemOption.DisplayOrder,
                     EResult: expectedResult?.[itemOption.MCListID] || "",
                 });
+
             });
         });
 
@@ -199,8 +200,8 @@ const useForm = (route: any) => {
                     validator = Yup.number()
                         .nullable()
                         .typeError(`The ${field.CListName} field must be a valid number`);
-                        
-                }else if (dataTypeName === "String") {
+
+                } else if (dataTypeName === "String") {
                     if (checkListTypeName === "Checkbox") {
                         validator = Yup.array()
                             .of(Yup.string())

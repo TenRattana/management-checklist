@@ -19,7 +19,7 @@ export interface BaseSubForm {
   Columns?: number;
   DisplayOrder?: number;
   MachineID: string;
-  Fields:BaseFormState[]
+  Fields: BaseFormState[];
 }
 
 export interface SubForm extends BaseSubForm {
@@ -29,7 +29,13 @@ export interface SubForm extends BaseSubForm {
 export interface FormData extends BaseForm {
   SubForm?: SubForm[];
 }
-
+export interface BaseImportant {
+  ID: number;
+  ImportantID: string;
+  Value?:string;
+  MinLength?: number;
+  MaxLength?: number;
+}
 export interface BaseFormState {
   MCListID: string;
   CListID: string;
@@ -39,18 +45,18 @@ export interface BaseFormState {
   DTypeValue?: number;
   SFormID: string;
   Required: boolean;
-  MinLength?: number;
-  MaxLength?: number;
+  Important: boolean;
+  ImportantList?: BaseImportant[];
   Placeholder?: string;
   Hint?: string;
   DisplayOrder?: number;
   EResult?: any;
-  CTypeName?:string;
-  CListName?:string;
+  CTypeName?: string;
+  CListName?: string;
 }
-export interface RowItemProps <V extends BaseFormState | BaseSubForm> {
-    item: V;
-    drag: () => void;
-    isActive: boolean;
-};
+export interface RowItemProps<V extends BaseFormState | BaseSubForm> {
+  item: V;
+  drag: () => void;
+  isActive: boolean;
+}
 export type FormConfig = BaseForm | BaseSubForm | BaseFormState;

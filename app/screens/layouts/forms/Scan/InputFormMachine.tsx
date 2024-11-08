@@ -113,15 +113,15 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
 
                                   const warnings: { [key: string]: string | undefined } = {};
 
-                                  if (field.MinLength !== undefined && field.MinLength !== null && !errors[fastFieldProps.name] && touched[fastFieldProps.name] && fastFieldProps.value < field.MinLength) {
-                                    warnings[fastFieldProps.name] = `The ${field.CListName} minimum recommended value is ${field.MinLength}`;
-                                  } else if (field.MaxLength !== undefined && field.MaxLength !== null && !errors[fastFieldProps.name] && touched[fastFieldProps.name] && fastFieldProps.value > field.MaxLength) {
-                                    warnings[fastFieldProps.name] = `The ${field.CListName} maximum recommended value is ${field.MaxLength}`;
-                                  } else if (field.MinLength !== undefined && field.MinLength < 0 && !errors[fastFieldProps.name] && touched[fastFieldProps.name] && fastFieldProps.value < field.MinLength) {
-                                    warnings[fastFieldProps.name] = `The ${field.CListName} maximum recommended value is ${field.MaxLength}`;
-                                  } else {
-                                    warnings[fastFieldProps.name] = undefined;
-                                  }
+                                  // if (field.MinLength !== undefined && field.MinLength !== null && !errors[fastFieldProps.name] && touched[fastFieldProps.name] && fastFieldProps.value < field.MinLength) {
+                                  //   warnings[fastFieldProps.name] = `The ${field.CListName} minimum recommended value is ${field.MinLength}`;
+                                  // } else if (field.MaxLength !== undefined && field.MaxLength !== null && !errors[fastFieldProps.name] && touched[fastFieldProps.name] && fastFieldProps.value > field.MaxLength) {
+                                  //   warnings[fastFieldProps.name] = `The ${field.CListName} maximum recommended value is ${field.MaxLength}`;
+                                  // } else if (field.MinLength !== undefined && field.MinLength < 0 && !errors[fastFieldProps.name] && touched[fastFieldProps.name] && fastFieldProps.value < field.MinLength) {
+                                  //   warnings[fastFieldProps.name] = `The ${field.CListName} maximum recommended value is ${field.MaxLength}`;
+                                  // } else {
+                                  //   warnings[fastFieldProps.name] = undefined;
+                                  // }
 
                                   const handleBlur = () => {
                                     if (type === "Number") {
@@ -152,10 +152,10 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
                                         field={field}
                                         values={
                                           field.CTypeName === "Checkbox"
-                                          ? (Array.isArray(fastFieldProps.value) 
-                                              ? fastFieldProps.value.filter((value: string) => value.trim() !== '') 
+                                            ? (Array.isArray(fastFieldProps.value)
+                                              ? fastFieldProps.value.filter((value: string) => value.trim() !== '')
                                               : undefined)
-                                          : String(fastFieldProps.value ?? '')
+                                            : String(fastFieldProps.value ?? '')
                                         }
                                         handleChange={(fieldname: string, value: any) => {
                                           setFieldValue(fastFieldProps.name, value);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
-import { Inputs } from "@/components/common";
+import { Checkboxs, Inputs } from "@/components/common";
 import { Portal, Dialog, HelperText, Switch, IconButton, useTheme } from "react-native-paper";
 import { Formik, FastField } from "formik";
 import Checklist_dialog from "../screens/Checklist_dialog";
@@ -13,6 +13,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-na
 import { InitialValuesChecklist } from '@/typing/value'
 import { FieldDialogProps } from "@/typing/tag";
 import Text from "@/components/Text";
+import { CheckListOption } from "@/typing/type";
 
 const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField, setShowDialogs
     , checkListType, dataType, checkList, groupCheckListOption, dropcheckList, dropcheckListType, dropdataType, dropgroupCheckListOption
@@ -24,16 +25,19 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
 
     const [shouldRender, setShouldRender] = useState<string>("");
     const [shouldRenderDT, setShouldRenderDT] = useState<boolean>(false);
+    const [shouldRenderIT, setShouldRenderIT] = useState<boolean>(false);
+
     const { fontSize } = useRes()
 
     const validationSchema = Yup.object().shape({
         CListID: Yup.string().required("The checklist field is required."),
         CTypeID: Yup.string().required("The checklist type field is required."),
         Required: Yup.boolean().required("The required field is required."),
+        Important: Yup.boolean().required("The important field is required."),
         DTypeID: Yup.lazy((value, context) => {
             const CTypeID = checkListType.find(v => v.CTypeID === context.parent.CTypeID)?.CTypeName;
             if (CTypeID && ['Textinput', 'Textarea'].includes(CTypeID)) {
-                return Yup.string().required("DTypeID is required for Text/TextArea.");
+                return Yup.string().required("Data Type is required for Text/TextArea.");
             }
             return Yup.string().nullable();
         }),
@@ -62,8 +66,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
         }
     };
 
-    const itemHeight = fontSize === "small" ? 70 : fontSize === "medium" ? 80 : 100
-    const itemHeightN = itemHeight * 3
+    const itemHeight = fontSize === "small" ? 85 : fontSize === "medium" ? 80 : 100
 
     const opacityT = useSharedValue(0);
     const heightT = useSharedValue(0);
@@ -73,6 +76,9 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
 
     const opacityN = useSharedValue(0);
     const heightN = useSharedValue(0);
+
+    const opacityIT = useSharedValue(0);
+    const heightIT = useSharedValue(0);
 
     const animatedText = useAnimatedStyle(() => ({
         opacity: opacityT.value,
@@ -91,6 +97,32 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
         height: heightN.value,
         overflow: 'hidden',
     }));
+
+    const animatedStyleIT = useAnimatedStyle(() => ({
+        opacity: opacityIT.value,
+        height: heightIT.value,
+        overflow: 'hidden',
+    }));
+
+    useEffect(() => {
+        opacityIT.value = withTiming(0, { duration: 0 });
+        heightIT.value = withTiming(0, { duration: 0 });
+
+        if (shouldRenderIT) {
+            if (shouldRenderDT) {
+                opacityIT.value = withTiming(1, { duration: 300 });
+                heightIT.value = withTiming(itemHeight * 2, { duration: 300 });
+            } else if (shouldRender === "detail") {
+                opacityIT.value = withTiming(1, { duration: 300 });
+                heightIT.value = withTiming(itemHeight * 1, { duration: 300 });
+            }
+        } else {
+            setTimeout(() => {
+                opacityIT.value = withTiming(0, { duration: 300 });
+                heightIT.value = withTiming(0, { duration: 300 });
+            }, 300);
+        }
+    }, [shouldRenderIT, shouldRenderDT, shouldRender])
 
     useEffect(() => {
         opacityT.value = withTiming(0, { duration: 0 });
@@ -122,7 +154,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
 
         if (shouldRender) {
             opacityN.value = withTiming(1, { duration: 300 });
-            heightN.value = withTiming(itemHeightN, { duration: 300 });
+            heightN.value = withTiming(itemHeight, { duration: 300 });
         } else {
             setTimeout(() => {
                 opacityN.value = withTiming(0, { duration: 300 });
@@ -186,6 +218,10 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
 
                                     setShouldRenderDT(dataTypeItem === "Number");
                                 }, [values.DTypeID]);
+
+                                useEffect(() => {
+                                    setShouldRenderIT(values.Important)
+                                }, [values.Important]);
 
                                 return (
                                     <View id="form-fd">
@@ -320,7 +356,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                         )}
                                                     </FastField >
 
-                                                    <FastField name="MinLength">
+                                                    {/* <FastField name="MinLength">
                                                         {({ field, form }: any) => (
                                                             <Inputs
                                                                 placeholder="Min Value"
@@ -348,7 +384,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                                 testId={`MaxLength-form`}
                                                             />
                                                         )}
-                                                    </FastField >
+                                                    </FastField > */}
 
                                                 </Animated.View>
                                             )}
@@ -366,6 +402,100 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                     id="Required-form"
                                                 />
                                             </View>
+
+                                            <View id="form-important-fd" style={masterdataStyles.containerSwitch}>
+                                                <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
+                                                    Important: {values.Important ? "Yes" : "No"}
+                                                </Text>
+                                                <Switch
+                                                    style={{ transform: [{ scale: 1.1 }], top: 2 }}
+                                                    value={values.Important}
+                                                    onValueChange={(v: boolean) => {
+                                                        setFieldValue("Important", v);
+                                                    }}
+                                                    id="Important-form"
+                                                />
+                                            </View>
+
+                                            {shouldRenderIT && shouldRender === "detail" && (
+                                                <Animated.View style={[animatedStyleIT]}>
+                                                    <FastField name="MinLength">
+                                                        {({ field, form }: any) => {
+
+                                                            const option = useMemo(() =>
+                                                                groupCheckListOption
+                                                                    .filter(option => option.GCLOptionID === values.GCLOptionID)
+                                                                    .flatMap(v => v.CheckListOptions?.map((item: CheckListOption) => ({
+                                                                        label: item.CLOptionName,
+                                                                        value: item.CLOptionID,
+                                                                    })) || []),
+                                                                [groupCheckListOption, values.GCLOptionID]
+                                                            );
+
+                                                            return (
+                                                                // <Checkboxs
+                                                                //     option={option}
+                                                                //     // hint={error ? errorMessages?.[MCListID] as string || "" : ""}
+                                                                //     handleChange={(value: string | string[]) => {
+                                                                //         const processedValues = Array.isArray(value)
+                                                                //             ? value.filter((v: string) => v.trim() !== '')
+                                                                //             : value.split(',').filter((v: string) => v.trim() !== '');
+                                                                //         form.setFieldValue(field.name, processedValues)
+                                                                //     }}
+                                                                //     handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                                //     value={""}
+                                                                //     testId={`Value-Important-form`}
+                                                                // />
+                                                                <Inputs
+                                                                    placeholder="Min Value"
+                                                                    label="Min Value Control"
+                                                                    handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                                    handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                                    value={String(field.value ?? "")}
+                                                                    error={form.touched.MinLength && Boolean(form.errors.MinLength)}
+                                                                    errorMessage={form.touched.MinLength ? form.errors.MinLength : ""}
+                                                                    testId={`MinLength-form`}
+                                                                />
+                                                            )
+                                                        }}
+                                                    </FastField >
+
+                                                </Animated.View>
+                                            )}
+
+                                            {shouldRenderIT && shouldRenderDT && (
+                                                <Animated.View style={[animatedStyleIT]}>
+                                                    <FastField name="MinLength">
+                                                        {({ field, form }: any) => (
+                                                            <Inputs
+                                                                placeholder="Min Value"
+                                                                label="Min Value Control"
+                                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                                value={String(field.value ?? "")}
+                                                                error={form.touched.MinLength && Boolean(form.errors.MinLength)}
+                                                                errorMessage={form.touched.MinLength ? form.errors.MinLength : ""}
+                                                                testId={`MinLength-form`}
+                                                            />
+                                                        )}
+                                                    </FastField >
+
+                                                    <FastField name="MaxLength">
+                                                        {({ field, form }: any) => (
+                                                            <Inputs
+                                                                placeholder="Max Value"
+                                                                label="Max Value Control"
+                                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                                value={String(field.value ?? "")}
+                                                                error={form.touched.MaxLength && Boolean(form.errors.MaxLength)}
+                                                                errorMessage={form.touched.MaxLength ? form.errors.MaxLength : ""}
+                                                                testId={`MaxLength-form`}
+                                                            />
+                                                        )}
+                                                    </FastField >
+                                                </Animated.View>
+                                            )}
                                         </ScrollView>
 
                                         <View id="form-action-fd" style={masterdataStyles.containerAction}>

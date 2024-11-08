@@ -172,8 +172,6 @@ const subFormSlice = createSlice({
           ...BaseFormState,
           DTypeID: dataType.find((v) => v.DTypeName === "String")?.DTypeID ?? "",
           DTypeValue: undefined,
-          MaxLength: undefined,
-          MinLength: undefined,
         }
         : BaseFormState;
 
@@ -210,8 +208,6 @@ const subFormSlice = createSlice({
           ...BaseFormState,
           DTypeID: dataType.find((v) => v.DTypeName === "String")?.DTypeID ?? "",
           DTypeValue: undefined,
-          MaxLength: undefined,
-          MinLength: undefined,
         }
         : BaseFormState;
 

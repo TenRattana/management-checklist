@@ -80,7 +80,6 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
         <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]}>
             <Stack.Screen
                 options={{
-                    headerTitle: state.MachineName ?? "",
                     headerRight: () => (
                         <View style={{ alignItems: 'center', justifyContent: 'center', paddingRight: 20 }}>
                             <Text style={[{ fontSize: 18, fontWeight: "500" }]}>
