@@ -80,6 +80,7 @@ const CustomDrawerContent: React.FC<CustomDrawerProps> = (props) => {
                         {renderPressable('List Form', 'Form')}
                         {renderPressable('Match Form & Machine', 'Match_form_machine')}
                         {renderPressable('List Result', 'Expected_result')}
+                        {renderPressable('List Approve', 'Approve')}
                         {renderPressable('Scan QR Code', 'ScanQR')}
                         {renderPressable('Generate QR Code', 'GenerateQR')}
                         {renderPressable('Setting', 'Setting')}

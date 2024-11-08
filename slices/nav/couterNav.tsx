@@ -1,27 +1,30 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-const superAdminScreens = [
+const superAdmin = [
     "view_home", "view_login", "view_machine_group", "view_machine", "view_checklist"
     , "view_checklist_option", "view_checklist_group", "view_match_checklist_option", "view_match_form_machine", "create_form"
     , "view_expected_result", "view_form", "view_preview", "view_scan_qr", "generate_qr", "input_form_machine", "manage_settings"
-    , "manage_permissions", "view_config"
+    , "manage_permissions", "view_config", "view_approved"
 ]
-const adminScreens = [
+const admin = [
     "view_home", "view_machine_group", "view_machine", "view_checklist"
     , "view_checklist_option", "view_checklist_group", "view_match_checklist_option", "view_match_form_machine", "create_form"
     , "view_expected_result", "view_form", "view_preview", "view_scan_qr", "generate_qr", "input_form_machine", "manage_settings"
-    , "view_config"
+    , "view_config", "view_approved"
 ]
-const generalUserScreens = ["view_home", "view_scan_qr", "input_form_machine", "manage_settings"]
+const generalUser = ["view_home", "view_scan_qr", "input_form_machine", "manage_settings"]
+const Head = ["view_home", "view_expected_result", "view_approved", "manage_settings"]
 
 const getPermissionRole = (role: string) => {
     switch (role) {
         case 'SuperAdmin':
-            return superAdminScreens;
+            return superAdmin;
         case 'Admin':
-            return adminScreens;
+            return admin;
         case 'GeneralUser':
-            return generalUserScreens;
+            return generalUser;
+        case 'Head':
+            return Head;
         default:
             return [];
     }
@@ -29,9 +32,10 @@ const getPermissionRole = (role: string) => {
 
 const setScreen = (GUserName: string) => {
     const screenMapping: Record<string, string[]> = {
-        SuperAdmin: ["Home", "Machine_group", "Machine", "Checklist", "Checklist_option", "Checklist_group", "Match_checklist_option", "Match_form_machine", "Create_form", "Expected_result", "Form", "User", "Preview", "Admin", "ScanQR", "GenerateQR", "InputFormMachine", "Setting", "Managepermissions", "SuperAdmin","Test", "Permission_deny", "Config"],
-        Admin: ["Home", "Machine_group", "Machine", "Checklist", "Checklist_option", "Checklist_group", "Match_checklist_option", "Match_form_machine", "Create_form", "Expected_result", "Form", "User", "Preview", "Admin", "ScanQR", "GenerateQR", "InputFormMachine", "Setting", "Permission_deny", "Config"],
-        GeneralUser: ["Home", "ScanQR", "InputFormMachine", "Setting", "Permission_deny"]
+        SuperAdmin: ["Home", "Machine_group", "Machine", "Checklist", "Checklist_option", "Checklist_group", "Match_checklist_option", "Match_form_machine", "Create_form", "Expected_result", "Approve", "Form", "User", "Preview", "Admin", "ScanQR", "GenerateQR", "InputFormMachine", "Setting", "Managepermissions", "SuperAdmin", "Test", "Permission_deny", "Config"],
+        Admin: ["Home", "Machine_group", "Machine", "Checklist", "Checklist_option", "Checklist_group", "Match_checklist_option", "Match_form_machine", "Create_form", "Expected_result", "Approve", "Form", "User", "Preview", "Admin", "ScanQR", "GenerateQR", "InputFormMachine", "Setting", "Permission_deny", "Config"],
+        GeneralUser: ["Home", "ScanQR", "InputFormMachine", "Approve", "Setting", "Permission_deny"],
+        Head: ["Home", "Expected_result", "Approve", "Setting"]
     };
 
     const permittedScreens = screenMapping[GUserName] || [];

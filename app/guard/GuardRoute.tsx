@@ -14,6 +14,7 @@ const screens = [
     { name: "Match_form_machine", route: 'screens/layouts/matchs/match_form_machine/MatchFormMachineScreen', permissions: ["view_match_form_machine"] },
     { name: "Create_form", route: 'screens/layouts/forms/create/CreateFormScreen', permissions: ["create_form"] },
     { name: "Expected_result", route: 'screens/layouts/transitions/expected_result/ExpectedResultScreen', permissions: ["view_expected_result"] },
+    { name: "Approve", route: 'screens/layouts/approveds/ApprovedScreen', permissions: ["view_approved"] },
     { name: "Form", route: 'screens/layouts/forms/form/FormScreen', permissions: ["view_form"] },
     { name: "Preview", route: 'screens/layouts/forms/view/Preview', permissions: ["view_preview"] },
     { name: "ScanQR", route: 'screens/layouts/actions/camera/ScanQR', permissions: ["view_scan_qr"] },
