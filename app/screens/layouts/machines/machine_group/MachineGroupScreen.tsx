@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Pressable } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast, useRes } from "@/app/contexts";
 import { LoadingSpinner, AccessibleView, Searchbar, Customtable, Text } from "@/components";
@@ -157,11 +157,29 @@ const MachineGroupScreen = React.memo(() => {
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);
 
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1
+        },
+        header: {
+            fontSize: spacing.large,
+            marginTop: spacing.small,
+            paddingVertical: fontSize === "large" ? 7 : 5
+        },
+        functionname: {
+            textAlign: 'center'
+        },
+        cardcontent: {
+            padding: 2,
+            flex: 1
+        }
+    })
+
     return (
-        <AccessibleView name="container-groupmachine" style={{ flex: 1 }}>
+        <AccessibleView name="container-groupmachine" style={styles.container}>
             <Card.Title
                 title="Create Group Machine"
-                titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
+                titleStyle={[masterdataStyles.textBold, styles.header]}
             />
             <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
@@ -171,10 +189,10 @@ const MachineGroupScreen = React.memo(() => {
                     testId="search-machine-group"
                 />
                 <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>Create Group Machine</Text>
+                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Group Machine</Text>
                 </Pressable>
             </AccessibleView>
-            <Card.Content style={{ padding: 2, flex: 1 }}>
+            <Card.Content style={styles.cardcontent}>
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
             </Card.Content>
 

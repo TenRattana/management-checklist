@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
-import { Pressable } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast, useRes } from "@/app/contexts";
 import { AccessibleView, Customtable, LoadingSpinner, Searchbar, Text } from "@/components";
@@ -186,11 +186,29 @@ const MachineGroupScreen: React.FC = React.memo(() => {
         return machineGroups.filter(v => v.IsActive || v.GMachineID === initialValues.machineGroupId);
     }, [machineGroups, initialValues.machineGroupId]);
 
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1
+        },
+        header: {
+            fontSize: spacing.large,
+            marginTop: spacing.small,
+            paddingVertical: fontSize === "large" ? 7 : 5
+        },
+        functionname: {
+            textAlign: 'center'
+        },
+        cardcontent: {
+            padding: 2,
+            flex: 1
+        }
+    })
+
     return (
-        <AccessibleView name="container-machine" style={{ flex: 1 }}>
+        <AccessibleView name="container-machine" style={styles.container}>
             <Card.Title
                 title="Create Machine"
-                titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
+                titleStyle={[masterdataStyles.textBold, styles.header]}
             />
             <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
@@ -200,10 +218,10 @@ const MachineGroupScreen: React.FC = React.memo(() => {
                     testId="search-machine"
                 />
                 <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>Create Machine</Text>
+                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Machine</Text>
                 </Pressable>
             </AccessibleView>
-            <Card.Content style={{ padding: 2, flex: 1 }}>
+            <Card.Content style={styles.cardcontent}>
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
             </Card.Content>
 

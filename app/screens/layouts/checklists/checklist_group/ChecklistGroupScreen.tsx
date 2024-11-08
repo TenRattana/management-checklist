@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Pressable } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 import axiosInstance from "@/config/axios";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
@@ -147,11 +147,29 @@ const ChecklistGroupScreen = React.memo(() => {
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);
 
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1
+        },
+        header: {
+            fontSize: spacing.large,
+            marginTop: spacing.small,
+            paddingVertical: fontSize === "large" ? 7 : 5
+        },
+        functionname: {
+            textAlign: 'center'
+        },
+        cardcontent: {
+            padding: 2,
+            flex: 1
+        }
+    })
+
     return (
-        <AccessibleView name="container-groupchecklist" style={{ flex: 1 }}>
+        <AccessibleView name="container-groupchecklist" style={styles.container}>
             <Card.Title
                 title="Create Group Option"
-                titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
+                titleStyle={[masterdataStyles.textBold, styles.header]}
             />
             <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
@@ -161,10 +179,10 @@ const ChecklistGroupScreen = React.memo(() => {
                     testId="search-groupchecklist"
                 />
                 <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>Create Group Option</Text>
+                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Group Option</Text>
                 </Pressable>
             </AccessibleView>
-            <Card.Content style={{ padding: 2, flex: 1 }}>
+            <Card.Content style={styles.cardcontent}>
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
             </Card.Content>
 

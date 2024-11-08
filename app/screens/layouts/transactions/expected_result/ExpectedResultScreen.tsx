@@ -7,6 +7,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { ExpectedResult } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
 import { useQuery } from 'react-query';
+import { StyleSheet } from "react-native";
 
 const fetchExpectedResults = async (): Promise<ExpectedResult[]> => {
     const response = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResults");
@@ -96,11 +97,29 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);
 
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1
+        },
+        header: {
+            fontSize: spacing.large,
+            marginTop: spacing.small,
+            paddingVertical: fontSize === "large" ? 7 : 5
+        },
+        functionname: {
+            textAlign: 'center'
+        },
+        cardcontent: {
+            padding: 2,
+            flex: 1
+        }
+    })
+
     return (
-        <AccessibleView name="container-checklist" style={{ flex: 1 }}>
+        <AccessibleView name="container-checklist" style={styles.container}>
             <Card.Title
                 title="ExpectedResult"
-                titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
+                titleStyle={[masterdataStyles.textBold, styles.header]}
             />
             <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
@@ -110,7 +129,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
                     testId="search-er"
                 />
             </AccessibleView>
-            <Card.Content style={{ padding: 2, flex: 1 }}>
+            <Card.Content style={styles.cardcontent}>
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
             </Card.Content>
         </AccessibleView>
