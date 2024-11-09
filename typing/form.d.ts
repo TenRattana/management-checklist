@@ -30,9 +30,9 @@ export interface FormData extends BaseForm {
   SubForm?: SubForm[];
 }
 export interface BaseImportant {
-  ID: number;
+  ID?: number;
   ImportantID: string;
-  Value?:string;
+  ImportantValue?:string | string[];
   MinLength?: number;
   MaxLength?: number;
 }
@@ -46,7 +46,7 @@ export interface BaseFormState {
   SFormID: string;
   Required: boolean;
   Important: boolean;
-  ImportantList?: BaseImportant[];
+  ImportantList?: BaseImportant;
   Placeholder?: string;
   Hint?: string;
   DisplayOrder?: number;

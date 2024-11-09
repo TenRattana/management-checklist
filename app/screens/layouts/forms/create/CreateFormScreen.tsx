@@ -55,6 +55,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
 
         if (cardIndex >= 0) {
             const targetSubForm = state.subForms[cardIndex];
+            const idITD = `ITD-ADD-${Math.random()}`
             const newField: BaseFormState = {
                 MCListID: `MCL-ADD-${Math.random()}`,
                 CListID: selectedChecklist?.CListID ?? "",
@@ -66,7 +67,13 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                 SFormID: targetSubForm.SFormID,
                 Required: false,
                 Important: false,
-                ImportantList: [],
+                ImportantList: {
+                    ID: undefined,
+                    ImportantID: idITD,
+                    ImportantValue: undefined,
+                    MinLength: undefined,
+                    MaxLength: undefined
+                },
                 Placeholder: "Empty content",
                 Hint: "Empty content",
                 EResult: "",

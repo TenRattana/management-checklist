@@ -19,7 +19,6 @@ const CustomDrawerContent: React.FC<CustomDrawerProps> = (props) => {
     const [isMenuListOpen, setIsMenuListOpen] = useState({
         machine: false,
         checklist: false,
-        match: false,
     });
 
     useEffect(() => {
