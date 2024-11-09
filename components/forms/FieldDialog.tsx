@@ -193,6 +193,17 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
         }
     }, [shouldRenderDT]);
 
+    useEffect(() => {
+        if (!isVisible) {
+            setOption([]);
+            setShouldRender('');
+            setShouldRenderDT(false);
+            setShouldRenderIT(false);
+            setIsVisibleCL(false);
+            setInitialValueCL({ checkListId: "", checkListName: "", isActive: false, disables: false });
+        }
+    }, [isVisible]);
+
     return (
         <Portal>
             <Dialog visible={isVisible} onDismiss={() => setShowDialogs()} style={masterdataStyles.containerDialog}>
@@ -219,8 +230,6 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                 handleSubmit,
                                 isValid,
                                 dirty,
-                                touched,
-                                errors
                             }) => {
                                 useEffect(() => {
                                     const checkListTypeItem = checkListType.find(
@@ -244,13 +253,18 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                         item => item.DTypeID === values.DTypeID
                                     )?.DTypeName;
 
+                                    if (dataTypeItem === "Number") {
+                                        if (values.ImportantList) {
+                                            values.ImportantList.ImportantValue = undefined;
+                                        }
+                                    }
                                     setShouldRenderDT(dataTypeItem === "Number");
+
                                 }, [values.DTypeID]);
 
                                 useEffect(() => {
                                     if (values.Important && values.GCLOptionID) {
                                         if (values.ImportantList) {
-                                            values.ImportantList.ImportantValue = undefined;
                                             values.ImportantList.MinLength = undefined;
                                             values.ImportantList.MaxLength = undefined;
                                         }
@@ -267,11 +281,6 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                 useEffect(() => {
                                     setShouldRenderIT(values.Important)
                                 }, [values.Important]);
-
-                                console.log(values);
-                                console.log(touched);
-                                console.log(errors);
-
 
                                 return (
                                     <View id="form-fd">
@@ -433,17 +442,33 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                         Select value is important!
                                                     </Text>
                                                     <FastField name="ImportantList.ImportantValue">
-                                                        {({ field, form }: any) => (
-                                                            <Checkboxs
-                                                                option={option}
-                                                                handleChange={(value: string | string[]) => {
-                                                                    const processedValues = Array.isArray(value)
-                                                                        ? value.filter((v: string) => v.trim() !== '')
-                                                                        : value.split(',').filter((v: string) => v.trim() !== '');
+                                                        {({ field, form }: any) => {
 
-                                                                    form.setFieldValue(field.name, processedValues);
+                                                            return (
+                                                                <Checkboxs
+                                                                    option={option}
+                                                                    handleChange={(value: string | string[]) => {
+                                                                        const processedValues = Array.isArray(value)
+                                                                            ? value.filter((v: string) => v.trim() !== '')
+                                                                            : value.split(',').filter((v: string) => v.trim() !== '');
 
-                                                                    setTimeout(() => {
+                                                                        form.setFieldValue(field.name, processedValues);
+
+                                                                        setTimeout(() => {
+                                                                            form.setTouched({
+                                                                                ...form.touched,
+                                                                                ImportantList: {
+                                                                                    ...form.touched.ImportantList,
+                                                                                    ImportantValue: true,
+                                                                                },
+                                                                            });
+
+                                                                            form.validateField(field.name);
+                                                                        }, 0);
+                                                                    }}
+                                                                    error={form.touched?.ImportantList?.ImportantValue && Boolean(form.errors?.ImportantList?.ImportantValue)}
+                                                                    errorMessage={form.touched?.ImportantList?.ImportantValue ? form.errors?.ImportantList?.ImportantValue : ""}
+                                                                    handleBlur={() => {
                                                                         form.setTouched({
                                                                             ...form.touched,
                                                                             ImportantList: {
@@ -451,25 +476,12 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                                                 ImportantValue: true,
                                                                             },
                                                                         });
-
-                                                                        form.validateField(field.name);
-                                                                    }, 0);
-                                                                }}
-                                                                error={form.touched?.ImportantList?.ImportantValue && Boolean(form.errors?.ImportantList?.ImportantValue)}
-                                                                errorMessage={form.touched?.ImportantList?.ImportantValue ? form.errors?.ImportantList?.ImportantValue : ""}
-                                                                handleBlur={() => {
-                                                                    form.setTouched({
-                                                                        ...form.touched,
-                                                                        ImportantList: {
-                                                                            ...form.touched.ImportantList,
-                                                                            ImportantValue: true,
-                                                                        },
-                                                                    });
-                                                                }}
-                                                                value={Array.isArray(field.value) ? field.value.filter((value: string) => value.trim() !== '') : undefined}
-                                                                testId={`Value-Important-form`}
-                                                            />
-                                                        )}
+                                                                    }}
+                                                                    value={String(field.value ?? "")}
+                                                                    testId={`Value-Important-form`}
+                                                                />
+                                                            )
+                                                        }}
                                                     </FastField>
                                                 </Animated.View>
                                             )}
