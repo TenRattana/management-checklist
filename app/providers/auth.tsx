@@ -4,7 +4,8 @@ import axiosInstance from '@/config/axios';
 import { AppProps, GroupUsers, UsersPermission } from '@/typing/type';
 import { useQuery } from 'react-query';
 import { useDispatch } from 'react-redux';
-import { setUser, setApp, logout } from "@/slices";
+import { setUser, setApp, logout, fetchMenu } from "@/slices";
+import { AppDispatch } from '@/stores';
 
 const fetchAppConfig = async (): Promise<AppProps> => {
   const response = await axiosInstance.post('AppConfig_service.asmx/GetAppConfigs');
@@ -33,16 +34,13 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState<boolean>(true);
 
   const { data: user = [], isLoading: isUserLoading } = useQuery<UsersPermission[], Error>(
     'userPermission',
     fetchUserPermission,
-    {
-      refetchOnWindowFocus: false,
-      keepPreviousData: true,
-    }
+    { refetchOnWindowFocus: false, keepPreviousData: true }
   );
 
   const { data, isLoading: isAppLoading } = useQuery<AppProps, Error>(
@@ -55,7 +53,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       cacheTime: 1000 * 60 * 10,
     }
   );
-
   useEffect(() => {
     if (data) {
       dispatch(setApp({ App: data }));
@@ -73,6 +70,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   );
 
+  useEffect(() => {
+    if (!isUserLoading && !isAppLoading && !isGroupUserLoading) {
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
+  }, [isUserLoading, isAppLoading, isGroupUserLoading]);
+
   const updateSession = useCallback((UserName: string) => {
     const userData = user.find(v => v.UserName === UserName);
     if (userData) {
@@ -83,39 +88,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         GUserName: groupUser.find(v => v.GUserID === userData.GUserID)?.GUserName || "",
         IsActive: userData.IsActive
       };
+      dispatch(fetchMenu(userData.GUserID));
       dispatch(setUser({ user: newSession }));
     } else {
       dispatch(logout());
     }
     saveUserData({ UserName: UserName });
-  }, [user, groupUser]);
+  }, [user, groupUser, dispatch]);
 
   useEffect(() => {
     const loadUserDataAsync = async () => {
       try {
         updateSession("Rattana Chomwihok");
 
+        // Optional loading of persisted user data (commented out for now)
         // const userInfo = await loadUserData();
         // if (userInfo) {
         //   updateSession(userInfo.UserName);
         // }
+
       } catch (error) {
         console.error("Error loading user data:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
     loadUserDataAsync();
   }, [updateSession]);
-
-  useEffect(() => {
-    if (isUserLoading || isAppLoading || isGroupUserLoading) {
-      setLoading(true);
-    } else {
-      setLoading(false);
-    }
-  }, [isUserLoading, isAppLoading, isGroupUserLoading]);
 
   const login = useCallback((username: string) => {
     updateSession(username);

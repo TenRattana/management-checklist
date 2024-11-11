@@ -52,11 +52,16 @@ const MenuSection = React.memo(({ title, isOpen, onToggle, items, navigation }: 
                 <IconButton icon={isOpen ? 'chevron-up' : 'chevron-down'} size={spacing.large} />
             </Pressable>
             <Animated.View style={animatedStyle}>
-                {items.map((item) => (
-                    <Pressable key={item.label} onPress={() => navigation.navigate(item.navigateTo)} style={masterdataStyles.subMenuItem}>
-                        <Text style={masterdataStyles.subMenuText}>{item.label ?? ""}</Text>
-                    </Pressable>
-                ))}
+                {items.map((item) => {
+                    return (
+                        <Pressable
+                            key={`item-${item.label}-nav-${item.navigateTo}`}
+                            onPress={() => navigation.navigate(item.navigateTo)}
+                            style={masterdataStyles.subMenuItem}>
+                            <Text style={masterdataStyles.subMenuText}>{item.label ?? ""}</Text>
+                        </Pressable>
+                    )
+                })}
             </Animated.View>
         </>
     );

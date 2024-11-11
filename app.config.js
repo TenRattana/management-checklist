@@ -50,7 +50,7 @@ export default {
       //   dev: false,
       // },
     },
-    assetBundlePatterns: ["assets/fonts/*"],
+    assetBundlePatterns: ["assets/fonts/*", "assets/images/*"],
     plugins: [
       "expo-router",
       [
@@ -66,5 +66,6 @@ export default {
     experiments: {
       typedRoutes: true,
     },
+    jsEngine: "hermes",
   },
 };

@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Pressable, StyleSheet, ImageBackground, View } from "react-native";
 import { Text } from "@/components";
 import useMasterdataStyles from "@/styles/common/masterdata";
@@ -7,7 +7,7 @@ import { ScanQRProps } from "@/typing/tag";
 
 const HomeScreen: React.FC<ScanQRProps> = React.memo(({ navigation }) => {
   const masterdataStyles = useMasterdataStyles();
-  const bgImage = require('../../../assets/images/bgs.jpg');
+  const bgImage = useMemo(() => require('../../../assets/images/bgs.jpg'), []);
 
   const handleSacnQR = useCallback(() => {
     navigation.navigate("ScanQR")

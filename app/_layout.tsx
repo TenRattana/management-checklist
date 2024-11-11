@@ -15,6 +15,7 @@ import { Asset } from 'expo-asset';
 import { StatusBar, setStatusBarStyle } from 'expo-status-bar';
 
 const queryClient = new QueryClient();
+
 SplashScreen.preventAutoHideAsync();
 
 const SetTheme = () => {
@@ -50,47 +51,48 @@ const SetTheme = () => {
             </PaperProvider>
         );
     }
-}
+};
+
 const RootLayout = () => {
     const [fontsLoaded, setFontsLoaded] = useState(false);
+    const [assetsLoaded, setAssetsLoaded] = useState(false);
+
+    const prepare = async () => {
+        try {
+            await Font.loadAsync({
+                "Poppins": require("../assets/fonts/Poppins-Regular.ttf"),
+                "Sarabun": require("../assets/fonts/Sarabun-Regular.ttf"),
+            });
+
+            await Asset.loadAsync([
+                require('../assets/images/bgs.jpg'),
+                require('../assets/images/Icon.jpg'),
+                require('../assets/images/Icon-app.png'),
+            ]);
+        } catch (error) {
+            console.warn('Error loading fonts and assets:', error);
+        } finally {
+            setFontsLoaded(true);
+            setAssetsLoaded(true);
+        }
+    };
 
     useEffect(() => {
-        const prepare = async () => {
-            try {
-                await Font.loadAsync({
-                    "Poppins": require("../assets/fonts/Poppins-Regular.ttf"),
-                    "Sarabun": require("../assets/fonts/Sarabun-Regular.ttf"),
-                });
-                await Asset.loadAsync([
-                    require('../assets/images/bgs.jpg'),
-                    require('../assets/images/Icon.jpg'),
-                    require('../assets/images/Icon-app.png'),
-                ]);
-
-                await new Promise(resolve => setTimeout(resolve, 2000));
-
-            } catch (error) {
-                console.warn('Error loading fonts:', error);
-            } finally {
-                setFontsLoaded(true);
-            }
-        };
-
-        setTimeout(() => {
-            setStatusBarStyle("light");
-        }, 0);
-
         prepare();
     }, []);
 
     useEffect(() => {
-        if (fontsLoaded) {
+        if (fontsLoaded && assetsLoaded) {
             SplashScreen.hideAsync();
         }
-    }, [fontsLoaded]);
+    }, [fontsLoaded, assetsLoaded]);
 
-    if (!fontsLoaded) {
-        return <ActivityIndicator size="large" color="#0000ff" style={{ alignContent: 'center', justifyContent: 'center', height: '100%' }} />;
+    useEffect(() => {
+        setStatusBarStyle("light");
+    }, []);
+
+    if (!fontsLoaded || !assetsLoaded) {
+        return <ActivityIndicator size="large" color="#0000ff" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />;
     }
 
     return (

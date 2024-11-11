@@ -65,7 +65,7 @@ export interface Form {
   FormName: string;
   IsActive: boolean;
   Description: string;
-  Disables:boolean;
+  Disables: boolean;
 }
 
 export interface MatchForm {
@@ -82,15 +82,15 @@ export interface MatchCheckListOption {
   CheckListOptions: Array<{ CLOptionID: string }>;
   IsActive: boolean;
   GCLOptionName: string;
-  Disables:boolean;
+  Disables: boolean;
 }
 
 export interface ExpectedResult {
   TableID: string;
   MachineID: string;
   MachineName: string;
-  UserID:string;
-  UserName:string;
+  UserID: string;
+  UserName: string;
   FormID: string;
   FormName: string;
   CreateDate: string;
@@ -116,7 +116,7 @@ export interface GroupUsers {
 }
 
 export interface Prefixs {
-  AppID:string;
+  AppID: string;
   GroupMachine: string;
   Machine: string;
   CheckList: string;
@@ -125,7 +125,7 @@ export interface Prefixs {
   MatchCheckListOption: string;
   MatchFormMachine: string;
   Form: string;
-  SubForm:string;
+  SubForm: string;
   ExpectedResult: string;
   UsersPermission: string;
 }
@@ -133,6 +133,55 @@ export interface Prefixs {
 export interface AppProps extends Prefixs {
   AppName: string;
 }
+
+export interface ParentMenu {
+  MenuID: number;
+  MenuPermission: string;
+  MenuLabel: string;
+  ParentMenuID: string | null;
+  PermissionID: number;
+  Path: string | null;
+  NavigationTo: string;
+  OrderNo: number | null;
+  IsActive: boolean;
+}
+export interface Menu {
+  MenuID: number;
+  MenuPermission: string;
+  MenuLabel: string;
+  ParentMenuID: string | null;
+  PermissionID: number;
+  Path: string | null;
+  NavigationTo: string;
+  OrderNo: number | null;
+  IsActive: boolean;
+  ParentMenu: ParentMenu[];
+}
+
+export type ComponentNames =
+  | "Create_form"
+  | "InputFormMachine"
+  | "Preview"
+  | "Approve";
+
+export type ComponentNameNoLazy =
+  | "Machine_group"
+  | "Machine"
+  | "Checklist"
+  | "Home"
+  | "ScanQR"
+  | "GenerateQR"
+  | "Setting"
+  | "Config"
+  | "Permission_deny"
+  | "Checklist_option"
+  | "Checklist_group"
+  | "Form"
+  | "Expected_result"
+  | "Match_checklist_option"
+  | "Match_form_machine"
+  | "Managepermissions"
+  | "Test";
 
 export type TypeConfig =
   | GroupMachine
