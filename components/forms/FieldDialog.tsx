@@ -14,6 +14,7 @@ import { InitialValuesChecklist } from '@/typing/value'
 import { FieldDialogProps } from "@/typing/tag";
 import Text from "@/components/Text";
 import { CheckListOption, GroupCheckListOption } from "@/typing/type";
+import { BaseImportant } from "@/typing/form";
 
 const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField, setShowDialogs
     , checkListType, dataType, checkList, groupCheckListOption, dropcheckList, dropcheckListType, dropdataType, dropgroupCheckListOption
@@ -56,57 +57,61 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
             }
             return Yup.string().nullable();
         }),
-        ImportantList: Yup.object().shape({
-            Value: Yup.lazy((value, context) => {
-                const isImportant = context.context?.Important || false;
-                const GCLOptionID = context.context?.GCLOptionID || false;
+        ImportantList: Yup.array().of(
+            Yup.object().shape({
+                // Value: Yup.lazy((value, context) => {
+                //     const isImportant = context?.context?.Important || false;
+                //     const hasGCLOptionID = context?.context?.GCLOptionID || false;
+                //     console.log(isImportant);
+                //     console.log(hasGCLOptionID);
 
-                if (isImportant && GCLOptionID) {
-                    return Yup.array()
-                        .min(1, "You must select at least one option.")
-                        .typeError("The min value control must be a number.")
-                        .required("Important value is required when marked as important.");
-                }
+                //     if (isImportant && hasGCLOptionID) {
+                //         return Yup.array()
+                //             .min(1, "You must select at least one option.")
+                //             .required("Important value is required when marked as important.");
+                //     }
 
-                return Yup.array().nullable();
-            }),
-            MinLength: Yup.lazy((value, context) => {
-                const DTypeID = dataType.find(v => v.DTypeID === context.context.DTypeID)?.DTypeName;
-                const max = context.parent.MaxLength
-                const isImportant = context.context.Important;
+                //     return Yup.mixed().nullable();
+                // }),
+                MinLength: Yup.lazy((value, context) => {
+                    const DTypeID = dataType.find(v => v.DTypeID === context.parent.DTypeID)?.DTypeName;
+                    const max = context.parent.MaxLength;
+                    const isImportant = context.parent?.Important;
 
-                if (DTypeID === "Number" && isImportant) {
-                    if (!max && !value) {
+                    if (DTypeID === "Number" && isImportant) {
+                        if (!max && !value) {
+                            return Yup.number()
+                                .typeError("The min value control must be a number.")
+                                .required("The min value control is required.");
+                        }
                         return Yup.number()
                             .typeError("The min value control must be a number.")
-                            .required("The min value control is required.")
+                            .nullable();
                     }
-                    return Yup.number()
-                        .typeError("The min value control must be a number.")
-                        .nullable()
-                }
 
-                return Yup.number().nullable();
-            }),
-            MaxLength: Yup.lazy((value, context) => {
-                const DTypeID = dataType.find(v => v.DTypeID === context.context.DTypeID)?.DTypeName;
-                const min = context.parent.MinLength
-                const isImportant = context.context.Important;
+                    return Yup.number().nullable();
+                }),
+                MaxLength: Yup.lazy((value, context) => {
+                    const DTypeID = dataType.find(v => v.DTypeID === context.parent.DTypeID)?.DTypeName;
+                    const min = context.parent.MinLength;
+                    const isImportant = context.parent?.Important;
 
-                if (DTypeID === "Number" && isImportant) {
-                    if (!min && !value) {
+                    if (DTypeID === "Number" && isImportant) {
+                        if (!min && !value) {
+                            return Yup.number()
+                                .typeError("The max value control must be a number.")
+                                .min(min + 1, 'Max length must be greater than or equal to Min length')
+                                .required("The max value control is required.");
+                        }
                         return Yup.number()
                             .typeError("The max value control must be a number.")
-                            .min(min + 1 || true, 'Max length must be greater than or equal to Min length').required("The max value control is required.")
+                            .min(min + 1, 'Max length must be greater than or equal to Min length');
                     }
-                    return Yup.number()
-                        .typeError("The max value control must be a number.")
-                        .min(min + 1 || true, 'Max length must be greater than or equal to Min length');
-                }
 
-                return Yup.number().nullable();
-            }),
-        }),
+                    return Yup.number().nullable();
+                }),
+            })
+        )
     });
 
     const saveDataCheckList = async (values: InitialValuesChecklist) => {
@@ -254,29 +259,50 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                     )?.DTypeName;
 
                                     if (dataTypeItem === "Number") {
-                                        if (values.ImportantList) {
-                                            values.ImportantList.Value = undefined;
+                                        if (Array.isArray(values.ImportantList)) {
+                                            const updatedList = values.ImportantList.map(item => ({
+                                                ...item,
+                                                Value: undefined,
+                                            }));
+                                            // อัปเดตเฉพาะเมื่อมีการเปลี่ยนแปลง
+                                            if (JSON.stringify(values.ImportantList) !== JSON.stringify(updatedList)) {
+                                                values.ImportantList = updatedList;
+                                            }
+                                        } else {
+                                            values.ImportantList = [];
                                         }
                                     }
                                     setShouldRenderDT(dataTypeItem === "Number");
-
-                                }, [values.DTypeID]);
+                                }, [values.DTypeID, dataType, values.ImportantList]);
 
                                 useEffect(() => {
                                     if (values.Important && values.GCLOptionID) {
-                                        if (values.ImportantList) {
-                                            values.ImportantList.MinLength = undefined;
-                                            values.ImportantList.MaxLength = undefined;
+                                        if (Array.isArray(values.ImportantList)) {
+                                            const updatedList = values.ImportantList.map(item => ({
+                                                ...item,
+                                                MinLength: undefined,
+                                                MaxLength: undefined,
+                                            }));
+                                            if (JSON.stringify(values.ImportantList) !== JSON.stringify(updatedList)) {
+                                                values.ImportantList = updatedList;
+                                            }
+                                        } else {
+                                            values.ImportantList = [];
                                         }
 
-                                        setOption(groupCheckListOption
+                                        const options = groupCheckListOption
                                             .filter(option => option.GCLOptionID === values.GCLOptionID)
-                                            .flatMap(v => v.CheckListOptions?.map((item: CheckListOption) => ({
-                                                label: item.CLOptionName,
-                                                value: item.CLOptionID,
-                                            })) || []))
+                                            .flatMap(v =>
+                                                v.CheckListOptions?.map((item: CheckListOption) => ({
+                                                    label: item.CLOptionName,
+                                                    value: item.CLOptionID,
+                                                })) || []
+                                            );
+
+                                        setOption(options);
                                     }
-                                }, [values.Important, values.GCLOptionID, setOption]);
+                                }, [values.Important, values.GCLOptionID, groupCheckListOption]);
+
 
                                 useEffect(() => {
                                     setShouldRenderIT(values.Important)
@@ -437,15 +463,21 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
 
                                             {shouldRenderIT && option.length > 0 && values.GCLOptionID && (
                                                 <Animated.View style={[animatedStyleIT]}>
-                                                    <Text
-                                                        style={[{
-                                                            marginTop: 10, marginBottom: 10, paddingLeft: 10, fontSize: spacing.small, color: theme.colors.error
-                                                        }]}
-                                                    >
-                                                        Select value is important!
+                                                    <Text style={{ marginTop: 10, marginBottom: 10, paddingLeft: 10, fontSize: spacing.small, color: theme.colors.error }}>
+                                                        {(values.ImportantList || []).some(item => item.Value) ? "Select value is important!" : "Input value control!"}
                                                     </Text>
-                                                    <FastField name="ImportantList.Value">
-                                                        {({ field, form }: any) => {
+
+                                                    <FastField name="ImportantList">
+                                                        {({ field, form  }: any) => {
+                                                            const importantList = values.ImportantList || [];
+
+                                                            const combinedValues = importantList
+                                                                .map((item: any) => item?.Value || "")
+                                                                .filter(Boolean)
+                                                                .join(", ");
+
+                                                            console.log(form.value);
+                                                            console.log(combinedValues);
 
                                                             return (
                                                                 <Checkboxs
@@ -455,35 +487,41 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                                             ? value.filter((v: string) => v.trim() !== '')
                                                                             : value.split(',').filter((v: string) => v.trim() !== '');
 
-                                                                        form.setFieldValue(field.name, processedValues);
+                                                                        processedValues.forEach((val: string, index: number) => {
+                                                                            if (!values.ImportantList) {
+                                                                                form.setFieldValue("ImportantList", importantList);
+                                                                            }
+                                                                            if (importantList[index]) {
+                                                                                form.setFieldValue(`ImportantList.${index}.Value`, val);
+                                                                            } else {
+                                                                                form.setFieldValue(`ImportantList.${index}`, { Value: val });
+                                                                            }
+                                                                        });
 
                                                                         setTimeout(() => {
                                                                             form.setTouched({
                                                                                 ...form.touched,
-                                                                                ImportantList: {
-                                                                                    ...form.touched.ImportantList,
-                                                                                    Value: true,
-                                                                                },
+                                                                                ImportantList: importantList.map((_, i) => ({ Value: true })),
                                                                             });
-
-                                                                            form.validateField(field.name);
+                                                                            form.validateField("ImportantList");
                                                                         }, 0);
                                                                     }}
-                                                                    error={form.touched?.ImportantList?.Value && Boolean(form.errors?.ImportantList?.Value)}
-                                                                    errorMessage={form.touched?.ImportantList?.Value ? form.errors?.ImportantList?.Value : ""}
+                                                                    error={form.touched?.ImportantList?.some((_, index) =>
+                                                                        Boolean(form.errors?.ImportantList?.[index]?.Value)
+                                                                    )}
+                                                                    errorMessage={form.touched?.ImportantList?.some((_, index) =>
+                                                                        form.errors?.ImportantList?.[index]?.Value
+                                                                    )}
                                                                     handleBlur={() => {
                                                                         form.setTouched({
                                                                             ...form.touched,
-                                                                            ImportantList: {
-                                                                                ...form.touched.ImportantList,
-                                                                                Value: true,
-                                                                            },
+                                                                            ImportantList: importantList.map((_, i) => ({ Value: true })),
                                                                         });
                                                                     }}
-                                                                    value={String(field.value ?? "")}
-                                                                    testId={`Value-Important-form`}
+                                                                    value={String(form.value ?? "")}
+                                                                    testId="Value-Important-form-combined"
                                                                 />
-                                                            )
+                                                            );
                                                         }}
                                                     </FastField>
                                                 </Animated.View>
@@ -498,40 +536,51 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                     >
                                                         Input value control!
                                                     </Text>
+                                                    <>
+                                                        <FastField name="ImportantList[0].MinLength">
+                                                            {({ field, form }: any) => (
+                                                                <Inputs
+                                                                    placeholder="Min Value"
+                                                                    label="Min Value Control"
+                                                                    handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                                    handleBlur={() => form.setTouched({
+                                                                        ...form.touched,
+                                                                        ImportantList: form.touched.ImportantList?.map((touchedItem: BaseImportant, i: number) =>
+                                                                            i === 0 ? { ...touchedItem, MinLength: true } : touchedItem
+                                                                        ),
+                                                                    })}
+                                                                    value={String(field.value ?? "")}
+                                                                    error={form.touched?.ImportantList?.[0]?.MinLength && Boolean(form.errors?.ImportantList?.[0]?.MinLength)}
+                                                                    errorMessage={form.touched?.ImportantList?.[0]?.MinLength ? form.errors?.ImportantList?.[0]?.MinLength : ""}
+                                                                    testId={`MinLength-form`}
+                                                                />
+                                                            )}
+                                                        </FastField>
 
-                                                    <FastField name="ImportantList.MinLength">
-                                                        {({ field, form }: any) =>
-                                                            <Inputs
-                                                                placeholder="Min Value"
-                                                                label="Min Value Control"
-                                                                handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                                handleBlur={() => form.setTouched({ ...form.touched, ImportantList: { ...form.touched.ImportantList, MinLength: true } })}
-                                                                value={String(field.value ?? "")}
-                                                                error={form.touched?.ImportantList?.MinLength && Boolean(form.errors?.ImportantList?.MinLength)}
-                                                                errorMessage={form.touched?.ImportantList?.MinLength ? form.errors?.ImportantList?.MinLength : ""}
-                                                                testId={`MinLength-form`}
-                                                            />
-                                                        }
-                                                    </FastField>
-
-                                                    <FastField name="ImportantList.MaxLength">
-                                                        {({ field, form }: any) => (
-                                                            <Inputs
-                                                                placeholder="Max Value"
-                                                                label="Max Value Control"
-                                                                handleChange={(value: string) => form.setFieldValue(field.name, value)}
-                                                                handleBlur={() => form.setTouched({ ...form.touched, ImportantList: { ...form.touched.ImportantList, MaxLength: true } })}
-                                                                value={String(field.value ?? "")}
-                                                                error={form.touched?.ImportantList?.MaxLength && Boolean(form.errors?.ImportantList?.MaxLength)}
-                                                                errorMessage={form.touched?.ImportantList?.MaxLength ? form.errors?.ImportantList?.MaxLength : ""}
-                                                                testId={`MaxLength-form`}
-                                                            />
-                                                        )}
-                                                    </FastField>
-
+                                                        <FastField name="ImportantList[0].MaxLength">
+                                                            {({ field, form }: any) => (
+                                                                <Inputs
+                                                                    placeholder="Max Value"
+                                                                    label="Max Value Control"
+                                                                    handleChange={(value: string) => form.setFieldValue(field.name, value)}
+                                                                    handleBlur={() => form.setTouched({
+                                                                        ...form.touched,
+                                                                        ImportantList: form.touched.ImportantList?.map((touchedItem: BaseImportant, i: number) =>
+                                                                            i === 0 ? { ...touchedItem, MaxLength: true } : touchedItem
+                                                                        ),
+                                                                    })}
+                                                                    value={String(field.value ?? "")}
+                                                                    error={form.touched?.ImportantList?.[0]?.MaxLength && Boolean(form.errors?.ImportantList?.[0]?.MaxLength)}
+                                                                    errorMessage={form.touched?.ImportantList?.[0]?.MaxLength ? form.errors?.ImportantList?.[0]?.MaxLength : ""}
+                                                                    testId={`MaxLength-form`}
+                                                                />
+                                                            )}
+                                                        </FastField>
+                                                    </>
                                                 </Animated.View>
 
                                             )}
+
 
                                             <View id="form-important-fd" style={masterdataStyles.containerSwitch}>
                                                 <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>

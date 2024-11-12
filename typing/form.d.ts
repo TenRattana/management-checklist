@@ -31,10 +31,11 @@ export interface FormData extends BaseForm {
 }
 export interface BaseImportant {
   MCListID: string;
-  Value?:string | string[];
+  Value?: string | string[];
   MinLength?: number;
   MaxLength?: number;
 }
+
 export interface BaseFormState {
   MCListID: string;
   CListID: string;
@@ -45,7 +46,7 @@ export interface BaseFormState {
   SFormID: string;
   Required: boolean;
   Important: boolean;
-  ImportantList?: BaseImportant;
+  ImportantList?: BaseImportant[]; 
   Placeholder?: string;
   Hint?: string;
   DisplayOrder?: number;
@@ -53,6 +54,7 @@ export interface BaseFormState {
   CTypeName?: string;
   CListName?: string;
 }
+
 export interface RowItemProps<V extends BaseFormState | BaseSubForm> {
   item: V;
   drag: () => void;
