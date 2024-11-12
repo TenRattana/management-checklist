@@ -37,15 +37,15 @@ const SaveDialog = ({
 
         console.log(state.subForms);
 
-        // try {
-        //     const response = await axiosInstance.post("MatchCheckList_service.asmx/SaveFormCheckList", data);
-        //     messages = (String(response.data.message));
-        //     navigation.navigate("Form", { messages });
-        // } catch (error) {
-        //     handleError(error)
-        // } finally {
-        //     setIsVisible(false)
-        // }
+        try {
+            const response = await axiosInstance.post("MatchCheckList_service.asmx/SaveFormCheckList", data);
+            messages = (String(response.data.message));
+            navigation.navigate("Form", { messages });
+        } catch (error) {
+            handleError(error)
+        } finally {
+            setIsVisible(false)
+        }
     }, [state, state?.subForms]);
 
     return (

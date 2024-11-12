@@ -21,7 +21,6 @@ const useForm = (route: any) => {
     const [dataType, setDataType] = useState<DataType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [found, setFound] = useState<boolean>(false);
-    const [expectedResult, setExpectedResult] = useState<{ [key: string]: any }>({});
     const { formId, action, tableId, machineId } = route.params || {};
     const { handleError } = useToast();
 
@@ -82,7 +81,6 @@ const useForm = (route: any) => {
         if (tableId) {
             const expectedResultResponse = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResult", { TableID: tableId });
             fetchedExpectedResult = expectedResultResponse.data?.data[0] || [];
-            setExpectedResult(fetchedExpectedResult);
         }
 
         const formData = await fetchForm(formId);
@@ -140,6 +138,8 @@ const useForm = (route: any) => {
             subForms.push(subForm);
 
             item.MatchCheckList?.forEach((itemOption) => {
+                console.log(itemOption.ImportantList, "itemOption.ImportantList");
+
                 fields.push({
                     MCListID: itemOption.MCListID,
                     CListID: itemOption.CListID,
@@ -222,7 +222,7 @@ const useForm = (route: any) => {
         });
 
         return Yup.object().shape(shape);
-    }, [state.subForms, dataType, checkListType]);
+    }, [state.subForms.length > 0, dataType, checkListType]);
 
     return {
         found,

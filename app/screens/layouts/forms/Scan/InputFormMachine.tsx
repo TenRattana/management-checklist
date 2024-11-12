@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import axiosInstance from "@/config/axios";
 import { Card, Divider } from "react-native-paper";
 import { FlatList, Pressable, ViewStyle, View } from "react-native";
@@ -13,13 +13,52 @@ import { Stack, useNavigation } from "expo-router";
 import useForm from "@/hooks/custom/useForm";
 import { DataType } from "@/typing/type";
 import { useSelector } from "react-redux";
+import * as Yup from 'yup';
+
 
 const InputFormMachine: React.FC<PreviewProps<ScanParams>> = ({ route }) => {
-  const { state, groupCheckListOption, dataType, found, validationSchema } = useForm(route);
+  const { state, groupCheckListOption, dataType, found, checkListType } = useForm(route);
   const navigation = useNavigation();
   const prefix = useSelector((state: any) => state.prefix);
 
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const validationSchema = useMemo(() => {
+    const shape: any = {};
+
+    state.subForms.forEach((subForm: BaseSubForm) => {
+      subForm.Fields.forEach((field: BaseFormState) => {
+        const dataTypeName = dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName;
+        const checkListTypeName = checkListType.find(item => item.CTypeID === field.CTypeID)?.CTypeName;
+
+        let validator;
+
+        if (dataTypeName === "Number") {
+          validator = Yup.number()
+            .nullable()
+            .typeError(`The ${field.CListName} field must be a valid number`);
+        } else if (dataTypeName === "String") {
+          if (checkListTypeName === "Checkbox") {
+            validator = Yup.array()
+              .of(Yup.string())
+              .min(1, `The ${field.CListName} field requires at least one option to be selected`);
+          } else {
+            validator = Yup.string()
+              .nullable()
+              .typeError(`The ${field.CListName} field must be a valid string`);
+          }
+        }
+
+        if (field.Required) {
+          validator = validator?.required(`The ${field.CListName} field is required`);
+        }
+
+        shape[field.MCListID] = validator;
+      });
+    });
+
+    return Yup.object().shape(shape);
+  }, [state.subForms, dataType, checkListType]);
 
   const masterdataStyles = useMasterdataStyles();
   const { showSuccess, handleError } = useToast();

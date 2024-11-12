@@ -57,7 +57,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
             return Yup.string().nullable();
         }),
         ImportantList: Yup.object().shape({
-            ImportantValue: Yup.lazy((value, context) => {
+            Value: Yup.lazy((value, context) => {
                 const isImportant = context.context?.Important || false;
                 const GCLOptionID = context.context?.GCLOptionID || false;
 
@@ -255,7 +255,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
 
                                     if (dataTypeItem === "Number") {
                                         if (values.ImportantList) {
-                                            values.ImportantList.ImportantValue = undefined;
+                                            values.ImportantList.Value = undefined;
                                         }
                                     }
                                     setShouldRenderDT(dataTypeItem === "Number");
@@ -281,6 +281,9 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                 useEffect(() => {
                                     setShouldRenderIT(values.Important)
                                 }, [values.Important]);
+
+                                console.log(values);
+
 
                                 return (
                                     <View id="form-fd">
@@ -441,7 +444,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                     >
                                                         Select value is important!
                                                     </Text>
-                                                    <FastField name="ImportantList.ImportantValue">
+                                                    <FastField name="ImportantList.Value">
                                                         {({ field, form }: any) => {
 
                                                             return (
@@ -459,21 +462,21 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                                                 ...form.touched,
                                                                                 ImportantList: {
                                                                                     ...form.touched.ImportantList,
-                                                                                    ImportantValue: true,
+                                                                                    Value: true,
                                                                                 },
                                                                             });
 
                                                                             form.validateField(field.name);
                                                                         }, 0);
                                                                     }}
-                                                                    error={form.touched?.ImportantList?.ImportantValue && Boolean(form.errors?.ImportantList?.ImportantValue)}
-                                                                    errorMessage={form.touched?.ImportantList?.ImportantValue ? form.errors?.ImportantList?.ImportantValue : ""}
+                                                                    error={form.touched?.ImportantList?.Value && Boolean(form.errors?.ImportantList?.Value)}
+                                                                    errorMessage={form.touched?.ImportantList?.Value ? form.errors?.ImportantList?.Value : ""}
                                                                     handleBlur={() => {
                                                                         form.setTouched({
                                                                             ...form.touched,
                                                                             ImportantList: {
                                                                                 ...form.touched.ImportantList,
-                                                                                ImportantValue: true,
+                                                                                Value: true,
                                                                             },
                                                                         });
                                                                     }}
