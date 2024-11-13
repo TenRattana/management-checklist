@@ -467,18 +467,10 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                         {(values.ImportantList || []).some(item => item.Value) ? "Select value is important!" : "Input value control!"}
                                                     </Text>
 
-                                                    <FastField name="ImportantList">
-                                                        {({ field, form  }: any) => {
-                                                            const importantList = values.ImportantList || [];
-
-                                                            const combinedValues = importantList
-                                                                .map((item: any) => item?.Value || "")
-                                                                .filter(Boolean)
-                                                                .join(", ");
+                                                    <FastField name="ImportantList[0].Value">
+                                                        {({ field, form }: any) => {
 
                                                             console.log(form.value);
-                                                            console.log(combinedValues);
-
                                                             return (
                                                                 <Checkboxs
                                                                     option={option}
@@ -487,38 +479,37 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                                             ? value.filter((v: string) => v.trim() !== '')
                                                                             : value.split(',').filter((v: string) => v.trim() !== '');
 
-                                                                        processedValues.forEach((val: string, index: number) => {
-                                                                            if (!values.ImportantList) {
-                                                                                form.setFieldValue("ImportantList", importantList);
-                                                                            }
-                                                                            if (importantList[index]) {
-                                                                                form.setFieldValue(`ImportantList.${index}.Value`, val);
-                                                                            } else {
-                                                                                form.setFieldValue(`ImportantList.${index}`, { Value: val });
-                                                                            }
-                                                                        });
+                                                                        form.setFieldValue(field.name, processedValues);
+
+                                                                        // processedValues.forEach((val: string, index: number) => {
+                                                                        //     if (!values.ImportantList) {
+                                                                        //         form.setFieldValue("ImportantList", importantList);
+                                                                        //     }
+                                                                        //     if (importantList[index]) {
+                                                                        //         form.setFieldValue(`ImportantList.${index}.Value`, val);
+                                                                        //     } else {
+                                                                        //         form.setFieldValue(`ImportantList.${index}`, { Value: val });
+                                                                        //     }
+                                                                        // });
 
                                                                         setTimeout(() => {
                                                                             form.setTouched({
                                                                                 ...form.touched,
-                                                                                ImportantList: importantList.map((_, i) => ({ Value: true })),
-                                                                            });
-                                                                            form.validateField("ImportantList");
+                                                                                ImportantList: form.touched.ImportantList?.map((touchedItem: BaseImportant, i: number) =>
+                                                                                    i === 0 ? { ...touchedItem, Value: true } : touchedItem
+                                                                                ),
+                                                                            })
                                                                         }, 0);
                                                                     }}
-                                                                    error={form.touched?.ImportantList?.some((_, index) =>
-                                                                        Boolean(form.errors?.ImportantList?.[index]?.Value)
-                                                                    )}
-                                                                    errorMessage={form.touched?.ImportantList?.some((_, index) =>
-                                                                        form.errors?.ImportantList?.[index]?.Value
-                                                                    )}
-                                                                    handleBlur={() => {
-                                                                        form.setTouched({
-                                                                            ...form.touched,
-                                                                            ImportantList: importantList.map((_, i) => ({ Value: true })),
-                                                                        });
-                                                                    }}
-                                                                    value={String(form.value ?? "")}
+                                                                    value={String(field.value ?? "")}
+                                                                    error={form.touched?.ImportantList?.[0]?.Value && Boolean(form.errors?.ImportantList?.[0]?.Value)}
+                                                                    errorMessage={form.touched?.ImportantList?.[0]?.Value ? form.errors?.ImportantList?.[0]?.Value : ""}
+                                                                    handleBlur={() => form.setTouched({
+                                                                        ...form.touched,
+                                                                        ImportantList: form.touched.ImportantList?.map((touchedItem: BaseImportant, i: number) =>
+                                                                            i === 0 ? { ...touchedItem, Value: true } : touchedItem
+                                                                        ),
+                                                                    })}
                                                                     testId="Value-Important-form-combined"
                                                                 />
                                                             );
