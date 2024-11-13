@@ -25,7 +25,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const [currentField, setCurrentField] = useState<BaseFormState>({
         MCListID: "", CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: SFormID,
-        Required: false, Important: false, EResult: "", CListName: "", DTypeValue: undefined,
+        Required: false, Important: false, ImportantList:[],EResult: "", CListName: "", DTypeValue: undefined,
     });
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [count, setCount] = useState<number>(0)
@@ -47,7 +47,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
         item ? setCurrentField(item) :
             setCurrentField({
                 MCListID: `MCL-ADD-${count}`, CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: SFormID,
-                Required: false, Important: false, ImportantList: undefined, EResult: "", CListName: "", DTypeValue: undefined,
+                Required: false, Important: false, ImportantList: [], EResult: "", CListName: "", DTypeValue: undefined,
             })
     };
 
