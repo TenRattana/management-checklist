@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "@/config/axios";
 import { setForm, setSubForm, setField, reset } from "@/slices";
@@ -25,9 +25,11 @@ const useForm = (route: any) => {
     const { handleError } = useToast();
 
     const fetchData = useCallback(async () => {
+        if (isLoading || checkList.length) return;
+
         setIsLoading(true);
         try {
-            const [checkLists, checkListOptions, groupCheckListOptions, groupCheckListOptionsActive, checkListTypes, dataTypes, machine] = await Promise.all([
+            const responses = await Promise.all([
                 axiosInstance.post("CheckList_service.asmx/GetCheckLists"),
                 axiosInstance.post("CheckListOption_service.asmx/GetCheckListOptions"),
                 axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions"),
@@ -37,37 +39,30 @@ const useForm = (route: any) => {
                 axiosInstance.post("Machine_service.asmx/GetMachines")
             ]);
 
-            setCheckList(prev => prev.length ? prev : checkLists.data?.data ?? []);
-            setCheckListOption(prev => prev.length ? prev : checkListOptions.data?.data ?? []);
-            setGroupCheckListOption(prev => prev.length ? prev : groupCheckListOptions.data?.data ?? []);
-            setGroupCheckListOptionActive(prev => prev.length ? prev : groupCheckListOptionsActive.data?.data ?? []);
-            setCheckListType(prev => prev.length ? prev : checkListTypes.data?.data ?? []);
-            setDataType(prev => prev.length ? prev : dataTypes.data?.data ?? []);
-            setMachine(prev => prev.length ? prev : machine.data?.data ?? [])
+            setCheckList(responses[0].data?.data ?? []);
+            setCheckListOption(responses[1].data?.data ?? []);
+            setGroupCheckListOption(responses[2].data?.data ?? []);
+            setGroupCheckListOptionActive(responses[3].data?.data ?? []);
+            setCheckListType(responses[4].data?.data ?? []);
+            setDataType(responses[5].data?.data ?? []);
+            setMachine(responses[6].data?.data ?? []);
         } catch (error) {
             handleError(error);
         } finally {
             setIsLoading(false);
         }
-    }, [handleError]);
+    }, [isLoading, checkList.length, handleError]);
 
     const fetchForm = useCallback(async (formId: string, mode: boolean = false) => {
         if (!formId) return null;
 
         try {
-            let response;
-
-            if (mode) {
-                response = await axiosInstance.post("Form_service.asmx/ScanForm", { MachineID: formId });
-            } else {
-                response = await axiosInstance.post("Form_service.asmx/GetForm", { FormID: formId });
-            }
-
+            const endpoint = mode ? "Form_service.asmx/ScanForm" : "Form_service.asmx/GetForm";
+            const response = await axiosInstance.post(endpoint, { [mode ? "MachineID" : "FormID"]: formId });
             const status = response?.data?.status;
             const data = response?.data?.data?.[0] || null;
 
             setFound(status);
-
             return data;
         } catch (error) {
             handleError(error);
@@ -77,6 +72,8 @@ const useForm = (route: any) => {
     }, [handleError]);
 
     const loadForm = useCallback(async (formId: string, tableId?: string) => {
+        if (!formId) return;
+
         let fetchedExpectedResult = [];
         if (tableId) {
             const expectedResultResponse = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResult", { TableID: tableId });
@@ -88,10 +85,8 @@ const useForm = (route: any) => {
             setFound(true);
 
             const { subForms, fields } = createSubFormsAndFields(formData, fetchedExpectedResult);
-            const foundMachine = machine.find(v => v.MachineID === formData.MachineID);
-
-            const machineName = foundMachine ? foundMachine.MachineName : "";
-            formData['MachineName'] = machineName
+            const machineName = machine.find(v => v.MachineID === formData.MachineID)?.MachineName || "";
+            formData['MachineName'] = machineName;
 
             dispatch(setForm({ form: action === "copy" ? {} : formData }));
             dispatch(setSubForm({ subForms }));
@@ -107,9 +102,7 @@ const useForm = (route: any) => {
             setFound(true);
 
             const { subForms, fields } = createSubFormsAndFields(formData);
-
-            const foundMachine = machine.find(v => v.MachineID === formData.MachineID);
-            const machineName = foundMachine ? foundMachine.MachineName : "";
+            const machineName = machine.find(v => v.MachineID === formData.MachineID)?.MachineName || "";
             formData['MachineName'] = machineName;
 
             dispatch(setForm({ form: formData }));
@@ -119,7 +112,6 @@ const useForm = (route: any) => {
             setFound(false);
         }
     }, [fetchForm, checkList, checkListType, dispatch, machine]);
-
 
     const createSubFormsAndFields = useCallback((formData: FormData, expectedResult?: { [key: string]: any }) => {
         const subForms: SubForm[] = [];
@@ -138,8 +130,6 @@ const useForm = (route: any) => {
             subForms.push(subForm);
 
             item.MatchCheckList?.forEach((itemOption) => {
-                console.log(itemOption.ImportantList, "itemOption.ImportantList");
-
                 const Value = itemOption?.ImportantList?.length &&
                     !itemOption?.ImportantList[0]?.MinLength &&
                     !itemOption?.ImportantList[0]?.MaxLength
@@ -159,14 +149,12 @@ const useForm = (route: any) => {
                     Required: itemOption.Required,
                     Important: itemOption.Important,
                     ImportantList: itemOption?.ImportantList?.length
-                        ? [
-                            {
-                                MCListID: itemOption?.ImportantList[0]?.MCListID,
-                                MinLength: itemOption?.ImportantList[0]?.MinLength,
-                                MaxLength: itemOption?.ImportantList[0]?.MaxLength,
-                                Value: Value
-                            }
-                        ]
+                        ? [{
+                            MCListID: itemOption?.ImportantList[0]?.MCListID,
+                            MinLength: itemOption?.ImportantList[0]?.MinLength,
+                            MaxLength: itemOption?.ImportantList[0]?.MaxLength,
+                            Value
+                        }]
                         : [],
                     Placeholder: itemOption.Placeholder,
                     Hint: itemOption.Hint,
@@ -174,8 +162,6 @@ const useForm = (route: any) => {
                     EResult: expectedResult?.[itemOption.MCListID] || "",
                 });
             });
-
-
         });
 
         return { subForms, fields };
@@ -183,64 +169,52 @@ const useForm = (route: any) => {
 
     useFocusEffect(
         useCallback(() => {
-            fetchData();
-            return () => {
-                dispatch(reset());
-            };
-        }, [fetchData, dispatch])
+            if (!checkList.length) fetchData();
+            return () => dispatch(reset());
+        }, [fetchData, checkList.length, dispatch])
     );
 
     useFocusEffect(
         useCallback(() => {
             if (dataType.length) {
-                if (formId && !machineId) {
-                    loadForm(formId, tableId);
-                }
-
-                if (machineId) {
-                    loadFormMachine(machineId);
-                }
+                if (formId && !machineId) loadForm(formId, tableId);
+                else if (machineId) loadFormMachine(machineId);
             }
-        }, [formId, dataType.length, loadForm, tableId, machineId])
+        }, [formId, machineId, dataType.length, loadForm, loadFormMachine, tableId])
     );
 
     const validationSchema = useMemo(() => {
         const shape: any = {};
-
+    
         state.subForms.forEach((subForm: BaseSubForm) => {
             subForm.Fields.forEach((field: BaseFormState) => {
-                const dataTypeName = dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName;
-                const checkListTypeName = checkListType.find(item => item.CTypeID === field.CTypeID)?.CTypeName;
-
-                let validator;
-
-                if (dataTypeName === "Number") {
-                    validator = Yup.number()
-                        .nullable()
-                        .typeError(`The ${field.CListName} field must be a valid number`);
-
-                } else if (dataTypeName === "String") {
-                    if (checkListTypeName === "Checkbox") {
-                        validator = Yup.array()
-                            .of(Yup.string())
-                            .min(1, `The ${field.CListName} field requires at least one option to be selected`);
-                    } else {
-                        validator = Yup.string()
-                            .nullable()
-                            .typeError(`The ${field.CListName} field must be a valid string`);
+                if (field.Required) {
+                    shape[field.MCListID] = Yup.string()
+                        .required("กรุณาระบุข้อมูล");
+                } else {
+                    if (field.CTypeID === "text" || field.CTypeID === "textarea") {
+                        shape[field.MCListID] = Yup.string().nullable();
+                    } else if (field.CTypeID === "number") {
+                        shape[field.MCListID] = Yup.number()
+                            .typeError("กรุณาระบุข้อมูลเป็นตัวเลข")
+                            .nullable();
+                    } else if (field.CTypeID === "email") {
+                        shape[field.MCListID] = Yup.string()
+                            .email("รูปแบบอีเมลไม่ถูกต้อง")
+                            .nullable();
+                    } else if (field.CTypeID === "date") {
+                        shape[field.MCListID] = Yup.date()
+                            .typeError("กรุณาระบุวันที่ที่ถูกต้อง")
+                            .nullable();
                     }
                 }
-
-                if (field.Required) {
-                    validator = validator?.required(`The ${field.CListName} field is required`);
-                }
-
-                shape[field.MCListID] = validator;
+    
             });
         });
-
+    
         return Yup.object().shape(shape);
-    }, [state.subForms.length > 0, dataType, checkListType]);
+    }, [state.subForms]);
+    
 
     return {
         found,

@@ -30,16 +30,13 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
     });
 
     const validationSchema = useMemo(() => {
-
         const shape: any = {};
-
         state.subForms.forEach((subForm: BaseSubForm) => {
             subForm.Fields.forEach((field: BaseFormState) => {
                 const dataTypeName = dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName;
                 const checkListTypeName = checkListType.find(item => item.CTypeID === field.CTypeID)?.CTypeName;
 
                 let validator;
-
                 if (dataTypeName === "Number") {
                     validator = Yup.number()
                         .nullable()
@@ -63,7 +60,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                 shape[field.MCListID] = validator;
             });
         });
-
         return Yup.object().shape(shape);
     }, [state.subForms, dataType, checkListType]);
 
@@ -87,16 +83,15 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
     }, []);
     const childRef = useRef<any>();
 
-    const handleDrop = (item: CheckListType, absoluteX: number, absoluteY: number) => {
+    const handleDrop = useCallback((item: CheckListType, absoluteX: number, absoluteY: number) => {
         const cardIndex = childRef.current.checkCardPosition(absoluteX, absoluteY);
         const selectedChecklist = checkList.find((v: Checklist) => v.CListID === "CL000") || checkList?.[0];
         const selectedDataType = dataType.find((v: DataType) => v.DTypeName === "String") || dataType?.[0];
 
-
         if (cardIndex >= 0) {
             const targetSubForm = state.subForms[cardIndex];
-            const idITD = `ITD-ADD-${Math.random()}`
-            const idMcl = `MCL-ADD-${Math.random()}`
+            const idITD = `ITD-ADD-${Math.random()}`;
+            const idMcl = `MCL-ADD-${Math.random()}`;
             const newField: BaseFormState = {
                 MCListID: idMcl,
                 CListID: selectedChecklist?.CListID ?? "",
@@ -120,14 +115,13 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                 CListName: selectedChecklist?.CListName ?? "",
                 CTypeName: item.CTypeName,
                 DTypeValue: undefined,
-
             };
 
             dispatch(defaultDataForm({ currentField: newField }));
         }
-    };
+    }, [checkList, dataType, groupCheckListOption, state.subForms, dispatch]);
 
-    const renderItem = () => {
+    const renderItem = useCallback(() => {
         if (selectedIndex === 0) {
             return (
                 <>
@@ -152,7 +146,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
             );
         }
         return null;
-    }
+    }, [selectedIndex, state, edit, createform, masterdataStyles]);
 
     const onRenderCallback = (
         id: string, // ชื่อของ Profiler (จะเป็น "App" ในกรณีนี้)
@@ -184,11 +178,9 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
 
                     <FlatList
                         data={selectedIndex === 0 ? [1] : []}
-                        renderItem={() => renderItem()}
+                        renderItem={renderItem}
                         keyExtractor={(index) => `unique-key-${index}`}
-                        style={{ display: selectedIndex === 0 ? 'flex' : 'none' }}
-                        contentContainerStyle={{ flexGrow: selectedIndex === 0 ? 1 : undefined }}
-                        ListFooterComponentStyle={{ paddingHorizontal: 20 }}
+                        contentContainerStyle={{ flexGrow: 1 }}
                         ListFooterComponent={() => (
                             <>
                                 <Divider bold style={[{ marginVertical: 10, height: 2, backgroundColor: theme.colors.onBackground }]} />
@@ -199,13 +191,12 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                                         <DraggableItem item={item} onDrop={handleDrop} key={`${item.CTypeID}-${index}`} />
                                     ))
                                 ) : (
-                                    <Text style={{ textAlign: 'center', color: theme.colors.onBackground }}>No items available</Text>
+                                    <Text>No Data</Text>
                                 )}
                             </>
                         )}
                     />
-
-                    {selectedIndex === 1 && (
+                      {selectedIndex === 1 && (
                         <Dragsubform
                             navigation={navigation}
                             state={state}
@@ -217,9 +208,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                             selectedIndex={selectedIndex}
                         />
                     )}
-
                 </AccessibleView>
-
                 <AccessibleView name="container-preview" style={[createform.containerL2]}>
                     <Preview
                         route={route}
@@ -227,7 +216,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                         validationSchema={validationSchema}
                     />
                 </AccessibleView>
-
                 <SaveDialog
                     state={state}
                     isVisible={initialSaveDialog}
@@ -235,7 +223,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                     navigation={navigation}
                 />
             </Profiler>
-
         </GestureHandlerRootView>
     );
 });
