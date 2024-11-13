@@ -57,61 +57,61 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
             }
             return Yup.string().nullable();
         }),
-        ImportantList: Yup.array().of(
-            Yup.object().shape({
-                // Value: Yup.lazy((value, context) => {
-                //     const isImportant = context?.context?.Important || false;
-                //     const hasGCLOptionID = context?.context?.GCLOptionID || false;
-                //     console.log(isImportant);
-                //     console.log(hasGCLOptionID);
+        // ImportantList: Yup.array().of(
+        //     Yup.object().shape({
+        // Value: Yup.lazy((value, context) => {
+        //     const isImportant = context?.context?.Important || false;
+        //     const hasGCLOptionID = context?.context?.GCLOptionID || false;
+        //     console.log(isImportant);
+        //     console.log(hasGCLOptionID);
 
-                //     if (isImportant && hasGCLOptionID) {
-                //         return Yup.array()
-                //             .min(1, "You must select at least one option.")
-                //             .required("Important value is required when marked as important.");
-                //     }
+        //     if (isImportant && hasGCLOptionID) {
+        //         return Yup.array()
+        //             .min(1, "You must select at least one option.")
+        //             .required("Important value is required when marked as important.");
+        //     }
 
-                //     return Yup.mixed().nullable();
-                // }),
-                MinLength: Yup.lazy((value, context) => {
-                    const DTypeID = dataType.find(v => v.DTypeID === context.parent.DTypeID)?.DTypeName;
-                    const max = context.parent.MaxLength;
-                    const isImportant = context.parent?.Important;
+        //     return Yup.mixed().nullable();
+        // }),
+        // MinLength: Yup.lazy((value, context) => {
+        //     const DTypeID = dataType.find(v => v.DTypeID === context.parent.DTypeID)?.DTypeName;
+        //     const max = context.parent.MaxLength;
+        //     const isImportant = context.parent?.Important;
 
-                    if (DTypeID === "Number" && isImportant) {
-                        if (!max && !value) {
-                            return Yup.number()
-                                .typeError("The min value control must be a number.")
-                                .required("The min value control is required.");
-                        }
-                        return Yup.number()
-                            .typeError("The min value control must be a number.")
-                            .nullable();
-                    }
+        //     if (DTypeID === "Number" && isImportant) {
+        //         if (!max && !value) {
+        //             return Yup.number()
+        //                 .typeError("The min value control must be a number.")
+        //                 .required("The min value control is required.");
+        //         }
+        //         return Yup.number()
+        //             .typeError("The min value control must be a number.")
+        //             .nullable();
+        //     }
 
-                    return Yup.number().nullable();
-                }),
-                MaxLength: Yup.lazy((value, context) => {
-                    const DTypeID = dataType.find(v => v.DTypeID === context.parent.DTypeID)?.DTypeName;
-                    const min = context.parent.MinLength;
-                    const isImportant = context.parent?.Important;
+        //     return Yup.number().nullable();
+        // }),
+        // MaxLength: Yup.lazy((value, context) => {
+        //     const DTypeID = dataType.find(v => v.DTypeID === context.parent.DTypeID)?.DTypeName;
+        //     const min = context.parent.MinLength;
+        //     const isImportant = context.parent?.Important;
 
-                    if (DTypeID === "Number" && isImportant) {
-                        if (!min && !value) {
-                            return Yup.number()
-                                .typeError("The max value control must be a number.")
-                                .min(min + 1, 'Max length must be greater than or equal to Min length')
-                                .required("The max value control is required.");
-                        }
-                        return Yup.number()
-                            .typeError("The max value control must be a number.")
-                            .min(min + 1, 'Max length must be greater than or equal to Min length');
-                    }
+        //     if (DTypeID === "Number" && isImportant) {
+        //         if (!min && !value) {
+        //             return Yup.number()
+        //                 .typeError("The max value control must be a number.")
+        //                 .min(min + 1, 'Max length must be greater than or equal to Min length')
+        //                 .required("The max value control is required.");
+        //         }
+        //         return Yup.number()
+        //             .typeError("The max value control must be a number.")
+        //             .min(min + 1, 'Max length must be greater than or equal to Min length');
+        //     }
 
-                    return Yup.number().nullable();
-                }),
-            })
-        )
+        //     return Yup.number().nullable();
+        // }),
+        // })
+        // )
     });
 
     const saveDataCheckList = async (values: InitialValuesChecklist) => {
