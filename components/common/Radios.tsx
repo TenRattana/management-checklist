@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { RadioButton, HelperText } from "react-native-paper";
 import { RadiosProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
@@ -30,7 +30,7 @@ const Radios: React.FC<RadiosProps> = React.memo(({
         value={value as string}
       >
         {option.map((opt, index) => (
-          <Pressable
+          <TouchableOpacity
             key={index}
             onPress={() => handleChange(opt.value)}
             style={{ flex: 1 }}
@@ -41,7 +41,7 @@ const Radios: React.FC<RadiosProps> = React.memo(({
               <RadioButton value={opt.value} />
               <Text style={masterdataStyles.radioLabel}>{opt.label}</Text>
             </View>
-          </Pressable>
+          </TouchableOpacity>
         ))}
       </RadioButton.Group>
       {hint ? <Text style={masterdataStyles.hint}>{hint}</Text> : false}

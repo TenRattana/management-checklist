@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { IconButton } from "react-native-paper";
 import AccessibleView from "@/components/AccessibleView";
 import Inputs from "@/components/common/Inputs";
@@ -18,10 +18,16 @@ interface CreateForm {
     onEdit: (v: boolean) => void;
 }
 
-const ConfigItemForm: React.FC<CreateForm> = ({ label, value, editable, onEdit }) => {
+const MemoizedIconButton = React.memo(IconButton)
+
+const ConfigItemForm: React.FC<CreateForm> = React.memo(({ label, value, editable, onEdit }) => {
     const { theme } = useTheme();
     const { spacing, fontSize } = useRes();
     const masterdataStyles = useMasterdataStyles();
+
+    const handlePress = useCallback(() => {
+        onEdit(true);
+    }, [onEdit]);
 
     return (
         <AccessibleView name="" style={styles.container}>
@@ -30,9 +36,9 @@ const ConfigItemForm: React.FC<CreateForm> = ({ label, value, editable, onEdit }
                     <Text style={[styles.configPrefixText, masterdataStyles.settingText]} ellipsizeMode="tail" numberOfLines={1}>
                         {`${label} : ${!editable ? value : ""}`}
                     </Text>
-                    <IconButton
+                    <MemoizedIconButton
                         icon="pencil-box"
-                        onPress={() => onEdit(true)}
+                        onPress={handlePress}
                         iconColor={theme.colors.blue}
                         size={spacing.large + 5}
                         style={styles.iconButton}
@@ -41,7 +47,7 @@ const ConfigItemForm: React.FC<CreateForm> = ({ label, value, editable, onEdit }
             }
         </AccessibleView>
     );
-};
+});
 
 const RenderFormik: React.FC<{ field: string; setEdit: (v: boolean) => void; }> = React.memo(({ field, setEdit }) => {
     const dispatch = useDispatch();
@@ -78,7 +84,7 @@ const RenderFormik: React.FC<{ field: string; setEdit: (v: boolean) => void; }> 
                         />
                     </View>
 
-                    <IconButton
+                    <MemoizedIconButton
                         icon="check"
                         onPress={() => handleSubmit()}
                         iconColor={theme.colors.green}
@@ -91,7 +97,7 @@ const RenderFormik: React.FC<{ field: string; setEdit: (v: boolean) => void; }> 
     );
 });
 
-export default React.memo(ConfigItemForm);
+export default ConfigItemForm;
 
 const styles = StyleSheet.create({
     container: {

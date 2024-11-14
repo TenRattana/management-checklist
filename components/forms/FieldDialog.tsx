@@ -253,63 +253,60 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                     }
                                 }, [values.CTypeID]);
 
-                                useEffect(() => {
-                                    const dataTypeItem = dataType.find(
-                                        item => item.DTypeID === values.DTypeID
-                                    )?.DTypeName;
+                                const updateImportantList = useCallback((modifications: {
+                                    Value?: string | string[];
+                                    MinLength?: number;
+                                    MaxLength?: number;
+                                }) => {
+                                    if (Array.isArray(values.ImportantList)) {
+                                        const idMcl = `MCL-ADD-${Math.random()}`;
 
-                                    if (dataTypeItem === "Number") {
-                                        if (Array.isArray(values.ImportantList)) {
-                                            const updatedList = values.ImportantList.map(item => ({
-                                                ...item,
-                                                Value: undefined,
-                                            }));
-                                            // อัปเดตเฉพาะเมื่อมีการเปลี่ยนแปลง
-                                            if (JSON.stringify(values.ImportantList) !== JSON.stringify(updatedList)) {
-                                                values.ImportantList = updatedList;
-                                            }
+                                        const updatedList = values.ImportantList.map(item => ({
+                                            ...item,
+                                            ...modifications,
+                                            MCListID: item.MCListID || idMcl
+                                        }));
+                                        if (JSON.stringify(values.ImportantList) !== JSON.stringify(updatedList)) {
+                                            values.ImportantList = updatedList;
+                                        }
+                                    } else {
+                                        values.ImportantList = [];
+                                    }
+                                }, []);
+
+                                useEffect(() => {
+                                    const dataTypeItem = dataType.find(item => item.DTypeID === values.DTypeID)?.DTypeName;
+
+                                    if (values.Important) {
+                                        if (dataTypeItem === "Number") {
+                                            updateImportantList({ Value: undefined });
+                                        } else if (values.GCLOptionID) {
+                                            updateImportantList({ MinLength: undefined, MaxLength: undefined });
+
+                                            const options = groupCheckListOption
+                                                .filter(option => option.GCLOptionID === values.GCLOptionID)
+                                                .flatMap(option =>
+                                                    option.CheckListOptions?.map(item => ({
+                                                        label: item.CLOptionName,
+                                                        value: item.CLOptionID,
+                                                    })) || []
+                                                );
+
+                                            setOption(options);
                                         } else {
-                                            values.ImportantList = [];
+                                            updateImportantList({ MinLength: undefined, MaxLength: undefined, Value: undefined });
                                         }
                                     }
+
                                     setShouldRenderDT(dataTypeItem === "Number");
-                                }, [values.DTypeID, dataType, values.ImportantList]);
 
-                                useEffect(() => {
-                                    if (values.Important && values.GCLOptionID) {
-                                        if (Array.isArray(values.ImportantList)) {
-                                            const updatedList = values.ImportantList.map(item => ({
-                                                ...item,
-                                                MinLength: undefined,
-                                                MaxLength: undefined,
-                                            }));
-                                            if (JSON.stringify(values.ImportantList) !== JSON.stringify(updatedList)) {
-                                                values.ImportantList = updatedList;
-                                            }
-                                        } else {
-                                            values.ImportantList = [];
-                                        }
-
-                                        const options = groupCheckListOption
-                                            .filter(option => option.GCLOptionID === values.GCLOptionID)
-                                            .flatMap(v =>
-                                                v.CheckListOptions?.map((item: CheckListOption) => ({
-                                                    label: item.CLOptionName,
-                                                    value: item.CLOptionID,
-                                                })) || []
-                                            );
-
-                                        setOption(options);
-                                    }
-                                }, [values.Important, values.GCLOptionID, groupCheckListOption]);
-
+                                }, [values.DTypeID, dataType, values.ImportantList, values.Important, values.GCLOptionID, groupCheckListOption]);
 
                                 useEffect(() => {
                                     setShouldRenderIT(values.Important)
                                 }, [values.Important]);
 
                                 console.log(values);
-
 
                                 return (
                                     <View id="form-fd">
@@ -480,18 +477,6 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                                             : value.split(',').filter((v: string) => v.trim() !== '');
 
                                                                         form.setFieldValue(field.name, processedValues);
-
-                                                                        // processedValues.forEach((val: string, index: number) => {
-                                                                        //     if (!values.ImportantList) {
-                                                                        //         form.setFieldValue("ImportantList", importantList);
-                                                                        //     }
-                                                                        //     if (importantList[index]) {
-                                                                        //         form.setFieldValue(`ImportantList.${index}.Value`, val);
-                                                                        //     } else {
-                                                                        //         form.setFieldValue(`ImportantList.${index}`, { Value: val });
-                                                                        //     }
-                                                                        // });
-
                                                                         setTimeout(() => {
                                                                             form.setTouched({
                                                                                 ...form.touched,

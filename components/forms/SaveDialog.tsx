@@ -8,7 +8,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
 import { useSelector } from "react-redux";
 
-const SaveDialog = ({
+const SaveDialog = React.memo(({
     state,
     isVisible,
     setIsVisible,
@@ -46,7 +46,7 @@ const SaveDialog = ({
         } finally {
             setIsVisible(false)
         }
-    }, [state, state?.subForms]);
+    }, [state, axiosInstance, handleError, setIsVisible, navigation]);
 
     return (
         <Portal>
@@ -108,6 +108,6 @@ const SaveDialog = ({
             </Dialog>
         </Portal>
     );
-};
+});
 
-export default React.memo(SaveDialog);
+export default SaveDialog;

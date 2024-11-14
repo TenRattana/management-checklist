@@ -1,8 +1,6 @@
 import React, { useState, useCallback } from "react";
 import {
-    Platform,
-    Pressable,
-    ScrollView,
+    TouchableOpacity,
 } from "react-native";
 import {
     setDragSubForm,
@@ -29,7 +27,7 @@ import { DragsubformProps } from "@/typing/tag";
 import { useRes, useTheme, useToast } from "@/app/contexts";
 import useMasterdataStyles from "@/styles/common/masterdata";
 
-const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, checkListType, groupCheckListOption, checkList, navigation, selectedIndex }) => {
+const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, dataType, checkListType, groupCheckListOption, checkList, navigation }) => {
     const [initialDialog, setInitialDialog] = useState<boolean>(false)
     const [initialSubForm, setInitialSubForm] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", MachineID: "", Fields: [] });
     const [editMode, setEditMode] = useState<boolean>(false)
@@ -38,8 +36,6 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
     const { theme } = useTheme()
     const createform = useCreateformStyle();
     const { handleError } = useToast();
-
-    const isSelectedIndex1 = selectedIndex === 1;
 
     const handleDropSubForm = (data: Omit<BaseSubForm, 'DisplayOrder'>[]) => {
         runOnJS(dispatch)(setDragSubForm({ data }));
@@ -74,7 +70,7 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
     const RowItem = ({ item, drag, isActive }: RowItemProps<BaseSubForm>) => {
         return (
             <>
-                <Pressable
+                <TouchableOpacity
                     onPress={() => {
                         setEditMode(true);
                         setInitialDialog(true);
@@ -89,11 +85,11 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
                     testID={`dg-SF-${item.SFormID}`}
                 >
                     <IconButton icon={"credit-card-plus"} iconColor={theme.colors.fff} size={spacing.large} style={createform.icon} animated />
-                    <Text style={[createform.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
+                    <Text style={[createform.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]} numberOfLines={1} ellipsizeMode="tail">
                         {item.SFormName}
                     </Text>
                     <IconButton icon="chevron-right" iconColor={theme.colors.fff} size={spacing.large} style={createform.icon} animated />
-                </Pressable>
+                </TouchableOpacity>
 
                 <AccessibleView name="drag-subform" style={{ paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 40 : 0 }}>
                     <Dragfield
@@ -120,52 +116,48 @@ const Dragsubform: React.FC<DragsubformProps> = ({ state, dispatch, dataType, ch
         );
     }, []);
 
-    if (isSelectedIndex1) {
-        return (
-            <>
-                <Pressable
-                    onPress={() => {
-                        setInitialDialog(true);
-                        handelSubForm();
-                    }}
-                    style={[createform.addSubFormButton]}
-                >
-                    <IconButton icon="plus" iconColor={theme.colors.fff} size={spacing.large} style={createform.icon} animated />
-                    <Text style={[masterdataStyles.textFFF, { marginLeft: 8, paddingVertical: 10 }]}>Add Sub Form</Text>
-                </Pressable>
+    return (
+        <>
+            <TouchableOpacity
+                onPress={() => {
+                    setInitialDialog(true);
+                    handelSubForm();
+                }}
+                style={[createform.addSubFormButton]}
+            >
+                <IconButton icon="plus" iconColor={theme.colors.fff} size={spacing.large} style={createform.icon} animated />
+                <Text style={[masterdataStyles.textFFF, { marginLeft: 8, paddingVertical: 10 }]}>Add Sub Form</Text>
+            </TouchableOpacity>
 
-                <NestableScrollContainer
-                    style={{
-                        paddingHorizontal: fontSize === "large" ? 30 : 25,
-                        paddingTop: 5,
-                        paddingBottom: state.subForms.length > 0 ? 20 : 0,
-                    }}
-                >
-                    <NestableDraggableFlatList
-                        data={state.subForms}
-                        renderItem={renderSubForm}
-                        keyExtractor={(item, index) => `SF-${item.SFormID}-${index}`}
-                        onDragEnd={({ data }) => handleDropSubForm(data)}
-                        activationDistance={10}
-                    />
-                </NestableScrollContainer>
-
-                <SubFormDialog
-                    isVisible={initialDialog}
-                    setIsVisible={handelSetDialog}
-                    isEditing={editMode}
-                    initialValues={initialSubForm}
-                    saveData={handelSaveSubForm}
-                    onDelete={(SFormID: string) => {
-                        runOnJS(dispatch)(deleteSubForm({ SFormID }));
-                        handelSetDialog();
-                    }}
+            <NestableScrollContainer
+                style={{
+                    paddingHorizontal: fontSize === "large" ? 30 : 25,
+                    paddingTop: 5,
+                    paddingBottom: state.subForms.length > 0 ? 20 : 0,
+                }}
+            >
+                <NestableDraggableFlatList
+                    data={state.subForms}
+                    renderItem={renderSubForm}
+                    keyExtractor={(item, index) => `SF-${item.SFormID}-${index}`}
+                    onDragEnd={({ data }) => handleDropSubForm(data)}
+                    activationDistance={10}
                 />
+            </NestableScrollContainer>
 
-            </ >
-        )
-    }
-    return null
-}
+            <SubFormDialog
+                isVisible={initialDialog}
+                setIsVisible={handelSetDialog}
+                isEditing={editMode}
+                initialValues={initialSubForm}
+                saveData={handelSaveSubForm}
+                onDelete={(SFormID: string) => {
+                    runOnJS(dispatch)(deleteSubForm({ SFormID }));
+                    handelSetDialog();
+                }}
+            />
+        </ >
+    )
+})
 
-export default React.memo(Dragsubform)
+export default Dragsubform

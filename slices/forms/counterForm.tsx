@@ -34,15 +34,50 @@ const subFormSlice = createSlice({
   name: "form",
   initialState,
   reducers: {
-    setForm: (state, action: PayloadAction<{ form?: BaseForm }>) => {
+    setFormData: (state, action: PayloadAction<{
+      form?: BaseForm,
+      subForms: BaseSubForm[],
+      BaseFormState: BaseFormState[],
+      checkList: Checklist[],
+      checkListType: CheckListType[];
+    }>) => {
+      const { form, subForms, BaseFormState, checkList, checkListType } = action.payload;
 
-      const { form } = action.payload;
+      const updatedForm = {
+        FormID: form?.FormID || "",
+        FormName: form?.FormName || "",
+        Description: form?.Description || "",
+        MachineID: form?.MachineID || "",
+        MachineName: form?.MachineName || "",
+        subForms: subForms.map((sub, index) => ({
+          ...sub,
+          Columns: sub.Columns,
+          DisplayOrder: sub.DisplayOrder || index,
+        }))
+      };
 
-      state.FormID = form?.FormID || "";
-      state.FormName = form?.FormName || "";
-      state.Description = form?.Description || "";
-      state.MachineID = form?.MachineID || "";
-      state.MachineName = form?.MachineName;
+      const checkListMap = new Map(checkList.map(item => [item.CListID, item.CListName]));
+      const checkListTypeMap = new Map(checkListType.map(item => [item.CTypeID, item.CTypeName]));
+
+      updatedForm.subForms.forEach(sub => {
+        const matchingFields = BaseFormState.filter(form => form.SFormID === sub.SFormID);
+
+        sub.Fields = matchingFields.map((field, index) => ({
+          ...field,
+          DisplayOrder: field.DisplayOrder || index,
+          CListName: checkListMap.get(field.CListID) || "",
+          CTypeName: checkListTypeMap.get(field.CTypeID) || "",
+        }));
+      });
+
+      if (updatedForm.subForms.length > 0) {
+        sortSubForms(updatedForm.subForms);
+      }
+
+      return {
+        ...state,
+        ...updatedForm
+      };
     },
     updateFormName: (state, action: PayloadAction<{ form?: string }>) => {
       const { form } = action.payload;
@@ -54,19 +89,6 @@ const subFormSlice = createSlice({
 
       state.Description = form || "";
     },
-    setSubForm: (state, action: PayloadAction<{ subForms: BaseSubForm[] }>) => {
-
-      const { subForms } = action.payload;
-
-      state.subForms = subForms.map((sub, index) =>
-      ({
-        ...sub,
-        Columns: sub.Columns,
-        DisplayOrder: sub?.DisplayOrder ? index : sub.DisplayOrder,
-      }));
-
-      sortSubForms(state.subForms);
-    },
     setDragSubForm: (state, action: PayloadAction<{ data: Omit<BaseSubForm, 'DisplayOrder'>[] }>) => {
 
       const { data } = action.payload;
@@ -76,35 +98,6 @@ const subFormSlice = createSlice({
         Columns: sub.Columns,
         DisplayOrder: index,
       }));
-
-      sortSubForms(state.subForms);
-    },
-    setField: (state, action: PayloadAction<{
-      BaseFormState: BaseFormState[];
-      checkList: Checklist[];
-      checkListType: CheckListType[];
-    }>) => {
-
-      const { BaseFormState, checkList, checkListType } = action.payload;
-
-      const checkListMap = new Map(checkList.map(item => [item.CListID, item.CListName]));
-      const checkListTypeMap = new Map(checkListType.map(item => [item.CTypeID, item.CTypeName]));
-
-      state.subForms.forEach((sub) => {
-        const matchingForms = BaseFormState.filter(form => form.SFormID === sub.SFormID);
-
-        if (matchingForms.length > 0) {
-          const updatedFields = matchingForms.map((field, index) => ({
-            ...field,
-            DisplayOrder: field?.DisplayOrder ? index : field.DisplayOrder,
-            CListName: checkListMap.get(field.CListID) || "",
-            CTypeName: checkListTypeMap.get(field.CTypeID) || "",
-          }));
-
-          sub.Fields = updatedFields;
-          sortFields(sub.Fields);
-        }
-      });
 
       sortSubForms(state.subForms);
     },
@@ -280,13 +273,11 @@ const subFormSlice = createSlice({
 });
 
 export const {
-  setForm,
+  setFormData,
   updateFormName,
   updateFormDescription,
-  setSubForm,
   setDragSubForm,
   setDragField,
-  setField,
   addSubForm,
   updateSubForm,
   deleteSubForm,

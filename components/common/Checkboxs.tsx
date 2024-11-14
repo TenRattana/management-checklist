@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Checkbox, HelperText } from "react-native-paper";
-import { Pressable, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { CheckboxsProps } from "@/typing/tag";
 import AccessibleView from "@/components/AccessibleView";
 import Text from "@/components/Text";
 import useMasterdataStyles from "@/styles/common/masterdata";
 
-const Checkboxs : React.FC<CheckboxsProps>= React.memo(({
+const Checkboxs: React.FC<CheckboxsProps> = React.memo(({
   option,
   value,
   handleChange,
@@ -43,7 +43,7 @@ const Checkboxs : React.FC<CheckboxsProps>= React.memo(({
   return (
     <View id="checkboxs" style={masterdataStyles.commonContainer}>
       {option.map((item, index) => (
-        <Pressable
+        <TouchableOpacity
           key={index}
           onPress={() => handleCheckBoxChange(item.value || '')}
           testID={testId}
@@ -57,7 +57,7 @@ const Checkboxs : React.FC<CheckboxsProps>= React.memo(({
               <Text style={masterdataStyles.checkboxLabel}>{item.label}</Text>
             </View>
           </View>
-        </Pressable>
+        </TouchableOpacity>
       ))}
 
       {hint ? <Text style={masterdataStyles.hint}>{hint}</Text> : null}

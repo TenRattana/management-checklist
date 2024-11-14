@@ -1,22 +1,22 @@
-import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef } from "react";
+import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef, useCallback, Profiler } from "react";
 import { View, ViewStyle, FlatList } from "react-native";
-import { Card, Divider, HelperText } from "react-native-paper";
+import { Card, Divider } from "react-native-paper";
 import { useRes, useTheme } from "@/app/contexts";
 import { BaseFormState, BaseSubForm } from '@/typing/form';
 import { AccessibleView, Dynamic, Text } from "@/components";
-import useForm from "@/hooks/custom/useForm";
-import { FastField, Formik, FieldProps, Field } from "formik";
+import { Formik, FieldProps, Field } from "formik";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { Stack } from "expo-router";
 import { DataType } from "@/typing/type";
+import { useSelector } from "react-redux";
 
 interface FormValues {
     [key: string]: any;
 }
 
 const Preview = React.memo(forwardRef<any, any>((props, ref) => {
-    const { route, validationSchema } = props;
-    const { state, groupCheckListOption, dataType } = useForm(route);
+    const { validationSchema, groupCheckListOption, dataType, isLoading } = props;
+    const state = useSelector((state: any) => state.form);
 
     const masterdataStyles = useMasterdataStyles();
     const cardRef = useRef<View>(null);
@@ -26,9 +26,9 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
     const cardRefs = useRef<(View | null)[]>([]);
     const cardPositions = useRef<{ x: number; y: number; width: number; height: number }[]>([]);
 
-    const handleScroll = () => {
+    const handleScroll = useCallback(() => {
         updateCardPositions();
-    };
+    }, []);
 
     const updateCardPositions = () => {
         const positions: { x: number; y: number; width: number; height: number }[] = [];
@@ -193,7 +193,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                 )}
                 keyExtractor={(_, index) => `index-preview-${index}`}
                 onScroll={handleScroll}
-                scrollEventThrottle={16}
+                scrollEventThrottle={-30}
                 contentContainerStyle={{ paddingBottom: 20 }}
             />
         </AccessibleView>

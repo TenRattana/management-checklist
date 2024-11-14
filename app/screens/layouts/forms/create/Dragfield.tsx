@@ -2,6 +2,7 @@ import React, { useState, useCallback } from "react";
 import {
     Pressable,
     ScrollView,
+    TouchableOpacity,
 } from "react-native";
 import {
     addField,
@@ -21,11 +22,11 @@ import { useTheme, useToast } from "@/app/contexts";
 import Text from '@/components/Text'
 import useMasterdataStyles from "@/styles/common/masterdata";
 
-const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType, checkListType, groupCheckListOption, checkList }) => {
+const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatch, dataType, checkListType, groupCheckListOption, checkList }) => {
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const [currentField, setCurrentField] = useState<BaseFormState>({
         MCListID: "", CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: SFormID,
-        Required: false, Important: false, ImportantList:[],EResult: "", CListName: "", DTypeValue: undefined,
+        Required: false, Important: false, ImportantList: [], EResult: "", CListName: "", DTypeValue: undefined,
     });
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [count, setCount] = useState<number>(0)
@@ -75,7 +76,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
 
     const RowItem = ({ item, drag, isActive }: RowItemProps<BaseFormState>) => {
         return (
-            <Pressable
+            <TouchableOpacity
                 onPress={() => {
                     setIsEditing(true);
                     setDialogVisible(true);
@@ -87,11 +88,11 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
                 testID={`dg-FD-${item.SFormID}`}
             >
                 <IconButton icon={checkListType.find((v) => v.CTypeID === item.CTypeID)?.Icon ?? "camera"} style={createformStyles.icon} iconColor={theme.colors.fff} size={spacing.large} animated />
-                <Text style={[createformStyles.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
+                <Text style={[createformStyles.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]} numberOfLines={1} ellipsizeMode="tail">
                     {item.CListName}
                 </Text>
                 <IconButton icon="chevron-right" iconColor={theme.colors.fff} size={spacing.large} style={createformStyles.icon} animated />
-            </Pressable>
+            </TouchableOpacity>
         );
     }
 
@@ -117,7 +118,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
                 />
             </NestableScrollContainer>
 
-            <Pressable
+            <TouchableOpacity
                 onPress={() => {
                     handleDialogToggle();
                     handleField();
@@ -126,7 +127,7 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
             >
                 <IconButton icon="plus" iconColor={theme.colors.fff} size={spacing.large} style={createformStyles.icon} animated />
                 <Text style={[masterdataStyles.textFFF, { marginLeft: 8, paddingVertical: 10 }]}>Add Field</Text>
-            </Pressable>
+            </TouchableOpacity>
 
             <FieldDialog
                 isVisible={dialogVisible}
@@ -146,6 +147,6 @@ const Dragfield: React.FC<DragfieldProps> = ({ data, SFormID, dispatch, dataType
             />
         </>
     );
-}
+})
 
-export default React.memo(Dragfield);
+export default Dragfield;
