@@ -44,11 +44,11 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
             return Yup.string().nullable();
         }),
         DTypeValue: Yup.lazy((value, context) => {
-            const DTypeID = dataType.find(v => v.DTypeID === context.context.DTypeID)?.DTypeName;
+            const DTypeID = dataType.find(v => v.DTypeID === context.parent.DTypeID)?.DTypeName;
             if (DTypeID === "Number") {
-                return Yup.number().typeError("The digit value must be a number.").nullable()
+                return Yup.number().typeError("The digit value must be a number.").nullable();
             }
-            return Yup.number().nullable();
+            return Yup.string().nullable();
         }),
         GCLOptionID: Yup.lazy((value, context) => {
             const CTypeID = checkListType.find(v => v.CTypeID === context.parent.CTypeID)?.CTypeName;
@@ -57,64 +57,68 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
             }
             return Yup.string().nullable();
         }),
-        // ImportantList: Yup.array().of(
-        //     Yup.object().shape({
-        // Value: Yup.lazy((value, context) => {
-        //     const isImportant = context?.context?.Important || false;
-        //     const hasGCLOptionID = context?.context?.GCLOptionID || false;
-        //     console.log(isImportant);
-        //     console.log(hasGCLOptionID);
+        ImportantList: Yup.array().of(
+            Yup.object().shape({
+                Value: Yup.lazy((value, context) => {
+                    const isImportant = context.context?.Important || false;
+                    const hasGCLOptionID = !!context.context?.GCLOptionID;
 
-        //     if (isImportant && hasGCLOptionID) {
-        //         return Yup.array()
-        //             .min(1, "You must select at least one option.")
-        //             .required("Important value is required when marked as important.");
-        //     }
+                    if (isImportant && hasGCLOptionID) {
+                        if (Array.isArray(value)) {
+                            return Yup.array()
+                                .of(Yup.string().required("Each selected option is required."))
+                                .min(1, "You must select at least one option.")
+                                .required("Important value is required when marked as important.");
+                        } else {
+                            return Yup.string()
+                                .required("Important value is required when marked as important.")
+                                .nullable();
+                        }
+                    }
+                    return Yup.mixed().nullable();
+                }),
+                MinLength: Yup.lazy((value, context) => {
+                    const DTypeID = dataType.find(v => v.DTypeID === context.context?.DTypeID)?.DTypeName;
+                    const max = context.parent.MaxLength;
+                    const isImportant = context.context?.Important;
 
-        //     return Yup.mixed().nullable();
-        // }),
-        // MinLength: Yup.lazy((value, context) => {
-        //     const DTypeID = dataType.find(v => v.DTypeID === context.parent.DTypeID)?.DTypeName;
-        //     const max = context.parent.MaxLength;
-        //     const isImportant = context.parent?.Important;
+                    if (DTypeID === "Number" && isImportant) {
+                        if (!max && !value) {
+                            return Yup.number()
+                                .typeError("The min value control must be a number.")
+                                .required("The min value control is required.");
+                        }
+                        return Yup.number()
+                            .typeError("The min value control must be a number.")
+                            .nullable();
+                    }
 
-        //     if (DTypeID === "Number" && isImportant) {
-        //         if (!max && !value) {
-        //             return Yup.number()
-        //                 .typeError("The min value control must be a number.")
-        //                 .required("The min value control is required.");
-        //         }
-        //         return Yup.number()
-        //             .typeError("The min value control must be a number.")
-        //             .nullable();
-        //     }
+                    return Yup.number().nullable();
+                }),
+                MaxLength: Yup.lazy((value, context) => {
+                    const DTypeID = dataType.find(v => v.DTypeID === context.context?.DTypeID)?.DTypeName;
+                    const min = context.parent.MinLength;
+                    const isImportant = context.context?.Important;
 
-        //     return Yup.number().nullable();
-        // }),
-        // MaxLength: Yup.lazy((value, context) => {
-        //     const DTypeID = dataType.find(v => v.DTypeID === context.parent.DTypeID)?.DTypeName;
-        //     const min = context.parent.MinLength;
-        //     const isImportant = context.parent?.Important;
+                    if (DTypeID === "Number" && isImportant) {
+                        if (!min && !value) {
+                            return Yup.number()
+                                .typeError("The max value control must be a number.")
+                                .min(min + 1, 'Max length must be greater than or equal to Min length')
+                                .required("The max value control is required.");
+                        }
+                        return Yup.number()
+                            .typeError("The max value control must be a number.")
+                            .min(min + 1, 'Max length must be greater than or equal to Min length');
+                    }
 
-        //     if (DTypeID === "Number" && isImportant) {
-        //         if (!min && !value) {
-        //             return Yup.number()
-        //                 .typeError("The max value control must be a number.")
-        //                 .min(min + 1, 'Max length must be greater than or equal to Min length')
-        //                 .required("The max value control is required.");
-        //         }
-        //         return Yup.number()
-        //             .typeError("The max value control must be a number.")
-        //             .min(min + 1, 'Max length must be greater than or equal to Min length');
-        //     }
-
-        //     return Yup.number().nullable();
-        // }),
-        // })
-        // )
+                    return Yup.number().nullable();
+                }),
+            })
+        )
     });
 
-    const saveDataCheckList = async (values: InitialValuesChecklist) => {
+    const saveDataCheckList = useCallback(async (values: InitialValuesChecklist) => {
         const data = {
             CListId: values.checkListId ?? "",
             CListName: values.checkListName,
@@ -128,7 +132,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
         } catch (error) {
             handleError(error);
         }
-    };
+    }, [handleError, showSuccess, setIsVisibleCL]);
 
     const opacityT = useSharedValue(0);
     const opacityD = useSharedValue(0);
@@ -207,7 +211,7 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
             setIsVisibleCL(false);
             setInitialValueCL({ checkListId: "", checkListName: "", isActive: false, disables: false });
         }
-    }, [isVisible]);
+    }, [isVisible, setOption, setShouldRender, setShouldRenderDT, setShouldRenderIT, setIsVisibleCL, setInitialValueCL]);
 
     return (
         <Portal>
@@ -229,29 +233,26 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                             validateOnChange={false}
                             onSubmit={values => saveField(values, editMode ? "update" : "add")}
                         >
-                            {({
-                                setFieldValue,
-                                values,
-                                handleSubmit,
-                                isValid,
-                                dirty,
-                            }) => {
-                                useEffect(() => {
+                            {({ setFieldValue, values, handleSubmit, isValid, dirty }) => {
+
+                                const updateRenderStates = useCallback(() => {
                                     const checkListTypeItem = checkListType.find(
                                         item => item.CTypeID === values.CTypeID
                                     )?.CTypeName ?? "";
 
-                                    const newRender = ["Dropdown", "Radio", "Checkbox"].includes(checkListTypeItem) ? "detail" : ["Textinput", "Textarea"].includes(checkListTypeItem) ? "text" : "";
+                                    const newRender = ["Dropdown", "Radio", "Checkbox"].includes(checkListTypeItem)
+                                        ? "detail"
+                                        : ["Textinput", "Textarea"].includes(checkListTypeItem)
+                                            ? "text"
+                                            : "";
 
                                     if (newRender !== shouldRender) {
-                                        if (newRender === "detail") {
-                                            setFieldValue("DTypeID", null);
-                                        } else {
-                                            setFieldValue("GCLOptionID", undefined);
-                                        }
+                                        setFieldValue(newRender === "detail" ? "DTypeID" : "GCLOptionID", null);
                                         setShouldRender(newRender);
                                     }
-                                }, [values.CTypeID]);
+                                }, [values.CTypeID, checkListType]);
+
+                                useEffect(updateRenderStates, [updateRenderStates]);
 
                                 const updateImportantList = useCallback((modifications: {
                                     Value?: string | string[];
@@ -259,54 +260,46 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                     MaxLength?: number;
                                 }) => {
                                     if (Array.isArray(values.ImportantList)) {
-                                        const idMcl = `MCL-ADD-${Math.random()}`;
-
                                         const updatedList = values.ImportantList.map(item => ({
                                             ...item,
                                             ...modifications,
-                                            MCListID: item.MCListID || idMcl
+                                            MCListID: item.MCListID || `MCL-ADD-${Math.random()}`,
                                         }));
                                         if (JSON.stringify(values.ImportantList) !== JSON.stringify(updatedList)) {
-                                            values.ImportantList = updatedList;
+                                            setFieldValue("ImportantList", updatedList);
                                         }
-                                    } else {
-                                        values.ImportantList = [];
                                     }
-                                }, []);
+                                }, [values.ImportantList, setFieldValue]);
 
-                                useEffect(() => {
+                                const handleDataTypeChange = useCallback(() => {
                                     const dataTypeItem = dataType.find(item => item.DTypeID === values.DTypeID)?.DTypeName;
 
                                     if (values.Important) {
                                         if (dataTypeItem === "Number") {
                                             updateImportantList({ Value: undefined });
                                         } else if (values.GCLOptionID) {
-                                            updateImportantList({ MinLength: undefined, MaxLength: undefined });
-
                                             const options = groupCheckListOption
                                                 .filter(option => option.GCLOptionID === values.GCLOptionID)
-                                                .flatMap(option =>
-                                                    option.CheckListOptions?.map(item => ({
-                                                        label: item.CLOptionName,
-                                                        value: item.CLOptionID,
-                                                    })) || []
-                                                );
+                                                .flatMap(option => option.CheckListOptions?.map(item => ({
+                                                    label: item.CLOptionName,
+                                                    value: item.CLOptionID,
+                                                })) || []);
 
                                             setOption(options);
+                                            updateImportantList({ MinLength: undefined, MaxLength: undefined });
                                         } else {
                                             updateImportantList({ MinLength: undefined, MaxLength: undefined, Value: undefined });
                                         }
                                     }
 
                                     setShouldRenderDT(dataTypeItem === "Number");
+                                }, [values.DTypeID, values.GCLOptionID, values.Important, dataType, groupCheckListOption, updateImportantList]);
 
-                                }, [values.DTypeID, dataType, values.ImportantList, values.Important, values.GCLOptionID, groupCheckListOption]);
+                                useEffect(handleDataTypeChange, [values.DTypeID, values.GCLOptionID, values.Important]);
 
                                 useEffect(() => {
-                                    setShouldRenderIT(values.Important)
+                                    setShouldRenderIT(values.Important);
                                 }, [values.Important]);
-
-                                console.log(values);
 
                                 return (
                                     <View id="form-fd">
@@ -466,8 +459,6 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
 
                                                     <FastField name="ImportantList[0].Value">
                                                         {({ field, form }: any) => {
-
-                                                            console.log(form.value);
                                                             return (
                                                                 <Checkboxs
                                                                     option={option}

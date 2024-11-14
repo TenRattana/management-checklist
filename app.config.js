@@ -23,6 +23,7 @@ export default {
     name: "m_checklist",
     slug: "m_checklist",
     version: "1.0.0",
+    sdkVersion: "51.0.0",
     orientation: "landscape",
     icon: "./assets/images/Icon-app.png",
     scheme: "myapp",
