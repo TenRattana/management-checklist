@@ -4,6 +4,7 @@
     "target": "esnext",
     "module": "esnext",
     "strict": true,
+    "jsx": "react",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,

@@ -4,13 +4,14 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
     "lint": "expo lint",
-    "tsc": "tsc --watch"
+    "typecheck": "tsc --watch",
+    "typecheck-only": "tsc",
+    "build": "expo build"
   },
   "jest": {
     "preset": "jest-expo"
@@ -21,6 +22,7 @@
     "@expo/vector-icons": "^14.0.2",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/masked-view": "^0.1.11",
+    "@react-native-firebase/app": "^21.4.1",
     "@react-native-picker/picker": "2.7.5",
     "@react-native-segmented-control/segmented-control": "2.5.2",
     "@react-navigation/drawer": "^6.7.2",

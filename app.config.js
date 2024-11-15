@@ -63,7 +63,12 @@ export default {
         },
       ],
     ],
-    extra: getEnvVars(environment),
+    extra: {
+      ...getEnvVars(process.env.NODE_ENV),
+      eas: {
+        projectId: "0f2240ee-c314-4fa4-b36a-6038aa1ba0da",
+      },
+    },
     experiments: {
       typedRoutes: true,
     },

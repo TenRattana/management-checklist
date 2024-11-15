@@ -46,6 +46,14 @@ const createSubFormsAndFields = (
         subForms.push(subForm);
 
         subFormItem.MatchCheckList?.forEach((itemOption) => {
+            const Value = itemOption?.ImportantList?.length &&
+                !itemOption?.ImportantList[0]?.MinLength &&
+                !itemOption?.ImportantList[0]?.MaxLength
+                ? itemOption.ImportantList
+                    .map(v => v.Value)
+                    .filter((v): v is string => v !== undefined)
+                : undefined;
+
             fields.push({
                 MCListID: itemOption.MCListID,
                 CListID: itemOption.CListID,
@@ -56,7 +64,14 @@ const createSubFormsAndFields = (
                 SFormID: itemOption.SFormID,
                 Required: itemOption.Required,
                 Important: itemOption.Important,
-                ImportantList: itemOption.ImportantList ?? [],
+                ImportantList: itemOption?.ImportantList?.length
+                    ? [{
+                        MCListID: itemOption?.ImportantList[0]?.MCListID,
+                        MinLength: itemOption?.ImportantList[0]?.MinLength,
+                        MaxLength: itemOption?.ImportantList[0]?.MaxLength,
+                        Value
+                    }]
+                    : [],
                 Placeholder: itemOption.Placeholder,
                 Hint: itemOption.Hint,
                 DisplayOrder: itemOption.DisplayOrder,

@@ -29,7 +29,6 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
         Required: false, Important: false, ImportantList: [], EResult: "", CListName: "", DTypeValue: undefined,
     });
     const [isEditing, setIsEditing] = useState<boolean>(false);
-    const [count, setCount] = useState<number>(0)
     const { handleError } = useToast();
     const { theme } = useTheme()
     const createformStyles = useCreateformStyle();
@@ -45,29 +44,49 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
     }, []);
 
     const handleField = (item?: BaseFormState) => {
-        item ? setCurrentField(item) :
-            setCurrentField({
-                MCListID: `MCL-ADD-${count}`, CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: SFormID,
-                Required: false, Important: false, ImportantList: [], EResult: "", CListName: "", DTypeValue: undefined,
-            })
+        const idMcl = `MCL-ADD-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+
+        item
+            ? setCurrentField(item)
+            : setCurrentField({
+                MCListID: idMcl,
+                CListID: "",
+                GCLOptionID: "",
+                CTypeID: "",
+                DTypeID: "",
+                SFormID: SFormID,
+                Required: false,
+                Important: false,
+                ImportantList: [{
+                    MCListID: idMcl,
+                    Value: undefined,
+                    MinLength: undefined,
+                    MaxLength: undefined
+                }],
+                EResult: "",
+                CListName: "",
+                DTypeValue: undefined,
+            });
     };
 
-    const handleSaveField = useCallback((values: BaseFormState, mode: string) => {
-        const payload = { BaseFormState: values, checkList, checkListType, dataType };
+    const handleSaveField = useCallback(
+        (values: BaseFormState, mode: string) => {
+            const payload = { BaseFormState: values, checkList, checkListType, dataType };
 
-        try {
-            if (mode === "add") {
-                dispatch(addField(payload));
-            } else if (mode === "update") {
-                dispatch(updateField(payload));
+            try {
+                if (mode === "add") {
+                    dispatch(addField(payload));
+                } else if (mode === "update") {
+                    dispatch(updateField(payload));
+                }
+            } catch (error) {
+                handleError(error);
+            } finally {
+                handleDialogToggle();
             }
-        } catch (error) {
-            handleError(error);
-        } finally {
-            setCount(prevCount => prevCount + 1);
-            handleDialogToggle();
-        }
-    }, [dispatch, handleError, handleDialogToggle, checkList, checkListType, dataType]);
+        },
+        [dispatch, handleError, handleDialogToggle, checkList, checkListType, dataType]
+    );
 
     const dropcheckList = checkList.filter(v => v.IsActive);
     const dropcheckListType = checkListType.filter(v => v.IsActive);
@@ -106,6 +125,7 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
         );
     }, []);
 
+    const MemoFieldDialog = React.memo(FieldDialog)
     return (
         <>
             <NestableScrollContainer>
@@ -129,7 +149,7 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
                 <Text style={[masterdataStyles.textFFF, { marginLeft: 8, paddingVertical: 10 }]}>Add Field</Text>
             </TouchableOpacity>
 
-            <FieldDialog
+            <MemoFieldDialog
                 isVisible={dialogVisible}
                 formState={currentField}
                 onDeleteField={(SFormID, MCListID) => runOnJS(dispatch)(deleteField({ SFormID, MCListID }))}

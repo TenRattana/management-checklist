@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useMemo, Profiler } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import React, { useState, useEffect, useCallback, useMemo, Profiler, useRef } from "react";
+import { Pressable, ScrollView, TouchableOpacity, View } from "react-native";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import { Checkboxs, Inputs } from "@/components/common";
 import { Portal, Dialog, HelperText, Switch, IconButton } from "react-native-paper";
@@ -15,8 +15,9 @@ import { FieldDialogProps } from "@/typing/tag";
 import Text from "@/components/Text";
 import { CheckListOption, GroupCheckListOption } from "@/typing/type";
 import { BaseImportant } from "@/typing/form";
+import { useFocusEffect } from "@react-navigation/native";
 
-const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField, setShowDialogs
+const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode, saveField, setShowDialogs
     , checkListType, dataType, checkList, groupCheckListOption, dropcheckList, dropcheckListType, dropdataType, dropgroupCheckListOption
 }: FieldDialogProps) => {
     const [isVisibleCL, setIsVisibleCL] = useState<boolean>(false)
@@ -31,110 +32,103 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
     const { fontSize, spacing } = useRes()
     const { theme } = useTheme()
 
-    const onRenderCallback = useCallback((
-        id: string,
-        phase: 'mount' | 'update' | 'nested-update',
-        actualDuration: number,
-        baseDuration: number,
-        startTime: number,
-        commitTime: number
-    ) => {
-        console.log(`ชื่อของ Profiler ${id} รองรับ: ${phase}`);
-        console.log(`เวลาที่ใช้ในการ render component นี้: ${actualDuration}ms`);
-        console.log(`เวลาที่คาดว่าจะใช้ในการ render: ${baseDuration}ms`);
-        console.log(`เวลาเริ่มต้นที่เริ่ม render: ${startTime}`);
-        console.log(`เวลาที่ commit การ render นี้: ${commitTime}`);
-        console.log(`------------------------------------------------------------------------------`);
-    }, []);
+    const validationSchema = useMemo(() => {
+        return Yup.object().shape({
+            CListID: Yup.string().required("The checklist field is required."),
+            CTypeID: Yup.string().required("The checklist type field is required."),
+            Required: Yup.boolean().required("The required field is required."),
+            Important: Yup.boolean().required("The important field is required."),
+            DTypeID: Yup.lazy((value, context) => {
+                const CTypeID = checkListType.find(v => v.CTypeID === context.parent.CTypeID)?.CTypeName;
+                if (CTypeID && ['Textinput'].includes(CTypeID)) {
+                    return Yup.string().required("Data Type is required for Text.");
+                }
+                return Yup.string().nullable();
+            }),
+            DTypeValue: Yup.lazy((value, context) => {
+                const DTypeID = dataType.find(v => v.DTypeID === context.context.DTypeID)?.DTypeName;
+                if (DTypeID === "Number") {
+                    return Yup.number().typeError("The digit value must be a number.").nullable();
+                }
+                return Yup.string().nullable();
+            }),
+            GCLOptionID: Yup.lazy((value, context) => {
+                const CTypeID = checkListType.find(v => v.CTypeID === context.context.CTypeID)?.CTypeName;
+                if (CTypeID && ['Dropdown', 'Checkbox', 'Radio'].includes(CTypeID)) {
+                    return Yup.string().required("GCLOptionID is required for Dropdown/Select/Radio.");
+                }
+                return Yup.string().nullable();
+            }),
+            ImportantList: Yup.array().of(
+                Yup.object().shape({
+                    Value: Yup.lazy((value, context) => {
+                        const isImportant = context.context?.Important || false;
+                        const hasGCLOptionID = context.context?.GCLOptionID;
 
-    const validationSchema = Yup.object().shape({
-        CListID: Yup.string().required("The checklist field is required."),
-        CTypeID: Yup.string().required("The checklist type field is required."),
-        Required: Yup.boolean().required("The required field is required."),
-        Important: Yup.boolean().required("The important field is required."),
-        DTypeID: Yup.lazy((value, context) => {
-            const CTypeID = checkListType.find(v => v.CTypeID === context.parent.CTypeID)?.CTypeName;
-            if (CTypeID && ['Textinput', 'Textarea'].includes(CTypeID)) {
-                return Yup.string().required("Data Type is required for Text/TextArea.");
-            }
-            return Yup.string().nullable();
-        }),
-        DTypeValue: Yup.lazy((value, context) => {
-            const DTypeID = dataType.find(v => v.DTypeID === context.parent.DTypeID)?.DTypeName;
-            if (DTypeID === "Number") {
-                return Yup.number().typeError("The digit value must be a number.").nullable();
-            }
-            return Yup.string().nullable();
-        }),
-        GCLOptionID: Yup.lazy((value, context) => {
-            const CTypeID = checkListType.find(v => v.CTypeID === context.parent.CTypeID)?.CTypeName;
-            if (CTypeID && ['Dropdown', 'Checkbox', 'Radio'].includes(CTypeID)) {
-                return Yup.string().required("GCLOptionID is required for Dropdown/Select/Radio.");
-            }
-            return Yup.string().nullable();
-        }),
-        ImportantList: Yup.array().of(
-            Yup.object().shape({
-                Value: Yup.lazy((value, context) => {
-                    const isImportant = context.context?.Important || false;
-                    const hasGCLOptionID = !!context.context?.GCLOptionID;
-
-                    if (isImportant && hasGCLOptionID) {
-                        if (Array.isArray(value)) {
-                            return Yup.array()
-                                .of(Yup.string().required("Each selected option is required."))
-                                .min(1, "You must select at least one option.")
-                                .required("Important value is required when marked as important.");
-                        } else {
-                            return Yup.string()
-                                .required("Important value is required when marked as important.")
-                                .nullable();
+                        if (isImportant && hasGCLOptionID) {
+                            if (Array.isArray(value)) {
+                                return Yup.array()
+                                    .of(Yup.string().required("Each selected option is required."))
+                                    .min(1, "You must select at least one option.")
+                                    .required("Important value is required when marked as important.");
+                            } else {
+                                return Yup.string()
+                                    .required("Important value is required when marked as important.")
+                                    .nullable();
+                            }
                         }
-                    }
-                    return Yup.mixed().nullable();
-                }),
-                MinLength: Yup.lazy((value, context) => {
-                    const DTypeID = dataType.find(v => v.DTypeID === context.context?.DTypeID)?.DTypeName;
-                    const max = context.parent.MaxLength;
-                    const isImportant = context.context?.Important;
+                        return Yup.mixed().nullable();
+                    }),
+                    MinLength: Yup.lazy((value, context) => {
+                        const DTypeID = dataType.find(v => v.DTypeID === context.context?.DTypeID)?.DTypeName;
+                        const max = context.parent.MaxLength;
+                        const isImportant = context.context?.Important;
 
-                    if (DTypeID === "Number" && isImportant) {
-                        if (!max && !value) {
-                            return Yup.number()
-                                .typeError("The min value control must be a number.")
-                                .required("The min value control is required.");
+                        if (DTypeID === "Number" && isImportant) {
+                            if (!max && !value) {
+                                return Yup.number()
+                                    .typeError("The min value control must be a number.")
+                                    .required("The min value control is required.");
+                            } else if (max) {
+                                return Yup.number()
+                                    .typeError("The max value control must be a number.")
+                                    .max(max, 'Min length must be less than or equal to Max length');
+                            }
                         }
+
                         return Yup.number()
                             .typeError("The min value control must be a number.")
                             .nullable();
-                    }
+                    }),
+                    MaxLength: Yup.lazy((value, context) => {
+                        const DTypeID = dataType.find(v => v.DTypeID === context.context?.DTypeID)?.DTypeName;
+                        const min = context.parent.MinLength;
+                        const isImportant = context.context?.Important;
 
-                    return Yup.number().nullable();
-                }),
-                MaxLength: Yup.lazy((value, context) => {
-                    const DTypeID = dataType.find(v => v.DTypeID === context.context?.DTypeID)?.DTypeName;
-                    const min = context.parent.MinLength;
-                    const isImportant = context.context?.Important;
-
-                    if (DTypeID === "Number" && isImportant) {
-                        if (!min && !value) {
-                            return Yup.number()
-                                .typeError("The max value control must be a number.")
-                                .min(min + 1, 'Max length must be greater than or equal to Min length')
-                                .required("The max value control is required.");
+                        if (DTypeID === "Number" && isImportant) {
+                            if (!min && !value) {
+                                return Yup.number()
+                                    .typeError("The max value control must be a number.")
+                                    .min(min + 1, 'Max length must be greater than or equal to Min length')
+                                    .required("The max value control is required.");
+                            } else if (min) {
+                                return Yup.number()
+                                    .typeError("The max value control must be a number.")
+                                    .min(min, 'Max length must be greater than or equal to Min length');
+                            }
                         }
+
                         return Yup.number()
                             .typeError("The max value control must be a number.")
-                            .min(min + 1, 'Max length must be greater than or equal to Min length');
-                    }
-
-                    return Yup.number().nullable();
-                }),
-            })
-        )
-    });
+                            .nullable();
+                    }),
+                })
+            )
+        });
+    }, [checkListType, dataType]);
 
     const saveDataCheckList = useCallback(async (values: InitialValuesChecklist) => {
+
         const data = {
             CListId: values.checkListId ?? "",
             CListName: values.checkListName,
@@ -150,105 +144,71 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
         }
     }, [handleError, showSuccess, setIsVisibleCL]);
 
-    const opacityT = useSharedValue(0);
-    const opacityD = useSharedValue(0);
-    const opacityN = useSharedValue(0);
-    const opacityIT = useSharedValue(0);
+    const animatedText = useAnimatedStyle(() => {
 
-    const animatedText = useAnimatedStyle(() => ({
-        opacity: opacityT.value,
-        overflow: 'hidden',
-    }));
-
-    const animatedDetail = useAnimatedStyle(() => ({
-        opacity: opacityD.value,
-        overflow: 'hidden',
-    }));
-
-    const animatedStyleNumber = useAnimatedStyle(() => ({
-        opacity: opacityN.value,
-        overflow: 'hidden',
-    }));
-
-    const animatedStyleIT = useAnimatedStyle(() => ({
-        opacity: opacityIT.value,
-        overflow: 'hidden',
-    }));
-
-    useEffect(() => {
-        opacityIT.value = withTiming(0, { duration: 0 });
-        if (shouldRenderIT) {
-            if (shouldRenderDT) {
-                opacityIT.value = withTiming(1, { duration: 300 });
-            } else if (option.length > 0) {
-                opacityIT.value = withTiming(1, { duration: 300 });
-            }
+        if (shouldRender !== "") {
+            return { opacity: 1, transform: [{ scale: withTiming(1, { duration: 300 }) }] };
         } else {
-            setTimeout(() => {
-                opacityIT.value = withTiming(0, { duration: 300 });
-            }, 300);
-        }
-    }, [shouldRenderIT, shouldRenderDT, shouldRender, option])
-
-    useEffect(() => {
-        opacityT.value = withTiming(0, { duration: 0 });
-        opacityD.value = withTiming(0, { duration: 0 });
-
-        if (shouldRender === "text") {
-            opacityT.value = withTiming(1, { duration: 300 });
-        } else if (shouldRender === "detail") {
-            opacityT.value = withTiming(0, { duration: 200 });
-            setTimeout(() => {
-                opacityD.value = withTiming(1, { duration: 100 });
-            }, 300);
-        } else {
-            opacityT.value = withTiming(0, { duration: 300 });
-            opacityD.value = withTiming(0, { duration: 300 });
+            return { opacity: 0, transform: [{ scale: withTiming(0.5, { duration: 300 }) }] };
         }
     }, [shouldRender]);
 
-    useEffect(() => {
-        opacityN.value = withTiming(0, { duration: 0 });
-        if (shouldRender) {
-            opacityN.value = withTiming(1, { duration: 300 });
+    const animatedStyleNumber = useAnimatedStyle(() => {
+
+        if (shouldRenderDT) {
+            return { opacity: 1, transform: [{ scale: withTiming(1, { duration: 300 }) }] };
         } else {
-            setTimeout(() => {
-                opacityN.value = withTiming(0, { duration: 300 });
-            }, 300);
+            return { opacity: 0, transform: [{ scale: withTiming(0.5, { duration: 300 }) }] };
         }
     }, [shouldRenderDT]);
 
-    useEffect(() => {
-        if (!isVisible) {
-            setOption([]);
-            setShouldRender('');
-            setShouldRenderDT(false);
-            setShouldRenderIT(false);
-            setIsVisibleCL(false);
-            setInitialValueCL({ checkListId: "", checkListName: "", isActive: false, disables: false });
+    const animatedStyleIT = useAnimatedStyle(() => {
+
+        if (shouldRenderIT) {
+            if (shouldRenderDT) {
+                return { opacity: 1, transform: [{ scale: withTiming(1, { duration: 300 }) }] };
+            } else if (option.length > 0) {
+                return { opacity: 1, transform: [{ scale: withTiming(1, { duration: 300 }) }] };
+            } else {
+                return { opacity: 0, transform: [{ scale: withTiming(0.5, { duration: 300 }) }] };
+            }
+        } else {
+            return { opacity: 0, transform: [{ scale: withTiming(0.5, { duration: 300 }) }] };
         }
-    }, [isVisible, setOption, setShouldRender, setShouldRenderDT, setShouldRenderIT, setIsVisibleCL, setInitialValueCL]);
+    }, [shouldRenderIT, shouldRenderDT, option]);
+
+    useFocusEffect(
+        useCallback(() => {
+            return (() => {
+                setOption([]);
+                setShouldRender('');
+                setShouldRenderDT(false);
+                setShouldRenderIT(false);
+                setIsVisibleCL(false);
+                setInitialValueCL({ checkListId: "", checkListName: "", isActive: false, disables: false });
+            })
+        }, [])
+    )
 
     const MemoChecklist_dialog = React.memo(Checklist_dialog)
+    const memoizedAnimatedText = useMemo(() => animatedText, [shouldRender]);
+    const memoizedAnimatedDT = useMemo(() => animatedStyleNumber, [shouldRenderDT]);
+    const memoizedAnimatedIT = useMemo(() => animatedStyleIT, [shouldRenderIT, shouldRenderDT, option]);
+
     return (
         <Portal>
             <Dialog visible={isVisible} onDismiss={() => setShowDialogs()} style={masterdataStyles.containerDialog}>
-                <Profiler id="Dialog.Title" onRender={onRenderCallback}>
 
-
-                    <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]}>
-                        {editMode ? "Edit check list" : "Create check list"}
-                    </Dialog.Title>
-                </Profiler>
+                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]}>
+                    {editMode ? "Edit check list" : "Create check list"}
+                </Dialog.Title>
 
                 <Dialog.Content>
-                    <Profiler id="Text" onRender={onRenderCallback}>
-                        <Text
-                            style={[masterdataStyles.text, masterdataStyles.textDark, { marginBottom: 10, paddingLeft: 10 }]}
-                        >
-                            {editMode ? "Edit the details of the field." : "Enter the details for the new field."}
-                        </Text>
-                    </Profiler>
+                    <Text
+                        style={[masterdataStyles.text, masterdataStyles.textDark, { marginBottom: 10, paddingLeft: 10 }]}
+                    >
+                        {editMode ? "Edit the details of the field." : "Enter the details for the new field."}
+                    </Text>
 
                     {isVisible && (
                         <Formik
@@ -267,15 +227,15 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
 
                                     const newRender = ["Dropdown", "Radio", "Checkbox"].includes(checkListTypeItem)
                                         ? "detail"
-                                        : ["Textinput", "Textarea"].includes(checkListTypeItem)
+                                        : ["Textinput"].includes(checkListTypeItem)
                                             ? "text"
-                                            : "";
+                                            : ["Text"].includes(checkListTypeItem) ? "label" : ""
 
                                     if (newRender !== shouldRender) {
                                         setFieldValue(newRender === "detail" ? "DTypeID" : "GCLOptionID", null);
                                         setShouldRender(newRender);
                                     }
-                                }, [values.CTypeID, checkListType]);
+                                }, [values.CTypeID, checkListType, shouldRender, setFieldValue]);
 
                                 useEffect(updateRenderStates, [updateRenderStates]);
 
@@ -285,40 +245,46 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                     MaxLength?: number;
                                 }) => {
                                     if (Array.isArray(values.ImportantList)) {
+                                        const idMcl = `MCL-ADD-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+
                                         const updatedList = values.ImportantList.map(item => ({
                                             ...item,
                                             ...modifications,
-                                            MCListID: item.MCListID || `MCL-ADD-${Math.random()}`,
+                                            MCListID: item.MCListID || idMcl,
                                         }));
                                         if (JSON.stringify(values.ImportantList) !== JSON.stringify(updatedList)) {
-                                            setFieldValue("ImportantList", updatedList);
+                                            setFieldValue("ImportantList", [...updatedList]);
                                         }
                                     }
                                 }, [values.ImportantList, setFieldValue]);
 
                                 const handleDataTypeChange = useCallback(() => {
                                     const dataTypeItem = dataType.find(item => item.DTypeID === values.DTypeID)?.DTypeName;
+                                    let options: { label: string; value: string; }[] = [];
 
                                     if (values.Important) {
                                         if (dataTypeItem === "Number") {
                                             updateImportantList({ Value: undefined });
                                         } else if (values.GCLOptionID) {
-                                            const options = groupCheckListOption
+                                            options = groupCheckListOption
                                                 .filter(option => option.GCLOptionID === values.GCLOptionID)
                                                 .flatMap(option => option.CheckListOptions?.map(item => ({
                                                     label: item.CLOptionName,
                                                     value: item.CLOptionID,
                                                 })) || []);
 
-                                            setOption(options);
                                             updateImportantList({ MinLength: undefined, MaxLength: undefined });
                                         } else {
                                             updateImportantList({ MinLength: undefined, MaxLength: undefined, Value: undefined });
                                         }
                                     }
 
+                                    setOption(prevOptions => {
+                                        const isEqual = JSON.stringify(prevOptions) === JSON.stringify(options);
+                                        return isEqual ? prevOptions : options;
+                                    });
                                     setShouldRenderDT(dataTypeItem === "Number");
-                                }, [values.DTypeID, values.GCLOptionID, values.Important, dataType, groupCheckListOption, updateImportantList]);
+                                }, [values.DTypeID, values.GCLOptionID, values.Important, dataType, groupCheckListOption]);
 
                                 useEffect(handleDataTypeChange, [values.DTypeID, values.GCLOptionID, values.Important]);
 
@@ -334,145 +300,135 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                             showsVerticalScrollIndicator={false}
                                             style={{ maxHeight: 330 }}
                                         >
-                                            <Profiler id="CListID" onRender={onRenderCallback}>
-                                                <FastField name="CListID">
-                                                    {({ field, form }: any) => (
-                                                        <CustomDropdownSingle
-                                                            title="Check List"
-                                                            labels="CListName"
-                                                            values="CListID"
-                                                            data={editMode ? checkList : dropcheckList}
-                                                            value={field.value}
-                                                            handleChange={(value) => {
-                                                                const stringValue = (value as { value: string }).value;
-                                                                form.setFieldValue(field.name, stringValue);
-                                                                setTimeout(() => {
-                                                                    form.setFieldTouched(field.name, true);
-                                                                }, 0);
-                                                            }}
-                                                            handleBlur={() => {
+                                            <FastField name="CListID">
+                                                {({ field, form }: any) => (
+                                                    <CustomDropdownSingle
+                                                        title="Check List"
+                                                        labels="CListName"
+                                                        values="CListID"
+                                                        data={editMode ? checkList : dropcheckList}
+                                                        value={field.value}
+                                                        handleChange={(value) => {
+                                                            const stringValue = (value as { value: string }).value;
+                                                            form.setFieldValue(field.name, stringValue);
+                                                            setTimeout(() => {
                                                                 form.setFieldTouched(field.name, true);
-                                                            }}
-                                                            testId={`CListID-form`}
-                                                            error={form.touched.CListID && Boolean(form.errors.CListID)}
-                                                            errorMessage={form.touched.CListID ? form.errors.CListID : ""}
-                                                        />
-                                                    )}
-                                                </FastField>
-                                            </Profiler>
+                                                            }, 0);
+                                                        }}
+                                                        handleBlur={() => {
+                                                            form.setFieldTouched(field.name, true);
+                                                        }}
+                                                        testId={`CListID-form`}
+                                                        error={form.touched.CListID && Boolean(form.errors.CListID)}
+                                                        errorMessage={form.touched.CListID ? form.errors.CListID : ""}
+                                                    />
+                                                )}
+                                            </FastField>
 
-                                            <Profiler id="CTypeID" onRender={onRenderCallback}>
-                                                <FastField name="CTypeID">
-                                                    {({ field, form }: any) => (
-                                                        <CustomDropdownSingle
-                                                            title="Check List Type"
-                                                            labels="CTypeName"
-                                                            values="CTypeID"
-                                                            data={editMode ? checkListType : dropcheckListType}
-                                                            value={field.value}
-                                                            handleChange={(value) => {
-                                                                const stringValue = (value as { value: string }).value;
-                                                                form.setFieldValue(field.name, stringValue);
-                                                                setTimeout(() => {
-                                                                    form.setFieldTouched(field.name, true);
-                                                                }, 0);
-                                                            }}
-                                                            handleBlur={() => {
+                                            <FastField name="CTypeID">
+                                                {({ field, form }: any) => (
+                                                    <CustomDropdownSingle
+                                                        title="Check List Type"
+                                                        labels="CTypeName"
+                                                        values="CTypeID"
+                                                        data={editMode ? checkListType : dropcheckListType}
+                                                        value={field.value}
+                                                        handleChange={(value) => {
+                                                            const stringValue = (value as { value: string }).value;
+                                                            form.setFieldValue(field.name, stringValue);
+                                                            setTimeout(() => {
                                                                 form.setFieldTouched(field.name, true);
-                                                            }}
-                                                            testId={`CTypeID-form`}
-                                                            error={form.touched.CTypeID && Boolean(form.errors.CTypeID)}
-                                                            errorMessage={form.touched.CTypeID ? form.errors.CTypeID : ""}
-                                                        />
-                                                    )}
-                                                </FastField>
-                                            </Profiler>
+                                                            }, 0);
+                                                        }}
+                                                        handleBlur={() => {
+                                                            form.setFieldTouched(field.name, true);
+                                                        }}
+                                                        testId={`CTypeID-form`}
+                                                        error={form.touched.CTypeID && Boolean(form.errors.CTypeID)}
+                                                        errorMessage={form.touched.CTypeID ? form.errors.CTypeID : ""}
+                                                    />
+                                                )}
+                                            </FastField>
 
-                                            <Profiler id="shouldRender === detail" onRender={onRenderCallback}>
-                                                {shouldRender === "detail" && (
-                                                    <Animated.View style={[animatedDetail]}>
-                                                        <FastField name="GCLOptionID">
-                                                            {({ field, form }: any) =>
-                                                                <CustomDropdownSingle
-                                                                    title="Match Check List Option Group"
-                                                                    labels="GCLOptionName"
-                                                                    values="GCLOptionID"
-                                                                    data={editMode ? groupCheckListOption : dropgroupCheckListOption}
-                                                                    value={field.value}
-                                                                    handleChange={(value) => {
-                                                                        const stringValue = (value as { value: string }).value;
+                                            {shouldRender === "detail" && (
+                                                <Animated.View style={[memoizedAnimatedText]}>
+                                                    <FastField name="GCLOptionID" key={shouldRender === "detail"}>
+                                                        {({ field, form }: any) =>
+                                                            <CustomDropdownSingle
+                                                                title="Match Check List Option Group"
+                                                                labels="GCLOptionName"
+                                                                values="GCLOptionID"
+                                                                data={editMode ? groupCheckListOption : dropgroupCheckListOption}
+                                                                value={field.value}
+                                                                handleChange={(value) => {
+                                                                    const stringValue = (value as { value: string }).value;
 
-                                                                        form.setFieldValue(field.name, stringValue);
-                                                                        setTimeout(() => {
-                                                                            form.setFieldTouched(field.name, true);
-                                                                        }, 0);
-                                                                    }}
-                                                                    handleBlur={() => {
+                                                                    form.setFieldValue(field.name, stringValue);
+                                                                    setTimeout(() => {
                                                                         form.setFieldTouched(field.name, true);
-                                                                    }}
-                                                                    testId={`GCLOptionID-form`}
-                                                                    error={form.touched.GCLOptionID && Boolean(form.errors.GCLOptionID)}
-                                                                    errorMessage={form.touched.GCLOptionID ? form.errors.GCLOptionID : ""}
-                                                                />
-                                                            }
-                                                        </FastField>
-                                                    </Animated.View>
-                                                )}
-                                            </Profiler>
+                                                                    }, 0);
+                                                                }}
+                                                                handleBlur={() => {
+                                                                    form.setFieldTouched(field.name, true);
+                                                                }}
+                                                                testId={`GCLOptionID-form`}
+                                                                error={form.touched.GCLOptionID && Boolean(form.errors.GCLOptionID)}
+                                                                errorMessage={form.touched.GCLOptionID ? form.errors.GCLOptionID : ""}
+                                                            />
+                                                        }
+                                                    </FastField>
+                                                </Animated.View>
+                                            )}
 
-                                            <Profiler id="shouldRender === text" onRender={onRenderCallback}>
-                                                {shouldRender === "text" && (
-                                                    <Animated.View style={[animatedText]}>
-                                                        <FastField name="DTypeID">
-                                                            {({ field, form }: any) => (
-                                                                <CustomDropdownSingle
-                                                                    title="Data Type"
-                                                                    labels="DTypeName"
-                                                                    values="DTypeID"
-                                                                    data={editMode ? dataType : dropdataType}
-                                                                    value={field.value}
-                                                                    handleChange={(value) => {
-                                                                        const stringValue = (value as { value: string }).value;
-                                                                        form.setFieldValue(field.name, stringValue);
-                                                                        setTimeout(() => {
-                                                                            form.setFieldTouched(field.name, true);
-                                                                        }, 0);
-                                                                    }}
-                                                                    handleBlur={() => {
+                                            {shouldRender === "text" && (
+                                                <Animated.View style={[memoizedAnimatedText]}>
+                                                    <FastField name="DTypeID" key={shouldRender === "text"}>
+                                                        {({ field, form }: any) => (
+                                                            <CustomDropdownSingle
+                                                                title="Data Type"
+                                                                labels="DTypeName"
+                                                                values="DTypeID"
+                                                                data={editMode ? dataType : dropdataType}
+                                                                value={field.value}
+                                                                handleChange={(value) => {
+                                                                    const stringValue = (value as { value: string }).value;
+                                                                    form.setFieldValue(field.name, stringValue);
+                                                                    setTimeout(() => {
                                                                         form.setFieldTouched(field.name, true);
-                                                                    }}
-                                                                    testId={`DTypeID-form`}
-                                                                    error={form.touched.DTypeID && Boolean(form.errors.DTypeID)}
-                                                                    errorMessage={form.touched.DTypeID ? form.errors.DTypeID : ""}
-                                                                />
-                                                            )}
-                                                        </FastField>
-                                                    </Animated.View>
-                                                )}
-                                            </Profiler>
+                                                                    }, 0);
+                                                                }}
+                                                                handleBlur={() => {
+                                                                    form.setFieldTouched(field.name, true);
+                                                                }}
+                                                                testId={`DTypeID-form`}
+                                                                error={form.touched.DTypeID && Boolean(form.errors.DTypeID)}
+                                                                errorMessage={form.touched.DTypeID ? form.errors.DTypeID : ""}
+                                                            />
+                                                        )}
+                                                    </FastField>
+                                                </Animated.View>
+                                            )}
 
-                                            <Profiler id="shouldRenderDT" onRender={onRenderCallback}>
-                                                {shouldRenderDT && (
-                                                    <Animated.View style={[animatedStyleNumber]}>
-                                                        <FastField name="DTypeValue">
-                                                            {({ field, form }: any) => (
-                                                                <Inputs
-                                                                    placeholder="Digis Value"
-                                                                    label="Digit number"
-                                                                    handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                                    handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                                    value={String(field.value ?? "")}
-                                                                    error={form.touched?.DTypeValue && Boolean(form.errors?.DTypeValue)}
-                                                                    errorMessage={form.touched?.DTypeValue ? form.errors?.DTypeValue : ""}
-                                                                    testId={`DTypeValue-form`}
-                                                                />
-                                                            )}
-                                                        </FastField >
-                                                    </Animated.View>
-                                                )}
-                                            </Profiler>
+                                            {shouldRenderDT && (
+                                                <Animated.View style={[memoizedAnimatedDT]}>
+                                                    <FastField name="DTypeValue">
+                                                        {({ field, form }: any) => (
+                                                            <Inputs
+                                                                placeholder="Digis Value"
+                                                                label="Digit number"
+                                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                                value={String(field.value ?? "")}
+                                                                error={form.touched?.DTypeValue && Boolean(form.errors?.DTypeValue)}
+                                                                errorMessage={form.touched?.DTypeValue ? form.errors?.DTypeValue : ""}
+                                                                testId={`DTypeValue-form`}
+                                                            />
+                                                        )}
+                                                    </FastField >
+                                                </Animated.View>
+                                            )}
 
-                                            <Profiler id="form-active-fd" onRender={onRenderCallback}>
+                                            {shouldRender !== "label" && (
                                                 <View id="form-active-fd" style={masterdataStyles.containerSwitch}>
                                                     <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                                         Require: {values.Required ? "Yes" : "No"}
@@ -486,56 +442,46 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                         id="Required-form"
                                                     />
                                                 </View>
-                                            </Profiler>
+                                            )}
 
-                                            {shouldRenderIT && option.length > 0 && values.GCLOptionID && (
-                                                <Animated.View style={[animatedStyleIT]}>
+                                            {shouldRenderIT && option.length > 0 && (
+                                                <Animated.View style={[memoizedAnimatedIT]}>
                                                     <Text style={{ marginTop: 10, marginBottom: 10, paddingLeft: 10, fontSize: spacing.small, color: theme.colors.error }}>
-                                                        {(values.ImportantList || []).some(item => item.Value) ? "Select value is important!" : "Input value control!"}
+                                                        {(values.ImportantList || []).some((item) => item.Value) ? "Select value is important!" : "Input value control!"}
                                                     </Text>
 
-                                                    <Profiler id="ImportantList[0].Value" onRender={onRenderCallback}>
-                                                        <FastField name="ImportantList[0].Value">
-                                                            {({ field, form }: any) => {
-                                                                return (
-                                                                    <Checkboxs
-                                                                        option={option}
-                                                                        handleChange={(value: string | string[]) => {
-                                                                            const processedValues = Array.isArray(value)
-                                                                                ? value.filter((v: string) => v.trim() !== '')
-                                                                                : value.split(',').filter((v: string) => v.trim() !== '');
+                                                    <FastField name="ImportantList[0].Value" key={JSON.stringify(option)}>
+                                                        {({ field, form }: any) => {
+                                                            return (
+                                                                <Checkboxs
+                                                                    option={option}
+                                                                    handleChange={(value: string | string[]) => {
+                                                                        const processedValues = Array.isArray(value)
+                                                                            ? value.filter((v: string) => v.trim() !== '')
+                                                                            : value.split(',').filter((v: string) => v.trim() !== '');
 
-                                                                            form.setFieldValue(field.name, processedValues);
-                                                                            setTimeout(() => {
-                                                                                form.setTouched({
-                                                                                    ...form.touched,
-                                                                                    ImportantList: form.touched.ImportantList?.map((touchedItem: BaseImportant, i: number) =>
-                                                                                        i === 0 ? { ...touchedItem, Value: true } : touchedItem
-                                                                                    ),
-                                                                                })
-                                                                            }, 0);
-                                                                        }}
-                                                                        value={String(field.value ?? "")}
-                                                                        error={form.touched?.ImportantList?.[0]?.Value && Boolean(form.errors?.ImportantList?.[0]?.Value)}
-                                                                        errorMessage={form.touched?.ImportantList?.[0]?.Value ? form.errors?.ImportantList?.[0]?.Value : ""}
-                                                                        handleBlur={() => form.setTouched({
-                                                                            ...form.touched,
-                                                                            ImportantList: form.touched.ImportantList?.map((touchedItem: BaseImportant, i: number) =>
-                                                                                i === 0 ? { ...touchedItem, Value: true } : touchedItem
-                                                                            ),
-                                                                        })}
-                                                                        testId="Value-Important-form-combined"
-                                                                    />
-                                                                );
-                                                            }}
-                                                        </FastField>
-                                                    </Profiler>
+                                                                        form.setFieldValue(field.name, processedValues);
+                                                                        setTimeout(() => {
+                                                                            form.setFieldTouched(field.name, true);
+                                                                        }, 0);
+                                                                    }}
+                                                                    value={String(field.value ?? "")}
+                                                                    error={form.touched?.ImportantList?.[0]?.Value && Boolean(form.errors?.ImportantList?.[0]?.Value)}
+                                                                    errorMessage={form.touched?.ImportantList?.[0]?.Value ? form.errors?.ImportantList?.[0]?.Value : ""}
+                                                                    handleBlur={() => {
+                                                                        form.setFieldTouched(field.name, true);
+                                                                    }}
+                                                                    testId="Value-Important-form-combined"
+                                                                />
+                                                            );
+                                                        }}
+                                                    </FastField>
 
                                                 </Animated.View>
                                             )}
 
                                             {shouldRenderIT && shouldRenderDT && (
-                                                <Animated.View style={[animatedStyleIT]}>
+                                                <Animated.View style={[memoizedAnimatedIT]}>
                                                     <Text
                                                         style={[
                                                             { marginTop: 10, marginBottom: 10, paddingLeft: 10, fontSize: spacing.small, color: theme.colors.error }
@@ -544,55 +490,47 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                         Input value control!
                                                     </Text>
                                                     <>
-                                                        <Profiler id="ImportantList[0].MinLength" onRender={onRenderCallback}>
-                                                            <FastField name="ImportantList[0].MinLength">
-                                                                {({ field, form }: any) => (
+                                                        <FastField name="ImportantList[0].MinLength">
+                                                            {({ field, form }: any) => {
+                                                                return (
                                                                     <Inputs
                                                                         placeholder="Min Value"
                                                                         label="Min Value Control"
                                                                         handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                                        handleBlur={() => form.setTouched({
-                                                                            ...form.touched,
-                                                                            ImportantList: form.touched.ImportantList?.map((touchedItem: BaseImportant, i: number) =>
-                                                                                i === 0 ? { ...touchedItem, MinLength: true } : touchedItem
-                                                                            ),
-                                                                        })}
+                                                                        handleBlur={() => {
+                                                                            form.setFieldTouched(field.name, true);
+                                                                        }}
                                                                         value={String(field.value ?? "")}
                                                                         error={form.touched?.ImportantList?.[0]?.MinLength && Boolean(form.errors?.ImportantList?.[0]?.MinLength)}
                                                                         errorMessage={form.touched?.ImportantList?.[0]?.MinLength ? form.errors?.ImportantList?.[0]?.MinLength : ""}
                                                                         testId={`MinLength-form`}
                                                                     />
-                                                                )}
-                                                            </FastField>
-                                                        </Profiler>
+                                                                )
+                                                            }}
+                                                        </FastField>
 
-                                                        <Profiler id="ImportantList[0].MaxLength" onRender={onRenderCallback}>
-                                                            <FastField name="ImportantList[0].MaxLength">
-                                                                {({ field, form }: any) => (
-                                                                    <Inputs
-                                                                        placeholder="Max Value"
-                                                                        label="Max Value Control"
-                                                                        handleChange={(value: string) => form.setFieldValue(field.name, value)}
-                                                                        handleBlur={() => form.setTouched({
-                                                                            ...form.touched,
-                                                                            ImportantList: form.touched.ImportantList?.map((touchedItem: BaseImportant, i: number) =>
-                                                                                i === 0 ? { ...touchedItem, MaxLength: true } : touchedItem
-                                                                            ),
-                                                                        })}
-                                                                        value={String(field.value ?? "")}
-                                                                        error={form.touched?.ImportantList?.[0]?.MaxLength && Boolean(form.errors?.ImportantList?.[0]?.MaxLength)}
-                                                                        errorMessage={form.touched?.ImportantList?.[0]?.MaxLength ? form.errors?.ImportantList?.[0]?.MaxLength : ""}
-                                                                        testId={`MaxLength-form`}
-                                                                    />
-                                                                )}
-                                                            </FastField>
-                                                        </Profiler>
+                                                        <FastField name="ImportantList[0].MaxLength">
+                                                            {({ field, form }: any) => (
+                                                                <Inputs
+                                                                    placeholder="Max Value"
+                                                                    label="Max Value Control"
+                                                                    handleChange={(value: string) => form.setFieldValue(field.name, value)}
+                                                                    handleBlur={() => {
+                                                                        form.setFieldTouched(field.name, true);
+                                                                    }}
+                                                                    value={String(field.value ?? "")}
+                                                                    error={form.touched?.ImportantList?.[0]?.MaxLength && Boolean(form.errors?.ImportantList?.[0]?.MaxLength)}
+                                                                    errorMessage={form.touched?.ImportantList?.[0]?.MaxLength ? form.errors?.ImportantList?.[0]?.MaxLength : ""}
+                                                                    testId={`MaxLength-form`}
+                                                                />
+                                                            )}
+                                                        </FastField>
                                                     </>
                                                 </Animated.View>
 
                                             )}
 
-                                            <Profiler id="form-important-fd" onRender={onRenderCallback}>
+                                            {shouldRender !== "label" && (
                                                 <View id="form-important-fd" style={masterdataStyles.containerSwitch}>
                                                     <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
                                                         Important: {values.Important ? "Yes" : "No"}
@@ -606,13 +544,12 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                         id="Important-form"
                                                     />
                                                 </View>
-                                            </Profiler>
-
+                                            )}
 
                                         </ScrollView>
 
-                                        {/* <View id="form-action-fd" style={masterdataStyles.containerAction}>
-                                            <Pressable
+                                        <View id="form-action-fd" style={masterdataStyles.containerAction}>
+                                            <TouchableOpacity
                                                 onPress={() => handleSubmit()}
                                                 disabled={!isValid || !dirty}
                                                 style={[
@@ -624,10 +561,10 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                 <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
                                                     {editMode ? "Update Field" : "Add Field"}
                                                 </Text>
-                                            </Pressable>
+                                            </TouchableOpacity>
 
                                             {editMode && (
-                                                <Pressable
+                                                <TouchableOpacity
                                                     onPress={() => {
                                                         onDeleteField(values.SFormID, values.MCListID);
                                                         setShowDialogs();
@@ -637,19 +574,18 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                                                     <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
                                                         Delete Field
                                                     </Text>
-                                                </Pressable>
+                                                </TouchableOpacity>
                                             )}
 
-                                            <Pressable
+                                            <TouchableOpacity
                                                 onPress={() => setShowDialogs()}
                                                 style={[masterdataStyles.button, masterdataStyles.backMain]}
                                             >
                                                 <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
                                                     Cancel
                                                 </Text>
-                                            </Pressable>
-                                        </View> */}
-
+                                            </TouchableOpacity>
+                                        </View>
                                     </View>
                                 );
                             }}
@@ -657,20 +593,18 @@ const FieldDialog = ({ isVisible, formState, onDeleteField, editMode, saveField,
                     )}
                 </Dialog.Content>
             </Dialog>
-            <Profiler id="Checklist_dialog" onRender={onRenderCallback}>
-                <MemoChecklist_dialog
-                    isEditing={false}
-                    isVisible={isVisibleCL}
-                    setIsVisible={() => {
-                        setIsVisibleCL(false);
-                        setInitialValueCL({ checkListId: "", checkListName: "", isActive: false, disables: false });
-                    }}
-                    initialValues={initialValueCL}
-                    saveData={saveDataCheckList}
-                />
-            </Profiler>
+            <MemoChecklist_dialog
+                isEditing={false}
+                isVisible={isVisibleCL}
+                setIsVisible={() => {
+                    setIsVisibleCL(false);
+                    setInitialValueCL({ checkListId: "", checkListName: "", isActive: false, disables: false });
+                }}
+                initialValues={initialValueCL}
+                saveData={saveDataCheckList}
+            />
         </Portal>
     );
-};
+});
 
 export default FieldDialog;
