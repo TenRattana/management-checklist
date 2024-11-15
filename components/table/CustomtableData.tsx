@@ -13,7 +13,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 
 type justifyContent = 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly' | undefined;
 
-const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead, flexArr, actionIndex, displayData, handleDialog, showMessage }) => {
+const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead, flexArr, actionIndex, displayData, handleDialog, showMessage, selectedRows, toggleSelect }) => {
     const customtable = useCustomtableStyles();
     const masterdataStyles = useMasterdataStyles();
 
@@ -57,6 +57,7 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                                                         rowIndex={rowIndex}
                                                         Canedit={row[Number(actionItem['disables'])]}
                                                         handlePress={handlePress}
+                                                        selectedRows={selectedRows}
                                                     />
                                                     <Actioncontent
                                                         data={String(row[cellIndex])}
@@ -65,6 +66,7 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                                                         rowIndex={rowIndex}
                                                         Canedit={row[Number(actionItem['disables'])]}
                                                         handlePress={handlePress}
+                                                        selectedRows={selectedRows}
                                                     />
                                                 </AccessibleView>
                                             );
@@ -77,6 +79,8 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                                                     rowIndex={rowIndex}
                                                     Canedit={row[Number(actionItem['disables'])]}
                                                     handlePress={handlePress}
+                                                    selectedRows={selectedRows}
+                                                    toggleSelect={toggleSelect}
                                                 />
                                             </AccessibleView>
                                             )

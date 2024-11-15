@@ -9,7 +9,7 @@ import Actioncontent from "./Contents/Actioncontent";
 import { Dialogs } from "../common";
 import { HandelPrssProps, CustomtableSmallProps } from "@/typing/tag";
 
-const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayData, Tablehead, actionIndex, showMessage, handleDialog }) => {
+const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayData, Tablehead, actionIndex, showMessage, handleDialog, selectedRows }) => {
 
     const masterdataStyles = useMasterdataStyles();
     const customtable = useCustomtableStyles();
@@ -50,6 +50,7 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
                                                     rowIndex={rowIndex}
                                                     Canedit={rowData[Number(actionItem['disables'])]}
                                                     handlePress={handlePress}
+                                                    selectedRows={selectedRows}
                                                 />
                                                 <Actioncontent
                                                     data={String(rowData[colIndex])}
@@ -58,6 +59,7 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
                                                     rowIndex={rowIndex}
                                                     Canedit={rowData[Number(actionItem['disables'])]}
                                                     handlePress={handlePress}
+                                                    selectedRows={selectedRows}
                                                 />
                                             </AccessibleView>
                                         );
@@ -71,6 +73,7 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
                                                     rowIndex={rowIndex}
                                                     Canedit={rowData[Number(actionItem['disables'])]}
                                                     handlePress={handlePress}
+                                                    selectedRows={selectedRows}
                                                 />
                                             </AccessibleView>
                                         )

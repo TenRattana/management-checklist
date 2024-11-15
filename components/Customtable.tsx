@@ -6,11 +6,38 @@ import CustomtableSmall from "./table/CustomtableSmall";
 import CustomtableData from "./table/CustomtableData";
 import { CustomTableProps } from '@/typing/tag';
 
-const CustomTable = ({ Tabledata, Tablehead, flexArr, handleAction, actionIndex, searchQuery, showMessage }: CustomTableProps) => {
+const CustomTable = ({ Tabledata, Tablehead, flexArr, handleAction, actionIndex, searchQuery, showMessage, selectedRows, setSelectedRows }: CustomTableProps) => {
   const [sortColumn, setSortColumn] = useState<number | null>(null);
   const [sortDirection, setSortDirection] = useState<"ascending" | "descending" | undefined>(undefined);
   const [displayData, setDisplayData] = useState<(string | number | boolean)[][]>([]);
 
+  const toggleSelectAll = () => {
+    if (selectedRows) {
+      if (selectedRows.length === displayData.length) {
+        setSelectedRows([]);
+      } else {
+        const selectedIndices = displayData.map((row, index) => {
+          const selectIndex = actionIndex.find(item => item.selectIndex !== undefined)?.selectIndex;
+          console.log(selectIndex);
+
+          return Number(selectIndex) > -1 ? String(row[Number(selectIndex)]) : null
+        }).filter(v => v !== null)
+
+        setSelectedRows(selectedIndices);
+      }
+    }
+
+  }
+
+  const toggleSelect = (value: string) => {
+    const isSelected = selectedRows.includes(value);
+
+    if (isSelected) {
+      setSelectedRows((prev) => prev.filter(item => item !== value));
+    } else {
+      setSelectedRows((prev) => [...prev, value]);
+    }
+  };
   const { responsive } = useRes();
 
   const handleSort = useCallback((columnIndex: number) => {
@@ -57,7 +84,7 @@ const CustomTable = ({ Tabledata, Tablehead, flexArr, handleAction, actionIndex,
           actionIndex={actionIndex}
           showMessage={showMessage}
           handleDialog={handleDialog}
-
+          selectedRows={selectedRows}
         />
       ) :
         <AccessibleView name="data" style={{ flex: 1, paddingHorizontal: 10 }}>
@@ -67,6 +94,9 @@ const CustomTable = ({ Tabledata, Tablehead, flexArr, handleAction, actionIndex,
             handleSort={handleSort}
             sortColumn={sortColumn}
             sortDirection={sortDirection}
+            selectedRows={selectedRows}
+            toggleSelectAll={toggleSelectAll}
+            displayData={displayData}
           />
 
           <CustomtableData
@@ -75,6 +105,8 @@ const CustomTable = ({ Tabledata, Tablehead, flexArr, handleAction, actionIndex,
             displayData={displayData}
             flexArr={flexArr}
             handleDialog={handleDialog}
+            selectedRows={selectedRows}
+            toggleSelect={toggleSelect}
             showMessage={showMessage}
           />
 

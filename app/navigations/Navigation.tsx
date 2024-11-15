@@ -32,7 +32,7 @@ const components: Record<ComponentNames, () => Promise<{ default: React.Componen
     Create_form: () => import('@/app/screens/layouts/forms/create/CreateFormScreen'),
     InputFormMachine: () => import('@/app/screens/layouts/forms/Scan/InputFormMachine'),
     Preview: () => import('@/app/screens/layouts/forms/view/Preview'),
-    Approve: () => import('@/app/screens/layouts/approveds/ApprovedScreen'),
+    Apporved: () => import('@/app/screens/layouts/approveds/ApporvedScreen'),
 };
 
 const nonLazyComponents: Record<ComponentNameNoLazy, React.ComponentType<any>> = {

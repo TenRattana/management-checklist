@@ -162,7 +162,7 @@ export type ComponentNames =
   | "Create_form"
   | "InputFormMachine"
   | "Preview"
-  | "Approve";
+  | "Apporved";
 
 export type ComponentNameNoLazy =
   | "Machine_group"

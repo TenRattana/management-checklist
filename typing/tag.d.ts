@@ -6,14 +6,14 @@ import {
   TextInputFocusEventData,
 } from "react-native";
 import { NavigationProp, RouteProp } from "@react-navigation/native";
-import { Form , BaseFormState } from "./form";
+import { Form, BaseFormState } from "./form";
 import {
   DataType,
   Checklist,
   CheckListType,
   GroupCheckListOption,
 } from "./type";
-import * as Yup from 'yup';
+import * as Yup from "yup";
 import { FormikErrors } from "formik";
 
 export type CreateFormParams = { formId: string };
@@ -57,7 +57,7 @@ export interface InputProps extends Event, DefaultProps {
   mode?: "outlined" | "flat";
   lefticon?: string;
   name?: string;
-  textColor?:string;
+  textColor?: string;
 }
 
 export interface RadiosProps extends Event, DefaultProps {
@@ -75,7 +75,7 @@ export interface CheckboxsProps extends Event, DefaultProps {
 export interface TextareasProps extends Event, DefaultProps {
   placeholder?: string;
   mode?: "outlined" | "flat";
-  textColor?:string;
+  textColor?: string;
 }
 export interface CustomDropdownSingleProps extends Event, DefaultProps {
   labels: string;
@@ -93,10 +93,10 @@ export interface DynamicFormProps {
   handleChange: (fieldName: string, value: any) => void;
   handleBlur?: () => void;
   groupCheckListOption: GroupCheckListOption[];
-  error?:boolean;
-  errorMessages?:FormikErrors<{[key: string]: any;}>;
-  type?:string;
-  warning?:{ [key: string]: string | undefined } = {}
+  error?: boolean;
+  errorMessages?: FormikErrors<{ [key: string]: any }>;
+  type?: string;
+  warning?: { [key: string]: string | undefined } = {};
 }
 
 export interface PreviewProps<T extends PreviewParams | ScanParams> {
@@ -134,7 +134,9 @@ export interface CustomTableProps {
   handleAction?: (action?: string, data?: string) => void;
   actionIndex: { [key: string]: number }[];
   searchQuery: string;
-  showMessage:number | Array;
+  showMessage: number | Array;
+  selectedRows?:string[];
+  setSelectedRows?: React.Dispatch<React.SetStateAction<string[]>>
 }
 
 export interface DragfieldProps {
@@ -156,7 +158,7 @@ export interface DragsubformProps {
   groupCheckListOption: GroupCheckListOption[];
   navigation: NavigationProp<any>;
 }
-  // validationSchema: Yup.ObjectSchema<{[x: string]: any;},Yup.AnyObject,{[x: string]: any;},"" >;
+// validationSchema: Yup.ObjectSchema<{[x: string]: any;},Yup.AnyObject,{[x: string]: any;},"" >;
 
 // Admin and QR Props
 export interface GenerateQRProps {}
@@ -214,14 +216,15 @@ export interface HandelPrssProps {
   data: string;
   message: (string | number | boolean)[];
   visible?: boolean;
-  Change?:string;
+  Change?: string;
 }
 export interface CustomtableSmallProps {
   displayData: (string | number | boolean)[][];
   Tablehead: { label?: string; align?: string }[];
   actionIndex: { [key: string]: number }[];
   showMessage: number | any;
-  handleDialog: (action?: string, data?: string) => void
+  handleDialog: (action?: string, data?: string) => void;
+  selectedRows:string[];
 }
 
 export interface CustomtableDataProps {
@@ -231,4 +234,6 @@ export interface CustomtableDataProps {
   displayData: (string | number | boolean)[][];
   handleDialog: (action?: string, data?: string) => void;
   showMessage: number;
+  selectedRows: string[];
+  toggleSelect: (value : string) => void;
 }
