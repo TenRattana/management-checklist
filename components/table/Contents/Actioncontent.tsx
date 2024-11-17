@@ -7,7 +7,7 @@ import { ActionProps, HandelPrssProps } from "@/typing/tag";
 
 interface ActioncontentProps extends ActionProps {
     handlePress: (props: HandelPrssProps) => void
-    selectedRows: string[];
+    selectedRows?: string[];
     toggleSelect?: (value: string) => void;
 }
 
@@ -40,7 +40,7 @@ const Actioncontent = React.memo(({ data, action, row, rowIndex, Canedit, handle
         case "selectIndex":
             return (
                 <View>
-                    <Checkbox status={selectedRows[rowIndex] ? 'checked' : 'unchecked'} onPress={() => toggleSelect ? toggleSelect(data) : null} />
+                    <Checkbox status={selectedRows?.includes(data) ? 'checked' : 'unchecked'} onPress={() => toggleSelect ? toggleSelect(data) : null} />
                 </View>
             )
         default:

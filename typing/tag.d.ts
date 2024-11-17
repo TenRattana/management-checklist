@@ -136,7 +136,8 @@ export interface CustomTableProps {
   searchQuery: string;
   showMessage: number | Array;
   selectedRows?:string[];
-  setSelectedRows?: React.Dispatch<React.SetStateAction<string[]>>
+  setRow?: (value : string[]) => void;
+  showFilter?:boolean;
 }
 
 export interface DragfieldProps {
@@ -224,7 +225,7 @@ export interface CustomtableSmallProps {
   actionIndex: { [key: string]: number }[];
   showMessage: number | any;
   handleDialog: (action?: string, data?: string) => void;
-  selectedRows:string[];
+  selectedRows?:string[];
 }
 
 export interface CustomtableDataProps {
@@ -234,6 +235,6 @@ export interface CustomtableDataProps {
   displayData: (string | number | boolean)[][];
   handleDialog: (action?: string, data?: string) => void;
   showMessage: number;
-  selectedRows: string[];
+  selectedRows?: string[];
   toggleSelect: (value : string) => void;
 }

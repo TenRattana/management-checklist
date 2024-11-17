@@ -50,7 +50,6 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
                                                     rowIndex={rowIndex}
                                                     Canedit={rowData[Number(actionItem['disables'])]}
                                                     handlePress={handlePress}
-                                                    selectedRows={selectedRows}
                                                 />
                                                 <Actioncontent
                                                     data={String(rowData[colIndex])}
@@ -59,7 +58,6 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
                                                     rowIndex={rowIndex}
                                                     Canedit={rowData[Number(actionItem['disables'])]}
                                                     handlePress={handlePress}
-                                                    selectedRows={selectedRows}
                                                 />
                                             </AccessibleView>
                                         );

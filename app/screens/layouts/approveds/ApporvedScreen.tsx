@@ -7,7 +7,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { ExpectedResult } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
 import { useQuery } from 'react-query';
-import { StyleSheet } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 
 const fetchExpectedResults = async (): Promise<ExpectedResult[]> => {
     const response = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResults");
@@ -68,6 +68,10 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
         return `${day}/${month}/${year} เวลา ${hours}:${minutes}`;
     };
 
+    const setRow = useCallback((value: string[]) => {
+        setSelectedRows(value)
+    }, [selectedRows])
+
     const tableData = useMemo(() => {
         return expectedResult.map((item) => [
             item.TableID,
@@ -97,11 +101,12 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
             },
         ],
         handleAction,
-        showMessage: [0, 1],
+        showMessage: [1, 2],
         searchQuery: debouncedSearchQuery,
         selectedRows,
-        setSelectedRows
-    }), [tableData, debouncedSearchQuery, handleAction]);
+        setRow,
+        showFilter:true,
+    }), [tableData, debouncedSearchQuery, handleAction, setRow, selectedRows]);
 
     const styles = StyleSheet.create({
         container: {
@@ -121,6 +126,11 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
         }
     })
 
+    const handelApporve = useCallback(() => {
+        console.log(selectedRows);
+
+    }, [])
+
     return (
         <AccessibleView name="container-checklist" style={styles.container}>
             <Card.Title
@@ -134,6 +144,49 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
                     onChange={setSearchQuery}
                     testId="search-er"
                 />
+                {selectedRows.length > 0 && (
+                    <AccessibleView name="" style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginVertical: 10 }}>
+                        <TouchableOpacity
+                            onPress={handelApporve}
+                            style={[
+                                masterdataStyles.backMain,
+                                masterdataStyles.buttonCreate,
+                                {
+                                    backgroundColor: '#4CAF50', // Green for Approve button
+                                    borderRadius: 8,             // Rounded corners
+                                    paddingVertical: 12,         // Increase padding for better touch area
+                                    paddingHorizontal: 20,
+                                    elevation: 3                 // Adds shadow on Android
+                                },
+                            ]}
+                        >
+                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>
+                                Approve
+                            </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            onPress={() => setSelectedRows([])}
+                            style={[
+                                masterdataStyles.backMain,
+                                masterdataStyles.buttonCreate,
+                                {
+                                    backgroundColor: '#F44336', 
+                                    borderRadius: 8,
+                                    paddingVertical: 12,
+                                    paddingHorizontal: 20,
+                                    marginLeft: 10,          
+                                    elevation: 3
+                                },
+                            ]}
+                        >
+                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>
+                                Cancel Select
+                            </Text>
+                        </TouchableOpacity>
+                    </AccessibleView>
+                )}
+
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}

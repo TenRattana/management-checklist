@@ -14,8 +14,8 @@ interface CustomTableHeadProps {
     handleSort: (index: number) => void;
     sortColumn: number | null;
     sortDirection: "ascending" | "descending" | undefined;
-    selectedRows: string[];
-    toggleSelectAll: () => void;
+    selectedRows?: string[];
+    toggleSelectAll?: () => void;
     displayData: (string | number | boolean)[][]
 }
 
@@ -43,7 +43,7 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({ Tablehead,
                                 {header.label === "selected" ? (
                                     <View style={{ top: fontSize === "small" ? -5 : fontSize === "medium" ? -7 : -7 }}>
                                         <Checkbox
-                                            status={selectedRows.length === displayData.length ? 'checked' : 'unchecked'}
+                                            status={selectedRows?.length === displayData.length ? 'checked' : 'unchecked'}
                                             onPress={toggleSelectAll}
                                         />
                                     </View>
