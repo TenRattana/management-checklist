@@ -140,12 +140,12 @@ const useForm = (route: RouteParams) => {
 
             let fetchedExpectedResult = [];
             if (tableId) {
-                setExp(true)
                 const expectedResultResponse = await axiosInstance.post(
                     "ExpectedResult_service.asmx/GetExpectedResult",
                     { TableID: tableId }
                 );
                 fetchedExpectedResult = expectedResultResponse.data?.data[0] || [];
+                setExp(true)
             }
 
             const { subForms, fields } = createSubFormsAndFields(

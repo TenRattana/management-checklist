@@ -16,7 +16,6 @@ const DynamicForm = React.memo(({
   error,
   errorMessages,
   type,
-  warning,
   exp
 }: DynamicFormProps) => {
   const { CTypeName, CListName, MCListID, GCLOptionID, Required, Important, ImportantList } = field;
@@ -29,7 +28,7 @@ const DynamicForm = React.memo(({
   const [messageminOrmax, setMessageMinOrMax] = useState("");
 
   useEffect(() => {
-    if (Important) {
+    if (Important && type === "Number" && values !== "") {
       const numericValue = Number(values);
 
       const minLength = Number(ImportantList?.[0]?.MinLength) || 0;
@@ -68,7 +67,7 @@ const DynamicForm = React.memo(({
       case "Textinput":
         return (
           <Inputs
-            hint={error ? errorMessages?.[MCListID] as string || "" : warning ? warning?.[MCListID] : ""}
+            hint={error ? errorMessages?.[MCListID] as string || "" : messageminOrmax ? messageminOrmax : ""}
             mode={"outlined"}
             label={CListName}
             value={values}
@@ -82,7 +81,7 @@ const DynamicForm = React.memo(({
       case "Textarea":
         return (
           <Textareas
-            hint={error ? errorMessages?.[MCListID] as string || "" : warning?.[MCListID] ? warning?.[MCListID] : ""}
+            hint={error ? errorMessages?.[MCListID] as string || "" : ""}
             mode={"outlined"}
             label={CListName}
             value={values}
@@ -150,9 +149,6 @@ const DynamicForm = React.memo(({
         {Required && <Text style={{ color: theme.colors.error }}>(*)</Text>}
       </Text>
       {renderField()}
-      <HelperText type="info" visible={minOrmax} style={[{ display: minOrmax ? 'flex' : 'none', color: textColor }, masterdataStyles.errorText]}>
-        {messageminOrmax}
-      </HelperText>
     </View>
   );
 });
