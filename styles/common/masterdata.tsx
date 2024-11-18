@@ -93,7 +93,6 @@ const useMasterdataStyles = () => {
         containerSearch: {
             flexDirection: 'row',
             flexWrap: 'wrap',
-            height: 100,
         },
         searchbar: {
             width: responsive === "small" ? "90%" : 400,
@@ -101,7 +100,6 @@ const useMasterdataStyles = () => {
             alignContent: 'center',
             alignItems: 'center',
             alignSelf: 'center',
-            height: spacing.small + 40,
             marginHorizontal: responsive === "small" ? '5%' : 30,
             borderRadius: 10,
             fontSize: spacing.small,
