@@ -40,6 +40,7 @@ export interface DefaultProps {
   error?: boolean;
   errorMessage?: string;
   testId?: string;
+  exp?:boolean;
 }
 
 export interface DialogsProps {
@@ -98,6 +99,7 @@ export interface DynamicFormProps {
   errorMessages?: FormikErrors<{ [key: string]: any }>;
   type?: string;
   warning?: { [key: string]: string | undefined } = {};
+  exp?:boolean;
 }
 
 export interface PreviewProps<T extends PreviewParams | ScanParams> {

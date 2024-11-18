@@ -96,6 +96,7 @@ const useForm = (route: RouteParams) => {
     });
     const [dataLoaded, setDataLoaded] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [exp, setExp] = useState(false);
 
     const { formId, action, machineId, tableId } = route.params || {};
     const { handleError } = useToast();
@@ -139,6 +140,7 @@ const useForm = (route: RouteParams) => {
 
             let fetchedExpectedResult = [];
             if (tableId) {
+                setExp(true)
                 const expectedResultResponse = await axiosInstance.post(
                     "ExpectedResult_service.asmx/GetExpectedResult",
                     { TableID: tableId }
@@ -164,7 +166,7 @@ const useForm = (route: RouteParams) => {
             handleError(error);
         }
     },
-        [dataLoaded, data.checkList, data.checkListType, handleError, dispatch]
+        [dataLoaded, data.checkList, data.checkListType, handleError, dispatch, exp]
     );
 
     useFocusEffect(
@@ -190,7 +192,8 @@ const useForm = (route: RouteParams) => {
         checkListType: data.checkListType,
         groupCheckListOption: tableId || machineId ? data.groupCheckListOption : data.groupCheckListOptionActive,
         machine: data.machine,
-        isLoading
+        isLoading,
+        exp
     };
 };
 

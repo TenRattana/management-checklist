@@ -15,7 +15,8 @@ const Textareas: React.FC<TextareasProps> = React.memo(({
     handleBlur,
     mode,
     hint,
-    testId
+    testId,
+    exp
 }) => {
     const masterdataStyles = useMasterdataStyles()
 
@@ -36,13 +37,14 @@ const Textareas: React.FC<TextareasProps> = React.memo(({
                 multiline
                 numberOfLines={4}
                 right={
-                    value ? (
+                    value && !exp ? (
                         <TextInput.Icon
                             icon={"window-close"}
                             onPress={() => handleChange("")}
                         />
                     ) : undefined
                 }
+                readOnly={exp}
                 error={error}
                 enterKeyHint="done"
                 testID={testId}

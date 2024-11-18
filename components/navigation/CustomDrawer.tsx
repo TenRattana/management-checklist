@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Pressable, View } from 'react-native';
+import { ActivityIndicator, Pressable, TouchableOpacity, View } from 'react-native';
 import { useAuth } from "@/app/contexts";
 import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
 import { Text } from '@/components';
@@ -26,14 +26,13 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = React.memo((p
 
     const renderPressable = (label: string, navigateTo: string) => {
         return (
-            <Pressable
+            <TouchableOpacity
                 key={`item-${label}-nav-${navigateTo}`}
                 onPress={() => navigation.navigate(navigateTo)}
                 style={masterdataStyles.menuItemNav}
-                android_ripple={{ color: '#f0f0f0' }}
             >
                 <Text style={masterdataStyles.menuText}>{label}</Text>
-            </Pressable>
+            </TouchableOpacity>
         );
     };
 

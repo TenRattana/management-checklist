@@ -14,7 +14,8 @@ const Checkboxs: React.FC<CheckboxsProps> = React.memo(({
   hint,
   error,
   errorMessage,
-  testId
+  testId,
+  exp
 }) => {
   const [checkedOptions, setCheckedOptions] = useState<string[]>([]);
   const masterdataStyles = useMasterdataStyles();
@@ -46,6 +47,7 @@ const Checkboxs: React.FC<CheckboxsProps> = React.memo(({
         <TouchableOpacity
           key={index}
           onPress={() => handleCheckBoxChange(item.value || '')}
+          disabled={exp}
           testID={testId}
         >
           <View id="con-checkbox">
@@ -53,6 +55,7 @@ const Checkboxs: React.FC<CheckboxsProps> = React.memo(({
               <Checkbox
                 status={checkedOptions.includes(item.value || '') ? "checked" : "unchecked"}
                 onPress={() => handleCheckBoxChange(item.value || '')}
+                disabled={exp}
               />
               <Text style={masterdataStyles.checkboxLabel}>{item.label}</Text>
             </View>

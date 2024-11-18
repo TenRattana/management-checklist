@@ -16,7 +16,8 @@ const Selects: React.FC<SelectsProps> = React.memo(({
   label,
   error,
   errorMessage,
-  testId
+  testId,
+  exp
 }) => {
   if (!option || option.length === 0) {
     return null;
@@ -34,6 +35,7 @@ const Selects: React.FC<SelectsProps> = React.memo(({
           style={masterdataStyles.picker}
           itemStyle={masterdataStyles.text}
           testID={testId}
+          enabled={!exp}
           id={testId}
         >
           <Picker.Item label="Select..."

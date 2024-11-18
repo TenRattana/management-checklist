@@ -31,7 +31,7 @@ const Drawer = createDrawerNavigator();
 const components: Record<ComponentNames, () => Promise<{ default: React.ComponentType<any> }>> = {
     Create_form: () => import('@/app/screens/layouts/forms/create/CreateFormScreen'),
     InputFormMachine: () => import('@/app/screens/layouts/forms/Scan/InputFormMachine'),
-    Preview: () => import('@/app/screens/layouts/forms/view/Preview'),
+    Preview: () => import('@/app/screens/layouts/forms/view/PreviewScreen'),
     Apporved: () => import('@/app/screens/layouts/approveds/ApporvedScreen'),
 };
 

@@ -18,7 +18,8 @@ const Inputs: React.FC<InputProps> = React.memo(({
   hint,
   mode,
   testId,
-  textColor
+  textColor,
+  exp
 }) => {
   const masterdataStyles = useMasterdataStyles();
 
@@ -43,13 +44,14 @@ const Inputs: React.FC<InputProps> = React.memo(({
         onBlur={handleBlur}
         value={String(value)}
         right={
-          value ? (
+          value && !exp ? (
             <TextInput.Icon
               icon="window-close"
               onPress={() => handleChange("")}
             />
           ) : undefined
         }
+        readOnly={exp}
         error={error}
         enterKeyHint="done"
         testID={testId}

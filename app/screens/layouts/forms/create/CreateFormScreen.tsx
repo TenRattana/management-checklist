@@ -8,7 +8,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import useForm from "@/hooks/custom/useForm";
 import { AccessibleView, ConfigItemForm, SaveDialog, Text } from "@/components";
 import Dragsubform from "./Dragsubform";
-import Preview from "@/app/screens/layouts/forms/view/Preview";
+import Preview from "@/app/screens/layouts/forms/create/ShowForm";
 import { CreateFormProps } from "@/typing/tag";
 import { BaseFormState, BaseSubForm } from "@/typing/form";
 import { Checklist, CheckListType, DataType, GroupCheckListOption } from "@/typing/type";

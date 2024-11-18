@@ -7,7 +7,7 @@ import { View } from "react-native";
 import { useRes, useTheme } from "@/app/contexts";
 import { Text } from "react-native-paper";
 
-const DynamicForm = ({
+const DynamicForm = React.memo(({
   field,
   values,
   handleChange,
@@ -16,7 +16,8 @@ const DynamicForm = ({
   error,
   errorMessages,
   type,
-  warning
+  warning,
+  exp
 }: DynamicFormProps) => {
   const { CTypeName, CListName, MCListID, GCLOptionID, Required, Important, ImportantList } = field;
   const masterdataStyles = useMasterdataStyles();
@@ -57,6 +58,7 @@ const DynamicForm = ({
             handleBlur={handleBlur}
             testId={`input-${MCListID}`}
             textColor={textColor}
+            exp={exp}
           />
         );
       case "Textarea":
@@ -70,6 +72,7 @@ const DynamicForm = ({
             handleBlur={handleBlur}
             testId={`inputarea-${MCListID}`}
             textColor={textColor}
+            exp={exp}
           />
         );
       case "Radio":
@@ -81,6 +84,7 @@ const DynamicForm = ({
             handleBlur={handleBlur}
             value={values}
             testId={`radio-${MCListID}`}
+            exp={exp}
           />
         );
       case "Dropdown":
@@ -92,6 +96,7 @@ const DynamicForm = ({
             handleBlur={handleBlur}
             value={values}
             testId={`dropdown-${MCListID}`}
+            exp={exp}
           />
         );
       case "Checkbox":
@@ -109,6 +114,7 @@ const DynamicForm = ({
             handleBlur={handleBlur}
             value={values}
             testId={`checkbox-${MCListID}`}
+            exp={exp}
           />
         );
       default:
@@ -128,6 +134,6 @@ const DynamicForm = ({
       {renderField()}
     </View>
   );
-};
+});
 
-export default React.memo(DynamicForm);
+export default DynamicForm;

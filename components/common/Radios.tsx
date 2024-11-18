@@ -14,7 +14,8 @@ const Radios: React.FC<RadiosProps> = React.memo(({
   label,
   error,
   errorMessage,
-  testId
+  testId,
+  exp
 }) => {
   const masterdataStyles = useMasterdataStyles()
 
@@ -26,7 +27,7 @@ const Radios: React.FC<RadiosProps> = React.memo(({
     <View id="radios" style={masterdataStyles.commonContainer}>
       {label && <Text style={masterdataStyles.label}>{label}</Text>}
       <RadioButton.Group
-        onValueChange={handleChange}
+        onValueChange={(value: string) => !exp ? handleChange(value) : false}
         value={value as string}
       >
         {option.map((opt, index) => (
@@ -35,6 +36,7 @@ const Radios: React.FC<RadiosProps> = React.memo(({
             onPress={() => handleChange(opt.value)}
             style={{ flex: 1 }}
             testID={testId}
+            disabled={exp}
             id={testId}
           >
             <View id="con-radio" style={[masterdataStyles.radioItem]}>
