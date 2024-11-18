@@ -24,7 +24,6 @@ const DynamicForm = React.memo(({
   const { fontSize } = useRes()
 
   const [textColor, setTextColor] = useState(theme.colors.onBackground);
-  const [minOrmax, setMinOrMax] = useState(false);
   const [messageminOrmax, setMessageMinOrMax] = useState("");
 
   useEffect(() => {
@@ -36,17 +35,14 @@ const DynamicForm = React.memo(({
 
       if (numericValue < minLength) {
         setTextColor(theme.colors.yellow);
-        setMinOrMax(true);
         setMessageMinOrMax("Min value control is overlength");
       }
       else if (numericValue > maxLength) {
         setTextColor(theme.colors.error);
-        setMinOrMax(true);
         setMessageMinOrMax("Max value control is overlength");
       }
       else {
         setTextColor(theme.colors.onBackground);
-        setMinOrMax(false);
         setMessageMinOrMax("");
       }
     }
