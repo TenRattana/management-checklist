@@ -5,10 +5,6 @@ import CustomtableHead from "./table/CustomtableHead";
 import CustomtableSmall from "./table/CustomtableSmall";
 import CustomtableData from "./table/CustomtableData";
 import { CustomTableProps } from '@/typing/tag';
-import { Selects, Text } from "@/components";
-import { Picker } from "@react-native-picker/picker";
-import { StyleSheet, View } from "react-native";
-import useMasterdataStyles from "@/styles/common/masterdata";
 
 const CustomTable = ({
   Tabledata,
@@ -20,7 +16,9 @@ const CustomTable = ({
   showMessage,
   selectedRows,
   setRow,
-  showFilter
+  showFilter,
+  showData,
+  showColumn
 }: CustomTableProps) => {
   const [sortColumn, setSortColumn] = useState<number | null>(null);
   const [sortDirection, setSortDirection] = useState<"ascending" | "descending" | undefined>(undefined);
@@ -94,31 +92,12 @@ const CustomTable = ({
     }
   }, [handleAction]);
 
-  const dropdownOptions = useMemo(() => {
-    const uniqueOptions = new Set(Tabledata.map(row => row[1]));
-    return Array.from(uniqueOptions);
-  }, [Tabledata]);
-
-  const masterdataStyles = useMasterdataStyles();
+  const handelSetFilter = useCallback((value: string) => {
+    setFilter(value)
+  }, [])
 
   return (
     <AccessibleView name="customtable" style={{ flex: 1 }} >
-      {showFilter && (
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginVertical: 10, marginHorizontal: 10 }}>
-          <Text style={[masterdataStyles.text, { alignContent: 'center', paddingRight: 15 }]}>{Tablehead[1].label}</Text>
-          <Picker
-            selectedValue={filter || ""}
-            onValueChange={(itemValue) => setFilter(itemValue)}
-            style={styles.picker}
-            mode="dropdown"
-          >
-            <Picker.Item label="Select an option" value="" style={styles.placeholder} />
-            {dropdownOptions.map((option, index) => (
-              <Picker.Item key={index} label={String(option)} value={option} />
-            ))}
-          </Picker>
-        </View>
-      )}
 
       {responsive === "small" ? (
         <CustomtableSmall
@@ -128,9 +107,16 @@ const CustomTable = ({
           showMessage={showMessage}
           handleDialog={handleDialog}
           selectedRows={selectedRows}
+          handelSetFilter={handelSetFilter}
+          filter={filter}
+          showColumn={showColumn}
+          showData={showData}
+          showFilter={showFilter}
+          toggleSelect={toggleSelect}
+          key={"CustomtableSmall"}
         />
       ) :
-        <AccessibleView name="data" style={{ flex: 1, paddingHorizontal: 10 }}>
+        <AccessibleView name="data" style={{ flex: 1 }}>
           <CustomtableHead
             Tablehead={Tablehead}
             flexArr={flexArr}
@@ -140,6 +126,13 @@ const CustomTable = ({
             selectedRows={selectedRows}
             toggleSelectAll={toggleSelectAll}
             displayData={displayData}
+            handelSetFilter={handelSetFilter}
+            filter={filter}
+            showColumn={showColumn}
+            showData={showData}
+            showFilter={showFilter}
+            handleDialog={handleDialog}
+            key={"CustomtableHead"}
           />
 
           <CustomtableData
@@ -151,6 +144,7 @@ const CustomTable = ({
             selectedRows={selectedRows}
             toggleSelect={toggleSelect}
             showMessage={showMessage}
+            key={"CustomtableData"}
           />
 
         </AccessibleView>
@@ -160,39 +154,3 @@ const CustomTable = ({
 };
 
 export default React.memo(CustomTable);
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 15,
-    marginTop: 10,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    width: 300,
-    maxWidth: 400,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 10,
-  },
-  picker: {
-    height: 50,
-    backgroundColor: '#f7f7f7',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    paddingHorizontal: 12,
-    fontSize: 16,
-    color: '#333',
-    width: 300
-  },
-  placeholder: {
-    color: '#888',
-  },
-});

@@ -4,13 +4,18 @@ import { useToast, useRes } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { ExpectedResult } from "@/typing/type";
+import { ExpectedResult, UsersPermission } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
 import { useQuery } from 'react-query';
 import { StyleSheet } from "react-native";
 
 const fetchExpectedResults = async (): Promise<ExpectedResult[]> => {
     const response = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResults");
+    return response.data.data ?? [];
+};
+
+const fetchUserPermission = async (): Promise<UsersPermission[]> => {
+    const response = await axiosInstance.post("User_service.asmx/GetUsersPermission");
     return response.data.data ?? [];
 };
 
@@ -28,6 +33,14 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
         {
             refetchOnWindowFocus: true,
         });
+
+    const { data: userPermission = [] } = useQuery<UsersPermission[], Error>(
+        'userPermission',
+        fetchUserPermission,
+        {
+            refetchOnWindowFocus: true,
+        }
+    );
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -71,7 +84,8 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
         return expectedResult.map((item) => [
             item.MachineName,
             item.FormName,
-            item.UserName ?? "-",
+            userPermission.find(v => v.UserID === item.UserID)?.UserName || "-",
+            userPermission.find(v => v.UserID === item.ApporvedID)?.UserName || "-",
             convertToThaiDateTime(item.CreateDate),
             item.TableID,
         ]);
@@ -83,13 +97,14 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
             { label: "Machine Name", align: "flex-start" },
             { label: "Form Name", align: "flex-start" },
             { label: "User", align: "flex-start" },
+            { label: "Apporved", align: "flex-start" },
             { label: "Time Submit", align: "flex-start" },
             { label: "Preview", align: "center" },
         ],
-        flexArr: [3, 3, 2, 3, 1],
+        flexArr: [2, 3, 2, 2, 2, 1],
         actionIndex: [
             {
-                preIndex: 4,
+                preIndex: 5,
             },
         ],
         handleAction,

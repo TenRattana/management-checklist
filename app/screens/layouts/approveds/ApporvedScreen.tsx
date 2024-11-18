@@ -4,14 +4,29 @@ import { useToast, useRes } from "@/app/contexts";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { ExpectedResult } from "@/typing/type";
+import { ExpectedResult, Machine, UsersPermission } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
-import { useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { StyleSheet, TouchableOpacity } from "react-native";
 
-const fetchExpectedResults = async (): Promise<ExpectedResult[]> => {
-    const response = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResults");
+const fetchMachines = async (): Promise<Machine[]> => {
+    const response = await axiosInstance.post("Machine_service.asmx/GetMachines");
     return response.data.data ?? [];
+};
+
+const fetchApporved = async (): Promise<ExpectedResult[]> => {
+    const response = await axiosInstance.post("ExpectedResult_service.asmx/GetApporveds");
+    return response.data.data ?? [];
+};
+
+const fetchUserPermission = async (): Promise<UsersPermission[]> => {
+    const response = await axiosInstance.post("User_service.asmx/GetUsersPermission");
+    return response.data.data ?? [];
+};
+
+const SaveApporved = async (data: string[]): Promise<{ message: string }> => {
+    const response = await axiosInstance.post("ExpectedResult_service.asmx/SaveApporved", { TableID: JSON.stringify(data) });
+    return response.data;
 };
 
 const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }) => {
@@ -22,13 +37,30 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
+    const queryClient = useQueryClient();
+
+    const { data: machines = [], } = useQuery<Machine[], Error>(
+        'machines',
+        fetchMachines,
+        {
+            refetchOnWindowFocus: true,
+        }
+    );
 
     const { data: expectedResult = [], isLoading } = useQuery<ExpectedResult[], Error>(
-        'expectedResult',
-        fetchExpectedResults,
+        'approved',
+        fetchApporved,
         {
             refetchOnWindowFocus: true,
         });
+
+    const { data: userPermission = [] } = useQuery<UsersPermission[], Error>(
+        'userPermission',
+        fetchUserPermission,
+        {
+            refetchOnWindowFocus: true,
+        }
+    );
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -51,11 +83,16 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
                         tableId: data.TableID,
                     });
                 }
+            } else if (action === "Apporved") {
+                mutation.mutate(selectedRows);
+                setSelectedRows([])
+            } else if (action === "ResetRow") {
+                setSelectedRows([])
             }
         } catch (error) {
             handleError(error);
         }
-    }, [handleError, expectedResult]);
+    }, [handleError, expectedResult, selectedRows]);
 
     const convertToThaiDateTime = (dateString: string) => {
         const date = new Date(dateString);
@@ -77,11 +114,19 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
             item.TableID,
             item.MachineName,
             item.FormName,
-            item.UserName ?? "-",
+            userPermission.find(v => v.UserID === item.UserID)?.UserName || "-",
             convertToThaiDateTime(item.CreateDate),
             item.TableID,
         ]);
-    }, [expectedResult, debouncedSearchQuery]);
+    }, [expectedResult, debouncedSearchQuery, userPermission]);
+
+    const mutation = useMutation(SaveApporved, {
+        onSuccess: (data) => {
+            showSuccess(data.message);
+            queryClient.invalidateQueries('approved');
+        },
+        onError: handleError,
+    });
 
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
@@ -105,7 +150,9 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
         searchQuery: debouncedSearchQuery,
         selectedRows,
         setRow,
-        showFilter:true,
+        showFilter: true,
+        showData: machines,
+        showColumn: "MachineName"
     }), [tableData, debouncedSearchQuery, handleAction, setRow, selectedRows]);
 
     const styles = StyleSheet.create({
@@ -126,11 +173,6 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
         }
     })
 
-    const handelApporve = useCallback(() => {
-        console.log(selectedRows);
-
-    }, [])
-
     return (
         <AccessibleView name="container-checklist" style={styles.container}>
             <Card.Title
@@ -144,49 +186,6 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
                     onChange={setSearchQuery}
                     testId="search-er"
                 />
-                {selectedRows.length > 0 && (
-                    <AccessibleView name="" style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginVertical: 10 }}>
-                        <TouchableOpacity
-                            onPress={handelApporve}
-                            style={[
-                                masterdataStyles.backMain,
-                                masterdataStyles.buttonCreate,
-                                {
-                                    backgroundColor: '#4CAF50', // Green for Approve button
-                                    borderRadius: 8,             // Rounded corners
-                                    paddingVertical: 12,         // Increase padding for better touch area
-                                    paddingHorizontal: 20,
-                                    elevation: 3                 // Adds shadow on Android
-                                },
-                            ]}
-                        >
-                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>
-                                Approve
-                            </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            onPress={() => setSelectedRows([])}
-                            style={[
-                                masterdataStyles.backMain,
-                                masterdataStyles.buttonCreate,
-                                {
-                                    backgroundColor: '#F44336', 
-                                    borderRadius: 8,
-                                    paddingVertical: 12,
-                                    paddingHorizontal: 20,
-                                    marginLeft: 10,          
-                                    elevation: 3
-                                },
-                            ]}
-                        >
-                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>
-                                Cancel Select
-                            </Text>
-                        </TouchableOpacity>
-                    </AccessibleView>
-                )}
-
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}

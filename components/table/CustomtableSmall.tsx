@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from "react";
-import { FlatList } from "react-native";
+import React, { useCallback, useMemo, useState } from "react";
+import { FlatList, StyleSheet, TouchableOpacity } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import Text from "@/components/Text";
 import useMasterdataStyles from "@/styles/common/masterdata";
@@ -8,11 +8,14 @@ import Cellcontent from "./Contents/Cellcontent";
 import Actioncontent from "./Contents/Actioncontent";
 import { Dialogs } from "../common";
 import { HandelPrssProps, CustomtableSmallProps } from "@/typing/tag";
+import { useRes } from "@/app/contexts";
+import { Picker } from "@react-native-picker/picker";
 
-const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayData, Tablehead, actionIndex, showMessage, handleDialog, selectedRows }) => {
+const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayData, Tablehead, actionIndex, showMessage, handleDialog, selectedRows, handelSetFilter, filter, showColumn, showData, showFilter, toggleSelect }) => {
 
     const masterdataStyles = useMasterdataStyles();
     const customtable = useCustomtableStyles();
+    const { fontSize, responsive } = useRes()
 
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [dialogAction, setDialogAction] = useState<string>("");
@@ -29,11 +32,26 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
         setIsVisible((visible || action === "editIndex" || action === "changeIndex" || action === "copyIndex" || action === "preIndex"));
     }, [setDialogAction, setDialogData, setDialogTitle, setDialogMessage, setIsVisible, showMessage]);
 
+    const styles = StyleSheet.create({
+        functionname: {
+            textAlign: 'center'
+        },
+        cardcontent: {
+            padding: 2,
+            flex: 1
+        }
+    })
+
+    const dropdownOptions = useMemo(() => {
+        const uniqueOptions = new Set(showData?.map(row => row?.[showColumn]));
+        return Array.from(uniqueOptions);
+    }, [showData, showColumn]);
+
     const renderSmallRes = useCallback((rowData: (string | number | boolean)[], rowIndex: number) => {
         return (
-            <AccessibleView name={`container-${rowIndex}`} style={[customtable.cardRow, { alignItems: 'flex-start' }]}>
+            <AccessibleView name={`container-${rowIndex}`} style={[customtable.cardRow, { alignItems: 'flex-start', paddingBottom: 10 }]}>
                 {Tablehead.map((header, colIndex) => (
-                    <AccessibleView name={`header-${rowIndex}-${colIndex}`} key={`cell-${rowIndex}-${colIndex}`} style={{ flex: 1, paddingTop: -10 }}>
+                    <AccessibleView name={`header-${rowIndex}-${colIndex}`} key={`cell-${rowIndex}-${colIndex}`} style={{ flex: 1, marginVertical: 5, paddingVertical: 5 }}>
                         <Text style={[{ marginVertical: 5 }, masterdataStyles.text]}>{header.label}</Text>
                         {actionIndex.map((actionItem, index) => {
                             const filteredEntries = Object.entries(actionItem).filter(([, value]) => value === colIndex);
@@ -72,6 +90,7 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
                                                     Canedit={rowData[Number(actionItem['disables'])]}
                                                     handlePress={handlePress}
                                                     selectedRows={selectedRows}
+                                                    toggleSelect={toggleSelect}
                                                 />
                                             </AccessibleView>
                                         )
@@ -95,6 +114,78 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
 
     return (
         <>
+            <AccessibleView name="Approve" style={{
+                flexDirection: 'column', justifyContent: 'space-between',
+                marginHorizontal: '2%',
+            }}>
+                <AccessibleView name="" style={{ flexDirection: 'column', justifyContent: 'space-evenly' }}>
+                    {selectedRows && selectedRows.length > 0 && (
+                        <>
+                            <TouchableOpacity
+                                onPress={() => handleDialog("Apporved",)}
+                                style={[
+                                    masterdataStyles.backMain,
+                                    masterdataStyles.buttonCreate,
+                                    {
+                                        backgroundColor: '#4CAF50',
+                                        width: '100%',
+                                        marginLeft: 0,
+                                        borderRadius: 8,
+                                        paddingVertical: 12,
+                                        paddingHorizontal: 20,
+                                        elevation: 3
+                                    },
+                                ]}
+                            >
+                                <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>
+                                    {`Approve : ${String(selectedRows.length)}`}
+                                </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                onPress={() => handleDialog("ResetRow")}
+                                style={[
+                                    masterdataStyles.backMain,
+                                    masterdataStyles.buttonCreate,
+                                    {
+                                        backgroundColor: '#F44336',
+                                        width: '100%',
+                                        marginLeft: 0,
+                                        borderRadius: 8,
+                                        paddingVertical: 12,
+                                        paddingHorizontal: 20,
+                                        elevation: 3
+                                    },
+                                ]}
+                            >
+                                <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>
+                                    Cancel Select
+                                </Text>
+                            </TouchableOpacity>
+                        </>
+                    )}
+                </AccessibleView>
+
+                {showFilter && (
+                    <AccessibleView name="filter" style={{ flexDirection: 'column', justifyContent: 'flex-end', marginVertical: 10 }}>
+                        <Text style={[masterdataStyles.text, { alignContent: 'center', paddingRight: 15 }]}>{Tablehead[1].label}</Text>
+                        <Picker
+                            selectedValue={filter || ""}
+                            onValueChange={(itemValue) => handelSetFilter(itemValue)}
+                            style={[masterdataStyles.picker, { width: '100%', borderWidth: 0, borderBottomWidth: 1 }]}
+                            mode="dropdown"
+                            testID="picker-custom"
+                            accessibilityLabel="Picker Accessibility Label"
+                        >
+                            <Picker.Item label="Select an option" value="" />
+                            {dropdownOptions.map((option, index) => (
+                                <Picker.Item key={index} label={String(option)} value={option} />
+                            ))}
+                        </Picker>
+                    </AccessibleView>
+                )}
+            </AccessibleView>
+
             <FlatList
                 data={displayData.length > 0 ? displayData : []}
                 renderItem={({ item, index }) => renderSmallRes(item, index)}

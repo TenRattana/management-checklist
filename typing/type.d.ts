@@ -90,12 +90,13 @@ export interface ExpectedResult {
   MachineID: string;
   MachineName: string;
   UserID: string;
-  UserName: string;
+  ApporvedID:string;
   FormID: string;
   FormName: string;
   CreateDate: string;
 }
 export interface Users {
+  User
   UserName: string;
 }
 export interface UsersPermission {

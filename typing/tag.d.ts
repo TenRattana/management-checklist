@@ -12,6 +12,7 @@ import {
   Checklist,
   CheckListType,
   GroupCheckListOption,
+  TypeConfig,
 } from "./type";
 import * as Yup from "yup";
 import { FormikErrors } from "formik";
@@ -135,9 +136,11 @@ export interface CustomTableProps {
   actionIndex: { [key: string]: number }[];
   searchQuery: string;
   showMessage: number | Array;
-  selectedRows?:string[];
-  setRow?: (value : string[]) => void;
-  showFilter?:boolean;
+  selectedRows?: string[];
+  setRow?: (value: string[]) => void;
+  showFilter?: boolean;
+  showData?: TypeConfig[];
+  showColumn?: string;
 }
 
 export interface DragfieldProps {
@@ -225,7 +228,14 @@ export interface CustomtableSmallProps {
   actionIndex: { [key: string]: number }[];
   showMessage: number | any;
   handleDialog: (action?: string, data?: string) => void;
-  selectedRows?:string[];
+  selectedRows?: string[];
+  showFilter?: boolean;
+  filter?: string | null;
+  handelSetFilter: (value: string) => void;
+  showData?: TypeConfig[];
+  showColumn?: string;
+  handleDialog: (action?: string, data?: string) => void;
+  toggleSelect: (value: string) => void;
 }
 
 export interface CustomtableDataProps {
@@ -236,5 +246,5 @@ export interface CustomtableDataProps {
   handleDialog: (action?: string, data?: string) => void;
   showMessage: number;
   selectedRows?: string[];
-  toggleSelect: (value : string) => void;
+  toggleSelect: (value: string) => void;
 }
