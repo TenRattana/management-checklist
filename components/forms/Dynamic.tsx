@@ -1,11 +1,11 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Selects, Radios, Textareas, Inputs, Checkboxs } from "@/components/common";
 import { CheckListOption } from '@/typing/type';
 import { DynamicFormProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { View } from "react-native";
 import { useRes, useTheme } from "@/app/contexts";
-import { Text } from "react-native-paper";
+import { HelperText, Text } from "react-native-paper";
 
 const DynamicForm = React.memo(({
   field,
@@ -23,17 +23,35 @@ const DynamicForm = React.memo(({
   const masterdataStyles = useMasterdataStyles();
   const { theme } = useTheme()
   const { fontSize } = useRes()
-  let textColor = theme.colors.onBackground;
 
-  if (Important) {
-    const numericValue = Number(values);
+  const [textColor, setTextColor] = useState(theme.colors.onBackground);
+  const [minOrmax, setMinOrMax] = useState(false);
+  const [messageminOrmax, setMessageMinOrMax] = useState("");
 
-    // if (Number(ImportantList?.MinLength) > numericValue) {
-    //   textColor = theme.colors.yellow;
-    // } else if (Number(ImportantList?.MaxLength) < numericValue) {
-    //   textColor = theme.colors.error;
-    // }
-  }
+  useEffect(() => {
+    if (Important) {
+      const numericValue = Number(values);
+
+      const minLength = Number(ImportantList?.[0]?.MinLength) || 0;
+      const maxLength = Number(ImportantList?.[0]?.MaxLength) || Infinity;
+
+      if (numericValue < minLength) {
+        setTextColor(theme.colors.yellow);
+        setMinOrMax(true);
+        setMessageMinOrMax("Min value control is overlength");
+      }
+      else if (numericValue > maxLength) {
+        setTextColor(theme.colors.error);
+        setMinOrMax(true);
+        setMessageMinOrMax("Max value control is overlength");
+      }
+      else {
+        setTextColor(theme.colors.onBackground);
+        setMinOrMax(false);
+        setMessageMinOrMax("");
+      }
+    }
+  }, [Important, values, ImportantList, theme.colors]);
 
   const option = useMemo(() =>
     groupCheckListOption
@@ -132,6 +150,9 @@ const DynamicForm = React.memo(({
         {Required && <Text style={{ color: theme.colors.error }}>(*)</Text>}
       </Text>
       {renderField()}
+      <HelperText type="info" visible={minOrmax} style={[{ display: minOrmax ? 'flex' : 'none', color: textColor }, masterdataStyles.errorText]}>
+        {messageminOrmax}
+      </HelperText>
     </View>
   );
 });

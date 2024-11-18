@@ -1,4 +1,4 @@
-import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef, useCallback, Profiler, useMemo } from "react";
+import React, { useEffect, useState, forwardRef, Profiler, useMemo } from "react";
 import { View, ViewStyle, FlatList } from "react-native";
 import { Card, Divider } from "react-native-paper";
 import { useRes, useTheme } from "@/app/contexts";
@@ -29,16 +29,25 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
             subForm.Fields.forEach((field: BaseFormState) => {
                 const dataTypeName = dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName;
                 let validator;
+
                 if (dataTypeName === "Number") {
                     validator = Yup.number()
                         .nullable()
                         .typeError(`The ${field.CListName} field must be a valid number`);
+                } else if (field.CTypeName === "Checkbox") {
+                    validator = Yup.array()
+                        .of(Yup.string().required("Each selected option is required."))
                 } else {
                     validator = Yup.string()
                         .nullable()
                         .typeError(`The ${field.CListName} field must be a valid string`);
                 }
                 if (field.Required) validator = validator.required(`The ${field.CListName} field is required`);
+
+                if (field.Required && field.CTypeName === "Checkbox") {
+                    validator = validator.min(1, "You must select at least one option.").required("Important value is required when marked as important.");
+                }
+
                 shape[field.MCListID] = validator;
             });
         });
@@ -46,50 +55,9 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
     }, [state.subForms, dataType]);
 
     const masterdataStyles = useMasterdataStyles();
-    const cardRef = useRef<View>(null);
     const { responsive } = useRes();
     const [formValues, setFormValues] = useState<FormValues>({});
     const { theme } = useTheme()
-    const cardRefs = useRef<(View | null)[]>([]);
-    const cardPositions = useRef<{ x: number; y: number; width: number; height: number }[]>([]);
-
-    const handleScroll = useCallback(() => {
-        updateCardPositions();
-    }, []);
-
-    const updateCardPositions = () => {
-        const positions: { x: number; y: number; width: number; height: number }[] = [];
-        cardRefs.current.forEach((cardRef, index) => {
-            if (cardRef) {
-                cardRef.measureInWindow((x, y, width, height) => {
-                    positions.push({ x, y, width: width + 350, height: height + 16 });
-                });
-            }
-        });
-        cardPositions.current = positions;
-    };
-
-    useEffect(() => {
-        setTimeout(() => {
-            updateCardPositions()
-        }, 100)
-    }, [state]);
-
-    useImperativeHandle(ref, () => ({
-        getCardPosition: (callback: (x: number, y: number) => void) => {
-            if (cardRef.current) {
-                cardRef.current.measure((x, y, width, height, pageX, pageY) => {
-                    callback(pageX, pageY);
-                });
-            }
-        },
-        checkCardPosition: (x: number, y: number) => {
-            return cardPositions.current.findIndex((card) =>
-                x >= card.x && x <= card.x + card.width &&
-                y >= card.y && y <= card.y + card.height
-            );
-        },
-    }));
 
     useEffect(() => {
         if (state.subForms) {
@@ -126,14 +94,12 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
                         validateOnBlur={true}
                         validateOnChange={false}
                         onSubmit={(value) => console.log(value)}
-                        enableReinitialize={true}
-                        key={subForm.SFormID + subForm.Columns + JSON.stringify(subForm.Fields)}
+                        key={exp ? `Form-Expected-${subForm.SFormID}-${subForm.Columns}` : `Form-Preview-${subForm.SFormID}-${subForm.Columns}`}
                     >
-                        {({ errors, touched, setFieldValue, setTouched, setFieldError }) => (
+                        {({ errors, touched, setFieldValue, setTouched }) => (
                             <>
                                 <Card
                                     style={masterdataStyles.card}
-                                    ref={(el) => (cardRefs.current[index] = el)}
                                     key={subForm.SFormID}
                                 >
                                     <Card.Title
@@ -220,8 +186,6 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
                     </>
                 )}
                 keyExtractor={(_, index) => `index-preview-${index}`}
-                onScroll={handleScroll}
-                scrollEventThrottle={-30}
                 contentContainerStyle={{ paddingBottom: 20 }}
             />
         </AccessibleView>

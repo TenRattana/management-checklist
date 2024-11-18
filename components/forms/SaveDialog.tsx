@@ -35,8 +35,6 @@ const SaveDialog = React.memo(({
             FormData: JSON.stringify(form),
         };
 
-        console.log(state.subForms);
-
         try {
             const response = await axiosInstance.post("MatchCheckList_service.asmx/SaveFormCheckList", data);
             messages = (String(response.data.message));

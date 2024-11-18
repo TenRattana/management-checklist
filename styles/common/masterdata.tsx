@@ -229,7 +229,6 @@ const useMasterdataStyles = () => {
             borderRadius: 8,
             elevation: 2,
             marginBottom: 20,
-            // backgroundColor: '#e7e7e7'
         },
         cardTitle: {
             fontSize: spacing.small,
