@@ -93,6 +93,7 @@ const useMasterdataStyles = () => {
         containerSearch: {
             flexDirection: 'row',
             flexWrap: 'wrap',
+            marginVertical: 10
         },
         searchbar: {
             width: responsive === "small" ? "90%" : 400,
