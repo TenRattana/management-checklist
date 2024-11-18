@@ -248,14 +248,13 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = (props) => {
                   masterdataStyles.button,
                   masterdataStyles.backMain,
                   {
-                    opacity: formikRef.current?.isValid && formikRef.current?.dirty ? 1 : 0.5,
+                    opacity: Object.keys(formikRef.current?.errors ?? {}).length === 0 ? 1 : 0.5,
                   },
                 ]}
-                disabled={!formikRef.current?.isValid || !formikRef.current?.dirty}
+                disabled={Object.keys(formikRef.current?.errors ?? {}).length !== 0}
               >
                 <Text style={[masterdataStyles.textBold, masterdataStyles.textFFF]}>Submit Form</Text>
               </TouchableOpacity>
-
             </AccessibleView>
           )}
           keyExtractor={(_, index) => `index-preview-${index}`}
