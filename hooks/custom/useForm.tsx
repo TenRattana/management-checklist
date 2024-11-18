@@ -97,6 +97,7 @@ const useForm = (route: RouteParams) => {
     const [dataLoaded, setDataLoaded] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [exp, setExp] = useState(false);
+    const [found, setFound] = useState(false);
 
     const { formId, action, machineId, tableId } = route.params || {};
     const { handleError } = useToast();
@@ -153,6 +154,10 @@ const useForm = (route: RouteParams) => {
                 fetchedExpectedResult
             );
 
+            if (mode && response.data?.status) {
+                setFound(true)
+            }
+
             dispatch(
                 setFormData({
                     form: action === "copy" ? {} : response.data?.data[0],
@@ -166,7 +171,7 @@ const useForm = (route: RouteParams) => {
             handleError(error);
         }
     },
-        [dataLoaded, data.checkList, data.checkListType, handleError, dispatch, exp]
+        [dataLoaded, data.checkList, data.checkListType, handleError, dispatch, exp, found]
     );
 
     useFocusEffect(
@@ -193,7 +198,8 @@ const useForm = (route: RouteParams) => {
         groupCheckListOption: tableId || machineId ? data.groupCheckListOption : data.groupCheckListOptionActive,
         machine: data.machine,
         isLoading,
-        exp
+        exp,
+        found
     };
 };
 

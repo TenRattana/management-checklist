@@ -34,6 +34,8 @@ const DynamicForm = React.memo(({
       const maxLength = Number(ImportantList?.[0]?.MaxLength) || Infinity;
 
       if (numericValue < minLength) {
+        console.log("min");
+
         setTextColor(theme.colors.yellow);
         setMessageMinOrMax("Min value control is overlength");
       }
@@ -45,8 +47,14 @@ const DynamicForm = React.memo(({
         setTextColor(theme.colors.onBackground);
         setMessageMinOrMax("");
       }
+      console.log(numericValue);
+      console.log(minLength);
+      console.log(maxLength);
+      console.log(ImportantList);
+
     }
   }, [Important, values, ImportantList, theme.colors]);
+
 
   const option = useMemo(() =>
     groupCheckListOption

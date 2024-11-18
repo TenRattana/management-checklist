@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, Profiler, useRef } from "react";
-import { Pressable, ScrollView, TouchableOpacity, View } from "react-native";
+import { Platform, Pressable, ScrollView, TouchableOpacity, View } from "react-native";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import { Checkboxs, Inputs } from "@/components/common";
 import { Portal, Dialog, HelperText, Switch, IconButton } from "react-native-paper";
@@ -298,7 +298,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                         <ScrollView
                                             contentContainerStyle={{ paddingBottom: 5, paddingHorizontal: 10 }}
                                             showsVerticalScrollIndicator={false}
-                                            style={{ maxHeight: 330 }}
+                                            style={{ maxHeight: Platform.OS === "web" ? 330 : '68%' }}
                                         >
                                             <FastField name="CListID">
                                                 {({ field, form }: any) => (
@@ -592,6 +592,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                         </Formik>
                     )}
                 </Dialog.Content>
+
             </Dialog>
             <MemoChecklist_dialog
                 isEditing={false}
