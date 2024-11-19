@@ -51,11 +51,11 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({ Tablehead,
     return (
         <AccessibleView name="container-datahead">
             <AccessibleView name="Approve" style={{
-                flexDirection: responsive === "small" || responsive === "medium" ? 'column' : 'row', justifyContent: 'space-between', flex: 1,
-                marginHorizontal: responsive === "small" || responsive === "medium" ? '2%' : 0,
+                flexDirection: responsive === "small" ? 'column' : 'row', justifyContent: 'space-between',
+                marginHorizontal: responsive === "small" ? '2%' : 0,
 
             }}>
-                <AccessibleView name="" style={{ flexDirection: responsive === "small" || responsive === "medium" ? 'column' : 'row' }}>
+                <AccessibleView name="" style={{ flexDirection: responsive === "small" ? 'column' : 'row' }}>
                     {selectedRows && selectedRows.length > 0 && (
                         <>
                             <TouchableOpacity
@@ -65,8 +65,8 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({ Tablehead,
                                     masterdataStyles.buttonCreate,
                                     {
                                         backgroundColor: '#4CAF50',
-                                        width: responsive === "small" || responsive === "medium" ? '100%' : undefined,
-                                        marginLeft: responsive === "small" || responsive === "medium" ? 0 : 15,
+                                        width: responsive === "small" ? '100%' : undefined,
+                                        marginLeft: responsive === "small" ? 0 : 15,
                                         borderRadius: 8,
                                         paddingVertical: 12,
                                         paddingHorizontal: 20,
@@ -86,8 +86,8 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({ Tablehead,
                                     masterdataStyles.buttonCreate,
                                     {
                                         backgroundColor: '#F44336',
-                                        width: responsive === "small" || responsive === "medium" ? '100%' : undefined,
-                                        marginLeft: responsive === "small" || responsive === "medium" ? 0 : 10,
+                                        width: responsive === "small" ? '100%' : undefined,
+                                        marginLeft: responsive === "small" ? 0 : 10,
                                         borderRadius: 8,
                                         paddingVertical: 12,
                                         paddingHorizontal: 20,
@@ -105,19 +105,19 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({ Tablehead,
 
                 {showFilter && (
                     <AccessibleView name="filter" style={{
-                        flexDirection: responsive === "small" || responsive === "medium" ? 'column' : 'row', justifyContent: 'flex-end', marginVertical: 10,
-                        marginLeft: responsive === "small" || responsive === "medium" ? 0 : 10,
+                        flexDirection: responsive === "small" ? 'column' : 'row', justifyContent: 'flex-end', marginVertical: 10,
+                        marginLeft: responsive === "small" ? 0 : 10,
                     }}>
-                        <Text style={[masterdataStyles.text, { alignContent: 'center', paddingRight: 15 }]}>{Tablehead[1].label}</Text>
+                        <Text style={[masterdataStyles.text, { alignContent: 'center', paddingRight: 15, alignSelf: 'center' }]}>{Tablehead[1].label}</Text>
                         <Picker
                             selectedValue={filter || ""}
                             onValueChange={(itemValue) => handelSetFilter(itemValue)}
-                            style={[masterdataStyles.picker, { width: responsive === "small" || responsive === "medium" ? '100%' : 300, borderWidth: 0, borderBottomWidth: 1 }]}
+                            style={[masterdataStyles.picker, { width: responsive === "small" ? '100%' : 300, borderWidth: 0, borderBottomWidth: 1 }]}
                             mode="dropdown"
                             testID="picker-custom"
                             accessibilityLabel="Picker Accessibility Label"
                         >
-                            <Picker.Item label="Select an option" value="" />
+                            <Picker.Item label="Select all" value="" />
                             {dropdownOptions.map((option, index) => (
                                 <Picker.Item key={index} label={String(option)} value={option} />
                             ))}

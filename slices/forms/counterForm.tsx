@@ -40,8 +40,9 @@ const subFormSlice = createSlice({
       BaseFormState: BaseFormState[],
       checkList: Checklist[],
       checkListType: CheckListType[];
+      dataType: DataType[]
     }>) => {
-      const { form, subForms, BaseFormState, checkList, checkListType } = action.payload;
+      const { form, subForms, BaseFormState, checkList, checkListType, dataType } = action.payload;
 
       const updatedForm = {
         FormID: form?.FormID || "",
@@ -58,6 +59,7 @@ const subFormSlice = createSlice({
 
       const checkListMap = new Map(checkList.map(item => [item.CListID, item.CListName]));
       const checkListTypeMap = new Map(checkListType.map(item => [item.CTypeID, item.CTypeName]));
+      const dataTypeMap = new Map(dataType.map(item => [item.DTypeID, item.DTypeName]));
 
       updatedForm.subForms.forEach(sub => {
         const matchingFields = BaseFormState.filter(form => form.SFormID === sub.SFormID);
@@ -67,6 +69,7 @@ const subFormSlice = createSlice({
           DisplayOrder: field.DisplayOrder || index,
           CListName: checkListMap.get(field.CListID) || "",
           CTypeName: checkListTypeMap.get(field.CTypeID) || "",
+          DTypeName: dataTypeMap.get(field.DTypeID) || ""
         }));
       });
 
@@ -174,6 +177,7 @@ const subFormSlice = createSlice({
             DisplayOrder: (sub.Fields?.length || 0) + 1,
             CListName: checkList.find((v) => v.CListID === formData.CListID)?.CListName,
             CTypeName: checkListType.find((v) => v.CTypeID === formData.CTypeID)?.CTypeName,
+            DTypeName: dataType.find(v => v.DTypeID === formData.DTypeID)?.DTypeName
           };
 
           const updatedFields = [...(sub.Fields || []), addField];
@@ -211,6 +215,7 @@ const subFormSlice = createSlice({
                 DisplayOrder: field.DisplayOrder,
                 CListName: checkList.find((v) => v.CListID === formData.CListID)?.CListName,
                 CTypeName: checkListType.find((v) => v.CTypeID === formData.CTypeID)?.CTypeName,
+                DTypeName: dataType.find(v => v.DTypeID === formData.DTypeID)?.DTypeName
               };
             }
             return field;

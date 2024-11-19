@@ -42,6 +42,7 @@ export interface BaseFormState {
   GCLOptionID?: string;
   CTypeID: string;
   DTypeID: string;
+  DTypeName?: string;
   DTypeValue?: number;
   SFormID: string;
   Required: boolean;

@@ -19,7 +19,7 @@ interface FormValues {
   [key: string]: any;
 }
 
-const InputFormMachine: React.FC<PreviewProps<ScanParams>> = (props) => {
+const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) => {
   const { route } = props;
   const { groupCheckListOption, dataType, found } = useForm(route);
 
@@ -69,38 +69,13 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = (props) => {
   const { responsive } = useRes();
   const { theme } = useTheme()
 
-  const formikRef = useRef<FormikProps<{ [key: string]: any }>>(null);
-
-  const handleExternalSubmit = async () => {
-    if (formikRef.current) {
-      const formik = formikRef.current;
-
-      console.log(formikRef.current);
-
-      const touchedFields = Object.keys(formik.values).reduce<Record<string, boolean>>((acc, key) => {
-        acc[key] = true;
-        return acc;
-      }, {});
-
-      formik.setTouched(touchedFields);
-
-      await formik.validateForm();
-
-      setTimeout(() => {
-        formik.submitForm();
-      }, 0);
-    }
-  };
-
   const onFormSubmit = useCallback(async (values: { [key: string]: any }) => {
     const updatedSubForms = state.subForms.map((subForm: BaseSubForm) => ({
       ...subForm,
       MachineID: state.MachineID,
       Fields: subForm?.Fields?.map((field: BaseFormState) => ({
         ...field,
-        EResult: Array.isArray(values[field.MCListID])
-          ? values[field.MCListID].join(',')
-          : values[field.MCListID] || "",
+        EResult: values[field.MCListID] || "",
       })),
     }));
 
@@ -136,131 +111,92 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = (props) => {
       />
 
       {!isSubmitted ? (
-        <FlatList
-          data={state.subForms}
-          renderItem={({ item, index }) => (
-            <Formik
-              initialValues={formValues}
-              validationSchema={validationSchema}
-              validateOnBlur={true}
-              validateOnChange={false}
-              innerRef={formikRef}
-              validateOnS
-              onSubmit={onFormSubmit}
-              key={`Form-input-${item.SFormID}-${item.Columns}`}
-            >
-              {({ errors, touched, setFieldValue, setTouched }) => {
-                console.log(formikRef);
+        <Formik
+          initialValues={formValues}
+          validationSchema={validationSchema}
+          validateOnBlur={true}
+          validateOnChange={false}
+          onSubmit={onFormSubmit}
+        >
+          {({ errors, touched, setFieldValue, setTouched, values, dirty, isValid, handleSubmit }) => (
+            <>
+              <FlatList
+                data={state.subForms}
+                renderItem={({ item }) => {
+                  const columns = item.Columns ?? 1;
 
-                return (
-                  <>
-                    <Card
-                      style={masterdataStyles.card}
-                      key={item.SFormID}
-                    >
+                  return (
+                    <Card style={masterdataStyles.card} key={item.SFormID}>
                       <Card.Title
                         title={item.SFormName}
                         titleStyle={masterdataStyles.cardTitle}
                       />
                       <Card.Content style={[masterdataStyles.subFormContainer]}>
                         {item.Fields?.map((field: BaseFormState, fieldIndex: number) => {
-                          const columns = item.Columns ?? 1;
-
                           const containerStyle: ViewStyle = {
                             width: responsive === "small" ? "100%" : `${98 / columns}%`,
                             flexGrow: field.DisplayOrder || 1,
                             padding: 5,
                           };
 
+                          const fieldName = field.MCListID;
+                          const type = dataType.find((v: DataType) => v.DTypeID === field.DTypeID)?.DTypeName;
+
+                          const handleBlur = () => {
+                            if (type === "Number") {
+                              const numericValue = Number(values[fieldName]);
+                              if (!isNaN(numericValue) && Number(field.DTypeValue) > 0) {
+                                const formattedValue = numericValue.toFixed(Number(field.DTypeValue));
+                                setFieldValue(fieldName, formattedValue);
+                              }
+                            }
+                            setTouched({ ...touched, [fieldName]: true });
+                          };
+
                           return (
-                            <Field name={field.MCListID} key={`field-${fieldIndex}-${item.Columns}`}>
-                              {({ field: fastFieldProps }: FieldProps) => {
-
-                                const type = dataType.find((v: DataType) => v.DTypeID === field.DTypeID)?.DTypeName;
-
-                                const handleBlur = () => {
-                                  if (type === "Number") {
-                                    const numericValue = Number(fastFieldProps.value);
-
-                                    if (!isNaN(numericValue) && Number(field.DTypeValue) > 0 && numericValue) {
-                                      const formattedValue = numericValue.toFixed(Number(field.DTypeValue));
-                                      setFieldValue(fastFieldProps.name, formattedValue);
-                                      setTouched({
-                                        ...touched,
-                                        [fastFieldProps.name]: true,
-                                      });
-
-                                    } else if (isNaN(numericValue)) {
-                                      setFieldValue(fastFieldProps.name, fastFieldProps.value);
-                                      setTouched({
-                                        ...touched,
-                                        [fastFieldProps.name]: true,
-                                      });
-                                    }
-                                  }
-                                };
-
-                                return (
-                                  <View id="container-layout2" style={containerStyle}>
-                                    <Dynamic
-                                      field={field}
-                                      values={String(fastFieldProps.value ?? "")}
-                                      handleChange={(fieldname: string, value: any) => {
-                                        setFieldValue(fastFieldProps.name, value);
-                                        setTimeout(() => {
-                                          setTouched({
-                                            ...touched,
-                                            [fastFieldProps.name]: true,
-                                          });
-                                        }, 0);
-                                      }}
-                                      handleBlur={handleBlur}
-                                      groupCheckListOption={groupCheckListOption ?? []}
-                                      error={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
-                                      errorMessages={errors}
-                                      type={type}
-                                    />
-                                  </View>
-                                );
-                              }}
-                            </Field>
+                            <View id="container-layout2" style={containerStyle} key={`field-${fieldIndex}`}>
+                              <Dynamic
+                                field={field}
+                                values={String(values[fieldName] ?? "")}
+                                handleChange={(fieldname: string, value: any) => {
+                                  setFieldValue(fieldName, value);
+                                  setTimeout(() => setTouched({ ...touched, [fieldName]: true }), 0);
+                                }}
+                                handleBlur={handleBlur}
+                                groupCheckListOption={groupCheckListOption ?? []}
+                                error={Boolean(touched[fieldName] && errors[fieldName])}
+                                errorMessages={errors}
+                                type={type}
+                              />
+                            </View>
                           );
                         })}
                       </Card.Content>
                     </Card>
-                  </>
-                )
-              }}
-            </Formik>
-          )}
-          ListHeaderComponent={() => (
-            <>
-              <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
-              <Divider />
-              <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
+                  );
+                }}
+                keyExtractor={(_, index) => `index-preview-${index}`}
+                ListFooterComponent={() => (
+                  <AccessibleView name="form-action-scan" style={[masterdataStyles.containerAction]}>
+                    <TouchableOpacity
+                      onPress={() => handleSubmit()}
+                      style={[
+                        masterdataStyles.button,
+                        masterdataStyles.backMain,
+                        { opacity: isValid && dirty ? 1 : 0.5 },
+                      ]}
+                      disabled={!dirty || !isValid}
+                    >
+                      <Text style={[masterdataStyles.textBold, masterdataStyles.textFFF]}>Submit Form</Text>
+                    </TouchableOpacity>
+                  </AccessibleView>
+                )}
+                contentContainerStyle={{ paddingBottom: 20 }}
+                removeClippedSubviews={true}
+              />
             </>
           )}
-          ListFooterComponent={() => (
-            <AccessibleView name="form-action-scan" style={[masterdataStyles.containerAction]}>
-              <TouchableOpacity
-                onPress={handleExternalSubmit}
-                style={[
-                  masterdataStyles.button,
-                  masterdataStyles.backMain,
-                  {
-                    opacity: Object.keys(formikRef.current?.errors ?? {}).length === 0 ? 1 : 0.5,
-                  },
-                ]}
-                disabled={Object.keys(formikRef.current?.errors ?? {}).length !== 0}
-              >
-                <Text style={[masterdataStyles.textBold, masterdataStyles.textFFF]}>Submit Form</Text>
-              </TouchableOpacity>
-            </AccessibleView>
-          )}
-          keyExtractor={(_, index) => `index-preview-${index}`}
-          contentContainerStyle={{ paddingBottom: 20 }}
-          removeClippedSubviews={true}
-        />
+        </Formik>
 
       ) : (
         <AccessibleView name="form-success" style={masterdataStyles.containerScccess}>
@@ -277,6 +213,6 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = (props) => {
   ) : (
     <NotFoundScreen />
   );
-};
+});
 
 export default InputFormMachine;

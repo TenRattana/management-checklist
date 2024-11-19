@@ -99,6 +99,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                 CListName: selectedChecklist?.CListName ?? "",
                 CTypeName: item.CTypeName,
                 DTypeValue: undefined,
+                DTypeName: selectedDataType?.DTypeName ?? "",
             };
 
             dispatch(defaultDataForm({ currentField: newField }));

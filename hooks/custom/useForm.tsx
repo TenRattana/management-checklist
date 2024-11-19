@@ -164,14 +164,15 @@ const useForm = (route: RouteParams) => {
                     subForms,
                     BaseFormState: fields,
                     checkList: data.checkList,
-                    checkListType: data.checkListType
+                    checkListType: data.checkListType,
+                    dataType: data.dataType
                 })
             );
         } catch (error) {
             handleError(error);
         }
     },
-        [dataLoaded, data.checkList, data.checkListType, handleError, dispatch, exp, found]
+        [dataLoaded, data.checkList, data.checkListType, data.dataType, handleError, dispatch, exp, found]
     );
 
     useFocusEffect(
