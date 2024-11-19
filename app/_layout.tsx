@@ -12,7 +12,7 @@ import { useTheme } from './contexts';
 import RouteGuard from './guard/GuardRoute';
 import axiosInstance from '@/config/axios';
 import { Asset } from 'expo-asset';
-import { StatusBar, setStatusBarStyle } from 'expo-status-bar';
+import { StatusBar } from 'expo-status-bar';
 
 const queryClient = new QueryClient();
 
@@ -87,10 +87,6 @@ const RootLayout = () => {
         }
     }, [fontsLoaded, assetsLoaded]);
 
-    useEffect(() => {
-        setStatusBarStyle("light");
-    }, []);
-
     if (!fontsLoaded || !assetsLoaded) {
         return <ActivityIndicator size="large" color="#0000ff" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />;
     }
@@ -102,7 +98,7 @@ const RootLayout = () => {
                     <Provider store={store}>
                         <QueryClientProvider client={queryClient}>
                             <AuthProvider>
-                                <StatusBar style="light" hidden={true} />
+                                <StatusBar hidden={false} />
                                 <SetTheme />
                             </AuthProvider>
                         </QueryClientProvider>

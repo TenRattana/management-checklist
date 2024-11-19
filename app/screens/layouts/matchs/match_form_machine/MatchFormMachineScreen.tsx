@@ -172,7 +172,7 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
             { label: "Preview", align: "center" },
             { label: "", align: "flex-end" }
         ],
-        flexArr: [2, 3, 1, 1, 1, 1],
+        flexArr: [2, 2, 1, 1, 1, 1],
         actionIndex: [
             {
                 changeIndex: 2,

@@ -55,7 +55,7 @@ const nonLazyComponents: Record<ComponentNameNoLazy, React.ComponentType<any>> =
     Test: TestComponent
 };
 
-const Navigation: React.FC = () => {
+const Navigation: React.FC = React.memo(() => {
     const state = useSelector((state: any) => state.prefix);
     const user = useSelector((state: any) => state.user);
     const { fontSize } = useRes();
@@ -103,66 +103,66 @@ const Navigation: React.FC = () => {
     if (!user.isAuthenticated) return null
 
     return (
-        <Drawer.Navigator
-            drawerContent={(props) => <CustomDrawerContent {...props} />}
-            screenOptions={{
-                drawerStyle: {
-                    backgroundColor: theme.colors.background,
-                    width: drawerWidth,
-                },
-                unmountOnBlur: true,
-                drawerHideStatusBarOnOpen: true,
-                drawerStatusBarAnimation: 'slide',
-                freezeOnBlur: true
-            }}
-            initialRouteName={initialRoute}
-            id="nav"
-        >
-            {user.username && user.screen.length > 0 ? (
-                user.screen.map((screen: Menu) => {
-                    if (screen.NavigationTo) {
-                        return (
-                            <Drawer.Screen
-                                key={screen.MenuID}
-                                name={screen.NavigationTo}
-                                component={renderComponent(screen.NavigationTo as (ComponentNames | ComponentNameNoLazy))}
-                                options={{
-                                    headerTitle: state.AppName || "",
-                                    drawerLabel: screen.MenuLabel,
-                                }}
-                            />
-                        );
-                    }
-
-                    if (screen.ParentMenu && screen.ParentMenu.length > 0) {
-                        return screen.ParentMenu.map((parentScreen: ParentMenu) => {
+        <>
+            <Drawer.Navigator
+                drawerContent={(props) => <CustomDrawerContent {...props} />}
+                screenOptions={{
+                    drawerStyle: {
+                        backgroundColor: theme.colors.background,
+                        width: drawerWidth,
+                    },
+                    headerTitle: state.AppName || "",
+                    headerTitleStyle: {
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                        color: '#333',
+                    },
+                    unmountOnBlur: true,
+                    drawerHideStatusBarOnOpen: true,
+                    drawerStatusBarAnimation: 'slide',
+                    freezeOnBlur: true
+                }}
+                initialRouteName={initialRoute}
+                id="nav"
+            >
+                {user.username && user.screen.length > 0 ? (
+                    user.screen.map((screen: Menu) => {
+                        if (screen.NavigationTo) {
                             return (
                                 <Drawer.Screen
-                                    key={parentScreen.MenuID}
-                                    name={parentScreen.NavigationTo}
-                                    component={renderComponent(parentScreen.NavigationTo as (ComponentNames | ComponentNameNoLazy))}
-                                    options={{
-                                        headerTitle: state.AppName || "",
-                                        drawerLabel: parentScreen.MenuLabel,
-                                    }}
+                                    key={screen.MenuID}
+                                    name={screen.NavigationTo}
+                                    component={renderComponent(screen.NavigationTo as (ComponentNames | ComponentNameNoLazy))}
                                 />
                             );
-                        });
-                    }
+                        }
 
-                    return null;
-                })
-            ) : (
-                <Drawer.Screen
-                    name="Permission_deny"
-                    component={PermissionDeny}
-                    options={{
-                        drawerLabel: 'Permission Denied',
-                    }}
-                />
-            )}
-        </Drawer.Navigator>
+                        if (screen.ParentMenu && screen.ParentMenu.length > 0) {
+                            return screen.ParentMenu.map((parentScreen: ParentMenu) => {
+                                return (
+                                    <Drawer.Screen
+                                        key={parentScreen.MenuID}
+                                        name={parentScreen.NavigationTo}
+                                        component={renderComponent(parentScreen.NavigationTo as (ComponentNames | ComponentNameNoLazy))}
+                                    />
+                                );
+                            });
+                        }
+
+                        return null;
+                    })
+                ) : (
+                    <Drawer.Screen
+                        name="Permission_deny"
+                        component={PermissionDeny}
+                        options={{
+                            drawerLabel: 'Permission Denied',
+                        }}
+                    />
+                )}
+            </Drawer.Navigator>
+        </>
     )
-};
+});
 
-export default React.memo(Navigation);
+export default Navigation;
