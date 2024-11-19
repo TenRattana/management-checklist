@@ -20,10 +20,10 @@ const LoginScreen: React.FC = React.memo(() => {
   const masterdataStyles = useMasterdataStyles();
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = useCallback(async (values: { username: string }) => {
+  const handleLogin = useCallback(async (values: { username: string, password: string }) => {
     setLoading(true);
     try {
-      await login(values.username);
+      await login(values.username, values.password);
     } catch (error) {
       handleError(error);
     } finally {
@@ -45,8 +45,9 @@ const LoginScreen: React.FC = React.memo(() => {
           titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
         />
         <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
+
           <Formik
-            initialValues={{ username: "" }}
+            initialValues={{ username: "", password: "" }}
             validationSchema={validationSchema}
             validateOnBlur={false}
             validateOnChange={true}
@@ -73,6 +74,18 @@ const LoginScreen: React.FC = React.memo(() => {
                   errorMessage={touched.username ? errors.username : ""}
                   name="username"
                   testId="username"
+                />
+
+                <Inputs
+                  placeholder="Enter Password"
+                  label="Password"
+                  handleChange={handleChange("password") as any}
+                  handleBlur={handleBlur("password")}
+                  value={values.password}
+                  error={touched.password && Boolean(errors.password)}
+                  errorMessage={touched.password ? errors.password : ""}
+                  name="password"
+                  testId="password"
                 />
 
                 <View id="action-login" style={{ justifyContent: 'center', alignItems: 'center' }}>

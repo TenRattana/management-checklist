@@ -17,6 +17,7 @@ import {
     MatchCheckListOptionScreen,
     MatchFormMachineScreen,
     Managepermissions,
+    LoginScreen,
 } from '@/app/screens';
 import PermissionDeny from '../screens/layouts/PermissionDeny';
 import { useRes } from "@/app/contexts";
@@ -36,6 +37,7 @@ const components: Record<ComponentNames, () => Promise<{ default: React.Componen
 };
 
 const nonLazyComponents: Record<ComponentNameNoLazy, React.ComponentType<any>> = {
+    Login: LoginScreen,
     Machine_group: MachineGroupScreen,
     Machine: MachineScreen,
     Checklist: CheckListScreen,
@@ -65,9 +67,11 @@ const Navigation: React.FC = React.memo(() => {
 
     const drawerWidth = fontSize === "small" ? 300 : fontSize === "medium" ? 350 : 400;
 
-    const initialRoute: string = user?.username && user?.screen?.length > 0 ? user.screen[0].MenuLabel : "Permission_deny";
+    const initialRoute: string = user?.username && user?.screen?.length > 0 ? user.screen[0].MenuLabel : "Login";
 
     const renderComponent = useCallback((name: ComponentNames | ComponentNameNoLazy) => {
+        console.log(name, "renderComponent");
+
         if (name in nonLazyComponents) {
             const Component = nonLazyComponents[name as ComponentNameNoLazy];
             return (props: any) => <Component {...props} />;
@@ -99,8 +103,6 @@ const Navigation: React.FC = React.memo(() => {
             </Suspense>
         );
     }, []);
-
-    if (!user.isAuthenticated) return null
 
     return (
         <>
@@ -153,10 +155,10 @@ const Navigation: React.FC = React.memo(() => {
                     })
                 ) : (
                     <Drawer.Screen
-                        name="Permission_deny"
-                        component={PermissionDeny}
+                        name="Login"
+                        component={LoginScreen}
                         options={{
-                            drawerLabel: 'Permission Denied',
+                            drawerLabel: 'Login',
                         }}
                     />
                 )}

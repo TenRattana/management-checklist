@@ -90,13 +90,13 @@ export interface ExpectedResult {
   MachineID: string;
   MachineName: string;
   UserID: string;
-  ApporvedID:string;
+  ApporvedID: string;
   FormID: string;
   FormName: string;
   CreateDate: string;
 }
 export interface Users {
-  User
+  User;
   UserName: string;
 }
 export interface UsersPermission {
@@ -170,6 +170,7 @@ export type ComponentNameNoLazy =
   | "Machine"
   | "Checklist"
   | "Home"
+  | "Login"
   | "ScanQR"
   | "GenerateQR"
   | "Setting"
