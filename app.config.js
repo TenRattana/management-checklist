@@ -55,6 +55,14 @@ export default {
     plugins: [
       "expo-router",
       [
+        "expo-secure-store",
+        {
+          configureAndroidBackup: true,
+          faceIDPermission:
+            "Allow PMChecklist to access your Face ID biometric data.",
+        },
+      ],
+      [
         "expo-camera",
         {
           cameraPermission: "Allow PMChecklist to access your camera",
@@ -64,7 +72,7 @@ export default {
       ],
     ],
     extra: {
-      ...getEnvVars(process.env.NODE_ENV),
+      ...getEnvVars(environment),
       eas: {
         projectId: "0f2240ee-c314-4fa4-b36a-6038aa1ba0da",
       },

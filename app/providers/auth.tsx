@@ -1,5 +1,5 @@
-import { saveUserData, loadUserData } from '@/app/services/storage';
 import React, { createContext, useState, useEffect, ReactNode, useCallback, useMemo } from "react";
+import { getData, saveData, deleteData } from '@/app/services/storage';
 import axiosInstance from '@/config/axios';
 import { AppProps, GroupUsers, UsersPermission } from '@/typing/type';
 import { useQuery } from 'react-query';
@@ -7,25 +7,12 @@ import { useDispatch } from 'react-redux';
 import { setUser, setApp, logout, fetchMenu } from "@/slices";
 import { AppDispatch } from '@/stores';
 import { useToast } from '../contexts';
+import { jwtDecode } from 'jwt-decode';
+import { useNavigation } from "expo-router";
 
 const fetchAppConfig = async (): Promise<AppProps> => {
   const response = await axiosInstance.post('AppConfig_service.asmx/GetAppConfigs');
   return response.data.data[0] ?? [];
-};
-
-const fetchUserPermission = async (): Promise<UsersPermission[]> => {
-  const response = await axiosInstance.post('User_service.asmx/GetUsersPermission');
-  return response.data.data ?? [];
-};
-
-const fetchSession = async (data: { UserName: string, Password: string }): Promise<{ message: string }> => {
-  const response = await axiosInstance.post("User_service.asmx/Session_User", data);
-  return response.data;
-};
-
-const fetchGroupUser = async (): Promise<GroupUsers[]> => {
-  const response = await axiosInstance.post('GroupUser_service.asmx/GetGroupUsers');
-  return response.data.data ?? [];
 };
 
 export interface AuthContextType {
@@ -43,6 +30,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState<boolean>(true);
   const { handleError, showSuccess } = useToast();
+  const navigation = useNavigation();
 
   console.log("Auth");
 
@@ -64,19 +52,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [data, dispatch]);
 
-  const { data: groupUser = [], isLoading: isGroupUserLoading } = useQuery<GroupUsers[], Error>(
-    'groupUser',
-    fetchGroupUser,
-    {
-      refetchOnWindowFocus: false,
-      keepPreviousData: true,
-      staleTime: 1000 * 60 * 5,
-      cacheTime: 1000 * 60 * 10
-    }
-  );
-
   useEffect(() => {
-    if (!isAppLoading && !isGroupUserLoading) {
+    if (!isAppLoading) {
       console.log("setLoading F");
 
       setLoading(false);
@@ -85,52 +62,73 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       setLoading(true);
     }
-  }, [isAppLoading, isGroupUserLoading, groupUser, data]);
+  }, [isAppLoading, data]);
 
-  const updateSession = useCallback(async (UserName: string, Password: string) => {
+  const updateSession = useCallback(async (UserName: string, Password: string, TokenAuth: string) => {
     console.log("updateSession");
 
-    const data = {
-      UserName: UserName,
-      Password: Password
+    const token = TokenAuth;
+    let DataUser: any = undefined
+
+    if (token && token.split('.').length === 3) {
+      try {
+        const payload = jwtDecode(token);
+        console.log("Decoded Payload:", payload);
+
+        if (payload.exp) {
+          const expirationTime = payload.exp * 1000;
+          const currentTime = Date.now();
+
+          if (currentTime < expirationTime) {
+            DataUser = payload
+            console.log("Token is still valid.");
+          } else {
+            console.log("Token has expired. Requesting a new token...");
+
+            await deleteData('userToken');
+            navigation.navigate('Login');
+          }
+        }
+      } catch (error) {
+        handleError(error);
+      }
+    } else {
+      console.log("No valid token found. Requesting a new token...");
+
+      const data = {
+        UserName: UserName,
+        Password: Password,
+        TokenAuth: TokenAuth
+      };
+
+      try {
+        const response = await axiosInstance.post("User_service.asmx/GetAD", data);
+        if (response.data && response.data.token) {
+          await saveData('userToken', response.data.token);
+          const payload = jwtDecode(response.data.token);
+          DataUser = payload
+
+          console.log("New token saved.");
+        }
+      } catch (error) {
+        handleError(error);
+      }
     }
-    console.log(data);
+    dispatch(fetchMenu(DataUser.GUserID))
+    dispatch(setUser({ user: DataUser }));
+    navigation.navigate('Home');
 
-    const response = await axiosInstance.post("User_service.asmx/Session_User", data, {
-      withCredentials: true,
-    });
-    console.log(response.data);
-
-
-    // const userData = user.find(v => v.UserName === UserName);
-    // if (userData) {
-    //   const newSession = {
-    //     UserID: userData.UserID,
-    //     UserName: userData.UserName,
-    //     GUserID: userData.GUserID,
-    //     GUserName: groupUser.find(v => v.GUserID === userData.GUserID)?.GUserName || "",
-    //     IsActive: userData.IsActive
-    //   };
-    //   dispatch(fetchMenu(userData.GUserID));
-    //   dispatch(setUser({ user: newSession }));
-    // } else {
-    //   dispatch(logout());
-    // }
-    // saveUserData({ UserName: UserName });
-  }, [groupUser, dispatch]);
+  }, [dispatch]);
 
   useEffect(() => {
-    console.log("loadUserDataAsync");
-
     const loadUserDataAsync = async () => {
       try {
-        // updateSession("Rattana Chomwihok");
+        const userInfo = await getData('userToken');
+        console.log(userInfo);
 
-        // Optional loading of persisted user data (commented out for now)
-        // const userInfo = await loadUserData();
-        // if (userInfo) {
-        //   updateSession(userInfo.UserName);
-        // }
+        if (userInfo !== undefined && userInfo) {
+          updateSession("", "", userInfo);
+        }
 
       } catch (error) {
         console.error("Error loading user data:", error);
@@ -138,13 +136,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     loadUserDataAsync();
-  }, [updateSession]);
+  }, []);
 
   const login = useCallback((username: string, password: string) => {
     console.log("login");
+    console.log(username, password);
 
-    updateSession(username, password);
-  }, [updateSession]);
+    updateSession(username, password, "");
+  }, []);
 
   const value = useMemo(() => ({ loading, login }), [loading, login]);
 

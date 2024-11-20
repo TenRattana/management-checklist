@@ -11,29 +11,37 @@ export const fetchMenu = createAsyncThunk(
 );
 
 interface User {
-    username: string;
-    role: string;
-    roleID: string;
-    isAuthenticated: boolean;
-    screen: { name: string }[];
-    permissions: string[];
+    UserID: string;
+    Full_Name: string;
+    Position: string;
+    DepartMent: string;
+    GUserID: string;
+    GUserName: string;
+    IsAuthenticated: boolean;
+    Screen: { name: string }[];
+    Permissions: string[];
 }
 
 interface UserPayload {
     UserID: string;
-    UserName: string;
+    Full_Name: string;
+    Position: string;
+    DepartMent: string;
     GUserID: string;
     GUserName: string;
     IsActive: boolean;
 }
 
 const initialState: User = {
-    username: "",
-    role: "",
-    roleID: "",
-    isAuthenticated: false,
-    screen: [],
-    permissions: []
+    UserID: "",
+    Full_Name: "",
+    Position: "",
+    DepartMent: "",
+    GUserID: "",
+    GUserName: "",
+    IsAuthenticated: false,
+    Screen: [],
+    Permissions: []
 };
 
 const middlewareStore = createSlice({
@@ -42,31 +50,40 @@ const middlewareStore = createSlice({
     reducers: {
         setUser: (state, action: PayloadAction<{ user: UserPayload }>) => {
             const { user } = action.payload;
-            state.username = user.UserName;
-            state.role = user.GUserName;
-            state.roleID = user.GUserID;
-            state.isAuthenticated = true;
+
+            state.UserID = user.UserID;
+            state.Full_Name = user.Full_Name;
+            state.Position = user.Position;
+            state.DepartMent = user.DepartMent;
+            state.GUserID = user.GUserID;
+            state.GUserName = user.GUserName;
+            state.IsAuthenticated = true;
         },
         logout: (state) => {
-            state.username = "";
-            state.role = "";
-            state.roleID = "";
-            state.isAuthenticated = false;
+            state.UserID = ""
+            state.Full_Name = ""
+            state.Position = ""
+            state.DepartMent = ""
+            state.GUserID = ""
+            state.GUserName = ""
+            state.IsAuthenticated = false;
+            state.Screen = []
+            state.Permissions = []
         },
     },
     extraReducers: (builder) => {
         builder
             .addCase(fetchMenu.pending, (state) => {
-                state.screen = [];
-                state.permissions = [];
+                state.Screen = [];
+                state.Permissions = [];
             })
             .addCase(fetchMenu.fulfilled, (state, action) => {
-                state.screen = action.payload;
-                state.permissions = action.payload.map((menu: Menu) => menu.MenuPermission);
+                state.Screen = action.payload;
+                state.Permissions = action.payload.map((menu: Menu) => menu.MenuPermission);
             })
             .addCase(fetchMenu.rejected, (state) => {
-                state.screen = [];
-                state.permissions = [];
+                state.Screen = [];
+                state.Permissions = [];
             });
     }
 });

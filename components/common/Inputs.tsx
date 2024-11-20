@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { TextInput, HelperText } from "react-native-paper";
 import { StyleSheet, View } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
@@ -19,9 +19,15 @@ const Inputs: React.FC<InputProps> = React.memo(({
   mode,
   testId,
   textColor,
+  secureTextEntry,
   exp
 }) => {
   const masterdataStyles = useMasterdataStyles();
+  const [passwordVisible, setPasswordVisible] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
+  };
 
   const formattedLabel = useMemo(() => {
     return mode ? undefined : <Text style={masterdataStyles.text}>{label}</Text>;
@@ -42,12 +48,18 @@ const Inputs: React.FC<InputProps> = React.memo(({
         style={{ fontSize: spacing.small }}
         onChangeText={handleChange}
         onBlur={handleBlur}
+        secureTextEntry={secureTextEntry ? !passwordVisible : undefined}
         value={String(value)}
         right={
-          value && !exp ? (
+          value && !exp && !secureTextEntry ? (
             <TextInput.Icon
               icon="window-close"
               onPress={() => handleChange("")}
+            />
+          ) : secureTextEntry ? (
+            <TextInput.Icon
+              icon={passwordVisible ? 'eye-off' : 'eye'}
+              onPress={togglePasswordVisibility}
             />
           ) : undefined
         }

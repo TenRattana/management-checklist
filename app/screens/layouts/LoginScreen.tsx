@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
-import { Pressable, ActivityIndicator, View } from "react-native";
+import { Pressable, ActivityIndicator, View, TouchableOpacity } from "react-native";
 import { Card } from "react-native-paper";
-import { Formik } from "formik";
+import { FastField, FieldProps, Formik } from "formik";
 import * as Yup from "yup";
 import { AccessibleView, Inputs, Text } from "@/components";
 import useMasterdataStyles from "@/styles/common/masterdata";
@@ -10,6 +10,7 @@ import { useAuth, useRes, useTheme, useToast } from "@/app/contexts";
 
 const validationSchema = Yup.object().shape({
   username: Yup.string().required("The username field is required."),
+  password: Yup.string().required("The password field is required."),
 });
 
 const LoginScreen: React.FC = React.memo(() => {
@@ -39,7 +40,7 @@ const LoginScreen: React.FC = React.memo(() => {
 
   return (
     <AccessibleView name="login-container" style={{ flex: 1, paddingHorizontal: 30, backgroundColor: theme.colors.onBackground }}>
-      <Card style={{ height: 250, marginTop: 100, marginHorizontal: 50 }}>
+      <Card style={{ marginTop: 100, marginHorizontal: 50 }}>
         <Card.Title
           title="Login"
           titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
@@ -49,47 +50,53 @@ const LoginScreen: React.FC = React.memo(() => {
           <Formik
             initialValues={{ username: "", password: "" }}
             validationSchema={validationSchema}
-            validateOnBlur={false}
-            validateOnChange={true}
+            validateOnBlur={true}
+            validateOnChange={false}
             onSubmit={handleLogin}
           >
             {({
-              handleChange,
-              handleBlur,
-              values,
-              errors,
-              touched,
               handleSubmit,
               isValid,
               dirty,
             }) => (
               <View id="login">
-                <Inputs
-                  placeholder="Enter Username"
-                  label="Username"
-                  handleChange={handleChange("username") as any}
-                  handleBlur={handleBlur("username")}
-                  value={values.username}
-                  error={touched.username && Boolean(errors.username)}
-                  errorMessage={touched.username ? errors.username : ""}
-                  name="username"
-                  testId="username"
-                />
 
-                <Inputs
-                  placeholder="Enter Password"
-                  label="Password"
-                  handleChange={handleChange("password") as any}
-                  handleBlur={handleBlur("password")}
-                  value={values.password}
-                  error={touched.password && Boolean(errors.password)}
-                  errorMessage={touched.password ? errors.password : ""}
-                  name="password"
-                  testId="password"
-                />
+                <FastField name="username">
+                  {({ field, form }: any) => (
+                    <Inputs
+                      placeholder="Enter Username"
+                      label="Username"
+                      handleChange={(value) => form.setFieldValue(field.name, value)}
+                      handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                      value={field.value}
+                      error={form.touched.username && Boolean(form.errors.username)}
+                      errorMessage={form.touched.username ? form.errors.username : ""}
+                      name="username"
+                      testId="username"
+                    />
+                  )}
+                </FastField>
 
-                <View id="action-login" style={{ justifyContent: 'center', alignItems: 'center' }}>
-                  <Pressable
+                <FastField name="password">
+                  {({ field, form }: any) => (
+                    <Inputs
+                      placeholder="Enter Password"
+                      label="Password"
+                      handleChange={(value) => form.setFieldValue(field.name, value)}
+                      handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                      value={field.value}
+                      error={form.touched.password && Boolean(form.errors.password)}
+                      errorMessage={form.touched.password ? form.errors.password : ""}
+                      secureTextEntry={true}
+                      name="password"
+                      testId="password"
+                    />
+                  )}
+                </FastField>
+
+                <View id="action-login" style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+
+                  <TouchableOpacity
                     onPress={() => handleSubmit()}
                     disabled={!isValid || !dirty || loading}
                     style={[
@@ -103,7 +110,7 @@ const LoginScreen: React.FC = React.memo(() => {
                     ) : (
                       <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>Login</Text>
                     )}
-                  </Pressable>
+                  </TouchableOpacity>
                 </View>
               </View>
             )}

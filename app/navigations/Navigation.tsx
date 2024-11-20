@@ -104,6 +104,8 @@ const Navigation: React.FC = React.memo(() => {
         );
     }, []);
 
+    if (!user.IsAuthenticated) return null
+
     return (
         <>
             <Drawer.Navigator

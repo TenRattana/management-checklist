@@ -60,6 +60,7 @@ export interface InputProps extends Event, DefaultProps {
   lefticon?: string;
   name?: string;
   textColor?: string;
+  secureTextEntry?:boolean;
 }
 
 export interface RadiosProps extends Event, DefaultProps {

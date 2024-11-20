@@ -1,31 +1,50 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const USER_KEY = 'user';
+import { Platform } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 
-interface UsersPermissionProps {
-    UserName: string;
+
+export async function saveData(key: string, TokenAuth: string) {
+    try {
+        if (Platform.OS === 'web') {
+            await AsyncStorage.setItem(key, JSON.stringify(TokenAuth));
+            console.log('Token saved in localStorage');
+        } else {
+            await SecureStore.setItemAsync('userToken', TokenAuth);
+            console.log('Token saved in SecureStore');
+        }
+    } catch (error) {
+        console.error('Failed to save token', error);
+    }
 }
 
-export const saveUserData = async (UserName: UsersPermissionProps) => {
+export async function getData(key: string) {
     try {
-        await AsyncStorage.setItem(USER_KEY, JSON.stringify(UserName));
+        let token;
+        if (Platform.OS === 'web') {
+            const token = await AsyncStorage.getItem(key);
+            console.log('Token retrieved from localStorage:', token);
+            return token != null ? JSON.parse(token) : null;
+        } else {
+            token = await SecureStore.getItemAsync('userToken');
+            console.log('Token retrieved from SecureStore:', token);
+        }
+        return token;
     } catch (error) {
-        console.error('Failed to save user data', error);
+        console.error('Failed to retrieve token', error);
     }
-};
+}
 
-export const loadUserData = async () => {
+export async function deleteData(key: string) {
     try {
-        const jsonValue = await AsyncStorage.getItem(USER_KEY);
-        return jsonValue != null ? JSON.parse(jsonValue) : null;
+        if (Platform.OS === 'web') {
+            await AsyncStorage.removeItem(key);
+            console.log('Token deleted from localStorage');
+        } else {
+            await SecureStore.deleteItemAsync('userToken');
+            console.log('Token deleted from SecureStore');
+        }
     } catch (error) {
-        console.error('Failed to load user data', error);
+        console.error('Failed to delete token', error);
     }
-};
+}
 
-export const removeUserData = async () => {
-    try {
-        await AsyncStorage.removeItem(USER_KEY);
-    } catch (error) {
-        console.error('Failed to remove user data', error);
-    }
-};

@@ -13,6 +13,7 @@ import RouteGuard from './guard/GuardRoute';
 import axiosInstance from '@/config/axios';
 import { Asset } from 'expo-asset';
 import { StatusBar } from 'expo-status-bar';
+import NotFoundScreen404 from '@/app/screens/NotFoundScreen404';
 
 const queryClient = new QueryClient();
 
@@ -34,21 +35,24 @@ const SetTheme = () => {
                 axiosInstance.interceptors.request.eject(interceptor);
             };
         }
-    }, [user]);
+    }, [user, axiosInstance]);
 
     if (currentRouteName) {
         return (
-            <PaperProvider theme={theme}>
-                <RouteGuard route={currentRouteName}>
-                    <Slot screenOptions={{ headerShown: false }} />
-                </RouteGuard>
-            </PaperProvider>
+            <NotFoundScreen404 />
         );
     } else {
         return (
-            <PaperProvider theme={theme}>
-                <Stack screenOptions={{ headerShown: false }} />
-            </PaperProvider>
+            <ToastProvider>
+                <QueryClientProvider client={queryClient}>
+                    <AuthProvider>
+                        <StatusBar hidden={false} />
+                        <PaperProvider theme={theme}>
+                            <Stack screenOptions={{ headerShown: false }} />
+                        </PaperProvider>
+                    </AuthProvider>
+                </QueryClientProvider>
+            </ToastProvider>
         );
     }
 };
@@ -94,16 +98,9 @@ const RootLayout = () => {
     return (
         <ThemeProvider>
             <ResponsiveProvider>
-                <ToastProvider>
-                    <Provider store={store}>
-                        <QueryClientProvider client={queryClient}>
-                            <AuthProvider>
-                                <StatusBar hidden={false} />
-                                <SetTheme />
-                            </AuthProvider>
-                        </QueryClientProvider>
-                    </Provider>
-                </ToastProvider>
+                <Provider store={store}>
+                    <SetTheme />
+                </Provider>
             </ResponsiveProvider>
         </ThemeProvider>
     );
