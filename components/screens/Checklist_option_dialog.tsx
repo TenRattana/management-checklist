@@ -16,7 +16,7 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The active field is required."),
 });
 
-const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }: CheckListOptionProps<InitialValuesCheckListOption>) => {
+const Checklist_option_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData }: CheckListOptionProps<InitialValuesCheckListOption>) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
 
@@ -105,6 +105,6 @@ const Checklist_option_dialog = ({ isVisible, setIsVisible, isEditing, initialVa
             </Dialog>
         </Portal>
     )
-}
+})
 
-export default React.memo(Checklist_option_dialog)
+export default Checklist_option_dialog

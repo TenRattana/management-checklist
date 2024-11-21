@@ -19,7 +19,7 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The active field is required."),
 });
 
-const Match_checklist_option = ({
+const Match_checklist_option = React.memo(({
     isVisible,
     setIsVisible,
     isEditing,
@@ -151,6 +151,6 @@ const Match_checklist_option = ({
             </Dialog>
         </Portal>
     );
-};
+});
 
 export default Match_checklist_option;

@@ -15,7 +15,7 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The status field is required."),
 });
 
-const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }: GroupMachineDialogProps<InitialValuesGroupMachine>) => {
+const Machine_group_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData }: GroupMachineDialogProps<InitialValuesGroupMachine>) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
 
@@ -117,6 +117,6 @@ const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValue
             </Dialog>
         </Portal>
     )
-}
+})
 
-export default React.memo(Machine_group_dialog)
+export default Machine_group_dialog

@@ -47,9 +47,6 @@ export default {
       bundler: "metro",
       output: "static",
       favicon: "./assets/images/Icon-app.png",
-      // packagerOpts: {
-      //   dev: false,
-      // },
     },
     assetBundlePatterns: ["assets/fonts/*", "assets/images/*"],
     plugins: [

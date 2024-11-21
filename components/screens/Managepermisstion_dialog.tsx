@@ -18,7 +18,7 @@ const validationSchema = Yup.object().shape({
 });
 
 
-const Managepermisstion_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData, users, groupUser }: ManagepermissionDialogProps<InitialValuesManagepermission, Users, GroupUsers>) => {
+const Managepermisstion_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData, users, groupUser }: ManagepermissionDialogProps<InitialValuesManagepermission, Users, GroupUsers>) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
 
@@ -134,6 +134,6 @@ const Managepermisstion_dialog = ({ isVisible, setIsVisible, isEditing, initialV
             </Dialog>
         </Portal >
     )
-}
+})
 
-export default React.memo(Managepermisstion_dialog)
+export default Managepermisstion_dialog

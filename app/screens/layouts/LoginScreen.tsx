@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { ActivityIndicator, View, TouchableOpacity } from "react-native";
 import { Card } from "react-native-paper";
 import { FastField, Formik } from "formik";
@@ -31,6 +31,8 @@ const LoginScreen: React.FC = React.memo(() => {
     }
   }, [login, handleError, loading]);
 
+
+
   return (
     <AccessibleView name="login-container" style={{ flex: 1, paddingHorizontal: 30, backgroundColor: theme.colors.onBackground }}>
       <Card style={{ marginTop: 100, marginHorizontal: 50 }}>
@@ -51,62 +53,68 @@ const LoginScreen: React.FC = React.memo(() => {
               handleSubmit,
               isValid,
               dirty,
-            }) => (
-              <View id="login">
+            }) => {
+              const buttonStyle = useMemo(() => {
+                return [
+                  masterdataStyles.button,
+                  masterdataStyles.backMain,
+                  { opacity: isValid && dirty ? 1 : 0.5 }
+                ];
+              }, [isValid, dirty]);
 
-                <FastField name="username">
-                  {({ field, form }: any) => (
-                    <Inputs
-                      placeholder="Enter Username"
-                      label="Username"
-                      handleChange={(value) => form.setFieldValue(field.name, value)}
-                      handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                      value={field.value}
-                      error={form.touched.username && Boolean(form.errors.username)}
-                      errorMessage={form.touched.username ? form.errors.username : ""}
-                      name="username"
-                      testId="username"
-                    />
-                  )}
-                </FastField>
+              return (
+                <View id="login">
 
-                <FastField name="password">
-                  {({ field, form }: any) => (
-                    <Inputs
-                      placeholder="Enter Password"
-                      label="Password"
-                      handleChange={(value) => form.setFieldValue(field.name, value)}
-                      handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                      value={field.value}
-                      error={form.touched.password && Boolean(form.errors.password)}
-                      errorMessage={form.touched.password ? form.errors.password : ""}
-                      secureTextEntry={true}
-                      name="password"
-                      testId="password"
-                    />
-                  )}
-                </FastField>
-
-                <View id="action-login" style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-
-                  <TouchableOpacity
-                    onPress={() => handleSubmit()}
-                    disabled={!isValid || !dirty || loading}
-                    style={[
-                      masterdataStyles.button,
-                      masterdataStyles.backMain,
-                      { opacity: isValid && dirty ? 1 : 0.5 }
-                    ]}
-                  >
-                    {loading ? (
-                      <ActivityIndicator />
-                    ) : (
-                      <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>Login</Text>
+                  <FastField name="username">
+                    {({ field, form }: any) => (
+                      <Inputs
+                        placeholder="Enter Username"
+                        label="Username"
+                        handleChange={(value) => form.setFieldValue(field.name, value)}
+                        handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                        value={field.value}
+                        error={form.touched.username && Boolean(form.errors.username)}
+                        errorMessage={form.touched.username ? form.errors.username : ""}
+                        name="username"
+                        testId="username"
+                      />
                     )}
-                  </TouchableOpacity>
+                  </FastField>
+
+                  <FastField name="password">
+                    {({ field, form }: any) => (
+                      <Inputs
+                        placeholder="Enter Password"
+                        label="Password"
+                        handleChange={(value) => form.setFieldValue(field.name, value)}
+                        handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                        value={field.value}
+                        error={form.touched.password && Boolean(form.errors.password)}
+                        errorMessage={form.touched.password ? form.errors.password : ""}
+                        secureTextEntry={true}
+                        name="password"
+                        testId="password"
+                      />
+                    )}
+                  </FastField>
+
+                  <View id="action-login" style={{ justifyContent: 'center', alignItems: 'center' }}>
+
+                    <TouchableOpacity
+                      onPress={() => handleSubmit()}
+                      disabled={!isValid || !dirty || loading}
+                      style={buttonStyle}
+                    >
+                      {loading ? (
+                        <ActivityIndicator />
+                      ) : (
+                        <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>Login</Text>
+                      )}
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            )}
+              )
+            }}
           </Formik>
         </Card.Content>
       </Card>

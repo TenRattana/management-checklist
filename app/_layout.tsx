@@ -57,10 +57,8 @@ const RootLayout = () => {
                 "Sarabun": require("../assets/fonts/Sarabun-Regular.ttf"),
             });
 
-            // ตรวจสอบว่า assets ถูกโหลดจากแคชแล้วหรือไม่
             const isAssetsLoaded = await AsyncStorage.getItem('assetsLoaded');
             if (isAssetsLoaded !== 'true') {
-                // ถ้า assets ยังไม่ได้ถูกโหลด, ให้โหลดใหม่
                 console.log('Assets not loaded from cache, loading assets...');
                 await Asset.loadAsync([
                     require('../assets/images/bgs.jpg'),
@@ -68,11 +66,9 @@ const RootLayout = () => {
                     require('../assets/images/Icon-app.png'),
                 ]);
 
-                // เก็บสถานะว่า assets ถูกโหลดแล้วใน AsyncStorage
                 await AsyncStorage.setItem('assetsLoaded', 'true');
                 console.log('Assets loaded and cached.');
             } else {
-                // ถ้า assets ถูกโหลดจากแคช
                 console.log('Assets are already loaded from cache.');
             }
         } catch (error) {
