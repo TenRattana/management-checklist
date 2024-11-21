@@ -83,9 +83,11 @@ export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children
   }), [responsive, spacing, fontSize, setFontSize]);
 
   return (
-    <ResponsiveContext.Provider value={value}>
-      {children}
-    </ResponsiveContext.Provider>
+    <>
+      <ResponsiveContext.Provider value={value}>
+        {children}
+      </ResponsiveContext.Provider>
+    </>
   );
 };
 

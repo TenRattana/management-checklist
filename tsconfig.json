@@ -10,14 +10,13 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "./",
     "paths": {
-      "@/*": ["*"]
+      "@/*": [
+        "*"
+      ]
     }
   },
   "include": [
     "app/**/*",
-    "components/**/*",
-    "**/*.ts",
-    "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
   ],

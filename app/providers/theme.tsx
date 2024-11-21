@@ -77,10 +77,12 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   );
 
   return (
-    <ThemeContext.Provider value={value}>
-      <PaperProvider theme={theme}>
-        {children}
-      </PaperProvider>
-    </ThemeContext.Provider>
+    <>
+      <ThemeContext.Provider value={value}>
+        <PaperProvider theme={theme}>
+          {children}
+        </PaperProvider>
+      </ThemeContext.Provider>
+    </>
   );
 };

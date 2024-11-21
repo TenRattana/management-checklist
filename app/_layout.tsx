@@ -4,105 +4,107 @@ import * as SplashScreen from 'expo-splash-screen';
 import { ToastProvider, AuthProvider, ResponsiveProvider, ThemeProvider } from "@/app/providers";
 import { QueryClient, QueryClientProvider } from 'react-query';
 import * as Font from "expo-font";
-import { Provider, useSelector } from "react-redux";
+import { Provider } from "react-redux";
 import { store } from "@/stores";
-import { Slot, Stack, useSegments } from 'expo-router';
-import { PaperProvider } from 'react-native-paper';
-import { useTheme } from './contexts';
-import RouteGuard from './guard/GuardRoute';
-import axiosInstance from '@/config/axios';
+import { useSegments } from 'expo-router';
 import { Asset } from 'expo-asset';
-import { StatusBar } from 'expo-status-bar';
 import NotFoundScreen404 from '@/app/screens/NotFoundScreen404';
+import App from '.';
+import { NavigationContainer } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const queryClient = new QueryClient();
 
 SplashScreen.preventAutoHideAsync();
 
-const SetTheme = () => {
-    const { theme } = useTheme();
+const SetTheme = React.memo(() => {
+    console.log("SetTheme");
+
     const currentRouteName = useSegments().join('/');
-    const user = useSelector((state: any) => state.user);
-
-    useEffect(() => {
-        if (user) {
-            const interceptor = axiosInstance.interceptors.request.use(config => {
-                config.headers['Authorization'] = user.username;
-                return config;
-            });
-
-            return () => {
-                axiosInstance.interceptors.request.eject(interceptor);
-            };
-        }
-    }, [user, axiosInstance]);
 
     if (currentRouteName) {
+        console.log("if", currentRouteName);
+
         return (
             <NotFoundScreen404 />
         );
     } else {
+        console.log("else", currentRouteName);
+
         return (
             <ToastProvider>
-                <QueryClientProvider client={queryClient}>
-                    <AuthProvider>
-                        <StatusBar hidden={false} />
-                        <PaperProvider theme={theme}>
-                            <Stack screenOptions={{ headerShown: false }} />
-                        </PaperProvider>
-                    </AuthProvider>
-                </QueryClientProvider>
+                <AuthProvider>
+                    <NavigationContainer independent={true}>
+                        <App />
+                    </NavigationContainer>
+                </AuthProvider>
             </ToastProvider>
         );
     }
-};
+});
 
 const RootLayout = () => {
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [assetsLoaded, setAssetsLoaded] = useState(false);
+    console.log("RootLayout");
 
     const prepare = async () => {
+        console.log("prepare");
+
         try {
             await Font.loadAsync({
                 "Poppins": require("../assets/fonts/Poppins-Regular.ttf"),
                 "Sarabun": require("../assets/fonts/Sarabun-Regular.ttf"),
             });
 
-            await Asset.loadAsync([
-                require('../assets/images/bgs.jpg'),
-                require('../assets/images/Icon.jpg'),
-                require('../assets/images/Icon-app.png'),
-            ]);
+            // ตรวจสอบว่า assets ถูกโหลดจากแคชแล้วหรือไม่
+            const isAssetsLoaded = await AsyncStorage.getItem('assetsLoaded');
+            if (isAssetsLoaded !== 'true') {
+                // ถ้า assets ยังไม่ได้ถูกโหลด, ให้โหลดใหม่
+                console.log('Assets not loaded from cache, loading assets...');
+                await Asset.loadAsync([
+                    require('../assets/images/bgs.jpg'),
+                    require('../assets/images/Icon.jpg'),
+                    require('../assets/images/Icon-app.png'),
+                ]);
+
+                // เก็บสถานะว่า assets ถูกโหลดแล้วใน AsyncStorage
+                await AsyncStorage.setItem('assetsLoaded', 'true');
+                console.log('Assets loaded and cached.');
+            } else {
+                // ถ้า assets ถูกโหลดจากแคช
+                console.log('Assets are already loaded from cache.');
+            }
         } catch (error) {
             console.warn('Error loading fonts and assets:', error);
         } finally {
             setFontsLoaded(true);
             setAssetsLoaded(true);
-        }
-    };
-
-    useEffect(() => {
-        prepare();
-    }, []);
-
-    useEffect(() => {
-        if (fontsLoaded && assetsLoaded) {
             SplashScreen.hideAsync();
         }
-    }, [fontsLoaded, assetsLoaded]);
+    };
+    useEffect(() => {
+        console.log("useEffect prepare");
+
+        prepare();
+    }, []);
 
     if (!fontsLoaded || !assetsLoaded) {
         return <ActivityIndicator size="large" color="#0000ff" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />;
     }
 
     return (
-        <ThemeProvider>
+        <>
             <ResponsiveProvider>
-                <Provider store={store}>
-                    <SetTheme />
-                </Provider>
+                <ThemeProvider>
+                    <Provider store={store}>
+                        <QueryClientProvider client={queryClient}>
+                            <SetTheme />
+                        </QueryClientProvider>
+                    </Provider>
+                </ThemeProvider>
             </ResponsiveProvider>
-        </ThemeProvider>
+        </>
     );
 };
 

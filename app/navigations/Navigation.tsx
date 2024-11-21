@@ -57,20 +57,84 @@ const nonLazyComponents: Record<ComponentNameNoLazy, React.ComponentType<any>> =
     Test: TestComponent
 };
 
-const Navigation: React.FC = React.memo(() => {
-    const state = useSelector((state: any) => state.prefix);
-    const user = useSelector((state: any) => state.user);
-    const { fontSize } = useRes();
+const DrawerNav = React.memo(({ renderComponent, user }: any) => {
     const { theme } = useTheme();
-
-    const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
+    const { fontSize } = useRes();
+    const state = useSelector((state: any) => state.prefix);
 
     const drawerWidth = fontSize === "small" ? 300 : fontSize === "medium" ? 350 : 400;
 
-    const initialRoute: string = user?.username && user?.screen?.length > 0 ? user.screen[0].MenuLabel : "Login";
+    return (
+        <Drawer.Navigator
+            drawerContent={(props) => <CustomDrawerContent {...props} />}
+            screenOptions={{
+                drawerStyle: {
+                    backgroundColor: theme.colors.background,
+                    width: drawerWidth,
+                },
+                headerTitle: state.AppName || "",
+                headerTitleStyle: {
+                    fontSize: 14,
+                    fontWeight: 'bold',
+                    color: '#333',
+                },
+                unmountOnBlur: true,
+                drawerHideStatusBarOnOpen: true,
+                drawerStatusBarAnimation: 'slide',
+                freezeOnBlur: true
+            }}
+            initialRouteName={user.initialRoute}
+            id="nav"
+        >
+            {user.IsAuthenticated && user.Screen.length > 0 ? (
+                user.Screen.map((screen: Menu) => {
+                    if (screen.NavigationTo) {
+                        return (
+                            <Drawer.Screen
+                                key={screen.MenuID}
+                                name={screen.NavigationTo}
+                                component={renderComponent(screen.NavigationTo as (ComponentNames | ComponentNameNoLazy))}
+                            />
+                        );
+                    }
+
+                    if (screen.ParentMenu && screen.ParentMenu.length > 0) {
+                        return screen.ParentMenu.map((parentScreen: ParentMenu) => {
+                            return (
+                                <Drawer.Screen
+                                    key={parentScreen.MenuID}
+                                    name={parentScreen.NavigationTo}
+                                    component={renderComponent(parentScreen.NavigationTo as (ComponentNames | ComponentNameNoLazy))}
+                                />
+                            );
+                        });
+                    }
+
+                    return null;
+                })
+            ) : (
+                <Drawer.Screen
+                    name="Login"
+                    component={LoginScreen}
+                    options={{
+                        headerShown: false,
+                        drawerLabel: 'Login',
+                    }}
+                />
+            )}
+        </Drawer.Navigator>
+    );
+});
+
+const Navigation: React.FC = React.memo(() => {
+    const user = useSelector((state: any) => state.user);
+
+    console.log("Nav");
+
+    const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
 
     const renderComponent = useCallback((name: ComponentNames | ComponentNameNoLazy) => {
-        console.log(name, "renderComponent");
+        console.log("name");
 
         if (name in nonLazyComponents) {
             const Component = nonLazyComponents[name as ComponentNameNoLazy];
@@ -104,68 +168,11 @@ const Navigation: React.FC = React.memo(() => {
         );
     }, []);
 
-    if (!user.IsAuthenticated) return null
-
     return (
-        <>
-            <Drawer.Navigator
-                drawerContent={(props) => <CustomDrawerContent {...props} />}
-                screenOptions={{
-                    drawerStyle: {
-                        backgroundColor: theme.colors.background,
-                        width: drawerWidth,
-                    },
-                    headerTitle: state.AppName || "",
-                    headerTitleStyle: {
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                        color: '#333',
-                    },
-                    unmountOnBlur: true,
-                    drawerHideStatusBarOnOpen: true,
-                    drawerStatusBarAnimation: 'slide',
-                    freezeOnBlur: true
-                }}
-                initialRouteName={initialRoute}
-                id="nav"
-            >
-                {user.username && user.screen.length > 0 ? (
-                    user.screen.map((screen: Menu) => {
-                        if (screen.NavigationTo) {
-                            return (
-                                <Drawer.Screen
-                                    key={screen.MenuID}
-                                    name={screen.NavigationTo}
-                                    component={renderComponent(screen.NavigationTo as (ComponentNames | ComponentNameNoLazy))}
-                                />
-                            );
-                        }
-
-                        if (screen.ParentMenu && screen.ParentMenu.length > 0) {
-                            return screen.ParentMenu.map((parentScreen: ParentMenu) => {
-                                return (
-                                    <Drawer.Screen
-                                        key={parentScreen.MenuID}
-                                        name={parentScreen.NavigationTo}
-                                        component={renderComponent(parentScreen.NavigationTo as (ComponentNames | ComponentNameNoLazy))}
-                                    />
-                                );
-                            });
-                        }
-
-                        return null;
-                    })
-                ) : (
-                    <Drawer.Screen
-                        name="Login"
-                        component={LoginScreen}
-                        options={{
-                            drawerLabel: 'Login',
-                        }}
-                    />
-                )}
-            </Drawer.Navigator>
-        </>
+        <DrawerNav
+            renderComponent={renderComponent}
+            user={user}
+        />
     )
 });
 

@@ -1,11 +1,10 @@
 import React, { useState, useCallback } from "react";
-import { Pressable, ActivityIndicator, View, TouchableOpacity } from "react-native";
+import { ActivityIndicator, View, TouchableOpacity } from "react-native";
 import { Card } from "react-native-paper";
-import { FastField, FieldProps, Formik } from "formik";
+import { FastField, Formik } from "formik";
 import * as Yup from "yup";
 import { AccessibleView, Inputs, Text } from "@/components";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { useFocusEffect } from "expo-router";
 import { useAuth, useRes, useTheme, useToast } from "@/app/contexts";
 
 const validationSchema = Yup.object().shape({
@@ -21,22 +20,16 @@ const LoginScreen: React.FC = React.memo(() => {
   const masterdataStyles = useMasterdataStyles();
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = useCallback(async (values: { username: string, password: string }) => {
+  const handleLogin = useCallback((values: { username: string, password: string }) => {
     setLoading(true);
     try {
-      await login(values.username, values.password);
+      login(values.username, values.password);
     } catch (error) {
       handleError(error);
     } finally {
       setLoading(false);
     }
-  }, [login, handleError]);
-
-  useFocusEffect(
-    useCallback(() => {
-      return () => { };
-    }, [])
-  );
+  }, [login, handleError, loading]);
 
   return (
     <AccessibleView name="login-container" style={{ flex: 1, paddingHorizontal: 30, backgroundColor: theme.colors.onBackground }}>

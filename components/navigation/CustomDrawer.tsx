@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Pressable, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import { useAuth } from "@/app/contexts";
 import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
 import { Text } from '@/components';
@@ -13,10 +13,14 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = React.memo((p
     const masterdataStyles = useMasterdataStyles();
     const user = useSelector((state: any) => state.user);
     const { loading } = useAuth();
+    console.log("CustomDrawerContent");
 
     const [isMenuListOpen, setIsMenuListOpen] = useState<{ [key: string]: boolean }>({});
 
-    if (loading) {
+    if (!loading) {
+        console.log(loading, "loading");
+        console.log(user);
+
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <ActivityIndicator size="large" color="#0000ff" />
@@ -43,9 +47,9 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = React.memo((p
         }));
     };
 
-    return user.username ? (
+    return user.IsAuthenticated && user.Screen.length > 0 ? (
         <DrawerContentScrollView {...props} style={{ flex: 1 }}>
-            {user.screen.map((screen: Menu) => {
+            {user.Screen.map((screen: Menu) => {
                 if (screen.OrderNo) {
                     if (screen.ParentMenu) {
                         return (

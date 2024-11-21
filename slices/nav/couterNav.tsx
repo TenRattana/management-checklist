@@ -20,16 +20,16 @@ interface User {
     IsAuthenticated: boolean;
     Screen: { name: string }[];
     Permissions: string[];
+    initialRoute?: string;
 }
 
-interface UserPayload {
+export interface UserPayload {
     UserID: string;
     Full_Name: string;
     Position: string;
     DepartMent: string;
     GUserID: string;
     GUserName: string;
-    IsActive: boolean;
 }
 
 const initialState: User = {
@@ -41,7 +41,8 @@ const initialState: User = {
     GUserName: "",
     IsAuthenticated: false,
     Screen: [],
-    Permissions: []
+    Permissions: [],
+    initialRoute: ""
 };
 
 const middlewareStore = createSlice({
@@ -80,6 +81,7 @@ const middlewareStore = createSlice({
             .addCase(fetchMenu.fulfilled, (state, action) => {
                 state.Screen = action.payload;
                 state.Permissions = action.payload.map((menu: Menu) => menu.MenuPermission);
+                state.initialRoute = "Home"
             })
             .addCase(fetchMenu.rejected, (state) => {
                 state.Screen = [];
