@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useRef, useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, TouchableOpacity } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import {
     HomeScreen,
@@ -28,6 +28,8 @@ import TestComponent from '../screens/TestComponent';
 import { Menu, ComponentNames, ComponentNameNoLazy, ParentMenu } from '@/typing/type';
 import { AppDispatch } from '@/stores';
 import { initializeLogout } from '../providers';
+import { IconButton } from 'react-native-paper';
+import Setting_dailog from "@/components/screens/Setting_dailog";
 
 const Drawer = createDrawerNavigator();
 
@@ -64,6 +66,11 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
     const { fontSize } = useRes();
     const state = useSelector((state: any) => state.prefix);
     const drawerWidth = fontSize === "small" ? 300 : fontSize === "medium" ? 350 : 400;
+    const [showsetting, setShowsetting] = useState(false)
+
+    const handelShowsetting = useCallback((value: boolean) => {
+        setShowsetting(value)
+    }, [])
 
     return (
         <Drawer.Navigator
@@ -79,6 +86,12 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                     fontWeight: 'bold',
                     color: '#333',
                 },
+                headerRight: () => (
+                    <TouchableOpacity
+                        onPress={() => handelShowsetting(true)}>
+                        <IconButton icon="account-circle" size={30} style={{ marginRight: 10 }} />
+                    </TouchableOpacity>
+                ),
                 unmountOnBlur: true,
                 drawerHideStatusBarOnOpen: true,
                 drawerStatusBarAnimation: 'slide',
