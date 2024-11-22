@@ -31,10 +31,9 @@ const RenderPressable = React.memo((props: RenderPressableProps) => {
 });
 
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = React.memo((props) => {
-    const { navigation } = props;
-    const user = useSelector((state: any) => state.user);
-    console.log("CustomDrawerContent");
+    const { navigation, state } = props;
 
+    const user = useSelector((state: any) => state.user);
     const [isMenuListOpen, setIsMenuListOpen] = useState<{ [key: string]: boolean }>({});
 
     const handleSetMenuListOpen = useCallback((PermissionID: string) => {

@@ -18,19 +18,14 @@ const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();
 
 const SetTheme = React.memo(() => {
-    console.log("SetTheme");
 
     const currentRouteName = useSegments().join('/');
 
     if (currentRouteName) {
-        console.log("if", currentRouteName);
-
         return (
             <NotFoundScreen404 />
         );
     } else {
-        console.log("else", currentRouteName);
-
         return (
             <ToastProvider>
                 <SetAuth />
@@ -53,10 +48,8 @@ const SetAuth = React.memo(() => {
 const RootLayout = () => {
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [assetsLoaded, setAssetsLoaded] = useState(false);
-    console.log("RootLayout");
 
     const prepare = async () => {
-        console.log("prepare");
 
         try {
             await Font.loadAsync({
@@ -66,7 +59,6 @@ const RootLayout = () => {
 
             const isAssetsLoaded = await AsyncStorage.getItem('assetsLoaded');
             if (isAssetsLoaded !== 'true') {
-                console.log('Assets not loaded from cache, loading assets...');
                 await Asset.loadAsync([
                     require('../assets/images/bgs.jpg'),
                     require('../assets/images/Icon.jpg'),
@@ -74,9 +66,7 @@ const RootLayout = () => {
                 ]);
 
                 await AsyncStorage.setItem('assetsLoaded', 'true');
-                console.log('Assets loaded and cached.');
             } else {
-                console.log('Assets are already loaded from cache.');
             }
         } catch (error) {
             console.warn('Error loading fonts and assets:', error);
@@ -87,8 +77,6 @@ const RootLayout = () => {
         }
     };
     useEffect(() => {
-        console.log("useEffect prepare");
-
         prepare();
     }, []);
 

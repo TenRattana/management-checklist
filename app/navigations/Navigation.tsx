@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useRef, useCallback, useEffect } from 'react';
+import React, { lazy, Suspense, useRef, useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import {
@@ -63,13 +63,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
     const { theme } = useTheme();
     const { fontSize } = useRes();
     const state = useSelector((state: any) => state.prefix);
-    const dispatch = useDispatch<AppDispatch>();
-
     const drawerWidth = fontSize === "small" ? 300 : fontSize === "medium" ? 350 : 400;
-
-    const logout = useCallback(() => {
-        dispatch(initializeLogout());
-    }, [])
 
     return (
         <Drawer.Navigator
@@ -123,10 +117,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
 
                     <Drawer.Screen
                         name="Logout"
-                        component={() => {
-                            logout()
-                            return (<LoginScreen />)
-                        }}
+                        component={LogoutScreen}
                         options={{
                             headerShown: false,
                         }}
@@ -135,7 +126,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
             ) : (
                 <Drawer.Screen
                     name="Login"
-                    component={() => <LoginScreen />}
+                    component={LoginScreen}
                     options={{
                         headerShown: false,
                         drawerLabel: 'Login',
@@ -149,12 +140,9 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
 const Navigation: React.FC = React.memo(() => {
     const user = useSelector((state: any) => state.user);
 
-    console.log("Nav");
-
     const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
 
     const renderComponent = useCallback((name: ComponentNames | ComponentNameNoLazy) => {
-        console.log("name");
 
         if (name in nonLazyComponents) {
             const Component = nonLazyComponents[name as ComponentNameNoLazy];
@@ -196,5 +184,18 @@ const Navigation: React.FC = React.memo(() => {
     )
 });
 
+const LogoutScreen = React.memo(() => {
+    const dispatch = useDispatch<AppDispatch>();
+
+    const logouts = useCallback(async () => {
+        dispatch(initializeLogout());
+    }, [dispatch])
+
+    useEffect(() => {
+        logouts()
+    }, [logouts]);
+
+    return null;
+});
 
 export default Navigation;

@@ -2,7 +2,6 @@ import axios from "axios";
 import Constants from 'expo-constants';
 
 const API_URL = Constants.expoConfig?.extra?.apiUrl || "https://default.api.com";
-console.log("axios");
 
 const axiosInstance = axios.create({
     baseURL: API_URL,

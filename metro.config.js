@@ -7,8 +7,6 @@ defaultConfig.resolver.assetExts = [...defaultConfig.resolver.assetExts, "db"];
 defaultConfig.reporter = {
   update: ({ type, message }) => {
     if (type === "warn") {
-      console.log(type, "types war");
-
       if (message.includes("Require cycle") || true) {
         return;
       }

@@ -52,6 +52,7 @@ export const initializeApp = createAsyncThunk('app/initialize', async (payload: 
     },
     (error) => Promise.reject(error)
   );
+
 });
 
 export const initializeLogout = createAsyncThunk('app/initialize', async (_, { dispatch }) => {
@@ -62,8 +63,6 @@ export const initializeLogout = createAsyncThunk('app/initialize', async (_, { d
     async (config: InternalAxiosRequestConfig) => {
       if (config.headers instanceof AxiosHeaders) {
 
-        console.log('User logged out. Authorization header removed.');
-
         config.headers.delete('Authorization');
       } else {
         config.headers = new AxiosHeaders();
@@ -72,8 +71,6 @@ export const initializeLogout = createAsyncThunk('app/initialize', async (_, { d
     },
     (error) => Promise.reject(error)
   );
-
-  console.log('User logged out. Authorization header removed.');
 });
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
@@ -97,8 +94,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const loadUserDataAsync = async () => {
       try {
         const userInfo = await getData('userToken');
-        console.log(userInfo);
-
         if (userInfo !== undefined && userInfo) {
           updateSession("", "", userInfo);
         } else {
@@ -127,7 +122,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setUserData(payload)
           } else {
             await deleteData('userToken');
-            console.log("LoginSIn U");
             return
           }
         }
@@ -161,8 +155,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [UserData, data, dispatch]);
 
-  const login = useCallback((username: string, password: string) => {
-    updateSession(username, password, "");
+  const login = useCallback(async (username: string, password: string) => {
+    await updateSession(username, password, "");
   }, []);
 
   const value = useMemo(() => ({ loading, login }), [loading, login]);
