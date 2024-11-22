@@ -9,7 +9,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { CheckListOption, GroupCheckListOption } from '@/typing/type';
 import { InitialValuesMatchCheckListOption, MatchChecklistOptionProps } from '@/typing/value';
 import Text from "@/components/Text";
-import { useTheme } from "@/app/contexts";
+import { useTheme } from "@/app/contexts/useTheme";
 
 const validationSchema = Yup.object().shape({
     groupCheckListOptionId: Yup.string().required("This group check list field is required"),

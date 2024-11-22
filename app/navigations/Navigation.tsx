@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useRef, useCallback } from 'react';
+import React, { lazy, Suspense, useRef, useCallback, useEffect } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import {
@@ -20,12 +20,14 @@ import {
     LoginScreen,
 } from '@/app/screens';
 import PermissionDeny from '../screens/layouts/PermissionDeny';
-import { useRes } from "@/app/contexts";
+import { useRes } from "@/app/contexts/useRes";
 import CustomDrawerContent from '@/components/navigation/CustomDrawer';
-import { useTheme } from '../contexts';
-import { useSelector } from "react-redux";
+import { useTheme } from '@/app/contexts/useTheme';
+import { useDispatch, useSelector } from "react-redux";
 import TestComponent from '../screens/TestComponent';
 import { Menu, ComponentNames, ComponentNameNoLazy, ParentMenu } from '@/typing/type';
+import { AppDispatch } from '@/stores';
+import { initializeLogout } from '../providers';
 
 const Drawer = createDrawerNavigator();
 
@@ -61,8 +63,13 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
     const { theme } = useTheme();
     const { fontSize } = useRes();
     const state = useSelector((state: any) => state.prefix);
+    const dispatch = useDispatch<AppDispatch>();
 
     const drawerWidth = fontSize === "small" ? 300 : fontSize === "medium" ? 350 : 400;
+
+    const logout = useCallback(() => {
+        dispatch(initializeLogout());
+    }, [])
 
     return (
         <Drawer.Navigator
@@ -87,35 +94,48 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
             id="nav"
         >
             {user.IsAuthenticated && user.Screen.length > 0 ? (
-                user.Screen.map((screen: Menu) => {
-                    if (screen.NavigationTo) {
-                        return (
-                            <Drawer.Screen
-                                key={screen.MenuID}
-                                name={screen.NavigationTo}
-                                component={renderComponent(screen.NavigationTo as (ComponentNames | ComponentNameNoLazy))}
-                            />
-                        );
-                    }
-
-                    if (screen.ParentMenu && screen.ParentMenu.length > 0) {
-                        return screen.ParentMenu.map((parentScreen: ParentMenu) => {
+                <>
+                    {user.Screen.map((screen: Menu) => {
+                        if (screen.NavigationTo) {
                             return (
                                 <Drawer.Screen
-                                    key={parentScreen.MenuID}
-                                    name={parentScreen.NavigationTo}
-                                    component={renderComponent(parentScreen.NavigationTo as (ComponentNames | ComponentNameNoLazy))}
+                                    key={screen.MenuID}
+                                    name={screen.NavigationTo}
+                                    component={renderComponent(screen.NavigationTo as (ComponentNames | ComponentNameNoLazy))}
                                 />
                             );
-                        });
-                    }
+                        }
 
-                    return null;
-                })
+                        if (screen.ParentMenu && screen.ParentMenu.length > 0) {
+                            return screen.ParentMenu.map((parentScreen: ParentMenu) => {
+                                return (
+                                    <Drawer.Screen
+                                        key={parentScreen.MenuID}
+                                        name={parentScreen.NavigationTo}
+                                        component={renderComponent(parentScreen.NavigationTo as (ComponentNames | ComponentNameNoLazy))}
+                                    />
+                                );
+                            });
+                        }
+
+                        return null;
+                    })}
+
+                    <Drawer.Screen
+                        name="Logout"
+                        component={() => {
+                            logout()
+                            return (<LoginScreen />)
+                        }}
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
+                </>
             ) : (
                 <Drawer.Screen
                     name="Login"
-                    component={LoginScreen}
+                    component={() => <LoginScreen />}
                     options={{
                         headerShown: false,
                         drawerLabel: 'Login',
@@ -175,5 +195,6 @@ const Navigation: React.FC = React.memo(() => {
         />
     )
 });
+
 
 export default Navigation;

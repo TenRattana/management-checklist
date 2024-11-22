@@ -3,9 +3,13 @@ import { ActivityIndicator, View, TouchableOpacity } from "react-native";
 import { Card } from "react-native-paper";
 import { FastField, Formik } from "formik";
 import * as Yup from "yup";
-import { AccessibleView, Inputs, Text } from "@/components";
+import AccessibleView from "@/components/AccessibleView"
+import Inputs from "@/components/common/Inputs"
+import Text from "@/components/Text"
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { useAuth, useRes, useTheme, useToast } from "@/app/contexts";
+import { useAuth } from "@/app/contexts/useAuth";
+import { useRes } from "@/app/contexts/useRes";
+import { useToast } from "@/app/contexts/useToast";
 
 const validationSchema = Yup.object().shape({
   username: Yup.string().required("The username field is required."),
@@ -16,7 +20,6 @@ const LoginScreen: React.FC = React.memo(() => {
   const { handleError } = useToast();
   const { login } = useAuth();
   const { spacing, fontSize } = useRes();
-  const { theme } = useTheme();
   const masterdataStyles = useMasterdataStyles();
   const [loading, setLoading] = useState(false);
 
@@ -31,11 +34,9 @@ const LoginScreen: React.FC = React.memo(() => {
     }
   }, [login, handleError, loading]);
 
-
-
   return (
-    <AccessibleView name="login-container" style={{ flex: 1, paddingHorizontal: 30, backgroundColor: theme.colors.onBackground }}>
-      <Card style={{ marginTop: 100, marginHorizontal: 50 }}>
+    <AccessibleView name="login-container" style={[masterdataStyles.container, { alignContent: 'center', justifyContent: 'center', height: '100%' }]}>
+      <Card style={{ width: '50%', alignSelf: 'center' }}>
         <Card.Title
           title="Login"
           titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}

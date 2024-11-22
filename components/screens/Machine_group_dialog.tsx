@@ -7,7 +7,7 @@ import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { GroupMachineDialogProps, InitialValuesGroupMachine } from '@/typing/value'
 import Text from "@/components/Text";
-import { useTheme } from "@/app/contexts";
+import { useTheme } from "@/app/contexts/useTheme";
 
 const validationSchema = Yup.object().shape({
     machineGroupName: Yup.string().required("The group machine name field is required."),

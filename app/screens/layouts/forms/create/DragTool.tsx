@@ -6,7 +6,7 @@ import useCreateformStyle from "@/styles/createform";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { AccessibleView, Text } from "@/components";
 import { CheckListType } from "@/typing/type";
-import { useRes } from "@/app/contexts";
+import { useRes } from "@/app/contexts/useRes";
 
 const DraggableItem: React.FC<{
     item: CheckListType;

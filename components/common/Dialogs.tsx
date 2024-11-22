@@ -4,7 +4,7 @@ import { Portal, Dialog, Text } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import AccessibleView from "@/components/AccessibleView";
 import { DialogsProps } from "@/typing/tag";
-import { useRes } from "@/app/contexts";
+import { useRes } from "@/app/contexts/useRes";
 
 const Dialogs: React.FC<DialogsProps> = ({
     isVisible,

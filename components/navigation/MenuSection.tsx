@@ -3,7 +3,7 @@ import { Pressable } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
 import { IconButton } from 'react-native-paper';
 import Text from '@/components/Text';
-import { useRes } from '@/app/contexts';
+import { useRes } from '@/app/contexts/useRes';
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { DrawerNavigationHelpers } from '@react-navigation/drawer/lib/typescript/src/types';
 import { TouchableOpacity } from 'react-native';

@@ -1,51 +1,48 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
-import { useAuth } from "@/app/contexts";
+import { useAuth } from "@/app/contexts/useAuth";
 import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
 import { Text } from '@/components';
 import MenuSection from './MenuSection';
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useSelector } from 'react-redux';
 import { Menu, ParentMenu } from '@/typing/type';
+import { DrawerNavigationHelpers } from '@react-navigation/drawer/lib/typescript/src/types';
+
+interface RenderPressableProps {
+    label: string;
+    navigateTo: string;
+    navigations: DrawerNavigationHelpers;
+}
+
+const RenderPressable = React.memo((props: RenderPressableProps) => {
+    const masterdataStyles = useMasterdataStyles();
+    const { label, navigateTo, navigations } = props
+
+    return (
+        <TouchableOpacity
+            key={`item-${label}-nav-${navigateTo}`}
+            onPress={() => navigations.navigate(navigateTo)}
+            style={masterdataStyles.menuItemNav}
+        >
+            <Text style={masterdataStyles.menuText}>{label}</Text>
+        </TouchableOpacity>
+    );
+});
 
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = React.memo((props) => {
     const { navigation } = props;
-    const masterdataStyles = useMasterdataStyles();
     const user = useSelector((state: any) => state.user);
-    const { loading } = useAuth();
     console.log("CustomDrawerContent");
 
     const [isMenuListOpen, setIsMenuListOpen] = useState<{ [key: string]: boolean }>({});
 
-    if (!loading) {
-        console.log(loading, "loading");
-        console.log(user);
-
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <ActivityIndicator size="large" color="#0000ff" />
-            </View>
-        );
-    }
-
-    const renderPressable = (label: string, navigateTo: string) => {
-        return (
-            <TouchableOpacity
-                key={`item-${label}-nav-${navigateTo}`}
-                onPress={() => navigation.navigate(navigateTo)}
-                style={masterdataStyles.menuItemNav}
-            >
-                <Text style={masterdataStyles.menuText}>{label}</Text>
-            </TouchableOpacity>
-        );
-    };
-
-    const handleSetMenuListOpen = (PermissionID: string) => {
+    const handleSetMenuListOpen = useCallback((PermissionID: string) => {
         setIsMenuListOpen(prevState => ({
             ...prevState,
             [PermissionID]: !prevState[PermissionID]
         }));
-    };
+    }, [isMenuListOpen]);
 
     return user.IsAuthenticated && user.Screen.length > 0 ? (
         <DrawerContentScrollView {...props} style={{ flex: 1 }}>
@@ -68,10 +65,11 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = React.memo((p
                             />
                         );
                     } else {
-                        return renderPressable(screen.MenuLabel, screen.NavigationTo);
+                        return <RenderPressable key={`item-${screen.MenuLabel}-nav-${screen.NavigationTo}`} label={screen.MenuLabel} navigateTo={screen.NavigationTo} navigations={navigation} />;
                     }
                 }
             })}
+            <RenderPressable key={`item-logout`} label={"Logout"} navigateTo={"Logout"} navigations={navigation} />
         </DrawerContentScrollView>
     ) : null;
 });

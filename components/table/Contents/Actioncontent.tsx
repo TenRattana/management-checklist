@@ -1,7 +1,8 @@
 import { Pressable, View } from 'react-native'
 import React from 'react'
 import { Checkbox, IconButton } from 'react-native-paper';
-import { useRes, useTheme } from '@/app/contexts';
+import { useRes } from '@/app/contexts/useRes';
+import { useTheme } from '@/app/contexts/useTheme';
 import useCustomtableStyles from '@/styles/customtable';
 import { ActionProps, HandelPrssProps } from "@/typing/tag";
 

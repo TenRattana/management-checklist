@@ -8,7 +8,7 @@ import Cellcontent from "./Contents/Cellcontent";
 import Actioncontent from "./Contents/Actioncontent";
 import { Dialogs } from "../common";
 import { HandelPrssProps, CustomtableSmallProps } from "@/typing/tag";
-import { useRes } from "@/app/contexts";
+import { useRes } from "@/app/contexts/useRes";
 import { Picker } from "@react-native-picker/picker";
 
 const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayData, Tablehead, actionIndex, showMessage, handleDialog, selectedRows, handelSetFilter, filter, showColumn, showData, showFilter, toggleSelect }) => {
@@ -43,7 +43,7 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
     })
 
     const dropdownOptions = useMemo(() => {
-        const uniqueOptions = new Set(showData?.map(row => row?.[showColumn]));
+        const uniqueOptions = new Set(showData?.map(row => row?.[showColumn || 0]));
         return Array.from(uniqueOptions);
     }, [showData, showColumn]);
 

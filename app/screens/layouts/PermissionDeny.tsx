@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { AccessibleView, Text } from "@/components";
 import useMasterdataStyles from '@/styles/common/masterdata';
-import { useTheme } from '@/app/contexts';
+import { useTheme } from '@/app/contexts/useTheme';
 
 const PermissionDeny = React.memo(() => {
   const masterdataStyle = useMasterdataStyles();

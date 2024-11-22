@@ -9,7 +9,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { Users, GroupUsers } from '@/typing/type'
 import { ManagepermissionDialogProps, InitialValuesManagepermission } from '@/typing/value'
 import Text from "@/components/Text";
-import { useTheme } from "@/app/contexts";
+import { useTheme } from "@/app/contexts/useTheme";
 
 const validationSchema = Yup.object().shape({
     UserName: Yup.string().required("This user field is required"),

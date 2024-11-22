@@ -9,7 +9,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { MachineDialogProps, InitialValuesMachine } from '@/typing/value'
 import { GroupMachine } from '@/typing/type'
 import Text from "@/components/Text";
-import { useTheme } from "@/app/contexts";
+import { useTheme } from "@/app/contexts/useTheme";
 import QRCode from "react-native-qrcode-svg";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { Platform } from "react-native";

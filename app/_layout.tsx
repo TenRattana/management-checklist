@@ -33,15 +33,22 @@ const SetTheme = React.memo(() => {
 
         return (
             <ToastProvider>
-                <AuthProvider>
-                    <NavigationContainer independent={true}>
-                        <App />
-                    </NavigationContainer>
-                </AuthProvider>
+                <SetAuth />
             </ToastProvider>
+
         );
     }
 });
+
+const SetAuth = React.memo(() => {
+    return (
+        <AuthProvider>
+            <NavigationContainer independent={true}>
+                <App />
+            </NavigationContainer>
+        </AuthProvider>
+    )
+})
 
 const RootLayout = () => {
     const [fontsLoaded, setFontsLoaded] = useState(false);

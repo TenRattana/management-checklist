@@ -2,7 +2,8 @@ import React from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import AccessibleView from "../AccessibleView";
 import Text from "@/components/Text";
-import { useTheme, useRes } from '@/app/contexts';
+import { useTheme } from '@/app/contexts/useTheme';
+import { useRes } from '@/app/contexts/useRes';
 import useMasterdataStyles from '@/styles/common/masterdata';
 
 const NotFoundScreen = () => {
