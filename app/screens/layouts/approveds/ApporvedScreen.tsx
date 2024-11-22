@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import axiosInstance from "@/config/axios";
-import { useToast, useRes } from "@/app/contexts";
-import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
+import { useToast } from '@/app/contexts/useToast';
+import { useRes } from '@/app/contexts/useRes';
+import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { ExpectedResult, Machine, UsersPermission } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet } from "react-native";
 
 const fetchMachines = async (): Promise<Machine[]> => {
     const response = await axiosInstance.post("Machine_service.asmx/GetMachines");

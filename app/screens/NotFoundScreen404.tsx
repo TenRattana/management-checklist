@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { AccessibleView } from "@/components";
 import Text from "@/components/Text";
-import { useTheme, useRes } from '@/app/contexts';
+import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
 
 const NotFoundScreen404 = () => {

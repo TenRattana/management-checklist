@@ -9,7 +9,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { MachineDialogProps, InitialValuesMachine } from '@/typing/value'
 import { GroupMachine } from '@/typing/type'
 import Text from "@/components/Text";
-import { useTheme } from "@/app/contexts";
+import { useTheme } from "@/app/contexts/useTheme";
 import QRCode from "react-native-qrcode-svg";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { Platform } from "react-native";
@@ -21,7 +21,7 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The status field is required."),
 });
 
-const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData, dropmachine, machineGroup = [] }: MachineDialogProps<InitialValuesMachine, GroupMachine>) => {
+const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData, dropmachine, machineGroup = [] }: MachineDialogProps<InitialValuesMachine, GroupMachine>) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
 
@@ -245,6 +245,6 @@ const Machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, sav
             </Dialog>
         </Portal>
     )
-}
+})
 
-export default React.memo(Machine_dialog)
+export default Machine_dialog

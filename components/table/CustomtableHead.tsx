@@ -4,7 +4,7 @@ import Text from "@/components/Text";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import AccessibleView from "@/components/AccessibleView";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { useRes } from '@/app/contexts'
+import { useRes } from '@/app/contexts/useRes'
 import { Picker } from "@react-native-picker/picker";
 import { TypeConfig } from "@/typing/type";
 
@@ -34,7 +34,7 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({ Tablehead,
     const { fontSize, responsive } = useRes()
 
     const dropdownOptions = useMemo(() => {
-        const uniqueOptions = new Set(showData?.map(row => row?.[showColumn]));
+        const uniqueOptions = new Set(showData?.map(row => row?.[showColumn || 0]));
         return Array.from(uniqueOptions);
     }, [showData, showColumn]);
 

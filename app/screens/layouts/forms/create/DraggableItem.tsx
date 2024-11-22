@@ -1,11 +1,12 @@
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import { GestureEvent, HandlerStateChangeEvent, PanGestureHandler, PanGestureHandlerEventPayload } from "react-native-gesture-handler";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, runOnJS } from "react-native-reanimated";
 import { IconButton, Portal } from "react-native-paper";
 import useCreateformStyle from "@/styles/createform";
 import { CheckListType } from "@/typing/type";
 import { View } from "react-native";
-import { useRes, useTheme } from "@/app/contexts";
+import { useTheme } from "@/app/contexts/useTheme";
+import { useRes } from "@/app/contexts/useRes";
 import { Text } from "@/components";
 import useMasterdataStyles from "@/styles/common/masterdata";
 
@@ -65,9 +66,9 @@ const DraggableItem: React.FC<{
 
     return (
         <PanGestureHandler onGestureEvent={onGestureEvent} onEnded={onGestureEnd}>
-            <View>
+            <View style={{ marginHorizontal: 20 }}>
                 <Animated.View style={[itemAnimatedStyle, { opacity: isDragging ? 0 : 1 }]}>
-                    <View style={[{ marginHorizontal: 20, flexDirection: "row", alignItems: "center" }, createform.addItem]}>
+                    <View style={[{ flexDirection: "row", alignItems: "center" }, createform.addItem]}>
                         <IconButton icon={item.Icon} iconColor={theme.colors.fff} size={spacing.large} style={createform.icon} animated />
                         <Text style={[masterdataStyles.textFFF, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
                             {item.CTypeName}

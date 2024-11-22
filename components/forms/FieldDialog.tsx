@@ -5,7 +5,9 @@ import { Checkboxs, Inputs } from "@/components/common";
 import { Portal, Dialog, HelperText, Switch, IconButton } from "react-native-paper";
 import { Formik, FastField, Field } from "formik";
 import Checklist_dialog from "../screens/Checklist_dialog";
-import { useRes, useToast, useTheme } from "@/app/contexts";
+import { useToast } from "@/app/contexts/useToast";
+import { useTheme } from "@/app/contexts/useTheme";
+import { useRes } from "@/app/contexts/useRes";
 import axiosInstance from "@/config/axios";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
@@ -455,10 +457,10 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                                             return (
                                                                 <Checkboxs
                                                                     option={option}
-                                                                    handleChange={(value: string | string[]) => {
+                                                                    handleChange={(value) => {
                                                                         const processedValues = Array.isArray(value)
                                                                             ? value.filter((v: string) => v.trim() !== '')
-                                                                            : value.split(',').filter((v: string) => v.trim() !== '');
+                                                                            : String(value).split(',').filter((v: string) => v.trim() !== '');
 
                                                                         form.setFieldValue(field.name, processedValues);
                                                                         setTimeout(() => {
@@ -514,7 +516,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                                                 <Inputs
                                                                     placeholder="Max Value"
                                                                     label="Max Value Control"
-                                                                    handleChange={(value: string) => form.setFieldValue(field.name, value)}
+                                                                    handleChange={(value) => form.setFieldValue(field.name, value)}
                                                                     handleBlur={() => {
                                                                         form.setFieldTouched(field.name, true);
                                                                     }}

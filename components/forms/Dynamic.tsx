@@ -4,8 +4,9 @@ import { CheckListOption } from '@/typing/type';
 import { DynamicFormProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { View } from "react-native";
-import { useRes, useTheme } from "@/app/contexts";
-import { HelperText, Text } from "react-native-paper";
+import { useTheme } from "@/app/contexts/useTheme";
+import { useRes } from "@/app/contexts/useRes";
+import { Text } from "react-native-paper";
 
 const DynamicForm = React.memo(({
   field,
@@ -120,10 +121,10 @@ const DynamicForm = React.memo(({
           <Checkboxs
             option={option}
             hint={error ? errorMessages?.[MCListID] as string || "" : ""}
-            handleChange={(value: string | string[]) => {
+            handleChange={(value) => {
               const processedValues = Array.isArray(value)
                 ? value.filter((v: string) => v.trim() !== '')
-                : value.split(',').filter((v: string) => v.trim() !== '');
+                : String(value).split(',').filter((v: string) => v.trim() !== '');
 
               handleChange(MCListID, processedValues)
             }}

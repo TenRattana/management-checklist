@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useCallback } from "react";
-import { useRes } from "@/app/contexts";
+import { useRes } from "@/app/contexts/useRes";
 import AccessibleView from "@/components/AccessibleView";
 import CustomtableHead from "./table/CustomtableHead";
 import CustomtableSmall from "./table/CustomtableSmall";
@@ -33,7 +33,7 @@ const CustomTable = ({
         const selectedIndices = displayData.map((row, index) => {
           const selectIndex = actionIndex.find(item => item.selectIndex !== undefined)?.selectIndex;
 
-          return Number(selectIndex) > -1 ? String(row[Number(selectIndex)]) : null
+          return Number(selectIndex) > -1 ? String(row[Number(selectIndex)]) : ""
         }).filter(v => v !== null)
 
         setRow(selectedIndices);

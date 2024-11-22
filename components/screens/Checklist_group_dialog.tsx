@@ -7,7 +7,7 @@ import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { ChecklistGroupDialogProps, InitialValuesGroupCheckList } from '@/typing/value'
 import Text from "@/components/Text";
-import { useTheme } from "@/app/contexts";
+import { useTheme } from "@/app/contexts/useTheme";
 
 const validationSchema = Yup.object().shape({
     groupCheckListOptionName: Yup.string().required(
@@ -16,7 +16,7 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The active field is required."),
 });
 
-const Checklist_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }: ChecklistGroupDialogProps<InitialValuesGroupCheckList>) => {
+const Checklist_group_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData }: ChecklistGroupDialogProps<InitialValuesGroupCheckList>) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
 
@@ -103,6 +103,6 @@ const Checklist_group_dialog = ({ isVisible, setIsVisible, isEditing, initialVal
             </Dialog>
         </Portal>
     )
-}
+})
 
-export default React.memo(Checklist_group_dialog)
+export default Checklist_group_dialog

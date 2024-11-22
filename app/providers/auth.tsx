@@ -1,16 +1,23 @@
-import React, { createContext, useState, useEffect, ReactNode, useCallback, useMemo } from "react";
+import React, { createContext, useState, useEffect, ReactNode, useCallback, useMemo, useContext } from "react";
 import { getData, saveData, deleteData } from '@/app/services/storage';
 import axiosInstance from '@/config/axios';
 import { AppProps } from '@/typing/type';
 import { useQuery } from 'react-query';
 import { useDispatch } from 'react-redux';
-import { setUser, setApp, logout, fetchMenu, UserPayload } from "@/slices";
+import { setUser, setApp, fetchMenu, logout, UserPayload } from "@/slices";
 import { AppDispatch } from '@/stores';
-import { useToast } from '../contexts';
 import { jwtDecode } from 'jwt-decode';
-import { LoginScreen } from "../screens";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AxiosHeaders, InternalAxiosRequestConfig } from "axios";
+import { ToastContext, ToastContextProps } from "@/app/providers/toastify";
+
+const useToast = (): ToastContextProps => {
+  const context = useContext(ToastContext);
+  if (!context) {
+    throw new Error("useToast must be used within a ToastProvider");
+  }
+  return context;
+};
 
 const fetchAppConfig = async (): Promise<AppProps> => {
   const response = await axiosInstance.post('AppConfig_service.asmx/GetAppConfigs');
@@ -26,7 +33,8 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 interface AuthProviderProps {
   children: ReactNode;
 }
-const initializeApp = createAsyncThunk('app/initialize', async (payload: { App: AppProps, UserData: UserPayload }, { dispatch }) => {
+
+export const initializeApp = createAsyncThunk('app/initialize', async (payload: { App: AppProps, UserData: UserPayload }, { dispatch }) => {
   dispatch(setApp({ App: payload.App }));
   dispatch(fetchMenu(payload.UserData.GUserID));
   dispatch(setUser({ user: payload.UserData }));
@@ -39,6 +47,25 @@ const initializeApp = createAsyncThunk('app/initialize', async (payload: { App: 
         }
 
         config.headers.set('Authorization', payload.UserData.Full_Name);
+      }
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );
+
+});
+
+export const initializeLogout = createAsyncThunk('app/initialize', async (_, { dispatch }) => {
+  dispatch(logout());
+  await deleteData('userToken');
+
+  axiosInstance.interceptors.request.use(
+    async (config: InternalAxiosRequestConfig) => {
+      if (config.headers instanceof AxiosHeaders) {
+
+        config.headers.delete('Authorization');
+      } else {
+        config.headers = new AxiosHeaders();
       }
       return config;
     },
@@ -67,12 +94,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const loadUserDataAsync = async () => {
       try {
         const userInfo = await getData('userToken');
-        console.log(userInfo);
-
         if (userInfo !== undefined && userInfo) {
           updateSession("", "", userInfo);
         } else {
-          return LoginScreen
+          return
         }
       } catch (error) {
         handleError(error)
@@ -97,9 +122,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setUserData(payload)
           } else {
             await deleteData('userToken');
-            console.log("LoginSIn U");
-
-            return LoginScreen
+            return
           }
         }
       } catch (error) {
@@ -123,7 +146,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         handleError(error);
       }
     }
-  }, [LoginScreen, handleError]);
+  }, []);
 
   useEffect(() => {
     if (UserData && data) {
@@ -132,8 +155,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [UserData, data, dispatch]);
 
-  const login = useCallback((username: string, password: string) => {
-    updateSession(username, password, "");
+  const login = useCallback(async (username: string, password: string) => {
+    await updateSession(username, password, "");
   }, []);
 
   const value = useMemo(() => ({ loading, login }), [loading, login]);

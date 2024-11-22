@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from "react";
 import { TextInput, HelperText } from "react-native-paper";
-import { StyleSheet, View } from "react-native";
-import AccessibleView from "@/components/AccessibleView";
+import { View } from "react-native";
 import { InputProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
-import { useRes, useTheme } from "@/app/contexts";
+import { useTheme } from "@/app/contexts/useTheme";
+import { useRes } from "@/app/contexts/useRes";
 
 const Inputs: React.FC<InputProps> = React.memo(({
   placeholder,

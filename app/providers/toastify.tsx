@@ -1,7 +1,7 @@
-import React, { createContext, useContext, ReactNode, useCallback, useMemo } from "react";
+import React, { createContext, ReactNode, useCallback, useMemo } from "react";
 import ToastManager, { Toast } from "toastify-react-native";
 import axios from "axios";
-import { useRes } from "../contexts";
+import { useRes } from "../contexts/useRes";
 export interface ToastContextProps {
   showSuccess: (message: string) => void;
   showError: (messages: string[]) => void;

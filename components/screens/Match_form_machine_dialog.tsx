@@ -15,7 +15,7 @@ const validationSchema = Yup.object().shape({
 });
 
 
-const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData, dropmachine, machine = [], forms = [], dropform }: MatchFormMachineDialogProps<InitialValuesMatchFormMachine, Machine, Form>) => {
+const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData, dropmachine, machine = [], forms = [], dropform }: MatchFormMachineDialogProps<InitialValuesMatchFormMachine, Machine, Form>) => {
     const masterdataStyles = useMasterdataStyles()
 
     return (
@@ -117,6 +117,6 @@ const Match_form_machine_dialog = ({ isVisible, setIsVisible, isEditing, initial
             </Dialog>
         </Portal>
     )
-}
+})
 
-export default React.memo(Match_form_machine_dialog)
+export default Match_form_machine_dialog

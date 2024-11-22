@@ -14,7 +14,7 @@ const validationSchemaSubForm = Yup.object().shape({
     Columns: Yup.number().typeError(`The column field must be a valid number`).required("The columns field is required."),
 });
 
-const SubFormDialog = ({
+const SubFormDialog = React.memo(({
     isVisible,
     setIsVisible,
     isEditing,
@@ -163,6 +163,6 @@ const SubFormDialog = ({
             </Dialog>
         </Portal>
     );
-};
+});
 
-export default React.memo(SubFormDialog);
+export default SubFormDialog;

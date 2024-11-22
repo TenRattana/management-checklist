@@ -1,7 +1,8 @@
 import React, { ReactNode } from "react";
 import { View, Platform, ViewStyle } from "react-native";
 import PropTypes from "prop-types";
-import { useTheme } from "@/app/contexts";
+import { useTheme } from "@/app/contexts/useTheme";
+
 interface AccessibleViewProps {
   children?: ReactNode;
   name: string;

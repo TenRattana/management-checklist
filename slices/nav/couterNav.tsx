@@ -61,15 +61,7 @@ const middlewareStore = createSlice({
             state.IsAuthenticated = true;
         },
         logout: (state) => {
-            state.UserID = ""
-            state.Full_Name = ""
-            state.Position = ""
-            state.DepartMent = ""
-            state.GUserID = ""
-            state.GUserName = ""
-            state.IsAuthenticated = false;
-            state.Screen = []
-            state.Permissions = []
+            return initialState;
         },
     },
     extraReducers: (builder) => {

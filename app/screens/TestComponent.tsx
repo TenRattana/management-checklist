@@ -3,7 +3,8 @@ import React, { useCallback, useState } from 'react'
 import { NestableDraggableFlatList, NestableScrollContainer, ScaleDecorator, ShadowDecorator } from 'react-native-draggable-flatlist'
 import useCreateformStyle from '@/styles/createform';
 import { IconButton } from 'react-native-paper';
-import { useRes, useTheme } from '../contexts';
+import { useRes } from '../contexts/useRes';
+import { useTheme } from '../contexts/useTheme';
 import { spacing } from "@/constants/Spacing";
 
 const TestComponent = React.memo(() => {

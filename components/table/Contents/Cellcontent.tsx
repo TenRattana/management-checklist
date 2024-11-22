@@ -2,7 +2,8 @@ import React from 'react'
 import { Pressable } from "react-native";
 import Text from "@/components/Text";
 import { IconButton } from 'react-native-paper';
-import { useRes, useTheme } from '@/app/contexts';
+import { useRes } from '@/app/contexts/useRes';
+import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { CellProps, HandelPrssProps } from "@/typing/tag";
 

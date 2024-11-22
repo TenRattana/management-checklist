@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, StyleSheet } from "react-native";
 import { ScanQRProps } from "@/typing/tag";
 import { useFocusEffect } from "expo-router";
-import { useToast } from "@/app/contexts";
+import { useToast } from "@/app/contexts/useToast";
 import { AccessibleView, Text } from '@/components'
 
 const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {

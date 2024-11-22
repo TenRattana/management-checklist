@@ -18,38 +18,38 @@ const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();
 
 const SetTheme = React.memo(() => {
-    console.log("SetTheme");
 
     const currentRouteName = useSegments().join('/');
 
     if (currentRouteName) {
-        console.log("if", currentRouteName);
-
         return (
             <NotFoundScreen404 />
         );
     } else {
-        console.log("else", currentRouteName);
-
         return (
             <ToastProvider>
-                <AuthProvider>
-                    <NavigationContainer independent={true}>
-                        <App />
-                    </NavigationContainer>
-                </AuthProvider>
+                <SetAuth />
             </ToastProvider>
+
         );
     }
 });
 
+const SetAuth = React.memo(() => {
+    return (
+        <AuthProvider>
+            <NavigationContainer independent={true}>
+                <App />
+            </NavigationContainer>
+        </AuthProvider>
+    )
+})
+
 const RootLayout = () => {
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [assetsLoaded, setAssetsLoaded] = useState(false);
-    console.log("RootLayout");
 
     const prepare = async () => {
-        console.log("prepare");
 
         try {
             await Font.loadAsync({
@@ -57,23 +57,16 @@ const RootLayout = () => {
                 "Sarabun": require("../assets/fonts/Sarabun-Regular.ttf"),
             });
 
-            // ตรวจสอบว่า assets ถูกโหลดจากแคชแล้วหรือไม่
             const isAssetsLoaded = await AsyncStorage.getItem('assetsLoaded');
             if (isAssetsLoaded !== 'true') {
-                // ถ้า assets ยังไม่ได้ถูกโหลด, ให้โหลดใหม่
-                console.log('Assets not loaded from cache, loading assets...');
                 await Asset.loadAsync([
                     require('../assets/images/bgs.jpg'),
                     require('../assets/images/Icon.jpg'),
                     require('../assets/images/Icon-app.png'),
                 ]);
 
-                // เก็บสถานะว่า assets ถูกโหลดแล้วใน AsyncStorage
                 await AsyncStorage.setItem('assetsLoaded', 'true');
-                console.log('Assets loaded and cached.');
             } else {
-                // ถ้า assets ถูกโหลดจากแคช
-                console.log('Assets are already loaded from cache.');
             }
         } catch (error) {
             console.warn('Error loading fonts and assets:', error);
@@ -84,8 +77,6 @@ const RootLayout = () => {
         }
     };
     useEffect(() => {
-        console.log("useEffect prepare");
-
         prepare();
     }, []);
 

@@ -1,7 +1,6 @@
 import { StyleSheet } from "react-native";
-import { useSpacing } from "@/hooks/useSpacing";
-import { useRes, useTheme } from "@/app/contexts";
-
+import { useRes } from "@/app/contexts/useRes";
+import { useTheme } from "@/app/contexts/useTheme";
 
 const useCreateformStyle = () => {
     const { theme } = useTheme();

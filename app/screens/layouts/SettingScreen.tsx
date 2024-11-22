@@ -4,8 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 import { AccessibleView, Text } from '@/components';
 import useMasterdataStyles from '@/styles/common/masterdata';
-import { useRes, useTheme } from '@/app/contexts';
-
+import { useRes } from '@/app/contexts/useRes';
+import { useTheme } from '@/app/contexts/useTheme';
 
 const SettingsScreen: React.FC = () => {
   const { darkMode, setDarkMode, theme } = useTheme();

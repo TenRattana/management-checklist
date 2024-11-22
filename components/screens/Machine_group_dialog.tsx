@@ -7,7 +7,7 @@ import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { GroupMachineDialogProps, InitialValuesGroupMachine } from '@/typing/value'
 import Text from "@/components/Text";
-import { useTheme } from "@/app/contexts";
+import { useTheme } from "@/app/contexts/useTheme";
 
 const validationSchema = Yup.object().shape({
     machineGroupName: Yup.string().required("The group machine name field is required."),
@@ -15,7 +15,7 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The status field is required."),
 });
 
-const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValues, saveData }: GroupMachineDialogProps<InitialValuesGroupMachine>) => {
+const Machine_group_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData }: GroupMachineDialogProps<InitialValuesGroupMachine>) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
 
@@ -117,6 +117,6 @@ const Machine_group_dialog = ({ isVisible, setIsVisible, isEditing, initialValue
             </Dialog>
         </Portal>
     )
-}
+})
 
-export default React.memo(Machine_group_dialog)
+export default Machine_group_dialog

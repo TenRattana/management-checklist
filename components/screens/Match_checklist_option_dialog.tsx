@@ -9,7 +9,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { CheckListOption, GroupCheckListOption } from '@/typing/type';
 import { InitialValuesMatchCheckListOption, MatchChecklistOptionProps } from '@/typing/value';
 import Text from "@/components/Text";
-import { useTheme } from "@/app/contexts";
+import { useTheme } from "@/app/contexts/useTheme";
 
 const validationSchema = Yup.object().shape({
     groupCheckListOptionId: Yup.string().required("This group check list field is required"),
@@ -19,7 +19,7 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The active field is required."),
 });
 
-const Match_checklist_option = ({
+const Match_checklist_option = React.memo(({
     isVisible,
     setIsVisible,
     isEditing,
@@ -151,6 +151,6 @@ const Match_checklist_option = ({
             </Dialog>
         </Portal>
     );
-};
+});
 
 export default Match_checklist_option;

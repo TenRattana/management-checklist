@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
-import { useRes, useTheme } from "@/app/contexts";
-
+import { useRes } from "@/app/contexts/useRes";
+import { useTheme } from "@/app/contexts/useTheme";
 
 const useMasterdataStyles = () => {
     const { responsive, spacing, fontSize } = useRes();
