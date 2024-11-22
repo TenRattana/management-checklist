@@ -29,9 +29,10 @@ import { Menu, ComponentNames, ComponentNameNoLazy, ParentMenu } from '@/typing/
 import { AppDispatch } from '@/stores';
 import { initializeLogout } from '../providers';
 import { IconButton } from 'react-native-paper';
-import Setting_dailog from "@/components/screens/Setting_dailog";
+import Setting_dialog from "@/components/screens/Setting_dialog"
 
 const Drawer = createDrawerNavigator();
+const MemoSetting_dialog = React.memo(Setting_dialog)
 
 const components: Record<ComponentNames, () => Promise<{ default: React.ComponentType<any> }>> = {
     Create_form: () => import('@/app/screens/layouts/forms/create/CreateFormScreen'),
@@ -73,80 +74,84 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
     }, [])
 
     return (
-        <Drawer.Navigator
-            drawerContent={(props) => <CustomDrawerContent {...props} />}
-            screenOptions={{
-                drawerStyle: {
-                    backgroundColor: theme.colors.background,
-                    width: drawerWidth,
-                },
-                headerTitle: state.AppName || "",
-                headerTitleStyle: {
-                    fontSize: 14,
-                    fontWeight: 'bold',
-                    color: '#333',
-                },
-                headerRight: () => (
-                    <TouchableOpacity
-                        onPress={() => handelShowsetting(true)}>
-                        <IconButton icon="account-circle" size={30} style={{ marginRight: 10 }} />
-                    </TouchableOpacity>
-                ),
-                unmountOnBlur: true,
-                drawerHideStatusBarOnOpen: true,
-                drawerStatusBarAnimation: 'slide',
-                freezeOnBlur: true
-            }}
-            initialRouteName={user.initialRoute}
-            id="nav"
-        >
-            {user.IsAuthenticated && user.Screen.length > 0 ? (
-                <>
-                    {user.Screen.map((screen: Menu) => {
-                        if (screen.NavigationTo) {
-                            return (
-                                <Drawer.Screen
-                                    key={screen.MenuID}
-                                    name={screen.NavigationTo}
-                                    component={renderComponent(screen.NavigationTo as (ComponentNames | ComponentNameNoLazy))}
-                                />
-                            );
-                        }
-
-                        if (screen.ParentMenu && screen.ParentMenu.length > 0) {
-                            return screen.ParentMenu.map((parentScreen: ParentMenu) => {
+        <>
+            <Drawer.Navigator
+                drawerContent={(props) => <CustomDrawerContent {...props} />}
+                screenOptions={{
+                    drawerStyle: {
+                        backgroundColor: theme.colors.background,
+                        width: drawerWidth,
+                    },
+                    headerTitle: state.AppName || "",
+                    headerTitleStyle: {
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                        color: '#333',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity
+                            onPress={() => handelShowsetting(true)}>
+                            <IconButton icon="account-circle" size={30} style={{ marginRight: 10 }} />
+                        </TouchableOpacity>
+                    ),
+                    unmountOnBlur: true,
+                    drawerHideStatusBarOnOpen: true,
+                    drawerStatusBarAnimation: 'slide',
+                    freezeOnBlur: true
+                }}
+                initialRouteName={user.initialRoute}
+                id="nav"
+            >
+                {user.IsAuthenticated && user.Screen.length > 0 ? (
+                    <>
+                        {user.Screen.map((screen: Menu) => {
+                            if (screen.NavigationTo) {
                                 return (
                                     <Drawer.Screen
-                                        key={parentScreen.MenuID}
-                                        name={parentScreen.NavigationTo}
-                                        component={renderComponent(parentScreen.NavigationTo as (ComponentNames | ComponentNameNoLazy))}
+                                        key={screen.MenuID}
+                                        name={screen.NavigationTo}
+                                        component={renderComponent(screen.NavigationTo as (ComponentNames | ComponentNameNoLazy))}
                                     />
                                 );
-                            });
-                        }
+                            }
 
-                        return null;
-                    })}
+                            if (screen.ParentMenu && screen.ParentMenu.length > 0) {
+                                return screen.ParentMenu.map((parentScreen: ParentMenu) => {
+                                    return (
+                                        <Drawer.Screen
+                                            key={parentScreen.MenuID}
+                                            name={parentScreen.NavigationTo}
+                                            component={renderComponent(parentScreen.NavigationTo as (ComponentNames | ComponentNameNoLazy))}
+                                        />
+                                    );
+                                });
+                            }
 
+                            return null;
+                        })}
+
+                        <Drawer.Screen
+                            name="Logout"
+                            component={LogoutScreen}
+                            options={{
+                                headerShown: false,
+                            }}
+                        />
+                    </>
+                ) : (
                     <Drawer.Screen
-                        name="Logout"
-                        component={LogoutScreen}
+                        name="Login"
+                        component={LoginScreen}
                         options={{
                             headerShown: false,
+                            drawerLabel: 'Login',
                         }}
                     />
-                </>
-            ) : (
-                <Drawer.Screen
-                    name="Login"
-                    component={LoginScreen}
-                    options={{
-                        headerShown: false,
-                        drawerLabel: 'Login',
-                    }}
-                />
-            )}
-        </Drawer.Navigator>
+                )}
+            </Drawer.Navigator> 
+
+            <MemoSetting_dialog isVisible={showsetting} setVisible={handelShowsetting} />
+        </>
     );
 });
 

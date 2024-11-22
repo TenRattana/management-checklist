@@ -21,13 +21,18 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The status field is required."),
 });
 
-const Setting_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData, dropmachine, machineGroup = [] }: MachineDialogProps<InitialValuesMachine, GroupMachine>) => {
+interface SettingProps {
+    isVisible: boolean;
+    setVisible: (value: boolean) => void;
+}
+
+const Setting_dialog: React.FC<SettingProps> = React.memo(({isVisible, setVisible}) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
 
     return (
         <Portal>
-            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={masterdataStyles.containerDialog} testID="dialog-md">
+            <Dialog visible={isVisible} onDismiss={() => setVisible(false)} style={masterdataStyles.containerDialog} testID="dialog-md">
                 <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]} testID="dialog-title-md">
                     {isEditing ? "Edit" : "Create"}
                 </Dialog.Title>
