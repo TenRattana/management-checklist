@@ -56,16 +56,15 @@
     "react-query": "^3.39.3",
     "react-redux": "^9.1.2",
     "redux": "^5.0.1",
-    "toastify-react-native": "^5.0.1",
+    "toastify-react-native": "^5.0.2",
     "ts-loader": "^9.5.1",
-    "yup": "^1.4.0",
-    "undefined": "react-native-vector-icons/Ionicons"
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@types/react": "~18.2.45",
-    "typescript": "~5.3.3",
-    "expo-atlas": "^0.3.0"
+    "expo-atlas": "^0.3.0",
+    "typescript": "~5.3.3"
   },
   "private": true
 }
