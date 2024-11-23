@@ -57,21 +57,9 @@ const ConfigItem: React.FC<ConfigItemProps> = React.memo(({ label, value, editab
     return (
         <AccessibleView name={`container-${label}`} style={[styles.row, { flexBasis: '100%' }]}>
             {editable ? (
-                <>
-                    <View style={{ flexGrow: 1 }}>
-                        <Text
-                            style={[masterdataStyles.settingText]}
-                            ellipsizeMode="tail"
-                            numberOfLines={1}
-                            key={keyText}
-                        >
-                            {`${label} : ${!editable ? value : ""}`}
-                        </Text>
-                    </View>
-                    <View style={{ flexGrow: 10 }}>
-                        <MemoRenderFormik field={label === "Program Display" ? "AppName" : label} state={state} handleSubmit={handleSubmit} onEdit={(v: boolean) => onEdit(v)} />
-                    </View>
-                </>
+                <View style={{ flex: 1 }}>
+                    <MemoRenderFormik field={label === "Program Display" ? "AppName" : label} state={state} handleSubmit={handleSubmit} onEdit={(v: boolean) => onEdit(v)} />
+                </View>
             ) : (
                 <>
                     <Text

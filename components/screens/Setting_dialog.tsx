@@ -25,11 +25,9 @@ import { useMutation, useQueryClient } from 'react-query';
 import { AppProps } from '@/typing/type';
 import axiosInstance from '@/config/axios';
 import { useToast } from '@/app/contexts/useToast';
-
-// Memoizing Lazy Loaded Components
-const MemoSettingScreen = React.lazy(() => import('@/app/screens/layouts/SettingScreen'));
-const MemoConfiguration = React.lazy(() => import('@/app/screens/layouts/Configulation'));
-const MemoAuther = React.lazy(() => import('@/app/screens/layouts/Auther'));
+import SettingsScreen from '@/app/screens/layouts/SettingScreen';
+import ConfigulationScreen from '@/app/screens/layouts/Configulation';
+import Auther from '@/app/screens/layouts/Auther';
 
 const { height } = Dimensions.get('window');
 
@@ -244,17 +242,17 @@ const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisib
                         <ScrollView showsVerticalScrollIndicator={false}>
                             {activeMenu === "user" && (
                                 <Suspense fallback={<Text>Loading...</Text>}>
-                                    <MemoAuther user={user} />
+                                    <Auther user={user} />
                                 </Suspense>
                             )}
                             {activeMenu === 'general' && (
                                 <Suspense fallback={<Text>Loading...</Text>}>
-                                    <MemoSettingScreen />
+                                    <SettingsScreen />
                                 </Suspense>
                             )}
                             {user.Permissions.includes('view_config') && activeMenu === "configuration" && (
                                 <Suspense fallback={<Text>Loading...</Text>}>
-                                    <MemoConfiguration prefix={prefix} handleSubmit={handleSubmit} edit={edit} handelEdit={handelEdit} />
+                                    <ConfigulationScreen prefix={prefix} handleSubmit={handleSubmit} edit={edit} handelEdit={handelEdit} />
                                 </Suspense>
                             )}
                         </ScrollView>

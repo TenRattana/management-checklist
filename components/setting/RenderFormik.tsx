@@ -87,8 +87,6 @@ const styles = StyleSheet.create({
     row: {
         flex: 1,
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
         marginVertical: 5,
     },
     configPrefixText: {
