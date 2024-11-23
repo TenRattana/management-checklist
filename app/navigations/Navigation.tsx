@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useRef, useCallback, useEffect, useState } from 'react';
+import React, { lazy, Suspense, useRef, useCallback, useEffect, useState, useMemo } from 'react';
 import { ActivityIndicator, TouchableOpacity } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import {
@@ -25,11 +25,12 @@ import CustomDrawerContent from '@/components/navigation/CustomDrawer';
 import { useTheme } from '@/app/contexts/useTheme';
 import { useDispatch, useSelector } from "react-redux";
 import TestComponent from '../screens/TestComponent';
-import { Menu, ComponentNames, ComponentNameNoLazy, ParentMenu } from '@/typing/type';
+import { ComponentNames, ComponentNameNoLazy, ParentMenu, Menus } from '@/typing/type';
 import { AppDispatch } from '@/stores';
 import { initializeLogout } from '../providers';
-import { IconButton } from 'react-native-paper';
+import CustomMenu from '@/components/navigation/CustomMenu'
 import Setting_dialog from "@/components/screens/Setting_dialog"
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Drawer = createDrawerNavigator();
 const MemoSetting_dialog = React.memo(Setting_dialog)
@@ -67,14 +68,74 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
     const { fontSize } = useRes();
     const state = useSelector((state: any) => state.prefix);
     const drawerWidth = fontSize === "small" ? 300 : fontSize === "medium" ? 350 : 400;
-    const [showsetting, setShowsetting] = useState(false)
+    const dispatch = useDispatch<AppDispatch>();
 
-    const handelShowsetting = useCallback((value: boolean) => {
-        setShowsetting(value)
-    }, [])
+    const [menuVisible, setMenuVisible] = useState(false);
+    const [menuSetting, setMenuSetting] = useState(false);
+
+    const handleSettings = useCallback(() => {
+        setMenuSetting(true)
+        setMenuVisible(false);
+    }, []);
+
+    const handleLogout = useCallback(() => {
+        dispatch(initializeLogout());
+        setMenuVisible(false);
+    }, []);
+
+    const toggleMenu = useCallback(() => {
+        setMenuVisible((prev) => !prev);
+    }, []);
+
+    const closeMenu = useCallback(() => {
+        setMenuVisible(false);
+    }, []);
+
+    const menuScreens = useMemo(() => {
+        if (!user.IsAuthenticated || user.Screen.length === 0) {
+            return [
+                <Drawer.Screen
+                    key="login"
+                    name="Login"
+                    component={LoginScreen}
+                    options={{
+                        headerShown: false,
+                        drawerLabel: 'Login',
+                    }}
+                />,
+            ];
+        }
+
+        const screens: JSX.Element[] = [];
+        user.Screen.forEach((screen: Menus) => {
+            if (screen.NavigationTo) {
+                screens.push(
+                    <Drawer.Screen
+                        key={screen.MenuID}
+                        name={screen.NavigationTo}
+                        component={renderComponent(screen.NavigationTo as ComponentNames | ComponentNameNoLazy)}
+                    />
+                );
+            }
+
+            if (screen.ParentMenu && screen.ParentMenu.length > 0) {
+                screen.ParentMenu.forEach((parentScreen: ParentMenu) => {
+                    screens.push(
+                        <Drawer.Screen
+                            key={parentScreen.MenuID}
+                            name={parentScreen.NavigationTo}
+                            component={renderComponent(parentScreen.NavigationTo as ComponentNames | ComponentNameNoLazy)}
+                        />
+                    );
+                });
+            }
+        });
+
+        return screens;
+    }, [user.IsAuthenticated, user.Screen, renderComponent]);
 
     return (
-        <>
+        <SafeAreaView style={{ flex: 1 }}>
             <Drawer.Navigator
                 drawerContent={(props) => <CustomDrawerContent {...props} />}
                 screenOptions={{
@@ -89,69 +150,27 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                         color: '#333',
                     },
                     headerRight: () => (
-                        <TouchableOpacity
-                            onPress={() => handelShowsetting(true)}>
-                            <IconButton icon="account-circle" size={30} style={{ marginRight: 10 }} />
-                        </TouchableOpacity>
+                        <CustomMenu
+                            visible={menuVisible}
+                            onShow={toggleMenu}
+                            onDismiss={closeMenu}
+                            onSettingsPress={handleSettings}
+                            onLogoutPress={handleLogout}
+                        />
                     ),
                     unmountOnBlur: true,
                     drawerHideStatusBarOnOpen: true,
                     drawerStatusBarAnimation: 'slide',
-                    freezeOnBlur: true
+                    freezeOnBlur: true,
                 }}
                 initialRouteName={user.initialRoute}
                 id="nav"
             >
-                {user.IsAuthenticated && user.Screen.length > 0 ? (
-                    <>
-                        {user.Screen.map((screen: Menu) => {
-                            if (screen.NavigationTo) {
-                                return (
-                                    <Drawer.Screen
-                                        key={screen.MenuID}
-                                        name={screen.NavigationTo}
-                                        component={renderComponent(screen.NavigationTo as (ComponentNames | ComponentNameNoLazy))}
-                                    />
-                                );
-                            }
+                {menuScreens}
+            </Drawer.Navigator>
 
-                            if (screen.ParentMenu && screen.ParentMenu.length > 0) {
-                                return screen.ParentMenu.map((parentScreen: ParentMenu) => {
-                                    return (
-                                        <Drawer.Screen
-                                            key={parentScreen.MenuID}
-                                            name={parentScreen.NavigationTo}
-                                            component={renderComponent(parentScreen.NavigationTo as (ComponentNames | ComponentNameNoLazy))}
-                                        />
-                                    );
-                                });
-                            }
-
-                            return null;
-                        })}
-
-                        <Drawer.Screen
-                            name="Logout"
-                            component={LogoutScreen}
-                            options={{
-                                headerShown: false,
-                            }}
-                        />
-                    </>
-                ) : (
-                    <Drawer.Screen
-                        name="Login"
-                        component={LoginScreen}
-                        options={{
-                            headerShown: false,
-                            drawerLabel: 'Login',
-                        }}
-                    />
-                )}
-            </Drawer.Navigator> 
-
-            <MemoSetting_dialog isVisible={showsetting} setVisible={handelShowsetting} />
-        </>
+            <MemoSetting_dialog isVisible={menuSetting} setVisible={() => setMenuSetting(false)} />
+        </SafeAreaView>
     );
 });
 
@@ -161,7 +180,6 @@ const Navigation: React.FC = React.memo(() => {
     const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
 
     const renderComponent = useCallback((name: ComponentNames | ComponentNameNoLazy) => {
-
         if (name in nonLazyComponents) {
             const Component = nonLazyComponents[name as ComponentNameNoLazy];
             return (props: any) => <Component {...props} />;
@@ -170,7 +188,7 @@ const Navigation: React.FC = React.memo(() => {
         if (cachedComponents.current[name]) {
             const Component = cachedComponents.current[name];
             return (props: any) => (
-                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />} >
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
                     <Component {...props} />
                 </Suspense>
             );
@@ -181,14 +199,14 @@ const Navigation: React.FC = React.memo(() => {
             cachedComponents.current[name] = LazyComponent;
 
             return (props: any) => (
-                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />} >
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
                     <LazyComponent {...props} />
                 </Suspense>
             );
         }
 
         return (props: any) => (
-            <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />} >
+            <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
                 <PermissionDeny {...props} />
             </Suspense>
         );
@@ -199,21 +217,8 @@ const Navigation: React.FC = React.memo(() => {
             renderComponent={renderComponent}
             user={user}
         />
-    )
+    );
 });
 
-const LogoutScreen = React.memo(() => {
-    const dispatch = useDispatch<AppDispatch>();
-
-    const logouts = useCallback(async () => {
-        dispatch(initializeLogout());
-    }, [dispatch])
-
-    useEffect(() => {
-        logouts()
-    }, [logouts]);
-
-    return null;
-});
 
 export default Navigation;

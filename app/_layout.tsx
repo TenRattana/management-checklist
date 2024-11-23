@@ -18,21 +18,16 @@ const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();
 
 const SetTheme = React.memo(() => {
-
     const currentRouteName = useSegments().join('/');
-
     if (currentRouteName) {
-        return (
-            <NotFoundScreen404 />
-        );
-    } else {
-        return (
-            <ToastProvider>
-                <SetAuth />
-            </ToastProvider>
-
-        );
+        return <NotFoundScreen404 />;
     }
+    return (
+        <ToastProvider>
+            <SetAuth />
+        </ToastProvider>
+    );
+
 });
 
 const SetAuth = React.memo(() => {

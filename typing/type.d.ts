@@ -146,7 +146,7 @@ export interface ParentMenu {
   OrderNo: number | null;
   IsActive: boolean;
 }
-export interface Menu {
+export interface Menus {
   MenuID: number;
   MenuPermission: string;
   MenuLabel: string;
@@ -157,6 +157,12 @@ export interface Menu {
   OrderNo: number | null;
   IsActive: boolean;
   ParentMenu: ParentMenu[];
+}
+export interface Permissions {
+  PermissionID: number;
+  PermissionName: string;
+  Description: string;
+  IsActive: boolean;
 }
 
 export type ComponentNames =

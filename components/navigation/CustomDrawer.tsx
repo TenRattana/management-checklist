@@ -1,12 +1,11 @@
 import React, { useCallback, useState } from 'react';
-import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
-import { useAuth } from "@/app/contexts/useAuth";
+import { TouchableOpacity } from 'react-native';
 import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
 import { Text } from '@/components';
 import MenuSection from './MenuSection';
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useSelector } from 'react-redux';
-import { Menu, ParentMenu } from '@/typing/type';
+import { Menus, ParentMenu } from '@/typing/type';
 import { DrawerNavigationHelpers } from '@react-navigation/drawer/lib/typescript/src/types';
 
 interface RenderPressableProps {
@@ -31,7 +30,7 @@ const RenderPressable = React.memo((props: RenderPressableProps) => {
 });
 
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = React.memo((props) => {
-    const { navigation, state } = props;
+    const { navigation } = props;
 
     const user = useSelector((state: any) => state.user);
     const [isMenuListOpen, setIsMenuListOpen] = useState<{ [key: string]: boolean }>({});
@@ -45,7 +44,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = React.memo((p
 
     return user.IsAuthenticated && user.Screen.length > 0 ? (
         <DrawerContentScrollView {...props} style={{ flex: 1 }}>
-            {user.Screen.map((screen: Menu) => {
+            {user.Screen.map((screen: Menus) => {
                 if (screen.OrderNo) {
                     if (screen.ParentMenu) {
                         return (
@@ -68,7 +67,6 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = React.memo((p
                     }
                 }
             })}
-            <RenderPressable key={`item-logout`} label={"Logout"} navigateTo={"Logout"} navigations={navigation} />
         </DrawerContentScrollView>
     ) : null;
 });

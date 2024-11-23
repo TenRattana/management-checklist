@@ -1,255 +1,163 @@
-import React from "react";
-import { Pressable, ScrollView, View } from "react-native";
-import CustomDropdownSingle from "@/components/CustomDropdownSingle";
-import { Inputs } from "@/components/common";
-import { Portal, Switch, Dialog, TextInput } from "react-native-paper";
-import { Formik, FastField } from "formik";
-import * as Yup from 'yup'
-import useMasterdataStyles from "@/styles/common/masterdata";
-import { MachineDialogProps, InitialValuesMachine } from '@/typing/value'
-import { GroupMachine } from '@/typing/type'
-import Text from "@/components/Text";
-import { useTheme } from "@/app/contexts/useTheme";
-import QRCode from "react-native-qrcode-svg";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { Platform } from "react-native";
-
-const validationSchema = Yup.object().shape({
-    machineGroupId: Yup.string().required("The group machine field is required."),
-    machineName: Yup.string().required("The machine name field is required."),
-    description: Yup.string().required("The description field is required."),
-    isActive: Yup.boolean().required("The status field is required."),
-});
+import React, { useState } from 'react';
+import { View, StyleSheet, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
+import { Dialog, Portal, Divider, Text, IconButton } from 'react-native-paper';
+import useMasterdataStyles from '@/styles/common/masterdata';
+import { useRes } from '@/app/contexts/useRes';
+import { AccessibleView } from '..';
+import { useTheme } from '@/app/contexts/useTheme';
+import { SettingScreen } from '@/app/screens';
+import Configuration from '@/app/screens/layouts/Configulation';
+import { useSelector } from 'react-redux';
+import Auther from '@/app/screens/layouts/Auther'
 
 interface SettingProps {
     isVisible: boolean;
-    setVisible: (value: boolean) => void;
+    setVisible: () => void;
 }
+const MemoSettingScreen = React.memo(SettingScreen)
+const MemoConfiguration = React.memo(Configuration)
+const MemoAuther = React.memo(Auther)
+const { height } = Dimensions.get('window');
 
-const Setting_dialog: React.FC<SettingProps> = React.memo(({isVisible, setVisible}) => {
-    const masterdataStyles = useMasterdataStyles()
+const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisible }) => {
+    const [activeMenu, setActiveMenu] = useState<string>("user");
+    const { fontSize, spacing } = useRes()
     const { theme } = useTheme()
+    const masterdataStyles = useMasterdataStyles()
+    const prefix = useSelector((state: any) => state.prefix);
+    const user = useSelector((state: any) => state.user);
+
+    const handleMenuPress = (menu: string) => {
+        setActiveMenu(menu);
+    };
+
+    const styles = StyleSheet.create({
+        dialog: {
+            width: fontSize === "large" ? '80%' : fontSize === "medium" ? '75%' : '70%',
+            justifyContent: 'center',
+            alignSelf: 'center',
+            borderRadius: 12,
+            overflow: 'hidden',
+            backgroundColor: theme.colors.background
+        },
+        dialogContent: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            paddingHorizontal: 15
+        },
+        sectionTool: {
+            flexBasis: '30%',
+            paddingRight: 10,
+        },
+        sectionView: {
+            flexBasis: '70%',
+            paddingLeft: 10,
+            maxHeight: height / 1.5,
+        },
+        divider: {
+            marginBottom: 15,
+            backgroundColor: '#ddd',
+        },
+        saveButton: {
+            marginVertical: 10,
+            backgroundColor: '#4CAF50',
+            borderRadius: 8,
+            paddingVertical: 8,
+        },
+        logoutButton: {
+            marginVertical: 10,
+            borderColor: '#f44336',
+            borderRadius: 8,
+            borderWidth: 1,
+            paddingVertical: 8,
+        },
+        activeMenuItem: {
+            backgroundColor: theme.colors.drag,
+            borderRadius: 8,
+        },
+        menuItemNav: {
+            paddingHorizontal: 10,
+            paddingVertical: fontSize === "large" ? 10 : fontSize === "medium" ? 5 : 2,
+            minHeight: fontSize === "small" ? 50 : fontSize === "medium" ? 60 : 75,
+            flexDirection: 'row',
+            alignItems: 'center',
+        }
+    });
 
     return (
         <Portal>
-            <Dialog visible={isVisible} onDismiss={() => setVisible(false)} style={masterdataStyles.containerDialog} testID="dialog-md">
-                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]} testID="dialog-title-md">
-                    {isEditing ? "Edit" : "Create"}
-                </Dialog.Title>
-                <Dialog.Content>
-                    <Text
-                        style={[masterdataStyles.text, { paddingLeft: 10 }]}
-                    >
-                        {isEditing ? "Edit the details of the machine." : "Enter the details for the new machine."}
-                    </Text>
-                    {isVisible && (
-                        <Formik
-                            initialValues={initialValues}
-                            validationSchema={validationSchema}
-                            validateOnBlur={true}
-                            validateOnChange={false}
-                            onSubmit={(values: InitialValuesMachine) => saveData(values)}
+            <Dialog visible={isVisible} onDismiss={() => { setVisible(); setActiveMenu("user"); }} style={styles.dialog}>
+                <Dialog.Title style={masterdataStyles.title}>Settings</Dialog.Title>
+
+                <Divider style={styles.divider} />
+
+                <Dialog.Content style={styles.dialogContent}>
+                    <AccessibleView name="sectionTool" style={styles.sectionTool}>
+                        <TouchableOpacity
+                            onPress={() => handleMenuPress('user')}
+                            style={[
+                                styles.menuItemNav,
+                                activeMenu === 'user' && styles.activeMenuItem,
+                            ]}
                         >
-                            {({ values, handleSubmit, setFieldValue, dirty, isValid }) => (
-                                <View id="form-md" style={{ flexDirection: 'row' }}>
-                                    <View style={{ flex: values.machineId ? 1 : undefined }}>
-                                        <ScrollView
-                                            contentContainerStyle={{ marginTop: '15%', paddingBottom: 5, paddingHorizontal: 10 }}
-                                            showsVerticalScrollIndicator={false}
-                                        >
-                                            {values.machineId ? (
-                                                <View style={{ flexGrow: 1, alignItems: 'center' }}>
-                                                    <QRCode
-                                                        value={values.machineId || "No input"}
-                                                        size={180}
-                                                        color="black"
-                                                        backgroundColor="white"
-                                                        logoBorderRadius={5}
-                                                        logoMargin={20}
-                                                    />
-                                                    <Text
-                                                        style={[masterdataStyles.textQR, { marginVertical: 10 }]}
-                                                    >
-                                                        Scan this code for open form.
-                                                    </Text>
-                                                    <TextInput
-                                                        mode="outlined"
-                                                        value={values.machineId}
-                                                        contentStyle={{ borderRadius: 10 }}
-                                                        style={[masterdataStyles.text, { width: '70%', backgroundColor: theme.colors.background }]}
-                                                    />
-                                                </View>
-                                            ) : false}
-                                        </ScrollView>
-                                    </View>
+                            <View style={[{ flexDirection: "row", alignItems: "center" }]}>
+                                <IconButton icon="account" size={spacing.large} animated style={{ left: -10 }} />
+                                <Text style={[masterdataStyles.text, { textAlign: "left", left: -10 }]}>User info</Text>
+                            </View>
+                        </TouchableOpacity>
 
-                                    <View style={{ flex: 2, flexGrow: 2, maxHeight: hp(Platform.OS === "web" ? '50%' : '70&') }}>
-                                        <ScrollView
-                                            contentContainerStyle={{ paddingBottom: 5, paddingHorizontal: 10 }}
-                                            showsVerticalScrollIndicator={false}
-                                        >
-                                            <FastField name="machineGroupId">
-                                                {({ field, form }: any) => (
-                                                    <CustomDropdownSingle
-                                                        title="Machine Group"
-                                                        labels="GMachineName"
-                                                        values="GMachineID"
-                                                        data={!isEditing ? machineGroup?.filter((v) => v.IsActive) : dropmachine || []}
-                                                        value={field.value}
-                                                        handleChange={(value) => {
-                                                            const stringValue = (value as { value: string }).value;
-                                                            form.setFieldValue(field.name, stringValue);
-                                                            setTimeout(() => {
-                                                                form.setFieldTouched(field.name, true);
-                                                            }, 0);
-                                                        }}
-                                                        handleBlur={() => {
-                                                            form.setFieldTouched(field.name, true);
-                                                        }}
-                                                        testId="machineGroupId-md"
-                                                        error={form.touched.machineGroupId && Boolean(form.errors.machineGroupId)}
-                                                        errorMessage={form.touched.machineGroupId ? form.errors.machineGroupId : ""}
-                                                    />
-                                                )}
-                                            </FastField>
+                        <TouchableOpacity
+                            onPress={() => handleMenuPress('general')}
+                            style={[
+                                styles.menuItemNav,
+                                activeMenu === 'general' && styles.activeMenuItem,
+                            ]}
+                        >
+                            <View style={[{ flexDirection: "row", alignItems: "center" }]}>
+                                <IconButton icon="cog" size={spacing.large} animated style={{ left: -10 }} />
+                                <Text style={[masterdataStyles.text, { textAlign: "left", left: -10 }]}>Setting</Text>
+                            </View>
+                        </TouchableOpacity>
 
-                                            <FastField name="machineName">
-                                                {({ field, form }: any) => (
-                                                    <Inputs
-                                                        placeholder="Enter Machine Name"
-                                                        label="Machine Name"
-                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                        handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                        value={field.value}
-                                                        error={form.touched.machineName && Boolean(form.errors.machineName)}
-                                                        errorMessage={form.touched.machineName ? form.errors.machineName : ""}
-                                                        testId="machineName-md"
-                                                    />
-                                                )}
-                                            </FastField >
-
-                                            <FastField name="machineCode">
-                                                {({ field, form }: any) => (
-                                                    <Inputs
-                                                        placeholder="Enter machine Code"
-                                                        label="Machine Code"
-                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                        handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                        value={field.value}
-                                                        error={form.touched.machineCode && Boolean(form.errors.machineCode)}
-                                                        errorMessage={form.touched.machineCode ? form.errors.machineCode : ""}
-                                                        testId="machineCode-md"
-                                                    />
-                                                )}
-                                            </FastField>
-
-                                            <FastField name="description">
-                                                {({ field, form }: any) => (
-                                                    <Inputs
-                                                        placeholder="Enter Description"
-                                                        label="Description"
-                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                        handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                        value={field.value}
-                                                        error={form.touched.description && Boolean(form.errors.description)}
-                                                        errorMessage={form.touched.description ? form.errors.description : ""}
-                                                        testId="description-md"
-                                                    />
-                                                )}
-                                            </FastField>
-
-                                            <FastField name="building">
-                                                {({ field, form }: any) => (
-                                                    <Inputs
-                                                        placeholder="Enter Building"
-                                                        label="Building"
-                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                        handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                        value={field.value}
-                                                        error={form.touched.building && Boolean(form.errors.building)}
-                                                        errorMessage={form.touched.building ? form.errors.building : ""}
-                                                        testId="building-md"
-                                                    />
-                                                )}
-                                            </FastField>
-
-                                            <FastField name="floor">
-                                                {({ field, form }: any) => (
-                                                    <Inputs
-                                                        placeholder="Enter Floor"
-                                                        label="Floor"
-                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                        handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                        value={field.value}
-                                                        error={form.touched.floor && Boolean(form.errors.floor)}
-                                                        errorMessage={form.touched.floor ? form.errors.floor : ""}
-                                                        testId="floor-md"
-                                                    />
-                                                )}
-                                            </FastField>
-
-                                            <FastField name="area">
-                                                {({ field, form }: any) => (
-                                                    <Inputs
-                                                        placeholder="Enter Area"
-                                                        label="Area"
-                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                        handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                        value={field.value}
-                                                        error={form.touched.area && Boolean(form.errors.area)}
-                                                        errorMessage={form.touched.area ? form.errors.area : ""}
-                                                        testId="area-md"
-                                                    />
-                                                )}
-                                            </FastField>
-
-
-                                            <View id="form-active-md" style={masterdataStyles.containerSwitch}>
-                                                <View style={{ flex: 1, flexDirection: 'row' }}>
-                                                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
-                                                        Status: {values.isActive ? "Active" : "Inactive"}
-                                                    </Text>
-                                                    <Switch
-                                                        style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                                        color={values.disables ? theme.colors.inversePrimary : theme.colors.onPrimaryContainer}
-                                                        disabled={Boolean(values.disables)}
-                                                        value={values.isActive}
-                                                        onValueChange={(v: boolean) => {
-                                                            setFieldValue("isActive", v);
-                                                        }}
-                                                        testID="isActive-md"
-                                                    />
-                                                </View>
-                                            </View>
-
-                                        </ScrollView>
-                                        <View id="form-action-md" style={masterdataStyles.containerAction}>
-                                            <Pressable
-                                                onPress={() => handleSubmit()}
-                                                disabled={!isValid || !dirty}
-                                                style={[
-                                                    masterdataStyles.button,
-                                                    masterdataStyles.backMain,
-                                                    { opacity: isValid && dirty ? 1 : 0.5 }
-                                                ]}
-                                                testID="Save-md"
-                                            >
-                                                <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Save</Text>
-                                            </Pressable>
-                                            <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-md">
-                                                <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Cancel</Text>
-                                            </Pressable>
-                                        </View>
-                                    </View>
-
+                        {user.Permissions.includes('view_config') && (
+                            <TouchableOpacity
+                                onPress={() => handleMenuPress('configuration')}
+                                style={[
+                                    styles.menuItemNav,
+                                    activeMenu === 'configuration' && styles.activeMenuItem,
+                                ]}
+                            >
+                                <View style={[{ flexDirection: "row", alignItems: "center" }]}>
+                                    <IconButton icon="application-cog-outline" size={spacing.large} animated style={{ left: -10 }} />
+                                    <Text style={[masterdataStyles.text, { textAlign: "left", left: -10 }]}>Configuration</Text>
                                 </View>
+                            </TouchableOpacity>
+                        )}
+                    </AccessibleView>
+
+                    <Divider style={styles.divider} />
+
+                    <AccessibleView name="sectionView" style={styles.sectionView}>
+                        <ScrollView
+                            id="setting"
+                            showsVerticalScrollIndicator={false}
+                            showsHorizontalScrollIndicator={false}
+                        >
+                            {activeMenu === "user" && (
+                                <MemoAuther user={user} />
                             )}
-                        </Formik>
-                    )}
+                            {activeMenu === 'general' && (
+                                <MemoSettingScreen />
+                            )}
+                            {user.Permissions.includes('view_config') && activeMenu === "configuration" && (
+                                <MemoConfiguration prefix={prefix} />
+                            )}
+                        </ScrollView>
+                    </AccessibleView>
                 </Dialog.Content>
             </Dialog>
         </Portal>
-    )
-})
+    );
+});
 
-export default Setting_dialog
+export default Setting_dialog;

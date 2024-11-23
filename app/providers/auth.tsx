@@ -4,7 +4,7 @@ import axiosInstance from '@/config/axios';
 import { AppProps } from '@/typing/type';
 import { useQuery } from 'react-query';
 import { useDispatch } from 'react-redux';
-import { setUser, setApp, fetchMenu, logout, UserPayload } from "@/slices";
+import { setUser, setApp, fetchMenu, logout, UserPayload, fetchPermission } from "@/slices";
 import { AppDispatch } from '@/stores';
 import { jwtDecode } from 'jwt-decode';
 import { createAsyncThunk } from "@reduxjs/toolkit";
@@ -37,6 +37,7 @@ interface AuthProviderProps {
 export const initializeApp = createAsyncThunk('app/initialize', async (payload: { App: AppProps, UserData: UserPayload }, { dispatch }) => {
   dispatch(setApp({ App: payload.App }));
   dispatch(fetchMenu(payload.UserData.GUserID));
+  dispatch(fetchPermission(payload.UserData.GUserID));
   dispatch(setUser({ user: payload.UserData }));
 
   axiosInstance.interceptors.request.use(

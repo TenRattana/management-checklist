@@ -293,16 +293,10 @@ const useMasterdataStyles = () => {
             color: theme.colors.onBackground,
         },
         settingItem: {
+            paddingVertical: 5,
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'flex-start',
-            paddingVertical: 15,
-            paddingHorizontal: 20,
-            marginHorizontal: 20,
-            marginVertical: 10,
-            borderRadius: 8,
-            borderColor: theme.colors.onBackground,
-            borderWidth: 1,
         },
         settingText: {
             fontWeight: '500',
@@ -317,15 +311,9 @@ const useMasterdataStyles = () => {
             backgroundColor: theme.colors.onBackground
         },
         configPrefix: {
+            paddingVertical: fontSize === "large" ? 10 : fontSize === "medium" ? 5 : 2,
             flexDirection: 'row',
             flexWrap: 'wrap',
-            paddingVertical: 15,
-            paddingHorizontal: 20,
-            marginHorizontal: 20,
-            marginVertical: 10,
-            borderRadius: 8,
-            borderColor: theme.colors.onBackground,
-            borderWidth: 1,
         },
         configCreate: {
             flexDirection: 'row',
