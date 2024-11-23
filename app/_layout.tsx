@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, LogBox } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { ToastProvider, AuthProvider, ResponsiveProvider, ThemeProvider } from "@/app/providers";
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -48,6 +48,7 @@ const RootLayout = () => {
     };
 
     useEffect(() => {
+        LogBox.ignoreLogs(['Require cycle:', 'shadow* style props are deprecated.']);
         prepare();
     }, []);
 

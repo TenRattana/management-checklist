@@ -189,7 +189,8 @@ export type ComponentNameNoLazy =
   | "Match_checklist_option"
   | "Match_form_machine"
   | "Managepermissions"
-  | "Test";
+  | "Test"
+  | "Time";
 
 export type TypeConfig =
   | GroupMachine

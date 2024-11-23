@@ -18,6 +18,7 @@ import {
     MatchFormMachineScreen,
     Managepermissions,
     LoginScreen,
+    TimescheduleScreen,
 } from '@/app/screens';
 import PermissionDeny from '../screens/layouts/PermissionDeny';
 import { useRes } from "@/app/contexts/useRes";
@@ -60,7 +61,8 @@ const nonLazyComponents: Record<ComponentNameNoLazy, React.ComponentType<any>> =
     Config: ConfigulationScreen,
     Permission_deny: PermissionDeny,
     Home: HomeScreen,
-    Test: TestComponent
+    Test: TestComponent,
+    Time: TimescheduleScreen
 };
 
 const DrawerNav = React.memo(({ renderComponent, user }: any) => {
