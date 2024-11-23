@@ -1,112 +1,55 @@
-import React, { useCallback } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { useDispatch } from 'react-redux';
+import React from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Formik } from 'formik';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { IconButton } from 'react-native-paper';
-import {
-    setPrefixGroupMachine,
-    setPrefixCheckList,
-    setPrefixCheckListOption,
-    setPrefixExpectedResult,
-    setPrefixForm,
-    setPrefixSubForm,
-    setPrefixGroupCheckList,
-    setPrefixMachine,
-    setPrefixMatchCheckListOption,
-    setPrefixMatchFormMachine,
-    setPrefixUsersPermission,
-    setAppName
-} from "@/slices";
-import { useMutation, useQueryClient } from 'react-query';
+import { IconButton, TextInput } from 'react-native-paper';
 import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
-import { useToast } from '@/app/contexts/useToast';
-import { AppProps } from '@/typing/type';
-import axiosInstance from '@/config/axios';
 import { Inputs } from '../common';
-import { AppDispatch } from '@/stores';
+import useMasterdataStyles from '@/styles/common/masterdata';
+import Text from '../Text';
 
-const saveAppconfig = async (data: AppProps): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("AppConfig_service.asmx/SaveAppConfig", data);
-    return response.data;
-};
+interface RennderFormikPorps {
+    field: string;
+    state: any;
+    handleSubmit: (field: string, values: { [x: number]: any }) => void;
+    onEdit: (v: boolean) => void;
+}
 
-const RenderFormik: React.FC<{ field: string; setEdit: (v: boolean) => void; state: any }> = React.memo(({ field, setEdit, state }) => {
-    const dispatch = useDispatch<AppDispatch>();
+const RenderFormik: React.FC<RennderFormikPorps> = React.memo(({ field, state, handleSubmit, onEdit }) => {
     const { spacing } = useRes();
     const { theme } = useTheme();
-    const { handleError } = useToast()
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation(saveAppconfig, {
-        onSuccess: () => {
-            queryClient.invalidateQueries('appConfig');
-        },
-        onError: handleError,
-    });
-
-    const handleSubmit = useCallback((values: { [x: string]: any; }) => {
-        switch (field) {
-            case 'AppName':
-                dispatch(setAppName({ AppName: values[field] }));
-                break;
-            case 'GroupMachine':
-                dispatch(setPrefixGroupMachine({ GroupMachine: values[field] }));
-                break;
-            case 'CheckList':
-                dispatch(setPrefixCheckList({ CheckList: values[field] }));
-                break;
-            case 'CheckListOption':
-                dispatch(setPrefixCheckListOption({ CheckListOption: values[field] }));
-                break;
-            case 'ExpectedResult':
-                dispatch(setPrefixExpectedResult({ ExpectedResult: values[field] }));
-                break;
-            case 'Form':
-                dispatch(setPrefixForm({ Form: values[field] }));
-                break;
-            case 'SubForm':
-                dispatch(setPrefixSubForm({ SubForm: values[field] }));
-                break;
-            case 'GroupCheckList':
-                dispatch(setPrefixGroupCheckList({ GroupCheckList: values[field] }));
-                break;
-            case 'Machine':
-                dispatch(setPrefixMachine({ Machine: values[field] }));
-                break;
-            case 'MatchCheckListOption':
-                dispatch(setPrefixMatchCheckListOption({ MatchCheckListOption: values[field] }));
-                break;
-            case 'MatchFormMachine':
-                dispatch(setPrefixMatchFormMachine({ MatchFormMachine: values[field] }));
-                break;
-            case 'UsersPermission':
-                dispatch(setPrefixUsersPermission({ UsersPermission: values[field] }));
-                break;
-            default:
-                break;
-        }
-        const data = { ...state, [field]: values[field] }
-        mutation.mutate(data)
-
-        setEdit(false);
-    }, [dispatch, field])
+    const masterdataStyles = useMasterdataStyles();
 
     return (
         <Formik
             initialValues={{ [field]: state[field] }}
             validateOnBlur={true}
             validateOnChange={false}
-            onSubmit={(values) => handleSubmit(values)}
+            onSubmit={(values) => handleSubmit(field, values)}
         >
             {({ handleSubmit, errors, touched, setFieldValue, setTouched, values }) => (
                 <Animated.View entering={FadeIn} exiting={FadeOut}>
                     <View style={[styles.row]}>
                         <View style={{ flex: 1 }}>
+                            <View
+                                id="inputs"
+                                style={masterdataStyles.commonContainer}
+                            >
+                                <TextInput
+                                    mode="outlined"
+                                    textColor={theme.colors.onBackground}
+                                    style={{ fontSize: spacing.small }}
+                                    placeholder={`Enter ${field}`}
+                                    label={`${field}`}
+                                    value={state[field]}
+                                    readOnly
+                                />
+                            </View>
+
                             <Inputs
                                 placeholder={`Enter ${field}`}
-                                label={field}
+                                label={`New : ${field}`}
                                 handleChange={(value) => setFieldValue(field, value)}
                                 handleBlur={() => setTouched({ ...touched, [field]: true })}
                                 value={values[field]}
@@ -115,13 +58,22 @@ const RenderFormik: React.FC<{ field: string; setEdit: (v: boolean) => void; sta
                                 testId={`${field}-cf`}
                             />
                         </View>
+                    </View>
 
-                        <IconButton
-                            icon="pencil-box"
+                    <View id="form-action-config" style={masterdataStyles.containerAction}>
+                        <TouchableOpacity
                             onPress={() => handleSubmit()}
-                            iconColor={theme.colors.blue}
-                            size={spacing.large + 5}
-                        />
+                            style={[
+                                masterdataStyles.button,
+                                masterdataStyles.backMain,
+                            ]}
+                            testID="Save-config"
+                        >
+                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Save</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => onEdit(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-config">
+                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Cancel</Text>
+                        </TouchableOpacity>
                     </View>
                 </Animated.View>
             )}
@@ -129,7 +81,7 @@ const RenderFormik: React.FC<{ field: string; setEdit: (v: boolean) => void; sta
     );
 });
 
-export default RenderFormik
+export default RenderFormik;
 
 const styles = StyleSheet.create({
     row: {

@@ -1,31 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense, useCallback } from 'react';
 import { View, StyleSheet, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
 import { Dialog, Portal, Divider, Text, IconButton } from 'react-native-paper';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { useRes } from '@/app/contexts/useRes';
 import { AccessibleView } from '..';
 import { useTheme } from '@/app/contexts/useTheme';
-import { SettingScreen } from '@/app/screens';
-import Configuration from '@/app/screens/layouts/Configulation';
-import { useSelector } from 'react-redux';
-import Auther from '@/app/screens/layouts/Auther'
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '@/stores';
+import {
+    setPrefixGroupMachine,
+    setPrefixCheckList,
+    setPrefixCheckListOption,
+    setPrefixExpectedResult,
+    setPrefixForm,
+    setPrefixSubForm,
+    setPrefixGroupCheckList,
+    setPrefixMachine,
+    setPrefixMatchCheckListOption,
+    setPrefixMatchFormMachine,
+    setPrefixUsersPermission,
+    setAppName
+} from "@/slices";
+import { useMutation, useQueryClient } from 'react-query';
+import { AppProps } from '@/typing/type';
+import axiosInstance from '@/config/axios';
+import { useToast } from '@/app/contexts/useToast';
+
+// Memoizing Lazy Loaded Components
+const MemoSettingScreen = React.lazy(() => import('@/app/screens/layouts/SettingScreen'));
+const MemoConfiguration = React.lazy(() => import('@/app/screens/layouts/Configulation'));
+const MemoAuther = React.lazy(() => import('@/app/screens/layouts/Auther'));
+
+const { height } = Dimensions.get('window');
+
+const saveAppconfig = async (data: AppProps): Promise<{ message: string }> => {
+    const response = await axiosInstance.post("AppConfig_service.asmx/SaveAppConfig", data);
+    return response.data;
+};
 
 interface SettingProps {
     isVisible: boolean;
     setVisible: () => void;
 }
-const MemoSettingScreen = React.memo(SettingScreen)
-const MemoConfiguration = React.memo(Configuration)
-const MemoAuther = React.memo(Auther)
-const { height } = Dimensions.get('window');
 
 const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisible }) => {
     const [activeMenu, setActiveMenu] = useState<string>("user");
-    const { fontSize, spacing } = useRes()
-    const { theme } = useTheme()
-    const masterdataStyles = useMasterdataStyles()
+    const { fontSize, spacing } = useRes();
+    const { theme } = useTheme();
+    const { handleError } = useToast();
+
+    const masterdataStyles = useMasterdataStyles();
     const prefix = useSelector((state: any) => state.prefix);
     const user = useSelector((state: any) => state.user);
+
+    const dispatch = useDispatch<AppDispatch>();
 
     const handleMenuPress = (menu: string) => {
         setActiveMenu(menu);
@@ -38,12 +66,12 @@ const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisib
             alignSelf: 'center',
             borderRadius: 12,
             overflow: 'hidden',
-            backgroundColor: theme.colors.background
+            backgroundColor: theme.colors.background,
         },
         dialogContent: {
             flexDirection: 'row',
             justifyContent: 'space-between',
-            paddingHorizontal: 15
+            paddingHorizontal: 15,
         },
         sectionTool: {
             flexBasis: '30%',
@@ -81,8 +109,83 @@ const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisib
             minHeight: fontSize === "small" ? 50 : fontSize === "medium" ? 60 : 75,
             flexDirection: 'row',
             alignItems: 'center',
-        }
+        },
     });
+
+    const queryClient = useQueryClient();
+
+    const mutation = useMutation(saveAppconfig, {
+        onSuccess: () => {
+            queryClient.invalidateQueries('appConfig');
+        },
+        onError: handleError,
+    });
+
+    const [edit, setEdit] = useState<{ [key: string]: boolean }>({
+        AppName: false,
+        GroupMachine: false,
+        Machine: false,
+        CheckList: false,
+        GroupCheckList: false,
+        CheckListOption: false,
+        MatchCheckListOption: false,
+        MatchFormMachine: false,
+        Form: false,
+        SubForm: false,
+        ExpectedResult: false,
+    });
+
+    const handleSubmit = useCallback((field: string, values: { [x: string]: any; }) => {
+        switch (field) {
+            case 'AppName':
+                dispatch(setAppName({ AppName: values[field] }));
+                break;
+            case 'GroupMachine':
+                dispatch(setPrefixGroupMachine({ GroupMachine: values[field] }));
+                break;
+            case 'CheckList':
+                dispatch(setPrefixCheckList({ CheckList: values[field] }));
+                break;
+            case 'CheckListOption':
+                dispatch(setPrefixCheckListOption({ CheckListOption: values[field] }));
+                break;
+            case 'ExpectedResult':
+                dispatch(setPrefixExpectedResult({ ExpectedResult: values[field] }));
+                break;
+            case 'Form':
+                dispatch(setPrefixForm({ Form: values[field] }));
+                break;
+            case 'SubForm':
+                dispatch(setPrefixSubForm({ SubForm: values[field] }));
+                break;
+            case 'GroupCheckList':
+                dispatch(setPrefixGroupCheckList({ GroupCheckList: values[field] }));
+                break;
+            case 'Machine':
+                dispatch(setPrefixMachine({ Machine: values[field] }));
+                break;
+            case 'MatchCheckListOption':
+                dispatch(setPrefixMatchCheckListOption({ MatchCheckListOption: values[field] }));
+                break;
+            case 'MatchFormMachine':
+                dispatch(setPrefixMatchFormMachine({ MatchFormMachine: values[field] }));
+                break;
+            case 'UsersPermission':
+                dispatch(setPrefixUsersPermission({ UsersPermission: values[field] }));
+                break;
+            default:
+                break;
+        }
+
+        const data = { ...prefix, [field]: values[field] };
+        mutation.mutate(data);
+
+        setEdit((prev) => ({ ...prev, [field]: false }));
+    }, [dispatch, prefix]);
+
+    const handelEdit = useCallback((field: string, value: boolean) => {
+        setEdit((prev) => ({ ...prev, [field]: value }))
+    }, [edit])
 
     return (
         <Portal>
@@ -100,8 +203,8 @@ const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisib
                                 activeMenu === 'user' && styles.activeMenuItem,
                             ]}
                         >
-                            <View style={[{ flexDirection: "row", alignItems: "center" }]}>
-                                <IconButton icon="account" size={spacing.large} animated style={{ left: -10 }} />
+                            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                <IconButton icon="account" size={spacing.large} style={{ left: -10 }} />
                                 <Text style={[masterdataStyles.text, { textAlign: "left", left: -10 }]}>User info</Text>
                             </View>
                         </TouchableOpacity>
@@ -113,8 +216,8 @@ const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisib
                                 activeMenu === 'general' && styles.activeMenuItem,
                             ]}
                         >
-                            <View style={[{ flexDirection: "row", alignItems: "center" }]}>
-                                <IconButton icon="cog" size={spacing.large} animated style={{ left: -10 }} />
+                            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                <IconButton icon="cog" size={spacing.large} style={{ left: -10 }} />
                                 <Text style={[masterdataStyles.text, { textAlign: "left", left: -10 }]}>Setting</Text>
                             </View>
                         </TouchableOpacity>
@@ -127,8 +230,8 @@ const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisib
                                     activeMenu === 'configuration' && styles.activeMenuItem,
                                 ]}
                             >
-                                <View style={[{ flexDirection: "row", alignItems: "center" }]}>
-                                    <IconButton icon="application-cog-outline" size={spacing.large} animated style={{ left: -10 }} />
+                                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                    <IconButton icon="application-cog-outline" size={spacing.large} style={{ left: -10 }} />
                                     <Text style={[masterdataStyles.text, { textAlign: "left", left: -10 }]}>Configuration</Text>
                                 </View>
                             </TouchableOpacity>
@@ -138,19 +241,21 @@ const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisib
                     <Divider style={styles.divider} />
 
                     <AccessibleView name="sectionView" style={styles.sectionView}>
-                        <ScrollView
-                            id="setting"
-                            showsVerticalScrollIndicator={false}
-                            showsHorizontalScrollIndicator={false}
-                        >
+                        <ScrollView showsVerticalScrollIndicator={false}>
                             {activeMenu === "user" && (
-                                <MemoAuther user={user} />
+                                <Suspense fallback={<Text>Loading...</Text>}>
+                                    <MemoAuther user={user} />
+                                </Suspense>
                             )}
                             {activeMenu === 'general' && (
-                                <MemoSettingScreen />
+                                <Suspense fallback={<Text>Loading...</Text>}>
+                                    <MemoSettingScreen />
+                                </Suspense>
                             )}
                             {user.Permissions.includes('view_config') && activeMenu === "configuration" && (
-                                <MemoConfiguration prefix={prefix} />
+                                <Suspense fallback={<Text>Loading...</Text>}>
+                                    <MemoConfiguration prefix={prefix} handleSubmit={handleSubmit} edit={edit} handelEdit={handelEdit} />
+                                </Suspense>
                             )}
                         </ScrollView>
                     </AccessibleView>

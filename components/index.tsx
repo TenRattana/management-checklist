@@ -1,7 +1,6 @@
 export * from "./common";
 export * from "./forms";
 export { default as ConfigItem } from "./setting/ConfigItem";
-export { default as RenderFormik } from "./setting/RenderFormik";
 export { default as AccessibleView } from "./AccessibleView";
 export { default as Text } from "./Text";
 export { default as CustomDropdownSingle } from "./CustomDropdownSingle";

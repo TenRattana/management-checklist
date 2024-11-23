@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, View, ActivityIndicator } from 'react-native';
 import { IconButton, Text } from 'react-native-paper';
 import { useTheme } from '@/app/contexts/useTheme';
 import { useRes } from '@/app/contexts/useRes';
@@ -13,15 +13,24 @@ interface ConfigItemProps {
     editable: boolean;
     onEdit: (v: boolean) => void;
     state: any;
+    handleSubmit: (field: string, values: { [x: number]: any }) => void;
 }
 
-const MemoRenderFormik = React.memo(RenderFormik);
+const MemoRenderFormik = React.memo(RenderFormik, (prevProps, nextProps) => {
+    return (
+        prevProps.field === nextProps.field &&
+        prevProps.state[prevProps.field] === nextProps.state[nextProps.field]
+    );
+});
 
-const ConfigItem: React.FC<ConfigItemProps> = React.memo(({ label, value, editable, onEdit, state }) => {
+const ConfigItem: React.FC<ConfigItemProps> = React.memo(({ label, value, editable, onEdit, state, handleSubmit }) => {
     const { theme } = useTheme();
     const { spacing, fontSize } = useRes();
     const masterdataStyles = useMasterdataStyles();
 
+    if (!state || !label) {
+        return <ActivityIndicator size="large" />;
+    }
 
     const styles = StyleSheet.create({
         row: {
@@ -42,6 +51,9 @@ const ConfigItem: React.FC<ConfigItemProps> = React.memo(({ label, value, editab
         },
     });
 
+    const keyText = `${label}-${editable ? 'editable' : 'non-editable'}`;
+    const keyIconButton = `${label}-${editable ? 'editable' : 'non-editable'}-icon`;
+
     return (
         <AccessibleView name={`container-${label}`} style={[styles.row, { flexBasis: '100%' }]}>
             {editable ? (
@@ -51,14 +63,13 @@ const ConfigItem: React.FC<ConfigItemProps> = React.memo(({ label, value, editab
                             style={[masterdataStyles.settingText]}
                             ellipsizeMode="tail"
                             numberOfLines={1}
-                            key={`text-${label}-${editable ? 'editable' : 'non-editable'}`}
+                            key={keyText}
                         >
                             {`${label} : ${!editable ? value : ""}`}
                         </Text>
-
                     </View>
                     <View style={{ flexGrow: 10 }}>
-                        <MemoRenderFormik field={label === "Program Display" ? "AppName" : label} setEdit={onEdit} state={state} />
+                        <MemoRenderFormik field={label === "Program Display" ? "AppName" : label} state={state} handleSubmit={handleSubmit} onEdit={(v: boolean) => onEdit(v)} />
                     </View>
                 </>
             ) : (
@@ -67,7 +78,7 @@ const ConfigItem: React.FC<ConfigItemProps> = React.memo(({ label, value, editab
                         style={[masterdataStyles.settingText]}
                         ellipsizeMode="tail"
                         numberOfLines={1}
-                        key={`text-${label}-${editable ? 'editable' : 'non-editable'}`}
+                        key={keyText}
                     >
                         {`${label} : ${!editable ? value : ""}`}
                     </Text>
@@ -77,13 +88,19 @@ const ConfigItem: React.FC<ConfigItemProps> = React.memo(({ label, value, editab
                         iconColor={theme.colors.blue}
                         size={spacing.large + 5}
                         style={[styles.iconButton, { width: 100 }]}
-                        key={`icon-button-${label}`}
+                        key={keyIconButton}
                     />
                 </>
             )}
         </AccessibleView>
     );
+}, (prevProps, nextProps) => {
+    return (
+        prevProps.label === nextProps.label &&
+        prevProps.value === nextProps.value &&
+        prevProps.editable === nextProps.editable &&
+        prevProps.state === nextProps.state
+    );
 });
 
 export default ConfigItem;
-

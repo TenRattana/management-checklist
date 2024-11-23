@@ -1,30 +1,18 @@
-import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
-import { useTheme, } from '@/app/contexts/useTheme';
-import { useRes } from '@/app/contexts/useRes';
+import React, { useState, useCallback } from 'react';
+import { StyleSheet } from 'react-native';
 import { AccessibleView, ConfigItem, Text } from '@/components';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { Divider } from 'react-native-paper';
 
+interface ConfigurationProps {
+    prefix: any;
+    handleSubmit: (field: string, values: { [key: string]: any }) => void;
+    edit: { [key: string]: boolean };
+    handelEdit: (field: string, value: boolean) => void;
+}
 
-const Configuration = React.memo((prefix: any) => {
-    const { theme } = useTheme();
-    const { spacing, fontSize } = useRes();
-    const state = prefix.prefix
-
-    const [edit, setEdit] = useState<{ [key: string]: boolean }>({
-        AppName: false,
-        GroupMachine: false,
-        Machine: false,
-        CheckList: false,
-        GroupCheckList: false,
-        CheckListOption: false,
-        MatchCheckListOption: false,
-        MatchFormMachine: false,
-        Form: false,
-        SubForm: false,
-        ExpectedResult: false,
-    });
+const Configuration: React.FC<ConfigurationProps> = React.memo(({ prefix, handleSubmit, edit, handelEdit }) => {
+    const state = prefix;
 
     const masterdataStyles = useMasterdataStyles();
 
@@ -57,7 +45,8 @@ const Configuration = React.memo((prefix: any) => {
                     label="Program Display"
                     value={state.AppName}
                     editable={edit.AppName}
-                    onEdit={(v) => setEdit(prev => ({ ...prev, AppName: v }))}
+                    onEdit={(v: boolean) => handelEdit('AppName', v)}
+                    handleSubmit={handleSubmit}
                 />
                 <Divider style={styles.divider} />
             </AccessibleView>
@@ -65,13 +54,15 @@ const Configuration = React.memo((prefix: any) => {
             <AccessibleView name="setting-mode" style={[masterdataStyles.configPrefix]}>
                 <Text style={[masterdataStyles.settingText, masterdataStyles.textBold]}>Fix Prefixes</Text>
                 {['GroupMachine', 'Machine', 'CheckList', 'GroupCheckList', 'CheckListOption', 'MatchCheckListOption', 'MatchFormMachine', 'Form', 'SubForm', 'ExpectedResult', 'UsersPermission'].map((item) => (
-                    <React.Fragment key={`${state[item]}-${item}`}>
+                    <React.Fragment key={item}>
                         <ConfigItem
                             state={state}
                             label={item}
                             value={state[item]}
                             editable={edit[item]}
-                            onEdit={(v: boolean) => setEdit(prev => ({ ...prev, [item]: v }))} />
+                            onEdit={(v: boolean) => handelEdit(item, v)}
+                            handleSubmit={handleSubmit}
+                        />
                         <Divider style={styles.divider} />
                     </React.Fragment>
                 ))}
@@ -81,4 +72,3 @@ const Configuration = React.memo((prefix: any) => {
 });
 
 export default Configuration;
-

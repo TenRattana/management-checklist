@@ -34,8 +34,7 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-export const initializeApp = createAsyncThunk('app/initialize', async (payload: { App: AppProps, UserData: UserPayload }, { dispatch }) => {
-  dispatch(setApp({ App: payload.App }));
+export const initializeApp = createAsyncThunk('app/initialize', async (payload: { UserData: UserPayload }, { dispatch }) => {
   dispatch(fetchMenu(payload.UserData.GUserID));
   dispatch(fetchPermission(payload.UserData.GUserID));
   dispatch(setUser({ user: payload.UserData }));
@@ -80,7 +79,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [UserData, setUserData] = useState<any>(undefined)
   const { handleError } = useToast();
 
-  const { data } = useQuery<AppProps, Error>(
+  const { data, isLoading: LoadingApp } = useQuery<AppProps, Error>(
     'appConfig',
     fetchAppConfig,
     {
@@ -90,6 +89,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       cacheTime: 1000 * 60 * 10,
     }
   );
+
+  useEffect(() => {
+    if (!LoadingApp && data) {
+      dispatch(setApp({ App: data }));
+    }
+  }, [LoadingApp, dispatch])
 
   useEffect(() => {
     const loadUserDataAsync = async () => {
@@ -150,11 +155,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (UserData && data) {
-      dispatch(initializeApp({ App: data, UserData }));
+    if (UserData) {
+      dispatch(initializeApp({ UserData }));
       setLoading(true)
     }
-  }, [UserData, data, dispatch]);
+  }, [UserData, dispatch]);
 
   const login = useCallback(async (username: string, password: string) => {
     await updateSession(username, password, "");
