@@ -47,12 +47,14 @@ export default {
       bundler: "metro",
       output: "static",
       favicon: "./assets/images/Icon-app.png",
+      splitChunks: true,
+      cache: true
     },
     assetBundlePatterns: ["assets/fonts/*", "assets/images/*"],
     plugins: [
       "expo-router",
       [
-        "expo-secure-store",
+        "expo-secure-store",  
         {
           configureAndroidBackup: true,
           faceIDPermission:
@@ -70,6 +72,7 @@ export default {
     ],
     extra: {
       ...getEnvVars(environment),
+      enableMinification: environment === "production",
       eas: {
         projectId: "0f2240ee-c314-4fa4-b36a-6038aa1ba0da",
       },

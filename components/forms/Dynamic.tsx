@@ -3,7 +3,7 @@ import { Selects, Radios, Textareas, Inputs, Checkboxs } from "@/components/comm
 import { CheckListOption } from '@/typing/type';
 import { DynamicFormProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
 import { Text } from "react-native-paper";
@@ -139,11 +139,21 @@ const DynamicForm = React.memo(({
     }
   };
 
+  const styles = StyleSheet.create({
+    text: {
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+      marginVertical: fontSize === "large" ? 10 : 5,
+      paddingHorizontal: 20,
+      paddingTop: fontSize === "large" ? 15 : 5
+    }
+  })
+
   return (
     <View id="form-layout2">
       <Text
         variant="bodyMedium"
-        style={[masterdataStyles.text, CTypeName === "Text" ? { justifyContent: 'flex-start', alignItems: 'center', marginVertical: fontSize === "large" ? 10 : 5, paddingHorizontal: 20 } : {}, { paddingTop: fontSize === "large" ? 15 : 5 }]}
+        style={[masterdataStyles.text, CTypeName === "Text" ? styles.text : undefined, { color: exp && messageminOrmax ? theme.colors.error : theme.colors.onBackground }]}
       >
         {CListName} {" "}
         {Required && <Text style={{ color: theme.colors.error }}>(*)</Text>}

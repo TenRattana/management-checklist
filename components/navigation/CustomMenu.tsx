@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Dimensions } from "react-native";
+import { View, StyleSheet, Dimensions, ViewStyle } from "react-native";
 import { Menu, Divider, IconButton, Text } from "react-native-paper";
 import { useRes } from '@/app/contexts/useRes'
 import useMasterdataStyles from "@/styles/common/masterdata";
@@ -32,19 +32,13 @@ const CustomMenu: React.FC<CustomMenuProps> = ({
             borderRadius: 20,
         },
         menuContent: {
-            borderRadius: 10,
+            borderRadius: 8,
             paddingVertical: 10,
-            paddingHorizontal: 10,
-            backgroundColor: theme.colors.background,
-            shadowColor: "#000",
-            shadowOffset: {
-                width: 0,
-                height: 2,
-            },
-            shadowOpacity: 0.1,
-            shadowRadius: 4,
-            elevation: 5,
-        },
+            paddingHorizontal: 15,
+            backgroundColor: '#fff',
+            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+            elevation: 4, 
+          } as ViewStyle,
         divider: {
             marginVertical: 5,
             backgroundColor: "#E0E0E0",
