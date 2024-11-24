@@ -1,44 +1,71 @@
-import React, { createContext, ReactNode, useCallback, useMemo } from "react";
-import ToastManager, { Toast } from "toastify-react-native";
+import React, { createContext, ReactNode, useCallback, useMemo, useState } from "react";
+import { View, Text, StyleSheet, Platform, TouchableOpacity, Animated } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useRes } from "@/app/contexts/useRes";
+import { useTheme } from "@/app/contexts/useTheme";
 import axios from "axios";
-import { useRes } from "../contexts/useRes";
+
 export interface ToastContextProps {
   showSuccess: (message: string) => void;
   showError: (messages: string[]) => void;
   handleError: (error: unknown) => void;
 }
 
-interface ToastProviderProps {
+export interface ToastProviderProps {
   children: ReactNode;
+}
+
+interface Toast {
+  id: string;
+  message: string;
+  status: "success" | "error";
 }
 
 export const ToastContext = createContext<ToastContextProps | undefined>(undefined);
 
 export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
-  const { spacing, fontSize } = useRes();
+  const { theme } = useTheme();
+  const { spacing } = useRes();
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const showSuccess = useCallback((message: string) => {
-    Toast.success(message);
-  }, [Toast]);
+  const addToast = useCallback((message: string, status: "success" | "error") => {
+    const id = Math.random().toString(36).substring(7);
+    setToasts((prev) => [...prev, { id, message, status }]);
 
-  const showError = useCallback((messages: string[]) => {
-    const formattedMessage = messages.join('\n');
-    Toast.error(formattedMessage, "top");
-  }, [Toast]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    }, 30000);
+  }, []);
 
-  const handleError = useCallback((error: unknown) => {
-    let errorMsg: string[];
+  const showSuccess = useCallback((messages: string | string[]) => {
+    const messageArray = Array.isArray(messages) ? messages : [messages];
+    messageArray.forEach((message) => addToast(message, "success"));
+  }, [addToast]);
+  
+  const showError = useCallback((messages: string | string[]) => {
+    const messageArray = Array.isArray(messages) ? messages : [messages];
+    messageArray.forEach((message) => addToast(message, "error"));
+  }, [addToast]);
 
-    if (axios.isAxiosError(error)) {
-      errorMsg = error.response?.data?.errors ?? ["Something went wrong!"];
-    } else if (error instanceof Error) {
-      errorMsg = [error.message];
-    } else {
-      errorMsg = ["An unknown error occurred!"];
-    }
+  const handleError = useCallback(
+    (error: unknown) => {
+      let errorMsg: string[];
 
-    showError(errorMsg);
-  }, [showError]);
+      if (axios.isAxiosError(error)) {
+        errorMsg = error.response?.data?.errors ?? [
+          "Something went wrong!",
+          "Please try again later.",
+        ];
+      } else if (error instanceof Error) {
+        errorMsg = [error.message, "An unexpected issue occurred."];
+      } else {
+        errorMsg = ["An unknown error occurred!", "Please contact support."];
+      }
+
+      showError(errorMsg);
+    },
+    [showError]
+  );
 
   const value = useMemo(
     () => ({ showSuccess, showError, handleError }),
@@ -46,21 +73,72 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
   );
 
   return (
-    <>
-      <ToastContext.Provider value={value}>
-        <ToastManager
-          textStyle={{ fontSize: spacing.small, lineHeight: spacing.medium, }}
-          height={fontSize === "large" ? 180 : 80}
-          style={{
-            paddingHorizontal: 16,
-            paddingVertical: 8,
-            borderRadius: 8,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        />
-        {children}
-      </ToastContext.Provider>
-    </>
+    <ToastContext.Provider value={value}>
+      {children}
+      <View style={Platform.OS === "web" ? styles.toastStackWeb : styles.toastStackMobile} pointerEvents="box-none">
+        {toasts.map((toast, index) => (
+          <Animated.View
+            key={toast.id}
+            style={[
+              styles.toastContainer,
+              {
+                top: index * 15,
+                backgroundColor: toast.status === "error" ? theme.colors.error : theme.colors.succeass
+              }
+            ]}
+          >
+            <MaterialIcons
+              name={toast.status === "error" ? "error" : "check-circle"}
+              size={spacing.large}
+              color="white"
+              style={styles.icon}
+            />
+            <View style={styles.messageContainer}>
+              <Text style={{ fontSize: spacing.small, color: theme.colors.fff }}>{toast.message}</Text>
+            </View>
+            <TouchableOpacity
+              onPress={() =>
+                setToasts((prev) => prev.filter((item) => item.id !== toast.id))
+              }
+            >
+              <MaterialIcons name="close" size={spacing.large} color="white" />
+            </TouchableOpacity>
+          </Animated.View>
+
+        ))}
+      </View>
+    </ToastContext.Provider>
   );
 };
+
+const styles = StyleSheet.create({
+  toastStackWeb: {
+    position: "absolute",
+    top: 30,
+    right: '2%',
+    zIndex: 9999,
+  },
+  toastStackMobile: {
+    position: "absolute",
+    top: 30,
+    left: "50%",
+    transform: [{ translateX: -110 }],
+    zIndex: 9999,
+  },
+  toastContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "green",
+    padding: 15,
+    borderRadius: 8,
+    marginVertical: 5,
+    maxWidth: 350,
+  },
+  icon: {
+    marginRight: 8,
+  },
+  messageContainer: {
+    flex: 1,
+    paddingRight: 8,
+  },
+});
