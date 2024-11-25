@@ -1,148 +1,169 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { Animated, View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import { IconButton, Button, Surface } from 'react-native-paper';
-import Schedule_dialog from '@/components/screens/Schedule_dialog';
-import { format } from 'date-fns';
-import { Text } from '@/components';
-import useMasterdataStyles from '@/styles/common/masterdata';
-import { useToast } from '@/app/contexts/useToast';
-import { useTheme } from '@/app/contexts/useTheme'
-import { useRes } from '@/app/contexts/useRes'
+import React, { useState, useCallback, useMemo, useEffect } from "react";
+import { Pressable, StyleSheet } from "react-native";
+import axiosInstance from "@/config/axios";
+import { useRes } from "@/app/contexts/useRes";
+import { useToast } from "@/app/contexts/useToast";
+import { AccessibleView, Customtable, LoadingSpinner, Searchbar, Text } from "@/components";
+import { Card } from "react-native-paper";
+import useMasterdataStyles from "@/styles/common/masterdata";
+import Machine_dialog from "@/components/screens/Machine_dialog";
+import { Machine, GroupMachine } from '@/typing/type';
+import { InitialValuesMachine } from '@/typing/value';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useSelector } from "react-redux";
+import ScheduleDialog from "@/components/screens/Schedule_dialog";
 
-const TimescheduleScreen = React.memo(() => {
-    const { theme } = useTheme();
-    const { spacing } = useRes();
-    const animationValue = useRef(new Animated.Value(300)).current;
+const fetchMachines = async (): Promise<Machine[]> => {
+    const response = await axiosInstance.post("Machine_service.asmx/GetMachines");
+    return response.data.data ?? [];
+};
+interface InitialValues {
+    ScheduleName: string,
+    Machine: Machine[],
+    timeSlots: [{ start: null, end: null }],
+    timeInterval: string | null,
+}
+
+const TimescheduleScreen: React.FC = React.memo(() => {
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
+    const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [isVisible, setIsVisible] = useState<boolean>(false);
+    const initialValues: InitialValues = {
+        ScheduleName: '',
+        Machine: [],
+        timeSlots: [{ start: null, end: null }],
+        timeInterval: null,
+    };
+
     const masterdataStyles = useMasterdataStyles();
-    const { showError } = useToast()
-    const [schedules, setSchedules] = useState<Array<{ id: string; startTime: Date; endTime: Date }>>([]);
-    const [newStartTime, setNewStartTime] = useState<Date | null>(null);
-    const [newEndTime, setNewEndTime] = useState<Date | null>(null);
-    const [showTimePicker, setShowTimePicker] = useState<{ type: 'start' | 'end' | null }>({ type: null });
-    const [dialogVisible, setDialogVisible] = useState(false);
+    const state = useSelector((state: any) => state.prefix);
+    const { showSuccess, handleError } = useToast();
+    const { spacing, fontSize } = useRes();
+    const queryClient = useQueryClient();
 
-    const handleTimeChange = (date: Date, type: 'start' | 'end') => {
-        if (type === 'start') {
-            setNewStartTime(date);
-        } else if (type === 'end') {
-            if (newStartTime && date <= newStartTime) {
-                showError('End Time must be after Start Time!');
-                return;
+    const { data: machines = [], isLoading, } = useQuery<Machine[], Error>(
+        'machines',
+        fetchMachines,
+        {
+            refetchOnWindowFocus: true,
+        }
+    );
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 300);
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchQuery]);
+
+    const saveData = useCallback(async (values: any) => {
+        console.log(values);
+        
+    }, [state]);
+
+    const handleAction = useCallback(async (action?: string, item?: string) => {
+        try {
+            if (action === "editIndex") {
+                const response = await axiosInstance.post("Machine_service.asmx/GetMachine", { MachineID: item });
+                const machineData = response.data.data[0] ?? {};
+
+                setIsEditing(true);
+                setIsVisible(true);
+            } else {
+                const endpoint = action === "activeIndex" ? "ChangeMachine" : "DeleteMachine";
+                const response = await axiosInstance.post(`Machine_service.asmx/${endpoint}`, { MachineID: item });
+                showSuccess(String(response.data.message));
+                queryClient.invalidateQueries('machines');
+                queryClient.refetchQueries('machineGroups');
             }
-            setNewEndTime(date);
+        } catch (error) {
+            handleError(error);
         }
-        setShowTimePicker({ type: null });
-    };
+    }, [handleError, queryClient]);
 
-    const addSchedule = () => {
-        if (!newStartTime || !newEndTime) {
-            alert('Please set both Start and End Times');
-            return;
-        }
-        const id = `${newStartTime}-${newEndTime}-${Date.now()}`;
-        setSchedules([...schedules, { id, startTime: newStartTime, endTime: newEndTime }]);
-        setNewStartTime(null);
-        setNewEndTime(null);
-        setDialogVisible(false);
-    };
+    const tableData = useMemo(() => {
+        return machines.map((item) => [
+            item.Disables,
+            item.MachineName,
+            item.Description,
+            item.IsActive,
+            item.MachineID,
+        ]);
+    }, [machines, debouncedSearchQuery]);
 
-    const removeSchedule = (id: string) => {
-        setSchedules((prevSchedules) => prevSchedules.filter((schedule) => schedule.id !== id));
-    };
+    const handleNewData = useCallback(() => {
+
+        setIsEditing(false);
+        setIsVisible(true);
+    }, []);
+
+    const customtableProps = useMemo(() => ({
+        Tabledata: tableData,
+        Tablehead: [
+            { label: "", align: "flex-start" },
+            { label: "Machine Name", align: "flex-start" },
+            { label: "Description", align: "flex-start" },
+            { label: "Status", align: "center" },
+            { label: "", align: "flex-end" },
+        ],
+        flexArr: [0, 2, 2, 2, 1, 1],
+        actionIndex: [{ disables: 0, editIndex: 4, delIndex: 5 }],
+        handleAction,
+        showMessage: 2,
+        searchQuery: debouncedSearchQuery,
+    }), [tableData, debouncedSearchQuery, handleAction]);
 
     const styles = StyleSheet.create({
-        toggleButton: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 8,
-            marginHorizontal: 10,
-            backgroundColor: '#fff',
+        container: {
+            flex: 1
         },
-        addButtonContainer: {
-            flexBasis: '30%',
-            alignItems: 'center',
-            marginVertical: 10,
-            marginHorizontal: 10,
+        header: {
+            fontSize: spacing.large,
+            marginTop: spacing.small,
+            paddingVertical: fontSize === "large" ? 7 : 5
         },
-        addButton: {
-            width: '90%',
-            paddingVertical: 10,
-            borderRadius: 8,
-            backgroundColor: theme.colors.drag,
-            alignContent: 'center',
-            alignItems: 'center'
+        functionname: {
+            textAlign: 'center'
         },
-        scheduleItem: {
-            padding: 16,
-            marginVertical: 5,
-            borderRadius: 8,
-            backgroundColor: '#f9f9f9',
-        },
-        scheduleText: {
-            fontSize: 16,
-            fontWeight: '500',
-            color: '#333',
-        },
-    });
+        cardcontent: {
+            padding: 2,
+            flex: 1
+        }
+    })
 
     return (
-        <View style={{ flex: 1, flexDirection: 'row', backgroundColor: theme.colors.background }}>
-            <View style={{ flex: 1, flexBasis: '70%', }}>
-                <Animated.View style={{
-                    height: animationValue, overflow: 'hidden', marginHorizontal: 10, borderRadius: 8, marginVertical: 5
-                }}>
-                </Animated.View>
-
-                <FlatList
-                    data={schedules}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
-                        <Surface style={[styles.scheduleItem, { backgroundColor: theme.colors.surface }]}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <View>
-                                    <Text style={[styles.scheduleText, { color: theme.colors.onSurface }]}>
-                                        {`Start: ${format(item.startTime, 'hh:mm a')}`}
-                                    </Text>
-                                    <Text style={[styles.scheduleText, { color: theme.colors.onSurface }]}>
-                                        {`End: ${format(item.endTime, 'hh:mm a')}`}
-                                    </Text>
-                                </View>
-                                <IconButton
-                                    icon="delete"
-                                    size={24}
-                                    onPress={() => removeSchedule(item.id)}
-                                    iconColor={theme.colors.error}
-                                />
-                            </View>
-                        </Surface>
-                    )}
-                    contentContainerStyle={{ padding: 10 }}
-                    ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-                    style={{ flex: 1, width: '100%' }}
-                />
-
-            </View>
-
-            <View style={styles.addButtonContainer}>
-                <TouchableOpacity
-                    onPress={() => setDialogVisible(true)}
-                    style={styles.addButton}
-                >
-                    <Text style={masterdataStyles.textFFF}>Add New Schedule</Text>
-                </TouchableOpacity>
-            </View>
-            <Schedule_dialog
-                addSchedule={addSchedule}
-                dialogVisible={dialogVisible}
-                handleTimeChange={handleTimeChange}
-                setDialogVisible={(value: boolean) => setDialogVisible(value)}
-                // initialValues={}
-                // machine={}
-                // saveData={}
-                key={"schedule_dialog"}
+        <AccessibleView name="container-machine" style={styles.container}>
+            <Card.Title
+                title="Create Machine"
+                titleStyle={[masterdataStyles.textBold, styles.header]}
             />
-        </View>
+            <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
+                <Searchbar
+                    placeholder="Search Machine..."
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    testId="search-machine"
+                />
+                <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Add New Schedule</Text>
+                </Pressable>
+            </AccessibleView>
+            <Card.Content style={styles.cardcontent}>
+                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+            </Card.Content>
+
+            <ScheduleDialog
+                isVisible={isVisible}
+                setIsVisible={setIsVisible}
+                isEditing={isEditing}
+                initialValues={initialValues}
+                saveData={saveData}
+                machine={machines}
+            />
+        </AccessibleView>
     );
 });
 

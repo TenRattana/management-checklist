@@ -142,6 +142,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   messageContainer: {
+    maxWidth: 250,
     paddingRight: 8,
   },
 });

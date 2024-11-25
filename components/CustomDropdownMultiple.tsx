@@ -7,7 +7,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { Pressable, View } from "react-native";
 import Text from "@/components/Text";
 
-const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChange, lefticon, iconRight, testId, handleBlur }: CustomDropdownMultiProps) => {
+const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChange, lefticon, iconRight, testId, handleBlur , position }: CustomDropdownMultiProps) => {
   const [options, setOptions] = useState<{ label?: string; value?: string; icon?: () => JSX.Element }[]>([]);
 
   const masterdataStyles = useMasterdataStyles();

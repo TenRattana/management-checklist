@@ -128,6 +128,7 @@ export interface CustomDropdownMultiProps extends Event, DefaultProps {
   lefticon?: string;
   iconRight?: React.ReactNode;
   handleBlur: () => void;
+  position?:"auto" | "bottom" | "top" 
 }
 
 export interface CustomTableProps {
