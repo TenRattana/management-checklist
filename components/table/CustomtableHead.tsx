@@ -110,9 +110,10 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({ Tablehead,
                     }}>
                         <Text style={[masterdataStyles.text, { alignContent: 'center', paddingRight: 15, alignSelf: 'center' }]}>{Tablehead[1].label}</Text>
                         <Picker
+                            itemStyle={masterdataStyles.text}
                             selectedValue={filter || ""}
                             onValueChange={(itemValue) => handelSetFilter(itemValue)}
-                            style={[masterdataStyles.picker, { width: responsive === "small" ? '100%' : 300, borderWidth: 0, borderBottomWidth: 1 }]}
+                            style={[masterdataStyles.picker, { width: responsive === "small" ? '100%' : 300, borderWidth: 0, borderBottomWidth: 1, top: -2 }]}
                             mode="dropdown"
                             testID="picker-custom"
                             accessibilityLabel="Picker Accessibility Label"

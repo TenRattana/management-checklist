@@ -77,7 +77,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState<boolean>(false);
   const [UserData, setUserData] = useState<any>(undefined)
-  const { handleError } = useToast();
+  const { handleError, showSuccess } = useToast();
 
   const { data, isLoading: LoadingApp } = useQuery<AppProps, Error>(
     'appConfig',
@@ -158,6 +158,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (UserData) {
       dispatch(initializeApp({ UserData }));
       setLoading(true)
+      showSuccess("Login Success!")
     }
   }, [UserData, dispatch]);
 

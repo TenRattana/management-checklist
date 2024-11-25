@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useRef, useCallback, useEffect, useState, useMemo } from 'react';
-import { ActivityIndicator, TouchableOpacity } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import {
     HomeScreen,
@@ -141,6 +141,8 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
             <Drawer.Navigator
                 drawerContent={(props) => <CustomDrawerContent {...props} />}
                 screenOptions={{
+                    drawerHideStatusBarOnOpen: false,
+                    drawerStatusBarAnimation: 'none',
                     drawerStyle: {
                         backgroundColor: theme.colors.background,
                         width: drawerWidth,
@@ -161,8 +163,6 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                         />
                     ),
                     unmountOnBlur: true,
-                    drawerHideStatusBarOnOpen: true,
-                    drawerStatusBarAnimation: 'slide',
                     freezeOnBlur: true,
                 }}
                 initialRouteName={user.initialRoute}

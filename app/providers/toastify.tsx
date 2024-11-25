@@ -6,8 +6,8 @@ import { useTheme } from "@/app/contexts/useTheme";
 import axios from "axios";
 
 export interface ToastContextProps {
-  showSuccess: (message: string) => void;
-  showError: (messages: string[]) => void;
+  showSuccess: (message: string | string[]) => void;
+  showError: (messages: string | string[]) => void;
   handleError: (error: unknown) => void;
 }
 
@@ -34,14 +34,14 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
 
     setTimeout(() => {
       setToasts((prev) => prev.filter((toast) => toast.id !== id));
-    }, 30000);
+    }, 3000);
   }, []);
 
   const showSuccess = useCallback((messages: string | string[]) => {
     const messageArray = Array.isArray(messages) ? messages : [messages];
     messageArray.forEach((message) => addToast(message, "success"));
   }, [addToast]);
-  
+
   const showError = useCallback((messages: string | string[]) => {
     const messageArray = Array.isArray(messages) ? messages : [messages];
     messageArray.forEach((message) => addToast(message, "error"));
@@ -54,8 +54,8 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
       if (axios.isAxiosError(error)) {
         errorMsg = error.response?.data?.errors ?? [
           "Something went wrong!",
-          "Please try again later.",
         ];
+
       } else if (error instanceof Error) {
         errorMsg = [error.message, "An unexpected issue occurred."];
       } else {
@@ -76,36 +76,40 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
     <ToastContext.Provider value={value}>
       {children}
       <View style={Platform.OS === "web" ? styles.toastStackWeb : styles.toastStackMobile} pointerEvents="box-none">
-        {toasts.map((toast, index) => (
-          <Animated.View
-            key={toast.id}
-            style={[
-              styles.toastContainer,
-              {
-                top: index * 15,
-                backgroundColor: toast.status === "error" ? theme.colors.error : theme.colors.succeass
-              }
-            ]}
-          >
-            <MaterialIcons
-              name={toast.status === "error" ? "error" : "check-circle"}
-              size={spacing.large}
-              color="white"
-              style={styles.icon}
-            />
-            <View style={styles.messageContainer}>
-              <Text style={{ fontSize: spacing.small, color: theme.colors.fff }}>{toast.message}</Text>
-            </View>
-            <TouchableOpacity
-              onPress={() =>
-                setToasts((prev) => prev.filter((item) => item.id !== toast.id))
-              }
-            >
-              <MaterialIcons name="close" size={spacing.large} color="white" />
-            </TouchableOpacity>
-          </Animated.View>
+        {toasts.map((toast, index) => {
+          console.log(toast.message);
 
-        ))}
+          return (
+            <Animated.View
+              key={toast.id}
+              style={[
+                styles.toastContainer,
+                {
+                  top: index * 15,
+                  backgroundColor: toast.status === "error" ? theme.colors.error : theme.colors.succeass
+                }
+              ]}
+            >
+              <MaterialIcons
+                name={toast.status === "error" ? "error" : "check-circle"}
+                size={spacing.large}
+                color="white"
+                style={styles.icon}
+              />
+              <View style={styles.messageContainer}>
+                <Text style={{ fontSize: spacing.small, color: theme.colors.fff }}>{toast.message}</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() =>
+                  setToasts((prev) => prev.filter((item) => item.id !== toast.id))
+                }
+              >
+                <MaterialIcons name="close" size={spacing.large} color="white" />
+              </TouchableOpacity>
+            </Animated.View>
+
+          )
+        })}
       </View>
     </ToastContext.Provider>
   );
@@ -114,15 +118,15 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
 const styles = StyleSheet.create({
   toastStackWeb: {
     position: "absolute",
-    top: 30,
+    top: '10%',
     right: '2%',
     zIndex: 9999,
   },
   toastStackMobile: {
     position: "absolute",
-    top: 30,
-    left: "50%",
-    transform: [{ translateX: -110 }],
+    top: '10%',
+    flex: 1,
+    alignSelf: 'center',
     zIndex: 9999,
   },
   toastContainer: {
@@ -138,7 +142,6 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   messageContainer: {
-    flex: 1,
     paddingRight: 8,
   },
 });

@@ -7,6 +7,7 @@ const axiosInstance = axios.create({
     baseURL: API_URL,
     headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json',
     },
 });
 

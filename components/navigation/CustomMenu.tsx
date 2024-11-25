@@ -35,10 +35,9 @@ const CustomMenu: React.FC<CustomMenuProps> = ({
             borderRadius: 8,
             paddingVertical: 10,
             paddingHorizontal: 15,
-            backgroundColor: '#fff',
-            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-            elevation: 4, 
-          } as ViewStyle,
+            backgroundColor: theme.colors.background,
+            elevation: 4,
+        },
         divider: {
             marginVertical: 5,
             backgroundColor: "#E0E0E0",

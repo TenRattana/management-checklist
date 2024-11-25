@@ -10,6 +10,8 @@ import { Asset } from 'expo-asset';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import App from '.';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { StatusBar } from 'expo-status-bar';
 
 const queryClient = new QueryClient();
 
@@ -21,13 +23,11 @@ const RootLayout = () => {
 
     const prepare = async () => {
         try {
-            // Load fonts
             await Font.loadAsync({
                 "Poppins": require("../assets/fonts/Poppins-Regular.ttf"),
                 "Sarabun": require("../assets/fonts/Sarabun-Regular.ttf"),
             });
 
-            // Load assets
             const isAssetsLoaded = await AsyncStorage.getItem('assetsLoaded');
             if (isAssetsLoaded !== 'true') {
                 await Asset.loadAsync([
@@ -69,9 +69,12 @@ const RootLayout = () => {
                     <QueryClientProvider client={queryClient}>
                         <ToastProvider>
                             <AuthProvider>
-                                <NavigationContainer independent={true}>
-                                    <App />
-                                </NavigationContainer>
+                                <GestureHandlerRootView style={{ flex: 1 }}>
+                                    <StatusBar hidden={true} />
+                                    <NavigationContainer independent={true}>
+                                        <App />
+                                    </NavigationContainer>
+                                </GestureHandlerRootView>
                             </AuthProvider>
                         </ToastProvider>
                     </QueryClientProvider>
