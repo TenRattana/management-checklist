@@ -5,7 +5,7 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Dimensions } from 'react-native';
 import { Button, Dialog, Portal, Menu, IconButton, HelperText } from 'react-native-paper';
 import { Inputs } from '../common';
-import { Machine } from '@/typing/type';
+import { Machine, TimeSchedule } from '@/typing/type';
 import CustomDropdownMultiple from '../CustomDropdownMultiple';
 import { useToast } from '@/app/contexts/useToast';
 import { FastField, Formik } from 'formik';
@@ -19,8 +19,9 @@ const { height } = Dimensions.get('window');
 interface ScheduleDialogProps {
     isVisible: boolean;
     setIsVisible: (value: boolean) => void;
-    machine: Machine[];
+    timeSchedule: TimeSchedule[];
     saveData: (values: any) => void;
+    machine: Machine[];
     initialValues: {
         ScheduleName: string,
         Machine: Machine[],
@@ -30,7 +31,7 @@ interface ScheduleDialogProps {
     isEditing: boolean;
 }
 
-const ScheduleDialog = React.memo(({ isVisible, setIsVisible, machine, saveData, initialValues, isEditing }: ScheduleDialogProps) => {
+const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, saveData, initialValues, isEditing, machine }: ScheduleDialogProps) => {
     const { theme } = useTheme();
     const { spacing, responsive } = useRes();
     const { showError, showSuccess } = useToast()
@@ -87,12 +88,12 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, machine, saveData,
 
     const styles = StyleSheet.create({
         container: {
-            width: responsive === 'large' ? 550 : responsive === 'medium' ? '50%' : '80%',
+            width: responsive === 'large' ? 800 : responsive === 'medium' ? '80%' : '80%',
             alignSelf: 'center',
             backgroundColor: theme.colors.background,
+            overflow: 'hidden',
         },
         containerTime: {
-            flex: 1,
             marginVertical: 10,
             flexDirection: 'row',
             justifyContent: 'space-between',
@@ -103,12 +104,8 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, machine, saveData,
         addButton: {
             marginVertical: 5,
         },
-        scroll: {
-            maxHeight: height / 1.7,
-            paddingHorizontal: 24,
-        },
         slotContainer: {
-            marginHorizontal: '4.5%',
+            marginHorizontal: '4%',
             flexBasis: '38%',
         },
         label: {
@@ -126,11 +123,11 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, machine, saveData,
         deleteButton: {
             flex: 1,
             justifyContent: 'center',
-            left: -5,
-            top: '20%',
+            alignSelf: 'center',
+            // top: '20%',
             alignContent: 'center',
             alignItems: 'center',
-            marginTop: 10,
+            // marginTop: 10,
         },
         timeIntervalMenu: {
             marginHorizontal: 24,
@@ -143,7 +140,6 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, machine, saveData,
             <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={styles.container}>
                 <Dialog.Title>{isEditing ? "Edit Schedule" : "Add Schedule"}</Dialog.Title>
                 <Text style={[masterdataStyles.text, { marginHorizontal: 24, marginVertical: 10 }]}>{isEditing ? "Update TimeSchedule detail" : "Create TimeSchedule detail"}</Text>
-
                 <Formik
                     initialValues={initialValues}
                     validationSchema={validationSchema}
@@ -153,181 +149,188 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, machine, saveData,
                 >
                     {({ values, errors, touched, handleSubmit, setFieldValue, dirty, isValid }) => {
 
-                        const handleSelectTime = (
-                            type: 'start' | 'end',
-                            index: number,
-                            value: string
-                        ) => {
-                            const updatedSlots = values.timeSlots.map((slot, i) =>
-                                i === index ? { ...slot, [type]: value } : slot
-                            );
+                        const handleSelectTime = React.useCallback(
+                            (type: 'start' | 'end', index: number, value: string) => {
+                                setFieldValue(
+                                    'timeSlots',
+                                    values.timeSlots.map((slot, i) =>
+                                        i === index ? { ...slot, [type]: value } : slot
+                                    )
+                                );
+                            },
+                            [setFieldValue, values.timeSlots]
+                        );
 
-                            setFieldValue('timeSlots', updatedSlots);
-
-                            setShowStartMenu(-1);
-                            setShowEndMenu(-1);
-                        };
-
-                        const addTimeSlot = () => {
-                            const incompleteSlot = values.timeSlots.some(slot => !slot.start || !slot.end);
-
-                            if (incompleteSlot) {
+                        const addTimeSlot = React.useCallback(() => {
+                            if (values.timeSlots.some(slot => !slot.start || !slot.end)) {
                                 showError("Please complete all time slots before adding a new one.");
                                 return;
                             }
-                            const newSlots = [...values.timeSlots, { start: null, end: null }];
-
-                            setFieldValue('timeSlots', newSlots);
+                            setFieldValue('timeSlots', [...values.timeSlots, { start: null, end: null }]);
                             showSuccess("New time slot added successfully!");
-                        };
+                        }, [setFieldValue, values.timeSlots]);
 
-                        const removeTimeSlot = (index: number) => {
+                        const removeTimeSlot = React.useCallback((index: number) => {
                             if (values.timeSlots.length <= 1) {
                                 showError("You must have at least one time slot.");
                                 return;
                             }
-                            const updatedSlots = values.timeSlots.filter((_, i) => i !== index);
-
-                            setFieldValue('timeSlots', updatedSlots);
+                            setFieldValue(
+                                'timeSlots',
+                                values.timeSlots.filter((_, i) => i !== index)
+                            );
                             showSuccess(`Time slot at position ${index + 1} removed successfully!`);
-                        };
+                        }, [setFieldValue, values.timeSlots]);
 
                         return (
-                            <View id="form-schedule">
-                                <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-
-                                    <FastField name="ScheduleName">
-                                        {({ field, form }: any) => (
-                                            <Inputs
-                                                placeholder="Enter Schedule Name"
-                                                label="Schedule Name"
-                                                handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                value={field.value ??= ""}
-                                                error={form.touched.ScheduleName && Boolean(form.errors.ScheduleName)}
-                                                errorMessage={form.touched.ScheduleName ? form.errors.ScheduleName : ""}
-                                                testId="schedule-s"
-                                            />
-                                        )}
-                                    </FastField>
-
-                                    <FastField name="Machine">
-                                        {({ field, form }: any) => (
-                                            <CustomDropdownMultiple
-                                                title="Machine"
-                                                labels="MachineName"
-                                                values="MachineID"
-                                                data={machine}
-                                                value={field.value}
-                                                handleChange={(value) => {
-                                                    form.setFieldValue(field.name, value);
-                                                    setTimeout(() => {
-                                                        form.setFieldTouched(field.name, true);
-                                                    }, 0)
-                                                }}
-                                                handleBlur={() => {
-                                                    form.setFieldTouched(field.name, true);
-                                                }}
-                                                error={form.touched.checkListOptionId && Boolean(form.errors.checkListOptionId)}
-                                                errorMessage={form.touched.checkListOptionId ? form.errors.checkListOptionId : ""}
-                                                testId="machine-s"
-                                            />
-                                        )}
-                                    </FastField>
-
-                                    <View style={styles.timeIntervalMenu}>
-                                        <Text style={masterdataStyles.text}>Generate Time Every : {values.timeInterval}</Text>
-
-                                        <Menu
-                                            visible={showTimeIntervalMenu}
-                                            onDismiss={() => setShowTimeIntervalMenu(false)}
-                                            anchor={<Button
-                                                mode="outlined"
-                                                style={styles.timeButton}
-                                                onPress={() => setShowTimeIntervalMenu(true)}
-                                            >
-                                                <Text style={styles.timeText}>{values.timeInterval ? `Every ${values.timeInterval} hours` : 'Select Interval'}</Text>
-                                            </Button>}
-                                        >
-                                            {[1, 2, 3, 4, 6, 12].map((interval, index) => (
-                                                <Menu.Item
-                                                    style={{ width: 200 }}
-                                                    key={index}
-                                                    onPress={() => handleGenerateSchedule(interval, setFieldValue)}
-                                                    title={`Every ${interval} hours`}
+                            <>
+                                <View style={{
+                                    flexDirection: responsive === "small" ? 'column' : 'row',
+                                    maxHeight: height / 1.5,
+                                }}>
+                                    <View style={{ flexBasis: '46%', marginHorizontal: '2%' }}>
+                                        <FastField name="ScheduleName">
+                                            {({ field, form }: any) => (
+                                                <Inputs
+                                                    placeholder="Enter Schedule Name"
+                                                    label="Schedule Name"
+                                                    handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                    handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                    value={field.value ??= ""}
+                                                    error={form.touched.ScheduleName && Boolean(form.errors.ScheduleName)}
+                                                    errorMessage={form.touched.ScheduleName ? form.errors.ScheduleName : ""}
+                                                    testId="schedule-s"
                                                 />
-                                            ))}
-                                        </Menu>
+                                            )}
+                                        </FastField>
+
+                                        <ScrollView showsVerticalScrollIndicator={false}>
+                                            <FastField name="Machine">
+                                                {({ field, form }: any) => (
+                                                    <CustomDropdownMultiple
+                                                        title="Machine"
+                                                        labels="MachineName"
+                                                        values="MachineID"
+                                                        data={machine}
+                                                        value={field.value}
+                                                        handleChange={(value) => {
+                                                            form.setFieldValue(field.name, value);
+                                                            setTimeout(() => {
+                                                                form.setFieldTouched(field.name, true);
+                                                            }, 0)
+                                                        }}
+                                                        handleBlur={() => {
+                                                            form.setFieldTouched(field.name, true);
+                                                        }}
+                                                        error={form.touched.checkListOptionId && Boolean(form.errors.checkListOptionId)}
+                                                        errorMessage={form.touched.checkListOptionId ? form.errors.checkListOptionId : ""}
+                                                        testId="machine-s"
+                                                    />
+                                                )
+                                                }
+                                            </FastField>
+                                        </ScrollView>
                                     </View>
 
-                                    {values.timeSlots.map((timeSlot, index) => (
-                                        <View key={index} style={styles.containerTime}>
-                                            <View style={styles.slotContainer}>
-                                                <Text style={[masterdataStyles.text]}>Start Time</Text>
-                                                <Menu
-                                                    visible={showStartMenu === index}
-                                                    onDismiss={() => setShowStartMenu(-1)}
-                                                    anchor={
-                                                        <Button
-                                                            mode="outlined"
-                                                            style={styles.timeButton}
-                                                            onPress={() => setShowStartMenu(index)}
-                                                        >
-                                                            <Text style={styles.timeText}>
-                                                                {timeSlot.start || 'N/A'}
-                                                            </Text>
-                                                        </Button>
-                                                    }
+                                    <View style={{ flexBasis: '46%', marginHorizontal: '2%' }}>
+                                        <View style={styles.timeIntervalMenu}>
+                                            <Text style={masterdataStyles.text}>Generate Time Every : {values.timeInterval}</Text>
+
+                                            <Menu
+                                                visible={showTimeIntervalMenu}
+                                                onDismiss={() => setShowTimeIntervalMenu(false)}
+                                                anchor={<Button
+                                                    mode="outlined"
+                                                    style={styles.timeButton}
+                                                    onPress={() => setShowTimeIntervalMenu(true)}
                                                 >
-                                                    {hours.map((hour, i) => (
-                                                        <Menu.Item
-                                                            style={{ width: 200 }}
-                                                            key={i}
-                                                            onPress={() => handleSelectTime('start', index, hour)}
-                                                            title={hour}
-                                                        />
-                                                    ))}
-                                                </Menu>
-                                            </View>
+                                                    <Text style={styles.timeText}>{values.timeInterval ? `Every ${values.timeInterval} hours` : 'Select Interval'}</Text>
+                                                </Button>}
+                                            >
+                                                {[1, 2, 3, 4, 6, 12].map((interval, index) => (
+                                                    <Menu.Item
+                                                        style={{ width: 200 }}
+                                                        key={index}
+                                                        onPress={() => {
+                                                            handleGenerateSchedule(interval, setFieldValue);
+                                                            setShowTimeIntervalMenu(false)
+                                                        }}
+                                                        title={`Every ${interval} hours`}
+                                                    />
+                                                ))}
+                                            </Menu>
+                                        </View>
 
-                                            <View style={styles.slotContainer}>
-                                                <Text style={[masterdataStyles.text]}>End Time</Text>
-                                                <Menu
-                                                    visible={showEndMenu === index}
-                                                    onDismiss={() => setShowEndMenu(-1)}
-                                                    anchor={
-                                                        <Button
-                                                            mode="outlined"
-                                                            style={styles.timeButton}
-                                                            onPress={() => setShowEndMenu(index)}
+                                        <ScrollView showsVerticalScrollIndicator={false}>
+                                            {values.timeSlots.map((timeSlot, index) => (
+                                                <View key={index} style={styles.containerTime}>
+
+                                                    <View style={styles.slotContainer}>
+                                                        <Text style={[masterdataStyles.text]}>Start Time</Text>
+                                                        <Menu
+                                                            visible={showStartMenu === index}
+                                                            onDismiss={() => setShowStartMenu(-1)}
+                                                            anchor={
+                                                                <Button
+                                                                    mode="outlined"
+                                                                    style={styles.timeButton}
+                                                                    onPress={() => setShowStartMenu(index)}
+                                                                >
+                                                                    <Text style={styles.timeText}>
+                                                                        {timeSlot.start || 'N/A'}
+                                                                    </Text>
+                                                                </Button>
+                                                            }
                                                         >
-                                                            <Text style={styles.timeText}>
-                                                                {timeSlot.end || 'N/A'}
-                                                            </Text>
-                                                        </Button>
-                                                    }
-                                                >
-                                                    {hours.map((hour, i) => (
-                                                        <Menu.Item
-                                                            style={{ width: 200 }}
-                                                            key={i}
-                                                            onPress={() => handleSelectTime('end', index, hour)}
-                                                            title={hour}
-                                                        />
-                                                    ))}
-                                                </Menu>
-                                            </View>
+                                                            {hours.map((hour, i) => (
+                                                                <Menu.Item
+                                                                    style={{ width: 200 }}
+                                                                    key={i}
+                                                                    onPress={() => handleSelectTime('start', index, hour)}
+                                                                    title={hour}
+                                                                />
+                                                            ))}
+                                                        </Menu>
+                                                    </View>
 
-                                            <IconButton
-                                                icon="close"
-                                                iconColor={theme.colors.error}
-                                                size={spacing.large}
-                                                style={styles.deleteButton}
-                                                onPress={() => removeTimeSlot(index)}
-                                                animated
-                                            />
+                                                    <View style={styles.slotContainer}>
+                                                        <Text style={[masterdataStyles.text]}>End Time</Text>
+                                                        <Menu
+                                                            visible={showEndMenu === index}
+                                                            onDismiss={() => setShowEndMenu(-1)}
+                                                            anchor={
+                                                                <Button
+                                                                    mode="outlined"
+                                                                    style={styles.timeButton}
+                                                                    onPress={() => setShowEndMenu(index)}
+                                                                >
+                                                                    <Text style={styles.timeText}>
+                                                                        {timeSlot.end || 'N/A'}
+                                                                    </Text>
+                                                                </Button>
+                                                            }
+                                                        >
+                                                            {hours.map((hour, i) => (
+                                                                <Menu.Item
+                                                                    style={{ width: 200 }}
+                                                                    key={i}
+                                                                    onPress={() => handleSelectTime('end', index, hour)}
+                                                                    title={hour}
+                                                                />
+                                                            ))}
+                                                        </Menu>
+                                                    </View>
 
-                                            {/* <HelperText
+                                                    <IconButton
+                                                        icon="window-close"
+                                                        iconColor={theme.colors.error}
+                                                        size={spacing.large}
+                                                        style={styles.deleteButton}
+                                                        onPress={() => removeTimeSlot(index)}
+                                                        animated
+                                                    />
+
+                                                    {/* <HelperText
                                                 type="error"
                                                 visible={Boolean(errors.timeSlots?.[index])}
                                                 style={[
@@ -335,24 +338,26 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, machine, saveData,
                                                     masterdataStyles.errorText
                                                 ]}
                                             > */}
-                                            {/* {errors.timeSlots?.[index] || ""} */}
-                                            {/* </HelperText> */}
+                                                    {/* {errors.timeSlots?.[index] || ""} */}
+                                                    {/* </HelperText> */}
 
+                                                </View>
+                                            ))}
+                                        </ScrollView>
+                                        <View style={{ marginHorizontal: 24, marginBottom: 20 }}>
+                                            <Button onPress={() => addTimeSlot()} style={styles.addButton}>
+                                                Add Schedule
+                                            </Button>
                                         </View>
-                                    ))}
-                                </ScrollView>
-
-                                <View style={{ marginHorizontal: 24, marginBottom: 20 }}>
-                                    <Button onPress={() => addTimeSlot()} style={styles.addButton}>
-                                        Add Schedule
-                                    </Button>
+                                    </View>
                                 </View>
-
-                                <Dialog.Actions style={{ paddingBottom: 10 }}>
+                                <View style={{ paddingBottom: 10, justifyContent: 'flex-end', flexDirection: 'row', paddingHorizontal: 24 }}>
                                     <Button onPress={() => setIsVisible(false)}>Cancel</Button>
-                                    <Button onPress={() => handleSubmit()}>Save</Button>
-                                </Dialog.Actions>
-                            </View>
+                                    <Button
+                                        disabled={!isValid || !dirty}
+                                        onPress={() => handleSubmit()}>Save</Button>
+                                </View>
+                            </>
                         )
                     }}
                 </Formik>

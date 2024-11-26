@@ -120,14 +120,14 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: '10%',
     right: '2%',
-    zIndex: 9999,
+    // zIndex: 9999,
   },
   toastStackMobile: {
     position: "absolute",
     top: '10%',
     flex: 1,
     alignSelf: 'center',
-    zIndex: 9999,
+    // zIndex: 9999,
   },
   toastContainer: {
     flexDirection: "row",

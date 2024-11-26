@@ -40,7 +40,7 @@ export interface DefaultProps {
   error?: boolean;
   errorMessage?: string;
   testId?: string;
-  exp?:boolean;
+  exp?: boolean;
 }
 
 export interface DialogsProps {
@@ -60,7 +60,7 @@ export interface InputProps extends Event, DefaultProps {
   lefticon?: string;
   name?: string;
   textColor?: string;
-  secureTextEntry?:boolean;
+  secureTextEntry?: boolean;
 }
 
 export interface RadiosProps extends Event, DefaultProps {
@@ -99,7 +99,7 @@ export interface DynamicFormProps {
   error?: boolean;
   errorMessages?: FormikErrors<{ [key: string]: any }>;
   type?: string;
-  exp?:boolean;
+  exp?: boolean;
 }
 
 export interface PreviewProps<T extends PreviewParams | ScanParams> {
@@ -128,7 +128,7 @@ export interface CustomDropdownMultiProps extends Event, DefaultProps {
   lefticon?: string;
   iconRight?: React.ReactNode;
   handleBlur: () => void;
-  position?:"auto" | "bottom" | "top" 
+  position?: "auto" | "bottom" | "top";
 }
 
 export interface CustomTableProps {
@@ -144,6 +144,9 @@ export interface CustomTableProps {
   showFilter?: boolean;
   showData?: TypeConfig[];
   showColumn?: string;
+  detail?: boolean;
+  detailKey?:string[];
+  detailData?: TypeConfig[];
 }
 
 export interface DragfieldProps {
@@ -250,4 +253,7 @@ export interface CustomtableDataProps {
   showMessage: number;
   selectedRows?: string[];
   toggleSelect: (value: string) => void;
+  detail?: boolean;
+  detailKey?:string[];
+  detailData?: TypeConfig[];
 }

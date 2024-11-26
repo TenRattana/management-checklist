@@ -12,7 +12,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import App from '.';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
-import { TimescheduleScreen } from './screens';
 
 const queryClient = new QueryClient();
 
@@ -73,7 +72,7 @@ const RootLayout = () => {
                                 <GestureHandlerRootView style={{ flex: 1 }}>
                                     <StatusBar hidden={true} />
                                     <NavigationContainer independent={true}>
-                                        <TimescheduleScreen />
+                                        <App />
                                     </NavigationContainer>
                                 </GestureHandlerRootView>
                             </AuthProvider>

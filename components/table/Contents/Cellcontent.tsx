@@ -1,5 +1,5 @@
 import React from 'react'
-import { Pressable } from "react-native";
+import { TouchableOpacity } from "react-native";
 import Text from "@/components/Text";
 import { IconButton } from 'react-native-paper';
 import { useRes } from '@/app/contexts/useRes';
@@ -18,7 +18,7 @@ const Cellcontent = React.memo(({ cell, cellIndex, row, rowIndex, Canedit, handl
 
     if (typeof cell === "boolean") {
         return (
-            <Pressable onPress={() => handlePress({
+            <TouchableOpacity onPress={() => handlePress({
                 action: "activeIndex",
                 data: String(row[cellIndex + 1]),
                 message: row,
@@ -32,7 +32,7 @@ const Cellcontent = React.memo(({ cell, cellIndex, row, rowIndex, Canedit, handl
                     iconColor={cell ? theme.colors.green : theme.colors.secondary}
                     disabled={Boolean(Canedit)}
                 />
-            </Pressable>
+            </TouchableOpacity>
         );
     }
 

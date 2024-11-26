@@ -117,7 +117,7 @@ const useMasterdataStyles = () => {
             fontWeight: "500",
         },
         dropdown: {
-            // flex: 1,
+            width: '100%',
             height: 50,
             borderBottomColor: 'gray',
             borderBottomWidth: 0.5,

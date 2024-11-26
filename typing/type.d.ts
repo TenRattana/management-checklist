@@ -23,6 +23,18 @@ export interface Machine {
   Disables: boolean;
 }
 
+export interface TimeDetail {
+  TDetailID: string;
+  StartTime: string;
+  EndTime: string;
+}
+export interface TimeSchedule {
+  TScheduleID: string;
+  TScheduleName: string;
+  IsActive: boolean;
+  Machine?: { MachineID: string; MachineName: string }[];
+  TimeDetail?: TimeDetail[];
+}
 export interface CheckListType {
   CTypeID: string;
   CTypeName: string;
@@ -206,4 +218,5 @@ export type TypeConfig =
   | MatchCheckListOption
   | Users
   | GroupUsers
-  | UsersPermission;
+  | UsersPermission
+  | TimeSchedule;

@@ -35,7 +35,7 @@ class Text extends React.Component<CustomTextProps> {
           return (
             <DefaultText
               key={index}
-              style={[{ fontFamily }, style]}
+              style={[{ fontFamily, letterSpacing: 0.3 }, style]}
               {...props}
             >
               {child}

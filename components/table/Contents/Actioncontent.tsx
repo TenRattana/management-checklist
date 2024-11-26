@@ -1,4 +1,4 @@
-import { Pressable, View } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { Checkbox, IconButton } from 'react-native-paper';
 import { useRes } from '@/app/contexts/useRes';
@@ -49,7 +49,7 @@ const Actioncontent = React.memo(({ data, action, row, rowIndex, Canedit, handle
     }
 
     return (
-        <Pressable onPress={() => handlePress({
+        <TouchableOpacity onPress={() => handlePress({
             action: action,
             data: data,
             message: row,
@@ -57,7 +57,7 @@ const Actioncontent = React.memo(({ data, action, row, rowIndex, Canedit, handle
         }
         )} key={`action-${action}`} style={customtable.eventCell}>
             {icon}
-        </Pressable>
+        </TouchableOpacity>
     );
 });
 

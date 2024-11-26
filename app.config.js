@@ -45,16 +45,16 @@ export default {
     },
     web: {
       bundler: "metro",
-      output: "static",
+      output: "server",
       favicon: "./assets/images/Icon-app.png",
       splitChunks: true,
-      cache: true
+      cache: true,
     },
     assetBundlePatterns: ["assets/fonts/*", "assets/images/*"],
     plugins: [
       "expo-router",
       [
-        "expo-secure-store",  
+        "expo-secure-store",
         {
           configureAndroidBackup: true,
           faceIDPermission:

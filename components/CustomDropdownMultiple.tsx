@@ -6,10 +6,11 @@ import { CustomDropdownMultiProps } from '@/typing/tag';
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { Pressable, View } from "react-native";
 import Text from "@/components/Text";
+import { useRes } from '@/app/contexts/useRes'
 
-const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChange, lefticon, iconRight, testId, handleBlur , position }: CustomDropdownMultiProps) => {
+const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChange, lefticon, iconRight, testId, handleBlur, position }: CustomDropdownMultiProps) => {
   const [options, setOptions] = useState<{ label?: string; value?: string; icon?: () => JSX.Element }[]>([]);
-
+  const { spacing } = useRes();
   const masterdataStyles = useMasterdataStyles();
 
   const processData = useCallback(() => {
@@ -32,6 +33,7 @@ const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChan
     <View id="customdropdown-multi" style={masterdataStyles.commonContainer}>
       <MultiSelect
         mode="modal"
+        dropdownPosition="auto"
         style={masterdataStyles.dropdown}
         placeholderStyle={masterdataStyles.placeholderStyle}
         selectedTextStyle={masterdataStyles.selectedTextStyle}
@@ -39,7 +41,13 @@ const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChan
         iconStyle={masterdataStyles.iconStyle}
         itemTextStyle={masterdataStyles.text}
         activeColor={masterdataStyles.backMain.backgroundColor}
-        containerStyle={[masterdataStyles.backLight]}
+        containerStyle={{
+          flex: 1,
+          position: 'absolute',
+          backgroundColor: 'white',
+          zIndex: 1000,
+        }}
+        // containerStyle={[masterdataStyles.backLight]}
         searchPlaceholderTextColor={masterdataStyles.text.color}
         data={options}
         search
@@ -53,6 +61,7 @@ const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChan
         onBlur={handleBlur}
         alwaysRenderSelectedItem
         showsVerticalScrollIndicator
+
         renderLeftIcon={() => (
           <IconButton
             style={masterdataStyles.icon}
@@ -66,7 +75,7 @@ const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChan
               <IconButton
                 style={masterdataStyles.icon}
                 icon="window-close"
-                size={30}
+                size={spacing.large}
                 onPress={() => {
                   handleChange([]);
                 }}

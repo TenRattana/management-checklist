@@ -18,7 +18,10 @@ const CustomTable = ({
   setRow,
   showFilter,
   showData,
-  showColumn
+  showColumn,
+  detail,
+  detailData,
+  detailKey
 }: CustomTableProps) => {
   const [sortColumn, setSortColumn] = useState<number | null>(null);
   const [sortDirection, setSortDirection] = useState<"ascending" | "descending" | undefined>(undefined);
@@ -144,6 +147,9 @@ const CustomTable = ({
             selectedRows={selectedRows}
             toggleSelect={toggleSelect}
             showMessage={showMessage}
+            detail={detail}
+            detailData={detailData}
+            detailKey={detailKey}
             key={"CustomtableData"}
           />
 
