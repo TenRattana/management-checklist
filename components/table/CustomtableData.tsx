@@ -75,26 +75,14 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
 
     const renderTableData = useCallback((row: (string | number | boolean)[], rowIndex: number) => {
 
-        const index = detailData?.findIndex((item, index) => {
-            const itemValues = Object.values(item);
-            console.log(row.every((v, i) => itemValues[0] == v))
-            // console.log(row);
-            // console.log(itemValues);
-
-            // console.log(row[0]);
-            // console.log(itemValues[0]);
-
-            return row[0] == itemValues[0] ? index : -1
-        }) || -1;
-
-        if (index !== -1) {
-            console.log(detailData?.[index])
-            console.log(row);
-        }
-
+        const matchingIndex = detailData?.findIndex(item => {
+            const itemValues = Object.values(item); 
+            return row.every(value => itemValues.includes(value)); 
+        }) ?? -1 ;
+        
         return (
             <View key={`row-${rowIndex}`}>
-                <DataTable.Row onPress={() => detail ? setIsDetailVisible((prev) => ({ ...prev, [rowIndex]: !isDetailVisible[rowIndex] })) : null} disabled={!detail} key={`data-row-${rowIndex}`} style={{ backgroundColor: theme.colors.background }}>
+                <DataTable.Row onPress={() => detail ? setIsDetailVisible((prev) => ({ ...prev, [matchingIndex]: !isDetailVisible[matchingIndex] })) : null} disabled={!detail} key={`data-row-${rowIndex}`} style={{ backgroundColor: theme.colors.background }}>
                     {row.map((cell, cellIndex) => {
                         const Align: justifyContent = Tablehead[cellIndex]?.align as justifyContent;
                         const justifyContent = {
@@ -164,18 +152,18 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                     })}
                 </DataTable.Row>
 
-                {isDetailVisible[rowIndex] && detailKey?.some(key => detailData?.[index]?.hasOwnProperty(key)) && (
-                    <AccessibleView name="containerdetail" style={styles.containerdetail} key={`index-${rowIndex}`}>
-                        {Object.entries(detailData?.[index] || {}).map(
+                {isDetailVisible[matchingIndex] && detailKey?.some(key => detailData?.[matchingIndex]?.hasOwnProperty(key)) && (
+                    <AccessibleView name="containerdetail" style={styles.containerdetail} key={`index-${matchingIndex}`}>
+                        {Object.entries(detailData?.[matchingIndex] || {}).map(
                             ([key, value]) =>
                                 detailKey.includes(key) && (
                                     <AccessibleView name="containerdetailkey"
-                                        key={`detail-${rowIndex}-${key}`}
+                                        key={`detail-${matchingIndex}-${key}`}
                                         style={[styles.containerdetailkey]}
                                     >
                                         <Text
                                             style={[masterdataStyles.text, masterdataStyles.textBold, styles.text]}
-                                            key={`detail-${rowIndex}-${key}-${key.charAt(0).toUpperCase() + key.slice(1)}`}
+                                            key={`detail-${matchingIndex}-${key}-${key.charAt(0).toUpperCase() + key.slice(1)}`}
                                         >
                                             {key.charAt(0).toUpperCase() + key.slice(1)}
                                         </Text>
@@ -183,10 +171,10 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                                         {Array.isArray(value) ? (
                                             <AccessibleView name="chipContainer" style={styles.chipContainer}>
                                                 {value.map((item, index) => (
-                                                    <View id="chip" key={`chip-${rowIndex}-${key}-${index}`} style={[styles.chip, { backgroundColor: theme.colors.field }]}>
+                                                    <View id="chip" key={`chip-${matchingIndex}-${key}-${index}`} style={[styles.chip, { backgroundColor: theme.colors.field }]}>
                                                         {typeof item === "object" && item !== null ? (
                                                             Object.entries(item).map(([subKey, subValue]) => (
-                                                                <Text key={`chip-${rowIndex}-${key}-${index}-${subKey}`} style={[masterdataStyles.textFFF, styles.text]}>
+                                                                <Text key={`chip-${matchingIndex}-${key}-${index}-${subKey}`} style={[masterdataStyles.textFFF, styles.text]}>
                                                                     {subKey} : {String(subValue)}
                                                                 </Text>
                                                             ))
@@ -197,7 +185,7 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                                                 ))}
                                             </AccessibleView>
                                         ) : (
-                                            <Text style={[masterdataStyles.text, styles.text]} key={`detail-${rowIndex}-${key}-${value}`}>
+                                            <Text style={[masterdataStyles.text, styles.text]} key={`detail-${matchingIndex}-${key}-${value}`}>
                                                 {String(value)}
                                             </Text>
                                         )}
