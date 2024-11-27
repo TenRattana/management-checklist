@@ -410,13 +410,22 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                         disabled={!isValid || !dirty}
                                         onPress={() => handleSubmit()}>Save</Button>
                                 </View>
+                                <InfoSchedule_dialog 
+                                visible={showThirDialog} 
+                                setVisible={(v) => setShowThirDialog(v)} 
+                                setFieldValue={setFieldValue} 
+                                responsive={responsive}
+                                showError={showError}
+                                showSuccess={showSuccess}
+                                spacing={spacing}
+                                theme={theme}
+                                />
                             </>
                         )
                     }}
                 </Formik>
             </Dialog>
 
-            <InfoSchedule_dialog visible={showThirDialog} setVisible={(v) => setShowThirDialog(v)} />
         </Portal>
     );
 });
