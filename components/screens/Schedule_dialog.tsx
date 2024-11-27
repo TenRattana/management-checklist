@@ -1,20 +1,37 @@
 import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Dimensions } from 'react-native';
-import { Button, Dialog, Portal, Menu, IconButton, HelperText } from 'react-native-paper';
+import { Button, Dialog, Portal, Menu, IconButton, HelperText, Switch } from 'react-native-paper';
 import { Inputs } from '../common';
-import { Machine, TimeSchedule } from '@/typing/type';
+import { GroupMachine, Machine, TimeSchedule } from '@/typing/type';
 import CustomDropdownMultiple from '../CustomDropdownMultiple';
 import { useToast } from '@/app/contexts/useToast';
 import { FastField, Formik } from 'formik';
 import * as Yup from 'yup'
+import CustomDropdownSingle from '../CustomDropdownSingle';
+import axiosInstance from '@/config/axios';
+import { useQuery } from 'react-query';
+import Animated, {
+    interpolate,
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
+} from 'react-native-reanimated';
+import Daily_dialog from './Daily_dialog';
+import Week_dialog from './Week_dialog';
+import InfoSchedule_dialog from './InfoSchedule_dialog';
 
 const hours = Array.from({ length: 24 }, (_, i) =>
     i.toString().padStart(2, '0') + ':00'
 );
 const { height } = Dimensions.get('window');
+
+const fetchMachineGroups = async (): Promise<GroupMachine[]> => {
+    const response = await axiosInstance.post("GroupMachine_service.asmx/GetGroupMachines");
+    return response.data.data ?? [];
+};
 
 interface ScheduleDialogProps {
     isVisible: boolean;
@@ -24,12 +41,14 @@ interface ScheduleDialogProps {
     machine: Machine[];
     initialValues: {
         ScheduleName: string,
+        MachineGroup: string;
         Machine: Machine[],
-        timeSlots: [{ start: null, end: null }],
-        timeInterval: string | null,
+        timeSlots: [{ start: string | null, end: string | null }],
     };
     isEditing: boolean;
 }
+
+const Week = ["Mon", "The", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
 const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, saveData, initialValues, isEditing, machine }: ScheduleDialogProps) => {
     const { theme } = useTheme();
@@ -37,8 +56,29 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
     const { showError, showSuccess } = useToast()
     const [showStartMenu, setShowStartMenu] = useState(-1);
     const [showEndMenu, setShowEndMenu] = useState(-1);
-    const [showTimeIntervalMenu, setShowTimeIntervalMenu] = useState(false);
+    const [showTimeIntervalMenu, setShowTimeIntervalMenu] = useState<{ custom: boolean, time: boolean, week: boolean }>({ custom: false, time: false, week: false });
     const masterdataStyles = useMasterdataStyles();
+    const [shouldRender, setShouldRender] = useState(false)
+    const [showThirDialog, setShowThirDialog] = useState(false)
+    const [dataThirDialog, setDataThirDialog] = useState<{ [key: number]: { start: string | null, end: string | null }[] }[]>([])
+    const [indexThirDialog, setIndexThirDialog] = useState<number | undefined>()
+    const [shouldCustom, setShouldCustom] = useState<boolean | "">("")
+    const [shouldRenderTime, setShouldRenderTime] = useState<string>("")
+    const [fieldMachine, setFieldMachie] = useState<Machine[]>([])
+    const [timeInterval, setTimeInterval] = useState<number>(0)
+    const [selectedDays, setSelectedDays] = useState<string[]>([]);
+    const [dialy_d, setDialy_d] = useState(false)
+
+    useEffect(() => {
+        if (!isVisible) {
+            setShouldRender(false)
+            setShouldCustom("")
+            setShouldRenderTime("")
+            setFieldMachie([])
+            setSelectedDays([])
+            console.log(shouldRenderTime, shouldCustom, shouldRender);
+        }
+    }, [isVisible])
 
     const validationSchema = Yup.object().shape({
         ScheduleName: Yup.string().required('Schedule name is required'),
@@ -52,6 +92,14 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
             )
             .min(1, 'At least one time slot is required'),
     });
+
+    const { data: machineGroups = [] } = useQuery<GroupMachine[], Error>(
+        'machineGroups',
+        fetchMachineGroups,
+        {
+            refetchOnWindowFocus: true,
+        }
+    );
 
     const handleGenerateSchedule = useCallback(
         (timeInterval: number, setFieldValue: (field: string, value: any) => void) => {
@@ -78,13 +126,12 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                 }
 
                 setFieldValue('timeSlots', generatedSlots);
-                setFieldValue('timeInterval', timeInterval);
+                setTimeInterval(timeInterval);
                 showSuccess("Schedule generated successfully!");
             } catch (error) {
                 showError("An unexpected error occurred while generating the schedule.");
             }
         }, []);
-
 
     const styles = StyleSheet.create({
         container: {
@@ -95,6 +142,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
         },
         containerTime: {
             marginVertical: 10,
+            marginHorizontal: 5,
             flexDirection: 'row',
             justifyContent: 'space-between',
         },
@@ -133,7 +181,35 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
             marginHorizontal: 24,
             marginBottom: 10,
         },
+        menuItem: {
+            width: 200,
+        },
     });
+
+    const duration = 300;
+
+    const scaleTimeValue = withTiming(shouldCustom ? 1 : 1, { duration });
+    const scaleMachineValue = withTiming(shouldRender ? 1 : 0.5, { duration });
+
+    const opacityTimeValue = withTiming(shouldCustom ? 1 : 1, { duration });
+    const opacityMachineValue = withTiming(shouldRender ? 1 : 0, { duration });
+
+    const animatedMachineStyle = useAnimatedStyle(() => {
+        return {
+            opacity: opacityMachineValue,
+            transform: [{ scale: scaleMachineValue }]
+        };
+    }, [shouldRender]);
+
+    const animatedTimeStyle = useAnimatedStyle(() => {
+        return {
+            opacity: opacityTimeValue,
+            transform: [{ scale: scaleTimeValue }]
+        };
+    }, [shouldCustom]);
+
+
+    console.log(shouldCustom, shouldRenderTime, animatedTimeStyle.transform, "Form");
 
     return (
         <Portal>
@@ -147,40 +223,29 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                     validateOnChange={false}
                     onSubmit={(values) => saveData(values)}
                 >
-                    {({ values, errors, touched, handleSubmit, setFieldValue, dirty, isValid }) => {
+                    {({ values, handleSubmit, setFieldValue, dirty, isValid }) => {
 
-                        const handleSelectTime = React.useCallback(
-                            (type: 'start' | 'end', index: number, value: string) => {
-                                setFieldValue(
-                                    'timeSlots',
-                                    values.timeSlots.map((slot, i) =>
-                                        i === index ? { ...slot, [type]: value } : slot
-                                    )
-                                );
-                            },
-                            [setFieldValue, values.timeSlots]
-                        );
+                        useEffect(() => {
+                            let file: Machine[]
 
-                        const addTimeSlot = React.useCallback(() => {
-                            if (values.timeSlots.some(slot => !slot.start || !slot.end)) {
-                                showError("Please complete all time slots before adding a new one.");
-                                return;
+                            if (values.MachineGroup) {
+                                file = machine.filter(v => v.GMachineID === values.MachineGroup)
+                                setShouldRender(true)
+                            } else {
+                                file = machine
+                                setShouldRender(false)
                             }
-                            setFieldValue('timeSlots', [...values.timeSlots, { start: null, end: null }]);
-                            showSuccess("New time slot added successfully!");
-                        }, [setFieldValue, values.timeSlots]);
 
-                        const removeTimeSlot = React.useCallback((index: number) => {
-                            if (values.timeSlots.length <= 1) {
-                                showError("You must have at least one time slot.");
-                                return;
-                            }
-                            setFieldValue(
-                                'timeSlots',
-                                values.timeSlots.filter((_, i) => i !== index)
-                            );
-                            showSuccess(`Time slot at position ${index + 1} removed successfully!`);
-                        }, [setFieldValue, values.timeSlots]);
+                            setFieldMachie(prevOptions => {
+                                const isEqual = JSON.stringify(prevOptions) === JSON.stringify(file);
+                                return isEqual ? prevOptions : file;
+                            });
+                            setFieldValue('Machine', [])
+                        }, [values.MachineGroup, fieldMachine])
+
+
+
+
 
                         return (
                             <>
@@ -204,151 +269,139 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                             )}
                                         </FastField>
 
-                                        <ScrollView showsVerticalScrollIndicator={false}>
-                                            <FastField name="Machine">
-                                                {({ field, form }: any) => (
-                                                    <CustomDropdownMultiple
-                                                        title="Machine"
-                                                        labels="MachineName"
-                                                        values="MachineID"
-                                                        data={machine}
-                                                        value={field.value}
-                                                        handleChange={(value) => {
-                                                            form.setFieldValue(field.name, value);
-                                                            setTimeout(() => {
-                                                                form.setFieldTouched(field.name, true);
-                                                            }, 0)
-                                                        }}
-                                                        handleBlur={() => {
+                                        <FastField name="MachineGroup">
+                                            {({ field, form }: any) => (
+                                                <CustomDropdownSingle
+                                                    title="Machine Group"
+                                                    labels="GMachineName"
+                                                    values="GMachineID"
+                                                    data={machineGroups?.filter((v) => v.IsActive)}
+                                                    value={field.value}
+                                                    handleChange={(value) => {
+                                                        const stringValue = (value as { value: string }).value;
+                                                        form.setFieldValue(field.name, stringValue);
+                                                        setTimeout(() => {
                                                             form.setFieldTouched(field.name, true);
-                                                        }}
-                                                        error={form.touched.checkListOptionId && Boolean(form.errors.checkListOptionId)}
-                                                        errorMessage={form.touched.checkListOptionId ? form.errors.checkListOptionId : ""}
-                                                        testId="machine-s"
-                                                    />
-                                                )
-                                                }
-                                            </FastField>
-                                        </ScrollView>
+                                                        }, 0);
+                                                    }}
+                                                    handleBlur={() => {
+                                                        form.setFieldTouched(field.name, true);
+                                                    }}
+                                                    testId="MachineGroup-md"
+                                                    error={form.touched.MachineGroup && Boolean(form.errors.MachineGroup)}
+                                                    errorMessage={form.touched.MachineGroup ? form.errors.MachineGroup : ""}
+                                                />
+                                            )}
+                                        </FastField>
+
+                                        {shouldRender && (
+                                            <Animated.View style={[animatedMachineStyle]}>
+                                                <ScrollView showsVerticalScrollIndicator={false}>
+                                                    <FastField name="Machine" key={fieldMachine}>
+                                                        {({ field, form }: any) => (
+                                                            <CustomDropdownMultiple
+                                                                title="Machine"
+                                                                labels="MachineName"
+                                                                values="MachineID"
+                                                                data={fieldMachine}
+                                                                value={field.value}
+                                                                handleChange={(value) => {
+                                                                    form.setFieldValue(field.name, value);
+                                                                    setTimeout(() => {
+                                                                        form.setFieldTouched(field.name, true);
+                                                                    }, 0)
+                                                                }}
+                                                                handleBlur={() => {
+                                                                    form.setFieldTouched(field.name, true);
+                                                                }}
+                                                                error={form.touched.checkListOptionId && Boolean(form.errors.checkListOptionId)}
+                                                                errorMessage={form.touched.checkListOptionId ? form.errors.checkListOptionId : ""}
+                                                                testId="machine-s"
+                                                            />
+                                                        )
+                                                        }
+                                                    </FastField>
+                                                </ScrollView>
+                                            </Animated.View>
+                                        )}
                                     </View>
 
-                                    <View style={{ flexBasis: '46%', marginHorizontal: '2%' }}>
+                                    <View style={{ flexBasis: '46%', marginHorizontal: '2%', marginTop: 12, flex: 1 }}>
                                         <View style={styles.timeIntervalMenu}>
-                                            <Text style={masterdataStyles.text}>Generate Time Every : {values.timeInterval}</Text>
-
                                             <Menu
-                                                visible={showTimeIntervalMenu}
-                                                onDismiss={() => setShowTimeIntervalMenu(false)}
+                                                visible={showTimeIntervalMenu.custom}
+                                                onDismiss={() => setShowTimeIntervalMenu((prev) => ({ ...prev, custom: !showTimeIntervalMenu.custom }))}
+                                                style={{ marginTop: 50 }}
                                                 anchor={<Button
                                                     mode="outlined"
                                                     style={styles.timeButton}
-                                                    onPress={() => setShowTimeIntervalMenu(true)}
+                                                    onPress={() => setShowTimeIntervalMenu((prev) => ({ ...prev, custom: true }))}
                                                 >
-                                                    <Text style={styles.timeText}>{values.timeInterval ? `Every ${values.timeInterval} hours` : 'Select Interval'}</Text>
+                                                    <Text style={styles.timeText}>{shouldRenderTime ? `Selected ${shouldRenderTime}` : 'Select Reange Schedule'}</Text>
                                                 </Button>}
                                             >
-                                                {[1, 2, 3, 4, 6, 12].map((interval, index) => (
+                                                {["Monthly", "Weekly", "Daily"].map((interval, index) => (
                                                     <Menu.Item
-                                                        style={{ width: 200 }}
+                                                        style={{ width: 200, }}
                                                         key={index}
                                                         onPress={() => {
-                                                            handleGenerateSchedule(interval, setFieldValue);
-                                                            setShowTimeIntervalMenu(false)
+                                                            setShouldRenderTime(interval)
+                                                            setSelectedDays([])
+                                                            setShowTimeIntervalMenu((prev) => ({ ...prev, custom: false }))
                                                         }}
-                                                        title={`Every ${interval} hours`}
+                                                        title={`${interval}`}
                                                     />
                                                 ))}
                                             </Menu>
                                         </View>
 
-                                        <ScrollView showsVerticalScrollIndicator={false}>
-                                            {values.timeSlots.map((timeSlot, index) => (
-                                                <View key={index} style={styles.containerTime}>
-
-                                                    <View style={styles.slotContainer}>
-                                                        <Text style={[masterdataStyles.text]}>Start Time</Text>
-                                                        <Menu
-                                                            visible={showStartMenu === index}
-                                                            onDismiss={() => setShowStartMenu(-1)}
-                                                            anchor={
-                                                                <Button
-                                                                    mode="outlined"
-                                                                    style={styles.timeButton}
-                                                                    onPress={() => setShowStartMenu(index)}
-                                                                >
-                                                                    <Text style={styles.timeText}>
-                                                                        {timeSlot.start || 'N/A'}
-                                                                    </Text>
-                                                                </Button>
+                                        <View style={styles.timeIntervalMenu}>
+                                            <View id="form-active-md" style={[masterdataStyles.containerSwitch]}>
+                                                <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+                                                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginRight: 12 }]}>
+                                                        Type Schedule : {shouldCustom ? "Run Schedule" : "Only Schedule"}
+                                                    </Text>
+                                                    <Switch
+                                                        style={{ transform: [{ scale: 1.1 }], top: 2 }}
+                                                        color={shouldCustom ? theme.colors.inversePrimary : theme.colors.onPrimaryContainer}
+                                                        value={shouldCustom !== "" ? shouldCustom : false}
+                                                        onValueChange={(v: boolean) => {
+                                                            if (v !== shouldCustom) {
+                                                                setFieldValue('timeSlots', [])
+                                                                setFieldValue('timeInterval', "")
+                                                                setShouldCustom(v);
                                                             }
-                                                        >
-                                                            {hours.map((hour, i) => (
-                                                                <Menu.Item
-                                                                    style={{ width: 200 }}
-                                                                    key={i}
-                                                                    onPress={() => handleSelectTime('start', index, hour)}
-                                                                    title={hour}
-                                                                />
-                                                            ))}
-                                                        </Menu>
-                                                    </View>
-
-                                                    <View style={styles.slotContainer}>
-                                                        <Text style={[masterdataStyles.text]}>End Time</Text>
-                                                        <Menu
-                                                            visible={showEndMenu === index}
-                                                            onDismiss={() => setShowEndMenu(-1)}
-                                                            anchor={
-                                                                <Button
-                                                                    mode="outlined"
-                                                                    style={styles.timeButton}
-                                                                    onPress={() => setShowEndMenu(index)}
-                                                                >
-                                                                    <Text style={styles.timeText}>
-                                                                        {timeSlot.end || 'N/A'}
-                                                                    </Text>
-                                                                </Button>
-                                                            }
-                                                        >
-                                                            {hours.map((hour, i) => (
-                                                                <Menu.Item
-                                                                    style={{ width: 200 }}
-                                                                    key={i}
-                                                                    onPress={() => handleSelectTime('end', index, hour)}
-                                                                    title={hour}
-                                                                />
-                                                            ))}
-                                                        </Menu>
-                                                    </View>
-
-                                                    <IconButton
-                                                        icon="window-close"
-                                                        iconColor={theme.colors.error}
-                                                        size={spacing.large}
-                                                        style={styles.deleteButton}
-                                                        onPress={() => removeTimeSlot(index)}
-                                                        animated
+                                                        }}
+                                                        testID="schedule-md"
                                                     />
-
-                                                    {/* <HelperText
-                                                type="error"
-                                                visible={Boolean(errors.timeSlots?.[index])}
-                                                style={[
-                                                    { display: errors.timeSlots?.[index] ? 'flex' : 'none' , width:'100%' },
-                                                    masterdataStyles.errorText
-                                                ]}
-                                            > */}
-                                                    {/* {errors.timeSlots?.[index] || ""} */}
-                                                    {/* </HelperText> */}
-
                                                 </View>
-                                            ))}
-                                        </ScrollView>
-                                        <View style={{ marginHorizontal: 24, marginBottom: 20 }}>
-                                            <Button onPress={() => addTimeSlot()} style={styles.addButton}>
-                                                Add Schedule
-                                            </Button>
+                                            </View>
                                         </View>
+
+                                        <Daily_dialog
+                                            setFieldValue={setFieldValue}
+                                            shouldCustom={shouldCustom}
+                                            shouldRenderTime={shouldRenderTime}
+                                            values={values}
+                                            key={`daily-dialog`}
+                                            responsive={responsive}
+                                            showError={showError}
+                                            showSuccess={showSuccess}
+                                            spacing={spacing}
+                                            theme={theme}
+                                        />
+
+                                        <Week_dialog
+                                            shouldRenderTime={shouldRenderTime}
+                                            setShowThirDialog={(v: boolean) => setShowThirDialog(v)}
+                                            responsive={responsive}
+                                            showError={showError}
+                                            showSuccess={showSuccess}
+                                            spacing={spacing}
+                                            theme={theme}
+                                            key={`week-dialog`}
+                                        />
+
                                     </View>
                                 </View>
                                 <View style={{ paddingBottom: 10, justifyContent: 'flex-end', flexDirection: 'row', paddingHorizontal: 24 }}>
@@ -362,6 +415,8 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                     }}
                 </Formik>
             </Dialog>
+
+            <InfoSchedule_dialog visible={showThirDialog} setVisible={(v) => setShowThirDialog(v)} />
         </Portal>
     );
 });

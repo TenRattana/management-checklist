@@ -13,6 +13,7 @@ import App from '.';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
 import { TimezoneProvider } from './providers/timezone';
+import TestComponent from './screens/TestComponent';
 
 const queryClient = new QueryClient();
 
@@ -74,6 +75,7 @@ const RootLayout = () => {
                                     <GestureHandlerRootView style={{ flex: 1 }}>
                                         <StatusBar hidden={true} />
                                         <NavigationContainer independent={true}>
+                                            {/* <TestComponent /> */}
                                             <App />
                                         </NavigationContainer>
                                     </GestureHandlerRootView>

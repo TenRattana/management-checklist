@@ -6,7 +6,6 @@ import { useToast } from "@/app/contexts/useToast";
 import { AccessibleView, Customtable, LoadingSpinner, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import Machine_dialog from "@/components/screens/Machine_dialog";
 import { Machine, GroupMachine, TimeSchedule } from '@/typing/type';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSelector } from "react-redux";
@@ -23,9 +22,9 @@ const fetchMachines = async (): Promise<Machine[]> => {
 };
 interface InitialValues {
     ScheduleName: string,
+    MachineGroup: string;
     Machine: Machine[],
     timeSlots: [{ start: null, end: null }],
-    timeInterval: string | null,
 }
 
 const TimescheduleScreen: React.FC = React.memo(() => {
@@ -35,9 +34,9 @@ const TimescheduleScreen: React.FC = React.memo(() => {
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const initialValues: InitialValues = {
         ScheduleName: '',
+        MachineGroup: "",
         Machine: [],
         timeSlots: [{ start: null, end: null }],
-        timeInterval: null,
     };
 
     const masterdataStyles = useMasterdataStyles();

@@ -66,7 +66,7 @@ const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChan
           <IconButton
             style={masterdataStyles.icon}
             icon={options.find((v) => v.value === value)?.icon || lefticon || "check-all"}
-            size={20}
+            size={spacing.large}
           />
         )}
         renderRightIcon={() => (

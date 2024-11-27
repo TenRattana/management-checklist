@@ -4,6 +4,7 @@ import { IconButton, HelperText } from "react-native-paper";
 import { Dropdown } from 'react-native-element-dropdown';
 import { CustomDropdownSingleProps } from '@/typing/tag'
 import useMasterdataStyles from "@/styles/common/masterdata";
+import { useRes } from "@/app/contexts/useRes";
 
 const CustomDropdownSingle = ({
     labels,
@@ -21,7 +22,7 @@ const CustomDropdownSingle = ({
 }: CustomDropdownSingleProps) => {
     const [options, setOptions] = useState<{ label?: string; value?: string; icon?: () => JSX.Element }[]>([]);
     const masterdataStyles = useMasterdataStyles();
-
+    const { spacing } = useRes();
     const processData = useCallback(() => {
         if (data && Array.isArray(data)) {
             return data.map((item) => ({
@@ -65,7 +66,7 @@ const CustomDropdownSingle = ({
                     <IconButton
                         style={masterdataStyles.icon}
                         icon={options.find((v) => v.value === value)?.icon || lefticon || "check-all"}
-                        size={20}
+                        size={spacing.large}
                     />
                 )}
                 renderRightIcon={() => (
@@ -74,7 +75,7 @@ const CustomDropdownSingle = ({
                             <IconButton
                                 style={masterdataStyles.icon}
                                 icon="window-close"
-                                size={30}
+                                size={spacing.large}
                                 onPress={() => {
                                     handleChange("");
                                 }}
