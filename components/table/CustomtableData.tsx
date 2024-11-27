@@ -76,10 +76,10 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
     const renderTableData = useCallback((row: (string | number | boolean)[], rowIndex: number) => {
 
         const matchingIndex = detailData?.findIndex(item => {
-            const itemValues = Object.values(item); 
-            return row.every(value => itemValues.includes(value)); 
-        }) ?? -1 ;
-        
+            const itemValues = Object.values(item);
+            return row.every(value => itemValues.includes(value));
+        }) ?? -1;
+
         return (
             <View key={`row-${rowIndex}`}>
                 <DataTable.Row onPress={() => detail ? setIsDetailVisible((prev) => ({ ...prev, [matchingIndex]: !isDetailVisible[matchingIndex] })) : null} disabled={!detail} key={`data-row-${rowIndex}`} style={{ backgroundColor: theme.colors.background }}>
@@ -212,7 +212,10 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                 contentContainerStyle={{ flexGrow: 1 }}
                 nestedScrollEnabled={true}
                 showsVerticalScrollIndicator={true}
-                removeClippedSubviews
+                initialNumToRender={10}
+                removeClippedSubviews={true}
+                maxToRenderPerBatch={5}
+                windowSize={5}
             />
 
             <Dialogs

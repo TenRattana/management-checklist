@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import App from '.';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
+import { TimezoneProvider } from './providers/timezone';
 
 const queryClient = new QueryClient();
 
@@ -65,20 +66,22 @@ const RootLayout = () => {
     return (
         <ResponsiveProvider>
             <ThemeProvider>
-                <Provider store={store}>
-                    <QueryClientProvider client={queryClient}>
-                        <ToastProvider>
-                            <AuthProvider>
-                                <GestureHandlerRootView style={{ flex: 1 }}>
-                                    <StatusBar hidden={true} />
-                                    <NavigationContainer independent={true}>
-                                        <App />
-                                    </NavigationContainer>
-                                </GestureHandlerRootView>
-                            </AuthProvider>
-                        </ToastProvider>
-                    </QueryClientProvider>
-                </Provider>
+                <TimezoneProvider timezone="Asia/Bangkok">
+                    <Provider store={store}>
+                        <QueryClientProvider client={queryClient}>
+                            <ToastProvider>
+                                <AuthProvider>
+                                    <GestureHandlerRootView style={{ flex: 1 }}>
+                                        <StatusBar hidden={true} />
+                                        <NavigationContainer independent={true}>
+                                            <App />
+                                        </NavigationContainer>
+                                    </GestureHandlerRootView>
+                                </AuthProvider>
+                            </ToastProvider>
+                        </QueryClientProvider>
+                    </Provider>
+                </TimezoneProvider>
             </ThemeProvider>
         </ResponsiveProvider>
     );

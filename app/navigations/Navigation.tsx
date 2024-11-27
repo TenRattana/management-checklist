@@ -37,6 +37,7 @@ const Drawer = createDrawerNavigator();
 const MemoSetting_dialog = React.memo(Setting_dialog)
 
 const components: Record<ComponentNames, () => Promise<{ default: React.ComponentType<any> }>> = {
+    Home: () => import('@/app/screens/layouts/HomeScreen'),
     Create_form: () => import('@/app/screens/layouts/forms/create/CreateFormScreen'),
     InputFormMachine: () => import('@/app/screens/layouts/forms/Scan/InputFormMachine'),
     Preview: () => import('@/app/screens/layouts/forms/view/PreviewScreen'),
@@ -60,7 +61,6 @@ const nonLazyComponents: Record<ComponentNameNoLazy, React.ComponentType<any>> =
     Setting: SettingScreen,
     Config: ConfigulationScreen,
     Permission_deny: PermissionDeny,
-    Home: HomeScreen,
     Test: TestComponent,
     Time: TimescheduleScreen
 };

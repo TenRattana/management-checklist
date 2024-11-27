@@ -77,8 +77,6 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
       {children}
       <View style={Platform.OS === "web" ? styles.toastStackWeb : styles.toastStackMobile} pointerEvents="box-none">
         {toasts.map((toast, index) => {
-          console.log(toast.message);
-
           return (
             <Animated.View
               key={toast.id}

@@ -180,6 +180,7 @@ export interface Permissions {
 export type ComponentNames =
   | "Create_form"
   | "InputFormMachine"
+  | "Home"
   | "Preview"
   | "Apporved";
 
@@ -187,7 +188,6 @@ export type ComponentNameNoLazy =
   | "Machine_group"
   | "Machine"
   | "Checklist"
-  | "Home"
   | "Login"
   | "ScanQR"
   | "GenerateQR"
