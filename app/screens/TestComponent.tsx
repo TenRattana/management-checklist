@@ -1,45 +1,29 @@
-import React, { useState } from 'react';
-import { View, Button, StyleSheet } from 'react-native';
-import { Portal, Dialog, Paragraph, Provider } from 'react-native-paper';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { Swipeable } from 'react-native-gesture-handler'; // ใช้ Swipeable
+import { IconButton } from 'react-native-paper'; // ใช้ IconButton จาก react-native-paper
 
 const TestComponent = () => {
-    const [isDialogOneVisible, setDialogOneVisible] = useState(false);
-    const [isDialogTwoVisible, setDialogTwoVisible] = useState(false);
+    const renderLeftActions = () => (
+        <View style={styles.leftActions}>
+            <IconButton icon="check" iconColor="white" size={30} onPress={() => console.log("Item checked")} />
+        </View>
+    );
 
-    const openDialogOne = () => setDialogOneVisible(true);
-    const closeDialogOne = () => setDialogOneVisible(false);
-
-    const openDialogTwo = () => setDialogTwoVisible(true);
-    const closeDialogTwo = () => setDialogTwoVisible(false);
+    const renderRightActions = () => (
+        <View style={styles.rightActions}>
+            <IconButton icon="delete" iconColor="white" size={30} onPress={() => console.log("Item deleted")} />
+        </View>
+    );
 
     return (
-        <Portal>
-            <View style={styles.container}>
-                <Button title="Open First Dialog" onPress={openDialogOne} />
-
-                <Dialog visible={isDialogOneVisible} onDismiss={closeDialogOne} style={{ zIndex: 1 }}>
-                    <Dialog.Title>First Dialog</Dialog.Title>
-                    <Dialog.Content>
-                        <Paragraph>This is the first dialog.</Paragraph>
-                        <Button title="Open Second Dialog" onPress={openDialogTwo} />
-                    </Dialog.Content>
-                    <Dialog.Actions>
-                        <Button title="Close" onPress={closeDialogOne} />
-                    </Dialog.Actions>
-                </Dialog>
-
-
-                <Dialog visible={isDialogTwoVisible} onDismiss={closeDialogTwo} style={{ zIndex: 2 }}>
-                    <Dialog.Title>Second Dialog</Dialog.Title>
-                    <Dialog.Content>
-                        <Paragraph>This is the second dialog inside the first dialog.</Paragraph>
-                    </Dialog.Content>
-                    <Dialog.Actions>
-                        <Button title="Close" onPress={closeDialogTwo} />
-                    </Dialog.Actions>
-                </Dialog>
-            </View>
-        </Portal>
+        <View style={styles.container}>
+            <Swipeable renderLeftActions={renderLeftActions} renderRightActions={renderRightActions}>
+                <View style={styles.item}>
+                    <Text style={styles.text}>Swipe Me</Text>
+                </View>
+            </Swipeable>
+        </View>
     );
 };
 
@@ -48,7 +32,35 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f8f9fa',
+    },
+    item: {
+        width: 300,
+        height: 60,
+        backgroundColor: '#f0f0f0',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: 10,
+        borderRadius: 8,
+    },
+    text: {
+        fontSize: 18,
+        color: '#333',
+    },
+    leftActions: {
+        flex: 1,
+        backgroundColor: '#4caf50',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: 10,
+        borderRadius: 8,
+    },
+    rightActions: {
+        flex: 1,
+        backgroundColor: '#f44336',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: 10,
+        borderRadius: 8,
     },
 });
 

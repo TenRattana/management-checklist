@@ -10,7 +10,7 @@ import * as Yup from 'yup'
 import CustomDropdownSingle from '../CustomDropdownSingle';
 import axiosInstance from '@/config/axios';
 import { useQuery } from 'react-query';
-import Animated from 'react-native-reanimated';
+import Animated, { Easing, FadeInLeft, FadeInRight, FadeOutLeft, FadeOutRight } from 'react-native-reanimated';
 import InfoSchedule_dialog from './InfoSchedule_dialog';
 
 const hours = Array.from({ length: 24 }, (_, i) =>
@@ -48,10 +48,12 @@ const Week_dialog = React.memo(({ shouldRenderTime, theme, spacing, responsive, 
 
     const [showTimeIntervalMenu, setShowTimeIntervalMenu] = useState<{ custom: boolean, time: boolean, week: boolean }>({ custom: false, time: false, week: false });
     const masterdataStyles = useMasterdataStyles();
-    const [shouldRender, setShouldRender] = useState(false)
     const [indexThirDialog, setIndexThirDialog] = useState<number | undefined>()
     const [timeInterval, setTimeInterval] = useState<number>(0)
     const [selectedDays, setSelectedDays] = useState<string[]>([]);
+
+    FadeOutLeft.duration(300).easing(Easing.ease);
+    FadeInLeft.duration(300).easing(Easing.ease);
 
     const validationSchema = Yup.object().shape({
         ScheduleName: Yup.string().required('Schedule name is required'),
@@ -111,9 +113,6 @@ const Week_dialog = React.memo(({ shouldRenderTime, theme, spacing, responsive, 
             flexDirection: 'row',
             justifyContent: 'space-between',
         },
-        timeText: {
-            textAlign: 'center',
-        },
         addButton: {
             marginVertical: 5,
         },
@@ -172,7 +171,7 @@ const Week_dialog = React.memo(({ shouldRenderTime, theme, spacing, responsive, 
     }, [selectedDays]);
 
     return shouldRenderTime === "Weekly" && (
-        <Animated.View style={[{ flex: 1 }]}>
+        <Animated.View entering={FadeInLeft} exiting={FadeOutLeft}>
 
             <View style={styles.timeIntervalMenu}>
                 <Menu
@@ -180,9 +179,11 @@ const Week_dialog = React.memo(({ shouldRenderTime, theme, spacing, responsive, 
                     onDismiss={() => setShowTimeIntervalMenu((prev) => ({ ...prev, week: false }))}
                     anchor={
                         <Button
+                            mode="outlined"
+                            style={styles.timeButton}
                             onPress={() => setShowTimeIntervalMenu((prev) => ({ ...prev, week: true }))}
                         >
-                            <Text style={masterdataStyles.text}>{selectedDays.length > 0 ? `Selected: ${selectedDays.join(", ")}` : "Select Day"}</Text>
+                            <Text style={masterdataStyles.timeText}>{selectedDays.length > 0 ? `Selected: ${selectedDays.join(", ")}` : "Select Day"}</Text>
                         </Button>
                     }
                 >
@@ -228,7 +229,6 @@ const Week_dialog = React.memo(({ shouldRenderTime, theme, spacing, responsive, 
                     </View>
                 ))}
             </ScrollView>
-
         </Animated.View>
     )
 })

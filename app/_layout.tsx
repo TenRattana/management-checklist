@@ -13,8 +13,8 @@ import App from '.';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
 import { TimezoneProvider } from './providers/timezone';
-import TestComponent from './screens/TestComponent';
 import { TimescheduleScreen } from './screens';
+import TestComponent from './screens/TestComponent';
 
 const queryClient = new QueryClient();
 
@@ -77,7 +77,8 @@ const RootLayout = () => {
                                         <StatusBar hidden={true} />
                                         <NavigationContainer independent={true}>
                                             {/* <TestComponent /> */}
-                                            <TimescheduleScreen />
+                                            {/* <TimescheduleScreen /> */}
+                                            <App />
                                         </NavigationContainer>
                                     </GestureHandlerRootView>
                                 </AuthProvider>

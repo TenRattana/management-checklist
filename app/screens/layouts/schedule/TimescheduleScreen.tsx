@@ -23,8 +23,9 @@ const fetchMachines = async (): Promise<Machine[]> => {
 interface InitialValues {
     ScheduleName: string,
     MachineGroup: string;
-    Machine: Machine[],
-    timeSlots: [{ start: null, end: null }],
+    Machine: Machine[];
+    timeSlots: [{ start: string | null, end: string | null }];
+    timeCustom: [{ start: Date | null, end: Date | null }];
 }
 
 const TimescheduleScreen: React.FC = React.memo(() => {
@@ -37,6 +38,7 @@ const TimescheduleScreen: React.FC = React.memo(() => {
         MachineGroup: "",
         Machine: [],
         timeSlots: [{ start: null, end: null }],
+        timeCustom: [{ start: null, end: null }],
     };
 
     const masterdataStyles = useMasterdataStyles();

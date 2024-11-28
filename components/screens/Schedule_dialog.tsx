@@ -1,9 +1,9 @@
 import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Dimensions } from 'react-native';
-import { Button, Dialog, Portal, Menu, IconButton, HelperText, Switch } from 'react-native-paper';
+import { Button, Dialog, Portal, Menu, Switch } from 'react-native-paper';
 import { Inputs } from '../common';
 import { GroupMachine, Machine, TimeSchedule } from '@/typing/type';
 import CustomDropdownMultiple from '../CustomDropdownMultiple';
@@ -14,18 +14,14 @@ import CustomDropdownSingle from '../CustomDropdownSingle';
 import axiosInstance from '@/config/axios';
 import { useQuery } from 'react-query';
 import Animated, {
-    interpolate,
-    useAnimatedStyle,
-    useSharedValue,
+    FadeInUp,
+    FadeOutDown,
     withTiming,
 } from 'react-native-reanimated';
 import Daily_dialog from './Daily_dialog';
 import Week_dialog from './Week_dialog';
 import InfoSchedule_dialog from './InfoSchedule_dialog';
 
-const hours = Array.from({ length: 24 }, (_, i) =>
-    i.toString().padStart(2, '0') + ':00'
-);
 const { height } = Dimensions.get('window');
 
 const fetchMachineGroups = async (): Promise<GroupMachine[]> => {
@@ -44,30 +40,24 @@ interface ScheduleDialogProps {
         MachineGroup: string;
         Machine: Machine[],
         timeSlots: [{ start: string | null, end: string | null }],
+        timeCustom: [{ start: Date | null, end: Date | null }]
     };
     isEditing: boolean;
 }
-
-const Week = ["Mon", "The", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
 const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, saveData, initialValues, isEditing, machine }: ScheduleDialogProps) => {
     const { theme } = useTheme();
     const { spacing, responsive } = useRes();
     const { showError, showSuccess } = useToast()
-    const [showStartMenu, setShowStartMenu] = useState(-1);
-    const [showEndMenu, setShowEndMenu] = useState(-1);
     const [showTimeIntervalMenu, setShowTimeIntervalMenu] = useState<{ custom: boolean, time: boolean, week: boolean }>({ custom: false, time: false, week: false });
     const masterdataStyles = useMasterdataStyles();
     const [shouldRender, setShouldRender] = useState(false)
     const [showThirDialog, setShowThirDialog] = useState(false)
-    const [dataThirDialog, setDataThirDialog] = useState<{ [key: number]: { start: string | null, end: string | null }[] }[]>([])
-    const [indexThirDialog, setIndexThirDialog] = useState<number | undefined>()
     const [shouldCustom, setShouldCustom] = useState<boolean | "">("")
     const [shouldRenderTime, setShouldRenderTime] = useState<string>("")
     const [fieldMachine, setFieldMachie] = useState<Machine[]>([])
     const [timeInterval, setTimeInterval] = useState<number>(0)
     const [selectedDays, setSelectedDays] = useState<string[]>([]);
-    const [dialy_d, setDialy_d] = useState(false)
 
     useEffect(() => {
         if (!isVisible) {
@@ -101,38 +91,6 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
         }
     );
 
-    const handleGenerateSchedule = useCallback(
-        (timeInterval: number, setFieldValue: (field: string, value: any) => void) => {
-            if (timeInterval <= 0 || timeInterval > 24) {
-                showError("Time interval must be between 1 and 24 hours.");
-                return;
-            }
-
-            const generatedSlots = [];
-            try {
-                for (let i = 0; i < 24; i += timeInterval) {
-                    const endHour = i + timeInterval;
-                    if (endHour > 24) break;
-
-                    generatedSlots.push({
-                        start: `${i.toString().padStart(2, '0')}:00`,
-                        end: `${endHour.toString().padStart(2, '0')}:00`,
-                    });
-                }
-
-                if (generatedSlots.length === 0) {
-                    showError("No time slots could be generated. Adjust the time interval.");
-                    return;
-                }
-
-                setFieldValue('timeSlots', generatedSlots);
-                setTimeInterval(timeInterval);
-                showSuccess("Schedule generated successfully!");
-            } catch (error) {
-                showError("An unexpected error occurred while generating the schedule.");
-            }
-        }, []);
-
     const styles = StyleSheet.create({
         container: {
             width: responsive === 'large' ? 800 : responsive === 'medium' ? '80%' : '80%',
@@ -146,9 +104,6 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
             flexDirection: 'row',
             justifyContent: 'space-between',
         },
-        timeText: {
-            textAlign: 'center',
-        },
         addButton: {
             marginVertical: 5,
         },
@@ -157,7 +112,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
             flexBasis: '38%',
         },
         label: {
-            marginHorizontal: 24,
+            marginHorizontal: 5,
             marginVertical: 10,
             fontSize: spacing.small,
             marginBottom: 10,
@@ -178,7 +133,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
             // marginTop: 10,
         },
         timeIntervalMenu: {
-            marginHorizontal: 24,
+            marginHorizontal: 5,
             marginBottom: 10,
         },
         menuItem: {
@@ -188,34 +143,18 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
 
     const duration = 300;
 
-    const scaleTimeValue = withTiming(shouldCustom ? 1 : 1, { duration });
-    const scaleMachineValue = withTiming(shouldRender ? 1 : 0.5, { duration });
-
-    const opacityTimeValue = withTiming(shouldCustom ? 1 : 1, { duration });
     const opacityMachineValue = withTiming(shouldRender ? 1 : 0, { duration });
 
-    const animatedMachineStyle = useAnimatedStyle(() => {
-        return {
-            opacity: opacityMachineValue,
-            transform: [{ scale: scaleMachineValue }]
-        };
-    }, [shouldRender]);
-
-    const animatedTimeStyle = useAnimatedStyle(() => {
-        return {
-            opacity: opacityTimeValue,
-            transform: [{ scale: scaleTimeValue }]
-        };
-    }, [shouldCustom]);
-
-
-    console.log(shouldCustom, shouldRenderTime, animatedTimeStyle.transform, "Form");
+    // const animatedMachineStyle = useAnimatedStyle(() => {
+    //     return {
+    //         opacity: opacityMachineValue,
+    //     };
+    // }, [shouldRender, opacityMachineValue]);
 
     return (
         <Portal>
             <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={styles.container}>
-                <Dialog.Title>{isEditing ? "Edit Schedule" : "Add Schedule"}</Dialog.Title>
-                <Text style={[masterdataStyles.text, { marginHorizontal: 24, marginVertical: 10 }]}>{isEditing ? "Update TimeSchedule detail" : "Create TimeSchedule detail"}</Text>
+                <Dialog.Title style={{ marginLeft: 30 }}>{isEditing ? "Edit Schedule" : "Add Schedule"}</Dialog.Title>
                 <Formik
                     initialValues={initialValues}
                     validationSchema={validationSchema}
@@ -243,10 +182,6 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                             setFieldValue('Machine', [])
                         }, [values.MachineGroup, fieldMachine])
 
-
-
-
-
                         return (
                             <>
                                 <View style={{
@@ -254,6 +189,8 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                     maxHeight: height / 1.5,
                                 }}>
                                     <View style={{ flexBasis: '46%', marginHorizontal: '2%' }}>
+                                        <Text style={[masterdataStyles.text, { marginHorizontal: 24, marginVertical: 10 }]}>{isEditing ? "Update TimeSchedule detail" : "Create TimeSchedule detail"}</Text>
+
                                         <FastField name="ScheduleName">
                                             {({ field, form }: any) => (
                                                 <Inputs
@@ -295,9 +232,9 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                         </FastField>
 
                                         {shouldRender && (
-                                            <Animated.View style={[animatedMachineStyle]}>
+                                            <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
                                                 <ScrollView showsVerticalScrollIndicator={false}>
-                                                    <FastField name="Machine" key={fieldMachine}>
+                                                    <FastField name="Machine" key={JSON.stringify(fieldMachine)}>
                                                         {({ field, form }: any) => (
                                                             <CustomDropdownMultiple
                                                                 title="Machine"
@@ -326,7 +263,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                         )}
                                     </View>
 
-                                    <View style={{ flexBasis: '46%', marginHorizontal: '2%', marginTop: 12, flex: 1 }}>
+                                    <View style={{ flexBasis: '46%', marginHorizontal: '2%', flex: 1 }}>
                                         <View style={styles.timeIntervalMenu}>
                                             <Menu
                                                 visible={showTimeIntervalMenu.custom}
@@ -337,12 +274,12 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                                     style={styles.timeButton}
                                                     onPress={() => setShowTimeIntervalMenu((prev) => ({ ...prev, custom: true }))}
                                                 >
-                                                    <Text style={styles.timeText}>{shouldRenderTime ? `Selected ${shouldRenderTime}` : 'Select Reange Schedule'}</Text>
+                                                    <Text style={masterdataStyles.timeText}>{shouldRenderTime ? `Selected ${shouldRenderTime}` : 'Select Reange Schedule'}</Text>
                                                 </Button>}
                                             >
-                                                {["Monthly", "Weekly", "Daily"].map((interval, index) => (
+                                                {["Weekly", "Daily"].map((interval, index) => (
                                                     <Menu.Item
-                                                        style={{ width: 200, }}
+                                                        style={styles.menuItem}
                                                         key={index}
                                                         onPress={() => {
                                                             setShouldRenderTime(interval)
@@ -355,52 +292,56 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                             </Menu>
                                         </View>
 
-                                        <View style={styles.timeIntervalMenu}>
-                                            <View id="form-active-md" style={[masterdataStyles.containerSwitch]}>
-                                                <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-                                                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginRight: 12 }]}>
-                                                        Type Schedule : {shouldCustom ? "Run Schedule" : "Only Schedule"}
-                                                    </Text>
-                                                    <Switch
-                                                        style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                                        color={shouldCustom ? theme.colors.inversePrimary : theme.colors.onPrimaryContainer}
-                                                        value={shouldCustom !== "" ? shouldCustom : false}
-                                                        onValueChange={(v: boolean) => {
-                                                            if (v !== shouldCustom) {
-                                                                setFieldValue('timeSlots', [])
-                                                                setFieldValue('timeInterval', "")
-                                                                setShouldCustom(v);
-                                                            }
-                                                        }}
-                                                        testID="schedule-md"
-                                                    />
+                                        {shouldRenderTime === "Daily" && (
+                                            <View style={styles.timeIntervalMenu}>
+                                                <View id="form-active-md" style={[masterdataStyles.containerSwitch]}>
+                                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                        <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginRight: 12 }]}>
+                                                            Type Schedule : {shouldCustom ? "Run Schedule" : "Only Schedule"}
+                                                        </Text>
+                                                        <Switch
+                                                            style={{ transform: [{ scale: 1.1 }], top: 2 }}
+                                                            color={shouldCustom ? theme.colors.inversePrimary : theme.colors.onPrimaryContainer}
+                                                            value={shouldCustom !== "" ? shouldCustom : false}
+                                                            onValueChange={(v: boolean) => {
+                                                                if (v !== shouldCustom) {
+                                                                    setFieldValue('timeSlots', [])
+                                                                    setFieldValue('timeInterval', "")
+                                                                    setShouldCustom(v);
+                                                                }
+                                                            }}
+                                                            testID="schedule-md"
+                                                        />
+                                                    </View>
                                                 </View>
                                             </View>
-                                        </View>
+                                        )}
 
-                                        <Daily_dialog
-                                            setFieldValue={setFieldValue}
-                                            shouldCustom={shouldCustom}
-                                            shouldRenderTime={shouldRenderTime}
-                                            values={values}
-                                            key={`daily-dialog`}
-                                            responsive={responsive}
-                                            showError={showError}
-                                            showSuccess={showSuccess}
-                                            spacing={spacing}
-                                            theme={theme}
-                                        />
+                                        <ScrollView showsVerticalScrollIndicator={false}>
+                                            <Daily_dialog
+                                                setFieldValue={setFieldValue}
+                                                shouldCustom={shouldCustom}
+                                                shouldRenderTime={shouldRenderTime}
+                                                values={values}
+                                                key={`daily-dialog`}
+                                                responsive={responsive}
+                                                showError={showError}
+                                                showSuccess={showSuccess}
+                                                spacing={spacing}
+                                                theme={theme}
+                                            />
 
-                                        <Week_dialog
-                                            shouldRenderTime={shouldRenderTime}
-                                            setShowThirDialog={(v: boolean) => setShowThirDialog(v)}
-                                            responsive={responsive}
-                                            showError={showError}
-                                            showSuccess={showSuccess}
-                                            spacing={spacing}
-                                            theme={theme}
-                                            key={`week-dialog`}
-                                        />
+                                            <Week_dialog
+                                                shouldRenderTime={shouldRenderTime}
+                                                setShowThirDialog={(v: boolean) => setShowThirDialog(v)}
+                                                responsive={responsive}
+                                                showError={showError}
+                                                showSuccess={showSuccess}
+                                                spacing={spacing}
+                                                theme={theme}
+                                                key={`week-dialog`}
+                                            />
+                                        </ScrollView>
 
                                     </View>
                                 </View>
@@ -410,15 +351,19 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                         disabled={!isValid || !dirty}
                                         onPress={() => handleSubmit()}>Save</Button>
                                 </View>
-                                <InfoSchedule_dialog 
-                                visible={showThirDialog} 
-                                setVisible={(v) => setShowThirDialog(v)} 
-                                setFieldValue={setFieldValue} 
-                                responsive={responsive}
-                                showError={showError}
-                                showSuccess={showSuccess}
-                                spacing={spacing}
-                                theme={theme}
+                                <InfoSchedule_dialog
+                                    shouldCustom={shouldCustom}
+                                    shouldRenderTime={shouldRenderTime}
+                                    values={values}
+                                    key={`infoshedule`}
+                                    visible={showThirDialog}
+                                    setVisible={(v) => setShowThirDialog(v)}
+                                    setFieldValue={setFieldValue}
+                                    responsive={responsive}
+                                    showError={showError}
+                                    showSuccess={showSuccess}
+                                    spacing={spacing}
+                                    theme={theme}
                                 />
                             </>
                         )

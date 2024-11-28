@@ -121,7 +121,6 @@ const useMasterdataStyles = () => {
             height: 50,
             borderBottomColor: 'gray',
             borderBottomWidth: 0.5,
-
         },
         icon: {
             marginRight: 5,
@@ -333,7 +332,11 @@ const useMasterdataStyles = () => {
             fontSize: spacing.small,
             color: theme.colors.onBackground,
             alignContent: 'center'
-        }
+        },
+        timeText: {
+            fontSize: spacing.small,
+            textAlign: 'center',
+        },
     });
 };
 

@@ -1,7 +1,10 @@
-import { View, StyleSheet, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
-import { Dialog, Portal, Divider, IconButton, Menu, Button, Paragraph, Text } from 'react-native-paper';
+import React, { forwardRef, useCallback, useState } from 'react';
+import { View, StyleSheet, Platform } from 'react-native';
+import { Dialog, Button, Text } from 'react-native-paper';
+import DatePicker from 'react-datepicker';
 import useMasterdataStyles from '@/styles/common/masterdata';
-import React, { useCallback, useState } from 'react'
+import { Machine } from '@/typing/type';
+import RNDateTimePicker from '@react-native-community/datetimepicker';
 
 interface InfoScheduleProps {
     visible: boolean;
@@ -12,142 +15,138 @@ interface InfoScheduleProps {
     responsive: any;
     showError: (message: string | string[]) => void;
     showSuccess: (message: string | string[]) => void;
+    values: {
+        ScheduleName: string;
+        MachineGroup: string;
+        Machine: Machine[];
+        timeSlots: { start: string | null; end: string | null }[];
+    };
+    shouldCustom: boolean | string;
+    shouldRenderTime: string;
 }
 
-const Hours = [1, 2, 3, 4, 6, 12]
-
-
-const InfoSchedule_dialog = React.memo(({ visible, setVisible, setFieldValue, theme, responsive, spacing, showError, showSuccess }: InfoScheduleProps) => {
-
+const InfoScheduleDialog: React.FC<InfoScheduleProps> = React.memo(({
+    visible,
+    setVisible,
+    setFieldValue,
+    showError,
+    showSuccess,
+    values,
+    theme
+}) => {
     const masterdataStyles = useMasterdataStyles();
-    const [timeInterval, setTimeInterval] = useState<number>(0)
-    const [showTimeIntervalMenu, setShowTimeIntervalMenu] = useState<{ custom: boolean, time: boolean, week: boolean }>({ custom: false, time: false, week: false });
+    const [timeInterval, setTimeInterval] = useState<number>(0);
+    const [date, setDate] = useState<Date | null>(null);
+    const [isPickerVisible, setPickerVisible] = useState<boolean>(false);
 
-    const styles = StyleSheet.create({
-        container: {
-            width: responsive === 'large' ? 800 : responsive === 'medium' ? '80%' : '80%',
-            alignSelf: 'center',
-            backgroundColor: theme.colors.background,
-            overflow: 'hidden',
-        },
-        containerTime: {
-            marginVertical: 10,
-            marginHorizontal: 5,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-        },
-        timeText: {
-            textAlign: 'center',
-        },
-        addButton: {
-            marginVertical: 5,
-        },
-        slotContainer: {
-            marginHorizontal: '4%',
-            flexBasis: '38%',
-        },
-        label: {
-            marginHorizontal: 24,
-            marginVertical: 10,
-            fontSize: spacing.small,
-            marginBottom: 10,
-        },
-        timeButton: {
-            marginVertical: 5,
-            borderColor: '#ccc',
-            borderWidth: 1,
-            borderRadius: 6,
-        },
-        deleteButton: {
-            flex: 1,
-            justifyContent: 'center',
-            alignSelf: 'center',
-            // top: '20%',
-            alignContent: 'center',
-            alignItems: 'center',
-            // marginTop: 10,
-        },
-        timeIntervalMenu: {
-            marginHorizontal: 24,
-            marginBottom: 10,
-        },
-        menuItem: {
-            width: 200,
-        },
-    });
+    const handleTimeChange = (event: any, selectedTime?: Date) => {
+        setPickerVisible(!isPickerVisible);
+        if (selectedTime) {
+            setDate(selectedTime);
+            setFieldValue('selectedTime', selectedTime.toTimeString().split(' ')[0]);
+            showSuccess('Time selected successfully!');
+        } else {
+            showError('Time selection was cancelled.');
+        }
+    };
 
-    const handleGenerateSchedule = useCallback(
-        (timeInterval: number, setFieldValue: (field: string, value: any) => void) => {
-            if (timeInterval <= 0 || timeInterval > 24) {
-                showError("Time interval must be between 1 and 24 hours.");
+    const handleGenerateSchedule = useCallback(() => {
+        if (timeInterval <= 0 || timeInterval > 24) {
+            showError('Time interval must be between 1 and 24 hours.');
+            return;
+        }
+
+        try {
+            const generatedSlots = [];
+            for (let i = 0; i < 24; i += timeInterval) {
+                const endHour = i + timeInterval;
+                if (endHour > 24) break;
+
+                generatedSlots.push({
+                    start: `${i.toString().padStart(2, '0')}:00`,
+                    end: `${endHour.toString().padStart(2, '0')}:00`,
+                });
+            }
+
+            if (generatedSlots.length === 0) {
+                showError('No time slots could be generated. Adjust the time interval.');
                 return;
             }
 
-            const generatedSlots = [];
-            try {
-                for (let i = 0; i < 24; i += timeInterval) {
-                    const endHour = i + timeInterval;
-                    if (endHour > 24) break;
+            setFieldValue('timeSlots', generatedSlots);
+            setTimeInterval(timeInterval);
+            showSuccess('Schedule generated successfully!');
+        } catch (error) {
+            showError('An unexpected error occurred while generating the schedule.');
+        }
+    }, [timeInterval, setFieldValue, showError, showSuccess]);
 
-                    generatedSlots.push({
-                        start: `${i.toString().padStart(2, '0')}:00`,
-                        end: `${endHour.toString().padStart(2, '0')}:00`,
-                    });
-                }
-
-                if (generatedSlots.length === 0) {
-                    showError("No time slots could be generated. Adjust the time interval.");
-                    return;
-                }
-
-                setFieldValue('timeSlots', generatedSlots);
-                setTimeInterval(timeInterval);
-                showSuccess("Schedule generated successfully!");
-            } catch (error) {
-                showError("An unexpected error occurred while generating the schedule.");
-            }
-        }, []);
+    const CustomInput = forwardRef<View, any>(({ value, onClick }, ref) => (
+        <Button
+            mode="contained"
+            onPress={onClick}
+            ref={ref}
+            style={styles.addButton}
+        >
+            {value || 'Select Date'}
+        </Button>
+    ));
 
     return (
-        <Dialog visible={visible} onDismiss={() => setVisible(false)} style={{ zIndex: 2, width: 500, justifyContent: 'center', alignSelf: 'center' }}>
-            <Dialog.Title>Week Dialog</Dialog.Title>
-            <Dialog.Content>
-                <View style={styles.timeIntervalMenu}>
-                    <Text style={masterdataStyles.text}>Generate Time Every : {timeInterval}</Text>
+        <Dialog
+            visible={visible}
+            onDismiss={() => setVisible(false)}
+            style={[styles.dialog, { backgroundColor: theme.colors.background, borderRadius: 8 }]}
+        >
+            <Dialog.Title>Create Info Schedule</Dialog.Title>
 
-                    <Menu
-                        visible={showTimeIntervalMenu.time}
-                        onDismiss={() => setShowTimeIntervalMenu((prev) => ({ ...prev, time: !showTimeIntervalMenu.time }))}
-                        anchor={<Button
-                            mode="outlined"
-                            style={styles.timeButton}
-                            onPress={() => setShowTimeIntervalMenu((prev) => ({ ...prev, time: true }))}
-                        >
-                            <Text style={styles.timeText}>{timeInterval > 0 ? `Every ${timeInterval} hours` : 'Select Interval'}</Text>
-                        </Button>}
-                    >
-                        {Hours.map((interval, index) => (
-                            <Menu.Item
-                                style={styles.menuItem}
-                                key={index}
-                                onPress={() => {
-                                    handleGenerateSchedule(interval, setFieldValue);
-                                    setShowTimeIntervalMenu((prev) => ({ ...prev, time: false }))
-                                }}
-                                title={`Every ${interval} hours`}
-                            />
-                        ))}
-                    </Menu>
+            {Platform.OS === 'android' || Platform.OS === 'ios' ? (
+                <>
+                    {isPickerVisible && (
+                        <RNDateTimePicker
+                            value={date ?? new Date()}
+                            onChange={handleTimeChange}
+                            is24Hour={true}
+                        />
+                    )}
+                </>
+            ) : (
+                <View style={{ marginHorizontal: 24, marginBottom: 20 }}>
+                    <DatePicker
+                        selected={date}
+                        onChange={(newDate: Date | null) => newDate && setDate(newDate)}
+                        withPortal
+                        portalId="root-portal"
+                        showTimeInput
+                        timeInputLabel="Time:"
+                        customInput={<CustomInput />}
+                    />
                 </View>
-                <Paragraph>This is the second dialog inside the first dialog.</Paragraph>
-            </Dialog.Content>
+            )}
+
             <Dialog.Actions>
-                <Button onPress={() => setVisible(false)} >
+                <Button onPress={() => { setVisible(false); setPickerVisible(false) }}>
                     <Text style={masterdataStyles.text}>Close</Text>
                 </Button>
             </Dialog.Actions>
         </Dialog>
-    )
+    );
+});
+
+const styles = StyleSheet.create({
+    dialog: {
+        zIndex: 2,
+        width: 500,
+        justifyContent: 'center',
+        alignSelf: 'center',
+    },
+    webContainer: {
+        marginHorizontal: 24,
+        marginBottom: 20,
+    },
+    addButton: {
+        marginVertical: 5,
+    },
 })
 
-export default InfoSchedule_dialog
+export default InfoScheduleDialog;
