@@ -16,11 +16,11 @@ import { useQuery } from 'react-query';
 import Animated, {
     FadeInUp,
     FadeOutDown,
-    withTiming,
 } from 'react-native-reanimated';
 import Daily_dialog from './Daily_dialog';
 import Week_dialog from './Week_dialog';
 import InfoSchedule_dialog from './InfoSchedule_dialog';
+import { styles } from './Schedule';
 
 const { height } = Dimensions.get('window');
 
@@ -56,8 +56,6 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
     const [shouldCustom, setShouldCustom] = useState<boolean | "">("")
     const [shouldRenderTime, setShouldRenderTime] = useState<string>("")
     const [fieldMachine, setFieldMachie] = useState<Machine[]>([])
-    const [timeInterval, setTimeInterval] = useState<number>(0)
-    const [selectedDays, setSelectedDays] = useState<string[]>([]);
 
     useEffect(() => {
         if (!isVisible) {
@@ -65,7 +63,6 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
             setShouldCustom("")
             setShouldRenderTime("")
             setFieldMachie([])
-            setSelectedDays([])
             console.log(shouldRenderTime, shouldCustom, shouldRender);
         }
     }, [isVisible])
@@ -91,66 +88,6 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
         }
     );
 
-    const styles = StyleSheet.create({
-        container: {
-            width: responsive === 'large' ? 800 : responsive === 'medium' ? '80%' : '80%',
-            alignSelf: 'center',
-            backgroundColor: theme.colors.background,
-            overflow: 'hidden',
-        },
-        containerTime: {
-            marginVertical: 10,
-            marginHorizontal: 5,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-        },
-        addButton: {
-            marginVertical: 5,
-        },
-        slotContainer: {
-            marginHorizontal: '4%',
-            flexBasis: '38%',
-        },
-        label: {
-            marginHorizontal: 5,
-            marginVertical: 10,
-            fontSize: spacing.small,
-            marginBottom: 10,
-        },
-        timeButton: {
-            marginVertical: 5,
-            borderColor: '#ccc',
-            borderWidth: 1,
-            borderRadius: 6,
-        },
-        deleteButton: {
-            flex: 1,
-            justifyContent: 'center',
-            alignSelf: 'center',
-            // top: '20%',
-            alignContent: 'center',
-            alignItems: 'center',
-            // marginTop: 10,
-        },
-        timeIntervalMenu: {
-            marginHorizontal: 5,
-            marginBottom: 10,
-        },
-        menuItem: {
-            width: 200,
-        },
-    });
-
-    const duration = 300;
-
-    const opacityMachineValue = withTiming(shouldRender ? 1 : 0, { duration });
-
-    // const animatedMachineStyle = useAnimatedStyle(() => {
-    //     return {
-    //         opacity: opacityMachineValue,
-    //     };
-    // }, [shouldRender, opacityMachineValue]);
-
     return (
         <Portal>
             <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={styles.container}>
@@ -166,7 +103,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
 
                         useEffect(() => {
                             let file: Machine[]
-
+                            
                             if (values.MachineGroup) {
                                 file = machine.filter(v => v.GMachineID === values.MachineGroup)
                                 setShouldRender(true)
@@ -283,7 +220,6 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                                         key={index}
                                                         onPress={() => {
                                                             setShouldRenderTime(interval)
-                                                            setSelectedDays([])
                                                             setShowTimeIntervalMenu((prev) => ({ ...prev, custom: false }))
                                                         }}
                                                         title={`${interval}`}

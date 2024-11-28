@@ -12,6 +12,7 @@ import axiosInstance from '@/config/axios';
 import { useQuery } from 'react-query';
 import Animated, { Easing, FadeInLeft, FadeInRight, FadeOutLeft, FadeOutRight } from 'react-native-reanimated';
 import InfoSchedule_dialog from './InfoSchedule_dialog';
+import { styles } from './Schedule';
 
 const hours = Array.from({ length: 24 }, (_, i) =>
     i.toString().padStart(2, '0') + ':00'
@@ -99,56 +100,6 @@ const Week_dialog = React.memo(({ shouldRenderTime, theme, spacing, responsive, 
                 showError("An unexpected error occurred while generating the schedule.");
             }
         }, []);
-
-    const styles = StyleSheet.create({
-        container: {
-            width: responsive === 'large' ? 800 : responsive === 'medium' ? '80%' : '80%',
-            alignSelf: 'center',
-            backgroundColor: theme.colors.background,
-            overflow: 'hidden',
-        },
-        containerTime: {
-            marginVertical: 10,
-            marginHorizontal: 5,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-        },
-        addButton: {
-            marginVertical: 5,
-        },
-        slotContainer: {
-            marginHorizontal: '4%',
-            flexBasis: '38%',
-        },
-        label: {
-            marginHorizontal: 24,
-            marginVertical: 10,
-            fontSize: spacing.small,
-            marginBottom: 10,
-        },
-        timeButton: {
-            marginVertical: 5,
-            borderColor: '#ccc',
-            borderWidth: 1,
-            borderRadius: 6,
-        },
-        deleteButton: {
-            flex: 1,
-            justifyContent: 'center',
-            alignSelf: 'center',
-            // top: '20%',
-            alignContent: 'center',
-            alignItems: 'center',
-            // marginTop: 10,
-        },
-        timeIntervalMenu: {
-            marginHorizontal: 24,
-            marginBottom: 10,
-        },
-        menuItem: {
-            width: 200,
-        },
-    });
 
     const removeDay = React.useCallback((index: number) => {
         setSelectedDays(selectedDays.filter((_, i) => i !== index))

@@ -8,6 +8,7 @@ import RNDateTimePicker from '@react-native-community/datetimepicker';
 import DatePicker from 'react-datepicker';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { styles } from './Schedule';
 
 const hours = Array.from({ length: 24 }, (_, i) =>
     i.toString().padStart(2, '0') + ':00'
@@ -136,53 +137,6 @@ const Daily_dialog = React.memo(({ values, setFieldValue, shouldCustom, shouldRe
         }
     }, []);
 
-    const styles = StyleSheet.create({
-        container: {
-            width: responsive === 'large' ? 800 : responsive === 'medium' ? '80%' : '80%',
-            alignSelf: 'center',
-            backgroundColor: theme.colors.background,
-            overflow: 'hidden',
-        },
-        containerTime: {
-            backgroundColor: theme.colors.fff,
-            marginVertical: 10,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-        },
-        addButton: {
-            marginVertical: 5,
-        },
-        slotContainer: {
-            marginHorizontal: '2%',
-            flexBasis: '46%',
-        },
-        timeButton: {
-            marginVertical: 5,
-            borderColor: '#ccc',
-            borderWidth: 1,
-            borderRadius: 6,
-        },
-        deleteButton: {
-            justifyContent: 'center',
-            alignSelf: 'center',
-            alignContent: 'center',
-            alignItems: 'center',
-        },
-        timeIntervalMenu: {
-            marginHorizontal: 5,
-            marginBottom: 10,
-        },
-        menuItem: {
-            width: 200,
-        },
-        rightActionsContainer: {
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginVertical: 10,
-            borderRadius: 8,
-        },
-    });
-
     const renderTimePicker = (type: "start" | "end", index: number, timeSlot: { start: Date | null; end: Date | null; }) => {
         const isStart = type === 'start';
 
@@ -191,7 +145,7 @@ const Daily_dialog = React.memo(({ values, setFieldValue, shouldCustom, shouldRe
         return (
             <View style={styles.slotContainer}>
                 <Text style={[masterdataStyles.text]}>{isStart ? "Start Day" : "End Day"}</Text>
-                {Platform.OS === 'android' || Platform.OS === 'ios' ? (
+                {Platform.OS === 'android' || Platform.OS === 'ios' && (
                     <>
                         {isPickerVisible?.[type] && (
                             <RNDateTimePicker
@@ -222,13 +176,15 @@ const Daily_dialog = React.memo(({ values, setFieldValue, shouldCustom, shouldRe
                             </Text>
                         </Button>
                     </>
-                ) : Platform.OS === "web" && (
+                )}
+
+                {Platform.OS === "web" && (
                     <DatePicker
-                        selected={date}
+                        selected={date || new Date()}
                         onChange={(newDate) => {
+                            console.log("DatePicker value:", newDate);
                             if (newDate) {
-                                // setSDate(newDate);
-                                handleSelectTime(type, index, newDate.toTimeString().slice(0, 5));
+                                handleTimeChange(index, isStart, type, newDate);
                             }
                         }}
                         showTimeInput
@@ -237,6 +193,7 @@ const Daily_dialog = React.memo(({ values, setFieldValue, shouldCustom, shouldRe
                         withPortal
                         portalId="root-portal"
                         customInput={<CustomInput />}
+                        popperPlacement="bottom-start"
                     />
                 )}
             </View>
@@ -313,19 +270,24 @@ const Daily_dialog = React.memo(({ values, setFieldValue, shouldCustom, shouldRe
         );
     };
 
-    const CustomInput = forwardRef<any, any>((props: any, ref) => {
+    const CustomInput = forwardRef<HTMLButtonElement, any>(({ onClick, value }, ref) => {
+        console.log("CustomInput rendered with value:", value);
+
         return (
             <Button
                 mode="outlined"
                 style={styles.timeButton}
-                onLongPress={props.onClick}
+                onPress={() => {
+                    console.log("CustomInput clicked");
+                    onClick();
+                }}
                 ref={ref}
             >
                 <Text style={masterdataStyles.timeText}>
-                    {props.value || 'N/A'}
+                    {value || 'Select Date'}
                 </Text>
             </Button>
-        )
+        );
     });
 
     const renderRightActions = (dragX: SharedValue<number>, index: number, custom?: boolean) => {
@@ -352,7 +314,7 @@ const Daily_dialog = React.memo(({ values, setFieldValue, shouldCustom, shouldRe
                 </Animated.View>
             </View>
         );
-    };
+    }
 
     return (
         <GestureHandlerRootView>
