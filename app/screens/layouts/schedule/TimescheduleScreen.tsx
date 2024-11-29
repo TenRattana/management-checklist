@@ -6,8 +6,8 @@ import { useToast } from "@/app/contexts/useToast";
 import { AccessibleView, Customtable, LoadingSpinner, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { Machine, GroupMachine, TimeSchedule } from '@/typing/type';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { Machine, TimeSchedule } from '@/typing/type';
+import { useQuery, useQueryClient } from 'react-query';
 import { useSelector } from "react-redux";
 import ScheduleDialog from "@/components/screens/Schedule_dialog";
 
@@ -21,11 +21,11 @@ const fetchMachines = async (): Promise<Machine[]> => {
     return response.data.data ?? [];
 };
 interface InitialValues {
-    ScheduleName: string,
+    ScheduleName: string;
     MachineGroup: string;
     Machine: Machine[];
-    timeSlots: [{ start: string | null, end: string | null }];
-    timeCustom: [{ start: Date | null, end: Date | null }];
+    timeSlots: { start: string | null, end: string | null }[];
+    timeCustom: { start: string | null, end: string | null }[];
 }
 
 const TimescheduleScreen: React.FC = React.memo(() => {
@@ -174,7 +174,6 @@ const TimescheduleScreen: React.FC = React.memo(() => {
                 initialValues={initialValues}
                 saveData={saveData}
                 timeSchedule={timeSchedule}
-                machine={machine}
             />
         </AccessibleView>
     );

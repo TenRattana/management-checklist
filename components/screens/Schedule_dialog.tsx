@@ -2,25 +2,24 @@ import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, ScrollView, Dimensions } from 'react-native';
 import { Button, Dialog, Portal, Menu, Switch } from 'react-native-paper';
 import { Inputs } from '../common';
-import { GroupMachine, Machine, TimeSchedule } from '@/typing/type';
-import CustomDropdownMultiple from '../CustomDropdownMultiple';
+import { GroupMachine, TimeSchedule } from '@/typing/type';
 import { useToast } from '@/app/contexts/useToast';
 import { FastField, Formik } from 'formik';
 import * as Yup from 'yup'
 import CustomDropdownSingle from '../CustomDropdownSingle';
 import axiosInstance from '@/config/axios';
 import { useQuery } from 'react-query';
-import Animated, {
-    FadeInUp,
-    FadeOutDown,
+import {
+    runOnJS,
 } from 'react-native-reanimated';
 import Daily_dialog from './Daily_dialog';
 import Week_dialog from './Week_dialog';
 import InfoSchedule_dialog from './InfoSchedule_dialog';
 import { styles } from './Schedule';
+import Custom_schedule_dialog from './Custom_schedule_dialog';
 
 const { height } = Dimensions.get('window');
 
@@ -34,36 +33,32 @@ interface ScheduleDialogProps {
     setIsVisible: (value: boolean) => void;
     timeSchedule: TimeSchedule[];
     saveData: (values: any) => void;
-    machine: Machine[];
     initialValues: {
         ScheduleName: string,
         MachineGroup: string;
-        Machine: Machine[],
-        timeSlots: [{ start: string | null, end: string | null }],
-        timeCustom: [{ start: Date | null, end: Date | null }]
+        timeSlots: { start: string | null, end: string | null }[];
+        timeCustom: { start: string | null, end: string | null }[];
     };
     isEditing: boolean;
 }
 
-const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, saveData, initialValues, isEditing, machine }: ScheduleDialogProps) => {
+const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, saveData, initialValues, isEditing }: ScheduleDialogProps) => {
     const { theme } = useTheme();
     const { spacing, responsive } = useRes();
     const { showError, showSuccess } = useToast()
     const [showTimeIntervalMenu, setShowTimeIntervalMenu] = useState<{ custom: boolean, time: boolean, week: boolean }>({ custom: false, time: false, week: false });
     const masterdataStyles = useMasterdataStyles();
-    const [shouldRender, setShouldRender] = useState(false)
+    const [point, setPoint] = useState(false)
     const [showThirDialog, setShowThirDialog] = useState(false)
     const [shouldCustom, setShouldCustom] = useState<boolean | "">("")
     const [shouldRenderTime, setShouldRenderTime] = useState<string>("")
-    const [fieldMachine, setFieldMachie] = useState<Machine[]>([])
 
     useEffect(() => {
         if (!isVisible) {
-            setShouldRender(false)
+            setPoint(false)
             setShouldCustom("")
             setShouldRenderTime("")
-            setFieldMachie([])
-            console.log(shouldRenderTime, shouldCustom, shouldRender);
+            console.log(shouldRenderTime, shouldCustom, point);
         }
     }, [isVisible])
 
@@ -90,37 +85,19 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
 
     return (
         <Portal>
-            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={styles.container}>
-                <Dialog.Title style={{ marginLeft: 30 }}>{isEditing ? "Edit Schedule" : "Add Schedule"}</Dialog.Title>
-                <Formik
-                    initialValues={initialValues}
-                    validationSchema={validationSchema}
-                    validateOnBlur={true}
-                    validateOnChange={false}
-                    onSubmit={(values) => saveData(values)}
-                >
-                    {({ values, handleSubmit, setFieldValue, dirty, isValid }) => {
+            <Formik
+                initialValues={initialValues}
+                validationSchema={validationSchema}
+                validateOnBlur={true}
+                validateOnChange={false}
+                onSubmit={(values) => saveData(values)}
+            >
+                {({ values, handleSubmit, setFieldValue, dirty, isValid }) => {
+                    return (
+                        <>
+                            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={styles.container}>
+                                <Dialog.Title style={{ marginLeft: 30 }}>{isEditing ? "Edit Schedule" : "Add Schedule"}</Dialog.Title>
 
-                        useEffect(() => {
-                            let file: Machine[]
-                            
-                            if (values.MachineGroup) {
-                                file = machine.filter(v => v.GMachineID === values.MachineGroup)
-                                setShouldRender(true)
-                            } else {
-                                file = machine
-                                setShouldRender(false)
-                            }
-
-                            setFieldMachie(prevOptions => {
-                                const isEqual = JSON.stringify(prevOptions) === JSON.stringify(file);
-                                return isEqual ? prevOptions : file;
-                            });
-                            setFieldValue('Machine', [])
-                        }, [values.MachineGroup, fieldMachine])
-
-                        return (
-                            <>
                                 <View style={{
                                     flexDirection: responsive === "small" ? 'column' : 'row',
                                     maxHeight: height / 1.5,
@@ -168,36 +145,22 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                             )}
                                         </FastField>
 
-                                        {shouldRender && (
-                                            <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
-                                                <ScrollView showsVerticalScrollIndicator={false}>
-                                                    <FastField name="Machine" key={JSON.stringify(fieldMachine)}>
-                                                        {({ field, form }: any) => (
-                                                            <CustomDropdownMultiple
-                                                                title="Machine"
-                                                                labels="MachineName"
-                                                                values="MachineID"
-                                                                data={fieldMachine}
-                                                                value={field.value}
-                                                                handleChange={(value) => {
-                                                                    form.setFieldValue(field.name, value);
-                                                                    setTimeout(() => {
-                                                                        form.setFieldTouched(field.name, true);
-                                                                    }, 0)
-                                                                }}
-                                                                handleBlur={() => {
-                                                                    form.setFieldTouched(field.name, true);
-                                                                }}
-                                                                error={form.touched.checkListOptionId && Boolean(form.errors.checkListOptionId)}
-                                                                errorMessage={form.touched.checkListOptionId ? form.errors.checkListOptionId : ""}
-                                                                testId="machine-s"
-                                                            />
-                                                        )
-                                                        }
-                                                    </FastField>
-                                                </ScrollView>
-                                            </Animated.View>
-                                        )}
+                                        <View style={[styles.timeIntervalMenu, { marginBottom: 0 }]}>
+                                            <View id="form-active-point-md" style={[masterdataStyles.containerSwitch]}>
+                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginRight: 12 }]}>
+                                                        Point time schedule when stop : {point ? "Custom Day" : "Every Day"}
+                                                    </Text>
+                                                    <Switch
+                                                        style={{ transform: [{ scale: 1.1 }], top: 2 }}
+                                                        color={point ? theme.colors.inversePrimary : theme.colors.onPrimaryContainer}
+                                                        value={point}
+                                                        onValueChange={(v: boolean) => setPoint(v)}
+                                                        testID="point-md"
+                                                    />
+                                                </View>
+                                            </View>
+                                        </View>
                                     </View>
 
                                     <View style={{ flexBasis: '46%', marginHorizontal: '2%', flex: 1 }}>
@@ -233,7 +196,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                                 <View id="form-active-md" style={[masterdataStyles.containerSwitch]}>
                                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginRight: 12 }]}>
-                                                            Type Schedule : {shouldCustom ? "Run Schedule" : "Only Schedule"}
+                                                            Type Schedule : {shouldCustom ? "Every Day" : "Custom Day"}
                                                         </Text>
                                                         <Switch
                                                             style={{ transform: [{ scale: 1.1 }], top: 2 }}
@@ -243,7 +206,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                                                 if (v !== shouldCustom) {
                                                                     setFieldValue('timeSlots', [])
                                                                     setFieldValue('timeInterval', "")
-                                                                    setShouldCustom(v);
+                                                                    runOnJS(setShouldCustom)(v);
                                                                 }
                                                             }}
                                                             testID="schedule-md"
@@ -253,7 +216,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                             </View>
                                         )}
 
-                                        <ScrollView showsVerticalScrollIndicator={false}>
+                                        <ScrollView showsVerticalScrollIndicator={false} style={{ display: shouldRenderTime === "Daily" || shouldRenderTime === "Weekly" ? 'flex' : 'none' }}>
                                             <Daily_dialog
                                                 setFieldValue={setFieldValue}
                                                 shouldCustom={shouldCustom}
@@ -265,6 +228,17 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                                 showSuccess={showSuccess}
                                                 spacing={spacing}
                                                 theme={theme}
+                                            />
+
+                                            <Custom_schedule_dialog
+                                                responsive={responsive}
+                                                shouldCustom={shouldCustom}
+                                                shouldRenderTime={shouldRenderTime}
+                                                showError={showError}
+                                                showSuccess={showSuccess}
+                                                spacing={spacing}
+                                                theme={theme}
+                                                key={"custom_schedule"}
                                             />
 
                                             <Week_dialog
@@ -287,26 +261,30 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                         disabled={!isValid || !dirty}
                                         onPress={() => handleSubmit()}>Save</Button>
                                 </View>
-                                <InfoSchedule_dialog
-                                    shouldCustom={shouldCustom}
-                                    shouldRenderTime={shouldRenderTime}
-                                    values={values}
-                                    key={`infoshedule`}
-                                    visible={showThirDialog}
-                                    setVisible={(v) => setShowThirDialog(v)}
-                                    setFieldValue={setFieldValue}
-                                    responsive={responsive}
-                                    showError={showError}
-                                    showSuccess={showSuccess}
-                                    spacing={spacing}
-                                    theme={theme}
-                                />
-                            </>
-                        )
-                    }}
-                </Formik>
-            </Dialog>
 
+                            </Dialog>
+
+                            <InfoSchedule_dialog
+                                shouldCustom={shouldCustom}
+                                shouldRenderTime={shouldRenderTime}
+                                values={values}
+                                key={`infoshedule`}
+                                visible={showThirDialog}
+                                setVisible={(v) => setShowThirDialog(v)}
+                                setFieldValue={setFieldValue}
+                                responsive={responsive}
+                                showError={showError}
+                                showSuccess={showSuccess}
+                                spacing={spacing}
+                                theme={theme}
+                                dirty={dirty}
+                                isValid={isValid}
+                                handleSubmit={() => { }}
+                            />
+                        </>
+                    )
+                }}
+            </Formik>
         </Portal>
     );
 });

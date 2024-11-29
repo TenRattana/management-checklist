@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   ExpandableCalendar,
   CalendarProvider,
@@ -13,6 +13,7 @@ import useMasterdataStyles from '@/styles/common/masterdata';
 import { useTheme } from '@/app/contexts/useTheme';
 import { Icon } from 'react-native-paper';
 import { getDate, timelineEvents } from '@/app/mocks/timeline';
+import { getCurrentTime } from '@/config/timezoneUtils';
 const Customtable = React.lazy(() => import('@/components/Customtable'))
 
 const HomeScreen = React.memo(() => {
@@ -20,7 +21,7 @@ const HomeScreen = React.memo(() => {
   const [eventsByDate, setEventsByDate] = useState(() =>
     groupBy(timelineEvents, (e) => CalendarUtils.getCalendarDateString(e.start))
   );
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState(getCurrentTime());
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
   const masterdataStyles = useMasterdataStyles();
   const [week, setWeek] = useState<boolean>(false)

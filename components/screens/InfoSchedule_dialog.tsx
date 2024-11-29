@@ -1,10 +1,8 @@
-import React, { forwardRef, useCallback, useState } from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import React from 'react';
+import { View, StyleSheet, Dimensions, ScrollView } from 'react-native';
 import { Dialog, Button, Text } from 'react-native-paper';
-import DatePicker from 'react-datepicker';
 import useMasterdataStyles from '@/styles/common/masterdata';
-import { Machine } from '@/typing/type';
-import RNDateTimePicker from '@react-native-community/datetimepicker';
+import Daily_dialog from './Daily_dialog';
 
 interface InfoScheduleProps {
     visible: boolean;
@@ -16,15 +14,19 @@ interface InfoScheduleProps {
     showError: (message: string | string[]) => void;
     showSuccess: (message: string | string[]) => void;
     values: {
-        ScheduleName: string;
+        ScheduleName: string,
         MachineGroup: string;
-        Machine: Machine[];
-        timeSlots: { start: string | null; end: string | null }[];
+        timeSlots: { start: string | null, end: string | null }[];
+        timeCustom: { start: string | null, end: string | null }[];
     };
     shouldCustom: boolean | string;
     shouldRenderTime: string;
+    isValid: boolean;
+    dirty: boolean;
+    handleSubmit: () => void;
 }
 
+const { height } = Dimensions.get('window')
 const InfoScheduleDialog: React.FC<InfoScheduleProps> = React.memo(({
     visible,
     setVisible,
@@ -32,103 +34,45 @@ const InfoScheduleDialog: React.FC<InfoScheduleProps> = React.memo(({
     showError,
     showSuccess,
     values,
-    theme
+    theme,
+    responsive,
+    spacing,
+    isValid,
+    dirty,
+    handleSubmit
 }) => {
-    const masterdataStyles = useMasterdataStyles();
-    const [timeInterval, setTimeInterval] = useState<number>(0);
-    const [date, setDate] = useState<Date | null>(null);
-    const [isPickerVisible, setPickerVisible] = useState<boolean>(false);
-
-    const handleTimeChange = (event: any, selectedTime?: Date) => {
-        setPickerVisible(!isPickerVisible);
-        if (selectedTime) {
-            setDate(selectedTime);
-            setFieldValue('selectedTime', selectedTime.toTimeString().split(' ')[0]);
-            showSuccess('Time selected successfully!');
-        } else {
-            showError('Time selection was cancelled.');
-        }
-    };
-
-    const handleGenerateSchedule = useCallback(() => {
-        if (timeInterval <= 0 || timeInterval > 24) {
-            showError('Time interval must be between 1 and 24 hours.');
-            return;
-        }
-
-        try {
-            const generatedSlots = [];
-            for (let i = 0; i < 24; i += timeInterval) {
-                const endHour = i + timeInterval;
-                if (endHour > 24) break;
-
-                generatedSlots.push({
-                    start: `${i.toString().padStart(2, '0')}:00`,
-                    end: `${endHour.toString().padStart(2, '0')}:00`,
-                });
-            }
-
-            if (generatedSlots.length === 0) {
-                showError('No time slots could be generated. Adjust the time interval.');
-                return;
-            }
-
-            setFieldValue('timeSlots', generatedSlots);
-            setTimeInterval(timeInterval);
-            showSuccess('Schedule generated successfully!');
-        } catch (error) {
-            showError('An unexpected error occurred while generating the schedule.');
-        }
-    }, [timeInterval, setFieldValue, showError, showSuccess]);
-
-    const CustomInput = forwardRef<View, any>(({ value, onClick }, ref) => (
-        <Button
-            mode="contained"
-            onPress={onClick}
-            ref={ref}
-            style={styles.addButton}
-        >
-            {value || 'Select Date'}
-        </Button>
-    ));
 
     return (
         <Dialog
             visible={visible}
             onDismiss={() => setVisible(false)}
-            style={[styles.dialog, { backgroundColor: theme.colors.background, borderRadius: 8 }]}
+            style={[styles.dialog, { backgroundColor: theme.colors.background, borderRadius: 8, display: visible ? 'flex' : 'none' }]}
         >
             <Dialog.Title>Create Info Schedule</Dialog.Title>
 
-            {Platform.OS === 'android' || Platform.OS === 'ios' ? (
-                <>
-                    {isPickerVisible && (
-                        <RNDateTimePicker
-                            value={date ?? new Date()}
-                            onChange={handleTimeChange}
-                            is24Hour={true}
-                        />
-                    )}
-                </>
-            ) : (
-                <View style={{ marginHorizontal: 24, marginBottom: 20 }}>
-                    <DatePicker
-                        selected={date}
-                        onChange={(newDate: Date | null) => newDate && setDate(newDate)}
-                        withPortal
-                        portalId="root-portal"
-                        showTimeInput
-                        timeInputLabel="Time:"
-                        customInput={<CustomInput />}
+            <ScrollView style={{ maxHeight: height / 1.7 }} showsVerticalScrollIndicator={false}>
+                <View style={{ marginHorizontal: 24 }}>
+                    <Daily_dialog
+                        responsive={responsive}
+                        setFieldValue={setFieldValue}
+                        shouldCustom={true}
+                        shouldRenderTime={"Daily"}
+                        showError={showError}
+                        showSuccess={showSuccess}
+                        spacing={spacing}
+                        theme={theme}
+                        values={values}
+                        key={"daily"}
                     />
                 </View>
-            )}
+            </ScrollView>
 
-            <Dialog.Actions>
-                <Button onPress={() => { setVisible(false); setPickerVisible(false) }}>
-                    <Text style={masterdataStyles.text}>Close</Text>
-                </Button>
-            </Dialog.Actions>
+            <View style={{ paddingBottom: 10, justifyContent: 'flex-end', flexDirection: 'row', paddingHorizontal: 24 }}>
+                <Button onPress={() => setVisible(false)}>Cancel</Button>
+                <Button
+                    disabled={!isValid || !dirty}
+                    onPress={() => handleSubmit()}>Save</Button>
+            </View>
         </Dialog>
     );
 });
