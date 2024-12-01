@@ -1,144 +1,131 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   ExpandableCalendar,
   CalendarProvider,
   CalendarUtils,
   WeekCalendar,
 } from 'react-native-calendars';
-import { AccessibleView, LoadingSpinner, Text } from "@/components";
-import groupBy from 'lodash/groupBy';
-import { useRes } from '@/app/contexts/useRes';
-import { Platform, StyleSheet, TouchableOpacity } from 'react-native';
-import useMasterdataStyles from '@/styles/common/masterdata';
+import { Card, FAB, IconButton, Divider } from 'react-native-paper';
+import { Platform, StyleSheet, View } from 'react-native';
 import { useTheme } from '@/app/contexts/useTheme';
-import { Icon } from 'react-native-paper';
 import { getDate, timelineEvents } from '@/app/mocks/timeline';
-import { getCurrentTime } from '@/config/timezoneUtils';
-const Customtable = React.lazy(() => import('@/components/Customtable'))
+import CustomTable from '@/components/Customtable';
+import { groupBy } from 'lodash';
 
-const HomeScreen = React.memo(() => {
+const HomeScreen = () => {
+  const { theme } = useTheme();
   const [currentDate, setCurrentDate] = useState(getDate());
-  const [eventsByDate, setEventsByDate] = useState(() =>
-    groupBy(timelineEvents, (e) => CalendarUtils.getCalendarDateString(e.start))
+  const [isWeekView, setIsWeekView] = useState(false);
+
+  // Group events by date
+  const eventsByDate = useMemo(
+    () => groupBy(timelineEvents, (e) => CalendarUtils.getCalendarDateString(e.start)),
+    []
   );
-  const [currentTime, setCurrentTime] = useState(getCurrentTime());
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
-  const masterdataStyles = useMasterdataStyles();
-  const [week, setWeek] = useState<boolean>(false)
-  const { spacing, fontSize } = useRes()
-  const { theme } = useTheme()
 
-  const markedDates = {
-    [`${getDate(-1)}`]: { marked: true },
-    [`${getDate()}`]: { marked: true },
-    [`${getDate(1)}`]: { marked: true },
-  };
+  const onDateChanged = useCallback((date: string) => setCurrentDate(date), []);
 
-  const onDateChanged = (date: string) => {
-    setCurrentDate(date);
-  };
+  // Filtered events for the selected date
+  const filteredEvents = useMemo(
+    () => eventsByDate[currentDate] || [],
+    [eventsByDate, currentDate]
+  );
 
-  const onMonthChange = (month: any) => {
-  };
-
-  const currentHour = currentTime.getHours();
-  const currentMinute = currentTime.getMinutes();
-
-  const filteredEvents = Object.keys(eventsByDate).reduce((acc, date) => {
-    const eventsForDate = eventsByDate[date].filter((event) => {
-      const eventStart = new Date(event.start);
-      const eventEnd = new Date(event.end);
-
-      const eventStartHour = eventStart.getHours();
-      const eventEndHour = eventEnd.getHours();
-
-      const isEventOngoing =
-        (currentHour > eventStartHour || (currentHour === eventStartHour && currentMinute >= eventStart.getMinutes())) &&
-        (currentHour < eventEndHour || (currentHour === eventEndHour && currentMinute <= eventEnd.getMinutes()));
-
-      return isEventOngoing;
-    });
-
-    if (eventsForDate.length > 0) {
-      acc[date] = eventsForDate;
-    }
-
-    return acc;
-  }, {} as Record<string, typeof timelineEvents>);
+  // Marked dates for calendar
+  const markedDates = useMemo(() => {
+    return {
+      [`${getDate(-1)}`]: { marked: true, dotColor: theme.colors.primary },
+      [`${getDate(0)}`]: { marked: true, dotColor: theme.colors.secondary },
+      [`${getDate(1)}`]: { marked: true, dotColor: theme.colors.accent },
+    };
+  }, [theme]);
 
   const tableData = useMemo(() => {
-    return filteredEvents[currentDate]?.map((item) => [
+    return filteredEvents.map((item) => [
       item.title,
       item.start,
       item.end,
-      item.status ? "running" : "wait",
+      item.status ? "Running" : "Waiting",
       item.summary,
-    ]) || [];
-  }, [filteredEvents, currentDate]);
+    ]);
+  }, [filteredEvents]);
 
+  console.log(tableData);
+  
   const customtableProps = useMemo(() => ({
     Tabledata: tableData,
     Tablehead: [
-      { label: "Even title", align: "flex-start" },
+      { label: "Event Title", align: "flex-start" },
       { label: "Start", align: "flex-start" },
       { label: "End", align: "flex-start" },
       { label: "Status", align: "center" },
       { label: "Detail", align: "flex-start" },
     ],
-    flexArr: [2, 2, 2, 2, 2],
+    flexArr: [2, 2, 2, 1, 3],
     actionIndex: [{}],
-    showMessage: 1,
-    searchQuery: debouncedSearchQuery,
-  }), [tableData, debouncedSearchQuery]);
-
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-    },
-    header: {
-      fontSize: spacing.large,
-      marginTop: spacing.small,
-      paddingVertical: fontSize === "large" ? 7 : 5
-    },
-    functionname: {
-      textAlign: 'center'
-    },
-    cardcontent: {
-      padding: 2,
-      flex: 1
-    }
-  })
+    showMessage: true, 
+    searchQuery: ""
+  }), [tableData]);
 
   return (
-    <AccessibleView name="container-home" style={styles.container}>
-      <CalendarProvider
-        date={currentDate}
-        onDateChanged={onDateChanged}
-        onMonthChange={onMonthChange}
-        showTodayButton
-        disabledOpacity={0.6}
-      >
-        {week ? (
-          <WeekCalendar firstDay={1} markedDates={markedDates} />
-        ) : (
-          <ExpandableCalendar firstDay={1} markedDates={markedDates} />
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <CalendarProvider date={currentDate} onDateChanged={onDateChanged}>
+        <View style={styles.calendarContainer}>
+          {isWeekView ? (
+            <WeekCalendar firstDay={1} markedDates={markedDates} />
+          ) : (
+            <ExpandableCalendar firstDay={1} markedDates={markedDates} />
+          )}
+        </View>
+
+        {Platform.OS === 'web' && (
+          <IconButton
+            icon={isWeekView ? 'calendar-month-outline' : 'calendar-week-outline'}
+            size={24}
+            style={styles.toggleButton}
+            onPress={() => setIsWeekView(!isWeekView)}
+          />
         )}
 
-        {Platform.OS === "web" && (
-          <>
-            <TouchableOpacity onPress={() => setWeek(!week)} style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginVertical: 10 }}>
-              <Icon source={week ? "chevron-double-down" : "chevron-double-up"} size={spacing.large} />
-              <Text style={[masterdataStyles.text, { paddingHorizontal: 10 }]}>{week ? "Weekly" : "Monthly"}</Text>
-            </TouchableOpacity>
-          </>
-        )}
+        <Card style={styles.card}>
+          <Card.Title title="Events" subtitle="Today's ongoing events" />
+          <Divider />
+          <Card.Content>
+            <CustomTable {...customtableProps} />
+          </Card.Content>
+        </Card>
 
-        <AccessibleView name="container-table" style={styles.cardcontent}>
-          {false ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
-        </AccessibleView>
+        <FAB
+          style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+          icon="plus"
+          onPress={() => console.log('Add Event')}
+        />
       </CalendarProvider>
-    </AccessibleView>
+    </View>
   );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 10,
+  },
+  calendarContainer: {
+    marginBottom: 10,
+  },
+  card: {
+    marginVertical: 10,
+    elevation: 3,
+  },
+  toggleButton: {
+    alignSelf: 'center',
+    marginVertical: 10,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+  },
 });
 
 export default HomeScreen;

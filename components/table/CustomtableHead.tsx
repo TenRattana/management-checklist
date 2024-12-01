@@ -120,7 +120,7 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({ Tablehead,
                         >
                             <Picker.Item label="Select all" value="" />
                             {dropdownOptions.map((option, index) => (
-                                <Picker.Item key={index} label={String(option)} value={option} />
+                                <Picker.Item key={`item-${index}`} label={String(option)} value={option} />
                             ))}
                         </Picker>
                     </AccessibleView>
