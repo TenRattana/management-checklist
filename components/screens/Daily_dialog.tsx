@@ -14,13 +14,8 @@ const hours = Array.from({ length: 24 }, (_, i) =>
 const Hours = [1, 2, 3, 4, 6, 12]
 
 interface DailyProps {
-    values: {
-        ScheduleName: string,
-        MachineGroup: string;
-        timeSlots: { start: string | null, end: string | null }[];
-        timeCustom: { start: string | null, end: string | null }[];
-    };
-    setFieldValue: (field: string, value: any) => void;
+    values: { start: string | null, end: string | null }[];
+    setFieldValue: (value: any) => void;
     shouldCustom: boolean | string;
     shouldRenderTime: string;
     theme: any;
@@ -41,30 +36,31 @@ const Daily_dialog = React.memo(({ values, setFieldValue, shouldCustom, shouldRe
     FadeOutRight.duration(300).easing(Easing.ease);
 
     const handleSelectTime = React.useCallback((type: 'start' | 'end', index: number, value: string) => {
-        setFieldValue('timeSlots', values.timeSlots.map((slot, i) => i === index ? { ...slot, [type]: value } : slot));
-    }, [setFieldValue, values.timeSlots]);
+        setFieldValue(values.map((slot, i) => i === index ? { ...slot, [type]: value } : slot));
+    }, [setFieldValue, values]);
 
     const addTimeSlot = React.useCallback(() => {
-        if (values.timeSlots.some(slot => !slot.start || !slot.end)) {
+        if (values.some(slot => !slot.start || !slot.end)) {
             showError("Please complete all time slots before adding a new one.");
             return;
         }
-        setFieldValue('timeSlots', [...values.timeSlots, { start: null, end: null }]);
+
+        setFieldValue([...values, { start: null, end: null }]);
 
         showSuccess("New time slot added successfully!");
-    }, [setFieldValue, values.timeSlots]);
+    }, [setFieldValue, values]);
 
     const removeTimeSlot = React.useCallback((index: number) => {
-        if (values.timeSlots.length <= 0) {
+        if (values.length <= 0) {
             showError("You must have at least one time slot.");
             return;
         }
-        setFieldValue('timeSlots', values.timeSlots.filter((_, i) => i !== index));
+        setFieldValue(values.filter((_, i) => i !== index));
 
         showSuccess(`Time slot at position ${index + 1} removed successfully!`);
-    }, [setFieldValue, values.timeSlots]);
+    }, [setFieldValue, values]);
 
-    const handleGenerateSchedule = useCallback((timeInterval: number, setFieldValue: (field: string, value: any) => void) => {
+    const handleGenerateSchedule = useCallback((timeInterval: number, setFieldValue: (value: any) => void) => {
         if (timeInterval <= 0 || timeInterval > 24) {
             showError("Time interval must be between 1 and 24 hours.");
             return;
@@ -87,7 +83,7 @@ const Daily_dialog = React.memo(({ values, setFieldValue, shouldCustom, shouldRe
                 return;
             }
 
-            setFieldValue('timeSlots', generatedSlots);
+            setFieldValue(generatedSlots);
             setTimeInterval(timeInterval);
             showSuccess("Schedule generated successfully!");
         } catch (error) {
@@ -196,7 +192,7 @@ const Daily_dialog = React.memo(({ values, setFieldValue, shouldCustom, shouldRe
                     </Menu>
                 </View>
 
-                {values.timeSlots.map((timeSlot, index) => {
+                {values?.map((timeSlot, index) => {
                     return (
                         <Swipeable
                             key={index}

@@ -1,12 +1,13 @@
-import useMasterdataStyles from '@/styles/common/masterdata';
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Button, Menu, Icon } from 'react-native-paper';
-import * as Yup from 'yup'
+import * as Yup from 'yup';
 import Animated, { Easing, FadeInLeft, FadeOutLeft } from 'react-native-reanimated';
+import useMasterdataStyles from '@/styles/common/masterdata';
 import { styles } from './Schedule';
 
-const Week = ["Mon", "The", "Wed", "Thu", "Fri", "Sat", "Sun"]
+const Week = ["MonDay", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
 interface WeekProps {
     shouldRenderTime: string;
     theme: any;
@@ -15,54 +16,45 @@ interface WeekProps {
     showError: (message: string | string[]) => void;
     showSuccess: (message: string | string[]) => void;
     setShowThirDialog: (v: boolean) => void;
+    selectedDays: { [key: string]: { start: string | null, end: string | null }[] };
+    setSelectedDays: (value: { [key: string]: { start: string | null, end: string | null }[] }) => void;
+    setIndexThirDialog: (value: string) => void;
 }
 
-const Week_dialog = React.memo(({ shouldRenderTime, theme, spacing, responsive, showError, showSuccess, setShowThirDialog }: WeekProps) => {
-
+const Week_dialog = React.memo(({ shouldRenderTime, theme, spacing, responsive, showError, showSuccess, setShowThirDialog, selectedDays, setSelectedDays, setIndexThirDialog }: WeekProps) => {
     const [showTimeIntervalMenu, setShowTimeIntervalMenu] = useState<{ custom: boolean, time: boolean, week: boolean }>({ custom: false, time: false, week: false });
     const masterdataStyles = useMasterdataStyles();
-    const [indexThirDialog, setIndexThirDialog] = useState<number | undefined>()
-    const [selectedDays, setSelectedDays] = useState<string[]>([]);
 
     FadeOutLeft.duration(300).easing(Easing.ease);
     FadeInLeft.duration(300).easing(Easing.ease);
 
-    const validationSchema = Yup.object().shape({
-        ScheduleName: Yup.string().required('Schedule name is required'),
-        Machine: Yup.array().min(1, 'Select at least one machine'),
-        timeSlots: Yup.array()
-            .of(
-                Yup.object().shape({
-                    start: Yup.string().required('Start time is required'),
-                    end: Yup.string().required('End time is required'),
-                })
-            )
-            .min(1, 'At least one time slot is required'),
-    });
-
-    const removeDay = React.useCallback((index: number) => {
-        setSelectedDays(selectedDays.filter((_, i) => i !== index))
-        showSuccess(`Day slot at position ${index + 1} removed successfully`)
-    }, [selectedDays])
-
-    const setInfoDay = React.useCallback((index: number) => {
-        setShowThirDialog(true)
-        setIndexThirDialog(index)
-    }, [])
-
     const toggleDaySelection = React.useCallback((day: string) => {
-        console.log(selectedDays.includes(day));
-
-        if (selectedDays.includes(day)) {
-            setSelectedDays((prev) => prev.filter((d) => d !== day));
+        if (selectedDays[day]) {
+            const updatedDays = { ...selectedDays };
+            delete updatedDays[day];
+            setSelectedDays(updatedDays);
         } else {
-            setSelectedDays((prev) => [...prev, day]);
+            setSelectedDays({
+                ...selectedDays,
+                [day]: [{ start: null, end: null }]
+            });
         }
     }, [selectedDays]);
 
+    const removeDay = React.useCallback((day: string) => {
+        const updatedDays = { ...selectedDays };
+        delete updatedDays[day];
+        setSelectedDays(updatedDays);
+        showSuccess(`Day ${day} removed successfully`);
+    }, [selectedDays]);
+
+    const setInfoDay = React.useCallback((day: string, index: number) => {
+        setShowThirDialog(true);
+        setIndexThirDialog(day);
+    }, []);
+
     return shouldRenderTime === "Weekly" && (
         <Animated.View entering={FadeInLeft} exiting={FadeOutLeft}>
-
             <View style={styles.timeIntervalMenu}>
                 <Menu
                     visible={showTimeIntervalMenu.week}
@@ -73,7 +65,9 @@ const Week_dialog = React.memo(({ shouldRenderTime, theme, spacing, responsive, 
                             style={styles.timeButton}
                             onPress={() => setShowTimeIntervalMenu((prev) => ({ ...prev, week: true }))}
                         >
-                            <Text style={masterdataStyles.timeText}>{selectedDays.length > 0 ? `Selected: ${selectedDays.join(", ")}` : "Select Day"}</Text>
+                            <Text style={masterdataStyles.timeText}>
+                                {Object.keys(selectedDays).length > 0 ? `Selected: ${Object.keys(selectedDays).join(", ")}` : "Select Day"}
+                            </Text>
                         </Button>
                     }
                 >
@@ -81,7 +75,7 @@ const Week_dialog = React.memo(({ shouldRenderTime, theme, spacing, responsive, 
                         <Menu.Item
                             key={index}
                             onPress={() => toggleDaySelection(day)}
-                            title={`${selectedDays.includes(day) ? "✔ " : ""}${day}`}
+                            title={`${selectedDays[day] ? "✔ " : ""}${day}`}
                             style={styles.menuItem}
                         />
                     ))}
@@ -89,21 +83,18 @@ const Week_dialog = React.memo(({ shouldRenderTime, theme, spacing, responsive, 
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
-                {selectedDays.map((timeSlot, index) => (
-                    <View key={index} style={styles.containerWeek}>
-
+                {Object.keys(selectedDays).map((day) => (
+                    <View key={day} style={styles.containerWeek}>
                         <View style={styles.containerBoxWeek}>
                             <Text style={[masterdataStyles.textFFF, { textAlign: 'center', padding: 10 }]}>
-                                {`${timeSlot}Day` || 'N/A'}
+                                {day}
                             </Text>
                         </View>
 
                         <TouchableOpacity
-                            style={[
-                                masterdataStyles.button,
-                                styles.containerIconWeek
-                            ]}
-                            onPress={() => setInfoDay(index)}>
+                            style={[masterdataStyles.button, styles.containerIconWeek]}
+                            onPress={() => setInfoDay(day, 0)} // ถ้าจะแสดง dialog อาจส่ง index เป็น 0
+                        >
                             <Icon
                                 source="information-outline"
                                 color={theme.colors.blue}
@@ -113,12 +104,9 @@ const Week_dialog = React.memo(({ shouldRenderTime, theme, spacing, responsive, 
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                            onPress={() =>
-                                removeDay(index)}
-                            style={[
-                                masterdataStyles.button,
-                                styles.containerIconWeek
-                            ]}>
+                            onPress={() => removeDay(day)}
+                            style={[masterdataStyles.button, styles.containerIconWeek]}
+                        >
                             <Icon
                                 source="window-close"
                                 color={theme.colors.error}
@@ -126,12 +114,12 @@ const Week_dialog = React.memo(({ shouldRenderTime, theme, spacing, responsive, 
                             />
                             <Text style={[masterdataStyles.text, { paddingLeft: 10 }]}>Delete</Text>
                         </TouchableOpacity>
-
                     </View>
                 ))}
             </ScrollView>
-        </Animated.View>
-    )
-})
 
-export default Week_dialog
+        </Animated.View>
+    );
+});
+
+export default Week_dialog;

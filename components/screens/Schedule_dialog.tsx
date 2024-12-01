@@ -38,6 +38,7 @@ interface ScheduleDialogProps {
         MachineGroup: string;
         timeSlots: { start: string | null, end: string | null }[];
         timeCustom: { start: string | null, end: string | null }[];
+        timeWeek: { [key: string]: { start: string | null, end: string | null }[] }
     };
     isEditing: boolean;
 }
@@ -52,27 +53,18 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
     const [showThirDialog, setShowThirDialog] = useState(false)
     const [shouldCustom, setShouldCustom] = useState<boolean | "">("")
     const [shouldRenderTime, setShouldRenderTime] = useState<string>("")
+    const [IndexThirDialo, setIndexThirDialog] = useState("")
 
     useEffect(() => {
         if (!isVisible) {
             setPoint(false)
             setShouldCustom("")
             setShouldRenderTime("")
-            console.log(shouldRenderTime, shouldCustom, point);
         }
     }, [isVisible])
 
     const validationSchema = Yup.object().shape({
         ScheduleName: Yup.string().required('Schedule name is required'),
-        Machine: Yup.array().min(1, 'Select at least one machine'),
-        timeSlots: Yup.array()
-            .of(
-                Yup.object().shape({
-                    start: Yup.string().required('Start time is required'),
-                    end: Yup.string().required('End time is required'),
-                })
-            )
-            .min(1, 'At least one time slot is required'),
     });
 
     const { data: machineGroups = [] } = useQuery<GroupMachine[], Error>(
@@ -218,10 +210,10 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
 
                                         <ScrollView showsVerticalScrollIndicator={false} style={{ display: shouldRenderTime === "Daily" || shouldRenderTime === "Weekly" ? 'flex' : 'none' }}>
                                             <Daily_dialog
-                                                setFieldValue={setFieldValue}
+                                                setFieldValue={(value: [{ start: string | null, end: string | null }]) => setFieldValue('timeSlots', value)}
                                                 shouldCustom={shouldCustom}
                                                 shouldRenderTime={shouldRenderTime}
-                                                values={values}
+                                                values={values.timeSlots}
                                                 key={`daily-dialog`}
                                                 responsive={responsive}
                                                 showError={showError}
@@ -244,9 +236,12 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                             <Week_dialog
                                                 shouldRenderTime={shouldRenderTime}
                                                 setShowThirDialog={(v: boolean) => setShowThirDialog(v)}
+                                                setIndexThirDialog={(value) => setIndexThirDialog(value)}
                                                 responsive={responsive}
                                                 showError={showError}
                                                 showSuccess={showSuccess}
+                                                selectedDays={values.timeWeek}
+                                                setSelectedDays={(value) => setFieldValue('timeWeek', value)}
                                                 spacing={spacing}
                                                 theme={theme}
                                                 key={`week-dialog`}
@@ -265,13 +260,12 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                             </Dialog>
 
                             <InfoSchedule_dialog
-                                shouldCustom={shouldCustom}
-                                shouldRenderTime={shouldRenderTime}
-                                values={values}
+                                selectedDay={IndexThirDialo}
+                                values={values.timeWeek[IndexThirDialo]}
                                 key={`infoshedule`}
                                 visible={showThirDialog}
                                 setVisible={(v) => setShowThirDialog(v)}
-                                setFieldValue={setFieldValue}
+                                setFieldValue={(value) => setFieldValue("timeWeek", { ...values.timeWeek, [IndexThirDialo]: value })}
                                 responsive={responsive}
                                 showError={showError}
                                 showSuccess={showSuccess}
@@ -279,7 +273,6 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                 theme={theme}
                                 dirty={dirty}
                                 isValid={isValid}
-                                handleSubmit={() => { }}
                             />
                         </>
                     )

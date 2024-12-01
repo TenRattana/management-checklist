@@ -26,6 +26,7 @@ interface InitialValues {
     Machine: Machine[];
     timeSlots: { start: string | null, end: string | null }[];
     timeCustom: { start: string | null, end: string | null }[];
+    timeWeek: { [key: string]: { start: string | null, end: string | null }[] }
 }
 
 const TimescheduleScreen: React.FC = React.memo(() => {
@@ -37,8 +38,9 @@ const TimescheduleScreen: React.FC = React.memo(() => {
         ScheduleName: '',
         MachineGroup: "",
         Machine: [],
-        timeSlots: [{ start: null, end: null }],
-        timeCustom: [{ start: null, end: null }],
+        timeSlots: [],
+        timeCustom: [],
+        timeWeek: {}
     };
 
     const masterdataStyles = useMasterdataStyles();
