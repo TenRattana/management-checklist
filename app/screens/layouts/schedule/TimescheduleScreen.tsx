@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, TouchableOpacity } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
 import { AccessibleView, Customtable, LoadingSpinner, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { Machine, TimeSchedule } from '@/typing/type';
+import { TimeSchedule } from '@/typing/type';
 import { useQuery, useQueryClient } from 'react-query';
 import { useSelector } from "react-redux";
 import ScheduleDialog from "@/components/screens/Schedule_dialog";
@@ -16,14 +16,11 @@ const fetchTimeSchedules = async (): Promise<TimeSchedule[]> => {
     return response.data.data ?? [];
 };
 
-const fetchMachines = async (): Promise<Machine[]> => {
-    const response = await axiosInstance.post("Machine_service.asmx/GetMachines");
-    return response.data.data ?? [];
-};
 interface InitialValues {
     ScheduleName: string;
     MachineGroup: string;
-    Machine: Machine[];
+    type_schedule: string;
+    custom: boolean;
     timeSlots: { start: string | null, end: string | null }[];
     timeCustom: { start: string | null, end: string | null }[];
     timeWeek: { [key: string]: { start: string | null, end: string | null }[] }
@@ -34,28 +31,21 @@ const TimescheduleScreen: React.FC = React.memo(() => {
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isVisible, setIsVisible] = useState<boolean>(false);
-    const initialValues: InitialValues = {
+    const [initialValues, setInitialValues] = useState<InitialValues>({
         ScheduleName: '',
         MachineGroup: "",
-        Machine: [],
+        type_schedule: "",
+        custom: false,
         timeSlots: [],
         timeCustom: [],
         timeWeek: {}
-    };
+    });
 
     const masterdataStyles = useMasterdataStyles();
     const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
-
-    const { data: machine = [], } = useQuery<Machine[], Error>(
-        'machine',
-        fetchMachines,
-        {
-            refetchOnWindowFocus: true,
-        }
-    );
 
     const { data: timeSchedule = [], isLoading, } = useQuery<TimeSchedule[], Error>(
         'timeSchedule',
@@ -108,7 +98,15 @@ const TimescheduleScreen: React.FC = React.memo(() => {
     }, [timeSchedule, debouncedSearchQuery]);
 
     const handleNewData = useCallback(() => {
-
+        setInitialValues({
+            ScheduleName: '',
+            MachineGroup: "",
+            type_schedule: "",
+            custom: false,
+            timeSlots: [],
+            timeCustom: [],
+            timeWeek: {}
+        })
         setIsEditing(false);
         setIsVisible(true);
     }, []);
@@ -161,9 +159,9 @@ const TimescheduleScreen: React.FC = React.memo(() => {
                     onChange={setSearchQuery}
                     testId="search-schedule"
                 />
-                <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                     <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Add New Schedule</Text>
-                </Pressable>
+                </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}

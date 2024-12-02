@@ -68,8 +68,10 @@
     "@types/lodash": "^4.17.13",
     "@types/react": "~18.2.45",
     "@types/xml2js": "^0.4.14",
+    "css-loader": "^7.1.2",
     "react-datepicker": "^7.5.0",
     "react-datetime-picker": "^6.0.1",
+    "style-loader": "^4.0.0",
     "typescript": "~5.3.3"
   },
   "private": true

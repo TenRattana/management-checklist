@@ -4,7 +4,6 @@ import { View, Text } from 'react-native';
 import { Button, Menu, IconButton } from 'react-native-paper';
 import Animated, { Easing, Extrapolate, FadeInRight, FadeOutRight, interpolate, SharedValue } from 'react-native-reanimated';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { styles } from './Schedule';
 
 const hours = Array.from({ length: 24 }, (_, i) =>
@@ -16,8 +15,6 @@ const Hours = [1, 2, 3, 4, 6, 12]
 interface DailyProps {
     values: { start: string | null, end: string | null }[];
     setFieldValue: (value: any) => void;
-    shouldCustom: boolean | string;
-    shouldRenderTime: string;
     theme: any;
     spacing: any;
     responsive: any;
@@ -25,12 +22,11 @@ interface DailyProps {
     showSuccess: (message: string | string[]) => void;
 }
 
-const Daily_dialog = React.memo(({ values, setFieldValue, shouldCustom, shouldRenderTime, theme, spacing, responsive, showError, showSuccess }: DailyProps) => {
+const Daily_dialog = React.memo(({ values, setFieldValue, spacing, showError, showSuccess }: DailyProps) => {
     const [showStartMenu, setShowStartMenu] = useState(-1);
     const [showEndMenu, setShowEndMenu] = useState(-1);
     const [showTimeIntervalMenu, setShowTimeIntervalMenu] = useState<{ custom: boolean, time: boolean, week: boolean }>({ custom: false, time: false, week: false });
     const masterdataStyles = useMasterdataStyles();
-    const [timeInterval, setTimeInterval] = useState<number>(0)
 
     FadeInRight.duration(300).easing(Easing.ease);
     FadeOutRight.duration(300).easing(Easing.ease);
@@ -84,7 +80,6 @@ const Daily_dialog = React.memo(({ values, setFieldValue, shouldCustom, shouldRe
             }
 
             setFieldValue(generatedSlots);
-            setTimeInterval(timeInterval);
             showSuccess("Schedule generated successfully!");
         } catch (error) {
             showError("An unexpected error occurred while generating the schedule.");
@@ -136,12 +131,8 @@ const Daily_dialog = React.memo(({ values, setFieldValue, shouldCustom, shouldRe
         );
     };
 
-    const renderRightActions = (dragX: SharedValue<number>, index: number, custom?: boolean) => {
-        const translateX = dragX.value ? interpolate(dragX.value, {
-            inputRange: [0, 200],
-            outputRange: [0, 200],
-            extrapolate: Extrapolate.CLAMP,
-        }) : 0;
+    const renderRightActions = (dragX: SharedValue<number>, index: number) => {
+        const translateX = dragX.value ? interpolate(dragX.value, [0, 200], [0, 200], Extrapolate.CLAMP) : 0;
 
         return (
             <View style={styles.rightActionsContainer}>
@@ -163,59 +154,56 @@ const Daily_dialog = React.memo(({ values, setFieldValue, shouldCustom, shouldRe
     }
 
     return (
-        <GestureHandlerRootView style={{ display: shouldRenderTime === "Daily" && shouldCustom ? 'flex' : 'none' }}>
-            <Animated.View entering={FadeInRight} exiting={FadeOutRight} >
-                <View style={styles.timeIntervalMenu}>
-                    <Text style={masterdataStyles.text}>Generate Time Every : {timeInterval}</Text>
-                    <Menu
-                        visible={showTimeIntervalMenu.time}
-                        onDismiss={() => setShowTimeIntervalMenu((prev) => ({ ...prev, time: !showTimeIntervalMenu.time }))}
-                        anchor={<Button
-                            mode="outlined"
-                            style={styles.timeButton}
-                            onPress={() => setShowTimeIntervalMenu((prev) => ({ ...prev, time: true }))}
-                        >
-                            <Text style={masterdataStyles.timeText}>{timeInterval > 0 ? `Every ${timeInterval} hours` : 'Select Interval'}</Text>
-                        </Button>}
+        <>
+            <View style={styles.timeIntervalMenu}>
+                <Menu
+                    visible={showTimeIntervalMenu.time}
+                    onDismiss={() => setShowTimeIntervalMenu((prev) => ({ ...prev, time: !showTimeIntervalMenu.time }))}
+                    anchor={<Button
+                        mode="outlined"
+                        style={styles.timeButton}
+                        onPress={() => setShowTimeIntervalMenu((prev) => ({ ...prev, time: true }))}
                     >
-                        {Hours.map((interval, index) => (
-                            <Menu.Item
-                                style={styles.menuItem}
-                                key={index}
-                                onPress={() => {
-                                    handleGenerateSchedule(interval, setFieldValue);
-                                    setShowTimeIntervalMenu((prev) => ({ ...prev, time: false }))
-                                }}
-                                title={`Every ${interval} hours`}
-                            />
-                        ))}
-                    </Menu>
-                </View>
-
-                {values?.map((timeSlot, index) => {
-                    return (
-                        <Swipeable
+                        <Text style={masterdataStyles.timeText}>Generate Schedule</Text>
+                    </Button>}
+                >
+                    {Hours.map((interval, index) => (
+                        <Menu.Item
+                            style={styles.menuItem}
                             key={index}
-                            renderRightActions={(dragX: any) =>
-                                renderRightActions(dragX, index)
-                            }
-                        >
-                            <View key={`container-${index}`} style={styles.containerTime}>
-                                {renderTimeSelection('start', index, timeSlot, hours)}
+                            onPress={() => {
+                                handleGenerateSchedule(interval, setFieldValue);
+                                setShowTimeIntervalMenu((prev) => ({ ...prev, time: false }))
+                            }}
+                            title={`Every ${interval} hours`}
+                        />
+                    ))}
+                </Menu>
+            </View>
 
-                                {renderTimeSelection('end', index, timeSlot, hours)}
-                            </View>
-                        </Swipeable>
-                    )
-                })}
+            {values?.map((timeSlot, index) => {
+                return (
+                    <Swipeable
+                        key={index}
+                        renderRightActions={(dragX: any) =>
+                            renderRightActions(dragX, index)
+                        }
+                    >
+                        <View key={`container-${index}`} style={styles.containerTime}>
+                            {renderTimeSelection('start', index, timeSlot, hours)}
 
-                <View style={{ marginHorizontal: 24, marginBottom: 20 }}>
-                    <Button onPress={() => addTimeSlot()} style={styles.addButton}>
-                        <Text style={masterdataStyles.timeText}>Add Schedule</Text>
-                    </Button>
-                </View>
-            </Animated.View>
-        </GestureHandlerRootView>
+                            {renderTimeSelection('end', index, timeSlot, hours)}
+                        </View>
+                    </Swipeable>
+                )
+            })}
+
+            <View style={{ marginHorizontal: 24, marginBottom: 20 }}>
+                <Button onPress={() => addTimeSlot()} style={styles.addButton}>
+                    <Text style={masterdataStyles.timeText}>Add Schedule</Text>
+                </Button>
+            </View>
+        </>
     )
 })
 

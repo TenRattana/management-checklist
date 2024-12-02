@@ -1,67 +1,87 @@
-import React from 'react';
+import React, { useState } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { View, Text, StyleSheet } from 'react-native';
-import { Swipeable } from 'react-native-gesture-handler'; // ใช้ Swipeable
-import { IconButton } from 'react-native-paper'; // ใช้ IconButton จาก react-native-paper
+import { Portal, Dialog, Button } from 'react-native-paper';
+import { useTheme } from '../contexts/useTheme';
+import '../../styles/Datapicker.css';
 
 const TestComponent = () => {
-    const renderLeftActions = () => (
-        <View style={styles.leftActions}>
-            <IconButton icon="check" iconColor="white" size={30} onPress={() => console.log("Item checked")} />
-        </View>
-    );
+    const { theme } = useTheme();
 
-    const renderRightActions = () => (
-        <View style={styles.rightActions}>
-            <IconButton icon="delete" iconColor="white" size={30} onPress={() => console.log("Item deleted")} />
-        </View>
-    );
+    const [startDate, setStartDate] = useState<Date | null>(new Date());
+    const [isPickerVisible, setIsPickerVisible] = useState(false);
+
+    const togglePicker = () => setIsPickerVisible((prev) => !prev);
+
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 16,
+            backgroundColor: theme.colors.background,
+        },
+        dialog: {
+            padding: 16,
+            borderRadius: 10,
+            backgroundColor: theme.colors.surface,
+        },
+        dialogTitle: {
+            fontSize: 18,
+            fontWeight: 'bold',
+            color: theme.colors.primary,
+            textAlign: 'center',
+            marginBottom: 16,
+        },
+        datePickerWrapper: {
+            marginVertical: 16,
+            alignItems: 'center',
+        },
+        button: {
+            backgroundColor: theme.colors.primary,
+            padding: 10,
+            borderRadius: 5,
+            marginTop: 10,
+        },
+        buttonText: {
+            color: theme.colors.background,
+            fontWeight: 'bold',
+            textAlign: 'center',
+        },
+    });
 
     return (
         <View style={styles.container}>
-            <Swipeable renderLeftActions={renderLeftActions} renderRightActions={renderRightActions}>
-                <View style={styles.item}>
-                    <Text style={styles.text}>Swipe Me</Text>
-                </View>
-            </Swipeable>
+            <Text>Selected Date: {startDate ? startDate.toLocaleString() : 'None'}</Text>
+
+            <Button mode="contained" style={styles.button} onPress={togglePicker}>
+                <Text style={styles.buttonText}>Select Date</Text>
+            </Button>
+
+            <Portal>
+                <Dialog visible={isPickerVisible} onDismiss={togglePicker} style={styles.dialog}>
+                    <Dialog.Title style={styles.dialogTitle}>Select Date and Time</Dialog.Title>
+                    <View style={styles.datePickerWrapper}>
+                        <DatePicker
+                            selected={startDate}
+                            onChange={(date) => {
+                                setStartDate(date);
+                                togglePicker();
+                            }}
+                            showTimeSelect
+                            dateFormat="dd/MM/yyyy h:mm aa"
+                            timeFormat="HH:mm"
+                            className="custom-datepicker"
+                        />
+                    </View>
+                    <Dialog.Actions>
+                        <Button onPress={togglePicker}>Close</Button>
+                    </Dialog.Actions>
+                </Dialog>
+            </Portal>
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    item: {
-        width: 300,
-        height: 60,
-        backgroundColor: '#f0f0f0',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginVertical: 10,
-        borderRadius: 8,
-    },
-    text: {
-        fontSize: 18,
-        color: '#333',
-    },
-    leftActions: {
-        flex: 1,
-        backgroundColor: '#4caf50',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginVertical: 10,
-        borderRadius: 8,
-    },
-    rightActions: {
-        flex: 1,
-        backgroundColor: '#f44336',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginVertical: 10,
-        borderRadius: 8,
-    },
-});
 
 export default TestComponent;

@@ -1,0 +1,54 @@
+/* การจัดตำแหน่ง DatePicker ให้อยู่กลางหน้าจอ */
+.custom-datepicker-wrapper {
+    position: fixed; /* ให้แสดงที่ตำแหน่งที่ต้องการในหน้าจอ */
+    top: 40%; /* จัดให้ DatePicker อยู่กลางแนวตั้ง */
+    left: 50%; /* จัดให้ DatePicker อยู่กลางแนวนอน */
+    transform: translate(-50%, -50%); /* ปรับให้ศูนย์กลางของ DatePicker อยู่ที่กลางจอ */
+    align-items: center;
+    align-self: center;
+    z-index: 9999; /* ให้ DatePicker อยู่ด้านหน้า */
+    box-sizing: border-box; /* ให้ padding และ margin ไม่ทำให้ขนาดเกินที่กำหนด */
+    background-color: #6c63ff; /* สีพื้นหลังของ DatePicker */
+    overflow: hidden; /* หลีกเลี่ยงการเลื่อนเกิน */
+    font-family: "Poppins";
+}
+
+/* ปรับปรุงให้ DatePicker มีขนาดและสไตล์ที่สวยงาม */
+.custom-datepicker {
+    font-size: 16px;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    width: 100%; /* ให้กว้างเต็มพื้นที่ที่กำหนด */
+}
+
+/* ปรับปรุงให้ปุ่มเวลาสวยงาม */
+.react-datepicker__time-container {
+    background-color: #f9f9f9;
+    /* border: 1px solid #ddd; */
+    border-radius: 8px;
+}
+
+/* ปรับการเลือกวันที่ */
+.react-datepicker__day--selected {
+    background-color: #6c63ff;
+    color: white;
+    font-weight: bold;
+}
+
+/* ปรับหัวเดือน */
+.react-datepicker__current-month {
+    font-size: 18px;
+    font-weight: bold;
+    color: #6c63ff;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* ปรับให้มีระยะห่างระหว่าง input และ DatePicker */
+.react-datepicker__input-container {
+    margin-bottom: 15px; /* เพิ่มระยะห่างใต้ input */
+}

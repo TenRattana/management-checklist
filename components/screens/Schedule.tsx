@@ -12,6 +12,7 @@ export const styles = StyleSheet.create({
     alignSelf: "center",
     backgroundColor: theme.colors.background,
     overflow: "hidden",
+    borderRadius: 8
   },
   containerTime: {
     backgroundColor: theme.colors.fff,

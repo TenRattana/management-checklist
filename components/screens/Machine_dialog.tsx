@@ -86,7 +86,7 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                             <FastField name="machineGroupId">
                                                 {({ field, form }: any) => (
                                                     <CustomDropdownSingle
-                                                        title="Machine Group"
+                                                        title="Group Machine"
                                                         labels="GMachineName"
                                                         values="GMachineID"
                                                         data={!isEditing ? machineGroup?.filter((v) => v.IsActive) : dropmachine || []}

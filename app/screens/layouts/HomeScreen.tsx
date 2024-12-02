@@ -6,7 +6,7 @@ import {
   WeekCalendar,
 } from 'react-native-calendars';
 import { Card, FAB, IconButton, Divider } from 'react-native-paper';
-import { Platform, StyleSheet, View } from 'react-native';
+import { ScrollView, Platform, StyleSheet, View, Text } from 'react-native';
 import { useTheme } from '@/app/contexts/useTheme';
 import { getDate, timelineEvents } from '@/app/mocks/timeline';
 import CustomTable from '@/components/Customtable';
@@ -17,7 +17,6 @@ const HomeScreen = () => {
   const [currentDate, setCurrentDate] = useState(getDate());
   const [isWeekView, setIsWeekView] = useState(false);
 
-  // Group events by date
   const eventsByDate = useMemo(
     () => groupBy(timelineEvents, (e) => CalendarUtils.getCalendarDateString(e.start)),
     []
@@ -25,13 +24,11 @@ const HomeScreen = () => {
 
   const onDateChanged = useCallback((date: string) => setCurrentDate(date), []);
 
-  // Filtered events for the selected date
   const filteredEvents = useMemo(
     () => eventsByDate[currentDate] || [],
     [eventsByDate, currentDate]
   );
 
-  // Marked dates for calendar
   const markedDates = useMemo(() => {
     return {
       [`${getDate(-1)}`]: { marked: true, dotColor: theme.colors.primary },
@@ -50,8 +47,6 @@ const HomeScreen = () => {
     ]);
   }, [filteredEvents]);
 
-  console.log(tableData);
-  
   const customtableProps = useMemo(() => ({
     Tabledata: tableData,
     Tablehead: [
@@ -63,7 +58,7 @@ const HomeScreen = () => {
     ],
     flexArr: [2, 2, 2, 1, 3],
     actionIndex: [{}],
-    showMessage: true, 
+    showMessage: true,
     searchQuery: ""
   }), [tableData]);
 
@@ -76,31 +71,43 @@ const HomeScreen = () => {
           ) : (
             <ExpandableCalendar firstDay={1} markedDates={markedDates} />
           )}
-        </View>
-
-        {Platform.OS === 'web' && (
           <IconButton
-            icon={isWeekView ? 'calendar-month-outline' : 'calendar-week-outline'}
+            icon={!isWeekView ? 'sort-calendar-descending' : 'sort-calendar-ascending'}
             size={24}
             style={styles.toggleButton}
             onPress={() => setIsWeekView(!isWeekView)}
           />
-        )}
+        </View>
 
-        <Card style={styles.card}>
-          <Card.Title title="Events" subtitle="Today's ongoing events" />
-          <Divider />
-          <Card.Content>
-            <CustomTable {...customtableProps} />
-          </Card.Content>
-        </Card>
-
-        <FAB
-          style={[styles.fab, { backgroundColor: theme.colors.primary }]}
-          icon="plus"
-          onPress={() => console.log('Add Event')}
-        />
+        <ScrollView style={styles.eventsContainer}>
+          <Card style={[styles.card, { backgroundColor: theme.colors.surface }]}>
+            <Card.Title
+              title="Events"
+              subtitle={`Ongoing events for ${currentDate}`}
+              titleStyle={{ fontWeight: 'bold' }}
+            />
+            <Divider />
+            <Card.Content>
+              {filteredEvents.length > 0 ? (
+                <CustomTable {...customtableProps} />
+              ) : (
+                <View style={styles.noEventContainer}>
+                  <Text style={[styles.noEventText, { color: theme.colors.text }]}>
+                    No events available for this date.
+                  </Text>
+                </View>
+              )}
+            </Card.Content>
+          </Card>
+        </ScrollView>
       </CalendarProvider>
+
+      <FAB
+        style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+        icon="plus"
+        label={Platform.OS === 'web' ? 'Add Event' : undefined}
+        onPress={() => console.log('Add Event')}
+      />
     </View>
   );
 };
@@ -108,23 +115,42 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
   },
   calendarContainer: {
     marginBottom: 10,
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 10,
+    elevation: 2,
+  },
+  eventsContainer: {
+    flex: 1,
+    paddingHorizontal: 10,
   },
   card: {
     marginVertical: 10,
-    elevation: 3,
+    borderRadius: 10,
+    elevation: 2,
   },
   toggleButton: {
-    alignSelf: 'center',
-    marginVertical: 10,
+    alignSelf: 'flex-end',
+    marginTop: 0,
+    marginRight: 10,
+    zIndex: 2,
   },
   fab: {
     position: 'absolute',
     bottom: 16,
     right: 16,
+  },
+  noEventContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 100,
+  },
+  noEventText: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
