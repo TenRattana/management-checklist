@@ -266,17 +266,13 @@ const Custom_schedule_dialog = React.memo(({ showError, showSuccess, spacing, se
 
                 <HelperText
                     type="error"
-                    visible={Boolean(touched?.[index]?.[type]) && Boolean(errors?.[index]?.[type])}
-                    style={[
-                        { display: touched?.[index]?.[type] && errors?.[index]?.[type] ? 'flex' : 'none' },
-                        masterdataStyles.errorText,
-                    ]}
+                    visible={Boolean(touched) && Boolean(errors?.[index])}
+                    style={[{ display: touched && Array.isArray(errors) && typeof errors[index] === 'object' && errors[index] ? 'flex' : 'none' }, masterdataStyles.errorText]}
                 >
-                    {typeof errors?.[index] === 'string' || Array.isArray(errors?.[index])
-                        ? "A"
-                        : errors?.[index]?.[type] || "A"}
+                    {Array.isArray(errors) && typeof errors[index] === 'object' && errors[index] && (
+                        errors?.[index]?.[type]
+                    )}
                 </HelperText>
-
             </View>
         )
     }
@@ -296,6 +292,13 @@ const Custom_schedule_dialog = React.memo(({ showError, showSuccess, spacing, se
 
                             {renderTimePicker('end', index, custom)}
                         </View>
+                        <HelperText
+                            type="error"
+                            visible={Boolean(touched) && Boolean(errors?.[index])}
+                            style={[{ display: touched && errors?.[index] ? 'flex' : 'none' }, masterdataStyles.errorText]}
+                        >
+                            {Array.isArray(errors) && typeof errors[index] === 'object' && errors[index] ? false : errors?.[index] as string}
+                        </HelperText>
                     </Swipeable>
                 )
             })}

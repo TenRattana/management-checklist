@@ -1,10 +1,11 @@
 import useMasterdataStyles from '@/styles/common/masterdata';
 import React, { useCallback, useState } from 'react';
 import { View, Text } from 'react-native';
-import { Button, Menu, IconButton } from 'react-native-paper';
+import { Button, Menu, IconButton, HelperText } from 'react-native-paper';
 import Animated, { Easing, Extrapolate, FadeInRight, FadeOutRight, interpolate, SharedValue } from 'react-native-reanimated';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { styles } from './Schedule';
+import { FormikErrors, FormikTouched } from 'formik';
 
 const hours = Array.from({ length: 24 }, (_, i) =>
     i.toString().padStart(2, '0') + ':00'
@@ -20,9 +21,17 @@ interface DailyProps {
     responsive: any;
     showError: (message: string | string[]) => void;
     showSuccess: (message: string | string[]) => void;
+    touched?: FormikTouched<{
+        start: string | null;
+        end: string | null;
+    }>[] | undefined;
+    errors?: string | string[] | FormikErrors<{
+        start: string | null;
+        end: string | null;
+    }>[] | undefined;
 }
 
-const Daily_dialog = React.memo(({ values, setFieldValue, spacing, showError, showSuccess }: DailyProps) => {
+const Daily_dialog = React.memo(({ values, setFieldValue, spacing, showError, showSuccess, touched, errors }: DailyProps) => {
     const [showStartMenu, setShowStartMenu] = useState(-1);
     const [showEndMenu, setShowEndMenu] = useState(-1);
     const [showTimeIntervalMenu, setShowTimeIntervalMenu] = useState<{ custom: boolean, time: boolean, week: boolean }>({ custom: false, time: false, week: false });
@@ -127,6 +136,15 @@ const Daily_dialog = React.memo(({ values, setFieldValue, spacing, showError, sh
                         />
                     ))}
                 </Menu>
+                <HelperText
+                    type="error"
+                    visible={Boolean(touched) && Boolean(errors?.[index])}
+                    style={[{ display: touched && Array.isArray(errors) && typeof errors[index] === 'object' && errors[index] ? 'flex' : 'none' }, masterdataStyles.errorText]}
+                >
+                    {Array.isArray(errors) && typeof errors[index] === 'object' && errors[index] && (
+                        errors?.[index]?.[type]
+                    )}
+                </HelperText>
             </View>
         );
     };
@@ -194,6 +212,14 @@ const Daily_dialog = React.memo(({ values, setFieldValue, spacing, showError, sh
 
                             {renderTimeSelection('end', index, timeSlot, hours)}
                         </View>
+
+                        <HelperText
+                            type="error"
+                            visible={Boolean(touched) && Boolean(errors?.[index])}
+                            style={[{ display: touched && errors?.[index] ? 'flex' : 'none' }, masterdataStyles.errorText]}
+                        >
+                            {Array.isArray(errors) && typeof errors[index] === 'object' && errors[index] ? false : errors?.[index] as string}
+                        </HelperText>
                     </Swipeable>
                 )
             })}

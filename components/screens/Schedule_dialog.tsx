@@ -35,6 +35,19 @@ const isValidDateFormatSlots = (value: string) => {
     return dateRegex.test(value);
 };
 
+const createDaySchema = () => (
+    Yup.object().shape({
+        start: Yup.string().required('Start time is required'),
+        end: Yup.string().required('End time is required')
+    }).test('start-less-than-end', 'Start time must be less than end time', function (value) {
+        const { start, end } = value;
+        if (start && end) {
+            return start < end;
+        }
+        return false;
+    })
+);
+
 interface ScheduleDialogProps {
     isVisible: boolean;
     setIsVisible: (value: boolean) => void;
@@ -89,30 +102,27 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                     const { start, end } = timeSlots;
 
                     if (start && end) {
-                        return start < end;
+                        return start <= end;
                     }
                     return false;
                 })
-            // .test('start-after-prev-end', 'Start time must be after previous end time', function (timeSlots) {
-            //     const { start } = timeSlots;
-            //     const { parent } = this;
+                .test('start-after-prev-end', 'Start time must be after previous end time', function (timeSlots) {
+                    const { start } = timeSlots;
+                    const { parent } = this;
 
-            //     if (parent && parent.length > 1) {
-            //         const currentIndex = parent.findIndex((item: { start: string | null, end: string | null }) => item.start === start);
+                    if (parent && parent.length > 1) {
+                        const currentIndex = parent.findIndex((item: { start: string | null, end: string | null }) => item.start === start);
 
-            //         if (currentIndex > 0) {
-            //             const prevEnd = parent[currentIndex - 1]?.end;
+                        if (currentIndex > 0) {
+                            const prevEnd = parent[currentIndex - 1]?.end;
 
-            //             if (prevEnd) {
-            //                 const startDate = convertToDate(String(start));
-            //                 const prevEndDate = convertToDate(String(prevEnd));
-
-            //                 return startDate > prevEndDate;
-            //             }
-            //         }
-            //     }
-            //     return true;
-            // })
+                            if (prevEnd) {
+                                return start >= prevEnd;
+                            }
+                        }
+                    }
+                    return true;
+                })
         ),
         timeCustom: Yup.array().of(
             Yup.object().shape({
@@ -134,6 +144,17 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                     }
                     return false;
                 })
+        ),
+        timeWeek: Yup.array().of(
+            Yup.object().shape({
+                MonDay: Yup.array().of(createDaySchema()),
+                TueDay: Yup.array().of(createDaySchema()),
+                WedDay: Yup.array().of(createDaySchema()),
+                ThuDay: Yup.array().of(createDaySchema()),
+                FriDay: Yup.array().of(createDaySchema()),
+                SatDay: Yup.array().of(createDaySchema()),
+                SunDay: Yup.array().of(createDaySchema())
+            })
         )
     });
 
@@ -297,6 +318,8 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                             <Animated.View entering={FadeInRight} exiting={FadeOutRight} style={{ display: values.type_schedule === "Daily" && values.custom ? 'flex' : 'none' }} >
                                                 <FastField name="timeSlots" key={JSON.stringify({ type_schedule: values.type_schedule, custom: values.custom, timeSlots: values.timeSlots })}>
                                                     {({ field, form }: any) => {
+                                                        console.log(form.errors);
+
                                                         return (
                                                             <Daily_dialog
                                                                 values={values.timeSlots}
@@ -311,6 +334,8 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                                                 responsive={responsive}
                                                                 showError={showError}
                                                                 showSuccess={showSuccess}
+                                                                touched={touched.timeSlots}
+                                                                errors={errors.timeSlots}
                                                                 spacing={spacing}
                                                                 theme={theme}
                                                             />
@@ -344,18 +369,32 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                                 </FastField>
                                             </Animated.View>
 
-                                            <Week_dialog
-                                                shouldRenderTime={values.type_schedule}
-                                                setFieldValue={(value) => setFieldValue("timeWeek", value)}
-                                                responsive={responsive}
-                                                showError={showError}
-                                                showSuccess={showSuccess}
-                                                selectedDays={values.timeWeek}
-                                                setSelectedDays={(value) => setFieldValue('timeWeek', value)}
-                                                spacing={spacing}
-                                                theme={theme}
-                                                key={`week-dialog`}
-                                            />
+                                            <Animated.View entering={FadeInLeft} exiting={FadeOutLeft} style={{ display: values.type_schedule === "Weekly" ? 'flex' : 'none' }}>
+                                                <FastField name="timeWeek" key={JSON.stringify({ type_schedule: values.type_schedule, custom: values.custom, timeWeek: values.timeWeek })}>
+                                                    {({ field, form }: any) => (
+                                                        <Week_dialog
+                                                            setFieldValue={(value: [{ start: string | null, end: string | null }]) => {
+                                                                form.setFieldValue(field.name, value);
+
+                                                                setTimeout(() => {
+                                                                    form.setFieldTouched(field.name, true);
+                                                                }, 0)
+                                                            }}
+                                                            responsive={responsive}
+                                                            showError={showError}
+                                                            showSuccess={showSuccess}
+                                                            selectedDays={values.timeWeek}
+                                                            setSelectedDays={(value) => setFieldValue('timeWeek', value)}
+                                                            spacing={spacing}
+                                                            theme={theme}
+                                                            touched={touched.timeWeek}
+                                                            errors={errors.timeWeek}
+                                                            key={`week-dialog`}
+                                                        />
+                                                    )}
+                                                </FastField>
+                                            </Animated.View>
+
                                         </ScrollView>
 
                                     </View>
