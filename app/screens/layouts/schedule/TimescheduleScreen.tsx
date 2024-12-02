@@ -19,11 +19,11 @@ const fetchTimeSchedules = async (): Promise<TimeSchedule[]> => {
 interface InitialValues {
     ScheduleName: string;
     MachineGroup: string;
-    type_schedule: string;
-    custom: boolean;
-    timeSlots: { start: string | null, end: string | null }[];
-    timeCustom: { start: string | null, end: string | null }[];
-    timeWeek: { [key: string]: { start: string | null, end: string | null }[] }
+    Type_schedule: string;
+    Custom: boolean;
+    TimeSlots: { start: string | null, end: string | null }[];
+    TimeCustom: { start: string | null, end: string | null }[];
+    TimeWeek: { [key: string]: { start: string | null, end: string | null }[] }
 }
 
 
@@ -35,11 +35,11 @@ const TimescheduleScreen: React.FC = React.memo(() => {
     const [initialValues, setInitialValues] = useState<InitialValues>({
         ScheduleName: '',
         MachineGroup: "",
-        type_schedule: "",
-        custom: false,
-        timeSlots: [],
-        timeCustom: [],
-        timeWeek: {}
+        Type_schedule: "",
+        Custom: false,
+        TimeSlots: [],
+        TimeCustom: [],
+        TimeWeek: {}
     });
 
     const masterdataStyles = useMasterdataStyles();
@@ -102,17 +102,17 @@ const TimescheduleScreen: React.FC = React.memo(() => {
         setInitialValues({
             ScheduleName: '',
             MachineGroup: "",
-            type_schedule: "",
-            custom: false,
-            timeSlots: [],
-            timeCustom: [],
-            timeWeek: {}
+            Type_schedule: "",
+            Custom: false,
+            TimeSlots: [],
+            TimeCustom: [],
+            TimeWeek: {}
         })
         setIsEditing(false);
         setIsVisible(true);
     }, []);
 
-    const customtableProps = useMemo(() => ({
+    const CustomtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
             { label: "Schedule Name", align: "flex-start" },
@@ -165,7 +165,7 @@ const TimescheduleScreen: React.FC = React.memo(() => {
                 </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+                {isLoading ? <LoadingSpinner /> : <Customtable {...CustomtableProps} />}
             </Card.Content>
 
             <ScheduleDialog

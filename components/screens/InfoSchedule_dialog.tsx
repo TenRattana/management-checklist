@@ -95,8 +95,6 @@ const InfoScheduleDialog = React.memo(({
                     }}
                 >
                     {({ values, errors, touched, handleSubmit, isValid, dirty }) => {
-                        console.log(errors, "errors");
-
                         return (
                             <>
                                 <View
