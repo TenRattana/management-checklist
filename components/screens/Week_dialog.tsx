@@ -17,21 +17,9 @@ interface WeekProps {
     selectedDays: { [key: string]: { start: string | null, end: string | null }[] };
     setSelectedDays: (value: { [key: string]: { start: string | null, end: string | null }[] }) => void;
     setFieldValue: (value: any) => void;
-    touched?: FormikTouched<{
-        [key: string]: {
-            start: string | null;
-            end: string | null;
-        }[];
-    }> | undefined;
-    errors?: FormikErrors<{
-        [key: string]: {
-            start: string | null;
-            end: string | null;
-        }[];
-    }> | undefined
 }
 
-const Week_dialog = React.memo(({ theme, spacing, responsive, showError, showSuccess, selectedDays, setSelectedDays, setFieldValue, touched, errors }: WeekProps) => {
+const Week_dialog = React.memo(({ theme, spacing, responsive, showError, showSuccess, selectedDays, setSelectedDays, setFieldValue }: WeekProps) => {
     const [showTimeIntervalMenu, setShowTimeIntervalMenu] = useState<{ custom: boolean, time: boolean, week: boolean }>({ custom: false, time: false, week: false });
     const masterdataStyles = useMasterdataStyles();
     const [showThirDialog, setShowThirDialog] = useState(false)

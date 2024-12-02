@@ -34,20 +34,6 @@ const isValidDateFormatSlots = (value: string) => {
     const dateRegex = /^(\d{2}):(\d{2})$/;
     return dateRegex.test(value);
 };
-
-const createDaySchema = () => (
-    Yup.object().shape({
-        start: Yup.string().required('Start time is required'),
-        end: Yup.string().required('End time is required')
-    }).test('start-less-than-end', 'Start time must be less than end time', function (value) {
-        const { start, end } = value;
-        if (start && end) {
-            return start < end;
-        }
-        return false;
-    })
-);
-
 interface ScheduleDialogProps {
     isVisible: boolean;
     setIsVisible: (value: boolean) => void;
@@ -145,17 +131,6 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                     return false;
                 })
         ),
-        timeWeek: Yup.array().of(
-            Yup.object().shape({
-                MonDay: Yup.array().of(createDaySchema()),
-                TueDay: Yup.array().of(createDaySchema()),
-                WedDay: Yup.array().of(createDaySchema()),
-                ThuDay: Yup.array().of(createDaySchema()),
-                FriDay: Yup.array().of(createDaySchema()),
-                SatDay: Yup.array().of(createDaySchema()),
-                SunDay: Yup.array().of(createDaySchema())
-            })
-        )
     });
 
     const { data: machineGroups = [] } = useQuery<GroupMachine[], Error>(
@@ -387,8 +362,6 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, timeSchedule, save
                                                             setSelectedDays={(value) => setFieldValue('timeWeek', value)}
                                                             spacing={spacing}
                                                             theme={theme}
-                                                            touched={touched.timeWeek}
-                                                            errors={errors.timeWeek}
                                                             key={`week-dialog`}
                                                         />
                                                     )}

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Dimensions, ScrollView } from 'react-native';
-import { Dialog, Button, Text, Portal } from 'react-native-paper';
+import { Dialog, Button, Portal, Text } from 'react-native-paper';
 import Daily_dialog from './Daily_dialog';
 import { styles } from './Schedule';
-import { Formik } from 'formik';
+import { FastField, Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
+
 interface InfoScheduleProps {
     visible: boolean;
     setVisible: (v: boolean) => void;
@@ -18,22 +19,12 @@ interface InfoScheduleProps {
     selectedDay: string;
 }
 
-const { height } = Dimensions.get('window');
+const isValidDateFormatSlots = (value: string) => {
+    const dateRegex = /^(\d{2}):(\d{2})$/;
+    return dateRegex.test(value);
+};
 
-const createDaySchema = () => (
-    Yup.object().shape({
-        start: Yup.string().required('Start time is required'),
-        end: Yup.string().required('End time is required')
-    }).test('start-less-than-end', 'Start time must be less than end time', function (value) {
-        const { start, end } = value;
-        if (start && end) {
-            const startTime = new Date(`1970-01-01T${start}:00Z`);
-            const endTime = new Date(`1970-01-01T${end}:00Z`);
-            return startTime < endTime;
-        }
-        return false;
-    })
-);
+const { height } = Dimensions.get('window');
 
 const InfoScheduleDialog = React.memo(({
     visible,
@@ -47,79 +38,117 @@ const InfoScheduleDialog = React.memo(({
     values,
     selectedDay
 }: InfoScheduleProps) => {
-    const [value, setValue] = useState<{ start: string | null, end: string | null }[]>(values || []);
 
-    const timeWeekSchema = Yup.array().of(
-        Yup.object().shape({
-            // เพิ่มวันในสัปดาห์
-            MonDay: Yup.array().of(createDaySchema()),
-            TueDay: Yup.array().of(createDaySchema()),
-            WedDay: Yup.array().of(createDaySchema()),
-            ThuDay: Yup.array().of(createDaySchema()),
-            FriDay: Yup.array().of(createDaySchema()),
-            SatDay: Yup.array().of(createDaySchema()),
-            SunDay: Yup.array().of(createDaySchema())
-        })
-    );
+    const validationSchema = Yup.object().shape({
+        timeSlots: Yup.array().of(
+            Yup.object().shape({
+                start: Yup.string()
+                    .required('Start time is required')
+                    .test('is-valid-date', 'Invalid date format', isValidDateFormatSlots),
+                end: Yup.string()
+                    .required('End time is required')
+                    .test('is-valid-date', 'Invalid date format', isValidDateFormatSlots)
+            })
+                .test('start-less-than-end', 'Start time must be less than end time', function (timeSlot) {
+                    const { start, end } = timeSlot;
+                    return start && end ? start < end : false;
+                })
+                .test('start-after-prev-end', 'Start time must be after previous end time', function (timeSlots) {
+                    const { start } = timeSlots;
+                    const { parent } = this;
 
-    useEffect(() => { setValue(values) }, [visible])
+                    if (parent && parent.length > 1) {
+                        const currentIndex = parent.findIndex((item: { start: string | null, end: string | null }) => item.start === start);
+
+                        if (currentIndex > 0) {
+                            const prevEnd = parent[currentIndex - 1]?.end;
+
+                            if (prevEnd) {
+                                return start >= prevEnd;
+                            }
+                        }
+                    }
+                    return true;
+                })
+        )
+    });
 
     return (
         <Portal>
-            <Dialog visible={visible} onDismiss={() => setVisible(false)} style={[styles.dialog, { backgroundColor: theme.colors.background, borderRadius: 8, display: visible ? 'flex' : 'none' }]}>
+            <Dialog
+                visible={visible}
+                onDismiss={() => setVisible(false)}
+                style={[
+                    styles.dialog,
+                    { backgroundColor: theme.colors.background, borderRadius: 8 }
+                ]}
+            >
                 <Dialog.Title style={{ marginLeft: 24 }}>Schedule {selectedDay} Detail</Dialog.Title>
 
                 <Formik
-                    initialValues={value}
-                    validationSchema={timeWeekSchema}
-                    validateOnBlur={true}
-                    validateOnChange={false}
-                    onSubmit={(values) => console.log(values)}
+                    initialValues={{ timeSlots: values }}
+                    validationSchema={validationSchema}
+                    onSubmit={(formValues, { resetForm }: FormikHelpers<{ timeSlots: { start: string | null, end: string | null }[] }>) => {
+                        setFieldValue(formValues.timeSlots);
+                        setVisible(false);
+                        resetForm();
+                    }}
                 >
-                    {({ values, handleSubmit, setFieldValue, dirty, isValid, errors, touched, setFieldTouched, resetForm }) => {
+                    {({ values, errors, touched, handleSubmit, isValid, dirty }) => {
+                        console.log(errors, "errors");
 
                         return (
                             <>
-                                <View style={{ flexDirection: responsive === "small" ? "column" : "row", marginHorizontal: spacing.sm }}>
-                                    <View style={{ flex: 2 }}>
-                                        <ScrollView style={{ maxHeight: height / 1.7 }} showsVerticalScrollIndicator={false}>
-                                            <View style={{ marginHorizontal: 24 }}>
-                                                <Daily_dialog
-                                                    errors={errors}
-                                                    touched={touched}
-                                                    setFieldValue={(value: [{ start: string | null, end: string | null }]) => setValue(value)}
-                                                    values={value}
-                                                    key={`daily-dialog`}
-                                                    responsive={responsive}
-                                                    showError={showError}
-                                                    showSuccess={showSuccess}
-                                                    spacing={spacing}
-                                                    theme={theme}
-                                                />
-                                            </View>
+                                <View
+                                    style={{
+                                        flexDirection: responsive === "small" ? "column" : "row",
+                                        marginHorizontal: spacing.sm
+                                    }}
+                                >
+                                    <View style={{ flex: 2, marginHorizontal: 24 }}>
+                                        <ScrollView
+                                            style={{ maxHeight: height / 1.7 }}
+                                            showsVerticalScrollIndicator={false}
+                                        >
+                                            <FastField name="timeSlots" key={JSON.stringify({ timeSlots: values.timeSlots })}>
+                                                {({ field, form }: any) => (
+                                                    <Daily_dialog
+                                                        values={values.timeSlots}
+                                                        setFieldValue={(value: [{ start: string | null, end: string | null }]) => {
+                                                            form.setFieldValue(field.name, value);
+
+                                                            setTimeout(() => {
+                                                                form.setFieldTouched(field.name, true);
+                                                            }, 0)
+                                                        }}
+                                                        key={`daily-dialog`}
+                                                        responsive={responsive}
+                                                        showError={showError}
+                                                        showSuccess={showSuccess}
+                                                        touched={touched.timeSlots}
+                                                        errors={errors.timeSlots}
+                                                        spacing={spacing}
+                                                        theme={theme}
+                                                    />
+                                                )}
+                                            </FastField>
                                         </ScrollView>
                                     </View>
                                 </View>
 
-                                <View style={{ paddingBottom: 5, justifyContent: 'flex-end', flexDirection: 'row', paddingHorizontal: 24 }}>
-                                    <Button onPress={() => {
-                                        setVisible(false)
-                                        setValue([])
-                                    }}>Cancel</Button>
+                                <View style={{ paddingBottom: 10, justifyContent: 'flex-end', flexDirection: 'row', paddingHorizontal: 24 }}>
+                                    <Button onPress={() => setVisible(false)}>Cancel</Button>
                                     <Button
-                                        onPress={() => {
-                                            setFieldValue(value);
-                                            setVisible(false);
-                                            setValue([])
-                                        }}>Save</Button>
+                                        disabled={!isValid || !dirty}
+                                        onPress={() => handleSubmit()}>Save</Button>
                                 </View>
                             </>
                         )
-                    }}
+                    }
+                    }
                 </Formik>
             </Dialog>
         </Portal>
-
     );
 });
 
