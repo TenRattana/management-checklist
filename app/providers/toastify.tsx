@@ -34,7 +34,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
 
     setTimeout(() => {
       setToasts((prev) => prev.filter((toast) => toast.id !== id));
-    }, 30000);
+    }, 5000);
   }, []);
 
   const showSuccess = useCallback((messages: string | string[]) => {
