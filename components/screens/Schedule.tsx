@@ -10,12 +10,10 @@ export const styles = StyleSheet.create({
     width:
       responsive === "large" ? 800 : responsive === "medium" ? "80%" : "80%",
     alignSelf: "center",
-    backgroundColor: theme.colors.background,
     overflow: "hidden",
     borderRadius: 8
   },
   containerTime: {
-    backgroundColor: theme.colors.fff,
     marginVertical: 10,
     flexDirection: "row",
     justifyContent: "space-between",

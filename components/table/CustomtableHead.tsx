@@ -105,7 +105,7 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({ Tablehead,
 
                 {showFilter && (
                     <AccessibleView name="filter" style={{
-                        flexDirection: responsive === "small" ? 'column' : 'row', justifyContent: 'flex-end', marginVertical: 10,
+                        flexDirection: responsive === "small" ? 'column' : 'row', justifyContent: 'flex-end', marginBottom: 10,
                         marginLeft: responsive === "small" ? 0 : 10,
                     }}>
                         <Text style={[masterdataStyles.text, { alignContent: 'center', paddingRight: 15, alignSelf: 'center' }]}>{Tablehead[1].label}</Text>

@@ -27,7 +27,8 @@ const CustomLightTheme = {
     drag: '#37AFE1',
     subform: '#6439FF',
     field: '#4F75FF',
-    succeass: '#4CAF50'
+    succeass: '#4CAF50',
+    error: '#ff2222'
   },
 };
 
@@ -47,7 +48,8 @@ const CustomDarkTheme = {
     drag: '#37AFE1',
     subform: '#071952',
     field: '#088395',
-    succeass: '#4CAF50'
+    succeass: '#4CAF50',
+    error: '#ff2222'
   },
 };
 

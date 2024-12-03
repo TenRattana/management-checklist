@@ -94,56 +94,53 @@ const InfoScheduleDialog = React.memo(({
                         resetForm();
                     }}
                 >
-                    {({ values, errors, touched, handleSubmit, isValid, dirty }) => {
-                        return (
-                            <>
-                                <View
-                                    style={{
-                                        flexDirection: responsive === "small" ? "column" : "row",
-                                        marginHorizontal: spacing.sm
-                                    }}
-                                >
-                                    <View style={{ flex: 2, marginHorizontal: 24 }}>
-                                        <ScrollView
-                                            style={{ maxHeight: height / 1.7 }}
-                                            showsVerticalScrollIndicator={false}
-                                        >
-                                            <FastField name="timeSlots" key={JSON.stringify({ timeSlots: values.timeSlots })}>
-                                                {({ field, form }: any) => (
-                                                    <Daily_dialog
-                                                        values={values.timeSlots}
-                                                        setFieldValue={(value: [{ start: string | null, end: string | null }]) => {
-                                                            form.setFieldValue(field.name, value);
+                    {({ values, errors, touched, handleSubmit, isValid, dirty }) => (
+                        <>
+                            <View
+                                style={{
+                                    flexDirection: responsive === "small" ? "column" : "row",
+                                    marginHorizontal: spacing.sm
+                                }}
+                            >
+                                <View style={{ flex: 2, marginHorizontal: 24 }}>
+                                    <ScrollView
+                                        style={{ maxHeight: height / 1.7 }}
+                                        showsVerticalScrollIndicator={false}
+                                    >
+                                        <FastField name="timeSlots" key={JSON.stringify({ timeSlots: values.timeSlots })}>
+                                            {({ field, form }: any) => (
+                                                <Daily_dialog
+                                                    values={values.timeSlots}
+                                                    setFieldValue={(value: [{ start: string | null, end: string | null }]) => {
+                                                        form.setFieldValue(field.name, value);
 
-                                                            setTimeout(() => {
-                                                                form.setFieldTouched(field.name, true);
-                                                            }, 0)
-                                                        }}
-                                                        key={`daily-dialog`}
-                                                        responsive={responsive}
-                                                        showError={showError}
-                                                        showSuccess={showSuccess}
-                                                        touched={touched.timeSlots}
-                                                        errors={errors.timeSlots}
-                                                        spacing={spacing}
-                                                        theme={theme}
-                                                    />
-                                                )}
-                                            </FastField>
-                                        </ScrollView>
-                                    </View>
+                                                        setTimeout(() => {
+                                                            form.setFieldTouched(field.name, true);
+                                                        }, 0)
+                                                    }}
+                                                    key={`daily-dialog`}
+                                                    responsive={responsive}
+                                                    showError={showError}
+                                                    showSuccess={showSuccess}
+                                                    touched={touched?.timeSlots}
+                                                    errors={errors.timeSlots}
+                                                    spacing={spacing}
+                                                    theme={theme}
+                                                />
+                                            )}
+                                        </FastField>
+                                    </ScrollView>
                                 </View>
+                            </View>
 
-                                <View style={{ paddingBottom: 10, justifyContent: 'flex-end', flexDirection: 'row', paddingHorizontal: 24 }}>
-                                    <Button onPress={() => setVisible(false)}>Cancel</Button>
-                                    <Button
-                                        disabled={!isValid || !dirty}
-                                        onPress={() => handleSubmit()}>Save</Button>
-                                </View>
-                            </>
-                        )
-                    }
-                    }
+                            <View style={{ paddingBottom: 10, justifyContent: 'flex-end', flexDirection: 'row', paddingHorizontal: 24 }}>
+                                <Button onPress={() => setVisible(false)}>Cancel</Button>
+                                <Button
+                                    disabled={!isValid || !dirty}
+                                    onPress={() => handleSubmit()}>Save</Button>
+                            </View>
+                        </>
+                    )}
                 </Formik>
             </Dialog>
         </Portal>

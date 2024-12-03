@@ -6,23 +6,7 @@ import CustomtableSmall from "./table/CustomtableSmall";
 import CustomtableData from "./table/CustomtableData";
 import { CustomTableProps } from '@/typing/tag';
 
-const CustomTable = ({
-  Tabledata,
-  Tablehead,
-  flexArr,
-  handleAction,
-  actionIndex,
-  searchQuery,
-  showMessage,
-  selectedRows,
-  setRow,
-  showFilter,
-  showData,
-  showColumn,
-  detail,
-  detailData,
-  detailKey
-}: CustomTableProps) => {
+const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, actionIndex, searchQuery, showMessage, selectedRows, setRow, showFilter, showData, showColumn, detail, detailData, detailKey }: CustomTableProps) => {
   const [sortColumn, setSortColumn] = useState<number | null>(null);
   const [sortDirection, setSortDirection] = useState<"ascending" | "descending" | undefined>(undefined);
   const [displayData, setDisplayData] = useState<(string | number | boolean)[][]>([]);
@@ -56,7 +40,9 @@ const CustomTable = ({
 
   const handleSort = useCallback((columnIndex: number) => {
     setSortColumn((prev) => (prev === columnIndex ? null : columnIndex));
-    setSortDirection((prev) => (prev === "ascending" ? "descending" : "ascending"));
+    setSortDirection((prev) =>
+      prev === 'ascending' ? 'descending' : prev === "descending" ? undefined : prev === undefined ? 'ascending' : undefined
+    );
   }, []);
 
   const sortedData = useMemo(() => {
@@ -101,7 +87,6 @@ const CustomTable = ({
 
   return (
     <AccessibleView name="customtable" style={{ flex: 1 }} >
-
       {responsive === "small" ? (
         <CustomtableSmall
           displayData={displayData}
@@ -152,11 +137,10 @@ const CustomTable = ({
             detailKey={detailKey}
             key={"CustomtableData"}
           />
-
         </AccessibleView>
       }
     </AccessibleView>
   );
-};
+});
 
-export default React.memo(CustomTable);
+export default CustomTable;

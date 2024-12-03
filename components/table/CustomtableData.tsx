@@ -1,6 +1,7 @@
-import React, { useCallback, useRef, useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
-import { DataTable, Text } from "react-native-paper";
+import React, { useCallback, useState } from "react";
+import { FlatList, View } from "react-native";
+import { DataTable } from "react-native-paper";
+import Text from "../Text";
 import AccessibleView from "@/components/AccessibleView";
 import useCustomtableStyles from "@/styles/customtable";
 import Cellcontent from "./Contents/Cellcontent";
@@ -9,15 +10,14 @@ import { HandelPrssProps } from "@/typing/tag";
 import Actioncontent from "./Contents/Actioncontent";
 import { CustomtableDataProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { useRes } from '@/app/contexts/useRes'
 import { useTheme } from '@/app/contexts/useTheme'
+import DetailContent from "./Contents/Detailcontent";
 
 type justifyContent = 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly' | undefined;
 
 const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead, flexArr, actionIndex, displayData, handleDialog, showMessage, selectedRows, toggleSelect, detail, detailKey, detailData }) => {
     const customtable = useCustomtableStyles();
     const masterdataStyles = useMasterdataStyles();
-    const { spacing } = useRes()
     const { theme } = useTheme()
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [dialogAction, setDialogAction] = useState<string>("");
@@ -36,53 +36,39 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
     }, [setDialogAction, setDialogData, setDialogTitle, setDialogMessage, setIsVisible, showMessage]);
 
 
-    const styles = StyleSheet.create({
-        containerdetail: {
-            width: "100%",
-            paddingTop: 20
-        },
-        containerdetailvalue: {
-            paddingVertical: 4,
-            marginBottom: 8,
-            backgroundColor: "#fff",
-            borderRadius: 4,
-            padding: 8,
-        },
-        text: {
-            paddingVertical: 5,
-            fontFamily: 'Poppins',
-            letterSpacing: 0.3
-        },
-        containerdetailkey: {
-            backgroundColor: "#fff",
-            borderRadius: 8,
-            paddingHorizontal: 8
-        },
-        chipContainer: {
-            flexDirection: "row",
-            flexWrap: "wrap",
-            marginVertical: 10,
-        },
-        chip: {
-            backgroundColor: "#f0f8ff",
-            paddingHorizontal: 12,
-            paddingVertical: 6,
-            borderRadius: 16,
-            marginRight: 8,
-            marginBottom: 8,
-        },
-    })
+    const findIndex = (row: (string | number | boolean)[]) => {
+        return detailData?.findIndex(item => {
+            const itemValues = Object.entries(item).flatMap(([key, value]) => {
+                if (Array.isArray(value)) {
+                    return value.map(v => JSON.stringify(v));
+                }
+                if (typeof value === "object" && value !== null) {
+                    return JSON.stringify(value);
+                }
+                if (typeof value === "boolean") {
+                    return value ? "track" : "not track";
+                }
+                return String(value).toLowerCase();
+            });
+
+            const rowValues = row.map(value => {
+                if (typeof value === "boolean") {
+                    return value ? "track" : "not track";
+                }
+                if (typeof value === "object" && value !== null) {
+                    return JSON.stringify(value);
+                }
+                return String(value).toLowerCase();
+            });
+
+            return rowValues.every(value => itemValues.includes(value));
+        }) ?? -1;
+    };
 
     const renderTableData = useCallback((row: (string | number | boolean)[], rowIndex: number) => {
-
-        const matchingIndex = detailData?.findIndex(item => {
-            const itemValues = Object.values(item);
-            return row.every(value => itemValues.includes(value));
-        }) ?? -1;
-
         return (
-            <View key={`row-${rowIndex}`}>
-                <DataTable.Row onPress={() => detail ? setIsDetailVisible((prev) => ({ ...prev, [matchingIndex]: !isDetailVisible[matchingIndex] })) : null} disabled={!detail} key={`data-row-${rowIndex}`} style={{ backgroundColor: theme.colors.background }}>
+            <View key={`row-${rowIndex}`} style={{ flex: 1 }}>
+                <DataTable.Row onPress={() => detail ? setIsDetailVisible((prev) => ({ ...prev, [findIndex(row)]: !isDetailVisible[findIndex(row)] })) : null} disabled={!detail} key={`data-row-${rowIndex}`} style={{ backgroundColor: theme.colors.background }}>
                     {row.map((cell, cellIndex) => {
                         const Align: justifyContent = Tablehead[cellIndex]?.align as justifyContent;
                         const justifyContent = {
@@ -152,46 +138,9 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                     })}
                 </DataTable.Row>
 
-                {isDetailVisible[matchingIndex] && detailKey?.some(key => detailData?.[matchingIndex]?.hasOwnProperty(key)) && (
-                    <AccessibleView name="containerdetail" style={styles.containerdetail} key={`index-${matchingIndex}`}>
-                        {Object.entries(detailData?.[matchingIndex] || {}).map(
-                            ([key, value]) =>
-                                detailKey.includes(key) && (
-                                    <AccessibleView name="containerdetailkey"
-                                        key={`detail-${matchingIndex}-${key}`}
-                                        style={[styles.containerdetailkey]}
-                                    >
-                                        <Text
-                                            style={[masterdataStyles.text, masterdataStyles.textBold, styles.text]}
-                                            key={`detail-${matchingIndex}-${key}-${key.charAt(0).toUpperCase() + key.slice(1)}`}
-                                        >
-                                            {key.charAt(0).toUpperCase() + key.slice(1)}
-                                        </Text>
-
-                                        {Array.isArray(value) ? (
-                                            <AccessibleView name="chipContainer" style={styles.chipContainer}>
-                                                {value.map((item, index) => (
-                                                    <View id="chip" key={`chip-${matchingIndex}-${key}-${index}`} style={[styles.chip, { backgroundColor: theme.colors.field }]}>
-                                                        {typeof item === "object" && item !== null ? (
-                                                            Object.entries(item).map(([subKey, subValue]) => (
-                                                                <Text key={`chip-${matchingIndex}-${key}-${index}-${subKey}`} style={[masterdataStyles.textFFF, styles.text]}>
-                                                                    {subKey} : {String(subValue)}
-                                                                </Text>
-                                                            ))
-                                                        ) : (
-                                                            <Text style={[masterdataStyles.text, { paddingVertical: 5 }]}>{String(item)}</Text>
-                                                        )}
-                                                    </View>
-                                                ))}
-                                            </AccessibleView>
-                                        ) : (
-                                            <Text style={[masterdataStyles.text, styles.text]} key={`detail-${matchingIndex}-${key}-${value}`}>
-                                                {String(value)}
-                                            </Text>
-                                        )}
-                                    </AccessibleView>
-                                )
-                        )}
+                {isDetailVisible[findIndex(row)] && detailKey?.some(key => detailData?.[findIndex(row)]?.hasOwnProperty(key)) && (
+                    <AccessibleView name="containerdetail" key={`index-${findIndex(row)}`}>
+                        <DetailContent detailData={detailData?.[findIndex(row)] || []} isDetailVisible={isDetailVisible[findIndex(row)]} />
                     </AccessibleView>
                 )}
             </View>
@@ -211,7 +160,7 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                 )}
                 contentContainerStyle={{ flexGrow: 1 }}
                 nestedScrollEnabled={true}
-                showsVerticalScrollIndicator={true}
+                showsVerticalScrollIndicator={false}
                 initialNumToRender={10}
                 removeClippedSubviews={true}
                 maxToRenderPerBatch={5}
@@ -228,7 +177,6 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                 data={dialogData}
             />
         </>
-
     );
 });
 

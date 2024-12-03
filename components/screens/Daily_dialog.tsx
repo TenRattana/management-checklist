@@ -6,6 +6,8 @@ import Animated, { Easing, Extrapolate, FadeInRight, FadeOutRight, interpolate, 
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { styles } from './Schedule';
 import { FormikErrors, FormikTouched } from 'formik';
+import { Day, TimeScheduleProps } from '@/app/screens/layouts/schedule/TimescheduleScreen';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const hours = Array.from({ length: 24 }, (_, i) =>
     i.toString().padStart(2, '0') + ':00'
@@ -14,14 +16,14 @@ const hours = Array.from({ length: 24 }, (_, i) =>
 const Hours = [1, 2, 3, 4, 6, 12]
 
 interface DailyProps {
-    values: { start: string | null, end: string | null }[];
+    values: Day[];
     setFieldValue: (value: any) => void;
     theme: any;
     spacing: any;
     responsive: any;
     showError: (message: string | string[]) => void;
     showSuccess: (message: string | string[]) => void;
-    touched?: FormikTouched<{
+    touched: boolean | FormikTouched<{
         start: string | null;
         end: string | null;
     }>[] | undefined;
@@ -98,7 +100,7 @@ const Daily_dialog = React.memo(({ values, setFieldValue, spacing, showError, sh
     const renderTimeSelection = (
         type: 'start' | 'end',
         index: number,
-        timeSlot: { start: string | null; end: string | null },
+        timeSlot: Day,
         hours: string[]
     ) => {
         const isStart = type === 'start';
@@ -172,7 +174,7 @@ const Daily_dialog = React.memo(({ values, setFieldValue, spacing, showError, sh
     }
 
     return (
-        <>
+        <GestureHandlerRootView>
             <View style={styles.timeIntervalMenu}>
                 <Menu
                     visible={showTimeIntervalMenu.time}
@@ -216,9 +218,9 @@ const Daily_dialog = React.memo(({ values, setFieldValue, spacing, showError, sh
                         <HelperText
                             type="error"
                             visible={Boolean(touched) && Boolean(errors?.[index])}
-                            style={[{ display: touched && errors?.[index] ? 'flex' : 'none' }, masterdataStyles.errorText]}
+                            style={[{ display: touched && !Array.isArray(errors?.[index]) && typeof errors?.[index] === 'string' && errors[index] ? 'flex' : 'none' }, masterdataStyles.errorText]}
                         >
-                            {Array.isArray(errors) && typeof errors[index] === 'object' && errors[index] ? false : errors?.[index] as string}
+                            {!Array.isArray(errors?.[index]) && typeof errors?.[index] === 'string' && errors[index] && errors?.[index] as string}
                         </HelperText>
                     </Swipeable>
                 )
@@ -229,7 +231,7 @@ const Daily_dialog = React.memo(({ values, setFieldValue, spacing, showError, sh
                     <Text style={masterdataStyles.timeText}>Add Schedule</Text>
                 </Button>
             </View>
-        </>
+        </GestureHandlerRootView>
     )
 })
 

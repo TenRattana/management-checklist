@@ -7,10 +7,12 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { Pressable, View } from "react-native";
 import Text from "@/components/Text";
 import { useRes } from '@/app/contexts/useRes'
+import { useTheme } from '@/app/contexts/useTheme'
 
 const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChange, lefticon, iconRight, testId, handleBlur, position }: CustomDropdownMultiProps) => {
   const [options, setOptions] = useState<{ label?: string; value?: string; icon?: () => JSX.Element }[]>([]);
   const { spacing } = useRes();
+  const { theme } = useTheme();
   const masterdataStyles = useMasterdataStyles();
 
   const processData = useCallback(() => {
@@ -44,7 +46,7 @@ const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChan
         containerStyle={{
           flex: 1,
           position: 'absolute',
-          backgroundColor: 'white',
+          backgroundColor: theme.colors.background,
           zIndex: 1000,
         }}
         // containerStyle={[masterdataStyles.backLight]}

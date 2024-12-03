@@ -4,7 +4,7 @@ import { Button, Menu, Icon } from 'react-native-paper';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { styles } from './Schedule';
 import InfoSchedule_dialog from './InfoSchedule_dialog';
-import { FormikErrors, FormikTouched } from 'formik';
+import { Day } from '@/app/screens/layouts/schedule/TimescheduleScreen';
 
 const Week = ["MonDay", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
@@ -14,36 +14,35 @@ interface WeekProps {
     responsive: any;
     showError: (message: string | string[]) => void;
     showSuccess: (message: string | string[]) => void;
-    selectedDays: { [key: string]: { start: string | null, end: string | null }[] };
-    setSelectedDays: (value: { [key: string]: { start: string | null, end: string | null }[] }) => void;
+    values: { [key: string]: Day[] };
     setFieldValue: (value: any) => void;
 }
 
-const Week_dialog = React.memo(({ theme, spacing, responsive, showError, showSuccess, selectedDays, setSelectedDays, setFieldValue }: WeekProps) => {
+const Week_dialog = React.memo(({ theme, spacing, responsive, showError, showSuccess, values, setFieldValue }: WeekProps) => {
     const [showTimeIntervalMenu, setShowTimeIntervalMenu] = useState<{ custom: boolean, time: boolean, week: boolean }>({ custom: false, time: false, week: false });
     const masterdataStyles = useMasterdataStyles();
     const [showThirDialog, setShowThirDialog] = useState(false)
     const [IndexThirDialo, setIndexThirDialog] = useState("")
 
     const toggleDaySelection = React.useCallback((day: string) => {
-        if (selectedDays[day]) {
-            const updatedDays = { ...selectedDays };
+        if (values[day]) {
+            const updatedDays = { ...values };
             delete updatedDays[day];
-            setSelectedDays(updatedDays);
+            setFieldValue(updatedDays);
         } else {
-            setSelectedDays({
-                ...selectedDays,
+            setFieldValue({
+                ...values,
                 [day]: [{ start: null, end: null }]
             });
         }
-    }, [selectedDays]);
+    }, [values]);
 
     const removeDay = React.useCallback((day: string) => {
-        const updatedDays = { ...selectedDays };
+        const updatedDays = { ...values };
         delete updatedDays[day];
-        setSelectedDays(updatedDays);
+        setFieldValue(updatedDays);
         showSuccess(`Day ${day} removed successfully`);
-    }, [selectedDays]);
+    }, [values]);
 
     const setInfoDay = React.useCallback((day: string, index: number) => {
         setShowThirDialog(true);
@@ -63,7 +62,7 @@ const Week_dialog = React.memo(({ theme, spacing, responsive, showError, showSuc
                             onPress={() => setShowTimeIntervalMenu((prev) => ({ ...prev, week: true }))}
                         >
                             <Text style={masterdataStyles.timeText}>
-                                {Object.keys(selectedDays).length > 0 ? `Selected: ${Object.keys(selectedDays).join(", ")}` : "Select Day"}
+                                {Object.keys(values).length > 0 ? `Selected: ${Object.keys(values).join(", ")}` : "Select Day"}
                             </Text>
                         </Button>
                     }
@@ -72,7 +71,7 @@ const Week_dialog = React.memo(({ theme, spacing, responsive, showError, showSuc
                         <Menu.Item
                             key={index}
                             onPress={() => toggleDaySelection(day)}
-                            title={`${selectedDays[day] ? "✔ " : ""}${day}`}
+                            title={`${values[day] ? "✔ " : ""}${day}`}
                             style={styles.menuItem}
                         />
                     ))}
@@ -80,7 +79,7 @@ const Week_dialog = React.memo(({ theme, spacing, responsive, showError, showSuc
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
-                {Object.keys(selectedDays).map((day) => (
+                {Object.keys(values).map((day) => (
                     <View key={day} style={styles.containerWeek}>
                         <View style={styles.containerBoxWeek}>
                             <Text style={[masterdataStyles.textFFF, { textAlign: 'center', padding: 10 }]}>
@@ -117,11 +116,11 @@ const Week_dialog = React.memo(({ theme, spacing, responsive, showError, showSuc
 
             <InfoSchedule_dialog
                 selectedDay={IndexThirDialo}
-                values={selectedDays[IndexThirDialo]}
+                values={values[IndexThirDialo]}
                 key={`infoshedule`}
                 visible={showThirDialog}
                 setVisible={(v) => setShowThirDialog(v)}
-                setFieldValue={(value) => setFieldValue({ ...selectedDays, [IndexThirDialo]: value })}
+                setFieldValue={(value) => setFieldValue({ ...values, [IndexThirDialo]: value })}
                 responsive={responsive}
                 showError={showError}
                 showSuccess={showSuccess}

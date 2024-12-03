@@ -1,39 +1,55 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
-import { Pressable, StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
 import { AccessibleView, Customtable, LoadingSpinner, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { TimeSchedule } from '@/typing/type';
+import { GroupMachine, TimeSchedule } from '@/typing/type';
 import { useQuery, useQueryClient } from 'react-query';
 import { useSelector } from "react-redux";
 import ScheduleDialog from "@/components/screens/Schedule_dialog";
+import { timeSchedule } from "./Mock";
 
 const fetchTimeSchedules = async (): Promise<TimeSchedule[]> => {
     const response = await axiosInstance.post("TimeSchedule_service.asmx/GetTimeSchedules");
     return response.data.data ?? [];
 };
 
-interface InitialValues {
+const fetchMachineGroups = async (): Promise<GroupMachine[]> => {
+    const response = await axiosInstance.post("GroupMachine_service.asmx/GetGroupMachines");
+    return response.data.data ?? [];
+};
+
+export interface TimeScheduleProps {
+    ScheduleID: string;
     ScheduleName: string;
-    MachineGroup: string;
+    MachineGroup?: string | string[];
     Type_schedule: string;
+    Tracking: boolean;
+    IsActive: boolean;
     Custom: boolean;
-    TimeSlots: { start: string | null, end: string | null }[];
-    TimeCustom: { start: string | null, end: string | null }[];
-    TimeWeek: { [key: string]: { start: string | null, end: string | null }[] }
+    TimeSlots?: Day[];
+    TimeCustom?: Day[];
+    TimeWeek?: { [key: string]: Day[] };
 }
 
+export interface Day {
+    start: string | null;
+    end: string | null;
+}
 
 const TimescheduleScreen: React.FC = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isVisible, setIsVisible] = useState<boolean>(false);
-    const [initialValues, setInitialValues] = useState<InitialValues>({
-        ScheduleName: '',
+    const [initialValues, setInitialValues] = useState<TimeScheduleProps>({
+        ScheduleID: "",
+        ScheduleName: "",
+        IsActive: false,
+        Tracking: false,
         MachineGroup: "",
         Type_schedule: "",
         Custom: false,
@@ -48,13 +64,21 @@ const TimescheduleScreen: React.FC = React.memo(() => {
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
 
-    const { data: timeSchedule = [], isLoading, } = useQuery<TimeSchedule[], Error>(
-        'timeSchedule',
-        fetchTimeSchedules,
+    const { data: machineGroups = [] } = useQuery<GroupMachine[], Error>(
+        'machineGroups',
+        fetchMachineGroups,
         {
             refetchOnWindowFocus: true,
         }
     );
+
+    // const { data: timeSchedule = [], isLoading, } = useQuery<TimeSchedule[], Error>(
+    //     'timeSchedule',
+    //     fetchTimeSchedules,
+    //     {
+    //         refetchOnWindowFocus: true,
+    //     }
+    // );
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -73,8 +97,8 @@ const TimescheduleScreen: React.FC = React.memo(() => {
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
             if (action === "editIndex") {
-                const response = await axiosInstance.post("TimeSchedule_service.asmx/GetTimeSchedule", { TScheduleID: item });
-                // const machineData = response.data.data[0] ?? {};
+                // const response = await axiosInstance.post("TimeSchedule_service.asmx/GetTimeSchedule", { TScheduleID: item });
+                setInitialValues(timeSchedule[timeSchedule.findIndex((v) => v.ScheduleID === item)])
 
                 setIsEditing(true);
                 setIsVisible(true);
@@ -88,21 +112,26 @@ const TimescheduleScreen: React.FC = React.memo(() => {
         } catch (error) {
             handleError(error);
         }
-    }, [handleError, queryClient]);
+    }, [handleError, queryClient, timeSchedule]);
 
     const tableData = useMemo(() => {
         return timeSchedule.map((item) => [
-            item.TScheduleName,
+            item.ScheduleName,
+            item.Type_schedule,
+            item.Tracking ? "track" : "not track",
             item.IsActive,
-            item.TScheduleID
+            item.ScheduleID
         ]);
-    }, [timeSchedule, debouncedSearchQuery]);
+    }, [timeSchedule, debouncedSearchQuery, machineGroups]);
 
     const handleNewData = useCallback(() => {
         setInitialValues({
-            ScheduleName: '',
+            ScheduleID: "",
+            ScheduleName: "",
+            IsActive: false,
             MachineGroup: "",
             Type_schedule: "",
+            Tracking: false,
             Custom: false,
             TimeSlots: [],
             TimeCustom: [],
@@ -116,18 +145,20 @@ const TimescheduleScreen: React.FC = React.memo(() => {
         Tabledata: tableData,
         Tablehead: [
             { label: "Schedule Name", align: "flex-start" },
+            { label: "Type", align: "center" },
+            { label: "Tracking", align: "center" },
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
         ],
-        flexArr: [6, 1, 1],
-        actionIndex: [{ editIndex: 2, delIndex: 3 }],
+        flexArr: [2, 1, 1, 1, 1],
+        actionIndex: [{ editIndex: 4, delIndex: 5 }],
         handleAction,
         showMessage: 0,
         detail: true,
-        detailKey: ["Machine", "TimeDetail"],
+        detailKey: ["MachineGroup", "TimeSlots", "TimeCustom", "TimeWeek"],
         detailData: timeSchedule,
         searchQuery: debouncedSearchQuery,
-    }), [tableData, debouncedSearchQuery, handleAction]);
+    }), [tableData, debouncedSearchQuery, handleAction, timeSchedule]);
 
     const styles = StyleSheet.create({
         container: {
@@ -165,16 +196,20 @@ const TimescheduleScreen: React.FC = React.memo(() => {
                 </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...CustomtableProps} />}
+
+                <Customtable {...CustomtableProps} />
+
+                {/* {false ? <LoadingSpinner /> : 
+                } */}
             </Card.Content>
 
             <ScheduleDialog
                 isVisible={isVisible}
+                machineGroups={machineGroups}
                 setIsVisible={setIsVisible}
                 isEditing={isEditing}
                 initialValues={initialValues}
                 saveData={saveData}
-                timeSchedule={timeSchedule}
             />
         </AccessibleView>
     );

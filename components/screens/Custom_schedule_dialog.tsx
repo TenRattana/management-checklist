@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import Animated, { Extrapolate, interpolate, runOnJS } from 'react-native-reanimated'
 import { Button, Dialog, HelperText, IconButton, Portal } from 'react-native-paper'
 import useMasterdataStyles from '@/styles/common/masterdata';
-import { Swipeable } from 'react-native-gesture-handler';
+import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import { convertToDate, convertToThaiDateTime, styles } from './Schedule';
 import { SharedValue } from 'react-native-gesture-handler/lib/typescript/handlers/gestures/reanimatedWrapper';
 import { getCurrentTime } from '@/config/timezoneUtils';
@@ -20,10 +20,7 @@ interface Custom_scheduleProps {
     showSuccess: (message: string | string[]) => void;
     setFieldValue: (value: any) => void;
     values: { start: string | null, end: string | null }[];
-    touched?: FormikTouched<{
-        start: string | null;
-        end: string | null;
-    }>[] | undefined;
+    touched: boolean | undefined;
     errors?: string | string[] | FormikErrors<{
         start: string | null;
         end: string | null;
@@ -278,7 +275,7 @@ const Custom_schedule_dialog = React.memo(({ showError, showSuccess, spacing, se
     }
 
     return (
-        <>
+        <GestureHandlerRootView>
             {values?.map((custom, index) => {
                 return (
                     <Swipeable
@@ -292,23 +289,25 @@ const Custom_schedule_dialog = React.memo(({ showError, showSuccess, spacing, se
 
                             {renderTimePicker('end', index, custom)}
                         </View>
+
                         <HelperText
                             type="error"
                             visible={Boolean(touched) && Boolean(errors?.[index])}
-                            style={[{ display: touched && errors?.[index] ? 'flex' : 'none' }, masterdataStyles.errorText]}
+                            style={[{ display: touched && !Array.isArray(errors?.[index]) && typeof errors?.[index] === 'string' && errors[index] ? 'flex' : 'none' }, masterdataStyles.errorText]}
                         >
-                            {Array.isArray(errors) && typeof errors[index] === 'object' && errors[index] ? false : errors?.[index] as string}
+                            {!Array.isArray(errors?.[index]) && typeof errors?.[index] === 'string' && errors[index] && errors?.[index] as string}
                         </HelperText>
+
                     </Swipeable>
                 )
             })}
 
             <View style={{ marginHorizontal: 24, marginVertical: 10 }}>
                 <Button onPress={() => addTimeCustom()} style={styles.addButton}>
-                    <Text style={masterdataStyles.timeText}>Add Day</Text>
+                    <Text style={masterdataStyles.timeText}>Custom</Text>
                 </Button>
             </View>
-        </>
+        </GestureHandlerRootView>
     )
 })
 

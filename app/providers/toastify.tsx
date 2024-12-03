@@ -34,7 +34,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
 
     setTimeout(() => {
       setToasts((prev) => prev.filter((toast) => toast.id !== id));
-    }, 3000);
+    }, 30000);
   }, []);
 
   const showSuccess = useCallback((messages: string | string[]) => {
@@ -84,28 +84,30 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
                 styles.toastContainer,
                 {
                   top: index * 15,
-                  backgroundColor: toast.status === "error" ? theme.colors.error : theme.colors.succeass
+                  backgroundColor: toast.status === "error" ? theme.colors.error : theme.colors.succeass,
                 }
               ]}
             >
-              <MaterialIcons
-                name={toast.status === "error" ? "error" : "check-circle"}
-                size={spacing.large}
-                color="white"
-                style={styles.icon}
-              />
-              <View style={styles.messageContainer}>
-                <Text style={{ fontSize: spacing.small, color: theme.colors.fff }}>{toast.message}</Text>
+              <View style={{ flexBasis: '90%', flexDirection: 'row' }}>
+                <MaterialIcons
+                  name={toast.status === "error" ? "error" : "check-circle"}
+                  size={spacing.large}
+                  color="white"
+                  style={styles.icon}
+                />
+                <View style={styles.messageContainer}>
+                  <Text style={{ fontSize: spacing.small, color: theme.colors.fff }}>{toast.message}</Text>
+                </View>
               </View>
               <TouchableOpacity
                 onPress={() =>
                   setToasts((prev) => prev.filter((item) => item.id !== toast.id))
                 }
+                style={{ flexBasis: '10%' }}
               >
                 <MaterialIcons name="close" size={spacing.large} color="white" />
               </TouchableOpacity>
             </Animated.View>
-
           )
         })}
       </View>
@@ -128,9 +130,9 @@ const styles = StyleSheet.create({
     // zIndex: 9999,
   },
   toastContainer: {
+    justifyContent: 'space-between',
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "green",
     padding: 15,
     borderRadius: 8,
     marginVertical: 5,
