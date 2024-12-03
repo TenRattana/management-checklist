@@ -9,16 +9,10 @@ type DetailContentProps = {
     isDetailVisible: boolean;
 };
 
-const DetailContent = ({ detailData, isDetailVisible }: DetailContentProps) => {
+const DetailContent = ({ detailData }: DetailContentProps) => {
     useEffect(() => { }, [detailData])
     const { spacing } = useRes();
     const { theme } = useTheme()
-
-    useEffect(() => {
-        console.log(isDetailVisible);
-
-        isDetailVisible && console.log("A");
-    }, [isDetailVisible])
 
     const masterdataStyles = useMasterdataStyles()
 

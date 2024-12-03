@@ -1,7 +1,6 @@
-import { getCurrentTime } from "@/config/timezoneUtils";
+import { TimelineItem } from "@/app/mocks/timeline";
 import { TimeScheduleProps } from "./TimescheduleScreen";
-import { TimelineEventProps } from "react-native-calendars";
-import { TimelineItem } from "../HomeScreen";
+import { CalendarUtils } from "react-native-calendars";
 
 export const timeSchedule: TimeScheduleProps[] = [
     {
@@ -135,70 +134,80 @@ export const timeSchedule: TimeScheduleProps[] = [
     }
 ]
 
+import moment from 'moment';
 
-const today = getCurrentTime();
-
-const getDate = (offset = 0) => {
-    const date = new Date(today);
-    date.setDate(today.getDate() + offset);
-    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-};
-
-const getWeeklyDate = (dayOfWeek) => {
-    const date = new Date(today);
-    const daysToAdd = (7 + dayOfWeek - date.getDay()) % 7;
-    date.setDate(date.getDate() + daysToAdd);
-    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-};
-
+/**
+ * Converts a schedule into timeline items, including recurring weekly and daily events.
+ * @param {Array} schedule - Array of schedule items.
+ * @returns {Array} Timeline items with recurring events.
+ */
 export const convertScheduleToTimeline = (schedule: TimelineItem[]) => {
-    const timelineEvents: TimelineEventProps[] = [];
+    const today = moment();
+    const startOfWeek = today.clone().startOf('week');
+    const endOfWeek = today.clone().endOf('week');
+    const result: any = [];
 
-    schedule.forEach(item => {
-        if (item.date.includes('Weekly')) {
-            const weekDayMap = {
-                'MonDay': 1,
-                'Tuesday': 2,
-                'Wednesday': 3
-            };
+    schedule.forEach((item) => {
+        const { date, name, time }: any = item;
 
-            const weekDate = getWeeklyDate(weekDayMap[item.date.split('(')[1].split(')')[0]]);
+        if (date.startsWith('Weekly')) {
+            const weekday = date.match(/\((.*?)\)/)[1];
+            const day = moment().day(weekday).startOf('day');
 
-            item.time.split(',').forEach(timeSlot => {
-                const [start, end] = timeSlot.split(' - ');
-                timelineEvents.push({
-                    start: `${weekDate} ${start}:00`,
-                    end: `${weekDate} ${end}:00`,
-                    title: item.name,
-                    summary: `Mocktest on ${item.date}`
+            if (day.isBetween(startOfWeek, endOfWeek, 'days', '[]')) {
+                const [startTime, endTime] = time.split(' - ');
+                result.push({
+                    title: name,
+                    start: day.clone().set({
+                        hour: parseInt(startTime.split(':')[0]),
+                        minute: parseInt(startTime.split(':')[1]),
+                    }).toISOString(),
+                    end: day.clone().set({
+                        hour: parseInt(endTime.split(':')[0]),
+                        minute: parseInt(endTime.split(':')[1]),
+                    }).toISOString(),
+                    summary: `${date} (${time})`,
                 });
-            });
-        } else if (item.date === 'Recurring Daily') {
-            item.time.split(',').forEach(timeSlot => {
-                const [start, end] = timeSlot.split(' - ');
-                const dayDate = getDate();
-                timelineEvents.push({
-                    start: `${dayDate} ${start}:00`,
-                    end: `${dayDate} ${end}:00`,
-                    title: item.name,
-                    summary: `Mocktest on Recurring Daily`
-                });
-            });
-        } else if (item.date.includes('Custom')) {
-            const customDate = item.date.split('(')[1].split(')')[0];
-            const [day, month, year] = customDate.split('-');
+            }
+        } else if (date === 'Recurring Daily') {
+            for (let i = 0; i < 7; i++) {
+                const day = startOfWeek.clone().add(i, 'days');
+                const [startTime, endTime] = time.split(' - ');
 
-            item.time.split(',').forEach(timeSlot => {
-                const [start, end] = timeSlot.split(' - ');
-                timelineEvents.push({
-                    start: `${year}-${month}-${day} ${start}:00`,
-                    end: `${year}-${month}-${day} ${end}:00`,
-                    title: item.name,
-                    summary: `Mocktest on ${item.date}`
+                result.push({
+                    title: name,
+                    start: day.clone().set({
+                        hour: parseInt(startTime.split(':')[0]),
+                        minute: parseInt(startTime.split(':')[1]),
+                    }).toISOString(),
+                    end: day.clone().set({
+                        hour: parseInt(endTime.split(':')[0]),
+                        minute: parseInt(endTime.split(':')[1]),
+                    }).toISOString(),
+                    summary: `${date} (${time})`,
                 });
+            }
+        } else if (date.startsWith('Custom')) {
+            const eventDate = moment(date.match(/\((.*?)\)/)[1], 'DD-MM-YYYY');
+            const [startTime, endTime] = time.split(' - ');
+            
+            result.push({
+                title: name,
+                start: eventDate.clone().set({
+                        year: eventDate.year() - 543, 
+                        hour: parseInt(startTime.split(':')[0], 10),
+                        minute: parseInt(startTime.split(':')[1], 10), 
+                    }).toISOString(),
+                end: eventDate.clone().set({
+                    year: eventDate.year() - 543, 
+                    hour: parseInt(endTime.split(':')[0], 10),
+                    minute: parseInt(endTime.split(':')[1], 10), 
+                }).toISOString(),
+                summary: `${date} (${time})`,
             });
         }
     });
 
-    return timelineEvents;
+    return result;
 };
+

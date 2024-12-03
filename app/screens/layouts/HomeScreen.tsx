@@ -19,7 +19,6 @@ const HomeScreen = () => {
   const [isWeekView, setIsWeekView] = useState(false);
 
   const timelineItems = parseTimeScheduleToTimeline(timeSchedule);
-  console.log(timelineItems);
 
   const SS = convertScheduleToTimeline(timelineItems);
 
@@ -34,7 +33,6 @@ const HomeScreen = () => {
     () => eventsByDate[currentDate] || [],
     [eventsByDate, currentDate]
   );
-  const handleAction = useCallback(() => { }, [])
 
   const markedDates = useMemo(() => {
     return {
@@ -69,7 +67,7 @@ const HomeScreen = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <CalendarProvider date={currentDate} onDateChanged={onDateChanged}>
+      <CalendarProvider date={currentDate} onDateChanged={onDateChanged} showTodayButton>
         <View style={styles.calendarContainer}>
           {isWeekView ? (
             <WeekCalendar firstDay={1} markedDates={markedDates} />
@@ -106,13 +104,6 @@ const HomeScreen = () => {
           </Card>
         </ScrollView>
       </CalendarProvider>
-
-      <FAB
-        style={[styles.fab, { backgroundColor: theme.colors.primary }]}
-        icon="plus"
-        label={Platform.OS === 'web' ? 'Add Event' : undefined}
-        onPress={() => console.log('Add Event')}
-      />
     </View>
   );
 };
