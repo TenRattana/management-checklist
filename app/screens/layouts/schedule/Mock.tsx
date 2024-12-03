@@ -1,6 +1,6 @@
 import { TimelineItem } from "@/app/mocks/timeline";
 import { TimeScheduleProps } from "./TimescheduleScreen";
-import { CalendarUtils, TimelineEventProps } from "react-native-calendars";
+import { TimelineEventProps } from "react-native-calendars";
 
 export const timeSchedule: TimeScheduleProps[] = [
     {
@@ -128,86 +128,215 @@ export const timeSchedule: TimeScheduleProps[] = [
                 start: "20-02-2567 10:00",
                 end: "21-02-2567 10:00"
             },
+            {
+                start: "02-12-2567 10:00",
+                end: "02-12-2567 11:00"
+            },
         ],
         IsActive: true,
         TimeWeek: {}
     }
 ]
 
-import moment from 'moment';
+import moment from "moment";
+import { useTheme } from "@/app/contexts/useTheme";
+
+export interface TimeLine extends TimelineEventProps {
+    type?: string;
+}
+
+interface MarkedDates {
+    [date: string]: { dots: DOT[] };
+}
+
+interface DOT {
+    color: string;
+    selectedDotColor: string;
+    type?: string; // Optional type property
+}
 
 /**
  * Converts a schedule into timeline items, including recurring weekly and daily events.
  * @param {Array} schedule - Array of schedule items.
- * @returns {Array} Timeline items with recurring events.
+ * @returns {Array} Timeline items with recurring events and markedDates.
  */
-export const convertScheduleToTimeline = (schedule: TimelineItem[]): TimelineEventProps[] => {
+export const convertScheduleToTimeline = (
+    schedule: TimelineItem[]
+): { timeline: TimeLine[]; markedDates: MarkedDates } => {
     const today = moment();
-    const startOfWeek = today.clone().startOf('week');
-    const endOfWeek = today.clone().endOf('week');
-    const result: any = [];
+    const startOfWeek = today.clone().startOf("week");
+    const endOfWeek = today.clone().endOf("week");
+    const timeline: TimeLine[] = [];
+    const markedDates: MarkedDates = {};
+    const { theme } = useTheme();
+
+    const getColorForType = (type: string) => {
+        switch (type) {
+            case "Weekly":
+                return theme.colors.primary;
+            case "Daily":
+                return theme.colors.secondary;
+            case "Custom":
+                return theme.colors.error;
+            default:
+                return theme.colors.text;
+        }
+    };
+
+    const getSelectedColorForType = (type: string) => {
+        switch (type) {
+            case "Weekly":
+                return theme.colors.accent;
+            case "Daily":
+                return theme.colors.primary;
+            case "Custom":
+                return theme.colors.error;
+            default:
+                return theme.colors.green;
+        }
+    };
 
     schedule.forEach((item) => {
         const { date, name, time }: any = item;
 
-        if (date.startsWith('Weekly')) {
+        if (date.startsWith("Weekly")) {
             const weekday = date.match(/\((.*?)\)/)[1];
-            const day = moment().day(weekday).startOf('day');
+            const day = moment().day(weekday).startOf("day");
 
-            if (day.isBetween(startOfWeek, endOfWeek, 'days', '[]')) {
-                const [startTime, endTime] = time.split(' - ');
-                result.push({
+            if (day.isBetween(startOfWeek, endOfWeek, "days", "[]")) {
+                const [startTime, endTime] = time.split(" - ");
+                const start = day
+                    .clone()
+                    .set({
+                        hour: parseInt(startTime.split(":")[0]),
+                        minute: parseInt(startTime.split(":")[1]),
+                    })
+                    .toISOString();
+                const end = day
+                    .clone()
+                    .set({
+                        hour: parseInt(endTime.split(":")[0]),
+                        minute: parseInt(endTime.split(":")[1]),
+                    })
+                    .toISOString();
+
+                timeline.push({
                     title: name,
-                    start: day.clone().set({
-                        hour: parseInt(startTime.split(':')[0]),
-                        minute: parseInt(startTime.split(':')[1]),
-                    }).toISOString(),
-                    end: day.clone().set({
-                        hour: parseInt(endTime.split(':')[0]),
-                        minute: parseInt(endTime.split(':')[1]),
-                    }).toISOString(),
+                    start,
+                    end,
                     summary: `${date} (${time})`,
+                    color: theme.colors.blue,
+                    type: "Weekly",
                 });
+
+                const dateKey = day.format("YYYY-MM-DD");
+                if (!markedDates[dateKey]) {
+                    markedDates[dateKey] = { dots: [] };
+                }
+
+                const weeklyDotExists = markedDates[dateKey].dots.some(dot => dot.type === "Weekly");
+                if (!weeklyDotExists) {
+                    markedDates[dateKey].dots.push({
+                        color: getColorForType("Weekly"),
+                        selectedDotColor: getSelectedColorForType("Weekly"),
+                        type: "Weekly"
+                    });
+                }
             }
-        } else if (date === 'Recurring Daily') {
+        } else if (date === "Recurring Daily") {
             for (let i = 0; i < 7; i++) {
-                const day = startOfWeek.clone().add(i, 'days');
-                const [startTime, endTime] = time.split(' - ');
+                const day = startOfWeek.clone().add(i, "days");
+                const [startTime, endTime] = time.split(" - ");
+                const start = day
+                    .clone()
+                    .set({
+                        hour: parseInt(startTime.split(":")[0]),
+                        minute: parseInt(startTime.split(":")[1]),
+                    })
+                    .toISOString();
+                const end = day
+                    .clone()
+                    .set({
+                        hour: parseInt(endTime.split(":")[0]),
+                        minute: parseInt(endTime.split(":")[1]),
+                    })
+                    .toISOString();
 
-                result.push({
+                timeline.push({
                     title: name,
-                    start: day.clone().set({
-                        hour: parseInt(startTime.split(':')[0]),
-                        minute: parseInt(startTime.split(':')[1]),
-                    }).toISOString(),
-                    end: day.clone().set({
-                        hour: parseInt(endTime.split(':')[0]),
-                        minute: parseInt(endTime.split(':')[1]),
-                    }).toISOString(),
+                    start,
+                    end,
                     summary: `${date} (${time})`,
+                    color: theme.colors.green,
+                    type: "Daily",
                 });
-            }
-        } else if (date.startsWith('Custom')) {
-            const eventDate = moment(date.match(/\((.*?)\)/)[1], 'DD-MM-YYYY');
-            const [startTime, endTime] = time.split(' - ');
 
-            result.push({
-                title: name,
-                start: eventDate.clone().set({
-                    year: eventDate.year() - 543,
-                    hour: parseInt(startTime.split(':')[0], 10),
-                    minute: parseInt(startTime.split(':')[1], 10),
-                }).toISOString(),
-                end: eventDate.clone().set({
-                    year: eventDate.year() - 543,
-                    hour: parseInt(endTime.split(':')[0], 10),
-                    minute: parseInt(endTime.split(':')[1], 10),
-                }).toISOString(),
-                summary: `${date} (${time})`,
-            });
+                const dateKey = day.format("YYYY-MM-DD");
+                if (!markedDates[dateKey]) {
+                    markedDates[dateKey] = { dots: [] };
+                }
+
+                const dailyDotExists = markedDates[dateKey].dots.some(dot => dot.type === "Daily");
+                if (!dailyDotExists) {
+                    markedDates[dateKey].dots.push({
+                        color: getColorForType("Daily"),
+                        selectedDotColor: getSelectedColorForType("Daily"),
+                        type: "Daily"
+                    });
+                }
+            }
+        } else if (date.startsWith("Custom")) {
+            const match = date.match(/\((.*?)\)/);
+            if (match && match[1]) {
+                const eventDate = moment(match[1], "DD-MM-YYYY");
+
+                const gregorianDate = eventDate.clone().subtract(543, 'years');
+
+                const [startTime, endTime] = time.split(" - ");
+
+                const start = gregorianDate
+                    .clone()
+                    .set({
+                        hour: parseInt(startTime.split(":")[0], 10),
+                        minute: parseInt(startTime.split(":")[1], 10),
+                    })
+                    .toISOString();
+
+                const end = gregorianDate
+                    .clone()
+                    .set({
+                        hour: parseInt(endTime.split(":")[0], 10),
+                        minute: parseInt(endTime.split(":")[1], 10),
+                    })
+                    .toISOString();
+
+                timeline.push({
+                    title: name,
+                    start,
+                    end,
+                    summary: `${date} (${time})`,
+                    color: theme.colors.error,
+                    type: "Custom",
+                });
+
+                const dateKey = gregorianDate.format("YYYY-MM-DD");
+
+                if (!markedDates[dateKey]) {
+                    markedDates[dateKey] = { dots: [] };
+                }
+
+                const customDotExists = markedDates[dateKey].dots.some(dot => dot.type === "Custom");
+
+                if (!customDotExists) {
+                    markedDates[dateKey].dots.push({
+                        color: getColorForType("Custom"),
+                        selectedDotColor: getSelectedColorForType("Custom"),
+                        type: "Custom",
+                    });
+                }
+            }
         }
     });
 
-    return result;
+    return { timeline, markedDates };
 };
-

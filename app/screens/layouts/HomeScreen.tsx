@@ -21,10 +21,10 @@ const HomeScreen = () => {
 
   const timelineItems = parseTimeScheduleToTimeline(timeSchedule);
 
-  const SS = convertScheduleToTimeline(timelineItems);
+  const { markedDates, timeline } = convertScheduleToTimeline(timelineItems);
 
   const eventsByDate = useMemo(
-    () => groupBy(SS, (e) => CalendarUtils.getCalendarDateString(e.start)),
+    () => groupBy(timeline, (e) => CalendarUtils.getCalendarDateString(e.start)),
     []
   );
 
@@ -34,19 +34,6 @@ const HomeScreen = () => {
     () => eventsByDate[currentDate] || [],
     [eventsByDate, currentDate]
   );
-
-  const markedDates = useMemo(() => {
-    const marks: MarkedDates = {};
-
-    SS.forEach((event) => {
-      const dateKey = CalendarUtils.getCalendarDateString(event.start);
-      if (!marks[dateKey]) {
-        marks[dateKey] = { marked: true, dotColor: theme.colors.error };
-      }
-    });
-
-    return marks;
-  }, [SS, theme]);
 
   const tableData = useMemo(() => {
     return filteredEvents.map((item) => [
@@ -78,7 +65,7 @@ const HomeScreen = () => {
           {isWeekView ? (
             <WeekCalendar firstDay={1} markedDates={markedDates} />
           ) : (
-            <ExpandableCalendar firstDay={1} markedDates={markedDates} />
+            <ExpandableCalendar firstDay={1} markedDates={markedDates} markingType="multi-dot" />
           )}
           <IconButton
             icon={!isWeekView ? 'sort-calendar-descending' : 'sort-calendar-ascending'}
