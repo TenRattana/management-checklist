@@ -1,6 +1,6 @@
 import { TimelineItem } from "@/app/mocks/timeline";
 import { TimeScheduleProps } from "./TimescheduleScreen";
-import { CalendarUtils } from "react-native-calendars";
+import { CalendarUtils, TimelineEventProps } from "react-native-calendars";
 
 export const timeSchedule: TimeScheduleProps[] = [
     {
@@ -141,7 +141,7 @@ import moment from 'moment';
  * @param {Array} schedule - Array of schedule items.
  * @returns {Array} Timeline items with recurring events.
  */
-export const convertScheduleToTimeline = (schedule: TimelineItem[]) => {
+export const convertScheduleToTimeline = (schedule: TimelineItem[]): TimelineEventProps[] => {
     const today = moment();
     const startOfWeek = today.clone().startOf('week');
     const endOfWeek = today.clone().endOf('week');
@@ -190,18 +190,18 @@ export const convertScheduleToTimeline = (schedule: TimelineItem[]) => {
         } else if (date.startsWith('Custom')) {
             const eventDate = moment(date.match(/\((.*?)\)/)[1], 'DD-MM-YYYY');
             const [startTime, endTime] = time.split(' - ');
-            
+
             result.push({
                 title: name,
                 start: eventDate.clone().set({
-                        year: eventDate.year() - 543, 
-                        hour: parseInt(startTime.split(':')[0], 10),
-                        minute: parseInt(startTime.split(':')[1], 10), 
-                    }).toISOString(),
+                    year: eventDate.year() - 543,
+                    hour: parseInt(startTime.split(':')[0], 10),
+                    minute: parseInt(startTime.split(':')[1], 10),
+                }).toISOString(),
                 end: eventDate.clone().set({
-                    year: eventDate.year() - 543, 
+                    year: eventDate.year() - 543,
                     hour: parseInt(endTime.split(':')[0], 10),
-                    minute: parseInt(endTime.split(':')[1], 10), 
+                    minute: parseInt(endTime.split(':')[1], 10),
                 }).toISOString(),
                 summary: `${date} (${time})`,
             });

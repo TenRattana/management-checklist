@@ -5,13 +5,14 @@ import {
   CalendarUtils,
   WeekCalendar,
 } from 'react-native-calendars';
-import { Card, FAB, IconButton, Divider } from 'react-native-paper';
-import { ScrollView, Platform, StyleSheet, View, Text } from 'react-native';
+import { Card, IconButton, Divider } from 'react-native-paper';
+import { ScrollView, StyleSheet, View, Text } from 'react-native';
 import { useTheme } from '@/app/contexts/useTheme';
 import { getDate, parseTimeScheduleToTimeline } from '@/app/mocks/timeline';
 import CustomTable from '@/components/Customtable';
 import { groupBy } from 'lodash';
 import { convertScheduleToTimeline, timeSchedule } from './schedule/Mock';
+import { MarkedDates } from 'react-native-calendars/src/types';
 
 const HomeScreen = () => {
   const { theme } = useTheme();
@@ -35,19 +36,24 @@ const HomeScreen = () => {
   );
 
   const markedDates = useMemo(() => {
-    return {
-      [`${getDate(-1)}`]: { marked: true, dotColor: theme.colors.primary },
-      [`${getDate(0)}`]: { marked: true, dotColor: theme.colors.secondary },
-      [`${getDate(1)}`]: { marked: true, dotColor: theme.colors.accent },
-    };
-  }, [theme]);
+    const marks: MarkedDates = {};
+
+    SS.forEach((event) => {
+      const dateKey = CalendarUtils.getCalendarDateString(event.start);
+      if (!marks[dateKey]) {
+        marks[dateKey] = { marked: true, dotColor: theme.colors.error };
+      }
+    });
+
+    return marks;
+  }, [SS, theme]);
 
   const tableData = useMemo(() => {
     return filteredEvents.map((item) => [
       item.title,
       item.start,
       item.end,
-      item.summary,
+      item.summary || "",
     ]);
   }, [filteredEvents]);
 
