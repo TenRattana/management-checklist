@@ -1,4 +1,7 @@
+import { getCurrentTime } from "@/config/timezoneUtils";
 import { TimeScheduleProps } from "./TimescheduleScreen";
+import { TimelineEventProps } from "react-native-calendars";
+import { TimelineItem } from "../HomeScreen";
 
 export const timeSchedule: TimeScheduleProps[] = [
     {
@@ -131,3 +134,71 @@ export const timeSchedule: TimeScheduleProps[] = [
         TimeWeek: {}
     }
 ]
+
+
+const today = getCurrentTime();
+
+const getDate = (offset = 0) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() + offset);
+    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+};
+
+const getWeeklyDate = (dayOfWeek) => {
+    const date = new Date(today);
+    const daysToAdd = (7 + dayOfWeek - date.getDay()) % 7;
+    date.setDate(date.getDate() + daysToAdd);
+    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+};
+
+export const convertScheduleToTimeline = (schedule: TimelineItem[]) => {
+    const timelineEvents: TimelineEventProps[] = [];
+
+    schedule.forEach(item => {
+        if (item.date.includes('Weekly')) {
+            const weekDayMap = {
+                'MonDay': 1,
+                'Tuesday': 2,
+                'Wednesday': 3
+            };
+
+            const weekDate = getWeeklyDate(weekDayMap[item.date.split('(')[1].split(')')[0]]);
+
+            item.time.split(',').forEach(timeSlot => {
+                const [start, end] = timeSlot.split(' - ');
+                timelineEvents.push({
+                    start: `${weekDate} ${start}:00`,
+                    end: `${weekDate} ${end}:00`,
+                    title: item.name,
+                    summary: `Mocktest on ${item.date}`
+                });
+            });
+        } else if (item.date === 'Recurring Daily') {
+            item.time.split(',').forEach(timeSlot => {
+                const [start, end] = timeSlot.split(' - ');
+                const dayDate = getDate();
+                timelineEvents.push({
+                    start: `${dayDate} ${start}:00`,
+                    end: `${dayDate} ${end}:00`,
+                    title: item.name,
+                    summary: `Mocktest on Recurring Daily`
+                });
+            });
+        } else if (item.date.includes('Custom')) {
+            const customDate = item.date.split('(')[1].split(')')[0];
+            const [day, month, year] = customDate.split('-');
+
+            item.time.split(',').forEach(timeSlot => {
+                const [start, end] = timeSlot.split(' - ');
+                timelineEvents.push({
+                    start: `${year}-${month}-${day} ${start}:00`,
+                    end: `${year}-${month}-${day} ${end}:00`,
+                    title: item.name,
+                    summary: `Mocktest on ${item.date}`
+                });
+            });
+        }
+    });
+
+    return timelineEvents;
+};

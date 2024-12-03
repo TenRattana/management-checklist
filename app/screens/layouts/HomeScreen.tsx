@@ -8,17 +8,23 @@ import {
 import { Card, FAB, IconButton, Divider } from 'react-native-paper';
 import { ScrollView, Platform, StyleSheet, View, Text } from 'react-native';
 import { useTheme } from '@/app/contexts/useTheme';
-import { getDate, timelineEvents } from '@/app/mocks/timeline';
+import { getDate, parseTimeScheduleToTimeline } from '@/app/mocks/timeline';
 import CustomTable from '@/components/Customtable';
 import { groupBy } from 'lodash';
+import { convertScheduleToTimeline, timeSchedule } from './schedule/Mock';
 
 const HomeScreen = () => {
   const { theme } = useTheme();
   const [currentDate, setCurrentDate] = useState(getDate());
   const [isWeekView, setIsWeekView] = useState(false);
 
+  const timelineItems = parseTimeScheduleToTimeline(timeSchedule);
+  console.log(timelineItems);
+
+  const SS = convertScheduleToTimeline(timelineItems);
+
   const eventsByDate = useMemo(
-    () => groupBy(timelineEvents, (e) => CalendarUtils.getCalendarDateString(e.start)),
+    () => groupBy(SS, (e) => CalendarUtils.getCalendarDateString(e.start)),
     []
   );
 
@@ -28,6 +34,7 @@ const HomeScreen = () => {
     () => eventsByDate[currentDate] || [],
     [eventsByDate, currentDate]
   );
+  const handleAction = useCallback(() => { }, [])
 
   const markedDates = useMemo(() => {
     return {
@@ -42,7 +49,6 @@ const HomeScreen = () => {
       item.title,
       item.start,
       item.end,
-      item.status ? "Running" : "Waiting",
       item.summary,
     ]);
   }, [filteredEvents]);
@@ -53,13 +59,12 @@ const HomeScreen = () => {
       { label: "Event Title", align: "flex-start" },
       { label: "Start", align: "flex-start" },
       { label: "End", align: "flex-start" },
-      { label: "Status", align: "center" },
       { label: "Detail", align: "flex-start" },
     ],
-    flexArr: [2, 2, 2, 1, 3],
+    flexArr: [2, 2, 1, 3],
     actionIndex: [{}],
-    showMessage: true,
-    searchQuery: ""
+    showMessage: 2,
+    searchQuery: " ",
   }), [tableData]);
 
   return (
