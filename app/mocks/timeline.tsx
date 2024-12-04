@@ -269,7 +269,6 @@ export const convertScheduleToTimeline = (
             }
         } else if (date.startsWith("Custom")) {
             const match = date.match(/\((.*?)\)/);
-            console.log(date);
 
             if (match && match[1]) {
                 const eventDate = moment(match[1], "DD-MM-YYYY");

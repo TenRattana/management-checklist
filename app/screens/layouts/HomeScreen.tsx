@@ -25,10 +25,6 @@ const HomeScreen = React.memo(() => {
   const [isWeekView, setIsWeekView] = useState(false);
   const masterdataStyles = useMasterdataStyles();
 
-  useEffect(() => {
-    console.log("Current date:", currentDate);
-  }, [currentDate]);
-
   const timelineItems = parseTimeScheduleToTimeline(timeSchedule);
   const { markedDates, timeline } = convertScheduleToTimeline(timelineItems);
 
