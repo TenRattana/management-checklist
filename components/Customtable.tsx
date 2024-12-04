@@ -39,11 +39,12 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
   const { responsive } = useRes();
 
   const handleSort = useCallback((columnIndex: number) => {
-    setSortColumn((prev) => (prev === columnIndex ? null : columnIndex));
+    setSortColumn((prev) => (prev === columnIndex && sortDirection === "descending" ? null : columnIndex));
     setSortDirection((prev) =>
       prev === 'ascending' ? 'descending' : prev === "descending" ? undefined : prev === undefined ? 'ascending' : undefined
     );
-  }, []);
+
+  }, [sortDirection, sortColumn]);
 
   const sortedData = useMemo(() => {
     if (sortColumn === null) return Tabledata;

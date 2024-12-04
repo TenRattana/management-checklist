@@ -1,124 +1,38 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList } from 'react-native';
+import React, { useState, useEffect, useRef } from "react";
+import moment from "moment-timezone";
+import { Text, View } from "react-native";
 
-const App = () => {
-    const [data, setData] = useState([
-        { id: 1, name: 'Selivanova Vera', position: 'Designer', email: 'selivanova@gmail.com', isOpen: false },
-        { id: 2, name: 'Abramov Andrey', position: 'Product Manager', email: 'abramov@gmail.com', isOpen: false },
-        { id: 3, name: 'Durov Dmitry', position: 'Designer', email: 'durov@gmail.com', isOpen: false },
-    ]);
+const DEFAULT_TIMEZONE = "Asia/Bangkok";
 
-    const toggleRow = (id: number) => {
-        setData((prev) =>
-            prev.map((item) =>
-                item.id === id ? { ...item, isOpen: !item.isOpen } : item
-            )
-        );
+const Clock: React.FC = () => {
+    const [time, setTime] = useState<string>("");
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    // ฟังก์ชันที่อัปเดตเวลา
+    const updateTime = () => {
+        const currentTime = moment().tz(DEFAULT_TIMEZONE).format("YYYY-MM-DD HH:mm:ss");
+        setTime(currentTime);
     };
 
-    const renderRow = ({ item }: { item: any }) => (
-        <View style={styles.row}>
-            {/* Main Row */}
-            <View style={styles.mainRow}>
-                <Text style={styles.name}>{item.name}</Text>
-                <Text style={styles.position}>{item.position}</Text>
-                <TouchableOpacity onPress={() => toggleRow(item.id)} style={styles.toggleButton}>
-                    <Text style={styles.toggleText}>{item.isOpen ? '▲' : '▼'}</Text>
-                </TouchableOpacity>
-            </View>
+    // ใช้ useEffect เพื่อเริ่มจับเวลาเมื่อคอมโพเนนต์ mount
+    useEffect(() => {
+        updateTime(); // เรียกใช้ฟังก์ชันครั้งแรกเพื่อแสดงเวลาทันที
+        intervalRef.current = setInterval(updateTime, 1000); // เรียกใช้ทุกๆ 1 วินาที
 
-            {/* Expanded Details */}
-            {item.isOpen && (
-                <View style={styles.details}>
-                    <TextInput
-                        style={styles.input}
-                        value={item.email}
-                        placeholder="Email"
-                        onChangeText={(text) =>
-                            setData((prev) =>
-                                prev.map((row) =>
-                                    row.id === item.id ? { ...row, email: text } : row
-                                )
-                            )
-                        }
-                    />
-                    <TouchableOpacity style={styles.saveButton}>
-                        <Text style={styles.saveText}>Save</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
-        </View>
-    );
+        // Cleanup เมื่อคอมโพเนนต์ unmount
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current); // หยุด setInterval เมื่อคอมโพเนนต์ unmount
+            }
+        };
+    }, []); // ทำงานแค่ครั้งเดียวเมื่อคอมโพเนนต์ mount
 
     return (
-        <FlatList
-            data={data}
-            renderItem={renderRow}
-            keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={styles.container}
-        />
+        <View>
+            <Text>Current Time in {DEFAULT_TIMEZONE}:</Text>
+            <Text>{time}</Text>
+        </View>
     );
 };
 
-export default App;
-const styles = StyleSheet.create({
-    container: {
-        padding: 10,
-        backgroundColor: '#f9f9f9',
-    },
-    row: {
-        backgroundColor: '#fff',
-        marginBottom: 10,
-        borderRadius: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
-    },
-    mainRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 15,
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
-    },
-    name: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        flex: 1,
-        color: '#333',
-    },
-    position: {
-        fontSize: 14,
-        color: '#555',
-        flex: 1,
-    },
-    toggleButton: {
-        padding: 5,
-    },
-    toggleText: {
-        fontSize: 16,
-        color: '#007BFF',
-    },
-    details: {
-        padding: 15,
-    },
-    input: {
-        backgroundColor: '#f0f0f0',
-        borderRadius: 8,
-        padding: 10,
-        fontSize: 14,
-        marginBottom: 10,
-    },
-    saveButton: {
-        backgroundColor: '#007BFF',
-        padding: 10,
-        borderRadius: 8,
-        alignItems: 'center',
-    },
-    saveText: {
-        color: '#fff',
-        fontWeight: 'bold',
-    },
-});
+export default Clock;

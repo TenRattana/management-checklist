@@ -12,8 +12,12 @@ import { CustomtableDataProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useTheme } from '@/app/contexts/useTheme'
 import DetailContent from "./Contents/Detailcontent";
+import Animated, { Easing, FadeInUp, FadeOutDown } from "react-native-reanimated";
 
 type justifyContent = 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly' | undefined;
+
+FadeInUp.duration(300).easing(Easing.ease);
+FadeOutDown.duration(300).easing(Easing.ease);
 
 const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead, flexArr, actionIndex, displayData, handleDialog, showMessage, selectedRows, toggleSelect, detail, detailKey, detailData }) => {
     const customtable = useCustomtableStyles();
@@ -140,7 +144,9 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
 
                 {isDetailVisible[findIndex(row)] && detailKey?.some(key => detailData?.[findIndex(row)]?.hasOwnProperty(key)) && (
                     <AccessibleView name="containerdetail" key={`index-${findIndex(row)}`}>
-                        <DetailContent detailData={detailData?.[findIndex(row)] || []} isDetailVisible={isDetailVisible[findIndex(row)]} />
+                        <Animated.View entering={FadeInUp} exiting={FadeOutDown} >
+                            <DetailContent detailData={detailData?.[findIndex(row)] || []} isDetailVisible={isDetailVisible[findIndex(row)]} />
+                        </Animated.View>
                     </AccessibleView>
                 )}
             </View>

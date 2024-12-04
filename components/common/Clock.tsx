@@ -1,0 +1,28 @@
+import { useState, useEffect, useRef, useMemo } from "react";
+import moment from "moment-timezone";
+
+const DEFAULT_TIMEZONE = "Asia/Bangkok";
+
+export function Clock(): string {
+    const [time, setTime] = useState<string>("");
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    const updateTime = () => {
+        const currentTime = moment().tz(DEFAULT_TIMEZONE).format("YYYY-MM-DD HH:mm:ss");
+        setTime(currentTime);
+    };
+
+    useEffect(() => {
+        updateTime();
+        intervalRef.current = setInterval(updateTime, 1000);
+
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+        };
+    }, []);
+
+    return time
+};
+

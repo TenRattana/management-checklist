@@ -7,7 +7,7 @@ const DEFAULT_TIMEZONE = "Asia/Bangkok";
  * @returns {string} - Current time formatted as "YYYY-MM-DD HH:mm:ss".
  */
 export const getCurrentTime = (): Date => {
-    return moment().tz(DEFAULT_TIMEZONE).toDate();
+    return moment().tz(DEFAULT_TIMEZONE, true).toDate();
 };
 
 /**
@@ -16,7 +16,7 @@ export const getCurrentTime = (): Date => {
  * @returns {string} - The converted date in the format "YYYY-MM-DD HH:mm:ss".
  */
 export const convertToDefaultTimezone = (utcDate: string | Date): string => {
-    return moment.utc(utcDate).tz(DEFAULT_TIMEZONE).format("YYYY-MM-DD HH:mm:ss");
+    return moment.utc(utcDate).tz(DEFAULT_TIMEZONE, true).format("YYYY-MM-DD HH:mm:ss");
 };
 
 /**
@@ -26,5 +26,5 @@ export const convertToDefaultTimezone = (utcDate: string | Date): string => {
  * @returns {string} - The formatted date in the default timezone.
  */
 export const formatTime = (date: string | Date, format: string = "YYYY-MM-DD HH:mm:ss"): string => {
-    return moment(date).tz(DEFAULT_TIMEZONE).format(format);
+    return moment(date).tz(DEFAULT_TIMEZONE, true).format(format);
 };
