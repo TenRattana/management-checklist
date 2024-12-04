@@ -181,6 +181,7 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                 actions={dialogAction}
                 messages={dialogMessage}
                 data={dialogData}
+                key={`dialog-datatable`}
             />
         </>
     );

@@ -74,7 +74,7 @@ const DetailContent = ({ detailData }: DetailContentProps) => {
     const renderValue = useCallback((value: any) => {
         if (Array.isArray(value)) {
             return (
-                <View style={styles.chipContainer}>
+                <View style={styles.chipContainer} key={`container-rendervalue`}>
                     {value.map((item, index) => (
                         <View key={`chip-${index}`} style={styles.chip}>
                             <Text style={styles.chipText}>{renderValue(item)}</Text>
@@ -84,9 +84,9 @@ const DetailContent = ({ detailData }: DetailContentProps) => {
             );
         } else if (typeof value === "object" && value !== null) {
             return (
-                <View style={styles.nestedObjectContainer}>
+                <View style={styles.nestedObjectContainer} key={`container-object`}>
                     {Object.entries(value).map(([subKey, subValue]) => (
-                        <View style={styles.nestedRow} key={subKey}>
+                        <View style={styles.nestedRow} key={`${subKey}-subvalue-${subValue}`}>
                             <Text style={[masterdataStyles.text, styles.keyText]}>
                                 {`${subKey.charAt(0).toUpperCase() + subKey.slice(1)}:`}
                             </Text>
@@ -105,17 +105,17 @@ const DetailContent = ({ detailData }: DetailContentProps) => {
     const renderDetails = useCallback(() => {
         if (!detailData || detailData.length === 0) {
             return (
-                <View style={styles.emptyState}>
+                <View style={styles.emptyState} key={`container-renderdetail`}>
                     <Text style={styles.emptyStateText}>No data available</Text>
                 </View>
             );
         }
 
         return (
-            <View style={styles.containerDetail}>
+            <View style={styles.containerDetail} key={`container-${detailData}`}>
                 <View style={styles.detailRow}>
                     {Object.entries(detailData).map(([key, value]) => (
-                        <View style={styles.detailRowItem} key={key}>
+                        <View style={styles.detailRowItem} key={`${key}-value-${value}`}>
                             <Text style={[masterdataStyles.text, styles.keyText]}>
                                 {`${key.charAt(0).toUpperCase() + key.slice(1)}:`}
                             </Text>

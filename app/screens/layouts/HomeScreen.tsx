@@ -15,7 +15,7 @@ import { timeSchedule } from './schedule/Mock';
 import { AccessibleView } from '@/components';
 import { useRes } from '@/app/contexts/useRes';
 import useMasterdataStyles from '@/styles/common/masterdata';
-import { formatTime } from '@/config/timezoneUtils';
+import { formatTime, getCurrentTime } from '@/config/timezoneUtils';
 import { Clock } from '@/components/common/Clock';
 
 const HomeScreen = React.memo(() => {
@@ -36,6 +36,8 @@ const HomeScreen = React.memo(() => {
     () => eventsByDate[currentDate] || [],
     [eventsByDate, currentDate]
   );
+
+  // const time = useMemo(() => Clock(), [Clock])
 
   const tableData = useMemo(() => {
     return filteredEvents.map((item) => [
@@ -107,14 +109,15 @@ const HomeScreen = React.memo(() => {
     };
   }, [currentDate]);
 
+
   return (
     <AccessibleView name="container-home" style={styles.container}>
       <Card.Title
-        title={`Events ${Clock()}`}
+        title={`List  `}
         titleStyle={[masterdataStyles.textBold, styles.header]}
       />
 
-      <CalendarProvider date={currentDate} onDateChanged={(date) => setCurrentDate(date)} key={`calendar-${currentDate}`} theme={getTheme()} >
+      <CalendarProvider date={currentDate} key={`calendar-${currentDate}`} onDateChanged={setCurrentDate} theme={getTheme()} >
         <View style={styles.calendarContainer} key={`calendar-view-${currentDate}`}>
           {isWeekView ? (
             <WeekCalendar
@@ -123,6 +126,7 @@ const HomeScreen = React.memo(() => {
               markedDates={markedDatesS}
               markingType="multi-dot"
               key={`week-calendar-${currentDate}`}
+              theme={getTheme()}
             />
           ) : (
             <ExpandableCalendar
@@ -130,8 +134,9 @@ const HomeScreen = React.memo(() => {
               initialDate={currentDate}
               markedDates={markedDatesS}
               markingType="multi-dot"
-              key={`expand-calendar-${currentDate}`}
+              key={`expand-calendar-${getCurrentTime()}`}
               theme={getTheme()}
+              keyExtractor={(item, index) => `${item}-index-${index}`}
             />
           )}
 
