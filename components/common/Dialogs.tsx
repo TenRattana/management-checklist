@@ -16,7 +16,7 @@ const Dialogs: React.FC<DialogsProps> = ({
     data,
 }) => {
     const masterdataStyles = useMasterdataStyles();
-    const { fontSize } = useRes()
+    const { fontSize , responsive } = useRes()
     const handleOkPress = () => {
         handleDialog(actions, data);
         setIsVisible(false);
@@ -28,7 +28,7 @@ const Dialogs: React.FC<DialogsProps> = ({
                 <Dialog
                     visible={isVisible}
                     onDismiss={() => setIsVisible(false)}
-                    style={[{ width: '60%', alignSelf: 'center' }]}
+                    style={[{ width: responsive === "large" ? 800 :  '60%', alignSelf: 'center' }]}
                 >
                     <Dialog.Icon icon="alert" size={90} />
 

@@ -78,6 +78,7 @@ const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisib
         sectionView: {
             flexBasis: '70%',
             paddingLeft: 10,
+            minHeight:height / 2,
             maxHeight: height / 1.5,
         },
         divider: {

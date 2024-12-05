@@ -10,6 +10,7 @@ import { MachineDialogProps, InitialValuesMachine } from '@/typing/value'
 import { GroupMachine } from '@/typing/type'
 import Text from "@/components/Text";
 import { useTheme } from "@/app/contexts/useTheme";
+import { useRes } from "@/app/contexts/useRes";
 import QRCode from "react-native-qrcode-svg";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { Platform } from "react-native";
@@ -24,10 +25,11 @@ const validationSchema = Yup.object().shape({
 const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData, dropmachine, machineGroup = [] }: MachineDialogProps<InitialValuesMachine, GroupMachine>) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
+    const { responsive } = useRes()
 
     return (
         <Portal>
-            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={masterdataStyles.containerDialog} testID="dialog-md">
+            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={[masterdataStyles.containerDialog, { width: responsive === "large" ? 1000 : "80%" }]} testID="dialog-md">
                 <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]} testID="dialog-title-md">
                     {isEditing ? "Edit" : "Create"}
                 </Dialog.Title>
