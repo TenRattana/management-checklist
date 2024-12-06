@@ -255,7 +255,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                                                 <View id="form-active-md" style={[masterdataStyles.containerSwitch]}>
                                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginRight: 12 }]}>
-                                                            Type Schedule : {values.Custom ? "Every Day" : "Custom Day"}
+                                                            Type Schedule: {values.Custom ? "Every Year" : "One-time Year"}
                                                         </Text>
                                                         <Switch
                                                             style={{ transform: [{ scale: 1.1 }], top: 2 }}

@@ -6,8 +6,8 @@ import Animated, { Easing, Extrapolate, FadeInRight, FadeOutRight, interpolate, 
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { styles } from './Schedule';
 import { FormikErrors, FormikTouched } from 'formik';
-import { Day, TimeScheduleProps } from '@/app/screens/layouts/schedule/TimescheduleScreen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Day } from '@/typing/type';
 
 const hours = Array.from({ length: 24 }, (_, i) =>
     i.toString().padStart(2, '0') + ':00'

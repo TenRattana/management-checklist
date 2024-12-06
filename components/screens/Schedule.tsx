@@ -39,7 +39,6 @@ export const styles = StyleSheet.create({
   },
   timeIntervalMenu: {
     marginHorizontal: 5,
-    marginBottom: 10,
   },
   menuItem: {
     width: 200,

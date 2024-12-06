@@ -128,6 +128,11 @@ const TimescheduleScreen: React.FC = React.memo(() => {
     const tableData = useMemo(() => {
         return timeSchedule.map((item) => [
             item.ScheduleName,
+            // machineGroups.flatMap((v) =>
+            //     Array.isArray(item.MachineGroup)
+            //         ? item.MachineGroup.map(m => m === v.GMachineID ? v.GMachineName : null)
+            //         : []
+            // ).filter(name => name !== null).join(", "),
             item.Type_schedule,
             item.Tracking ? "track" : "not track",
             item.IsActive,
@@ -156,6 +161,7 @@ const TimescheduleScreen: React.FC = React.memo(() => {
         Tabledata: tableData,
         Tablehead: [
             { label: "Schedule Name", align: "flex-start" },
+            { label: "Group Machine", align: "flex-start" },
             { label: "Type", align: "center" },
             { label: "Tracking", align: "center" },
             { label: "Status", align: "center" },

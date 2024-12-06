@@ -4,7 +4,7 @@ import { Button, Menu, Icon } from 'react-native-paper';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { styles } from './Schedule';
 import InfoSchedule_dialog from './InfoSchedule_dialog';
-import { Day } from '@/app/screens/layouts/schedule/TimescheduleScreen';
+import { Day } from '@/typing/type';
 
 const Week = ["MonDay", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 

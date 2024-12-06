@@ -10,6 +10,7 @@ import { getCurrentTime } from '@/config/timezoneUtils';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import '@/styles/'
 import { FormikErrors, FormikTouched } from 'formik';
 
 interface Custom_scheduleProps {
@@ -211,6 +212,7 @@ const Custom_schedule_dialog = React.memo(({ showError, showSuccess, spacing, se
                         <Dialog
                             visible={isPickerVisible[index]?.[type]}
                             onDismiss={() => togglePicker(index, type, false)}
+                            style={{ width: 0, position: 'absolute', justifyContent: 'center', alignSelf: 'center', marginTop: -300 }}
                         >
                             <DatePicker
                                 selected={selectedDate ?? showDate}
