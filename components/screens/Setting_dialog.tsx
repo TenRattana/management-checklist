@@ -19,6 +19,7 @@ import {
     setPrefixMatchCheckListOption,
     setPrefixMatchFormMachine,
     setPrefixUsersPermission,
+    setPrefixTimeSchedule,
     setAppName
 } from "@/slices";
 import { useMutation, useQueryClient } from 'react-query';
@@ -78,7 +79,7 @@ const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisib
         sectionView: {
             flexBasis: '70%',
             paddingLeft: 10,
-            minHeight:height / 2,
+            minHeight: height / 2,
             maxHeight: height / 1.5,
         },
         divider: {
@@ -172,6 +173,8 @@ const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisib
             case 'UsersPermission':
                 dispatch(setPrefixUsersPermission({ UsersPermission: values[field] }));
                 break;
+            case 'TimeSchedule':
+                dispatch(setPrefixTimeSchedule({ TimeSchedule: values[field] }))
             default:
                 break;
         }

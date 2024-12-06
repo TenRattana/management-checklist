@@ -7,6 +7,7 @@ import { View, Text, StyleSheet } from "react-native";
 type DetailContentProps = {
     detailData: any[];
     isDetailVisible: boolean;
+    detailKey: any
 };
 
 const DetailContent = ({ detailData }: DetailContentProps) => {

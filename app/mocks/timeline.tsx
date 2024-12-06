@@ -7,7 +7,7 @@ import {
 
 import moment from "moment";
 import { useTheme } from "@/app/contexts/useTheme";
-import { point, Tracking } from '../screens/layouts/schedule/Mock';
+// import { point, Tracking } from '../screens/layouts/schedule/Mock';
 
 const today = getCurrentTime();
 
@@ -96,6 +96,12 @@ export type TimelineItem = {
     time: string;
     status: boolean;
 };
+export interface Tracking {
+    ScheduleID: string;
+    Tracking: boolean;
+    Status: boolean;
+    TrackingTime: Day[];
+}
 
 export interface TimeLine extends TimelineEventProps {
     ScheduleID: string;
@@ -129,31 +135,30 @@ export const convertScheduleToTimeline = (
     const endOfMonth = today.clone().endOf("month");
     const timeline: TimeLine[] = [];
     const markedDates: MarkedDates = {};
-    const { theme } = useTheme();
 
     const getColorForType = (type: string) => {
         switch (type) {
             case "Weekly":
-                return theme.colors.drag;
+                return CustomLightTheme.drag;
             case "Daily":
-                return theme.colors.green;
+                return CustomLightTheme.green;
             case "Custom":
-                return theme.colors.error;
+                return CustomLightTheme.error;
             default:
-                return theme.colors.text;
+                return CustomLightTheme.text;
         }
     };
 
     const getSelectedColorForType = (type: string) => {
         switch (type) {
             case "Weekly":
-                return theme.colors.accent;
+                return CustomLightTheme.accent;
             case "Daily":
-                return theme.colors.primary;
+                return CustomLightTheme.primary;
             case "Custom":
-                return theme.colors.error;
+                return CustomLightTheme.error;
             default:
-                return theme.colors.green;
+                return CustomLightTheme.green;
         }
     };
 
@@ -192,7 +197,7 @@ export const convertScheduleToTimeline = (
                     start,
                     end,
                     summary: `${date} (${time})`,
-                    color: theme.colors.surface,
+                    color: CustomLightTheme.surface,
                     type: "Weekly",
                     status: status,
                     statustype: status && intime ? "running" : status && (now.toISOString() > end) ? "end" : status ? "wait" : "stop",
@@ -245,7 +250,7 @@ export const convertScheduleToTimeline = (
                     start,
                     end,
                     summary: `${date} (${time})`,
-                    color: theme.colors.accent,
+                    color: CustomLightTheme.accent,
                     type: "Daily",
                     status: status,
                     statustype: status && intime ? "running" : status && (now.toISOString() > end) ? "end" : status ? "wait" : "stop"
@@ -304,7 +309,7 @@ export const convertScheduleToTimeline = (
                     start,
                     end,
                     summary: `${date} (${time})`,
-                    color: theme.colors.yellow,
+                    color: CustomLightTheme.yellow,
                     type: "Custom",
                     status: status,
                     statustype: status && intime ? "running" : status && (now.toISOString() > end) ? "end" : status ? "wait" : "stop"
@@ -333,6 +338,7 @@ export const convertScheduleToTimeline = (
 };
 
 import { useRes } from '../contexts/useRes';
+import { CustomLightTheme } from '@/constants/CustomColor';
 
 export function getTheme() {
     const { theme } = useTheme()

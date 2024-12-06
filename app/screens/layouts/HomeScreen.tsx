@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   ExpandableCalendar,
   CalendarProvider,
@@ -11,63 +11,68 @@ import { useTheme } from '@/app/contexts/useTheme';
 import { convertScheduleToTimeline, getDate, getTheme, parseTimeScheduleToTimeline } from '@/app/mocks/timeline';
 import CustomTable from '@/components/Customtable';
 import { groupBy } from 'lodash';
-import { timeSchedule } from './schedule/Mock';
-import { AccessibleView } from '@/components';
+import { AccessibleView, Customtable, LoadingSpinner } from '@/components';
 import { useRes } from '@/app/contexts/useRes';
 import useMasterdataStyles from '@/styles/common/masterdata';
-import { formatTime, getCurrentTime } from '@/config/timezoneUtils';
-import { Clock } from '@/components/common/Clock';
+import { formatTime } from '@/config/timezoneUtils';
+import { TimeScheduleProps } from '@/typing/type';
+import axiosInstance from '@/config/axios';
+import { useQuery } from 'react-query';
+
+const fetchTimeSchedules = async (): Promise<TimeScheduleProps[]> => {
+  const response = await axiosInstance.post("TimeSchedule_service.asmx/GetSchedules");
+  return response.data.data ?? [];
+};
 
 const HomeScreen = React.memo(() => {
   const { theme } = useTheme();
   const { spacing, fontSize } = useRes()
   const [currentDate, setCurrentDate] = useState<string>(getDate());
-  const [isWeekView, setIsWeekView] = useState(false);
+  const [isWeekView, setIsWeekView] = useState(true);
   const masterdataStyles = useMasterdataStyles();
 
-  const timelineItems = parseTimeScheduleToTimeline(timeSchedule);
-  const { markedDates, timeline } = convertScheduleToTimeline(timelineItems);
+  const { data: timeSchedule = [], isLoading } = useQuery<TimeScheduleProps[], Error>(
+    'timeSchedule',
+    fetchTimeSchedules,
+    { refetchOnWindowFocus: true }
+  );
+
+  const timelineItems = useMemo(() => parseTimeScheduleToTimeline(timeSchedule), [timeSchedule, parseTimeScheduleToTimeline])
+
+  const { markedDates, timeline } = useMemo(() => convertScheduleToTimeline(timelineItems), [timelineItems, convertScheduleToTimeline])
 
   const eventsByDate = useMemo(
-    () => groupBy(timeline, (e) => CalendarUtils.getCalendarDateString(e.start)), []
+    () => groupBy(timeline, (e) => CalendarUtils.getCalendarDateString(e.start)),
+    [timeline]
   );
 
-  const filteredEvents = useMemo(
-    () => eventsByDate[currentDate] || [],
-    [eventsByDate, currentDate]
-  );
+  const filteredEvents = eventsByDate[currentDate] || [];
 
-  // const time = useMemo(() => Clock(), [Clock])
+  const tableData = filteredEvents.map((item) => [
+    item.title,
+    formatTime(item.start),
+    formatTime(item.end),
+    item.summary || "",
+    item.statustype,
+  ]);
 
-  const tableData = useMemo(() => {
-    return filteredEvents.map((item) => [
-      item.title,
-      formatTime(item.start),
-      formatTime(item.end),
-      item.summary || "",
-      item.statustype
-    ]);
-  }, [filteredEvents]);
-
-  const customtableProps = useMemo(() => {
-    return {
-      Tabledata: tableData,
-      Tablehead: [
-        { label: "Event Title", align: "flex-start" },
-        { label: "Start", align: "flex-start" },
-        { label: "End", align: "flex-start" },
-        { label: "Detail", align: "flex-start" },
-        { label: "Status", align: "center" },
-      ],
-      flexArr: [2, 2, 2, 3, 1],
-      actionIndex: [{}],
-      showMessage: 2,
-      searchQuery: " ",
-      showFilter: true,
-      showData: filteredEvents,
-      showColumn: "statustype",
-    };
-  }, [tableData, filteredEvents]);
+  const customtableProps = {
+    Tabledata: tableData,
+    Tablehead: [
+      { label: "Event Title", align: "flex-start" },
+      { label: "Start", align: "flex-start" },
+      { label: "End", align: "flex-start" },
+      { label: "Detail", align: "flex-start" },
+      { label: "Status", align: "center" },
+    ],
+    flexArr: [2, 2, 2, 3, 1],
+    actionIndex: [{}],
+    showMessage: 2,
+    searchQuery: " ",
+    showFilter: true,
+    showData: filteredEvents,
+    showColumn: "statustype",
+  };
 
   const styles = StyleSheet.create({
     container: {
@@ -92,6 +97,7 @@ const HomeScreen = React.memo(() => {
       height: 100,
     },
     cardcontent: {
+      marginTop: 3,
       padding: 2,
       flex: 1
     },
@@ -107,17 +113,22 @@ const HomeScreen = React.memo(() => {
       ...markedDates,
       [currentDate]: { selected: true, selectedColor: theme.colors.drag, selectedTextColor: theme.colors.fff },
     };
-  }, [currentDate]);
+  }, [currentDate, markedDates]);
 
+  ExpandableCalendar.defaultProps = undefined
+
+  const handleDateChange = useCallback((date: string) => {
+    setCurrentDate(date);
+  }, []);
 
   return (
     <AccessibleView name="container-home" style={styles.container}>
       <Card.Title
-        title={`List  `}
+        title={`Schedule`}
         titleStyle={[masterdataStyles.textBold, styles.header]}
       />
 
-      <CalendarProvider date={currentDate} key={`calendar-${currentDate}`} onDateChanged={setCurrentDate} theme={getTheme()} >
+      <CalendarProvider date={currentDate} key={`calendar-${currentDate}`} onDateChanged={handleDateChange} theme={getTheme()}>
         <View style={styles.calendarContainer} key={`calendar-view-${currentDate}`}>
           {isWeekView ? (
             <WeekCalendar
@@ -134,9 +145,13 @@ const HomeScreen = React.memo(() => {
               initialDate={currentDate}
               markedDates={markedDatesS}
               markingType="multi-dot"
-              key={`expand-calendar-${getCurrentTime()}`}
               theme={getTheme()}
-              keyExtractor={(item, index) => `${item}-index-${index}`}
+              animateScroll
+              showsVerticalScrollIndicator={false}
+              initialNumToRender={10}
+              removeClippedSubviews={true}
+              maxToRenderPerBatch={5}
+              windowSize={5}
             />
           )}
 
@@ -153,15 +168,7 @@ const HomeScreen = React.memo(() => {
         </View>
 
         <Card.Content style={styles.cardcontent}>
-          {filteredEvents.length > 0 ? (
-            <CustomTable {...customtableProps} />
-          ) : (
-            <View style={styles.noEventContainer} key={`view-nodata`}>
-              <Text style={[masterdataStyles.text, { color: theme.colors.text }]}>
-                No events available for this date.
-              </Text>
-            </View>
-          )}
+          {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
         </Card.Content>
       </CalendarProvider>
     </AccessibleView>

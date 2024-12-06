@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useRef, useCallback, useEffect, useState, useMemo } from 'react';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import {
     HomeScreen,
@@ -134,7 +134,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
         });
 
         return screens;
-    }, [user.IsAuthenticated, user.Screen, renderComponent]);
+    }, [user.IsAuthenticated, user.Screen, renderComponent, user.loadgin]);
 
     return (
         <SafeAreaView style={{ flex: 1 }}>

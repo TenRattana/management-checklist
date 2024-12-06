@@ -29,6 +29,7 @@ interface User {
     Screen: { name: string }[];
     Permissions: string[];
     initialRoute?: string;
+    loadgin: boolean;
 }
 
 export interface UserPayload {
@@ -50,7 +51,8 @@ const initialState: User = {
     IsAuthenticated: false,
     Screen: [],
     Permissions: [],
-    initialRoute: ""
+    initialRoute: "",
+    loadgin: false
 };
 
 const middlewareStore = createSlice({
@@ -79,6 +81,7 @@ const middlewareStore = createSlice({
             })
             .addCase(fetchMenu.fulfilled, (state, action) => {
                 state.Screen = action.payload;
+                state.loadgin = true
             })
             .addCase(fetchMenu.rejected, (state) => {
                 state.Screen = [];

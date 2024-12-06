@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Dimensions } from 'react-native';
 import { Button, Dialog, Portal, Menu, Switch, HelperText } from 'react-native-paper';
 import { Inputs } from '../common';
-import { GroupMachine } from '@/typing/type';
+import { GroupMachine, TimeScheduleProps } from '@/typing/type';
 import { useToast } from '@/app/contexts/useToast';
 import { FastField, Formik } from 'formik';
 import * as Yup from 'yup'
@@ -15,7 +15,6 @@ import { convertToDate, styles } from './Schedule';
 import Custom_schedule_dialog from './Custom_schedule_dialog';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { Easing, FadeInLeft, FadeInRight, FadeOutLeft, FadeOutRight } from 'react-native-reanimated';
-import { TimeScheduleProps } from '@/app/screens/layouts/schedule/TimescheduleScreen';
 import CustomDropdownMultiple from '../CustomDropdownMultiple';
 
 const { height } = Dimensions.get('window');
@@ -49,10 +48,11 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
     const [showTimeIntervalMenu, setShowTimeIntervalMenu] = useState<{ Custom: boolean, time: boolean, week: boolean }>({ Custom: false, time: false, week: false });
     const masterdataStyles = useMasterdataStyles();
 
-
     const validationSchema = Yup.object().shape({
         ScheduleName: Yup.string().required('Schedule name field is required.'),
-        MachineGroup: Yup.string().nullable(),
+        MachineGroup: Yup.array()
+            .of(Yup.string())
+            .min(1, "The group machine list field requires at least one option to be selected"),
         Type_schedule: Yup.string().required('Type schedule field is required.'),
         Custom: Yup.boolean().typeError('Custom schedule field is type true or false').required('Custom schedule field is required.'),
         TimeSlots: Yup.array().of(
@@ -121,7 +121,11 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                     validationSchema={validationSchema}
                     validateOnBlur={true}
                     validateOnChange={false}
-                    onSubmit={(values) => saveData(values)}
+                    onSubmit={(values, formikHelpers) => {
+                        saveData(values);
+                        formikHelpers.resetForm();
+                        setIsVisible(false);
+                    }}
                     enableReinitialize={true}
                 >
                     {({ values, handleSubmit, setFieldValue, dirty, isValid, errors, touched, setFieldTouched, resetForm }) => {
@@ -187,6 +191,23 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                                                         value={values.Tracking}
                                                         onValueChange={(v: boolean) => { setFieldValue('Tracking', v) }}
                                                         testID="point-md"
+                                                    />
+                                                </View>
+                                            </View>
+                                        </View>
+
+                                        <View style={[styles.timeIntervalMenu, { marginBottom: 0 }]}>
+                                            <View id="form-active-active-md" style={[masterdataStyles.containerSwitch]}>
+                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginRight: 12 }]}>
+                                                        Status : {values.IsActive ? "Active" : "In active"}
+                                                    </Text>
+                                                    <Switch
+                                                        style={{ transform: [{ scale: 1.1 }], top: 2 }}
+                                                        color={values.IsActive ? theme.colors.inversePrimary : theme.colors.onPrimaryContainer}
+                                                        value={values.IsActive}
+                                                        onValueChange={(v: boolean) => { setFieldValue('IsActive', v) }}
+                                                        testID="active-md"
                                                     />
                                                 </View>
                                             </View>
@@ -334,7 +355,10 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                                     }}>Cancel</Button>
                                     <Button
                                         disabled={!isValid || !dirty}
-                                        onPress={() => handleSubmit()}>Save</Button>
+                                        onPress={() => {
+                                            handleSubmit();
+
+                                        }}>Save</Button>
                                 </View>
 
                             </Dialog>

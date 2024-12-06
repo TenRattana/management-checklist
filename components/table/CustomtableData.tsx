@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FlatList, View } from "react-native";
 import { DataTable } from "react-native-paper";
 import Text from "../Text";
@@ -38,7 +38,6 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
         setDialogMessage(String(`${messages}`));
         setIsVisible((visible || action === "editIndex" || action === "changeIndex" || action === "copyIndex" || action === "preIndex"));
     }, [setDialogAction, setDialogData, setDialogTitle, setDialogMessage, setIsVisible, showMessage]);
-
 
     const findIndex = (row: (string | number | boolean)[]) => {
         return detailData?.findIndex(item => {
@@ -142,10 +141,10 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                     })}
                 </DataTable.Row>
 
-                {isDetailVisible[findIndex(row)] && detailKey?.some(key => detailData?.[findIndex(row)]?.hasOwnProperty(key)) && (
+                {isDetailVisible[findIndex(row)] && (
                     <AccessibleView name="containerdetail" key={`index-${findIndex(row)}`}>
                         <Animated.View entering={FadeInUp} exiting={FadeOutDown} >
-                            <DetailContent detailData={detailData?.[findIndex(row)] || []} isDetailVisible={isDetailVisible[findIndex(row)]} />
+                            <DetailContent detailData={detailData?.[findIndex(row)] || []} isDetailVisible={isDetailVisible[findIndex(row)]} detailKey={detailKey} />
                         </Animated.View>
                     </AccessibleView>
                 )}
@@ -156,7 +155,7 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
     return (
         <>
             <FlatList
-                data={displayData.length > 0 ? displayData : []}
+                data={displayData}
                 renderItem={({ item, index }) => renderTableData(item, index)}
                 keyExtractor={(item, index) => `key-${index}`}
                 ListEmptyComponent={() => (
@@ -167,10 +166,11 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                 contentContainerStyle={{ flexGrow: 1 }}
                 nestedScrollEnabled={true}
                 showsVerticalScrollIndicator={false}
-                initialNumToRender={10}
+                initialNumToRender={20}
                 removeClippedSubviews={true}
-                maxToRenderPerBatch={5}
-                windowSize={5}
+                maxToRenderPerBatch={20}
+                windowSize={10}
+                onEndReachedThreshold={0.5}
             />
 
             <Dialogs

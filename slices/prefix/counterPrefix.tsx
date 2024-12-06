@@ -14,7 +14,8 @@ const initialState: AppProps = {
     Form: "",
     SubForm: "",
     ExpectedResult: "",
-    UsersPermission: ""
+    UsersPermission: "",
+    TimeSchedule: "",
 };
 
 const prefixSlice = createSlice({
@@ -37,6 +38,7 @@ const prefixSlice = createSlice({
             state.SubForm = App.SubForm
             state.ExpectedResult = App.ExpectedResult
             state.UsersPermission = App.UsersPermission
+            state.TimeSchedule = App.TimeSchedule
         },
         setAppName: (state, action: PayloadAction<{ AppName: string }>) => {
             const { AppName } = action.payload
@@ -98,8 +100,12 @@ const prefixSlice = createSlice({
 
             state.UsersPermission = UsersPermission;
         },
-    },
+        setPrefixTimeSchedule: (state, action: PayloadAction<{ TimeSchedule: string }>) => {
+            const { TimeSchedule } = action.payload;
 
+            state.TimeSchedule = TimeSchedule;
+        },
+    },
 });
 
 export const {
@@ -115,7 +121,8 @@ export const {
     setPrefixMachine,
     setPrefixMatchCheckListOption,
     setPrefixMatchFormMachine,
-    setPrefixUsersPermission
+    setPrefixUsersPermission,
+    setPrefixTimeSchedule
 } = prefixSlice.actions;
 
 export default prefixSlice.reducer;

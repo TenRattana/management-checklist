@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import { StyleSheet } from 'react-native';
 import { AccessibleView, ConfigItem, Text } from '@/components';
 import useMasterdataStyles from '@/styles/common/masterdata';
@@ -53,7 +53,7 @@ const Configuration: React.FC<ConfigurationProps> = React.memo(({ prefix, handle
 
             <AccessibleView name="setting-mode" style={[masterdataStyles.configPrefix]}>
                 <Text style={[masterdataStyles.settingText, masterdataStyles.textBold]}>Fix Prefixes</Text>
-                {['GroupMachine', 'Machine', 'CheckList', 'GroupCheckList', 'CheckListOption', 'MatchCheckListOption', 'MatchFormMachine', 'Form', 'SubForm', 'ExpectedResult', 'UsersPermission'].map((item) => (
+                {['GroupMachine', 'Machine', 'CheckList', 'GroupCheckList', 'CheckListOption', 'MatchCheckListOption', 'MatchFormMachine', 'Form', 'SubForm', 'ExpectedResult', 'UsersPermission', "TimeSchedule"].map((item) => (
                     <React.Fragment key={item}>
                         <ConfigItem
                             state={state}

@@ -35,6 +35,23 @@ export interface TimeSchedule {
   Machine?: { MachineID: string; MachineName: string }[];
   TimeDetail?: TimeDetail[];
 }
+export interface TimeScheduleProps {
+    ScheduleID: string;
+    ScheduleName: string;
+    MachineGroup?: string | string[];
+    Type_schedule: string;
+    Tracking: boolean;
+    IsActive: boolean;
+    Custom: boolean;
+    TimeSlots?: Day[];
+    TimeCustom?: Day[];
+    TimeWeek?: { [key: string]: Day[] };
+}
+
+export interface Day {
+    start: string | null;
+    end: string | null;
+}
 export interface CheckListType {
   CTypeID: string;
   CTypeName: string;
@@ -141,6 +158,7 @@ export interface Prefixs {
   SubForm: string;
   ExpectedResult: string;
   UsersPermission: string;
+  TimeSchedule:string;
 }
 
 export interface AppProps extends Prefixs {

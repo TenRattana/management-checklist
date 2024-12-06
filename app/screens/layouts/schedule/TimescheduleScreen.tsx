@@ -6,14 +6,13 @@ import { useToast } from "@/app/contexts/useToast";
 import { AccessibleView, Customtable, LoadingSpinner, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { GroupMachine, TimeSchedule } from '@/typing/type';
-import { useQuery, useQueryClient } from 'react-query';
+import { GroupMachine, TimeScheduleProps } from '@/typing/type';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useSelector } from "react-redux";
 import ScheduleDialog from "@/components/screens/Schedule_dialog";
-import { timeSchedule } from "./Mock";
 
-const fetchTimeSchedules = async (): Promise<TimeSchedule[]> => {
-    const response = await axiosInstance.post("TimeSchedule_service.asmx/GetTimeSchedules");
+const fetchTimeSchedules = async (): Promise<TimeScheduleProps[]> => {
+    const response = await axiosInstance.post("TimeSchedule_service.asmx/GetSchedules");
     return response.data.data ?? [];
 };
 
@@ -22,23 +21,11 @@ const fetchMachineGroups = async (): Promise<GroupMachine[]> => {
     return response.data.data ?? [];
 };
 
-export interface TimeScheduleProps {
-    ScheduleID: string;
-    ScheduleName: string;
-    MachineGroup?: string | string[];
-    Type_schedule: string;
-    Tracking: boolean;
-    IsActive: boolean;
-    Custom: boolean;
-    TimeSlots?: Day[];
-    TimeCustom?: Day[];
-    TimeWeek?: { [key: string]: Day[] };
-}
+const saveTimeSchedule = async (data: { Prefix: any; Schedule: string; }): Promise<{ message: string }> => {
+    const response = await axiosInstance.post("TimeSchedule_service.asmx/SaveSchedule", data);
+    return response.data;
+};
 
-export interface Day {
-    start: string | null;
-    end: string | null;
-}
 
 const TimescheduleScreen: React.FC = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -72,13 +59,23 @@ const TimescheduleScreen: React.FC = React.memo(() => {
         }
     );
 
-    // const { data: timeSchedule = [], isLoading, } = useQuery<TimeSchedule[], Error>(
-    //     'timeSchedule',
-    //     fetchTimeSchedules,
-    //     {
-    //         refetchOnWindowFocus: true,
-    //     }
-    // );
+    const { data: timeSchedule = [], isLoading, } = useQuery<TimeScheduleProps[], Error>(
+        'timeSchedule',
+        fetchTimeSchedules,
+        {
+            refetchOnWindowFocus: true,
+        }
+    );
+
+    const mutation = useMutation(saveTimeSchedule, {
+        onSuccess: (data) => {
+            showSuccess(data.message);
+            setIsVisible(false)
+            queryClient.invalidateQueries('timeSchedule');
+            queryClient.refetchQueries('machineGroups');
+        },
+        onError: handleError,
+    });
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -89,25 +86,39 @@ const TimescheduleScreen: React.FC = React.memo(() => {
         };
     }, [searchQuery]);
 
-    const saveData = useCallback(async (values: any) => {
-        console.log(values);
-
-    }, [state]);
+    const saveData = useCallback(async (values: TimeScheduleProps) => {
+        const data = {
+            Prefix: state.TimeSchedule ?? "",
+            Schedule: JSON.stringify(values)
+        };
+        mutation.mutate(data);
+    }, [mutation, state]);
 
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
             if (action === "editIndex") {
-                // const response = await axiosInstance.post("TimeSchedule_service.asmx/GetTimeSchedule", { TScheduleID: item });
-                setInitialValues(timeSchedule[timeSchedule.findIndex((v) => v.ScheduleID === item)])
+                const response = await axiosInstance.post("TimeSchedule_service.asmx/GetSchedule", { ScheduleID: item });
+                const timeschedule = response.data.data[0] ?? [];
+                setInitialValues({
+                    ScheduleID: timeschedule.ScheduleID ?? "",
+                    ScheduleName: timeschedule.ScheduleName ?? "",
+                    IsActive: timeschedule.IsActive ?? "",
+                    MachineGroup: timeschedule.MachineGroup ?? "",
+                    Type_schedule: timeschedule.Type_schedule ?? "",
+                    Tracking: Boolean(timeschedule.Tracking),
+                    Custom: Boolean(timeschedule.Custom),
+                    TimeSlots: timeschedule.TimeSlots ?? [],
+                    TimeCustom: timeschedule.TimeCustom ?? [],
+                    TimeWeek: timeschedule.TimeWeek ?? {}
+                })
 
                 setIsEditing(true);
                 setIsVisible(true);
             } else {
-                const endpoint = action === "activeIndex" ? "ChangeMachine" : "DeleteMachine";
-                const response = await axiosInstance.post(`Machine_service.asmx/${endpoint}`, { MachineID: item });
+                const endpoint = action === "activeIndex" ? "PointTimeSchedules" : "DeleteTimeSchedule";
+                const response = await axiosInstance.post(`TimeSchedule_service.asmx/${endpoint}`, { ScheduleID: item });
                 showSuccess(String(response.data.message));
-                queryClient.invalidateQueries('machines');
-                queryClient.refetchQueries('machineGroups');
+                queryClient.invalidateQueries('timeSchedule');
             }
         } catch (error) {
             handleError(error);
@@ -196,11 +207,7 @@ const TimescheduleScreen: React.FC = React.memo(() => {
                 </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-
-                <Customtable {...CustomtableProps} />
-
-                {/* {false ? <LoadingSpinner /> : 
-                } */}
+                {isLoading ? <LoadingSpinner /> : <Customtable {...CustomtableProps} />}
             </Card.Content>
 
             <ScheduleDialog
