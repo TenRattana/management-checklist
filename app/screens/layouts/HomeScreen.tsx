@@ -81,8 +81,8 @@ const HomeScreen = () => {
   const filteredEvents = useMemo(() => {
     const events = eventsByDate[currentDate] || [];
     if (filterStatus === 'all') return events;
-
-    return events.filter(event => event.statustype === filterStatus);
+  
+    return events?.filter(event => event.statustype === filterStatus);
   }, [eventsByDate, currentDate, filterStatus]);
 
   const markedDatesS = useMemo(() => {
@@ -145,7 +145,7 @@ const HomeScreen = () => {
   };
 
   const eventsByDateS = useMemo(() => {
-    const filteredEvents = eventsByDate[currentDate].filter(event => event.statustype === filterStatus);
+    const filteredEvents = eventsByDate[currentDate]?.filter(event => event.statustype === filterStatus);
 
     const groupedEvents = groupBy(filteredEvents, (event) => {
       if (event.start && typeof event.start === 'string') {
@@ -155,8 +155,11 @@ const HomeScreen = () => {
       return 'invalid_date';
     });
 
+    
     return groupedEvents;
   }, [timeSchedule, filterStatus, currentDate]);
+
+  console.log(eventsByDateS);
 
   return (
     <CalendarProvider
