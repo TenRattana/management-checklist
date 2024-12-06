@@ -21,6 +21,7 @@
     "components/**/*",
     "hooks/**/*",
     "styles/**/*",
+    "styles/Datapicker.css",
     "typing/*.d.ts",
     "config/axios.tsx",
     ".expo/types/**/*.ts",
