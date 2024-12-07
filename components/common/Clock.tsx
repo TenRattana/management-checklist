@@ -8,7 +8,7 @@ export function Clock(): string {
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
     const updateTime = () => {
-        const currentTime = moment().tz(DEFAULT_TIMEZONE).format("YYYY-MM-DD HH:mm:ss");
+        const currentTime = moment().tz(DEFAULT_TIMEZONE).format("HH:mm:ss");
         setTime(currentTime);
     };
 

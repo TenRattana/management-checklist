@@ -194,6 +194,15 @@ export interface Permissions {
   Description: string;
   IsActive: boolean;
 }
+export interface TimeScheduleMachine{
+  MachineName:string;
+  Area?:string;
+  Building?:string;
+  Floor?:string;
+  MachineCode?:string;
+  FormName:string;
+  IsActive:boolean;
+}
 
 export type ComponentNames =
   | "Create_form"

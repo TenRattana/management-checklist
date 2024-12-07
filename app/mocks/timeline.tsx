@@ -152,13 +152,13 @@ export const convertScheduleToTimeline = (
     const getSelectedColorForType = (type: string) => {
         switch (type) {
             case "Weekly":
-                return CustomLightTheme.accent;
+                return '#f2f2f2';
             case "Daily":
-                return CustomLightTheme.primary;
+                return '#f4f4f4';
             case "Custom":
-                return CustomLightTheme.error;
+                return '#f6f6f6';
             default:
-                return CustomLightTheme.green;
+                return '#f8f8f8';
         }
     };
 
@@ -197,7 +197,7 @@ export const convertScheduleToTimeline = (
                     start,
                     end,
                     summary: `${date} (${time})`,
-                    color: CustomLightTheme.surface,
+                    color: '#00b42e',
                     type: "Weekly",
                     status: status,
                     statustype: status && intime ? "running" : status && (now.toISOString() > end) ? "end" : status ? "wait" : "stop",
@@ -250,7 +250,7 @@ export const convertScheduleToTimeline = (
                     start,
                     end,
                     summary: `${date} (${time})`,
-                    color: CustomLightTheme.accent,
+                    color: '#001bb4',
                     type: "Daily",
                     status: status,
                     statustype: status && intime ? "running" : status && (now.toISOString() > end) ? "end" : status ? "wait" : "stop"
@@ -309,7 +309,7 @@ export const convertScheduleToTimeline = (
                     start,
                     end,
                     summary: `${date} (${time})`,
-                    color: CustomLightTheme.yellow,
+                    color: '#be3a00',
                     type: "Custom",
                     status: status,
                     statustype: status && intime ? "running" : status && (now.toISOString() > end) ? "end" : status ? "wait" : "stop"
@@ -337,31 +337,4 @@ export const convertScheduleToTimeline = (
     return { timeline, markedDates };
 };
 
-import { useRes } from '../contexts/useRes';
 import { CustomLightTheme } from '@/constants/CustomColor';
-
-export function getTheme() {
-    const { theme } = useTheme()
-    const { spacing } = useRes();
-    return {
-        calendarBackground: theme.colors.background,
-        // month
-        textMonthFontFamily: 'Poppins',
-        monthTextColor: theme.colors.onBackground,
-        textMonthFontSize: spacing.medium,
-        // day names
-        textSectionTitleColor: theme.colors.onBackground,
-        textDayHeaderFontFamily: 'Poppins',
-        textDayHeaderFontSize: spacing.small,
-        // dates
-        dayTextColor: theme.colors.onBackground,
-        textDayFontFamily: 'Poppins',
-        todayTextColor: theme.colors.onBackground,
-        textDayFontSize: spacing.small,
-        // selected date
-        selectedDayTextColor: theme.colors.blue,
-        // disabled date
-        textDisabledColor: theme.colors.drag,
-        // dot (marked date)
-    };
-}

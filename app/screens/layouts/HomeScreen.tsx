@@ -1,67 +1,69 @@
 import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
-import { convertScheduleToTimeline, getDate, getTheme, parseTimeScheduleToTimeline, TimeLine } from '@/app/mocks/timeline';
-import { Customtable, LoadingSpinner } from '@/components';
+import { convertScheduleToTimeline, getDate, parseTimeScheduleToTimeline } from '@/app/mocks/timeline';
+import { AccessibleView, Customtable, LoadingSpinner } from '@/components';
+import { Clock } from '@/components/common/Clock';
+import Home_dialog from '@/components/screens/Home_dialog';
 import axiosInstance from '@/config/axios';
-import { formatTime } from '@/config/timezoneUtils';
+import { formatTime, getCurrentTime } from '@/config/timezoneUtils';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { TimeScheduleProps } from '@/typing/type';
 import { groupBy } from 'lodash';
-import React, { useMemo, useState } from 'react';
-import { View, StyleSheet, Text, ScrollView, TouchableOpacity } from 'react-native';
+import moment from 'moment-timezone';
+import React, { useCallback, useMemo, useState } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { Calendar, CalendarProvider, CalendarUtils, DateData, Timeline, TimelineList, TimelineListRenderItemInfo, TimelineProps } from 'react-native-calendars';
-import { Card } from 'react-native-paper';
+import { Theme } from 'react-native-calendars/src/types';
+import { Card, Icon, IconButton } from 'react-native-paper';
+import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated';
 import { useQuery } from 'react-query';
-
-interface EventItem {
-  start: string;
-  end: string;
-  title: string;
-  summary: string;
-  color?: string;
-  statustype: 'end' | 'running' | 'wait'; // Added status type
-}
 
 const fetchTimeSchedules = async (): Promise<TimeScheduleProps[]> => {
   const response = await axiosInstance.post("TimeSchedule_service.asmx/GetSchedules");
   return response.data.data ?? [];
 };
 
-const Render = ({ item }: any) => {
+FadeIn.duration(300).easing(Easing.out(Easing.ease))
+FadeOut.duration(300).easing(Easing.out(Easing.ease))
+
+const RenderEvent = ({ event }: { event: any }) => {
   const masterdataStyles = useMasterdataStyles();
 
   const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      flexDirection: 'row',
-      flexBasis: 300
-    },
-    eventBlock: {
+      padding: 10,
       borderRadius: 8,
-      padding: 12,
-      marginBottom: 8,
-      marginHorizontal: 8,
-      width: '100%',
-      alignItems: 'flex-start',
-      justifyContent: 'center',
+      width: event?.width ?? 100,
+      height: event?.height ?? 50,
+      marginVertical: 4,
+    },
+    title: {
+      color: masterdataStyles.textFFF.color,
+      fontWeight: 'bold',
     },
   });
 
   return (
-    <View style={styles.eventBlock}>
-      <Text style={[masterdataStyles.text, masterdataStyles.textBold]}>{item.title}</Text>
-      <Text style={masterdataStyles.text}>
-        {formatTime(item.start, "HH:mm:ss")} - {formatTime(item.end, "HH:mm:ss")}
+    <View style={styles.container}>
+      <Text style={[masterdataStyles.text, masterdataStyles.textFFF, styles.title]}>{event?.title || 'Untitled Event'}</Text>
+
+      <Text style={[masterdataStyles.text, masterdataStyles.textFFF]}>
+        {`${formatTime(event?.start, 'HH:mm:ss')} - ${formatTime(event?.end, 'HH:mm:ss')}`}
       </Text>
-      <Text style={masterdataStyles.text}>{item.summary}</Text>
+      {event?.summary && <Text style={[masterdataStyles.text, masterdataStyles.textFFF]}>{event.summary}</Text>}
     </View>
   );
 }
 
 const HomeScreen = () => {
-  const { theme } = useTheme();
+  const { theme, darkMode } = useTheme();
+  const { responsive, spacing } = useRes();
   const [currentDate, setCurrentDate] = useState<string>(getDate());
   const [filterStatus, setFilterStatus] = useState<'all' | 'end' | 'running' | 'wait' | 'stop'>('all');
+  const [showCalendar, setShowCalendar] = useState<boolean>(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const masterdataStyles = useMasterdataStyles()
 
   const { data: timeSchedule = [], isLoading } = useQuery<TimeScheduleProps[], Error>(
     'timeSchedule',
@@ -81,7 +83,7 @@ const HomeScreen = () => {
   const filteredEvents = useMemo(() => {
     const events = eventsByDate[currentDate] || [];
     if (filterStatus === 'all') return events;
-  
+
     return events?.filter(event => event.statustype === filterStatus);
   }, [eventsByDate, currentDate, filterStatus]);
 
@@ -92,37 +94,9 @@ const HomeScreen = () => {
     };
   }, [currentDate, markedDates]);
 
-  const timelineProps = {
-    format24h: true,
-    overlapEventsSpacing: 8,
-    scrollToNow: true,
-    rightEdgeSpacing: 24,
-  };
-
-  const customTheme = {
-    timelineContainer: {
-      maxWidth: 200,
-      width: '100%',
-      overflow: 'hidden',
-    },
-    contentStyle: {
-      maxWidth: 200,
-      flex: 1,
-    },
-    timelineListContainer: {
-      flexDirection: 'column',
-      paddingHorizontal: 10,
-      paddingTop: 10,
-    }
-  };
-
-  const renderItem = (timelineProps: TimelineProps, info: TimelineListRenderItemInfo) => {
-    return (
-      <Timeline
-        {...timelineProps}
-        renderEvent={(item) => <Render item={item} />}
-      />
-    );
+  const initialTime = {
+    hour: getCurrentTime().getHours(),
+    minutes: getCurrentTime().getMinutes(),
   };
 
   const tableData = filteredEvents.map((item) => [
@@ -138,133 +112,243 @@ const HomeScreen = () => {
       { label: "Detail", align: "flex-start" },
       { label: "Status", align: "center" },
     ],
-    flexArr: [2, 2, 2, 3, 1],
+    flexArr: [2, 3, 1],
     actionIndex: [{}],
     showMessage: 2,
     searchQuery: " ",
   };
 
   const eventsByDateS = useMemo(() => {
-    const filteredEvents = eventsByDate[currentDate]?.filter(event => event.statustype === filterStatus);
+    const filteredEvents = eventsByDate[currentDate]?.filter(event =>
+      filterStatus === "all" || event.statustype === filterStatus
+    ) || [];
 
     const groupedEvents = groupBy(filteredEvents, (event) => {
       if (event.start && typeof event.start === 'string') {
-        const datePart = event.start.split('T')[0];
+        const datePart = moment(event.start).format('YYYY-MM-DD');
         return datePart;
       }
       return 'invalid_date';
     });
 
-    
     return groupedEvents;
   }, [timeSchedule, filterStatus, currentDate]);
 
-  console.log(eventsByDateS);
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      flexDirection: 'row',
+    },
+    calendarContainer: {
+      width: responsive === "small" ? 0 : responsive === "medium" ? 300 : 450,
+      borderRightWidth: 1,
+      borderColor: '#eaeaea',
+      padding: 10,
+    },
+    calendar: {
+      borderRadius: 10,
+      padding: 10,
+    },
+    cardcontent: {
+      paddingTop: 10,
+      paddingBottom: 10,
+    },
+    timelineContainer: {
+      flex: 1,
+      padding: 10,
+    },
+    timelineListContainer: {
+      flex: 1,
+    },
+    filterContainer: {
+      flexDirection: 'row',
+      marginBottom: 10,
+    },
+    filterButton: {
+      color: theme.colors.blue,
+      fontSize: spacing.small,
+      marginHorizontal: 10,
+      marginTop: 10
+    },
+    filterButtonActive: {
+      color: theme.colors.field,
+      fontSize: spacing.medium,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.drag,
+      marginHorizontal: 10,
+      marginTop: 10,
+    },
+  });
+
+  const toggleSwitch = useCallback(() => {
+    setShowCalendar(!showCalendar);
+  }, [showCalendar]);
+
+  const handleEventClick = (event: any) => {
+    setSelectedEvent(event);
+    setDialogVisible(true);
+  };
+
+  const renderItem = (timelineProps: TimelineProps, info: TimelineListRenderItemInfo) => {
+    return (
+      <Timeline
+        {...timelineProps}
+        theme={getTheme()}
+        onEventPress={handleEventClick}
+        renderEvent={(event) => <RenderEvent event={event} />}
+      />
+    );
+  };
+
+  const hideDialog = () => setDialogVisible(false);
+
+  const timelineProps = useMemo(() => {
+    return {
+      format24h: true,
+      overlapEventsSpacing: 20,
+      rightEdgeSpacing: 50,
+      start: 0,
+      end: 24,
+      unavailableHours: [{ start: 0, end: getCurrentTime().getHours() }],
+      unavailableHoursColor: darkMode ? '#484848' : "#f0f0f0",
+      styles: {
+        contentStyle: {
+          backgroundColor: theme.colors.background,
+        },
+        timelineContainer: {
+          backgroundColor: theme.colors.background,
+          borderRadius: 8
+        },
+        event: {
+          backgroundColor: '#e3f2fd',
+          borderRadius: 8,
+          padding: 8,
+          margin: 4,
+        },
+        eventTitle: {
+          color: theme.colors.fff,
+          fontSize: spacing.small,
+          fontWeight: 'bold',
+        },
+        eventSummary: {
+          color: theme.colors.fff,
+          fontSize: spacing.small,
+        },
+        eventTimes: {
+          color: theme.colors.fff,
+          fontSize: spacing.small,
+        }
+      },
+    }
+  }, [])
+
+  function getTheme() {
+    return {
+      calendarBackground: theme.colors.background,
+
+      // month
+      textMonthFontFamily: 'Poppins',
+      monthTextColor: theme.colors.onBackground,
+      textMonthFontSize: spacing.medium,
+
+      // day names
+      textSectionTitleColor: theme.colors.onBackground,
+      textDayHeaderFontFamily: 'Poppins',
+      textDayHeaderFontSize: spacing.small,
+
+      // dates
+      dayTextColor: theme.colors.onBackground,
+      textDayFontFamily: 'Poppins',
+      todayTextColor: theme.colors.primary,
+      textDayFontSize: spacing.small,
+
+      // selected date
+      selectedDayTextColor: theme.colors.blue,
+      selectedDayBackgroundColor: theme.colors.primary,
+
+      // disabled date
+      textDisabledColor: theme.colors.drag,
+
+      // dot (marked dates)
+      dotColor: theme.colors.primary,
+      selectedDotColor: theme.colors.accent,
+    };
+  }
 
   return (
-    <CalendarProvider
-      date={currentDate}
-      onDateChanged={setCurrentDate}
-      showTodayButton
-      disabledOpacity={0.6}
-      theme={{ ...getTheme(), ...customTheme }}
-    >
-      <View style={styles.container}>
-        <View style={styles.calendarContainer}>
-          <Calendar
-            onDayPress={(day: DateData) => setCurrentDate(day.dateString)}
-            markedDates={markedDatesS}
-            markingType="multi-dot"
-            style={styles.calendar}
-          />
-          <Card.Content style={styles.cardcontent}>
-            {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
-          </Card.Content>
+    <AccessibleView name="container-Home" style={{ flex: 1 }}>
+      <CalendarProvider
+        date={currentDate}
+        onDateChanged={setCurrentDate}
+        disabledOpacity={0.6}
+        theme={getTheme()}
+      >
+        <View style={styles.container}>
+          {showCalendar && (
+            <Animated.View
+              entering={FadeIn}
+              exiting={FadeOut}
+            >
+              <View style={styles.calendarContainer}>
+                <Calendar
+                  onDayPress={(day: DateData) => setCurrentDate(day.dateString)}
+                  markedDates={markedDatesS}
+                  markingType="multi-dot"
+                  style={styles.calendar}
+                  theme={getTheme()}
+                />
+                <Card.Content style={styles.cardcontent}>
+                  {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+                </Card.Content>
+              </View>
+            </Animated.View>
+          )}
+
+          <View style={styles.timelineContainer}>
+            <TouchableOpacity onPress={toggleSwitch} style={{ flexDirection: 'row', alignItems: 'center', width: 100 }}>
+              <Icon source={!showCalendar ? "chevron-double-right" : "chevron-double-left"} size={spacing.large} color={theme.colors.drag} />
+              <Text style={[styles.filterButton, { alignSelf: 'center', marginVertical: 10, fontSize: spacing.small + 2 }]}>show</Text>
+            </TouchableOpacity>
+
+            <View style={styles.filterContainer}>
+              <TouchableOpacity onPress={() => setFilterStatus('all')}>
+                <Text style={filterStatus === "all" ? styles.filterButtonActive : styles.filterButton}>All</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setFilterStatus('end')}>
+                <Text style={filterStatus === "end" ? styles.filterButtonActive : styles.filterButton}>Ended</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setFilterStatus('running')}>
+                <Text style={filterStatus === "running" ? styles.filterButtonActive : styles.filterButton}>Running</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setFilterStatus('wait')}>
+                <Text style={filterStatus === "wait" ? styles.filterButtonActive : styles.filterButton}>Waiting</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setFilterStatus('stop')}>
+                <Text style={filterStatus === "stop" ? styles.filterButtonActive : styles.filterButton}>Stop</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.timelineListContainer}>
+              <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginBottom: 10, fontSize: spacing.medium }]}>
+                {currentDate} - {Clock()} - Timeline
+              </Text>
+              <TimelineList
+                events={eventsByDateS}
+                timelineProps={timelineProps}
+                showNowIndicator
+                scrollToNow
+                initialTime={initialTime}
+                renderItem={renderItem}
+              />
+            </View>
+          </View>
         </View>
 
-        <View style={styles.timelineContainer}>
-          <View style={styles.filterContainer}>
-            <TouchableOpacity onPress={() => setFilterStatus('all')}>
-              <Text style={styles.filterButton}>All</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setFilterStatus('end')}>
-              <Text style={styles.filterButton}>Ended</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setFilterStatus('running')}>
-              <Text style={styles.filterButton}>Running</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setFilterStatus('wait')}>
-              <Text style={styles.filterButton}>Waiting</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setFilterStatus('stop')}>
-              <Text style={styles.filterButton}>Stop</Text>
-            </TouchableOpacity>
-          </View>
+        <Home_dialog dialogVisible={dialogVisible} hideDialog={hideDialog} selectedEvent={selectedEvent} key={`Home_dialog`} />
 
-          <Text style={styles.timelineTitle}>
-            {currentDate} - Timeline
-          </Text>
-
-          <View style={styles.timelineListContainer}>
-            <TimelineList
-              events={eventsByDateS}
-              timelineProps={timelineProps}
-              showNowIndicator
-              renderItem={renderItem}
-            />
-          </View>
-        </View>
-      </View>
-    </CalendarProvider>
+      </CalendarProvider>
+    </AccessibleView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: '#f9f9f9',
-  },
-  calendarContainer: {
-    width: 450,
-    borderRightWidth: 1,
-    borderRightColor: '#ddd',
-    backgroundColor: '#fff',
-    padding: 10,
-  },
-  calendar: {
-    borderRadius: 8,
-    width: 430,
-  },
-  timelineContainer: {
-    flex: 2,
-    padding: 16,
-  },
-  timelineTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  timelineListContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    paddingHorizontal: 10,
-    paddingTop: 10,
-  },
-  cardcontent: {
-    marginTop: 10,
-    flex: 1
-  },
-  filterContainer: {
-    flexDirection: 'row',
-    marginBottom: 10,
-  },
-  filterButton: {
-    padding: 8,
-    marginHorizontal: 5,
-    backgroundColor: '#ddd',
-    borderRadius: 4,
-  },
-});
 
 export default HomeScreen;

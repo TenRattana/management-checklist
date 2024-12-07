@@ -44,7 +44,7 @@ interface SettingProps {
 
 const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisible }) => {
     const [activeMenu, setActiveMenu] = useState<string>("user");
-    const { fontSize, spacing } = useRes();
+    const { fontSize, spacing, responsive } = useRes();
     const { theme } = useTheme();
     const { handleError } = useToast();
 
@@ -60,9 +60,10 @@ const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisib
 
     const styles = StyleSheet.create({
         dialog: {
-            width: fontSize === "large" ? '80%' : fontSize === "medium" ? '75%' : '70%',
+            width: responsive === "large" ? 800 : fontSize === "medium" ? '75%' : '90%',
             justifyContent: 'center',
             alignSelf: 'center',
+            alignContent: 'center',
             borderRadius: 12,
             overflow: 'hidden',
             backgroundColor: theme.colors.background,
