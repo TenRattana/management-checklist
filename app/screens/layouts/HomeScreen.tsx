@@ -11,9 +11,9 @@ import { TimeScheduleProps } from '@/typing/type';
 import { groupBy } from 'lodash';
 import moment from 'moment-timezone';
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, FlatList } from 'react-native';
 import { Calendar, CalendarProvider, CalendarUtils, DateData, Timeline, TimelineList, TimelineListRenderItemInfo, TimelineProps } from 'react-native-calendars';
-import { Card, Icon, IconButton } from 'react-native-paper';
+import { Card, Checkbox, Icon, IconButton } from 'react-native-paper';
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated';
 import { useQuery } from 'react-query';
 
@@ -24,6 +24,12 @@ const fetchTimeSchedules = async (): Promise<TimeScheduleProps[]> => {
 
 FadeIn.duration(300).easing(Easing.out(Easing.ease))
 FadeOut.duration(300).easing(Easing.out(Easing.ease))
+
+const categories = [
+  { id: '1', title: 'Schedule Daily', time: '5h00', color: '#27ae60' },
+  { id: '2', title: 'Schedule Weekly', time: '3h00', color: '#2980b9' },
+  { id: '3', title: 'Schedule Custom', time: '1h00', color: '#8e44ad' },
+];
 
 const RenderEvent = ({ event }: { event: any }) => {
   const masterdataStyles = useMasterdataStyles();
@@ -59,16 +65,37 @@ const HomeScreen = () => {
   const { responsive, spacing } = useRes();
   const [currentDate, setCurrentDate] = useState<string>(getDate());
   const [filterStatus, setFilterStatus] = useState<'all' | 'end' | 'running' | 'wait' | 'stop'>('all');
+  const [filterTitle, setFilterTitle] = useState<string[]>([]);
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [dialogVisible, setDialogVisible] = useState(false);
   const masterdataStyles = useMasterdataStyles()
 
-  const { data: timeSchedule = [], isLoading } = useQuery<TimeScheduleProps[], Error>(
+  const { data: timeSchedule = [] } = useQuery<TimeScheduleProps[], Error>(
     'timeSchedule',
     fetchTimeSchedules,
     { refetchOnWindowFocus: true }
   );
+
+  const [checkedItems, setCheckedItems] = useState<Record<any, boolean>>({ 1: true, 2: true, 3: true });
+
+  const toggleCheckbox = useCallback((id: string, title: string) => {
+    const secondPart = title.split(" ")[1] || "";
+
+    setCheckedItems((prevState) => {
+      const updatedCheckedState = { ...prevState, [id]: !prevState[id] };
+
+      if (updatedCheckedState[id]) {
+        setFilterTitle((prevFilter) =>
+          prevFilter.includes(secondPart) ? prevFilter : [...prevFilter, secondPart]
+        );
+      } else {
+        setFilterTitle((prevFilter) => prevFilter.filter((value) => value !== secondPart));
+      }
+
+      return updatedCheckedState;
+    });
+  }, [filterTitle, checkedItems]);
 
   const timelineItems = useMemo(() => parseTimeScheduleToTimeline(timeSchedule), [timeSchedule]);
 
@@ -78,13 +105,6 @@ const HomeScreen = () => {
     () => groupBy(timeline, (e) => CalendarUtils.getCalendarDateString(e.start)),
     [timeline]
   );
-
-  const filteredEvents = useMemo(() => {
-    const events = eventsByDate[currentDate] || [];
-    if (filterStatus === 'all') return events;
-
-    return events?.filter(event => event.statustype === filterStatus);
-  }, [eventsByDate, currentDate, filterStatus]);
 
   const markedDatesS = useMemo(() => {
     return {
@@ -98,29 +118,20 @@ const HomeScreen = () => {
     minutes: getCurrentTime().getMinutes(),
   };
 
-  const tableData = filteredEvents.map((item) => [
-    item.title,
-    item.summary || "",
-    item.statustype,
-  ]);
-
-  const customtableProps = {
-    Tabledata: tableData,
-    Tablehead: [
-      { label: "Event Title", align: "flex-start" },
-      { label: "Detail", align: "flex-start" },
-      { label: "Status", align: "center" },
-    ],
-    flexArr: [2, 3, 1],
-    actionIndex: [{}],
-    showMessage: 2,
-    searchQuery: " ",
+  const extractSecondPart = (title: string) => {
+    const parts = title.split(" ");
+    return parts[1] || "";
   };
 
   const eventsByDateS = useMemo(() => {
-    const filteredEvents = eventsByDate[currentDate]?.filter(event =>
-      filterStatus === "all" || event.statustype === filterStatus
-    ) || [];
+    const filteredEvents = eventsByDate[currentDate]?.filter(event => {
+      const statusMatches = filterStatus === "all" || event.statustype === filterStatus;
+
+      const typeMatches =
+        filterTitle.length === 0 || filterTitle.includes(event.type as string);
+  
+      return statusMatches && typeMatches; 
+    }) || [];
 
     const groupedEvents = groupBy(filteredEvents, (event) => {
       if (event.start && typeof event.start === 'string') {
@@ -129,9 +140,10 @@ const HomeScreen = () => {
       }
       return 'invalid_date';
     });
-
+  
     return groupedEvents;
-  }, [timeSchedule, filterStatus, currentDate]);
+  }, [timeSchedule, filterStatus, currentDate, filterTitle]);
+  
 
   const styles = StyleSheet.create({
     container: {
@@ -176,6 +188,41 @@ const HomeScreen = () => {
       borderBottomColor: theme.colors.drag,
       marginHorizontal: 10,
       marginTop: 10,
+    },
+    containerCata: {
+      padding: 20,
+      borderRadius: 10,
+      backgroundColor: '#f8f9fa',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    header: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginBottom: 15,
+      color: '#333',
+    },
+    itemContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 10,
+    },
+    itemText: {
+      flex: 1,
+      fontSize: 16,
+      fontWeight: '500',
+      marginLeft: 10,
+    },
+    timeContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    timeText: {
+      fontSize: 14,
+      color: '#666',
     },
   });
 
@@ -236,7 +283,8 @@ const HomeScreen = () => {
         eventTimes: {
           color: theme.colors.fff,
           fontSize: spacing.small,
-        }
+        },
+
       },
     }
   }, [])
@@ -297,7 +345,26 @@ const HomeScreen = () => {
                   theme={getTheme()}
                 />
                 <Card.Content style={styles.cardcontent}>
-                  {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+                  <View style={styles.container}>
+                    <FlatList
+                      data={categories}
+                      keyExtractor={(item) => item.id}
+                      renderItem={({ item }) => (
+                        <View style={styles.itemContainer}>
+                          <Checkbox
+                            status={checkedItems?.[item.id] ? 'checked' : 'unchecked'}
+                            onPress={() => toggleCheckbox(item.id, item.title)}
+                            color={item.color}
+                          />
+                          <Text style={[styles.itemText, { color: item.color }]}>{item.title}</Text>
+                        </View>
+                      )}
+                      ListHeaderComponent={() =>
+                        <Text style={styles.header}>Schedule Type</Text>
+                      }
+                      style={{ marginTop: 20 }}
+                    />
+                  </View>
                 </Card.Content>
               </View>
             </Animated.View>

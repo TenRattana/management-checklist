@@ -1,71 +1,94 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Animated, { withSpring, useSharedValue, useAnimatedStyle } from 'react-native-reanimated';
+import { StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+    useSharedValue,
+    useAnimatedStyle,
+    withTiming,
+} from 'react-native-reanimated';
 
-const TOOLBOX_WIDTH = 250;
+const { width } = Dimensions.get('window');
+const DRAWER_WIDTH = width * 0.2;
 
-const App = () => {
+const TestComponent = () => {
+    const translateX = useSharedValue(-DRAWER_WIDTH); 
+    const mainTranslateX = useSharedValue(0);
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [drawerForm, setDrawerForm] = useState(false);
+    const [drawerContent, setDrawerContent] = useState(null); 
 
-    const translateXToolbox = useSharedValue(-TOOLBOX_WIDTH);
-    const translateXForm = useSharedValue(-TOOLBOX_WIDTH);
-
-    // ใช้ useAnimatedStyle เพื่อจัดตำแหน่งของ Toolbox
-    const toolboxStyle = useAnimatedStyle(() => ({
-        transform: [{ translateX: withSpring(translateXToolbox.value) }],
-    }));
-
-    // ใช้ useAnimatedStyle เพื่อจัดตำแหน่งของ Form
-    const formStyle = useAnimatedStyle(() => ({
-        transform: [{ translateX: withSpring(translateXForm.value) }],
-    }));
-
-    // ฟังก์ชันสำหรับเปิดหรือปิด Toolbox
-    const toggleDrawer = () => {
-        setDrawerOpen(!drawerOpen);
-        translateXToolbox.value = drawerOpen ? 300 : 0;
-        if (drawerForm) {
-            setDrawerForm(false);
-        }
+    const openDrawer = (content) => {
+        setDrawerContent(content); 
+        translateX.value = withTiming(0, { duration: 300 });
+        mainTranslateX.value = withTiming(DRAWER_WIDTH, { duration: 300 });
+        setDrawerOpen(true);
     };
 
-    // ฟังก์ชันสำหรับเปิดหรือปิด Form
-    const toggleForm = () => {
-        setDrawerForm(!drawerForm);
-        translateXForm.value = drawerForm ? 300 : 0;
-        if (drawerOpen) {
-            setDrawerOpen(false);
-        }
+    const closeDrawer = () => {
+        translateX.value = withTiming(-DRAWER_WIDTH, { duration: 300 });
+        mainTranslateX.value = withTiming(0, { duration: 300 });
+        setDrawerOpen(false);
+        setDrawerContent(null);
     };
+
+    const drawerStyle = useAnimatedStyle(() => ({
+        transform: [{ translateX: translateX.value }],
+    }));
+
+    const mainContentStyle = useAnimatedStyle(() => ({
+        transform: [{ translateX: mainTranslateX.value }],
+    }));
+
+    const panGesture = Gesture.Pan()
+        .onUpdate((event) => {
+            const newValue = Math.max(-DRAWER_WIDTH, Math.min(0, translateX.value + event.translationX));
+            translateX.value = newValue;
+            mainTranslateX.value = Math.max(0, DRAWER_WIDTH + newValue);
+        })
+        .onEnd(() => {
+            if (translateX.value > -DRAWER_WIDTH / 2) {
+                openDrawer(drawerContent || 'main'); 
+            } else {
+                closeDrawer();
+            }
+        });
 
     return (
         <View style={styles.container}>
-            <View style={styles.sidebar}>
-                <TouchableOpacity onPress={toggleDrawer} style={styles.sidebarButton}>
-                    <Text style={styles.buttonText}>{drawerOpen ? 'Close Toolbox' : 'Open Toolbox'}</Text>
+            <GestureDetector gesture={panGesture}>
+                <Animated.View
+                    style={[
+                        styles.content,
+                        mainContentStyle,
+                        { width: drawerOpen ? width - DRAWER_WIDTH : width },
+                    ]}
+                >
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity onPress={() => openDrawer('main')} style={styles.openButton}>
+                            <Text style={styles.buttonText}>Open Drawer</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={() => openDrawer('toolbox')} style={styles.toolboxButton}>
+                            <Text style={styles.buttonText}>Toolbox</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <Text style={styles.contentText}>Main Content</Text>
+                </Animated.View>
+            </GestureDetector>
+
+            <Animated.View style={[styles.drawer, drawerStyle]}>
+                <TouchableOpacity onPress={closeDrawer} style={styles.closeButton}>
+                    <Text style={styles.buttonText}>Close Drawer</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={toggleForm} style={styles.sidebarButton}>
-                    <Text style={styles.buttonText}>{drawerForm ? 'Close Form' : 'Open Form'}</Text>
-                </TouchableOpacity>
-            </View>
+                {drawerContent === 'main' && (
+                    <Text style={styles.drawerContent}>Drawer Content</Text>
+                )}
 
-            <Animated.View style={[styles.drawer, toolboxStyle]}>
-                <View style={styles.drawerContent}>
-                    <Text style={styles.drawerText}>Toolbox Content</Text>
-                </View>
+                {drawerContent === 'toolbox' && (
+                    <Text style={styles.drawerContent}>Toolbox Content</Text>
+                )}
             </Animated.View>
-
-            <Animated.View style={[styles.drawer, formStyle]}>
-                <View style={styles.drawerContent}>
-                    <Text style={styles.drawerText}>Form Content</Text>
-                </View>
-            </Animated.View>
-
-            <View style={styles.mainContent}>
-                <Text style={styles.mainText}>Main Content Goes Here</Text>
-            </View>
         </View>
     );
 };
@@ -73,62 +96,62 @@ const App = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        flexDirection: 'row',
-        backgroundColor: '#f4f7fc',
+        backgroundColor: '#f4f4f4',
     },
-    sidebar: {
-        width: 70,
-        backgroundColor: '#004aad',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        paddingVertical: 20,
-    },
-    sidebarButton: {
-        backgroundColor: '#005eff',
-        borderRadius: 8,
-        paddingVertical: 10,
-        paddingHorizontal: 12,
-        alignItems: 'center',
+    content: {
+        flex: 1,
         justifyContent: 'center',
-        width: 50,
-        elevation: 2,
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        overflow: 'hidden',
+        position: 'relative',
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        position: 'absolute',
+        top: 20,
+        left: 20,
+    },
+    openButton: {
+        backgroundColor: '#3498db',
+        padding: 10,
+        borderRadius: 5,
+        marginRight: 10, 
+    },
+    toolboxButton: {
+        backgroundColor: '#e67e22',
+        padding: 10,
+        borderRadius: 5,
+    },
+    contentText: {
+        fontSize: 18,
+        fontWeight: 'bold',
     },
     buttonText: {
-        color: '#ffffff',
-        fontSize: 11,
-        textAlign: 'center',
-        fontWeight: '600',
+        color: '#fff',
+        fontSize: 16,
     },
     drawer: {
-        width: 300,
-        flex:1,
-        backgroundColor: '#ffffff',
-        borderRightWidth: 1,
-        borderColor: '#d1d1d1',
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        width: DRAWER_WIDTH,
+        backgroundColor: '#2ecc71',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    closeButton: {
+        backgroundColor: '#e74c3c',
+        padding: 10,
+        borderRadius: 5,
+        marginBottom: 20,
     },
     drawerContent: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-    },
-    drawerText: {
         fontSize: 16,
-        color: '#333333',
-        fontWeight: '500',
-    },
-    mainContent: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#eef2f7',
-        padding: 20,
-    },
-    mainText: {
-        fontSize: 24,
-        fontWeight: '700',
-        color: '#222222',
+        color: '#fff',
     },
 });
 
-export default App;
+export default TestComponent;
