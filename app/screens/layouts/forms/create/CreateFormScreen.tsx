@@ -24,7 +24,6 @@ import Animated, {
     useAnimatedStyle,
     withTiming,
 } from 'react-native-reanimated';
-import { Field } from "formik";
 
 const { width } = Dimensions.get('window');
 

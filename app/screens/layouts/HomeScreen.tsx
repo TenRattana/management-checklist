@@ -65,7 +65,7 @@ const HomeScreen = () => {
   const { responsive, spacing } = useRes();
   const [currentDate, setCurrentDate] = useState<string>(getDate());
   const [filterStatus, setFilterStatus] = useState<'all' | 'end' | 'running' | 'wait' | 'stop'>('all');
-  const [filterTitle, setFilterTitle] = useState<string[]>([]);
+  const [filterTitle, setFilterTitle] = useState<string[]>(["Daily" , "Weekly" , "Custom"]);
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -118,21 +118,16 @@ const HomeScreen = () => {
     minutes: getCurrentTime().getMinutes(),
   };
 
-  const extractSecondPart = (title: string) => {
-    const parts = title.split(" ");
-    return parts[1] || "";
-  };
-
   const eventsByDateS = useMemo(() => {
     const filteredEvents = eventsByDate[currentDate]?.filter(event => {
       const statusMatches = filterStatus === "all" || event.statustype === filterStatus;
 
-      const typeMatches =
-        filterTitle.length === 0 || filterTitle.includes(event.type as string);
+      const typeMatches = filterTitle.includes(event.type as string);
 
       return statusMatches && typeMatches;
     }) || [];
 
+    
     const groupedEvents = groupBy(filteredEvents, (event) => {
       if (event.start && typeof event.start === 'string') {
         const datePart = moment(event.start).format('YYYY-MM-DD');
