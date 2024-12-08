@@ -5,7 +5,7 @@ import { setFormData, reset } from "@/slices";
 import { useToast } from "@/app/contexts/useToast";
 import { useFocusEffect } from "@react-navigation/native";
 import { BaseFormState, FormData, SubForm } from "@/typing/form";
-import { Checklist, CheckListOption, CheckListType, DataType, GroupCheckListOption, Machine } from "@/typing/type";
+import { CheckList, Checklist, CheckListOption, CheckListType, DataType, GroupCheckListOption, Machine } from "@/typing/type";
 
 interface RouteParams {
     params?: {
@@ -158,13 +158,18 @@ const useForm = (route: RouteParams) => {
                 setFound(true)
             }
 
+            const checkListType = data.checkListType
+                    .filter(group => group.CheckList !== null) 
+                    .flatMap(group => group.CheckList)      
+                    .filter((checkList): checkList is CheckList => checkList !== undefined); 
+
             dispatch(
                 setFormData({
                     form: action === "copy" ? {} : response.data?.data[0],
                     subForms,
                     BaseFormState: fields,
                     checkList: data.checkList,
-                    checkListType: data.checkListType,
+                    checkListType: checkListType,
                     dataType: data.dataType
                 })
             );

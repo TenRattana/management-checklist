@@ -129,8 +129,8 @@ const HomeScreen = () => {
 
       const typeMatches =
         filterTitle.length === 0 || filterTitle.includes(event.type as string);
-  
-      return statusMatches && typeMatches; 
+
+      return statusMatches && typeMatches;
     }) || [];
 
     const groupedEvents = groupBy(filteredEvents, (event) => {
@@ -140,10 +140,10 @@ const HomeScreen = () => {
       }
       return 'invalid_date';
     });
-  
+
     return groupedEvents;
   }, [timeSchedule, filterStatus, currentDate, filterTitle]);
-  
+
 
   const styles = StyleSheet.create({
     container: {
@@ -199,30 +199,15 @@ const HomeScreen = () => {
       shadowRadius: 4,
       elevation: 3,
     },
-    header: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      marginBottom: 15,
-      color: '#333',
-    },
     itemContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       marginBottom: 10,
-    },
-    itemText: {
-      flex: 1,
-      fontSize: 16,
-      fontWeight: '500',
-      marginLeft: 10,
+      marginLeft: 10
     },
     timeContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-    },
-    timeText: {
-      fontSize: 14,
-      color: '#666',
     },
   });
 
@@ -356,11 +341,11 @@ const HomeScreen = () => {
                             onPress={() => toggleCheckbox(item.id, item.title)}
                             color={item.color}
                           />
-                          <Text style={[styles.itemText, { color: item.color }]}>{item.title}</Text>
+                          <Text style={[masterdataStyles.text, { color: item.color, paddingLeft: 5 }]}>{item.title}</Text>
                         </View>
                       )}
                       ListHeaderComponent={() =>
-                        <Text style={styles.header}>Schedule Type</Text>
+                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginBottom: 15 }]}>Schedule Type</Text>
                       }
                       style={{ marginTop: 20 }}
                     />

@@ -196,6 +196,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                 onScroll={handleScroll}
                 scrollEventThrottle={-30}
                 contentContainerStyle={{ paddingBottom: 20 }}
+                showsVerticalScrollIndicator={false}
             />
         </AccessibleView>
     );

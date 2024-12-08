@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { BaseSubForm, BaseFormState, Form, BaseForm } from '@/typing/form'
-import { Checklist, CheckListType, DataType } from '@/typing/type'
+import { CheckList, Checklist, DataType } from '@/typing/type'
 
 
 const initialState: Form = {
@@ -39,7 +39,7 @@ const subFormSlice = createSlice({
       subForms: BaseSubForm[],
       BaseFormState: BaseFormState[],
       checkList: Checklist[],
-      checkListType: CheckListType[];
+      checkListType: CheckList[];
       dataType: DataType[]
     }>) => {
       const { form, subForms, BaseFormState, checkList, checkListType, dataType } = action.payload;
@@ -124,7 +124,8 @@ const subFormSlice = createSlice({
     addSubForm: (state, action: PayloadAction<{ subForm: BaseSubForm }>) => {
 
       const { subForm } = action.payload;
-
+      console.log(subForm);
+      
       state.subForms.push({
         ...subForm,
         SFormID: String(state.subForms.length + 1),
@@ -158,7 +159,7 @@ const subFormSlice = createSlice({
     addField: (state, action: PayloadAction<{
       BaseFormState: BaseFormState;
       checkList: Checklist[];
-      checkListType: CheckListType[];
+      checkListType: CheckList[];
       dataType: DataType[];
     }>) => {
       const { BaseFormState, checkList, checkListType, dataType } = action.payload;
@@ -194,7 +195,7 @@ const subFormSlice = createSlice({
     updateField: (state, action: PayloadAction<{
       BaseFormState: BaseFormState;
       checkList: Checklist[];
-      checkListType: CheckListType[];
+      checkListType: CheckList[];
       dataType: DataType[];
     }>) => {
       const { BaseFormState, checkList, checkListType, dataType } = action.payload;

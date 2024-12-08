@@ -22,6 +22,7 @@ import { useTheme } from "@/app/contexts/useTheme";
 import { useToast } from "@/app/contexts/useToast";
 import Text from '@/components/Text'
 import useMasterdataStyles from "@/styles/common/masterdata";
+import { CheckList } from "@/typing/type";
 
 const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatch, dataType, checkListType, groupCheckListOption, checkList }) => {
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
@@ -34,6 +35,11 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
     const { theme } = useTheme()
     const createformStyles = useCreateformStyle();
     const masterdataStyles = useMasterdataStyles()
+
+    const checkListTypes = checkListType
+        .filter(group => group.CheckList !== null)
+        .flatMap(group => group.CheckList)
+        .filter((checkList): checkList is CheckList => checkList !== undefined);
 
     const handleDropField = (data: Omit<BaseFormState, 'DisplayOrder'>[]) => {
         runOnJS(dispatch)(setDragField({ data }));
@@ -72,7 +78,7 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
 
     const handleSaveField = useCallback(
         (values: BaseFormState, mode: string) => {
-            const payload = { BaseFormState: values, checkList, checkListType, dataType };
+            const payload = { BaseFormState: values, checkList, checkListType: checkListTypes, dataType };
 
             try {
                 if (mode === "add") {
@@ -90,7 +96,7 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
     );
 
     const dropcheckList = checkList.filter(v => v.IsActive);
-    const dropcheckListType = checkListType.filter(v => v.IsActive);
+    const dropcheckListType = checkListTypes.filter(v => v.IsActive);
     const dropdataType = dataType.filter(v => v.IsActive);
     const dropgroupCheckListOption = groupCheckListOption.filter(v => v.IsActive);
 
@@ -107,7 +113,7 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
                 style={[createformStyles.fieldContainer, isActive && createformStyles.active]}
                 testID={`dg-FD-${item.SFormID}`}
             >
-                <IconButton icon={checkListType.find((v) => v.CTypeID === item.CTypeID)?.Icon ?? "camera"} style={createformStyles.icon} iconColor={theme.colors.fff} size={spacing.large} animated />
+                <IconButton icon={checkListTypes.find((v) => v.CTypeID === item.CTypeID)?.Icon ?? "camera"} style={createformStyles.icon} iconColor={theme.colors.fff} size={spacing.large} animated />
                 <Text style={[createformStyles.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]} numberOfLines={1} ellipsizeMode="tail">
                     {item.CListName}
                 </Text>
@@ -157,7 +163,7 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
                 setShowDialogs={handleDialogToggle}
                 editMode={isEditing}
                 saveField={handleSaveField}
-                checkListType={checkListType}
+                checkListType={checkListTypes}
                 dataType={dataType}
                 checkList={checkList}
                 groupCheckListOption={groupCheckListOption}

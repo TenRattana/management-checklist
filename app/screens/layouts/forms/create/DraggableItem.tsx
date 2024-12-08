@@ -2,17 +2,16 @@ import React, { useState } from "react";
 import { GestureEvent, HandlerStateChangeEvent, PanGestureHandler, PanGestureHandlerEventPayload } from "react-native-gesture-handler";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, runOnJS } from "react-native-reanimated";
 import { IconButton, Portal } from "react-native-paper";
-import useCreateformStyle from "@/styles/createform";
-import { CheckListType } from "@/typing/type";
-import { View } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
-import { Text } from "@/components";
+import useCreateformStyle from "@/styles/createform";
 import useMasterdataStyles from "@/styles/common/masterdata";
+import { CheckList, CheckListType } from "@/typing/type";
 
 const DraggableItem: React.FC<{
-    item: CheckListType;
-    onDrop: (item: CheckListType, absoluteX: number, absoluteY: number) => void;
+    item: CheckList;
+    onDrop: (item: CheckList, absoluteX: number, absoluteY: number) => void;
 }> = React.memo(({ item, onDrop }) => {
     const itemTranslateX = useSharedValue(0);
     const itemTranslateY = useSharedValue(0);
@@ -34,8 +33,7 @@ const DraggableItem: React.FC<{
     }));
 
     const createform = useCreateformStyle();
-    const masterdataStyles = useMasterdataStyles()
-
+    const masterdataStyles = useMasterdataStyles();
     const { spacing } = useRes();
     const { theme } = useTheme();
 
@@ -49,7 +47,7 @@ const DraggableItem: React.FC<{
         itemTranslateX.value = translationX;
         itemTranslateY.value = translationY;
         setIsDragging(true);
-    }
+    };
 
     const onGestureEnd = (e: HandlerStateChangeEvent) => {
         const { absoluteX, absoluteY } = e.nativeEvent;
@@ -66,21 +64,33 @@ const DraggableItem: React.FC<{
 
     return (
         <PanGestureHandler onGestureEvent={onGestureEvent} onEnded={onGestureEnd}>
-            <View style={{ marginHorizontal: 20 }}>
+            <View>
                 <Animated.View style={[itemAnimatedStyle, { opacity: isDragging ? 0 : 1 }]}>
                     <View style={[{ flexDirection: "row", alignItems: "center" }, createform.addItem]}>
-                        <IconButton icon={item.Icon} iconColor={theme.colors.fff} size={spacing.large} style={createform.icon} animated />
-                        <Text style={[masterdataStyles.textFFF, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
-                            {item.CTypeName}
+                        <IconButton
+                            icon={item.Icon || "help"}
+                            iconColor={theme.colors.fff}
+                            size={spacing.large}
+                            style={createform.icon}
+                            animated
+                        />
+                        <Text style={[masterdataStyles.textFFF, { textAlign: "left", flex: 1}]}>
+                            {item.CTypeTitle}
                         </Text>
                     </View>
                 </Animated.View>
                 {isDragging && (
                     <Portal>
                         <Animated.View style={portalAnimatedStyle}>
-                            <IconButton icon={item.Icon} iconColor={theme.colors.onBackground} size={spacing.large} style={createform.icon} animated />
-                            <Text style={[createform.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}>
-                                {item.CTypeName}
+                            <IconButton
+                                icon={item.Icon || "help"}
+                                iconColor={theme.colors.onBackground}
+                                size={spacing.large}
+                                style={createform.icon}
+                                animated
+                            />
+                            <Text style={[createform.fieldText, { textAlign: "left", flex: 1 }]}>
+                                {item.CTypeTitle}
                             </Text>
                         </Animated.View>
                     </Portal>
@@ -90,4 +100,26 @@ const DraggableItem: React.FC<{
     );
 });
 
-export default DraggableItem;
+
+const FieldForm: React.FC<{ data: CheckList[], onDrop: (item: CheckList, absoluteX: number, absoluteY: number) => void; }> = ({ data, onDrop }) => {
+    const styles = StyleSheet.create({
+        container: {
+            flexDirection: 'row',
+            flexWrap: 'wrap'
+        },
+    });
+
+    return (
+        <View style={styles.container}>
+            {data?.map((item: CheckList, index: number) => (
+                item && item.IsActive && (
+                    <View style={{ width: '50%' }} key={index}>
+                        <DraggableItem item={item} onDrop={onDrop} />
+                    </View>
+                )
+            ))}
+        </View>
+    );
+};
+
+export default FieldForm;

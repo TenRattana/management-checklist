@@ -36,28 +36,36 @@ export interface TimeSchedule {
   TimeDetail?: TimeDetail[];
 }
 export interface TimeScheduleProps {
-    ScheduleID: string;
-    ScheduleName: string;
-    MachineGroup?: string | string[];
-    Type_schedule: string;
-    Tracking: boolean;
-    IsActive: boolean;
-    Custom: boolean;
-    TimeSlots?: Day[];
-    TimeCustom?: Day[];
-    TimeWeek?: { [key: string]: Day[] };
+  ScheduleID: string;
+  ScheduleName: string;
+  MachineGroup?: string | string[];
+  Type_schedule: string;
+  Tracking: boolean;
+  IsActive: boolean;
+  Custom: boolean;
+  TimeSlots?: Day[];
+  TimeCustom?: Day[];
+  TimeWeek?: { [key: string]: Day[] };
 }
 
 export interface Day {
-    start: string | null;
-    end: string | null;
+  start: string | null;
+  end: string | null;
 }
-export interface CheckListType {
+export interface CheckList {
   CTypeID: string;
   CTypeName: string;
+  CTypeTitle: string;
   Icon: string;
   IsActive: boolean;
   Disables: boolean;
+}
+
+export interface CheckListType {
+  GTypeID: string;
+  GTypeName: string;
+  IsActive: boolean;
+  CheckList?: CheckList[];
 }
 
 export interface CheckListOption {
@@ -158,7 +166,7 @@ export interface Prefixs {
   SubForm: string;
   ExpectedResult: string;
   UsersPermission: string;
-  TimeSchedule:string;
+  TimeSchedule: string;
 }
 
 export interface AppProps extends Prefixs {
@@ -194,14 +202,14 @@ export interface Permissions {
   Description: string;
   IsActive: boolean;
 }
-export interface TimeScheduleMachine{
-  MachineName:string;
-  Area?:string;
-  Building?:string;
-  Floor?:string;
-  MachineCode?:string;
-  FormName:string;
-  IsActive:boolean;
+export interface TimeScheduleMachine {
+  MachineName: string;
+  Area?: string;
+  Building?: string;
+  Floor?: string;
+  MachineCode?: string;
+  FormName: string;
+  IsActive: boolean;
 }
 
 export type ComponentNames =
@@ -236,6 +244,7 @@ export type TypeConfig =
   | Machine
   | Checklist
   | CheckListType
+  | CheckList
   | CheckListOption
   | DataType
   | GroupCheckListOption

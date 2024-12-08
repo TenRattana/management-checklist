@@ -195,12 +195,12 @@ export interface FieldDialogProps {
   setShowDialogs: () => void;
   editMode: boolean;
   saveField: (values: BaseFormState, mode: string) => void;
-  checkListType: CheckListType[];
+  checkListType: CheckList[];
   dataType: DataType[];
   checkList: Checklist[];
   groupCheckListOption: GroupCheckListOption[];
   dropcheckList: Checklist[];
-  dropcheckListType: CheckListType[];
+  dropcheckListType: CheckList[];
   dropdataType: DataType[];
   dropgroupCheckListOption: GroupCheckListOption[];
 }

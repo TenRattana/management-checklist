@@ -188,6 +188,7 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
                 )}
                 keyExtractor={(_, index) => `index-preview-${index}`}
                 contentContainerStyle={{ paddingBottom: 20 }}
+                showsVerticalScrollIndicator={false}
             />
         </AccessibleView>
     );

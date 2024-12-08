@@ -1,8 +1,7 @@
 import React, { useState, useCallback, useRef, useMemo } from "react";
 import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
-import SegmentedControl from "@/components/screens/SegmentedControl";
-import { Divider, Icon } from "react-native-paper";
+import { Divider, Icon, IconButton } from "react-native-paper";
 import useCreateformStyle from "@/styles/createform";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import useForm from "@/hooks/custom/useForm";
@@ -11,10 +10,10 @@ import Dragsubform from "./Dragsubform";
 import Preview from "@/app/screens/layouts/forms/create/ShowForm";
 import { CreateFormProps } from "@/typing/tag";
 import { BaseFormState, BaseSubForm } from "@/typing/form";
-import { Checklist, CheckListType, DataType, GroupCheckListOption } from "@/typing/type";
+import { CheckList, Checklist, CheckListType, DataType, GroupCheckListOption } from "@/typing/type";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
-import { defaultDataForm } from "@/slices";
+import { addSubForm, defaultDataForm } from "@/slices";
 import DraggableItem from "./DraggableItem";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/stores";
@@ -25,21 +24,24 @@ import Animated, {
     useAnimatedStyle,
     withTiming,
 } from 'react-native-reanimated';
+import { Field } from "formik";
 
-
-const options = ["Tool", "Form"]
 const { width } = Dimensions.get('window');
 
 const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigation }) => {
     const { responsive, fontSize, spacing } = useRes();
 
-    const DRAWER_WIDTH = responsive === "small" ? width : fontSize === "large" ? 430 : 370;
+    const DRAWER_WIDTH = responsive === "small" ? width : fontSize === "large" ? 500 : 400;
 
     const translateX = useSharedValue(-DRAWER_WIDTH);
     const mainTranslateX = useSharedValue(0);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [drawerContent, setDrawerContent] = useState(null);
     const [initialSaveDialog, setInitialSaveDialog] = useState(false);
+
+    const handleSaveDialog = useCallback(() => {
+        setInitialSaveDialog(false);
+    }, []);
 
     const { checkList, groupCheckListOption, checkListType, dataType, isLoading } = useForm(route);
     const dispatch = useDispatch<AppDispatch>();
@@ -109,10 +111,10 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
 
     const childRef = useRef<any>();
 
-    const handleDrop = useCallback((item: CheckListType, absoluteX: number, absoluteY: number) => {
+    const handleDrop = useCallback((item: CheckList, absoluteX: number, absoluteY: number) => {
         const cardIndex = childRef.current.checkCardPosition(absoluteX, absoluteY);
         const selectedChecklist = checkList.find((v: Checklist) => v.CListID === "CL000") || checkList?.[0];
-        const selectedDataType = dataType.find((v: DataType) => v.DTypeName === "String") || dataType?.[0];
+        const selectedDataType = dataType.find((v: DataType) => item.CTypeTitle === "Number Answer" ? v.DTypeName === "Number" : v.DTypeName === "String") || dataType?.[0];
 
         if (cardIndex >= 0) {
             const targetSubForm = state.subForms[cardIndex];
@@ -144,7 +146,11 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
             };
 
             dispatch(defaultDataForm({ currentField: newField }));
+        } else if (item.CTypeName === "SubForm") {
+            const subForm = { SFormID: "", SFormName: "New Setion", Columns: 1, Fields: [], FormID: state.FormID || "", MachineID: state.MachineID || "" }
+            dispatch(addSubForm({ subForm: subForm }));
         }
+
     }, [checkList, dataType, groupCheckListOption, state.subForms, dispatch]);
 
     const createform = useCreateformStyle();
@@ -153,7 +159,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
 
     const MemoDragsubform = React.memo(Dragsubform)
     const MemoConfigItemForm = React.memo(ConfigItemForm)
-    const MemoSegmentedControl = React.memo(SegmentedControl)
     const MemoDraggableItem = React.memo(DraggableItem)
     const MemoSaveDialog = React.memo(SaveDialog)
 
@@ -196,6 +201,33 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
             bottom: 0,
             left: 0,
             width: DRAWER_WIDTH,
+        },
+        groupContainer: {
+            marginVertical: 20,
+            paddingBottom: 10,
+        },
+        groupTitle: {
+            fontSize: 18,
+            fontWeight: 'bold',
+            marginBottom: 10,
+            textAlign: 'center',
+        },
+        fieldList: {
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'flex-start',
+        },
+        fieldContainer: {
+            marginHorizontal: 10,
+            flex: 1,
+        },
+        iconButton: {
+            marginBottom: 5,
+        },
+        fieldTitle: {
+            textAlign: 'center',
+            color: 'black',
+            fontSize: 12,
         },
     });
 
@@ -256,7 +288,10 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                     )}
 
                     {drawerContent === 'toolbox' && (
-                        <ScrollView style={{ display: drawerContent === "toolbox" ? 'flex' : 'none', marginTop: 20 }}>
+                        <ScrollView
+                            style={{ display: drawerContent === "toolbox" ? 'flex' : 'none', marginTop: 20 }}
+                            showsVerticalScrollIndicator={false}
+                        >
                             <AccessibleView name="container-formname" style={{ marginHorizontal: 10, marginTop: 5 }}>
                                 {['FormName', 'Description'].map((item) => (
                                     <MemoConfigItemForm
@@ -275,70 +310,38 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                                 <Text style={masterdataStyles.textFFF}>Save Form</Text>
                             </TouchableOpacity>
 
-                            <Divider bold style={[{ marginVertical: 10, height: 2, backgroundColor: theme.colors.onBackground }]} />
-                            <Text style={[masterdataStyles.title, { textAlign: 'center', color: theme.colors.onBackground }]}>Menu List Type</Text>
+                            <View style={styles.groupContainer}>
 
-                            {Array.isArray(checkListType) && checkListType.length > 0 ? (
-                                checkListType.map((item: CheckListType, index: number) => (
-                                    <MemoDraggableItem item={item} onDrop={handleDrop} key={`${item.CTypeID}-${index}`} />
-                                ))
-                            ) : (
-                                <Text>No Data</Text>
-                            )}
+                                {checkListType && checkListType.length > 0 ? checkListType.map((item: CheckListType, index) => (
+                                    item.IsActive && (
+                                        <View key={index}>
+                                            <View style={styles.fieldContainer}>
+                                                <Text style={masterdataStyles.text}>{item.GTypeName}</Text>
+
+                                                <Divider bold style={[{ marginVertical: 10, height: 1, backgroundColor: theme.colors.onBackground }]} />
+
+                                                <MemoDraggableItem data={item?.CheckList || []} key={`drag-${index}`} onDrop={handleDrop} />
+                                                {item.CheckList && <Divider bold style={[{ marginVertical: 10, height: 1, backgroundColor: theme.colors.onBackground }]} />}
+                                            </View>
+                                        </View>
+                                    )
+                                )) : (
+                                    <Text style={masterdataStyles.text}>No Fields Available</Text>
+                                )}
+                            </View>
                         </ScrollView>
                     )}
                 </Animated.View>
             </AccessibleView>
+
+            <MemoSaveDialog
+                state={state}
+                isVisible={initialSaveDialog}
+                setIsVisible={handleSaveDialog}
+                navigation={navigation}
+            />
         </GestureHandlerRootView>
     );
-
-
-
-
-
-
-
-    // const [selectedIndex, setSelectedIndex] = useState<string>("Tool");
-
-    // const handleSaveDialog = useCallback(() => {
-    //     setInitialSaveDialog(false);
-    // }, []);
-
-
-
-    // const handleSegmentChange = useCallback((option: string) => {
-    //     setSelectedIndex(option)
-    // }, [])
-
-
-
-    // return (
-    //     <GestureHandlerRootView style={[createform.container, { flex: 1 }]}>
-    //         <AccessibleView name="container-form" style={[createform.containerL1]}>
-
-    //             <MemoSegmentedControl
-    //                 options={options}
-    //                 selectedOption={selectedIndex}
-    //                 onOptionPress={handleSegmentChange}
-    //             />
-
-    //             
-    //             {selectedIndex === "Form" && (
-    //               
-    //             )}
-
-    //         </AccessibleView>
-
-
-
-    //         <MemoSaveDialog
-    //             state={state}
-    //             isVisible={initialSaveDialog}
-    //             setIsVisible={handleSaveDialog}
-    //             navigation={navigation}
-    //         />
-    //     </GestureHandlerRootView>
-    // );
 });
 
 

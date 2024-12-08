@@ -23,6 +23,7 @@ const useCreateformStyle = () => {
         },
         addSubFormButton: {
             margin: 16,
+            marginTop: 20,
             marginVertical: 8,
             backgroundColor: theme.colors.subform,
             borderRadius: 8,
@@ -31,10 +32,9 @@ const useCreateformStyle = () => {
             justifyContent: 'center',
         },
         addItem: {
-            margin: 16,
-            marginVertical: 8,
+            margin: 5,
             backgroundColor: theme.colors.drag,
-            borderRadius: 8,
+            borderRadius: 5,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
@@ -63,9 +63,8 @@ const useCreateformStyle = () => {
         },
         fieldText: {
             fontSize: spacing.small,
-            paddingVertical: 10,
+            padding: 5,
             color: theme.colors.fff
-
         },
         subFormText: {
             fontSize: spacing.small,
