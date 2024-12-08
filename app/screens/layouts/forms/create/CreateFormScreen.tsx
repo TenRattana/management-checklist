@@ -315,12 +315,11 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                                     item.IsActive && (
                                         <View key={index}>
                                             <View style={styles.fieldContainer}>
-                                                <Text style={masterdataStyles.text}>{item.GTypeName}</Text>
+                                                <Text style={[masterdataStyles.text, { marginTop: 10 }]}>{item.GTypeName}</Text>
 
                                                 <Divider bold style={[{ marginVertical: 10, height: 1, backgroundColor: theme.colors.onBackground }]} />
 
                                                 <MemoDraggableItem data={item?.CheckList || []} key={`drag-${index}`} onDrop={handleDrop} />
-                                                {item.CheckList && <Divider bold style={[{ marginVertical: 10, height: 1, backgroundColor: theme.colors.onBackground }]} />}
                                             </View>
                                         </View>
                                     )
