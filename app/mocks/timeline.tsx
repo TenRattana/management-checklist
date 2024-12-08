@@ -197,7 +197,7 @@ export const convertScheduleToTimeline = (
                     start,
                     end,
                     summary: `${date} (${time})`,
-                    color: '#00b42e',
+                    color: CustomLightTheme.drag,
                     type: "Weekly",
                     status: status,
                     statustype: status && intime ? "running" : status && (now.toISOString() > end) ? "end" : status ? "wait" : "stop",
@@ -250,7 +250,7 @@ export const convertScheduleToTimeline = (
                     start,
                     end,
                     summary: `${date} (${time})`,
-                    color: '#001bb4',
+                    color: CustomLightTheme.green,
                     type: "Daily",
                     status: status,
                     statustype: status && intime ? "running" : status && (now.toISOString() > end) ? "end" : status ? "wait" : "stop"
@@ -309,7 +309,7 @@ export const convertScheduleToTimeline = (
                     start,
                     end,
                     summary: `${date} (${time})`,
-                    color: '#be3a00',
+                    color: CustomLightTheme.error,
                     type: "Custom",
                     status: status,
                     statustype: status && intime ? "running" : status && (now.toISOString() > end) ? "end" : status ? "wait" : "stop"

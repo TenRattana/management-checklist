@@ -13,7 +13,6 @@ import moment from 'moment-timezone';
 import React, { useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { Calendar, CalendarProvider, CalendarUtils, DateData, Timeline, TimelineList, TimelineListRenderItemInfo, TimelineProps } from 'react-native-calendars';
-import { Theme } from 'react-native-calendars/src/types';
 import { Card, Icon, IconButton } from 'react-native-paper';
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated';
 import { useQuery } from 'react-query';
