@@ -273,30 +273,24 @@ const HomeScreen = () => {
     return {
       calendarBackground: theme.colors.background,
 
-      // month
       textMonthFontFamily: 'Poppins',
       monthTextColor: theme.colors.onBackground,
       textMonthFontSize: spacing.medium,
 
-      // day names
       textSectionTitleColor: theme.colors.onBackground,
       textDayHeaderFontFamily: 'Poppins',
       textDayHeaderFontSize: spacing.small,
 
-      // dates
       dayTextColor: theme.colors.onBackground,
       textDayFontFamily: 'Poppins',
       todayTextColor: theme.colors.primary,
       textDayFontSize: spacing.small,
 
-      // selected date
       selectedDayTextColor: theme.colors.blue,
       selectedDayBackgroundColor: theme.colors.primary,
 
-      // disabled date
       textDisabledColor: theme.colors.drag,
 
-      // dot (marked dates)
       dotColor: theme.colors.primary,
       selectedDotColor: theme.colors.accent,
     };
