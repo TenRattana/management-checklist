@@ -7,6 +7,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { useSelector } from 'react-redux';
 import { Menus, ParentMenu } from '@/typing/type';
 import { DrawerNavigationHelpers } from '@react-navigation/drawer/lib/typescript/src/types';
+import { runOnJS } from 'react-native-reanimated';
 
 interface RenderPressableProps {
     label: string;
@@ -36,7 +37,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = React.memo((p
     const [isMenuListOpen, setIsMenuListOpen] = useState<{ [key: string]: boolean }>({});
 
     const handleSetMenuListOpen = useCallback((PermissionID: string) => {
-        setIsMenuListOpen(prevState => ({
+        runOnJS(setIsMenuListOpen)(prevState => ({
             ...prevState,
             [PermissionID]: !prevState[PermissionID]
         }));

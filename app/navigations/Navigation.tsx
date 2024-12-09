@@ -32,6 +32,7 @@ import { initializeLogout } from '../providers';
 import CustomMenu from '@/components/navigation/CustomMenu'
 import Setting_dialog from "@/components/screens/Setting_dialog"
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { runOnJS } from 'react-native-reanimated';
 
 const Drawer = createDrawerNavigator();
 const MemoSetting_dialog = React.memo(Setting_dialog)
@@ -76,21 +77,21 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
     const [menuSetting, setMenuSetting] = useState(false);
 
     const handleSettings = useCallback(() => {
-        setMenuSetting(true)
-        setMenuVisible(false);
+        runOnJS(setMenuSetting)(true)
+        runOnJS(setMenuVisible)(false);
     }, []);
 
     const handleLogout = useCallback(() => {
         dispatch(initializeLogout());
-        setMenuVisible(false);
-    }, []);
+        runOnJS(setMenuVisible)(false);
+    }, [dispatch]);
 
     const toggleMenu = useCallback(() => {
-        setMenuVisible((prev) => !prev);
+        runOnJS(setMenuVisible)((prev) => !prev);
     }, []);
 
     const closeMenu = useCallback(() => {
-        setMenuVisible(false);
+        runOnJS(setMenuVisible)(false);
     }, []);
 
     const menuScreens = useMemo(() => {
@@ -171,7 +172,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                 {menuScreens}
             </Drawer.Navigator>
 
-            <MemoSetting_dialog isVisible={menuSetting} setVisible={() => setMenuSetting(false)} />
+            <MemoSetting_dialog isVisible={menuSetting} setVisible={() => runOnJS(setMenuSetting)(false)} />
         </SafeAreaView>
     );
 });

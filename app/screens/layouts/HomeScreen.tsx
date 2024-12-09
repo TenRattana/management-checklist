@@ -86,11 +86,11 @@ const HomeScreen = () => {
       const updatedCheckedState = { ...prevState, [id]: !prevState[id] };
 
       if (updatedCheckedState[id]) {
-        setFilterTitle((prevFilter) =>
+        runOnJS(setFilterTitle)((prevFilter) =>
           prevFilter.includes(secondPart) ? prevFilter : [...prevFilter, secondPart]
         );
       } else {
-        setFilterTitle((prevFilter) => prevFilter.filter((value) => value !== secondPart));
+        runOnJS(setFilterTitle)((prevFilter) => prevFilter.filter((value) => value !== secondPart));
       }
 
       return updatedCheckedState;
@@ -204,12 +204,12 @@ const HomeScreen = () => {
   });
 
   const toggleSwitch = useCallback(() => {
-    setShowCalendar(!showCalendar);
+    runOnJS(setShowCalendar)(!showCalendar);
   }, [showCalendar]);
 
   const handleEventClick = (event: any) => {
-    setSelectedEvent(event);
-    setDialogVisible(true);
+    runOnJS(setSelectedEvent)(event);
+    runOnJS(setDialogVisible)(true);
   };
 
   const renderItem = (timelineProps: TimelineProps, info: TimelineListRenderItemInfo) => {
@@ -223,7 +223,7 @@ const HomeScreen = () => {
     );
   };
 
-  const hideDialog = () => setDialogVisible(false);
+  const hideDialog = () => runOnJS(setDialogVisible)(false);
 
   const timelineProps = useMemo(() => {
     return {
@@ -347,19 +347,19 @@ const HomeScreen = () => {
             </TouchableOpacity>
 
             <View style={styles.filterContainer}>
-              <TouchableOpacity onPress={() => setFilterStatus('all')}>
+              <TouchableOpacity onPress={() => runOnJS(setFilterStatus)('all')}>
                 <Text style={filterStatus === "all" ? styles.filterButtonActive : styles.filterButton}>All</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setFilterStatus('end')}>
+              <TouchableOpacity onPress={() => runOnJS(setFilterStatus)('end')}>
                 <Text style={filterStatus === "end" ? styles.filterButtonActive : styles.filterButton}>Ended</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setFilterStatus('running')}>
+              <TouchableOpacity onPress={() => runOnJS(setFilterStatus)('running')}>
                 <Text style={filterStatus === "running" ? styles.filterButtonActive : styles.filterButton}>Running</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setFilterStatus('wait')}>
+              <TouchableOpacity onPress={() => runOnJS(setFilterStatus)('wait')}>
                 <Text style={filterStatus === "wait" ? styles.filterButtonActive : styles.filterButton}>Waiting</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setFilterStatus('stop')}>
+              <TouchableOpacity onPress={() => runOnJS(setFilterStatus)('stop')}>
                 <Text style={filterStatus === "stop" ? styles.filterButtonActive : styles.filterButton}>Stop</Text>
               </TouchableOpacity>
             </View>
