@@ -244,6 +244,11 @@ export interface CustomtableSmallProps {
   showColumn?: string;
   handleDialog: (action?: string, data?: string) => void;
   toggleSelect: (value: string) => void;
+   detail?: boolean;
+  detailKey?:string;
+  detailKeyrow?:number;
+  showDetailwithKey?:string[];
+  detailData?: TypeConfig[];
 }
 
 export interface CustomtableDataProps {

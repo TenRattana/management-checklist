@@ -41,7 +41,7 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
 
     const findIndex = (row: (string | number | boolean)[]) => {
         return detailData?.findIndex(item => {
-            return item[detailKey] === (detailKeyrow && row[Number(detailKeyrow)]);
+            return detailKey && item[detailKey] === (detailKeyrow && row[Number(detailKeyrow)]);
         }) ?? -1;
     };
 
@@ -119,9 +119,9 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                 </DataTable.Row>
 
                 {isDetailVisible[findIndex(row)] && (
-                    <AccessibleView name="containerdetail" key={`index-${findIndex(row)}`}>
+                    <AccessibleView name="containerdetail" key={`index-${findIndex(row)}`} style={{ padding: 10 }}>
                         <Animated.View entering={FadeInUp} exiting={FadeOutDown} >
-                            <DetailContent detailData={detailData?.[findIndex(row)] || []} isDetailVisible={isDetailVisible[findIndex(row)]} showDetailwithKey={showDetailwithKey} />
+                            <DetailContent detailData={detailData?.[findIndex(row)] || []} showDetailwithKey={showDetailwithKey} />
                         </Animated.View>
                     </AccessibleView>
                 )}

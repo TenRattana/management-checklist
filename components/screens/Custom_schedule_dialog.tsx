@@ -21,10 +21,7 @@ interface Custom_scheduleProps {
     setFieldValue: (value: any) => void;
     values: { start: string | null, end: string | null }[];
     touched: boolean | undefined;
-    errors?: string | string[] | FormikErrors<{
-        start: string | null;
-        end: string | null;
-    }>[] | undefined;
+    errors?: any
 }
 
 const Custom_schedule_dialog = React.memo(({ showError, showSuccess, spacing, setFieldValue, values, theme, touched, errors }: Custom_scheduleProps) => {

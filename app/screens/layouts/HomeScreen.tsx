@@ -143,7 +143,7 @@ const HomeScreen = () => {
   const styles = StyleSheet.create({
     calendarContainer: {
       flex: 1,
-      width: responsive === "small" ? 0 : responsive === "medium" ? 300 : 450,
+      width: responsive === "small" ? "100%" : responsive === "medium" ? 300 : 450,
       borderRightWidth: 1,
       borderColor: '#eaeaea',
       padding: 10,
@@ -198,7 +198,7 @@ const HomeScreen = () => {
       marginLeft: 10
     },
     timeContainer: {
-      flexDirection: 'row',
+      flexDirection: responsive === "small" ? 'column' : 'row',
       alignItems: 'center',
     },
   });
@@ -302,7 +302,7 @@ const HomeScreen = () => {
         theme={getTheme()}
         showTodayButton
       >
-        <View style={{ flex: 1, flexDirection: 'row' }}>
+        <View style={{ flex: 1, flexDirection: responsive === "small" ? 'column' : 'row' }}>
           {showCalendar && (
             <Animated.View
               entering={FadeIn}

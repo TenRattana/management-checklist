@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 interface CustomTextProps extends DefaultTextProps {
   style?: any;
-  children?: string | string[] | null;
+  children?: any;
 }
 
 const isThai = (text: string): boolean => {

@@ -5,10 +5,10 @@ import Inputs from "@/components/common/Inputs";
 import { updateFormName, updateFormDescription } from "@/slices";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
-import { Formik } from "formik";
+import { FastField, Formik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { StyleSheet, View } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
 
@@ -19,11 +19,11 @@ interface CreateForm {
     onEdit: (v: boolean) => void;
 }
 
-const MemoizedIconButton = React.memo(IconButton)
+const MemoizedIconButton = React.memo(IconButton);
 
 const ConfigItemForm: React.FC<CreateForm> = React.memo(({ label, value, editable, onEdit }) => {
     const { theme } = useTheme();
-    const { spacing, fontSize } = useRes();
+    const { spacing } = useRes();
     const masterdataStyles = useMasterdataStyles();
 
     const handlePress = useCallback(() => {
@@ -32,99 +32,144 @@ const ConfigItemForm: React.FC<CreateForm> = React.memo(({ label, value, editabl
 
     return (
         <AccessibleView name="" style={styles.container}>
-            {editable ? <RenderFormik field={label} setEdit={onEdit} /> :
-                <>
-                    <Text style={[styles.configPrefixText, masterdataStyles.settingText]} ellipsizeMode="tail" numberOfLines={1}>
-                        {`${label} : ${!editable ? value : ""}`}
+            {editable ? (
+                <RenderFormik field={label} setEdit={onEdit} />
+            ) : (
+                <View style={styles.textRow}>
+                    <Text
+                        style={[
+                            masterdataStyles.text,
+                            masterdataStyles.settingText,
+                            styles.labelText,
+                        ]}
+                        ellipsizeMode="tail"
+                        numberOfLines={1}
+                    >
+                        {`${label} : ${value}`}
                     </Text>
                     <MemoizedIconButton
-                        icon="pencil-box"
+                        icon="pencil"
                         onPress={handlePress}
-                        iconColor={theme.colors.blue}
-                        size={spacing.large + 5}
+                        iconColor={theme.colors.primary}
+                        size={spacing.large}
                         style={styles.iconButton}
                     />
-                </>
-            }
+                </View>
+            )}
         </AccessibleView>
     );
 });
 
-const RenderFormik: React.FC<{ field: string; setEdit: (v: boolean) => void; }> = React.memo(({ field, setEdit }) => {
-    const dispatch = useDispatch();
-    const state = useSelector((state: any) => state.form);
-    const { spacing, fontSize } = useRes();
-    const { theme } = useTheme();
+const RenderFormik: React.FC<{ field: string; setEdit: (v: boolean) => void }> = React.memo(
+    ({ field, setEdit }) => {
+        const dispatch = useDispatch();
+        const state = useSelector((state: any) => state.form);
+        const { spacing, responsive } = useRes();
+        const { theme } = useTheme();
+        const masterdataStyles = useMasterdataStyles()
 
-    return (
-        <Formik
-            initialValues={{ [field]: state[field] }}
-            validateOnBlur={true}
-            validateOnChange={false}
-            onSubmit={(values) => {
-                if (field === 'FormName') {
-                    dispatch(updateFormName({ form: values[field] }));
-                } else if (field === 'Description') {
-                    dispatch(updateFormDescription({ form: values[field] }));
-                }
-                setEdit(false);
-            }}
-        >
-            {({ handleSubmit, errors, touched, setFieldValue, setTouched, values }) => (
-                <Animated.View entering={FadeIn} exiting={FadeOut} style={styles.formContainer}>
-                    <View style={[{ width: fontSize === "large" ? 300 : 250 }]}>
-                        <Inputs
-                            placeholder={`Enter ${field}`}
-                            label={field}
-                            handleChange={(value) => setFieldValue(field, value)}
-                            handleBlur={() => setTouched({ ...touched, [field]: true })}
-                            value={String(values[field] ?? "")}
-                            error={touched[field] && Boolean(errors[field])}
-                            errorMessage={String(errors[field])}
-                            testId={`${field}-cf`}
-                        />
+        return (
+            <Formik
+                initialValues={{ [field]: state[field] || "" }}
+                validateOnBlur={true}
+                validateOnChange={false}
+                onSubmit={(values) => {
+                    switch (field) {
+                        case "FormName":
+                            dispatch(updateFormName({ form: values[field] }));
+                            break;
+                        case "Description":
+                            dispatch(updateFormDescription({ form: values[field] }));
+                            break;
+                        default:
+                            break;
+                    }
+                    setEdit(false);
+                }}
+            >
+                {({ handleSubmit }) => (
+                    <View style={styles.formContainer}>
+                        <Animated.View entering={FadeIn} exiting={FadeOut}>
+                            <FastField name={field}>
+                                {({ field, form }: any) => (
+                                    <Inputs
+                                        placeholder={`Enter ${field.name}`}
+                                        label={field.name.charAt(0).toUpperCase() + field.name.slice(1)}
+                                        handleChange={(value) => form.setFieldValue(field.name, value)}
+                                        handleBlur={() =>
+                                            form.setTouched({ ...form.touched, [field.name]: true })
+                                        }
+                                        value={field.value || ""}
+                                        error={Boolean(
+                                            form.touched?.[field.name] && form.errors?.[field.name]
+                                        )}
+                                        errorMessage={
+                                            form.touched?.[field.name] ? form.errors?.[field.name] : ""
+                                        }
+                                        testId={`${field.name}-cf`}
+                                    />
+                                )}
+                            </FastField>
+
+                            <View id="form-action-config">
+                                <TouchableOpacity
+                                    onPress={() => handleSubmit()}
+                                    style={[
+                                        masterdataStyles.button,
+                                        masterdataStyles.backMain,
+                                        { alignSelf: responsive === "small" ? 'center' : 'flex-end' }
+                                    ]}
+                                    testID="Save-config"
+                                >
+                                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Save</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </Animated.View>
                     </View>
-
-                    <MemoizedIconButton
-                        icon="check"
-                        onPress={() => handleSubmit()}
-                        iconColor={theme.colors.green}
-                        size={spacing.large}
-                        style={styles.iconButton}
-                    />
-                </Animated.View>
-            )}
-        </Formik>
-    );
-});
+                )}
+            </Formik>
+        );
+    }
+);
 
 export default ConfigItemForm;
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        flexDirection: 'row',
-        flexBasis: '100%',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginVertical: 10,
-        paddingVertical: 12,
-        paddingHorizontal: 15,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginVertical: 8,
+        marginHorizontal: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        backgroundColor: "#f9f9f9",
+        borderRadius: 8,
+        shadowColor: "#000",
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 3,
     },
-    configPrefixText: {
+    textRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        flex: 1,
+    },
+    labelText: {
+        flex: 1,
         marginRight: 10,
-        fontWeight: '600',
-        fontSize: 16,
-        color: '#333',
+        color: "#555",
     },
     formContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexBasis: '100%',
         flex: 1,
-        paddingHorizontal: 5,
     },
     iconButton: {
-        padding: 0,
-        margin: 0
+        marginLeft: 10,
+    },
+    submitButton: {
+        flexBasis: '10%',
+        alignSelf: "center",
     },
 });

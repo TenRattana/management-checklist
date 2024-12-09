@@ -2,11 +2,11 @@ import { useRes } from "@/app/contexts/useRes";
 import { useTheme } from "@/app/contexts/useTheme";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import React, { useCallback, useEffect } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
+import Text from "@/components/Text";
 
 type DetailContentProps = {
     detailData: any[];
-    isDetailVisible: boolean;
     showDetailwithKey?: string[];
 };
 
@@ -19,8 +19,8 @@ const DetailContent = ({ detailData, showDetailwithKey }: DetailContentProps) =>
 
     const styles = StyleSheet.create({
         containerDetail: {
+            flex: 1,
             marginTop: 10,
-            padding: 10,
             borderRadius: 8,
         },
         detailRowItem: {
@@ -34,6 +34,7 @@ const DetailContent = ({ detailData, showDetailwithKey }: DetailContentProps) =>
             alignSelf: 'center'
         },
         chipContainer: {
+            flex: 1,
             flexDirection: "row",
             flexWrap: "wrap",
         },
@@ -49,6 +50,8 @@ const DetailContent = ({ detailData, showDetailwithKey }: DetailContentProps) =>
             color: theme.colors.fff,
         },
         nestedObjectContainer: {
+            flex: 1,
+            flexWrap: 'wrap',
             paddingHorizontal: 5,
             borderLeftWidth: 2,
             borderLeftColor: "#eee",

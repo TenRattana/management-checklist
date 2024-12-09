@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useRef, useMemo } from "react";
-import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { useState, useCallback, useRef, useMemo, useEffect } from "react";
+import { useWindowDimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
 import { Divider, Icon, IconButton } from "react-native-paper";
 import useCreateformStyle from "@/styles/createform";
@@ -23,14 +23,15 @@ import Animated, {
     useSharedValue,
     useAnimatedStyle,
     withTiming,
+    runOnJS,
 } from 'react-native-reanimated';
 
-const { width } = Dimensions.get('window');
 
 const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigation }) => {
     const { responsive, fontSize, spacing } = useRes();
+    const { width } = useWindowDimensions();
 
-    const DRAWER_WIDTH = responsive === "small" ? width : fontSize === "large" ? 500 : 400;
+    const DRAWER_WIDTH = responsive === "small" ? width : fontSize === "large" ? 430 : 370;
 
     const translateX = useSharedValue(-DRAWER_WIDTH);
     const mainTranslateX = useSharedValue(0);
@@ -72,19 +73,18 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
         transform: [{ translateX: mainTranslateX.value }],
     }));
 
-    const panGesture = Gesture.Pan()
-        .onUpdate((event) => {
+    const panGesture = useMemo(() =>
+        Gesture.Pan().onUpdate((event) => {
             const newValue = Math.max(-DRAWER_WIDTH, Math.min(0, translateX.value + event.translationX));
             translateX.value = newValue;
             mainTranslateX.value = Math.max(0, DRAWER_WIDTH + newValue);
-        })
-        .onEnd(() => {
+        }).onEnd(() => {
             if (translateX.value > -DRAWER_WIDTH / 2) {
-                openDrawer(drawerContent || 'main');
+                runOnJS(openDrawer)(drawerContent || 'main');
             } else {
-                closeDrawer();
+                runOnJS(closeDrawer)();
             }
-        });
+        }), []);
 
     const validationSchema = useMemo(() => {
         const shape: Record<string, any> = {};
@@ -144,10 +144,10 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                 DTypeName: selectedDataType?.DTypeName ?? "",
             };
 
-            dispatch(defaultDataForm({ currentField: newField }));
+            runOnJS(dispatch)(defaultDataForm({ currentField: newField }));
         } else if (item.CTypeName === "SubForm") {
             const subForm = { SFormID: "", SFormName: "New Setion", Columns: 1, Fields: [], FormID: state.FormID || "", MachineID: state.MachineID || "" }
-            dispatch(addSubForm({ subForm: subForm }));
+            runOnJS(dispatch)(addSubForm({ subForm: subForm }));
         }
 
     }, [checkList, dataType, groupCheckListOption, state.subForms, dispatch]);
@@ -170,6 +170,8 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
             backgroundColor: theme.colors.background,
             borderLeftWidth: 1,
             borderColor: '#eaeaea',
+            width: drawerOpen ? width - DRAWER_WIDTH : width,
+            display: responsive === "small" && drawerOpen ? 'none' : 'flex',
         },
         buttonContainer: {
             flexDirection: 'row',
@@ -238,12 +240,11 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                         style={[
                             styles.content,
                             mainContentStyle,
-                            { width: drawerOpen ? width - DRAWER_WIDTH : width },
                         ]}
                     >
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity
-                                onPress={() => !drawerOpen || drawerContent !== "main" ? openDrawer('main') : closeDrawer()}
+                                onPress={() => !drawerOpen || drawerContent !== "main" ? runOnJS(openDrawer)('main') : runOnJS(closeDrawer)()}
                                 style={!drawerOpen || drawerContent !== "main" ? styles.openButton : styles.openButtonActive}
                             >
                                 <Icon source={"format-list-bulleted"} size={spacing.large} color={theme.colors.fff} key={"icon-tool"} />
@@ -251,7 +252,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                             </TouchableOpacity>
 
                             <TouchableOpacity
-                                onPress={() => !drawerOpen || drawerContent !== "toolbox" ? openDrawer('toolbox') : closeDrawer()}
+                                onPress={() => !drawerOpen || drawerContent !== "toolbox" ? runOnJS(openDrawer)('toolbox') : runOnJS(closeDrawer)()}
                                 style={!drawerOpen || drawerContent !== "toolbox" ? styles.openButton : styles.openButtonActive}
                             >
                                 <Icon source={"tools"} size={spacing.large} color={theme.colors.fff} key={"icon-tool"} />
@@ -275,15 +276,27 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
 
                 <Animated.View style={[styles.drawer, drawerStyle]}>
                     {drawerContent === 'main' && drawerContent && (
-                        <MemoDragsubform
-                            navigation={navigation}
-                            state={state}
-                            dispatch={dispatch}
-                            checkList={checkList ?? []}
-                            dataType={dataType ?? []}
-                            checkListType={checkListType ?? []}
-                            groupCheckListOption={groupCheckListOption ?? []}
-                        />
+                        <>
+                            {responsive === "small" && (
+                                <TouchableOpacity
+                                    onPress={() => runOnJS(closeDrawer)()}
+                                    style={[styles.openButtonActive, { marginHorizontal: 16 }]}
+                                >
+                                    <Icon source={"arrow-left-circle"} size={spacing.large} color={theme.colors.fff} key={"icon-tool"} />
+                                    <Text style={[masterdataStyles.text, masterdataStyles.textFFF, { marginLeft: 10, padding: 2 }]}>Close Drawer</Text>
+                                </TouchableOpacity>
+                            )}
+
+                            <MemoDragsubform
+                                navigation={navigation}
+                                state={state}
+                                dispatch={dispatch}
+                                checkList={checkList ?? []}
+                                dataType={dataType ?? []}
+                                checkListType={checkListType ?? []}
+                                groupCheckListOption={groupCheckListOption ?? []}
+                            />
+                        </>
                     )}
 
                     {drawerContent === 'toolbox' && (
@@ -291,7 +304,17 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                             style={{ display: drawerContent === "toolbox" ? 'flex' : 'none', marginTop: 20 }}
                             showsVerticalScrollIndicator={false}
                         >
-                            <AccessibleView name="container-formname" style={{ marginHorizontal: 10, marginTop: 5 }}>
+                            {responsive === "small" && (
+                                <TouchableOpacity
+                                    onPress={() => closeDrawer()}
+                                    style={[styles.openButtonActive, { marginHorizontal: 16 }]}
+                                >
+                                    <Icon source={"arrow-left-circle"} size={spacing.large} color={theme.colors.fff} key={"icon-tool"} />
+                                    <Text style={[masterdataStyles.text, masterdataStyles.textFFF, { marginLeft: 10, padding: 2 }]}>Close Drawer</Text>
+                                </TouchableOpacity>
+                            )}
+
+                            <AccessibleView name="container-formname" style={{ marginHorizontal: 10, marginTop: responsive === "small" ? 5 : 5 }}>
                                 {['FormName', 'Description'].map((item) => (
                                     <MemoConfigItemForm
                                         key={item}

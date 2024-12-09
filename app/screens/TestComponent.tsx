@@ -11,13 +11,13 @@ const { width } = Dimensions.get('window');
 const DRAWER_WIDTH = width * 0.2;
 
 const TestComponent = () => {
-    const translateX = useSharedValue(-DRAWER_WIDTH); 
+    const translateX = useSharedValue(-DRAWER_WIDTH);
     const mainTranslateX = useSharedValue(0);
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [drawerContent, setDrawerContent] = useState(null); 
+    const [drawerContent, setDrawerContent] = useState(null);
 
-    const openDrawer = (content) => {
-        setDrawerContent(content); 
+    const openDrawer = (content: any) => {
+        setDrawerContent(content);
         translateX.value = withTiming(0, { duration: 300 });
         mainTranslateX.value = withTiming(DRAWER_WIDTH, { duration: 300 });
         setDrawerOpen(true);
@@ -46,7 +46,7 @@ const TestComponent = () => {
         })
         .onEnd(() => {
             if (translateX.value > -DRAWER_WIDTH / 2) {
-                openDrawer(drawerContent || 'main'); 
+                openDrawer(drawerContent || 'main');
             } else {
                 closeDrawer();
             }
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#3498db',
         padding: 10,
         borderRadius: 5,
-        marginRight: 10, 
+        marginRight: 10,
     },
     toolboxButton: {
         backgroundColor: '#e67e22',

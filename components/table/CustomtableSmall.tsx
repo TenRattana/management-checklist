@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { FlatList, StyleSheet, TouchableOpacity } from "react-native";
+import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import Text from "@/components/Text";
 import useMasterdataStyles from "@/styles/common/masterdata";
@@ -10,8 +10,9 @@ import { Dialogs } from "../common";
 import { HandelPrssProps, CustomtableSmallProps } from "@/typing/tag";
 import { useRes } from "@/app/contexts/useRes";
 import { Picker } from "@react-native-picker/picker";
+import DetailContent from "./Contents/Detailcontent";
 
-const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayData, Tablehead, actionIndex, showMessage, handleDialog, selectedRows, handelSetFilter, filter, showColumn, showData, showFilter, toggleSelect }) => {
+const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayData, Tablehead, actionIndex, showMessage, handleDialog, selectedRows, handelSetFilter, filter, showColumn, showData, showFilter, toggleSelect, detail, detailKey, detailData, detailKeyrow, showDetailwithKey }) => {
 
     const masterdataStyles = useMasterdataStyles();
     const customtable = useCustomtableStyles();
@@ -47,12 +48,18 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
         return Array.from(uniqueOptions);
     }, [showData, showColumn]);
 
+    const findIndex = (row: (string | number | boolean)[]) => {
+        return detailData?.findIndex(item => {
+            return detailKey && item[detailKey] === (detailKeyrow && row[Number(detailKeyrow)]);
+        }) ?? -1;
+    };
+
     const renderSmallRes = useCallback((rowData: (string | number | boolean)[], rowIndex: number) => {
         return (
             <AccessibleView name={`container-${rowIndex}`} style={[customtable.cardRow, { alignItems: 'flex-start', paddingBottom: 10 }]}>
-                {Tablehead.map((header, colIndex) => (
-                    <AccessibleView name={`header-${rowIndex}-${colIndex}`} key={`cell-${rowIndex}-${colIndex}`} style={{ flex: 1, marginVertical: 5, paddingVertical: 5 }}>
-                        <Text style={[{ marginVertical: 5 }, masterdataStyles.text]}>{header.label}</Text>
+                {Tablehead.map((header, colIndex) => header.label !== "" && (
+                    <AccessibleView name={`header-${rowIndex}-${colIndex}`} key={`cell-${rowIndex}-${colIndex}`} style={{ flex: 1, marginVertical: 5, flexDirection: 'row', alignItems: 'center' }}>
+                        <Text style={masterdataStyles.text}>{header.label} : </Text>
                         {actionIndex.map((actionItem, index) => {
                             const filteredEntries = Object.entries(actionItem).filter(([, value]) => value === colIndex);
                             return filteredEntries.length > 0
@@ -108,9 +115,15 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
                         })}
                     </AccessibleView>
                 ))}
+
+                {detail && (
+                    <AccessibleView name="containerdetail" key={`index-${findIndex(rowData)}`} style={{ width: "100%" }}>
+                        <DetailContent detailData={detailData?.[findIndex(rowData)] || []} showDetailwithKey={showDetailwithKey} />
+                    </AccessibleView>
+                )}
             </AccessibleView>
         );
-    }, [actionIndex, Tablehead]);
+    }, [actionIndex, Tablehead, detail, detailKey, detailData]);
 
     return (
         <>
@@ -197,7 +210,7 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
                 )}
                 contentContainerStyle={{ flexGrow: 1 }}
                 nestedScrollEnabled={true}
-                showsVerticalScrollIndicator={true}
+                showsVerticalScrollIndicator={false}
                 removeClippedSubviews
             />
 

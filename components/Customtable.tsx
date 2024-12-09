@@ -102,6 +102,11 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
           showData={showData}
           showFilter={showFilter}
           toggleSelect={toggleSelect}
+          detail={detail}
+          detailData={detailData}
+          detailKey={detailKey}
+          detailKeyrow={detailKeyrow}
+          showDetailwithKey={showDetailwithKey}
           key={"CustomtableSmall"}
         />
       ) :

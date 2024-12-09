@@ -27,10 +27,7 @@ interface DailyProps {
         start: string | null;
         end: string | null;
     }>[] | undefined;
-    errors?: string | string[] | FormikErrors<{
-        start: string | null;
-        end: string | null;
-    }>[] | undefined;
+    errors?: any
 }
 
 const Daily_dialog = React.memo(({ values, setFieldValue, spacing, showError, showSuccess, touched, errors }: DailyProps) => {

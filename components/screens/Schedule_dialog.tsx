@@ -214,7 +214,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                                         </View>
                                     </View>
 
-                                    <View style={{ flexBasis: '46%', marginHorizontal: '2%', flex: 1 }}>
+                                    <View style={{ flexBasis: '46%', marginHorizontal: '2%', flex: 1, marginTop: responsive === "small" ? 100 : 0 }}>
                                         <View style={styles.timeIntervalMenu}>
                                             <Menu
                                                 visible={showTimeIntervalMenu.Custom}
