@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import axiosInstance from "@/config/axios";
 import { setFormData, reset } from "@/slices";
@@ -159,9 +159,9 @@ const useForm = (route: RouteParams) => {
             }
 
             const checkListType = data.checkListType
-                    .filter(group => group.CheckList !== null) 
-                    .flatMap(group => group.CheckList)      
-                    .filter((checkList): checkList is CheckList => checkList !== undefined); 
+                .filter(group => group.CheckList !== null)
+                .flatMap(group => group.CheckList)
+                .filter((checkList): checkList is CheckList => checkList !== undefined);
 
             dispatch(
                 setFormData({

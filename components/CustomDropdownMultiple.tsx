@@ -4,7 +4,7 @@ import { MultiSelect } from 'react-native-element-dropdown';
 import AccessibleView from "@/components/AccessibleView";
 import { CustomDropdownMultiProps } from '@/typing/tag';
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { Pressable, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import Text from "@/components/Text";
 import { useRes } from '@/app/contexts/useRes'
 import { useTheme } from '@/app/contexts/useTheme'
@@ -89,12 +89,12 @@ const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChan
           </View>
         )}
         renderSelectedItem={(item, unSelect) => (
-          <Pressable onPress={() => unSelect && unSelect(item)}>
+          <TouchableOpacity onPress={() => unSelect && unSelect(item)}>
             <AccessibleView name="container-renderSelect" style={masterdataStyles.selectedStyle}>
               <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{item.label}</Text>
               {/* <AntDesign style={styles.icon} name="Safety" size={20} /> */}
             </AccessibleView>
-          </Pressable>
+          </TouchableOpacity>
         )}
         testID={testId}
       />

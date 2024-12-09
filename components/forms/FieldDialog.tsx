@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo, Profiler, useRef } from "react";
-import { Platform, Pressable, ScrollView, TouchableOpacity, View } from "react-native";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import { Checkboxs, Inputs } from "@/components/common";
-import { Portal, Dialog, HelperText, Switch, IconButton } from "react-native-paper";
-import { Formik, FastField, Field } from "formik";
+import { Portal, Dialog, Switch } from "react-native-paper";
+import { Formik, FastField } from "formik";
 import Checklist_dialog from "../screens/Checklist_dialog";
 import { useToast } from "@/app/contexts/useToast";
 import { useTheme } from "@/app/contexts/useTheme";
@@ -11,12 +11,10 @@ import { useRes } from "@/app/contexts/useRes";
 import axiosInstance from "@/config/axios";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { InitialValuesChecklist } from '@/typing/value'
 import { FieldDialogProps } from "@/typing/tag";
 import Text from "@/components/Text";
-import { CheckListOption, GroupCheckListOption } from "@/typing/type";
-import { BaseImportant } from "@/typing/form";
 import { useFocusEffect } from "@react-navigation/native";
 
 const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode, saveField, setShowDialogs

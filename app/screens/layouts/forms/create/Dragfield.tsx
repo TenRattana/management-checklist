@@ -1,9 +1,5 @@
 import React, { useState, useCallback } from "react";
-import {
-    Pressable,
-    ScrollView,
-    TouchableOpacity,
-} from "react-native";
+import { TouchableOpacity } from "react-native";
 import {
     addField,
     updateField,

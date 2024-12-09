@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useRef, useMemo, useEffect } from "react";
+import React, { useState, useCallback, useRef, useMemo } from "react";
 import { useWindowDimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
-import { Divider, Icon, IconButton } from "react-native-paper";
+import { Divider, Icon } from "react-native-paper";
 import useCreateformStyle from "@/styles/createform";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import useForm from "@/hooks/custom/useForm";
@@ -25,7 +25,6 @@ import Animated, {
     withTiming,
     runOnJS,
 } from 'react-native-reanimated';
-
 
 const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigation }) => {
     const { responsive, fontSize, spacing } = useRes();

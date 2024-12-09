@@ -1,7 +1,5 @@
 import React, { useState, useCallback } from "react";
-import {
-    TouchableOpacity,
-} from "react-native";
+import { TouchableOpacity } from "react-native";
 import {
     setDragSubForm,
     addSubForm,
@@ -158,7 +156,7 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, d
                     handelSetDialog();
                 }}
             />
-        </ >
+        </>
     )
 })
 

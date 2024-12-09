@@ -5,7 +5,7 @@ import { Button, Menu, IconButton, HelperText } from 'react-native-paper';
 import Animated, { Easing, Extrapolate, FadeInRight, FadeOutRight, interpolate, SharedValue } from 'react-native-reanimated';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { styles } from './Schedule';
-import { FormikErrors, FormikTouched } from 'formik';
+import { FormikTouched } from 'formik';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Day } from '@/typing/type';
 

@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
+import { FlatList, StyleSheet, TouchableOpacity } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import Text from "@/components/Text";
 import useMasterdataStyles from "@/styles/common/masterdata";

@@ -31,7 +31,6 @@ const saveMatchCheckListOptions = async (data: { Prefix: string; MCLOptionID: st
     return response.data;
 };
 
-
 const MatchCheckListOptionScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
@@ -247,7 +246,6 @@ const MatchCheckListOptionScreen = React.memo(() => {
                 groupCheckListOption={groupCheckListOption}
                 dropgroupCheckListOption={dropgroupCheckListOption}
             />
-
         </AccessibleView>
     );
 });

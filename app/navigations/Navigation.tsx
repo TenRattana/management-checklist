@@ -1,8 +1,7 @@
-import React, { lazy, Suspense, useRef, useCallback, useEffect, useState, useMemo } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import React, { lazy, Suspense, useRef, useCallback, useState, useMemo } from 'react';
+import { ActivityIndicator } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import {
-    HomeScreen,
     ScanQR,
     GenerateQR,
     SettingScreen,

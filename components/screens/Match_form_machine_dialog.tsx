@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import { Portal, Dialog } from "react-native-paper";
 import { Formik, FastField } from "formik";
@@ -93,7 +93,7 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
                                     </FastField>
 
                                     <View id="form-action-mfmd" style={masterdataStyles.containerAction}>
-                                        <Pressable
+                                        <TouchableOpacity
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}
                                             style={[
@@ -104,10 +104,10 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
                                             testID="Save-mfmd"
                                         >
                                             <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Save</Text>
-                                        </Pressable>
-                                        <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-mfmd">
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-mfmd">
                                             <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Cancel</Text>
-                                        </Pressable>
+                                        </TouchableOpacity>
                                     </View>
                                 </View>
                             )}

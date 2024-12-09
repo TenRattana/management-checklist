@@ -1,6 +1,6 @@
 import React from "react";
-import { View, StyleSheet, Dimensions, ViewStyle } from "react-native";
-import { Menu, Divider, IconButton, Text } from "react-native-paper";
+import { View, StyleSheet, Dimensions } from "react-native";
+import { Menu, Divider, IconButton } from "react-native-paper";
 import { useRes } from '@/app/contexts/useRes'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useTheme } from "@/app/contexts/useTheme";

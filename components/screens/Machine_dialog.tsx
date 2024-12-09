@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { TouchableOpacity, ScrollView, View } from "react-native";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import { Inputs } from "@/components/common";
 import { Portal, Switch, Dialog, TextInput } from "react-native-paper";
@@ -221,7 +221,7 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
 
                                         </ScrollView>
                                         <View id="form-action-md" style={masterdataStyles.containerAction}>
-                                            <Pressable
+                                            <TouchableOpacity
                                                 onPress={() => handleSubmit()}
                                                 disabled={!isValid || !dirty}
                                                 style={[
@@ -232,10 +232,10 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                 testID="Save-md"
                                             >
                                                 <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Save</Text>
-                                            </Pressable>
-                                            <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-md">
+                                            </TouchableOpacity>
+                                            <TouchableOpacity onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-md">
                                                 <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Cancel</Text>
-                                            </Pressable>
+                                            </TouchableOpacity>
                                         </View>
                                     </View>
 

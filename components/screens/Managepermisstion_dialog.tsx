@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Pressable, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import { Portal, Dialog, Switch } from "react-native-paper";
 import { Formik, FastField } from "formik";
@@ -16,7 +16,6 @@ const validationSchema = Yup.object().shape({
     GUserID: Yup.string().required("This role field is required"),
     IsActive: Yup.boolean().required("This isactive field is required")
 });
-
 
 const Managepermisstion_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData, users, groupUser }: ManagepermissionDialogProps<InitialValuesManagepermission, Users, GroupUsers>) => {
     const masterdataStyles = useMasterdataStyles()
@@ -110,7 +109,7 @@ const Managepermisstion_dialog = React.memo(({ isVisible, setIsVisible, isEditin
                                     </View>
 
                                     <View id="form-action-managed" style={masterdataStyles.containerAction}>
-                                        <Pressable
+                                        <TouchableOpacity
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}
                                             style={[
@@ -121,10 +120,10 @@ const Managepermisstion_dialog = React.memo(({ isVisible, setIsVisible, isEditin
                                             testID="Save-managed"
                                         >
                                             <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Save</Text>
-                                        </Pressable>
-                                        <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-managed">
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-managed">
                                             <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Cancel</Text>
-                                        </Pressable>
+                                        </TouchableOpacity>
                                     </View>
                                 </View>
                             )}

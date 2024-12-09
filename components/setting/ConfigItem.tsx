@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { StyleSheet, View, ActivityIndicator } from 'react-native';
 import { IconButton, Text } from 'react-native-paper';
 import { useTheme } from '@/app/contexts/useTheme';

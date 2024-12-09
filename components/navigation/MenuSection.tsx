@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { Pressable } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
 import { IconButton } from 'react-native-paper';
 import Text from '@/components/Text';

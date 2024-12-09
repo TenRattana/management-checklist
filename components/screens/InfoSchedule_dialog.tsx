@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, Dimensions, ScrollView } from 'react-native';
-import { Dialog, Button, Portal, Text } from 'react-native-paper';
+import { Dialog, Button, Portal } from 'react-native-paper';
 import Daily_dialog from './Daily_dialog';
 import { styles } from './Schedule';
 import { FastField, Formik, FormikHelpers } from 'formik';

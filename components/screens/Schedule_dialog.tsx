@@ -1,7 +1,7 @@
 import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, Dimensions } from 'react-native';
 import { Button, Dialog, Portal, Menu, Switch, HelperText } from 'react-native-paper';
 import { Inputs } from '../common';

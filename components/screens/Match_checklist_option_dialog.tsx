@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Pressable, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import CustomDropdownMultiple from "@/components/CustomDropdownMultiple";
 import { Portal, Switch, Dialog } from "react-native-paper";
@@ -127,7 +127,7 @@ const Match_checklist_option = React.memo(({
                                         />
                                     </View>
                                     <View id="form-action-mcod" style={masterdataStyles.containerAction}>
-                                        <Pressable
+                                        <TouchableOpacity
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}
                                             style={[
@@ -138,10 +138,10 @@ const Match_checklist_option = React.memo(({
                                             testID="Save-mcod"
                                         >
                                             <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Save</Text>
-                                        </Pressable>
-                                        <Pressable onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-mcod">
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-mcod">
                                             <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Cancel</Text>
-                                        </Pressable>
+                                        </TouchableOpacity>
                                     </View>
                                 </View>
                             )}

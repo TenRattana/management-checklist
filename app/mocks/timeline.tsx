@@ -6,8 +6,6 @@ import {
 } from 'react-native-calendars';
 
 import moment from "moment";
-import { useTheme } from "@/app/contexts/useTheme";
-// import { point, Tracking } from '../screens/layouts/schedule/Mock';
 
 const today = getCurrentTime();
 
@@ -131,8 +129,8 @@ export const convertScheduleToTimeline = (
     schedule: TimelineItem[]
 ): { timeline: TimeLine[]; markedDates: MarkedDates } => {
     const today = moment();
-    const startOfMonth = today.clone().startOf("month");
-    const endOfMonth = today.clone().endOf("month");
+    const startOfMonth = today.clone().startOf("years");
+    const endOfMonth = today.clone().endOf("years");
     const timeline: TimeLine[] = [];
     const markedDates: MarkedDates = {};
 

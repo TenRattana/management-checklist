@@ -10,7 +10,6 @@ import { getCurrentTime } from '@/config/timezoneUtils';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css"
-import { FormikErrors, FormikTouched } from 'formik';
 
 interface Custom_scheduleProps {
     theme: any;

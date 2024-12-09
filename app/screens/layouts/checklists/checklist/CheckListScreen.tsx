@@ -12,7 +12,6 @@ import { InitialValuesChecklist } from '@/typing/value';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSelector } from "react-redux";
 
-
 const fetchCheckList = async (): Promise<Checklist[]> => {
     const response = await axiosInstance.post("CheckList_service.asmx/GetCheckLists");
     return response.data.data ?? [];

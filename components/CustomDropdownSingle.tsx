@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { View } from "react-native";
-import { IconButton, HelperText, Portal } from "react-native-paper";
+import { IconButton, HelperText } from "react-native-paper";
 import { Dropdown } from 'react-native-element-dropdown';
 import { CustomDropdownSingleProps } from '@/typing/tag'
 import useMasterdataStyles from "@/styles/common/masterdata";

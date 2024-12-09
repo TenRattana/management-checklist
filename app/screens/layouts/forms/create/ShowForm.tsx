@@ -1,4 +1,4 @@
-import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef, useCallback, Profiler } from "react";
+import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef, useCallback } from "react";
 import { View, ViewStyle, FlatList } from "react-native";
 import { Card, Divider } from "react-native-paper";
 import { useTheme } from "@/app/contexts/useTheme";
@@ -183,8 +183,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                             </>
                         )}
                     </Formik>
-                )
-                )}
+                ))}
                 ListHeaderComponent={() => (
                     <>
                         <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>

@@ -1,7 +1,7 @@
 import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
 import { convertScheduleToTimeline, getDate, parseTimeScheduleToTimeline } from '@/app/mocks/timeline';
-import { AccessibleView, Customtable, LoadingSpinner } from '@/components';
+import { AccessibleView } from '@/components';
 import { Clock } from '@/components/common/Clock';
 import Home_dialog from '@/components/screens/Home_dialog';
 import axiosInstance from '@/config/axios';
@@ -13,7 +13,7 @@ import moment from 'moment-timezone';
 import React, { useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, FlatList } from 'react-native';
 import { Calendar, CalendarProvider, CalendarUtils, DateData, Timeline, TimelineList, TimelineListRenderItemInfo, TimelineProps } from 'react-native-calendars';
-import { Card, Checkbox, Icon, IconButton } from 'react-native-paper';
+import { Checkbox, Icon } from 'react-native-paper';
 import Animated, { Easing, FadeIn, FadeOut, runOnJS } from 'react-native-reanimated';
 import { useQuery } from 'react-query';
 
@@ -64,7 +64,7 @@ const HomeScreen = () => {
   const { theme, darkMode } = useTheme();
   const { responsive, spacing } = useRes();
   const [currentDate, setCurrentDate] = useState<string>(getDate());
-  const [filterStatus, setFilterStatus] = useState<'all' | 'end' | 'running' | 'wait' | 'stop'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'end' | 'running' | 'wait' | 'stop'>('running');
   const [filterTitle, setFilterTitle] = useState<string[]>(["Daily", "Weekly", "Custom"]);
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [selectedEvent, setSelectedEvent] = useState(null);

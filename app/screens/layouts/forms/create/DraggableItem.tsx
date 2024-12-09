@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { GestureEvent, HandlerStateChangeEvent, PanGestureHandler, PanGestureHandlerEventPayload } from "react-native-gesture-handler";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, runOnJS } from "react-native-reanimated";
 import { IconButton, Portal } from "react-native-paper";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
 import useCreateformStyle from "@/styles/createform";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { CheckList, CheckListType } from "@/typing/type";
+import { CheckList } from "@/typing/type";
 
 const DraggableItem: React.FC<{
     item: CheckList;
@@ -74,7 +74,7 @@ const DraggableItem: React.FC<{
                             style={createform.icon}
                             animated
                         />
-                        <Text style={[masterdataStyles.textFFF, { textAlign: "left", flex: 1}]}>
+                        <Text style={[masterdataStyles.textFFF, { textAlign: "left", flex: 1 }]}>
                             {item.CTypeTitle}
                         </Text>
                     </View>
@@ -99,7 +99,6 @@ const DraggableItem: React.FC<{
         </PanGestureHandler>
     );
 });
-
 
 const FieldForm: React.FC<{ data: CheckList[], onDrop: (item: CheckList, absoluteX: number, absoluteY: number) => void; }> = ({ data, onDrop }) => {
     const styles = StyleSheet.create({

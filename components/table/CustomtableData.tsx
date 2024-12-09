@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { FlatList, View } from "react-native";
 import { DataTable } from "react-native-paper";
 import Text from "../Text";

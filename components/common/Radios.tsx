@@ -10,7 +10,6 @@ const Radios: React.FC<RadiosProps> = React.memo(({
   value,
   handleChange,
   hint,
-  handleBlur,
   label,
   error,
   errorMessage,

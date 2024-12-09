@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect, useMemo } from 'react';
+import React, { createContext, useState, ReactNode, useEffect, useMemo } from 'react';
 import { PaperProvider, DefaultTheme, MD3DarkTheme } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -9,7 +9,6 @@ export interface ThemeContextProps {
 }
 
 export const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
-
 
 const CustomLightTheme = {
   ...DefaultTheme,
