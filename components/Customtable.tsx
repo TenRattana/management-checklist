@@ -6,7 +6,7 @@ import CustomtableSmall from "./table/CustomtableSmall";
 import CustomtableData from "./table/CustomtableData";
 import { CustomTableProps } from '@/typing/tag';
 
-const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, actionIndex, searchQuery, showMessage, selectedRows, setRow, showFilter, showData, showColumn, detail, detailData, detailKey }: CustomTableProps) => {
+const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, actionIndex, searchQuery, showMessage, selectedRows, setRow, showFilter, showData, showColumn, detail, detailData, detailKey, detailKeyrow, showDetailwithKey }: CustomTableProps) => {
   const [sortColumn, setSortColumn] = useState<number | null>(null);
   const [sortDirection, setSortDirection] = useState<"ascending" | "descending" | undefined>(undefined);
   const [displayData, setDisplayData] = useState<(string | number | boolean)[][]>([]);
@@ -136,6 +136,8 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
             detail={detail}
             detailData={detailData}
             detailKey={detailKey}
+            detailKeyrow={detailKeyrow}
+            showDetailwithKey={showDetailwithKey}
             key={"CustomtableData"}
           />
         </AccessibleView>

@@ -7,10 +7,10 @@ import { View, Text, StyleSheet } from "react-native";
 type DetailContentProps = {
     detailData: any[];
     isDetailVisible: boolean;
-    detailKey: any
+    showDetailwithKey?: string[];
 };
 
-const DetailContent = ({ detailData }: DetailContentProps) => {
+const DetailContent = ({ detailData, showDetailwithKey }: DetailContentProps) => {
     useEffect(() => { }, [detailData])
     const { spacing } = useRes();
     const { theme } = useTheme()
@@ -22,9 +22,6 @@ const DetailContent = ({ detailData }: DetailContentProps) => {
             marginTop: 10,
             padding: 10,
             borderRadius: 8,
-        },
-        detailRow: {
-            marginBottom: 15,
         },
         detailRowItem: {
             marginBottom: 8,
@@ -114,19 +111,20 @@ const DetailContent = ({ detailData }: DetailContentProps) => {
 
         return (
             <View style={styles.containerDetail} key={`container-${detailData}`}>
-                <View style={styles.detailRow}>
-                    {Object.entries(detailData).map(([key, value]) => (
+                <View>
+                    {Object.entries(detailData).map(([key, value]) => showDetailwithKey && showDetailwithKey.includes(key) && value !== null && (
                         <View style={styles.detailRowItem} key={`${key}-value-${value}`}>
                             <Text style={[masterdataStyles.text, styles.keyText]}>
                                 {`${key.charAt(0).toUpperCase() + key.slice(1)}:`}
                             </Text>
+
                             {renderValue(value)}
                         </View>
                     ))}
                 </View>
             </View>
         );
-    }, [detailData]);
+    }, [detailData, showDetailwithKey]);
 
     return <View>{renderDetails()}</View>;
 };

@@ -207,8 +207,8 @@ const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisib
                             ]}
                         >
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                <IconButton icon="account" size={spacing.large} style={{ left: -10 }} />
-                                <Text style={[masterdataStyles.text, { textAlign: "left", left: -10 }]}>User info</Text>
+                                <IconButton icon="account" size={spacing.large} style={{ left: -10 }} iconColor={activeMenu === 'user' ? theme.colors.background : theme.colors.onBackground} />
+                                <Text style={[masterdataStyles.text, { textAlign: "left", left: -10, color: activeMenu === 'user' ? theme.colors.background : theme.colors.onBackground }]}>User info</Text>
                             </View>
                         </TouchableOpacity>
 
@@ -220,8 +220,8 @@ const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisib
                             ]}
                         >
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                <IconButton icon="cog" size={spacing.large} style={{ left: -10 }} />
-                                <Text style={[masterdataStyles.text, { textAlign: "left", left: -10 }]}>Setting</Text>
+                                <IconButton icon="cog" size={spacing.large} style={{ left: -10 }} iconColor={activeMenu === 'general' ? theme.colors.background : theme.colors.onBackground} />
+                                <Text style={[masterdataStyles.text, { textAlign: "left", left: -10, color: activeMenu === 'general' ? theme.colors.background : theme.colors.onBackground }]}>Setting</Text>
                             </View>
                         </TouchableOpacity>
 
@@ -234,8 +234,8 @@ const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisib
                                 ]}
                             >
                                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                    <IconButton icon="application-cog-outline" size={spacing.large} style={{ left: -10 }} />
-                                    <Text style={[masterdataStyles.text, { textAlign: "left", left: -10 }]}>Configuration</Text>
+                                    <IconButton icon="application-cog-outline" size={spacing.large} style={{ left: -10 }} iconColor={activeMenu === 'configuration' ? theme.colors.background : theme.colors.onBackground} />
+                                    <Text style={[masterdataStyles.text, { textAlign: "left", left: -10, color: activeMenu === 'configuration' ? theme.colors.background : theme.colors.onBackground }]}>Configuration</Text>
                                 </View>
                             </TouchableOpacity>
                         )}

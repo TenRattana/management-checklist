@@ -34,12 +34,12 @@ const DynamicForm = React.memo(({
       const minLength = Number(ImportantList?.[0]?.MinLength) || 0;
       const maxLength = Number(ImportantList?.[0]?.MaxLength) || Infinity;
 
-      if (numericValue < minLength) {
+      if (numericValue <= minLength) {
 
         setTextColor(theme.colors.yellow);
         setMessageMinOrMax("Min value control is overlength");
       }
-      else if (numericValue > maxLength) {
+      else if (numericValue >= maxLength) {
         setTextColor(theme.colors.error);
         setMessageMinOrMax("Max value control is overlength");
       }
@@ -149,11 +149,15 @@ const DynamicForm = React.memo(({
     }
   })
 
+  const isValidImportantList = values && ImportantList && ImportantList?.length > 0 ? ImportantList?.every(
+    (value) => value.Value && value.Value?.includes(values)
+  ) : false;
+
   return (
     <View id="form-layout2">
       <Text
         variant="bodyMedium"
-        style={[masterdataStyles.text, CTypeName === "Text" ? styles.text : undefined, { color: exp && messageminOrmax ? theme.colors.error : theme.colors.onBackground }]}
+        style={[masterdataStyles.text, CTypeName === "Text" ? styles.text : undefined, { color: exp && (messageminOrmax || isValidImportantList) ? theme.colors.error : theme.colors.onBackground }]}
       >
         {CListName} {" "}
         {Required && <Text style={{ color: theme.colors.error }}>(*)</Text>}

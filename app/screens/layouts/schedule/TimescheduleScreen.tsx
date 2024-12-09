@@ -128,11 +128,11 @@ const TimescheduleScreen: React.FC = React.memo(() => {
     const tableData = useMemo(() => {
         return timeSchedule.map((item) => [
             item.ScheduleName,
-            // machineGroups.flatMap((v) =>
-            //     Array.isArray(item.MachineGroup)
-            //         ? item.MachineGroup.map(m => m === v.GMachineID ? v.GMachineName : null)
-            //         : []
-            // ).filter(name => name !== null).join(", "),
+            machineGroups.flatMap((v) =>
+                Array.isArray(item.MachineGroup)
+                    ? item.MachineGroup.map(m => m === v.GMachineID ? v.GMachineName : null)
+                    : []
+            ).filter(name => name !== null).join(", "),
             item.Type_schedule,
             item.Tracking ? "track" : "not track",
             item.IsActive,
@@ -167,12 +167,14 @@ const TimescheduleScreen: React.FC = React.memo(() => {
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
         ],
-        flexArr: [2, 1, 1, 1, 1],
-        actionIndex: [{ editIndex: 4, delIndex: 5 }],
+        flexArr: [2, 1, 1, 1, 1, 1],
+        actionIndex: [{ editIndex: 5, delIndex: 6 }],
         handleAction,
         showMessage: 0,
         detail: true,
-        detailKey: ["MachineGroup", "TimeSlots", "TimeCustom", "TimeWeek"],
+        detailKey: "ScheduleID",
+        detailKeyrow: 5,
+        showDetailwithKey: ["Type_schedule", "TimeSlots", "TimeWeek", "TimeCustom"],
         detailData: timeSchedule,
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction, timeSchedule]);

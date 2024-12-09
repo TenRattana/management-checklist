@@ -44,7 +44,9 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = React.memo((p
     }, [isMenuListOpen]);
 
     return user.IsAuthenticated && user.Screen.length > 0 ? (
-        <DrawerContentScrollView {...props} style={{ flex: 1 }}>
+        <DrawerContentScrollView {...props} style={{ flex: 1 }}
+            showsVerticalScrollIndicator={false}
+        >
             {user.Screen.map((screen: Menus) => {
                 if (screen.OrderNo) {
                     if (screen.ParentMenu) {

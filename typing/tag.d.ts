@@ -145,7 +145,9 @@ export interface CustomTableProps {
   showData?: TypeConfig[];
   showColumn?: string;
   detail?: boolean;
-  detailKey?:string[];
+  detailKey?:string;
+  showDetailwithKey?:string[];
+  detailKeyrow?:number;
   detailData?: TypeConfig[];
 }
 
@@ -254,6 +256,8 @@ export interface CustomtableDataProps {
   selectedRows?: string[];
   toggleSelect: (value: string) => void;
   detail?: boolean;
-  detailKey?:string[];
+  detailKey?:string;
+  detailKeyrow?:number;
+  showDetailwithKey?:string[];
   detailData?: TypeConfig[];
 }

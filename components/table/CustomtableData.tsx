@@ -19,7 +19,7 @@ type justifyContent = 'flex-start' | 'flex-end' | 'center' | 'space-between' | '
 FadeInUp.duration(300).easing(Easing.ease);
 FadeOutDown.duration(300).easing(Easing.ease);
 
-const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead, flexArr, actionIndex, displayData, handleDialog, showMessage, selectedRows, toggleSelect, detail, detailKey, detailData }) => {
+const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead, flexArr, actionIndex, displayData, handleDialog, showMessage, selectedRows, toggleSelect, detail, detailKey, detailData, detailKeyrow, showDetailwithKey }) => {
     const customtable = useCustomtableStyles();
     const masterdataStyles = useMasterdataStyles();
     const { theme } = useTheme()
@@ -41,30 +41,7 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
 
     const findIndex = (row: (string | number | boolean)[]) => {
         return detailData?.findIndex(item => {
-            const itemValues = Object.entries(item).flatMap(([key, value]) => {
-                if (Array.isArray(value)) {
-                    return value.map(v => JSON.stringify(v));
-                }
-                if (typeof value === "object" && value !== null) {
-                    return JSON.stringify(value);
-                }
-                if (typeof value === "boolean") {
-                    return value ? "track" : "not track";
-                }
-                return String(value).toLowerCase();
-            });
-
-            const rowValues = row.map(value => {
-                if (typeof value === "boolean") {
-                    return value ? "track" : "not track";
-                }
-                if (typeof value === "object" && value !== null) {
-                    return JSON.stringify(value);
-                }
-                return String(value).toLowerCase();
-            });
-
-            return rowValues.every(value => itemValues.includes(value));
+            return item[detailKey] === (detailKeyrow && row[Number(detailKeyrow)]);
         }) ?? -1;
     };
 
@@ -144,7 +121,7 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                 {isDetailVisible[findIndex(row)] && (
                     <AccessibleView name="containerdetail" key={`index-${findIndex(row)}`}>
                         <Animated.View entering={FadeInUp} exiting={FadeOutDown} >
-                            <DetailContent detailData={detailData?.[findIndex(row)] || []} isDetailVisible={isDetailVisible[findIndex(row)]} detailKey={detailKey} />
+                            <DetailContent detailData={detailData?.[findIndex(row)] || []} isDetailVisible={isDetailVisible[findIndex(row)]} showDetailwithKey={showDetailwithKey} />
                         </Animated.View>
                     </AccessibleView>
                 )}
