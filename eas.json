@@ -1,21 +1,55 @@
 {
   "cli": {
-    "version": ">= 13.2.1",
-    "appVersionSource": "remote"
+    "version": ">=3.0.0"
   },
   "build": {
     "development": {
-      "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "simulator": true
+      },
+      "web": {
+        "buildCommand": "npm run build",
+        "publishCommand": "npm run deploy"
+      }
     },
-    "preview": {
-      "distribution": "internal"
+    "test": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "web": {
+        "buildCommand": "npm run build",
+        "publishCommand": "npm run deploy"
+      }
     },
     "production": {
-      "autoIncrement": true
+      "distribution": "store",
+      "android": {
+        "buildType": "aab"
+      },
+      "ios": {
+        "buildType": "app-store"
+      },
+      "web": {
+        "buildCommand": "npm run build",
+        "publishCommand": "npm run deploy"
+      }
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "android": {
+        "serviceAccountKeyPath": "./path/to/google-service-key.json",
+        "track": "production"
+      },
+      "ios": {
+        "ascAppId": "your-app-id",
+        "appleId": "your-email@example.com"
+      }
+    }
   }
 }
