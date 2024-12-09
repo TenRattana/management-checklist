@@ -14,7 +14,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, FlatList } from 'react-native';
 import { Calendar, CalendarProvider, CalendarUtils, DateData, Timeline, TimelineList, TimelineListRenderItemInfo, TimelineProps } from 'react-native-calendars';
 import { Card, Checkbox, Icon, IconButton } from 'react-native-paper';
-import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated';
+import Animated, { Easing, FadeIn, FadeOut, runOnJS } from 'react-native-reanimated';
 import { useQuery } from 'react-query';
 
 const fetchTimeSchedules = async (): Promise<TimeScheduleProps[]> => {
@@ -65,7 +65,7 @@ const HomeScreen = () => {
   const { responsive, spacing } = useRes();
   const [currentDate, setCurrentDate] = useState<string>(getDate());
   const [filterStatus, setFilterStatus] = useState<'all' | 'end' | 'running' | 'wait' | 'stop'>('all');
-  const [filterTitle, setFilterTitle] = useState<string[]>(["Daily" , "Weekly" , "Custom"]);
+  const [filterTitle, setFilterTitle] = useState<string[]>(["Daily", "Weekly", "Custom"]);
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -127,7 +127,7 @@ const HomeScreen = () => {
       return statusMatches && typeMatches;
     }) || [];
 
-    
+
     const groupedEvents = groupBy(filteredEvents, (event) => {
       if (event.start && typeof event.start === 'string') {
         const datePart = moment(event.start).format('YYYY-MM-DD');
@@ -141,11 +141,8 @@ const HomeScreen = () => {
 
 
   const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      flexDirection: 'row',
-    },
     calendarContainer: {
+      flex: 1,
       width: responsive === "small" ? 0 : responsive === "medium" ? 300 : 450,
       borderRightWidth: 1,
       borderColor: '#eaeaea',
@@ -231,8 +228,8 @@ const HomeScreen = () => {
   const timelineProps = useMemo(() => {
     return {
       format24h: true,
-      overlapEventsSpacing: 20,
-      rightEdgeSpacing: 50,
+      overlapEventsSpacing: 8,
+      rightEdgeSpacing: 8,
       start: 0,
       end: 24,
       unavailableHours: [{ start: 0, end: getCurrentTime().getHours() }],
@@ -300,46 +297,45 @@ const HomeScreen = () => {
     <AccessibleView name="container-Home" style={{ flex: 1 }}>
       <CalendarProvider
         date={currentDate}
-        onDateChanged={setCurrentDate}
+        onDateChanged={runOnJS(setCurrentDate)}
         disabledOpacity={0.6}
         theme={getTheme()}
+        showTodayButton
       >
-        <View style={styles.container}>
+        <View style={{ flex: 1, flexDirection: 'row' }}>
           {showCalendar && (
             <Animated.View
               entering={FadeIn}
               exiting={FadeOut}
             >
               <View style={styles.calendarContainer}>
-                <Calendar
-                  onDayPress={(day: DateData) => setCurrentDate(day.dateString)}
-                  markedDates={markedDatesS}
-                  markingType="multi-dot"
-                  style={styles.calendar}
-                  theme={getTheme()}
+                <FlatList
+                  data={categories}
+                  keyExtractor={(item) => item.id}
+                  renderItem={({ item }) => (
+                    <View style={styles.itemContainer}>
+                      <Checkbox
+                        status={checkedItems?.[item.id] ? 'checked' : 'unchecked'}
+                        onPress={() => runOnJS(toggleCheckbox)(item.id, item.title)}
+                        color={item.color}
+                      />
+                      <Text style={[masterdataStyles.text, { color: item.color, paddingLeft: 5 }]}>{item.title}</Text>
+                    </View>
+                  )}
+                  ListHeaderComponent={() => (
+                    <>
+                      <Calendar
+                        onDayPress={(day: DateData) => runOnJS(setCurrentDate)(day.dateString)}
+                        markedDates={markedDatesS}
+                        markingType="multi-dot"
+                        style={styles.calendar}
+                        theme={getTheme()}
+                      />
+                      <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginBottom: 15 }]}>Schedule Type</Text>
+                    </>
+                  )}
+                  style={{ marginTop: 20, flex: 1 }}
                 />
-                <Card.Content style={styles.cardcontent}>
-                  <View style={styles.container}>
-                    <FlatList
-                      data={categories}
-                      keyExtractor={(item) => item.id}
-                      renderItem={({ item }) => (
-                        <View style={styles.itemContainer}>
-                          <Checkbox
-                            status={checkedItems?.[item.id] ? 'checked' : 'unchecked'}
-                            onPress={() => toggleCheckbox(item.id, item.title)}
-                            color={item.color}
-                          />
-                          <Text style={[masterdataStyles.text, { color: item.color, paddingLeft: 5 }]}>{item.title}</Text>
-                        </View>
-                      )}
-                      ListHeaderComponent={() =>
-                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginBottom: 15 }]}>Schedule Type</Text>
-                      }
-                      style={{ marginTop: 20 }}
-                    />
-                  </View>
-                </Card.Content>
               </View>
             </Animated.View>
           )}
