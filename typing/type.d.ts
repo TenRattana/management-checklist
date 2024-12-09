@@ -237,7 +237,8 @@ export type ComponentNameNoLazy =
   | "Match_form_machine"
   | "Managepermissions"
   | "Test"
-  | "Time";
+  | "Time"
+  | "TimeTrack";
 
 export type TypeConfig =
   | GroupMachine

@@ -130,7 +130,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                 >
                     {({ values, handleSubmit, setFieldValue, dirty, isValid, errors, touched, setFieldTouched, resetForm }) => {
                         return (
-                            <Dialog visible={isVisible} style={styles.container}>
+                            <Dialog visible={isVisible} style={[masterdataStyles.containerDialog, { width: responsive === "large" ? 1000 : "80%" }]}>
                                 <Dialog.Title style={{ marginLeft: 30 }}>{isEditing ? "Edit Schedule" : "Add Schedule"}</Dialog.Title>
 
                                 <View style={{
@@ -250,7 +250,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                                             {errors.Type_schedule}
                                         </HelperText>
 
-                                        {values.Type_schedule === "Custom" && (
+                                        {/* {values.Type_schedule === "Custom" && (
                                             <View style={[styles.timeIntervalMenu, { marginBottom: 0 }]}>
                                                 <View id="form-active-md" style={[masterdataStyles.containerSwitch]}>
                                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -269,7 +269,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                                                     </View>
                                                 </View>
                                             </View>
-                                        )}
+                                        )} */}
 
                                         <ScrollView showsVerticalScrollIndicator={false} style={{ display: values.Type_schedule ? 'flex' : 'none' }}>
                                             <Animated.View entering={FadeInRight} exiting={FadeOutRight} style={{ display: values.Type_schedule === "Daily" ? 'flex' : 'none' }} >

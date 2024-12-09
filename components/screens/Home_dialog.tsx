@@ -40,7 +40,7 @@ const Home_dialog = React.memo(({ dialogVisible, hideDialog, selectedEvent }: Ho
         item.Floor ?? "-",
         item.MachineCode ?? "-",
         item.FormName ?? "-",
-        item.IsActive ? "Wait" : "Succeass"
+        selectedEvent?.statustype
     ]), [machine]);
 
     const customtableProps = useMemo(() => ({

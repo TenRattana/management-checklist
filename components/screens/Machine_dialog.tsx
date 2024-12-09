@@ -17,6 +17,7 @@ import { Platform } from "react-native";
 
 const validationSchema = Yup.object().shape({
     machineGroupId: Yup.string().required("The group machine field is required."),
+    machineCode: Yup.string().max(15, 'Machine code must not exceed 15 characters.'),
     machineName: Yup.string().required("The machine name field is required."),
     description: Yup.string().required("The description field is required."),
     isActive: Yup.boolean().required("The status field is required."),

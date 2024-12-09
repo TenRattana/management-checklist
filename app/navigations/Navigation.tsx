@@ -32,6 +32,7 @@ import CustomMenu from '@/components/navigation/CustomMenu'
 import Setting_dialog from "@/components/screens/Setting_dialog"
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { runOnJS } from 'react-native-reanimated';
+import TimescheduleTrack from '../screens/layouts/schedule/TimescheduleTrack';
 
 const Drawer = createDrawerNavigator();
 const MemoSetting_dialog = React.memo(Setting_dialog)
@@ -62,7 +63,8 @@ const nonLazyComponents: Record<ComponentNameNoLazy, React.ComponentType<any>> =
     Config: ConfigulationScreen,
     Permission_deny: PermissionDeny,
     Test: TestComponent,
-    Time: TimescheduleScreen
+    Time: TimescheduleScreen,
+    TimeTrack: TimescheduleTrack
 };
 
 const DrawerNav = React.memo(({ renderComponent, user }: any) => {

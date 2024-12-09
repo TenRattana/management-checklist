@@ -7,8 +7,7 @@ const { responsive } = useRes();
 
 export const styles = StyleSheet.create({
   container: {
-    width:
-      responsive === "large" ? 800 : responsive === "medium" ? "80%" : "80%",
+    width: responsive === "large" ? 900 : "80%",
     alignSelf: "center",
     overflow: "hidden",
     borderRadius: 8

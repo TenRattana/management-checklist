@@ -145,7 +145,7 @@ const TimescheduleScreen: React.FC = React.memo(() => {
             ScheduleID: "",
             ScheduleName: "",
             IsActive: false,
-            MachineGroup: "",
+            MachineGroup: [],
             Type_schedule: "",
             Tracking: false,
             Custom: false,
