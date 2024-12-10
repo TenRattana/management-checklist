@@ -129,8 +129,8 @@ export const convertScheduleToTimeline = (
     schedule: TimelineItem[]
 ): { timeline: TimeLine[]; markedDates: MarkedDates } => {
     const today = moment();
-    const startOfMonth = today.clone().startOf("years");
-    const endOfMonth = today.clone().endOf("years");
+    const startOfYear = moment().startOf("year");
+    const endOfYear = moment().endOf("year");
     const timeline: TimeLine[] = [];
     const markedDates: MarkedDates = {};
 
@@ -165,22 +165,27 @@ export const convertScheduleToTimeline = (
 
         if (date.startsWith("Weekly")) {
             const weekday = date.match(/\((.*?)\)/)[1];
-            let day = moment().day(weekday).startOf("day");
 
-            while (day.isBetween(startOfMonth, endOfMonth, "days", "[]")) {
+            let day = startOfYear.clone().day(weekday);
+
+            if (day.isBefore(startOfYear)) {
+                day.add(7, "days");
+            }
+
+            while (day.isBetween(startOfYear, endOfYear, "days", "[]")) {
                 const [startTime, endTime] = time.split(" - ");
                 const start = day
                     .clone()
                     .set({
-                        hour: parseInt(startTime.split(":")[0]),
-                        minute: parseInt(startTime.split(":")[1]),
+                        hour: parseInt(startTime.split(":")[0], 10),
+                        minute: parseInt(startTime.split(":")[1], 10),
                     })
                     .toISOString();
                 const end = day
                     .clone()
                     .set({
-                        hour: parseInt(endTime.split(":")[0]),
-                        minute: parseInt(endTime.split(":")[1]),
+                        hour: parseInt(endTime.split(":")[0], 10),
+                        minute: parseInt(endTime.split(":")[1], 10),
                     })
                     .toISOString();
 
@@ -218,22 +223,22 @@ export const convertScheduleToTimeline = (
                 day.add(7, "days");
             }
         } else if (date === "Recurring Daily") {
-            let day = startOfMonth.clone();
+            let day = startOfYear.clone();
 
-            while (day.isBetween(startOfMonth, endOfMonth, "days", "[]")) {
+            while (day.isBetween(startOfYear, endOfYear, "days", "[]")) {
                 const [startTime, endTime] = time.split(" - ");
                 const start = day
                     .clone()
                     .set({
-                        hour: parseInt(startTime.split(":")[0]),
-                        minute: parseInt(startTime.split(":")[1]),
+                        hour: parseInt(startTime.split(":")[0], 10),
+                        minute: parseInt(startTime.split(":")[1], 10),
                     })
                     .toISOString();
                 const end = day
                     .clone()
                     .set({
-                        hour: parseInt(endTime.split(":")[0]),
-                        minute: parseInt(endTime.split(":")[1]),
+                        hour: parseInt(endTime.split(":")[0], 10),
+                        minute: parseInt(endTime.split(":")[1], 10),
                     })
                     .toISOString();
 

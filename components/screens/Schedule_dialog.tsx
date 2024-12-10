@@ -135,7 +135,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
 
                                 <View style={{
                                     flexDirection: responsive === "small" ? 'column' : 'row',
-                                    maxHeight: height / 1.5,
+                                    maxHeight: height / 1.7,
                                 }}>
                                     <View style={{ flexBasis: '46%', marginHorizontal: '2%' }}>
                                         <Text style={[masterdataStyles.text, { marginHorizontal: 24, marginVertical: 10 }]}>{isEditing ? "Update TimeSchedule detail" : "Create TimeSchedule detail"}</Text>

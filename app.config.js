@@ -76,6 +76,12 @@ export default {
       eas: {
         projectId: "0f2240ee-c314-4fa4-b36a-6038aa1ba0da",
       },
+      updates: {
+        assetPatternsToBeBundled: [
+          "assets/images/**/*.png",
+          "assets/images/**/*.jpg",
+        ],
+      },
     },
     experiments: {
       typedRoutes: true,

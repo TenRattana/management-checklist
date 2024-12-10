@@ -37,7 +37,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   timeIntervalMenu: {
-    marginHorizontal: 5,
+    marginHorizontal: 20,
   },
   menuItem: {
     width: 200,
