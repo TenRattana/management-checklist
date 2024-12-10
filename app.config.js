@@ -39,7 +39,7 @@ export default {
     },
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "com.m_checklist_test",
+      bundleIdentifier: "com.mchecklisttest",
     },
     android: {
       adaptiveIcon: {
