@@ -1,10 +1,9 @@
 import axios from "axios";
-import Constants from 'expo-constants';
 
-const API_URL = Constants.expoConfig?.extra?.apiUrl || "https://default.api.com";
+const apiUrl = process.env.EXPO_PUBLIC_API_URL || "https://default.api.com";
 
 const axiosInstance = axios.create({
-    baseURL: API_URL,
+    baseURL: apiUrl,
     headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Accept': 'application/json',

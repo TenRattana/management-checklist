@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { ActivityIndicator, View, TouchableOpacity } from "react-native";
 import { Card } from "react-native-paper";
 import { FastField, Formik } from "formik";
@@ -10,7 +10,6 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { useAuth } from "@/app/contexts/useAuth";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
-import Constants from 'expo-constants';
 
 const validationSchema = Yup.object().shape({
   username: Yup.string().required("The username field is required."),
@@ -39,8 +38,7 @@ const LoginScreen: React.FC = React.memo(() => {
     <AccessibleView name="login-container" style={[masterdataStyles.container, { alignContent: 'center', justifyContent: 'center', height: '100%' }]}>
       <Card style={{ width: responsive === "large" ? 500 : responsive === "medium" ? '60%' : "80%", alignSelf: 'center' }}>
         <Card.Title
-          title={`Login ${Constants.expoConfig?.extra?.apiUrl
-            }`}
+          title={`Login ${process.env.EXPO_PUBLIC_API_URL} ${process.env.EXPO_PUBLIC_APP_ENV}`}
           titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
         />
         <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
