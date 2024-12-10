@@ -38,6 +38,13 @@
         "buildCommand": "npm run build",
         "publishCommand": "npm run deploy"
       }
+    },
+    "preproduction": {
+      "distribution": "internal",
+      "releaseChannel": "preproduction",
+      "env": {
+        "ENV_FILE": ".env.preproduction"
+      }
     }
   },
   "submit": {
