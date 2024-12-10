@@ -90,18 +90,6 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
 
     return (
         <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]}>
-            <Stack.Screen
-                options={{
-                    headerRight: () => (
-                        <View style={{ alignItems: 'center', justifyContent: 'center', paddingRight: 20 }}>
-                            <Text style={[{ fontSize: 18, fontWeight: "500" }]}>
-                                {state.FormName || "Form Name"}
-                            </Text>
-                        </View>
-                    )
-                }}
-            />
-
             <FlatList
                 data={[{}]}
                 renderItem={() => state.subForms.map((subForm: BaseSubForm, index: number) => (
@@ -125,7 +113,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                                         title={subForm.SFormName}
                                         titleStyle={masterdataStyles.cardTitle}
                                     />
-                                    <Card.Content style={[masterdataStyles.subFormContainer]}>
+                                    <Card.Content style={[masterdataStyles.subFormContainer, { marginHorizontal: 20 }]}>
                                         {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
                                             const columns = subForm.Columns ?? 1;
 

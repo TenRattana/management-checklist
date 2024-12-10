@@ -98,20 +98,6 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
 
   return found ? (
     <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]}>
-      <Stack.Screen
-        options={{
-          headerTitle: () => (
-            <Text style={[{ fontSize: 14, fontWeight: "500" }]}>{state.MachineName || "Default Machine Name"}</Text>
-          ),
-          headerRight: () => (
-            <View style={{ alignItems: 'center', justifyContent: 'center', paddingRight: 20 }}>
-              <Text style={[{ fontSize: 14, fontWeight: "500" }]}>
-                {state.FormName || "Form Name"}
-              </Text>
-            </View>
-          )
-        }}
-      />
 
       {!isSubmitted ? (
         <Formik

@@ -1,6 +1,7 @@
 {
   "cli": {
-    "version": ">=3.0.0"
+    "version": ">=3.0.0",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
@@ -8,12 +9,8 @@
       "android": {
         "buildType": "apk"
       },
-      "ios": {
-        "simulator": true
-      },
-      "web": {
-        "buildCommand": "npm run build",
-        "publishCommand": "npm run deploy"
+      "env": {
+        "ENV_FILE": ".env"
       }
     },
     "test": {
@@ -21,29 +18,30 @@
       "android": {
         "buildType": "apk"
       },
-      "web": {
-        "buildCommand": "npm run build",
-        "publishCommand": "npm run deploy"
+      "env": {
+        "ENV_FILE": ".env"
       }
     },
     "production": {
       "distribution": "store",
       "android": {
-        "buildType": "aab"
+        "buildType": "app-bundle"
       },
       "ios": {
-        "buildType": "app-store"
-      },
-      "web": {
-        "buildCommand": "npm run build",
-        "publishCommand": "npm run deploy"
+        "simulator": false
       }
     },
     "preproduction": {
       "distribution": "internal",
       "releaseChannel": "preproduction",
       "env": {
-        "ENV_FILE": ".env.preproduction"
+        "ENV_FILE": ".env"
+      },
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "simulator": true
       }
     }
   },
@@ -52,10 +50,6 @@
       "android": {
         "serviceAccountKeyPath": "./path/to/google-service-key.json",
         "track": "production"
-      },
-      "ios": {
-        "ascAppId": "your-app-id",
-        "appleId": "your-email@example.com"
       }
     }
   }

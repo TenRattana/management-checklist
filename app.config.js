@@ -5,13 +5,17 @@ const getEnvVars = (env = "") => {
     case "production":
       return {
         apiUrl: process.env.API_URL,
-        environment: "production",
+        environment: process.env.APP_ENV,
       };
     case "development":
+      return {
+        apiUrl: process.env.API_URL,
+        environment: process.env.APP_ENV,
+      };
     default:
       return {
         apiUrl: process.env.API_URL,
-        environment: "development",
+        environment: process.env.APP_ENV,
       };
   }
 };
@@ -35,6 +39,7 @@ export default {
     },
     ios: {
       supportsTablet: true,
+      bundleIdentifier: "com.m_checklist_test",
     },
     android: {
       adaptiveIcon: {
@@ -64,13 +69,8 @@ export default {
       [
         "expo-notifications",
         {
-          icon: "./local/assets/notification-icon.png",
           color: "#ffffff",
           defaultChannel: "default",
-          sounds: [
-            "./local/assets/notification-sound.wav",
-            "./local/assets/notification-sound-other.wav",
-          ],
         },
       ],
       [
@@ -84,7 +84,6 @@ export default {
     ],
     extra: {
       ...getEnvVars(environment),
-      enableMinification: environment === "production",
       eas: {
         projectId: "0f2240ee-c314-4fa4-b36a-6038aa1ba0da",
       },

@@ -16,7 +16,6 @@ export const useAppInitialization = () => {
             const isAssetsLoaded = await AsyncStorage.getItem("assetsLoaded");
             if (isAssetsLoaded !== "true") {
                 await Asset.loadAsync([
-                    require("../assets/images/bgs.jpg"),
                     require("../assets/images/Icon.jpg"),
                     require("../assets/images/Icon-app.png"),
                 ]);
