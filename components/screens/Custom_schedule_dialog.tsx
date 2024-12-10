@@ -93,9 +93,23 @@ const Custom_schedule_dialog = React.memo(({ showError, showSuccess, spacing, se
     }
 
     const togglePicker = useCallback((index: number, type: "start" | "end", visible: boolean) => {
-        setPickerVisible(isPickerVisible.map((v, i) => i === index ? { ...v, [type]: visible } : v))
+        let handler: NodeJS.Timeout | null = null;
 
-        Platform.OS === "web" && setTimeout(() => { ref.current && ref.current.setOpen(true, true) }, 0)
+        setPickerVisible(isPickerVisible.map((v, i) => i === index ? { ...v, [type]: visible } : v));
+
+        if (Platform.OS === "web") {
+            handler = setTimeout(() => {
+                if (ref.current) {
+                    ref.current.setOpen(true, true);
+                }
+            }, 0);
+        }
+
+        return () => {
+            if (handler) {
+                clearTimeout(handler);
+            }
+        };
     }, [isPickerVisible]);
 
     const toggleTimePicker = useCallback((index: number, type: "start" | "end", visible: boolean) => {

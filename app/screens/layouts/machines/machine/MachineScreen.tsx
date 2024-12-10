@@ -56,7 +56,10 @@ const MachineGroupScreen: React.FC = React.memo(() => {
         'machines',
         fetchMachines,
         {
-            refetchOnWindowFocus: true,
+            staleTime: 1000 * 60 * 5,
+            cacheTime: 1000 * 60 * 10,
+            refetchInterval: 1000 * 30,
+            enabled: true,
         }
     );
 
@@ -64,7 +67,10 @@ const MachineGroupScreen: React.FC = React.memo(() => {
         'machineGroups',
         fetchMachineGroups,
         {
-            refetchOnWindowFocus: true,
+            staleTime: 1000 * 60 * 5,
+            cacheTime: 1000 * 60 * 10,
+            refetchInterval: 1000 * 30,
+            enabled: true,
         }
     );
 
@@ -82,6 +88,7 @@ const MachineGroupScreen: React.FC = React.memo(() => {
         const handler = setTimeout(() => {
             setDebouncedSearchQuery(searchQuery);
         }, 300);
+
         return () => {
             clearTimeout(handler);
         };

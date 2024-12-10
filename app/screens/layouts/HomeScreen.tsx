@@ -74,7 +74,12 @@ const HomeScreen = () => {
   const { data: timeSchedule = [] } = useQuery<TimeScheduleProps[], Error>(
     'timeSchedule',
     fetchTimeSchedules,
-    { refetchOnWindowFocus: true }
+    {
+      staleTime: 1000 * 60 * 1,
+      cacheTime: 1000 * 60 * 2,
+      refetchInterval: 1000 * 30,
+      enabled: true,
+    }
   );
 
   const [checkedItems, setCheckedItems] = useState<Record<any, boolean>>({ 1: true, 2: true, 3: true });

@@ -34,15 +34,23 @@ const MenuSection = React.memo(({ title, isOpen, onToggle, items, navigation }: 
     };
 
     useEffect(() => {
+        let handler: NodeJS.Timeout | null = null
+
         if (isOpen) {
             runOnJS(setOpacity)(1);
             height.value = withTiming(totalHeight, { duration: 300 });
         } else {
-            setTimeout(() => {
+            handler = setTimeout(() => {
                 runOnJS(setOpacity)(0);
                 height.value = withTiming(0, { duration: 300 });
             }, 300);
         }
+
+        return () => {
+            if (handler) {
+                clearTimeout(handler);
+            }
+        };
     }, [isOpen, totalHeight]);
 
     return (

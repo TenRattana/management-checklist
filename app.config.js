@@ -62,6 +62,18 @@ export default {
         },
       ],
       [
+        "expo-notifications",
+        {
+          icon: "./local/assets/notification-icon.png",
+          color: "#ffffff",
+          defaultChannel: "default",
+          sounds: [
+            "./local/assets/notification-sound.wav",
+            "./local/assets/notification-sound-other.wav",
+          ],
+        },
+      ],
+      [
         "expo-camera",
         {
           cameraPermission: "Allow PMChecklist to access your camera",

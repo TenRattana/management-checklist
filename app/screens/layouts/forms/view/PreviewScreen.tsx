@@ -1,4 +1,4 @@
-import React, { useEffect, useState, forwardRef, useMemo } from "react";
+import React, { useEffect, useState, forwardRef, useMemo, useRef } from "react";
 import { View, ViewStyle, FlatList } from "react-native";
 import { Card, Divider } from "react-native-paper";
 import { useRes } from "@/app/contexts/useRes";
@@ -22,6 +22,7 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
     const { groupCheckListOption, dataType, exp } = useForm(route);
 
     const state = useSelector((state: any) => state.form);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const validationSchema = useMemo(() => {
 
@@ -145,20 +146,22 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
                                                             }
                                                         };
 
+                                                        const handleChange = (fieldName: string, value: any) => {
+                                                            setFieldValue(fieldName, value);
+
+                                                            if (timeoutRef.current) {
+                                                                clearTimeout(timeoutRef.current);
+                                                            }
+
+                                                            timeoutRef.current = setTimeout(() => setTouched({ ...touched, [fieldName]: true }), 0);
+                                                        };
+
                                                         return (
                                                             <View id="container-layout2" style={containerStyle}>
                                                                 <Dynamic
                                                                     field={field}
                                                                     values={String(fastFieldProps.value ?? "")}
-                                                                    handleChange={(fieldname: string, value: any) => {
-                                                                        setFieldValue(fastFieldProps.name, value);
-                                                                        setTimeout(() => {
-                                                                            setTouched({
-                                                                                ...touched,
-                                                                                [fastFieldProps.name]: true,
-                                                                            });
-                                                                        }, 0);
-                                                                    }}
+                                                                    handleChange={handleChange}
                                                                     handleBlur={handleBlur}
                                                                     groupCheckListOption={groupCheckListOption ?? []}
                                                                     error={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}

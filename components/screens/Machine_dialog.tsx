@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { TouchableOpacity, ScrollView, View } from "react-native";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import { Inputs } from "@/components/common";
@@ -27,6 +27,7 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
     const { responsive } = useRes()
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     return (
         <Portal>
@@ -87,28 +88,37 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                             showsVerticalScrollIndicator={false}
                                         >
                                             <FastField name="machineGroupId">
-                                                {({ field, form }: any) => (
-                                                    <CustomDropdownSingle
-                                                        title="Group Machine"
-                                                        labels="GMachineName"
-                                                        values="GMachineID"
-                                                        data={!isEditing ? machineGroup?.filter((v) => v.IsActive) : dropmachine || []}
-                                                        value={field.value}
-                                                        handleChange={(value) => {
-                                                            const stringValue = (value as { value: string }).value;
-                                                            form.setFieldValue(field.name, stringValue);
-                                                            setTimeout(() => {
+                                                {({ field, form }: any) => {
+
+                                                    const handleChange = (value: any) => {
+                                                        const stringValue = (value as { value: string }).value;
+
+                                                        form.setFieldValue(field.name, stringValue);
+
+                                                        if (timeoutRef.current) {
+                                                            clearTimeout(timeoutRef.current);
+                                                        }
+
+                                                        timeoutRef.current = setTimeout(() => form.setFieldTouched(field.name, true), 0);
+                                                    };
+
+                                                    return (
+                                                        <CustomDropdownSingle
+                                                            title="Group Machine"
+                                                            labels="GMachineName"
+                                                            values="GMachineID"
+                                                            data={!isEditing ? machineGroup?.filter((v) => v.IsActive) : dropmachine || []}
+                                                            value={field.value}
+                                                            handleChange={handleChange}
+                                                            handleBlur={() => {
                                                                 form.setFieldTouched(field.name, true);
-                                                            }, 0);
-                                                        }}
-                                                        handleBlur={() => {
-                                                            form.setFieldTouched(field.name, true);
-                                                        }}
-                                                        testId="machineGroupId-md"
-                                                        error={form.touched.machineGroupId && Boolean(form.errors.machineGroupId)}
-                                                        errorMessage={form.touched.machineGroupId ? form.errors.machineGroupId : ""}
-                                                    />
-                                                )}
+                                                            }}
+                                                            testId="machineGroupId-md"
+                                                            error={form.touched.machineGroupId && Boolean(form.errors.machineGroupId)}
+                                                            errorMessage={form.touched.machineGroupId ? form.errors.machineGroupId : ""}
+                                                        />
+                                                    )
+                                                }}
                                             </FastField>
 
                                             <FastField name="machineName">

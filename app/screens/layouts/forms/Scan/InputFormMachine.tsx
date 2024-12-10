@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useRef } from "react";
 import axiosInstance from "@/config/axios";
 import { Card } from "react-native-paper";
 import { FlatList, Pressable, ViewStyle, View, TouchableOpacity } from "react-native";
@@ -70,6 +70,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
   const { showSuccess, handleError } = useToast();
   const { responsive } = useRes();
   const { theme } = useTheme()
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const onFormSubmit = useCallback(async (values: { [key: string]: any }) => {
     const updatedSubForms = state.subForms.map((subForm: BaseSubForm) => ({
@@ -100,11 +101,11 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
       <Stack.Screen
         options={{
           headerTitle: () => (
-            <Text style={[{ fontSize: 18, fontWeight: "500" }]}>{state.MachineName || "Default Machine Name"}</Text>
+            <Text style={[{ fontSize: 14, fontWeight: "500" }]}>{state.MachineName || "Default Machine Name"}</Text>
           ),
           headerRight: () => (
             <View style={{ alignItems: 'center', justifyContent: 'center', paddingRight: 20 }}>
-              <Text style={[{ fontSize: 18, fontWeight: "500" }]}>
+              <Text style={[{ fontSize: 14, fontWeight: "500" }]}>
                 {state.FormName || "Form Name"}
               </Text>
             </View>
@@ -155,15 +156,22 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
                             setTouched({ ...touched, [fieldName]: true });
                           };
 
+                          const handleChange = (fieldName: string, value: any) => {
+                            setFieldValue(fieldName, value);
+
+                            if (timeoutRef.current) {
+                              clearTimeout(timeoutRef.current);
+                            }
+
+                            timeoutRef.current = setTimeout(() => setTouched({ ...touched, [fieldName]: true }), 0);
+                          };
+
                           return (
                             <View id="container-layout2" style={containerStyle} key={`field-${fieldIndex}`}>
                               <Dynamic
                                 field={field}
                                 values={String(values[fieldName] ?? "")}
-                                handleChange={(fieldname: string, value: any) => {
-                                  setFieldValue(fieldName, value);
-                                  setTimeout(() => setTouched({ ...touched, [fieldName]: true }), 0);
-                                }}
+                                handleChange={handleChange}
                                 handleBlur={handleBlur}
                                 groupCheckListOption={groupCheckListOption ?? []}
                                 error={Boolean(touched[fieldName] && errors[fieldName])}

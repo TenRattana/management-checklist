@@ -26,6 +26,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
     const { theme } = useTheme()
     const cardRefs = useRef<(View | null)[]>([]);
     const cardPositions = useRef<{ x: number; y: number; width: number; height: number }[]>([]);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const handleScroll = useCallback(() => {
         updateCardPositions();
@@ -44,9 +45,19 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
     };
 
     useEffect(() => {
-        setTimeout(() => {
-            updateCardPositions()
-        }, 100)
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+
+        timeoutRef.current = setTimeout(() => {
+            updateCardPositions();
+        }, 100);
+
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
     }, [state]);
 
     useImperativeHandle(ref, () => ({

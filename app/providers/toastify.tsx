@@ -32,9 +32,11 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
     const id = Math.random().toString(36).substring(7);
     setToasts((prev) => [...prev, { id, message, status }]);
 
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       setToasts((prev) => prev.filter((toast) => toast.id !== id));
     }, 5000);
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const showSuccess = useCallback((messages: string | string[]) => {

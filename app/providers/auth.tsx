@@ -39,20 +39,24 @@ export const initializeApp = createAsyncThunk('app/initialize', async (payload: 
   dispatch(fetchPermission(payload.UserData.GUserID));
   dispatch(setUser({ user: payload.UserData }));
 
-  axiosInstance.interceptors.request.use(
-    async (config: InternalAxiosRequestConfig) => {
-      if (payload.UserData) {
-        if (!(config.headers instanceof AxiosHeaders)) {
-          config.headers = new AxiosHeaders(config.headers);
+  useEffect(() => {
+    const interceptor = axiosInstance.interceptors.request.use(
+      async (config: InternalAxiosRequestConfig) => {
+        if (payload.UserData) {
+          if (!(config.headers instanceof AxiosHeaders)) {
+            config.headers = new AxiosHeaders(config.headers);
+          }
+          config.headers.set('Authorization', payload.UserData.Full_Name);
         }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
 
-        config.headers.set('Authorization', payload.UserData.Full_Name);
-      }
-      return config;
-    },
-    (error) => Promise.reject(error)
-  );
-
+    return () => {
+      axiosInstance.interceptors.request.eject(interceptor);
+    };
+  }, [payload.UserData]);
 });
 
 export const initializeLogout = createAsyncThunk('app/initialize', async (_, { dispatch }) => {
@@ -97,20 +101,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [LoadingApp, dispatch])
 
   useEffect(() => {
+    let isMounted = true;
+
     const loadUserDataAsync = async () => {
       try {
         const userInfo = await getData('userToken');
-        if (userInfo !== undefined && userInfo) {
+        if (isMounted && userInfo) {
           updateSession("", "", userInfo);
-        } else {
-          return
         }
       } catch (error) {
-        handleError(error)
+        if (isMounted) handleError(error);
       }
     };
 
     loadUserDataAsync();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const updateSession = useCallback(async (UserName: string, Password: string, TokenAuth: string) => {

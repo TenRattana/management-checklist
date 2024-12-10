@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { View, Dimensions, ScrollView } from 'react-native';
 import { Dialog, Button, Portal } from 'react-native-paper';
 import Daily_dialog from './Daily_dialog';
@@ -38,6 +38,7 @@ const InfoScheduleDialog = React.memo(({
     values,
     selectedDay
 }: InfoScheduleProps) => {
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const validationSchema = Yup.object().shape({
         timeSlots: Yup.array().of(
@@ -108,26 +109,33 @@ const InfoScheduleDialog = React.memo(({
                                         showsVerticalScrollIndicator={false}
                                     >
                                         <FastField name="timeSlots" key={JSON.stringify({ timeSlots: values.timeSlots })}>
-                                            {({ field, form }: any) => (
-                                                <Daily_dialog
-                                                    values={values.timeSlots}
-                                                    setFieldValue={(value: [{ start: string | null, end: string | null }]) => {
-                                                        form.setFieldValue(field.name, value);
+                                            {({ field, form }: any) => {
 
-                                                        setTimeout(() => {
-                                                            form.setFieldTouched(field.name, true);
-                                                        }, 0)
-                                                    }}
-                                                    key={`daily-dialog`}
-                                                    responsive={responsive}
-                                                    showError={showError}
-                                                    showSuccess={showSuccess}
-                                                    touched={touched?.timeSlots}
-                                                    errors={errors.timeSlots}
-                                                    spacing={spacing}
-                                                    theme={theme}
-                                                />
-                                            )}
+                                                const handleChange = (value: [{ start: string | null, end: string | null }]) => {
+                                                    form.setFieldValue(field.name, value);
+
+                                                    if (timeoutRef.current) {
+                                                        clearTimeout(timeoutRef.current);
+                                                    }
+
+                                                    timeoutRef.current = setTimeout(() => form.setFieldTouched(field.name, true), 0);
+                                                };
+
+                                                return (
+                                                    <Daily_dialog
+                                                        values={values.timeSlots}
+                                                        setFieldValue={handleChange}
+                                                        key={`daily-dialog`}
+                                                        responsive={responsive}
+                                                        showError={showError}
+                                                        showSuccess={showSuccess}
+                                                        touched={touched?.timeSlots}
+                                                        errors={errors.timeSlots}
+                                                        spacing={spacing}
+                                                        theme={theme}
+                                                    />
+                                                )
+                                            }}
                                         </FastField>
                                     </ScrollView>
                                 </View>
