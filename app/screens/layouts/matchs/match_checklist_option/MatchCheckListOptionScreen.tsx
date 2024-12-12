@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { TouchableOpacity, StyleSheet } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
@@ -215,7 +215,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
     })
 
     const MemoMatch_checklist_option = React.memo(Match_checklist_option)
-    
+
     return (
         <AccessibleView name="container-matchchecklist" style={styles.container}>
             <Card.Title
@@ -229,9 +229,9 @@ const MatchCheckListOptionScreen = React.memo(() => {
                     onChange={setSearchQuery}
                     testId="search-match-checklist"
                 />
-                <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                     <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Match Group & Option</Text>
-                </Pressable>
+                </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}

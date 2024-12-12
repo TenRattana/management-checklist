@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { TouchableOpacity, StyleSheet } from "react-native";
 import axiosInstance from "@/config/axios";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
@@ -167,7 +167,7 @@ const ChecklistGroupScreen = React.memo(() => {
     })
 
     const MemoChecklist_group_dialog = React.memo(Checklist_group_dialog)
-    
+
     return (
         <AccessibleView name="container-groupchecklist" style={styles.container}>
             <Card.Title
@@ -181,9 +181,9 @@ const ChecklistGroupScreen = React.memo(() => {
                     onChange={setSearchQuery}
                     testId="search-groupchecklist"
                 />
-                <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                     <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Group Option</Text>
-                </Pressable>
+                </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}

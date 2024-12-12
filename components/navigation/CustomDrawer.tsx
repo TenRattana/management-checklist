@@ -9,13 +9,13 @@ import { Menus, ParentMenu } from '@/typing/type';
 import { DrawerNavigationHelpers } from '@react-navigation/drawer/lib/typescript/src/types';
 import { runOnJS } from 'react-native-reanimated';
 
-interface RenderPressableProps {
+interface RenderTouchableOpacityProps {
     label: string;
     navigateTo: string;
     navigations: DrawerNavigationHelpers;
 }
 
-const RenderPressable = React.memo((props: RenderPressableProps) => {
+const RenderTouchableOpacity = React.memo((props: RenderTouchableOpacityProps) => {
     const masterdataStyles = useMasterdataStyles();
     const { label, navigateTo, navigations } = props
 
@@ -66,7 +66,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = React.memo((p
                             />
                         );
                     } else {
-                        return <RenderPressable key={`item-${screen.MenuLabel}-nav-${screen.NavigationTo}`} label={screen.MenuLabel} navigateTo={screen.NavigationTo} navigations={navigation} />;
+                        return <RenderTouchableOpacity key={`item-${screen.MenuLabel}-nav-${screen.NavigationTo}`} label={screen.MenuLabel} navigateTo={screen.NavigationTo} navigations={navigation} />;
                     }
                 }
             })}

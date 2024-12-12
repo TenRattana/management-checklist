@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { TouchableOpacity, StyleSheet } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
@@ -207,7 +207,7 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
     })
 
     const MemoMatch_form_machine_dialog = React.memo(Match_form_machine_dialog)
-    
+
     return (
         <AccessibleView name="container-checklist" style={styles.container}>
             <Card.Title
@@ -221,9 +221,9 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
                     onChange={setSearchQuery}
                     testId="search-match-form-machine"
                 />
-                <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                     <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Match Machine & Form</Text>
-                </Pressable>
+                </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}

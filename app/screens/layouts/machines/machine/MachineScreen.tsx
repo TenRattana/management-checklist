@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { TouchableOpacity, StyleSheet } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
@@ -213,7 +213,7 @@ const MachineGroupScreen: React.FC = React.memo(() => {
     })
 
     const MemoMachine_dialog = React.memo(Machine_dialog)
-    
+
     return (
         <AccessibleView name="container-machine" style={styles.container}>
             <Card.Title
@@ -227,9 +227,9 @@ const MachineGroupScreen: React.FC = React.memo(() => {
                     onChange={setSearchQuery}
                     testId="search-machine"
                 />
-                <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                     <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Machine</Text>
-                </Pressable>
+                </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}

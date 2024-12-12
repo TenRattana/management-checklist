@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { Portal, Dialog, Text } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import AccessibleView from "@/components/AccessibleView";
@@ -49,23 +49,23 @@ const Dialogs: React.FC<DialogsProps> = ({
                         </Text>
 
                         <View style={[masterdataStyles.containerAction, { flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }]}>
-                            <Pressable
+                            <TouchableOpacity
                                 onPress={handleOkPress}
                                 style={[masterdataStyles.button, masterdataStyles.backMain, { flex: 1, marginRight: 5 }]}
                             >
                                 <Text style={[masterdataStyles.text, masterdataStyles.textFFF, masterdataStyles.textBold]}>
                                     Ok
                                 </Text>
-                            </Pressable>
+                            </TouchableOpacity>
 
-                            <Pressable
+                            <TouchableOpacity
                                 onPress={() => setIsVisible(false)}
                                 style={[masterdataStyles.button, masterdataStyles.backMain, { flex: 1, marginLeft: 5 }]}
                             >
                                 <Text style={[masterdataStyles.text, masterdataStyles.textFFF, masterdataStyles.textBold]}>
                                     Cancel
                                 </Text>
-                            </Pressable>
+                            </TouchableOpacity>
                         </View>
                     </Dialog.Content>
                 </Dialog>

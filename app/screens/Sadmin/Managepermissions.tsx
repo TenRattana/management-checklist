@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Pressable } from "react-native";
+import { TouchableOpacity } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts/useToast";
 import { useRes } from "@/app/contexts/useRes";
@@ -175,6 +175,8 @@ const Managepermissions = React.memo(() => {
     searchQuery: debouncedSearchQuery,
   }), [tableData, debouncedSearchQuery, handleAction]);
 
+  const MemoManagepermisstion_dialog = React.memo(Managepermisstion_dialog)
+
   return (
     <AccessibleView name="container-checklist" style={{ flex: 1 }}>
       <Card.Title
@@ -188,15 +190,15 @@ const Managepermissions = React.memo(() => {
           onChange={setSearchQuery}
           testId="search-user"
         />
-        <Pressable onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+        <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
           <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>Add Permission</Text>
-        </Pressable>
+        </TouchableOpacity>
       </AccessibleView>
       <Card.Content style={{ padding: 2, flex: 1 }}>
         {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
       </Card.Content>
 
-      <Managepermisstion_dialog
+      <MemoManagepermisstion_dialog
         isVisible={isVisible}
         setIsVisible={setIsVisible}
         isEditing={isEditing}

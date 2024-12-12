@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { Pressable, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { Portal, Dialog } from "react-native-paper";
 import { SaveDialogProps } from "@/typing/value";
 import axiosInstance from "@/config/axios";
@@ -70,7 +70,7 @@ const SaveDialog = React.memo(({
                     </Text>
 
                     <View id="sd" style={masterdataStyles.containerAction}>
-                        <Pressable
+                        <TouchableOpacity
                             onPress={() => saveForm()}
                             style={[
                                 masterdataStyles.button,
@@ -84,9 +84,9 @@ const SaveDialog = React.memo(({
                                 ]}>
                                 Save
                             </Text>
-                        </Pressable>
+                        </TouchableOpacity>
 
-                        <Pressable
+                        <TouchableOpacity
                             onPress={() => setIsVisible(false)}
                             style={[
                                 masterdataStyles.button,
@@ -100,7 +100,7 @@ const SaveDialog = React.memo(({
                                 ]}>
                                 Cancel
                             </Text>
-                        </Pressable>
+                        </TouchableOpacity>
                     </View>
                 </Dialog.Content>
             </Dialog>

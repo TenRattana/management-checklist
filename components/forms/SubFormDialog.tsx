@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { Inputs } from "@/components/common";
 import { Portal, Dialog } from "react-native-paper";
 import { FastField, Formik } from "formik";
@@ -100,7 +100,7 @@ const SubFormDialog = React.memo(({
                                     </FastField >
 
                                     <View id="sfd-action" style={masterdataStyles.containerAction}>
-                                        <Pressable
+                                        <TouchableOpacity
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}
                                             style={[
@@ -117,10 +117,10 @@ const SubFormDialog = React.memo(({
                                             >
                                                 {isEditing ? "Update SubForm" : "Add SubForm"}
                                             </Text>
-                                        </Pressable>
+                                        </TouchableOpacity>
 
                                         {isEditing && (
-                                            <Pressable
+                                            <TouchableOpacity
                                                 onPress={() => onDelete(values.SFormID)}
                                                 style={[
                                                     masterdataStyles.button,
@@ -135,10 +135,10 @@ const SubFormDialog = React.memo(({
                                                 >
                                                     Delete sub form
                                                 </Text>
-                                            </Pressable>
+                                            </TouchableOpacity>
                                         )}
 
-                                        <Pressable
+                                        <TouchableOpacity
                                             onPress={() => setIsVisible(false)}
                                             style={[
                                                 masterdataStyles.button,
@@ -153,7 +153,7 @@ const SubFormDialog = React.memo(({
                                             >
                                                 Cancel
                                             </Text>
-                                        </Pressable>
+                                        </TouchableOpacity>
                                     </View>
                                 </View>
                             )}

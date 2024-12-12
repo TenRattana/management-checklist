@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import { TouchableOpacity, StyleSheet } from 'react-native';
 import AccessibleView from "../AccessibleView";
 import Text from "@/components/Text";
 import { useTheme } from '@/app/contexts/useTheme';
@@ -15,9 +15,9 @@ const NotFoundScreen = () => {
         <>
             <AccessibleView name="notfound" style={styles.container}>
                 <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>This form doesn't exist.</Text>
-                <Pressable style={styles.link}>
+                <TouchableOpacity style={styles.link}>
                     <Text style={[styles.linkText, { fontSize: spacing.small }]}>Scan again!</Text>
-                </Pressable>
+                </TouchableOpacity>
             </AccessibleView>
         </>
     );

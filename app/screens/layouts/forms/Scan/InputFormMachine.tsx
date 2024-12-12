@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo, useRef } from "react";
 import axiosInstance from "@/config/axios";
 import { Card, Divider } from "react-native-paper";
-import { FlatList, Pressable, ViewStyle, View, TouchableOpacity } from "react-native";
+import { FlatList, TouchableOpacity, ViewStyle, View } from "react-native";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useToast } from "@/app/contexts/useToast";
 import { useRes } from "@/app/contexts/useRes";
@@ -206,11 +206,11 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
       ) : (
         <AccessibleView name="form-success" style={masterdataStyles.containerScccess}>
           <Text style={masterdataStyles.text}>บันทึกเสร็จสิ้น</Text>
-          <Pressable onPress={() => {
+          <TouchableOpacity onPress={() => {
             setIsSubmitted(false);
           }} style={masterdataStyles.button}>
             <Text style={[masterdataStyles.textBold, masterdataStyles.text, { color: theme.colors.blue }]}>กลับไปยังหน้าก่อนหน้า</Text>
-          </Pressable>
+          </TouchableOpacity>
         </AccessibleView>
       )}
     </AccessibleView>
