@@ -1,36 +1,38 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import { Checkboxs, Inputs } from "@/components/common";
-import { Portal, Dialog, Switch } from "react-native-paper";
+import { Portal, Dialog, Switch, Icon } from "react-native-paper";
 import { Formik, FastField } from "formik";
 import Checklist_dialog from "../screens/Checklist_dialog";
 import { useToast } from "@/app/contexts/useToast";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
-import axiosInstance from "@/config/axios";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
-import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { InitialValuesChecklist } from '@/typing/value'
+import Animated, { runOnJS, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { FieldDialogProps } from "@/typing/tag";
 import Text from "@/components/Text";
 import { useFocusEffect } from "@react-navigation/native";
-import { values } from "lodash";
+import useField from "@/hooks/FieldDialog";
+import InfoGroup_dialog from "../screens/InfoGroup_dialog";
+import GroupCreate_dialog from "../screens/GroupCreate_dialog";
 
 const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode, saveField, setShowDialogs
-    , checkListType, dataType, checkList, groupCheckListOption, dropcheckList, dropcheckListType, dropdataType, dropgroupCheckListOption
+    , checkListType, dataType, dropcheckListType, dropdataType, dropgroupCheckListOption, checkListOption
 }: FieldDialogProps) => {
-    const [isVisibleCL, setIsVisibleCL] = useState<boolean>(false)
-    const [initialValueCL, setInitialValueCL] = useState<InitialValuesChecklist>({ checkListId: "", checkListName: "", isActive: false, disables: false })
+    const { dialogAdd, info, initialCheckList, initialGroupCheckList,
+        saveCheckListOption, saveDataCheckList, saveDataGroupCheckList, handelInfo, handelAdd, checkList, groupCheckListOption } = useField();
+
     const masterdataStyles = useMasterdataStyles()
-    const { showSuccess, handleError } = useToast();
     const [option, setOption] = useState<{ label: string; value: string; }[]>([])
     const [shouldRender, setShouldRender] = useState<string>("");
     const [shouldRenderDT, setShouldRenderDT] = useState<boolean>(false);
     const [shouldRenderIT, setShouldRenderIT] = useState<boolean>(false);
 
-    const { fontSize, spacing } = useRes()
+    const glc = useRef<string | undefined>(undefined)
+
+    const { spacing, responsive } = useRes()
     const { theme } = useTheme()
 
     const validationSchema = useMemo(() => {
@@ -128,23 +130,6 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
         });
     }, [checkListType, dataType]);
 
-    const saveDataCheckList = useCallback(async (values: InitialValuesChecklist) => {
-
-        const data = {
-            CListId: values.checkListId ?? "",
-            CListName: values.checkListName,
-            isActive: values.isActive,
-        };
-
-        try {
-            const response = await axiosInstance.post("CheckList_service.asmx/SaveCheckList", data);
-            setIsVisibleCL(!response.data.status);
-            showSuccess(String(response.data.message));
-        } catch (error) {
-            handleError(error);
-        }
-    }, [handleError, showSuccess, setIsVisibleCL]);
-
     const animatedText = useAnimatedStyle(() => {
 
         if (shouldRender !== "") {
@@ -185,21 +170,21 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                 setShouldRender('');
                 setShouldRenderDT(false);
                 setShouldRenderIT(false);
-                setIsVisibleCL(false);
-                setInitialValueCL({ checkListId: "", checkListName: "", isActive: false, disables: false });
             })
         }, [])
     )
 
     const MemoChecklist_dialog = React.memo(Checklist_dialog)
+    const MemoCreateGroupOption_dialog = React.memo(GroupCreate_dialog)
     const memoizedAnimatedText = useMemo(() => animatedText, [shouldRender]);
     const memoizedAnimatedDT = useMemo(() => animatedStyleNumber, [shouldRenderDT]);
     const memoizedAnimatedIT = useMemo(() => animatedStyleIT, [shouldRenderIT, shouldRenderDT, option]);
 
-
     return (
         <Portal>
-            <Dialog visible={isVisible} onDismiss={() => setShowDialogs()} style={masterdataStyles.containerDialog}>
+            <Dialog visible={isVisible} onDismiss={() => setShowDialogs()} style={[masterdataStyles.containerDialog, {
+                width: responsive === "large" ? 700 : '80%',
+            }]}>
 
                 <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]}>
                     {editMode ? "Edit check list" : "Create check list"}
@@ -221,6 +206,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             onSubmit={values => saveField(values, editMode ? "update" : "add")}
                         >
                             {({ setFieldValue, values, handleSubmit, isValid, dirty }) => {
+                                glc.current = values.GCLOptionID
 
                                 const updateRenderStates = useCallback(() => {
                                     const checkListTypeItem = checkListType.find(
@@ -304,26 +290,42 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                         >
                                             <FastField name="CListID">
                                                 {({ field, form }: any) => (
-                                                    <CustomDropdownSingle
-                                                        title="Check List"
-                                                        labels="CListName"
-                                                        values="CListID"
-                                                        data={editMode ? checkList : dropcheckList}
-                                                        value={field.value}
-                                                        handleChange={(value) => {
-                                                            const stringValue = (value as { value: string }).value;
-                                                            form.setFieldValue(field.name, stringValue);
-                                                            setTimeout(() => {
-                                                                form.setFieldTouched(field.name, true);
-                                                            }, 0);
-                                                        }}
-                                                        handleBlur={() => {
-                                                            form.setFieldTouched(field.name, true);
-                                                        }}
-                                                        testId={`CListID-form`}
-                                                        error={form.touched.CListID && Boolean(form.errors.CListID)}
-                                                        errorMessage={form.touched.CListID ? form.errors.CListID : ""}
-                                                    />
+                                                    <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                                                        <View style={{ flex: 1 }}>
+                                                            <CustomDropdownSingle
+                                                                title="Check List"
+                                                                labels="CListName"
+                                                                values="CListID"
+                                                                data={checkList}
+                                                                value={field.value}
+                                                                handleChange={(value) => {
+                                                                    const stringValue = (value as { value: string }).value;
+                                                                    form.setFieldValue(field.name, stringValue);
+                                                                    setTimeout(() => {
+                                                                        form.setFieldTouched(field.name, true);
+                                                                    }, 0);
+                                                                }}
+                                                                handleBlur={() => {
+                                                                    form.setFieldTouched(field.name, true);
+                                                                }}
+                                                                testId={`CListID-form`}
+                                                                error={form.touched.CListID && Boolean(form.errors.CListID)}
+                                                                errorMessage={form.touched.CListID ? form.errors.CListID : ""}
+                                                            />
+                                                        </View>
+
+                                                        <TouchableOpacity
+                                                            onPress={() => {
+                                                                runOnJS(handelAdd)(true, "CheckList")
+                                                            }}
+                                                            style={{
+                                                                alignItems: 'center',
+                                                                paddingRight: 5
+                                                            }}
+                                                        >
+                                                            <Icon source={"plus-box"} size={spacing.large + 3} color={theme.colors.drag} />
+                                                        </TouchableOpacity>
+                                                    </View>
                                                 )}
                                             </FastField>
 
@@ -355,29 +357,58 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                             {shouldRender === "detail" && (
                                                 <Animated.View style={[memoizedAnimatedText]}>
                                                     <FastField name="GCLOptionID" key={shouldRender === "detail"}>
-                                                        {({ field, form }: any) =>
-                                                            <CustomDropdownSingle
-                                                                title="Match Check List Option Group"
-                                                                labels="GCLOptionName"
-                                                                values="GCLOptionID"
-                                                                data={editMode ? groupCheckListOption : dropgroupCheckListOption}
-                                                                value={field.value}
-                                                                handleChange={(value) => {
-                                                                    const stringValue = (value as { value: string }).value;
+                                                        {({ field, form }: any) => (
+                                                            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                                                                <View style={{ flex: 1 }}>
+                                                                    <CustomDropdownSingle
+                                                                        title="Match Check List Option Group"
+                                                                        labels="GCLOptionName"
+                                                                        values="GCLOptionID"
+                                                                        data={editMode ? groupCheckListOption : dropgroupCheckListOption}
+                                                                        value={field.value}
+                                                                        handleChange={(value) => {
+                                                                            const stringValue = (value as { value: string }).value;
 
-                                                                    form.setFieldValue(field.name, stringValue);
-                                                                    setTimeout(() => {
-                                                                        form.setFieldTouched(field.name, true);
-                                                                    }, 0);
-                                                                }}
-                                                                handleBlur={() => {
-                                                                    form.setFieldTouched(field.name, true);
-                                                                }}
-                                                                testId={`GCLOptionID-form`}
-                                                                error={form.touched.GCLOptionID && Boolean(form.errors.GCLOptionID)}
-                                                                errorMessage={form.touched.GCLOptionID ? form.errors.GCLOptionID : ""}
-                                                            />
-                                                        }
+                                                                            form.setFieldValue(field.name, stringValue);
+                                                                            setTimeout(() => {
+                                                                                form.setFieldTouched(field.name, true);
+                                                                            }, 0);
+                                                                        }}
+                                                                        handleBlur={() => {
+                                                                            form.setFieldTouched(field.name, true);
+                                                                        }}
+                                                                        testId={`GCLOptionID-form`}
+                                                                        error={form.touched.GCLOptionID && Boolean(form.errors.GCLOptionID)}
+                                                                        errorMessage={form.touched.GCLOptionID ? form.errors.GCLOptionID : ""}
+                                                                    />
+                                                                </View>
+
+                                                                <TouchableOpacity
+                                                                    onPress={() => {
+                                                                        runOnJS(handelInfo)(true, "GroupCheckList")
+                                                                    }}
+                                                                    style={{
+                                                                        alignItems: 'center',
+                                                                        paddingRight: 5,
+                                                                        display: glc.current ? 'flex' : 'none'
+                                                                    }}
+                                                                >
+                                                                    <Icon source={"information"} size={spacing.large + 3} color={theme.colors.drag} />
+                                                                </TouchableOpacity>
+
+                                                                <TouchableOpacity
+                                                                    onPress={() => {
+                                                                        runOnJS(handelAdd)(true, "GroupCheckList")
+                                                                    }}
+                                                                    style={{
+                                                                        alignItems: 'center',
+                                                                        paddingRight: 5
+                                                                    }}
+                                                                >
+                                                                    <Icon source={"plus-box"} size={spacing.large + 3} color={theme.colors.drag} />
+                                                                </TouchableOpacity>
+                                                            </View>
+                                                        )}
                                                     </FastField>
                                                 </Animated.View>
                                             )}
@@ -596,16 +627,37 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                 </Dialog.Content>
 
             </Dialog>
-            <MemoChecklist_dialog
-                isEditing={false}
-                isVisible={isVisibleCL}
-                setIsVisible={() => {
-                    setIsVisibleCL(false);
-                    setInitialValueCL({ checkListId: "", checkListName: "", isActive: false, disables: false });
-                }}
-                initialValues={initialValueCL}
-                saveData={saveDataCheckList}
-            />
+
+            <Dialog visible={dialogAdd.CheckList} style={{ zIndex: 5 }}>
+                <MemoChecklist_dialog
+                    isEditing={false}
+                    isVisible={dialogAdd.CheckList}
+                    setIsVisible={() => {
+                        handelAdd(false, "CheckList")
+                    }}
+                    initialValues={initialCheckList}
+                    saveData={saveDataCheckList}
+                />
+            </Dialog>
+
+            <Dialog visible={info.GroupCheckList} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center' }} onDismiss={() => handelInfo(false, "GroupCheckList")}>
+                <InfoGroup_dialog
+                    setDialogAdd={() => handelInfo(false, "GroupCheckList")}
+                    option={groupCheckListOption}
+                    glc={glc.current}
+                />
+            </Dialog>
+
+            <Dialog visible={dialogAdd.GroupCheckList} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center', borderRadius: 8, padding: 20 }} onDismiss={() => handelAdd(false, "GroupCheckList")}>
+                <MemoCreateGroupOption_dialog
+                    setIsVisible={() => {
+                        handelAdd(false, "GroupCheckList")
+                    }}
+                    checkListOption={checkListOption}
+                    initialValues={initialGroupCheckList}
+                    saveData={saveDataGroupCheckList}
+                />
+            </Dialog>
         </Portal>
     );
 });

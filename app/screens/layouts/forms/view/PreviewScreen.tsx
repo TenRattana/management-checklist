@@ -71,7 +71,7 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
             });
             setFormValues(initialValues);
         }
-    }, [state.subForms]);
+    }, [state]);
 
     return (
         <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]}>

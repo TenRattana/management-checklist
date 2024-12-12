@@ -234,7 +234,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
     return (
         <GestureHandlerRootView style={[createform.container, { flex: 1 }]}>
             <AccessibleView name="container-create-form" style={styles.container}>
-                {/* <GestureDetector gesture={panGesture}> */}
                 <Animated.View
                     style={[
                         styles.content,
@@ -271,7 +270,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                     </AccessibleView>
 
                 </Animated.View>
-                {/* </GestureDetector> */}
 
                 <Animated.View style={[styles.drawer, drawerStyle]}>
                     {drawerContent === 'main' && drawerContent && (
@@ -294,6 +292,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                                 dataType={dataType ?? []}
                                 checkListType={checkListType ?? []}
                                 groupCheckListOption={groupCheckListOption ?? []}
+                                checkListOption={checkListOption}
                             />
                         </>
                     )}

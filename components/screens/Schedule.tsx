@@ -77,6 +77,10 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 10,
     alignSelf: 'center'
   },
+  actionButton: {
+    marginHorizontal: 5,
+    padding: 10
+  },
 });
 
 export const convertToDate = (thaiDate: string): Date => {

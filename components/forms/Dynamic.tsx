@@ -151,7 +151,7 @@ const DynamicForm = React.memo(({
 
   const isValidImportantList = values && ImportantList && ImportantList.length > 0 ? ImportantList?.every(
     (value) => value.Value && value.Value?.includes(values)
-  ) : Important ? Important : false;
+  ) : values && Important ? Important : false;
 
   return (
     <View id="form-layout2">

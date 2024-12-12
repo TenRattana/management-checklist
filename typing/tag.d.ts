@@ -13,6 +13,7 @@ import {
   CheckListType,
   GroupCheckListOption,
   TypeConfig,
+  CheckListOption,
 } from "./type";
 import * as Yup from "yup";
 import { FormikErrors } from "formik";
@@ -159,6 +160,7 @@ export interface DragfieldProps {
   dataType: DataType[];
   checkListType: CheckListType[];
   groupCheckListOption: GroupCheckListOption[];
+  checkListOption: CheckListOption[];
 }
 
 export interface DragsubformProps {
@@ -168,6 +170,7 @@ export interface DragsubformProps {
   dataType: DataType[];
   checkListType: CheckListType[];
   groupCheckListOption: GroupCheckListOption[];
+  checkListOption: CheckListOption[];
   navigation: NavigationProp<any>;
 }
 // validationSchema: Yup.ObjectSchema<{[x: string]: any;},Yup.AnyObject,{[x: string]: any;},"" >;
@@ -199,12 +202,11 @@ export interface FieldDialogProps {
   saveField: (values: BaseFormState, mode: string) => void;
   checkListType: CheckList[];
   dataType: DataType[];
-  checkList: Checklist[];
-  groupCheckListOption: GroupCheckListOption[];
   dropcheckList: Checklist[];
   dropcheckListType: CheckList[];
   dropdataType: DataType[];
   dropgroupCheckListOption: GroupCheckListOption[];
+  checkListOption: CheckListOption[];
 }
 
 export interface ActionProps {

@@ -27,7 +27,7 @@ import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
 import useMasterdataStyles from "@/styles/common/masterdata";
 
-const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, dataType, checkListType, groupCheckListOption, checkList, navigation }) => {
+const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, dataType, checkListType, groupCheckListOption, checkList, navigation, checkListOption }) => {
     const [initialDialog, setInitialDialog] = useState<boolean>(false)
     const [initialSubForm, setInitialSubForm] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", MachineID: "", Fields: [] });
     const [editMode, setEditMode] = useState<boolean>(false)
@@ -100,13 +100,14 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, d
                         dataType={dataType}
                         checkListType={checkListType}
                         groupCheckListOption={groupCheckListOption}
+                        checkListOption={checkListOption}
                     />
                 </AccessibleView>
             </>
         );
     }
 
-    const renderSubForm = useCallback((params: RenderItemParams<BaseSubForm>) => {
+    const renderSubForm = (params: RenderItemParams<BaseSubForm>) => {
         return (
             <ShadowDecorator>
                 <ScaleDecorator activeScale={0.90}>
@@ -114,7 +115,7 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, d
                 </ScaleDecorator>
             </ShadowDecorator>
         );
-    }, []);
+    }
 
     return (
         <>
@@ -139,7 +140,7 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, d
                 <NestableDraggableFlatList
                     data={state.subForms}
                     renderItem={renderSubForm}
-                    keyExtractor={(item, index) => `SF-${item.SFormID}-${index}`}
+                    keyExtractor={(item, index) => `SF-${index}-${index}`}
                     onDragEnd={({ data }) => handleDropSubForm(data)}
                     activationDistance={10}
                 />

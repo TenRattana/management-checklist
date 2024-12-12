@@ -19,13 +19,16 @@ import { useToast } from "@/app/contexts/useToast";
 import Text from '@/components/Text'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { CheckList } from "@/typing/type";
+import useField from "@/hooks/FieldDialog";
 
-const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatch, dataType, checkListType, groupCheckListOption, checkList }) => {
+const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatch, dataType, checkListType, groupCheckListOption, checkListOption }) => {
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const [currentField, setCurrentField] = useState<BaseFormState>({
         MCListID: "", CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: SFormID,
         Required: false, Important: false, ImportantList: [], EResult: "", CListName: "", DTypeValue: undefined,
     });
+    const { checkList } = useField();
+
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const { handleError } = useToast();
     const { theme } = useTheme()
@@ -161,12 +164,11 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
                 saveField={handleSaveField}
                 checkListType={checkListTypes}
                 dataType={dataType}
-                checkList={checkList}
-                groupCheckListOption={groupCheckListOption}
                 dropcheckList={dropcheckList}
                 dropcheckListType={dropcheckListType}
                 dropdataType={dropdataType}
                 dropgroupCheckListOption={dropgroupCheckListOption}
+                checkListOption={checkListOption}
             />
         </>
     );

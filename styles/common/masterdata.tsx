@@ -300,7 +300,6 @@ const useMasterdataStyles = () => {
             fontWeight: '500',
             paddingVertical: 10,
             fontSize: spacing.small,
-            color: theme.colors.onBackground
         },
         pickerContainer: {
             width: 150,
