@@ -5,7 +5,6 @@ import { Checkboxs, Inputs } from "@/components/common";
 import { Portal, Dialog, Switch, Icon } from "react-native-paper";
 import { Formik, FastField } from "formik";
 import Checklist_dialog from "../screens/Checklist_dialog";
-import { useToast } from "@/app/contexts/useToast";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
 import * as Yup from 'yup'
@@ -17,6 +16,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import useField from "@/hooks/FieldDialog";
 import InfoGroup_dialog from "../screens/InfoGroup_dialog";
 import GroupCreate_dialog from "../screens/GroupCreate_dialog";
+import CheckListCreate_dialog from "../screens/CheckListCreate_dialog";
 
 const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode, saveField, setShowDialogs
     , checkListType, dataType, dropcheckListType, dropdataType, dropgroupCheckListOption, checkListOption
@@ -174,7 +174,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
         }, [])
     )
 
-    const MemoChecklist_dialog = React.memo(Checklist_dialog)
+    const MemoChecklist_dialog = React.memo(CheckListCreate_dialog)
     const MemoCreateGroupOption_dialog = React.memo(GroupCreate_dialog)
     const memoizedAnimatedText = useMemo(() => animatedText, [shouldRender]);
     const memoizedAnimatedDT = useMemo(() => animatedStyleNumber, [shouldRenderDT]);
@@ -628,10 +628,8 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
             </Dialog>
 
-            <Dialog visible={dialogAdd.CheckList} style={{ zIndex: 5 }}>
+            <Dialog visible={dialogAdd.CheckList} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center', borderRadius: 8, padding: 20 }} onDismiss={() => handelAdd(false, "CheckList")}>
                 <MemoChecklist_dialog
-                    isEditing={false}
-                    isVisible={dialogAdd.CheckList}
                     setIsVisible={() => {
                         handelAdd(false, "CheckList")
                     }}

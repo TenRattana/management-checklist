@@ -28,7 +28,7 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, initialV
 
     return (
         <View>
-            <Text>GroupCreate_dialog</Text>
+            <Text>Create Group Check List Option & Option Detail</Text>
 
             <Formik
                 initialValues={initialValues}
@@ -68,7 +68,6 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, initialV
                                 testID="isActive-cgd"
                             />
                         </View>
-
 
                         <FlatList
                             data={options}
@@ -128,8 +127,6 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, initialV
                                 <Text style={masterdataStyles.text}>Cancel</Text>
                             </TouchableOpacity>
                         </View>
-
-
                     </View>
                 )}
             </Formik>
