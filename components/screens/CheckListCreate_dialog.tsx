@@ -1,6 +1,5 @@
 import { View } from 'react-native'
 import React from 'react'
-import { CheckListOption } from '@/typing/type'
 import { InitialValuesChecklist } from '@/typing/value'
 import { Switch } from 'react-native-paper'
 import { TouchableOpacity } from 'react-native-gesture-handler'
