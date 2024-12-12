@@ -150,6 +150,7 @@ export interface CustomTableProps {
   showDetailwithKey?:string[];
   detailKeyrow?:number;
   detailData?: TypeConfig[];
+  ShowTitle?:string;
 }
 
 export interface DragfieldProps {

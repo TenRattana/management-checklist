@@ -25,10 +25,11 @@ interface CustomTableHeadProps {
     showData?: TypeConfig[];
     showColumn?: string;
     handleDialog: (action?: string, data?: string) => void;
+    ShowTitle?: string;
 }
 
 
-const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({ Tablehead, flexArr, handleSort, sortColumn, sortDirection, selectedRows, toggleSelectAll, displayData, showFilter, filter, handelSetFilter, showData, showColumn, handleDialog }) => {
+const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({ Tablehead, flexArr, handleSort, sortColumn, sortDirection, selectedRows, toggleSelectAll, displayData, showFilter, filter, handelSetFilter, showData, showColumn, handleDialog, ShowTitle }) => {
     const masterdataStyles = useMasterdataStyles();
 
     const { fontSize, responsive } = useRes()
@@ -108,7 +109,7 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({ Tablehead,
                         flexDirection: responsive === "small" ? 'column' : 'row', justifyContent: 'flex-end', marginBottom: 10,
                         marginLeft: responsive === "small" ? 0 : 10,
                     }}>
-                        <Text style={[masterdataStyles.text, { alignContent: 'center', paddingRight: 15, alignSelf: 'center' }]}>{Tablehead[1].label}</Text>
+                        <Text style={[masterdataStyles.text, { alignContent: 'center', paddingRight: 15, alignSelf: 'center' }]}>{ShowTitle || "Title"}</Text>
                         <Picker
                             itemStyle={masterdataStyles.text}
                             selectedValue={filter || ""}

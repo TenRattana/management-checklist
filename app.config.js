@@ -49,6 +49,15 @@ export default {
       package: "com.m_checklist_test",
       permissions: ["CAMERA"],
       targetSdkVersion: 34,
+      statusBar: {
+        barStyle: "dark-content",
+        backgroundColor: "#00000000",
+        translucent: true,
+      },
+      navigationBar: {
+        backgroundColor: "#00000000",
+        barStyle: "dark-content",
+      },
     },
     web: {
       bundler: "metro",

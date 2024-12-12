@@ -37,11 +37,11 @@ const MenuSection = React.memo(({ title, isOpen, onToggle, items, navigation }: 
         let handler: NodeJS.Timeout | null = null
 
         if (isOpen) {
-            runOnJS(setOpacity)(1);
+            setOpacity(1);
             height.value = withTiming(totalHeight, { duration: 300 });
         } else {
             handler = setTimeout(() => {
-                runOnJS(setOpacity)(0);
+                setOpacity(0);
                 height.value = withTiming(0, { duration: 300 });
             }, 300);
         }

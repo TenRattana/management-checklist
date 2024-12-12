@@ -17,7 +17,9 @@ import useField from "@/hooks/FieldDialog";
 import InfoGroup_dialog from "../screens/InfoGroup_dialog";
 import GroupCreate_dialog from "../screens/GroupCreate_dialog";
 import CheckListCreate_dialog from "../screens/CheckListCreate_dialog";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+const AnimatedView = Animated.createAnimatedComponent(View);
 const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode, saveField, setShowDialogs
     , checkListType, dataType, dropcheckListType, dropdataType, dropgroupCheckListOption, checkListOption
 }: FieldDialogProps) => {
@@ -130,22 +132,14 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
         });
     }, [checkListType, dataType]);
 
-    const animatedText = useAnimatedStyle(() => {
+    const RenderView = Platform.OS === 'web' ? AnimatedView : View;
 
-        if (shouldRender !== "") {
-            return { opacity: 1, transform: [{ scale: withTiming(1, { duration: 300 }) }] };
-        } else {
-            return { opacity: 0, transform: [{ scale: withTiming(0.5, { duration: 300 }) }] };
-        }
+    const animatedText = useAnimatedStyle(() => {
+        return shouldRender !== "" ? { opacity: 1, transform: [{ scale: withTiming(1, { duration: 300 }) }] } : { opacity: 0, transform: [{ scale: withTiming(0.5, { duration: 300 }) }] };
     }, [shouldRender]);
 
     const animatedStyleNumber = useAnimatedStyle(() => {
-
-        if (shouldRenderDT) {
-            return { opacity: 1, transform: [{ scale: withTiming(1, { duration: 300 }) }] };
-        } else {
-            return { opacity: 0, transform: [{ scale: withTiming(0.5, { duration: 300 }) }] };
-        }
+        return shouldRenderDT ? { opacity: 1, transform: [{ scale: withTiming(1, { duration: 300 }) }] } : { opacity: 0, transform: [{ scale: withTiming(0.5, { duration: 300 }) }] };
     }, [shouldRenderDT]);
 
     const animatedStyleIT = useAnimatedStyle(() => {
@@ -316,7 +310,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
                                                         <TouchableOpacity
                                                             onPress={() => {
-                                                                runOnJS(handelAdd)(true, "CheckList")
+                                                                handelAdd(true, "CheckList")
                                                             }}
                                                             style={{
                                                                 alignItems: 'center',
@@ -355,7 +349,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                             </FastField>
 
                                             {shouldRender === "detail" && (
-                                                <Animated.View style={[memoizedAnimatedText]}>
+                                                <RenderView style={Platform.OS === 'web' ? memoizedAnimatedText : { opacity: 1 }}>
                                                     <FastField name="GCLOptionID" key={shouldRender === "detail"}>
                                                         {({ field, form }: any) => (
                                                             <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
@@ -385,7 +379,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
                                                                 <TouchableOpacity
                                                                     onPress={() => {
-                                                                        runOnJS(handelInfo)(true, "GroupCheckList")
+                                                                        handelInfo(true, "GroupCheckList")
                                                                     }}
                                                                     style={{
                                                                         alignItems: 'center',
@@ -398,7 +392,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
                                                                 <TouchableOpacity
                                                                     onPress={() => {
-                                                                        runOnJS(handelAdd)(true, "GroupCheckList")
+                                                                        handelAdd(true, "GroupCheckList")
                                                                     }}
                                                                     style={{
                                                                         alignItems: 'center',
@@ -410,11 +404,11 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                                             </View>
                                                         )}
                                                     </FastField>
-                                                </Animated.View>
+                                                </RenderView>
                                             )}
 
                                             {shouldRender === "text" && (
-                                                <Animated.View style={[memoizedAnimatedText]}>
+                                                <RenderView style={Platform.OS === 'web' ? memoizedAnimatedText : { opacity: 1 }}>
                                                     <FastField name="DTypeID" key={shouldRender === "text"}>
                                                         {({ field, form }: any) => (
                                                             <CustomDropdownSingle
@@ -439,11 +433,11 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                                             />
                                                         )}
                                                     </FastField>
-                                                </Animated.View>
+                                                </RenderView>
                                             )}
 
                                             {shouldRenderDT && (
-                                                <Animated.View style={[memoizedAnimatedDT]}>
+                                                <RenderView style={Platform.OS === 'web' ? memoizedAnimatedDT : { opacity: 1 }}>
                                                     <FastField name="DTypeValue">
                                                         {({ field, form }: any) => (
                                                             <Inputs
@@ -458,7 +452,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                                             />
                                                         )}
                                                     </FastField >
-                                                </Animated.View>
+                                                </RenderView>
                                             )}
 
                                             {shouldRender !== "label" && (
@@ -478,7 +472,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                             )}
 
                                             {shouldRenderIT && option.length > 0 && (
-                                                <Animated.View style={[memoizedAnimatedIT]}>
+                                                <RenderView style={Platform.OS === 'web' ? memoizedAnimatedIT : { opacity: 1 }}>
                                                     <Text style={{ marginTop: 10, marginBottom: 10, paddingLeft: 10, fontSize: spacing.small, color: theme.colors.error }}>
                                                         {(values.ImportantList || []).some((item) => item.Value) ? "Select value is important!" : "Input value control!"}
                                                     </Text>
@@ -510,11 +504,11 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                                         }}
                                                     </FastField>
 
-                                                </Animated.View>
+                                                </RenderView>
                                             )}
 
                                             {shouldRenderIT && shouldRenderDT && (
-                                                <Animated.View style={[memoizedAnimatedIT]}>
+                                                <RenderView style={Platform.OS === 'web' ? memoizedAnimatedIT : { opacity: 1 }}>
                                                     <Text
                                                         style={[
                                                             { marginTop: 10, marginBottom: 10, paddingLeft: 10, fontSize: spacing.small, color: theme.colors.error }
@@ -559,7 +553,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                                             )}
                                                         </FastField>
                                                     </>
-                                                </Animated.View>
+                                                </RenderView>
 
                                             )}
 

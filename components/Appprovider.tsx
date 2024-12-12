@@ -3,8 +3,11 @@ import { ToastProvider, AuthProvider, ResponsiveProvider, ThemeProvider, Timezon
 import { QueryClientProvider, QueryClient } from "react-query";
 import { Provider as ReduxProvider } from "react-redux";
 import { store } from "@/stores";
+import * as SplashScreen from 'expo-splash-screen';
 
 const queryClient = new QueryClient();
+
+SplashScreen.preventAutoHideAsync();
 
 const AppProviders = ({ children }: any) => (
     <ResponsiveProvider>

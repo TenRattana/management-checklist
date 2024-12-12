@@ -51,7 +51,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
     });
 
     const openDrawer = (content: any) => {
-        setDrawerContent(content);
+        runOnJS(setDrawerContent)(content);
         translateX.value = withTiming(0, { duration: 300 });
         mainTranslateX.value = withTiming(DRAWER_WIDTH, { duration: 300 });
         setDrawerOpen(true);
@@ -71,19 +71,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
     const mainContentStyle = useAnimatedStyle(() => ({
         transform: [{ translateX: mainTranslateX.value }],
     }));
-
-    const panGesture = useMemo(() =>
-        Gesture.Pan().onUpdate((event) => {
-            const newValue = Math.max(-DRAWER_WIDTH, Math.min(0, translateX.value + event.translationX));
-            translateX.value = newValue;
-            mainTranslateX.value = Math.max(0, DRAWER_WIDTH + newValue);
-        }).onEnd(() => {
-            if (translateX.value > -DRAWER_WIDTH / 2) {
-                runOnJS(openDrawer)(drawerContent || 'main');
-            } else {
-                runOnJS(closeDrawer)();
-            }
-        }), []);
 
     const validationSchema = useMemo(() => {
         const shape: Record<string, any> = {};
@@ -242,7 +229,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                 >
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity
-                            onPress={() => !drawerOpen || drawerContent !== "main" ? runOnJS(openDrawer)('main') : runOnJS(closeDrawer)()}
+                            onPress={() => !drawerOpen || drawerContent !== "main" ? openDrawer('main') : closeDrawer()}
                             style={!drawerOpen || drawerContent !== "main" ? styles.openButton : styles.openButtonActive}
                         >
                             <Icon source={"format-list-bulleted"} size={spacing.large} color={theme.colors.fff} key={"icon-tool"} />
@@ -250,7 +237,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                            onPress={() => !drawerOpen || drawerContent !== "toolbox" ? runOnJS(openDrawer)('toolbox') : runOnJS(closeDrawer)()}
+                            onPress={() => !drawerOpen || drawerContent !== "toolbox" ? openDrawer('toolbox') : closeDrawer()}
                             style={!drawerOpen || drawerContent !== "toolbox" ? styles.openButton : styles.openButtonActive}
                         >
                             <Icon source={"tools"} size={spacing.large} color={theme.colors.fff} key={"icon-tool"} />
@@ -276,7 +263,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                         <>
                             {responsive === "small" && (
                                 <TouchableOpacity
-                                    onPress={() => runOnJS(closeDrawer)()}
+                                    onPress={() => closeDrawer()}
                                     style={[styles.openButtonActive, { marginHorizontal: 16 }]}
                                 >
                                     <Icon source={"arrow-left-circle"} size={spacing.large} color={theme.colors.fff} key={"icon-tool"} />

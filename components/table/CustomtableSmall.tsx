@@ -212,6 +212,7 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
                 nestedScrollEnabled={true}
                 showsVerticalScrollIndicator={false}
                 removeClippedSubviews
+                getItemLayout={(data, index) => ({ length: 65, offset: 65 * index, index })}
             />
 
             <Dialogs

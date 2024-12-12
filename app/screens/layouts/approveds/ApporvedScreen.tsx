@@ -165,6 +165,7 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
         searchQuery: debouncedSearchQuery,
         selectedRows,
         setRow,
+        ShowTitle: "Machine : ",
         showFilter: true,
         showData: machines,
         showColumn: "MachineName"

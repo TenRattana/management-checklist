@@ -128,6 +128,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
         showMessage: [0, 1],
         searchQuery: debouncedSearchQuery,
         showFilter: true,
+        ShowTitle: "Machine : ",
         showData: machines,
         showColumn: "MachineName"
     }), [tableData, debouncedSearchQuery, handleAction, machines]);
@@ -156,14 +157,6 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
                 title="ExpectedResult"
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
-            <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
-                <Searchbar
-                    placeholder="Search Expected Result..."
-                    value={searchQuery}
-                    onChange={setSearchQuery}
-                    testId="search-er"
-                />
-            </AccessibleView>
             <Card.Content style={styles.cardcontent}>
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
             </Card.Content>

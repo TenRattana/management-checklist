@@ -212,14 +212,12 @@ export interface TimeScheduleMachine {
   IsActive: boolean;
 }
 
-export type ComponentNames =
-  | "Create_form"
-  | "InputFormMachine"
-  | "Home"
-  | "Preview"
-  | "Apporved";
+export type ComponentNames =  "InputFormMachine" | "Preview";
 
 export type ComponentNameNoLazy =
+  "Create_form"
+  | "Home"
+  | "Apporved"
   | "Machine_group"
   | "Machine"
   | "Checklist"

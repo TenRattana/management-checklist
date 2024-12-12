@@ -4,20 +4,20 @@ import { convertScheduleToTimeline, getDate, parseTimeScheduleToTimeline } from 
 import { AccessibleView } from '@/components';
 import { Clock } from '@/components/common/Clock';
 import Home_dialog from '@/components/screens/Home_dialog';
+import Timelines from '@/components/screens/TimeLines';
 import axiosInstance from '@/config/axios';
 import { formatTime, getCurrentTime } from '@/config/timezoneUtils';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { TimeScheduleProps } from '@/typing/type';
 import { groupBy } from 'lodash';
 import moment from 'moment-timezone';
-import React, { Suspense, useCallback, useMemo, useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
-import { Calendar, CalendarProvider, CalendarUtils, DateData, Timeline, TimelineList, TimelineListRenderItemInfo, TimelineProps } from 'react-native-calendars';
+import React, { useCallback, useMemo, useState } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, FlatList } from 'react-native';
+import { Calendar, CalendarProvider, CalendarUtils, DateData, Timeline, TimelineListRenderItemInfo, TimelineProps } from 'react-native-calendars';
 import { Checkbox, Icon } from 'react-native-paper';
 import Animated, { Easing, FadeIn, FadeOut, runOnJS } from 'react-native-reanimated';
 import { useQuery } from 'react-query';
 
-const Timelines = React.lazy(() => import('@/components/screens/TimeLines'));
 
 const fetchTimeSchedules = async (): Promise<TimeScheduleProps[]> => {
   const response = await axiosInstance.post("TimeSchedule_service.asmx/GetSchedules");
@@ -102,7 +102,7 @@ const HomeScreen = () => {
 
       return updatedCheckedState;
     });
-  }, [filterTitle, checkedItems]);
+  }, []);
 
   const timelineItems = useMemo(() => parseTimeScheduleToTimeline(timeSchedule), [timeSchedule]);
 
@@ -144,7 +144,7 @@ const HomeScreen = () => {
     });
 
     return groupedEvents;
-  }, [timeSchedule, filterStatus, currentDate, filterTitle]);
+  }, [filterStatus, currentDate, filterTitle]);
 
 
   const styles = StyleSheet.create({
@@ -206,29 +206,28 @@ const HomeScreen = () => {
   });
 
   const toggleSwitch = useCallback(() => {
-    runOnJS(setShowCalendar)(!showCalendar);
+    setShowCalendar(!showCalendar);
   }, [showCalendar]);
 
   const handleEventClick = (event: any) => {
-    runOnJS(setSelectedEvent)(event);
-    runOnJS(setDialogVisible)(true);
+    setSelectedEvent(event);
+    setDialogVisible(true);
   };
 
   const renderItem = (timelineProps: TimelineProps, info: TimelineListRenderItemInfo) => {
     return (
       <Timeline
         {...timelineProps}
-        theme={getTheme()}
+        theme={getTheme}
         onEventPress={handleEventClick}
         renderEvent={(event) => <RenderEvent event={event} />}
       />
     );
   };
 
-  const hideDialog = () => runOnJS(setDialogVisible)(false);
+  const hideDialog = () => setDialogVisible(false);
 
-
-  function getTheme() {
+  const getTheme = useMemo(() => {
     return {
       calendarBackground: theme.colors.background,
 
@@ -253,15 +252,17 @@ const HomeScreen = () => {
       dotColor: theme.colors.primary,
       selectedDotColor: theme.colors.accent,
     };
-  }
+  }, [])
+
+  console.log("Home");
 
   return (
-    <AccessibleView name="container-Home" style={{ flex: 1 }}>
+    <View id="container-Home" style={{ flex: 1 }}>
       <CalendarProvider
         date={currentDate}
         onDateChanged={runOnJS(setCurrentDate)}
         disabledOpacity={0.6}
-        theme={getTheme()}
+        theme={getTheme}
         showTodayButton
       >
         <View style={{ flex: 1, flexDirection: responsive === "small" ? 'column' : 'row' }}>
@@ -274,6 +275,7 @@ const HomeScreen = () => {
                 <FlatList
                   data={categories}
                   keyExtractor={(item) => item.id}
+                  getItemLayout={(data, index) => ({ length: 40, offset: 40 * index, index })}
                   renderItem={({ item }) => (
                     <View style={styles.itemContainer}>
                       <Checkbox
@@ -291,7 +293,7 @@ const HomeScreen = () => {
                         markedDates={markedDatesS}
                         markingType="multi-dot"
                         style={styles.calendar}
-                        theme={getTheme()}
+                        theme={getTheme}
                       />
                       <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginBottom: 15 }]}>Schedule Type</Text>
                     </>
@@ -309,19 +311,19 @@ const HomeScreen = () => {
             </TouchableOpacity>
 
             <View style={styles.filterContainer}>
-              <TouchableOpacity onPress={() => runOnJS(setFilterStatus)('all')}>
+              <TouchableOpacity onPress={() => setFilterStatus('all')}>
                 <Text style={filterStatus === "all" ? styles.filterButtonActive : styles.filterButton}>All</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => runOnJS(setFilterStatus)('end')}>
+              <TouchableOpacity onPress={() => setFilterStatus('end')}>
                 <Text style={filterStatus === "end" ? styles.filterButtonActive : styles.filterButton}>Ended</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => runOnJS(setFilterStatus)('running')}>
+              <TouchableOpacity onPress={() => setFilterStatus('running')}>
                 <Text style={filterStatus === "running" ? styles.filterButtonActive : styles.filterButton}>Running</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => runOnJS(setFilterStatus)('wait')}>
+              <TouchableOpacity onPress={() => setFilterStatus('wait')}>
                 <Text style={filterStatus === "wait" ? styles.filterButtonActive : styles.filterButton}>Waiting</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => runOnJS(setFilterStatus)('stop')}>
+              <TouchableOpacity onPress={() => setFilterStatus('stop')}>
                 <Text style={filterStatus === "stop" ? styles.filterButtonActive : styles.filterButton}>Stop</Text>
               </TouchableOpacity>
             </View>
@@ -331,14 +333,9 @@ const HomeScreen = () => {
                 {currentDate} - {Clock()} - Timeline
               </Text>
 
-              {eventsByDateS && initialTime ? (
-                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
-                  <Timelines eventsByDateS={eventsByDateS} initialTime={initialTime} renderItem={renderItem} />
-                </Suspense>
-              ) : (
-                <Text>Loading data...</Text>
+              {eventsByDateS && initialTime && (
+                <Timelines eventsByDateS={eventsByDateS} initialTime={initialTime} renderItem={renderItem} />
               )}
-
             </View>
           </View>
         </View>
@@ -346,7 +343,7 @@ const HomeScreen = () => {
         <Home_dialog dialogVisible={dialogVisible} hideDialog={hideDialog} selectedEvent={selectedEvent} key={`Home_dialog`} />
 
       </CalendarProvider>
-    </AccessibleView>
+    </View>
   );
 };
 

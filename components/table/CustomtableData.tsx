@@ -146,6 +146,7 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                 removeClippedSubviews={true}
                 windowSize={10}
                 onEndReachedThreshold={0.5}
+                getItemLayout={(data, index) => ({ length: 58, offset: 58 * index, index })}
             />
 
             <Dialogs

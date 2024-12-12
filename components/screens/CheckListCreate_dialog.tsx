@@ -2,7 +2,7 @@ import { View } from 'react-native'
 import React from 'react'
 import { InitialValuesChecklist } from '@/typing/value'
 import { Switch } from 'react-native-paper'
-import { TouchableOpacity } from 'react-native-gesture-handler'
+import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler'
 import useMasterdataStyles from '@/styles/common/masterdata'
 import { FastField, Formik } from 'formik'
 import * as Yup from 'yup'
@@ -21,7 +21,7 @@ const CheckListCreate_dialog = React.memo(({ setIsVisible, initialValues, saveDa
     const { theme } = useTheme()
 
     return (
-        <View>
+        <GestureHandlerRootView style={{ flexGrow: 1 }}>
             <Text>Create Check List</Text>
 
             <Formik
@@ -75,7 +75,7 @@ const CheckListCreate_dialog = React.memo(({ setIsVisible, initialValues, saveDa
                     </View>
                 )}
             </Formik>
-        </View>
+        </GestureHandlerRootView>
     )
 })
 

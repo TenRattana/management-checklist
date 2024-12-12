@@ -142,6 +142,7 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, d
                     renderItem={renderSubForm}
                     keyExtractor={(item, index) => `SF-${index}-${index}`}
                     onDragEnd={({ data }) => handleDropSubForm(data)}
+                    getItemLayout={(data, index) => ({ length: 60, offset: 60 * index, index })}
                     activationDistance={10}
                 />
             </NestableScrollContainer>

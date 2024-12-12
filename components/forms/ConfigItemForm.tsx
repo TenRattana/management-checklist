@@ -145,11 +145,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         backgroundColor: "#f9f9f9",
         borderRadius: 8,
-        shadowColor: "#000",
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 3,
     },
     textRow: {
         flexDirection: "row",

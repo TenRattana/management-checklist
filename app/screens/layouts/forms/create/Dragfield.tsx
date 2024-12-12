@@ -140,6 +140,7 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
                     renderItem={renderField}
                     keyExtractor={(item, index) => `FD-${item.SFormID}-${index}`}
                     onDragEnd={({ data }) => handleDropField(data)}
+                    getItemLayout={(data, index) => ({ length: 60, offset: 60 * index, index })}
                     activationDistance={1}
                 />
             </NestableScrollContainer>

@@ -3,6 +3,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { GroupCheckListOption, CheckListOption } from "@/typing/type";
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Dialog, List, Text } from "react-native-paper";
 
 const InfoGroup_dialog = ({
@@ -30,29 +31,31 @@ const InfoGroup_dialog = ({
     }, [option, glc]);
 
     return (
-        <View style={styles.dialog}>
-            <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold]}>{GCLOptionName || "Group Checklist Info"}</Dialog.Title>
-            <View style={{ marginHorizontal: 10 }}>
-                {options.length > 0 ? (
-                    options.map((option, index) => (
-                        <List.Item
-                            key={index}
-                            title={option.label}
-                            style={styles.optionItem}
-                            descriptionStyle={{ fontSize: spacing.small }}
-                            titleStyle={{ fontSize: spacing.small }}
-                        />
-                    ))
-                ) : (
-                    <Text style={masterdataStyles.text}>No options available</Text>
-                )}
+        <GestureHandlerRootView style={{ flexGrow: 1 }}>
+            <View style={styles.dialog}>
+                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold]}>{GCLOptionName || "Group Checklist Info"}</Dialog.Title>
+                <View style={{ marginHorizontal: 10 }}>
+                    {options.length > 0 ? (
+                        options.map((option, index) => (
+                            <List.Item
+                                key={index}
+                                title={option.label}
+                                style={styles.optionItem}
+                                descriptionStyle={{ fontSize: spacing.small }}
+                                titleStyle={{ fontSize: spacing.small }}
+                            />
+                        ))
+                    ) : (
+                        <Text style={masterdataStyles.text}>No options available</Text>
+                    )}
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                    <TouchableOpacity onPress={() => setDialogAdd()} style={styles.actionButton}>
+                        <Text style={masterdataStyles.text}>Close</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                <TouchableOpacity onPress={() => setDialogAdd()} style={styles.actionButton}>
-                    <Text style={masterdataStyles.text}>Close</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+        </GestureHandlerRootView>
     );
 };
 
@@ -62,7 +65,6 @@ const styles = StyleSheet.create({
     dialog: {
         borderRadius: 10,
         padding: 10,
-        flex: 1,
     },
     title: {
         fontWeight: "bold",

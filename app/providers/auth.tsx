@@ -39,24 +39,22 @@ export const initializeApp = createAsyncThunk('app/initialize', async (payload: 
   dispatch(fetchPermission(payload.UserData.GUserID));
   dispatch(setUser({ user: payload.UserData }));
 
-  useEffect(() => {
-    const interceptor = axiosInstance.interceptors.request.use(
-      async (config: InternalAxiosRequestConfig) => {
-        if (payload.UserData) {
+  axiosInstance.interceptors.request.use(
+    async (config: InternalAxiosRequestConfig) => {
+      const userInfo = await getData('userToken');
+      if (userInfo) {
+        const payload: any = jwtDecode(userInfo);
+        if (payload && payload.Full_Name) {
           if (!(config.headers instanceof AxiosHeaders)) {
             config.headers = new AxiosHeaders(config.headers);
           }
-          config.headers.set('Authorization', payload.UserData.Full_Name);
+          config.headers.set('Authorization', payload.Full_Name);
         }
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
-
-    return () => {
-      axiosInstance.interceptors.request.eject(interceptor);
-    };
-  }, [payload.UserData]);
+      }
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );
 });
 
 export const initializeLogout = createAsyncThunk('app/initialize', async (_, { dispatch }) => {
@@ -126,7 +124,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     if (token && token.split('.').length === 3) {
       try {
-        const payload = jwtDecode(token);
+        const payload: any = jwtDecode(token);
 
         if (payload.exp) {
           const expirationTime = payload.exp * 1000;

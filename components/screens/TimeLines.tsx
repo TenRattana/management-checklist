@@ -1,13 +1,23 @@
-import { TimelineList } from "react-native-calendars";
-import React, { useMemo } from "react";
+import { useRes } from "@/app/contexts/useRes";
+import { useTheme } from "@/app/contexts/useTheme";
 import { getCurrentTime } from "@/config/timezoneUtils";
-import { useRes } from '@/app/contexts/useRes';
-import { useTheme } from '@/app/contexts/useTheme';
+import React, { useState, useEffect, useMemo } from "react";
+import { Dimensions } from "react-native";
+import { TimelineList } from "react-native-calendars";
 
 const Timelines = React.memo(({ eventsByDateS, initialTime, renderItem }: { eventsByDateS: any, initialTime: any, renderItem: any }) => {
-
     const { theme, darkMode } = useTheme();
     const { spacing } = useRes();
+
+    const [screenSize, setScreenSize] = useState(Dimensions.get("window"));
+
+    useEffect(() => {
+        const onChange = ({ window }: { window: any }) => {
+            setScreenSize(window);
+        };
+        const subscription = Dimensions.addEventListener("change", onChange);
+        return () => subscription.remove();
+    }, []);
 
     const timelineProps = useMemo(() => {
         return {
@@ -24,7 +34,7 @@ const Timelines = React.memo(({ eventsByDateS, initialTime, renderItem }: { even
                 },
                 timelineContainer: {
                     backgroundColor: theme.colors.background,
-                    borderRadius: 8
+                    borderRadius: 8,
                 },
                 event: {
                     backgroundColor: '#e3f2fd',
@@ -45,19 +55,21 @@ const Timelines = React.memo(({ eventsByDateS, initialTime, renderItem }: { even
                     color: theme.colors.fff,
                     fontSize: spacing.small,
                 },
-
             },
-        }
-    }, [])
+        };
+    }, [theme, darkMode, spacing, screenSize]);
 
-    return <TimelineList
-        events={eventsByDateS}
-        timelineProps={timelineProps}
-        showNowIndicator
-        scrollToNow
-        initialTime={initialTime}
-        renderItem={renderItem}
-    />
-})
+    return (
+        <TimelineList
+            key={JSON.stringify(darkMode)}
+            events={eventsByDateS}
+            timelineProps={timelineProps}
+            showNowIndicator
+            scrollToNow
+            initialTime={initialTime}
+            renderItem={renderItem}
+        />
+    );
+});
 
 export default Timelines

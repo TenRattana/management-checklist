@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { CheckListOption } from '@/typing/type'
 import { InitialValuesCheckListOption, InitialValuesGroupCheckList } from '@/typing/value'
 import { Button, Dialog, Menu, Switch } from 'react-native-paper'
-import { TouchableOpacity } from 'react-native-gesture-handler'
+import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler'
 import useMasterdataStyles from '@/styles/common/masterdata'
 import { FastField, Formik } from 'formik'
 import * as Yup from 'yup'
@@ -27,7 +27,7 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, initialV
     const { theme } = useTheme()
 
     return (
-        <View>
+        <GestureHandlerRootView style={{ flexGrow: 1 }}>
             <Text>Create Group Check List Option & Option Detail</Text>
 
             <Formik
@@ -130,7 +130,7 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, initialV
                     </View>
                 )}
             </Formik>
-        </View>
+        </GestureHandlerRootView>
     )
 })
 

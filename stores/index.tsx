@@ -10,6 +10,10 @@ export const store = configureStore({
     form: counterForm,
     prefix: counterPrefix,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 export type AppDispatch = typeof store.dispatch;

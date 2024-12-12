@@ -21,25 +21,21 @@ const LoginScreen: React.FC = React.memo(() => {
   const { login } = useAuth();
   const { spacing, fontSize, responsive } = useRes();
   const masterdataStyles = useMasterdataStyles();
-  const [loading, setLoading] = useState(false);
 
   const handleLogin = useCallback((values: { username: string, password: string }) => {
-    setLoading(true);
     try {
       login(values.username, values.password);
     } catch (error) {
       handleError(error);
-    } finally {
-      setLoading(false);
     }
-  }, [login, handleError, loading]);
+  }, [login, handleError]);
 
   return (
     <AccessibleView name="login-container" style={[masterdataStyles.container, { alignContent: 'center', justifyContent: 'center', height: '100%' }]}>
       <Card style={{ width: responsive === "large" ? 500 : responsive === "medium" ? '60%' : "80%", alignSelf: 'center' }}>
         <Card.Title
           title={`Login`}
-          titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
+          titleStyle={[masterdataStyles.textBold, { fontSize: spacing.small, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
         />
         <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
 
@@ -103,14 +99,10 @@ const LoginScreen: React.FC = React.memo(() => {
 
                     <TouchableOpacity
                       onPress={() => handleSubmit()}
-                      disabled={!isValid || !dirty || loading}
+                      disabled={!isValid || !dirty}
                       style={buttonStyle}
                     >
-                      {loading ? (
-                        <ActivityIndicator />
-                      ) : (
-                        <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>Login</Text>
-                      )}
+                      <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>Login</Text>
                     </TouchableOpacity>
                   </View>
                 </View>

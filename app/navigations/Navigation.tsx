@@ -18,6 +18,9 @@ import {
     Managepermissions,
     LoginScreen,
     TimescheduleScreen,
+    ApprovedScreen,
+    HomeScreen,
+    CreateFormScreen
 } from '@/app/screens';
 import PermissionDeny from '../screens/layouts/PermissionDeny';
 import { useRes } from "@/app/contexts/useRes";
@@ -38,14 +41,13 @@ const Drawer = createDrawerNavigator();
 const MemoSetting_dialog = React.memo(Setting_dialog)
 
 const components: Record<ComponentNames, () => Promise<{ default: React.ComponentType<any> }>> = {
-    Home: () => import('@/app/screens/layouts/HomeScreen'),
-    Create_form: () => import('@/app/screens/layouts/forms/create/CreateFormScreen'),
     InputFormMachine: () => import('@/app/screens/layouts/forms/Scan/InputFormMachine'),
     Preview: () => import('@/app/screens/layouts/forms/view/PreviewScreen'),
-    Apporved: () => import('@/app/screens/layouts/approveds/ApporvedScreen'),
 };
 
 const nonLazyComponents: Record<ComponentNameNoLazy, React.ComponentType<any>> = {
+    Create_form: CreateFormScreen,
+    Home: HomeScreen,
     Login: LoginScreen,
     Machine_group: MachineGroupScreen,
     Machine: MachineScreen,
@@ -64,7 +66,8 @@ const nonLazyComponents: Record<ComponentNameNoLazy, React.ComponentType<any>> =
     Permission_deny: PermissionDeny,
     Test: TestComponent,
     Time: TimescheduleScreen,
-    TimeTrack: TimescheduleTrack
+    TimeTrack: TimescheduleTrack,
+    Apporved: ApprovedScreen
 };
 
 const DrawerNav = React.memo(({ renderComponent, user }: any) => {
@@ -136,7 +139,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
         });
 
         return screens;
-    }, [user.IsAuthenticated, user.Screen, renderComponent, user.loadgin]);
+    }, [user.IsAuthenticated, user.Screen, renderComponent]);
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
