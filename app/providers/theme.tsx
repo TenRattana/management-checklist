@@ -61,6 +61,10 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       setDarkMode(storedDarkMode === "darkMode");
     };
     loadSettings();
+
+    return () => {
+      loadSettings();
+    }
   }, []);
 
   const handleDarkModeChange = async (value: boolean) => {

@@ -212,6 +212,8 @@ const MachineGroupScreen: React.FC = React.memo(() => {
         }
     })
 
+    const MemoMachine_dialog = React.memo(Machine_dialog)
+    
     return (
         <AccessibleView name="container-machine" style={styles.container}>
             <Card.Title
@@ -233,7 +235,7 @@ const MachineGroupScreen: React.FC = React.memo(() => {
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
             </Card.Content>
 
-            <Machine_dialog
+            <MemoMachine_dialog
                 isVisible={isVisible}
                 setIsVisible={setIsVisible}
                 isEditing={isEditing}

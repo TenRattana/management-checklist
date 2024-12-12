@@ -46,7 +46,7 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
 
     const handleDialogToggle = useCallback(() => {
         setIsEditing(false);
-        setDialogVisible((prev) => !prev);
+        runOnJS(setDialogVisible)((prev) => !prev);
     }, []);
 
     const handleField = (item?: BaseFormState) => {

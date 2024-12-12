@@ -38,7 +38,7 @@ const Auther = React.memo((user: any) => {
         <AccessibleView name="setting" style={[masterdataStyles.container]}>
             <AccessibleView name="setting-mode" style={[masterdataStyles.settingItem]}>
                 <View style={styles.userInfoRow}>
-                    <Text style={[masterdataStyles.settingText, masterdataStyles.textBold]}>User Name : </Text>
+                    <Text style={[masterdataStyles.text, masterdataStyles.textBold]}>User Name : </Text>
                     <Text style={masterdataStyles.text}>{state.Full_Name}</Text>
                 </View>
             </AccessibleView>
@@ -46,7 +46,7 @@ const Auther = React.memo((user: any) => {
 
             <AccessibleView name="setting-mode" style={[masterdataStyles.settingItem]}>
                 <View style={styles.userInfoRow}>
-                    <Text style={[masterdataStyles.settingText, masterdataStyles.textBold]}>Position : </Text>
+                    <Text style={[masterdataStyles.text, masterdataStyles.textBold]}>Position : </Text>
                     <Text style={masterdataStyles.text}>{state.Position}</Text>
                 </View>
             </AccessibleView>
@@ -54,7 +54,7 @@ const Auther = React.memo((user: any) => {
 
             <AccessibleView name="setting-mode" style={[masterdataStyles.settingItem]}>
                 <View style={styles.userInfoRow}>
-                    <Text style={[masterdataStyles.settingText, masterdataStyles.textBold]}>Department : </Text>
+                    <Text style={[masterdataStyles.text, masterdataStyles.textBold]}>Department : </Text>
                     <Text style={masterdataStyles.text}>{state.DepartMent}</Text>
                 </View>
             </AccessibleView>
@@ -64,7 +64,7 @@ const Auther = React.memo((user: any) => {
 
             <AccessibleView name="setting-mode" style={[masterdataStyles.settingItem]}>
                 <View style={styles.userInfoRow}>
-                    <Text style={[masterdataStyles.settingText, masterdataStyles.textBold]}>Group Permission : </Text>
+                    <Text style={[masterdataStyles.text, masterdataStyles.textBold]}>Group Permission : </Text>
                     <Text style={[styles.chipText, masterdataStyles.text, masterdataStyles.textBold, { color: theme.colors.fff }]}>{state.GUserName}</Text>
                 </View>
             </AccessibleView>

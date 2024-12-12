@@ -7,7 +7,6 @@ import { BaseFormState, BaseSubForm } from '@/typing/form';
 import { AccessibleView, Dynamic, Text } from "@/components";
 import { Formik, FieldProps, Field } from "formik";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { Stack } from "expo-router";
 import { DataType } from "@/typing/type";
 import { useSelector } from "react-redux";
 import useForm from "@/hooks/custom/useForm";

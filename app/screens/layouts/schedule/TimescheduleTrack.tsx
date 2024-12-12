@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   StyleSheet,
   Text,
   View,
   FlatList,
-  Dimensions,
 } from 'react-native';
 import { Card } from 'react-native-paper';
 import { useQuery } from 'react-query';

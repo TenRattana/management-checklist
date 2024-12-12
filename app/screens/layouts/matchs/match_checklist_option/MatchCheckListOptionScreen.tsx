@@ -214,6 +214,8 @@ const MatchCheckListOptionScreen = React.memo(() => {
         }
     })
 
+    const MemoMatch_checklist_option = React.memo(Match_checklist_option)
+    
     return (
         <AccessibleView name="container-matchchecklist" style={styles.container}>
             <Card.Title
@@ -235,7 +237,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
             </Card.Content>
 
-            <Match_checklist_option
+            <MemoMatch_checklist_option
                 isVisible={isVisible}
                 setIsVisible={setIsVisible}
                 isEditing={isEditing}

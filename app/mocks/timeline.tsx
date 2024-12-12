@@ -4,8 +4,8 @@ import {
     CalendarUtils,
     TimelineEventProps,
 } from 'react-native-calendars';
-
 import moment from "moment";
+import { CustomLightTheme } from '@/constants/CustomColor';
 
 const today = getCurrentTime();
 
@@ -340,4 +340,3 @@ export const convertScheduleToTimeline = (
     return { timeline, markedDates };
 };
 
-import { CustomLightTheme } from '@/constants/CustomColor';

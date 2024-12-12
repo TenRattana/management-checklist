@@ -18,7 +18,6 @@ import DraggableItem from "./DraggableItem";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/stores";
 import * as Yup from 'yup';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,

@@ -35,11 +35,13 @@ const Configuration: React.FC<ConfigurationProps> = React.memo(({ prefix, handle
         },
     });
 
+    const MemoConfigItem = React.memo(ConfigItem)
+
     return (
         <AccessibleView name="setting" style={[masterdataStyles.container]}>
             <AccessibleView name="setting-mode" style={[masterdataStyles.configPrefix]}>
                 <Text style={[masterdataStyles.settingText, masterdataStyles.textBold]}>App</Text>
-                <ConfigItem
+                <MemoConfigItem
                     key={state.AppName}
                     state={state}
                     label="Program Display"
@@ -55,7 +57,7 @@ const Configuration: React.FC<ConfigurationProps> = React.memo(({ prefix, handle
                 <Text style={[masterdataStyles.settingText, masterdataStyles.textBold]}>Fix Prefixes</Text>
                 {['GroupMachine', 'Machine', 'CheckList', 'GroupCheckList', 'CheckListOption', 'MatchCheckListOption', 'MatchFormMachine', 'Form', 'SubForm', 'ExpectedResult', 'UsersPermission', "TimeSchedule"].map((item) => (
                     <React.Fragment key={item}>
-                        <ConfigItem
+                        <MemoConfigItem
                             state={state}
                             label={item}
                             value={state[item]}

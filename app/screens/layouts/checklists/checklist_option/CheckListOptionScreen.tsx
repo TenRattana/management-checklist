@@ -166,6 +166,8 @@ const CheckListOptionScreen = React.memo(() => {
         }
     })
 
+    const MemoChecklist_option_dialog = React.memo(Checklist_option_dialog)
+    
     return (
         <AccessibleView name="container-checklistoption" style={styles.container}>
             <Card.Title
@@ -187,7 +189,7 @@ const CheckListOptionScreen = React.memo(() => {
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
             </Card.Content>
 
-            <Checklist_option_dialog
+            <MemoChecklist_option_dialog
                 isVisible={isVisible}
                 setIsVisible={setIsVisible}
                 isEditing={isEditing}

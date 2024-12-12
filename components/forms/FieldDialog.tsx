@@ -17,7 +17,7 @@ import useField from "@/hooks/FieldDialog";
 import InfoGroup_dialog from "../screens/InfoGroup_dialog";
 import GroupCreate_dialog from "../screens/GroupCreate_dialog";
 import CheckListCreate_dialog from "../screens/CheckListCreate_dialog";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { styles } from "../screens/Schedule";
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode, saveField, setShowDialogs
@@ -575,8 +575,27 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
                                         </ScrollView>
 
+                                        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                                            <TouchableOpacity onPress={() => handleSubmit()} style={styles.actionButton}>
+                                                <Text style={masterdataStyles.text}>{editMode ? "Update Field" : "Add Field"}</Text>
+                                            </TouchableOpacity>
+
+                                            {editMode && (
+                                                <TouchableOpacity onPress={() => {
+                                                    onDeleteField(values.SFormID, values.MCListID);
+                                                    setShowDialogs();
+                                                }} style={styles.actionButton}>
+                                                    <Text style={masterdataStyles.text}>Delete</Text>
+                                                </TouchableOpacity>
+                                            )}
+
+                                            <TouchableOpacity onPress={() => setShowDialogs()} style={styles.actionButton}>
+                                                <Text style={masterdataStyles.text}>Cancel</Text>
+                                            </TouchableOpacity>
+                                        </View>
+
                                         <View id="form-action-fd" style={masterdataStyles.containerAction}>
-                                            <TouchableOpacity
+                                            {/* <TouchableOpacity
                                                 onPress={() => handleSubmit()}
                                                 disabled={!isValid || !dirty}
                                                 style={[
@@ -588,9 +607,9 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                                 <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
                                                     {editMode ? "Update Field" : "Add Field"}
                                                 </Text>
-                                            </TouchableOpacity>
+                                            </TouchableOpacity> */}
 
-                                            {editMode && (
+                                            {/* {editMode && (
                                                 <TouchableOpacity
                                                     onPress={() => {
                                                         onDeleteField(values.SFormID, values.MCListID);
@@ -602,16 +621,16 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                                         Delete Field
                                                     </Text>
                                                 </TouchableOpacity>
-                                            )}
+                                            )} */}
 
-                                            <TouchableOpacity
+                                            {/* <TouchableOpacity
                                                 onPress={() => setShowDialogs()}
                                                 style={[masterdataStyles.button, masterdataStyles.backMain]}
                                             >
                                                 <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
                                                     Cancel
                                                 </Text>
-                                            </TouchableOpacity>
+                                            </TouchableOpacity> */}
                                         </View>
                                     </View>
                                 );

@@ -9,7 +9,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import Machine_group_dialog from "@/components/screens/Machine_group_dialog";
 import { GroupMachine } from '@/typing/type';
 import { InitialValuesGroupMachine } from '@/typing/value';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
 
 const fetchMachineGroups = async (): Promise<GroupMachine[]> => {
@@ -176,6 +176,8 @@ const MachineGroupScreen = React.memo(() => {
         }
     })
 
+    const MemoMachine_group_dialog = React.memo(Machine_group_dialog)
+
     return (
         <AccessibleView name="container-groupmachine" style={styles.container}>
             <Card.Title
@@ -197,7 +199,7 @@ const MachineGroupScreen = React.memo(() => {
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
             </Card.Content>
 
-            <Machine_group_dialog
+            <MemoMachine_group_dialog
                 isVisible={isVisible}
                 setIsVisible={setIsVisible}
                 isEditing={isEditing}

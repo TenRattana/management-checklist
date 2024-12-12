@@ -50,9 +50,9 @@ export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children
     switch (fontSize) {
       case "large":
         return {
-          small: spacingValues.large,
-          medium: spacingValues.xLarge,
-          large: spacingValues.xxLarge,
+          small: spacingValues.xxmedium,
+          medium: spacingValues.large,
+          large: spacingValues.xLarge,
         };
       case "medium":
         return {

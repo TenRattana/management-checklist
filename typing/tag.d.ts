@@ -177,7 +177,6 @@ export interface DragsubformProps {
 // validationSchema: Yup.ObjectSchema<{[x: string]: any;},Yup.AnyObject,{[x: string]: any;},"" >;
 
 // Admin and QR Props
-export interface GenerateQRProps {}
 export interface AdminProps {}
 export interface ExpectedResultProps {
   navigation: any;

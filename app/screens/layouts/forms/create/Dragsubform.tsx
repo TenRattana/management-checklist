@@ -67,6 +67,8 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, d
         }
     }, [dispatch, handleError, handelSetDialog]);
 
+    const MemoDragfield = React.memo(Dragfield)
+    
     const RowItem = ({ item, drag, isActive }: RowItemProps<BaseSubForm>) => {
         return (
             <>
@@ -92,7 +94,7 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, d
                 </TouchableOpacity>
 
                 <AccessibleView name="drag-subform" style={{ paddingTop: 5, paddingBottom: state.subForms.length > 0 ? 40 : 0 }}>
-                    <Dragfield
+                    <MemoDragfield
                         data={item.Fields ?? []}
                         SFormID={item.SFormID}
                         dispatch={dispatch}

@@ -3,7 +3,6 @@ import { ActivityIndicator } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import {
     ScanQR,
-    GenerateQR,
     SettingScreen,
     ConfigulationScreen,
     MachineGroupScreen,
@@ -60,7 +59,6 @@ const nonLazyComponents: Record<ComponentNameNoLazy, React.ComponentType<any>> =
     Match_form_machine: MatchFormMachineScreen,
     Managepermissions: Managepermissions,
     ScanQR: ScanQR,
-    GenerateQR: GenerateQR,
     Setting: SettingScreen,
     Config: ConfigulationScreen,
     Permission_deny: PermissionDeny,

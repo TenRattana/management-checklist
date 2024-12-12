@@ -206,6 +206,8 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
         }
     })
 
+    const MemoMatch_form_machine_dialog = React.memo(Match_form_machine_dialog)
+    
     return (
         <AccessibleView name="container-checklist" style={styles.container}>
             <Card.Title
@@ -227,7 +229,7 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
             </Card.Content>
 
-            <Match_form_machine_dialog
+            <MemoMatch_form_machine_dialog
                 isVisible={isVisible}
                 setIsVisible={setIsVisible}
                 isEditing={isEditing}

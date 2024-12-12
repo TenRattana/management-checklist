@@ -166,6 +166,8 @@ const ChecklistGroupScreen = React.memo(() => {
         }
     })
 
+    const MemoChecklist_group_dialog = React.memo(Checklist_group_dialog)
+    
     return (
         <AccessibleView name="container-groupchecklist" style={styles.container}>
             <Card.Title
@@ -187,7 +189,7 @@ const ChecklistGroupScreen = React.memo(() => {
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
             </Card.Content>
 
-            <Checklist_group_dialog
+            <MemoChecklist_group_dialog
                 isVisible={isVisible}
                 setIsVisible={setIsVisible}
                 isEditing={isEditing}

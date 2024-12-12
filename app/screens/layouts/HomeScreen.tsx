@@ -1,7 +1,7 @@
 import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
 import { convertScheduleToTimeline, getDate, parseTimeScheduleToTimeline } from '@/app/mocks/timeline';
-import { AccessibleView } from '@/components';
+import { Text } from '@/components';
 import { Clock } from '@/components/common/Clock';
 import Home_dialog from '@/components/screens/Home_dialog';
 import Timelines from '@/components/screens/TimeLines';
@@ -12,7 +12,7 @@ import { TimeScheduleProps } from '@/typing/type';
 import { groupBy } from 'lodash';
 import moment from 'moment-timezone';
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, FlatList } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { Calendar, CalendarProvider, CalendarUtils, DateData, Timeline, TimelineListRenderItemInfo, TimelineProps } from 'react-native-calendars';
 import { Checkbox, Icon } from 'react-native-paper';
 import Animated, { Easing, FadeIn, FadeOut, runOnJS } from 'react-native-reanimated';
@@ -66,7 +66,7 @@ const HomeScreen = () => {
   const { theme, darkMode } = useTheme();
   const { responsive, spacing } = useRes();
   const [currentDate, setCurrentDate] = useState<string>(getDate());
-  const [filterStatus, setFilterStatus] = useState<'all' | 'end' | 'running' | 'wait' | 'stop'>('running');
+  const [filterStatus, setFilterStatus] = useState<string>('running');
   const [filterTitle, setFilterTitle] = useState<string[]>(["Daily", "Weekly", "Custom"]);
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -159,10 +159,6 @@ const HomeScreen = () => {
       borderRadius: 10,
       padding: 10,
     },
-    cardcontent: {
-      paddingTop: 10,
-      paddingBottom: 10,
-    },
     timelineContainer: {
       flex: 1,
       padding: 10,
@@ -188,20 +184,11 @@ const HomeScreen = () => {
       marginHorizontal: 10,
       marginTop: 10,
     },
-    containerCata: {
-      padding: 20,
-      borderRadius: 10,
-      backgroundColor: '#f8f9fa',
-    },
     itemContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       marginBottom: 10,
       marginLeft: 10
-    },
-    timeContainer: {
-      flexDirection: responsive === "small" ? 'column' : 'row',
-      alignItems: 'center',
     },
   });
 
@@ -224,8 +211,6 @@ const HomeScreen = () => {
       />
     );
   };
-
-  const hideDialog = () => setDialogVisible(false);
 
   const getTheme = useMemo(() => {
     return {
@@ -252,12 +237,13 @@ const HomeScreen = () => {
       dotColor: theme.colors.primary,
       selectedDotColor: theme.colors.accent,
     };
-  }, [])
+  }, [darkMode])
 
-  console.log("Home");
+  const MemoTimelines = React.memo(Timelines)
+  const MemoHome_dialog = React.memo(Home_dialog)
 
   return (
-    <View id="container-Home" style={{ flex: 1 }}>
+    <View id="container-Home" style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <CalendarProvider
         date={currentDate}
         onDateChanged={runOnJS(setCurrentDate)}
@@ -311,37 +297,31 @@ const HomeScreen = () => {
             </TouchableOpacity>
 
             <View style={styles.filterContainer}>
-              <TouchableOpacity onPress={() => setFilterStatus('all')}>
-                <Text style={filterStatus === "all" ? styles.filterButtonActive : styles.filterButton}>All</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setFilterStatus('end')}>
-                <Text style={filterStatus === "end" ? styles.filterButtonActive : styles.filterButton}>Ended</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setFilterStatus('running')}>
-                <Text style={filterStatus === "running" ? styles.filterButtonActive : styles.filterButton}>Running</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setFilterStatus('wait')}>
-                <Text style={filterStatus === "wait" ? styles.filterButtonActive : styles.filterButton}>Waiting</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setFilterStatus('stop')}>
-                <Text style={filterStatus === "stop" ? styles.filterButtonActive : styles.filterButton}>Stop</Text>
-              </TouchableOpacity>
+              {[{ la: "All", va: "all" }, { la: "End", va: "end" }, { la: "Running", va: "running" }, { la: "Waiting", va: "wait" }, { la: "Stop", va: "stop" }].map((item) => (
+                <TouchableOpacity onPress={() => setFilterStatus(item.va)} key={item.va}>
+                  <Text style={filterStatus === item.va ? styles.filterButtonActive : styles.filterButton}>{item.la}</Text>
+                </TouchableOpacity>
+              ))}
             </View>
 
             <View style={styles.timelineListContainer}>
-              <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginBottom: 10, fontSize: spacing.medium }]}>
-                {currentDate} - {Clock()} - Timeline
-              </Text>
+              <View style={{ flexDirection: 'row' }}>
+                <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginBottom: 10, fontSize: spacing.medium }]}>
+                  {`${currentDate} Time : `} 
+                </Text>
+                <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginBottom: 10, fontSize: spacing.medium }]}>
+                  {Clock()}
+                </Text>
+              </View>
 
               {eventsByDateS && initialTime && (
-                <Timelines eventsByDateS={eventsByDateS} initialTime={initialTime} renderItem={renderItem} />
+                <MemoTimelines eventsByDateS={eventsByDateS} initialTime={initialTime} renderItem={renderItem} />
               )}
             </View>
           </View>
         </View>
 
-        <Home_dialog dialogVisible={dialogVisible} hideDialog={hideDialog} selectedEvent={selectedEvent} key={`Home_dialog`} />
-
+        <MemoHome_dialog dialogVisible={dialogVisible} hideDialog={() => setDialogVisible(false)} selectedEvent={selectedEvent} key={`Home_dialog`} />
       </CalendarProvider>
     </View>
   );

@@ -63,7 +63,7 @@ const Timelines = React.memo(({ eventsByDateS, initialTime, renderItem }: { even
         <TimelineList
             key={JSON.stringify(darkMode)}
             events={eventsByDateS}
-            timelineProps={timelineProps}
+            timelineProps={{...timelineProps }}
             showNowIndicator
             scrollToNow
             initialTime={initialTime}

@@ -197,6 +197,8 @@ const TimescheduleScreen: React.FC = React.memo(() => {
         }
     })
 
+    const MemoScheduleDialog = React.memo(ScheduleDialog)
+
     return (
         <AccessibleView name="container-schedule" style={styles.container}>
             <Card.Title
@@ -218,7 +220,7 @@ const TimescheduleScreen: React.FC = React.memo(() => {
                 {isLoading ? <LoadingSpinner /> : <Customtable {...CustomtableProps} />}
             </Card.Content>
 
-            <ScheduleDialog
+            <MemoScheduleDialog
                 isVisible={isVisible}
                 machineGroups={machineGroups}
                 setIsVisible={setIsVisible}

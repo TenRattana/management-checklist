@@ -223,7 +223,6 @@ export type ComponentNameNoLazy =
   | "Checklist"
   | "Login"
   | "ScanQR"
-  | "GenerateQR"
   | "Setting"
   | "Config"
   | "Permission_deny"
