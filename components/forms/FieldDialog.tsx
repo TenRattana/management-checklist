@@ -16,6 +16,7 @@ import { InitialValuesChecklist } from '@/typing/value'
 import { FieldDialogProps } from "@/typing/tag";
 import Text from "@/components/Text";
 import { useFocusEffect } from "@react-navigation/native";
+import { values } from "lodash";
 
 const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode, saveField, setShowDialogs
     , checkListType, dataType, checkList, groupCheckListOption, dropcheckList, dropcheckListType, dropdataType, dropgroupCheckListOption
@@ -194,6 +195,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
     const memoizedAnimatedText = useMemo(() => animatedText, [shouldRender]);
     const memoizedAnimatedDT = useMemo(() => animatedStyleNumber, [shouldRenderDT]);
     const memoizedAnimatedIT = useMemo(() => animatedStyleIT, [shouldRenderIT, shouldRenderDT, option]);
+
 
     return (
         <Portal>

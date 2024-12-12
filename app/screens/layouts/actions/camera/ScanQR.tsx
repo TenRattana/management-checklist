@@ -1,110 +1,105 @@
-import { Camera } from "expo-camera/legacy";
-import React, { useCallback, useEffect, useState } from "react";
-import { Button, StyleSheet } from "react-native";
-import { ScanQRProps } from "@/typing/tag";
-import { useFocusEffect } from "expo-router";
-import { useToast } from "@/app/contexts/useToast";
-import { AccessibleView, Text } from '@/components'
+import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { useState } from 'react';
+import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useToast } from '@/app/contexts/useToast';
+import React from 'react';
+import { ScanQRProps } from '@/typing/tag';
 
 const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
-    const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-    const [scanned, setScanned] = useState<boolean>(false);
+    const [facing, setFacing] = useState<CameraType>('back');
+    const [permission, requestPermission] = useCameraPermissions();
+    const [scanned, setScanned] = useState(false);
     const [qrValue, setQrValue] = useState<string | null>(null);
-    const [cameraActive, setCameraActive] = useState<boolean>(true);
-    const { handleError } = useToast()
-    useFocusEffect(
-        useCallback(() => {
-            (async () => {
-                const { status } = await Camera.requestCameraPermissionsAsync();
-                setHasPermission(status === "granted");
-            })();
+    const { handleError } = useToast();
 
-            return () => setCameraActive(false);
-        }, [])
-    )
-
-    useEffect(() => {
-        if (scanned && qrValue) {
-            handleAction(qrValue);
-        }
-    }, [scanned, qrValue]);
-
-    if (hasPermission === null) {
-        return <AccessibleView name="container-scan">{false}</AccessibleView>;
+    if (!permission) {
+        return <View />;
     }
 
-    if (!hasPermission) {
+    if (!permission.granted) {
         return (
-            <AccessibleView name="container-hasPermission" style={styles.container}>
-                <Text style={{ textAlign: "center" }}>
-                    We need your permission to show the camera
-                </Text>
-                <Button
-                    onPress={() => Camera.requestCameraPermissionsAsync()}
-                    title="Grant Permission"
-                />
-            </AccessibleView>
+            <View style={styles.container}>
+                <Text style={styles.message}>We need your permission to show the camera</Text>
+                <Button onPress={requestPermission} title="Grant Permission" />
+            </View>
         );
     }
+
+    function toggleCameraFacing() {
+        setFacing(current => (current === 'back' ? 'front' : 'back'));
+    }
+
+    const handleBarcodeScanned = ({ type, data }: { type: string; data: string }) => {
+        if (!scanned) {
+            setScanned(true);
+            setQrValue(data);
+
+            handleAction(data);
+        }
+    };
 
     const handleAction = (value: string | null) => {
         try {
             if (value) {
-                navigation.navigate("InputFormMachine", {
+                navigation.navigate('InputFormMachine', {
                     machineId: value,
                 });
-                setScanned(false);
-                setCameraActive(false);
             }
         } catch (error) {
-            handleError(error)
-        }
-    };
-
-    const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
-        if (!scanned) {
-            setScanned(true);
-            setQrValue(data);
+            handleError(error);
         }
     };
 
     return (
-        <AccessibleView name="container-scan" style={styles.container}>
-            {cameraActive && !scanned ? (
-                <Camera style={styles.camera} onBarCodeScanned={handleBarCodeScanned} />
-            ) : (
-                <AccessibleView name="scan-qr" style={styles.resultContainer}>
-                    <Text style={styles.resultText}>Scanned QR Code</Text>
-                    <Button title="Scan Again" onPress={() => { setScanned(false); setCameraActive(true); }} />
-                </AccessibleView>
-            )}
-        </AccessibleView>
+        <View style={styles.container}>
+            <CameraView
+                style={styles.camera}
+                facing={facing}
+                onBarcodeScanned={handleBarcodeScanned}
+                barcodeScannerSettings={{
+                    barcodeTypes: ["qr"],
+                }}
+            >
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
+                        <Text style={styles.text}>Flip Camera</Text>
+                    </TouchableOpacity>
+                </View>
+            </CameraView>
+        </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: "center",
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    message: {
+        textAlign: 'center',
+        paddingBottom: 10,
     },
     camera: {
         flex: 1,
+        width: '100%',
     },
-    resultContainer: {
+    buttonContainer: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        flexDirection: 'row',
+        backgroundColor: 'transparent',
+        margin: 64,
     },
-    resultText: {
-        fontSize: 24,
-        color: "black",
-        marginBottom: 20,
+    button: {
+        flex: 1,
+        alignSelf: 'flex-end',
+        alignItems: 'center',
     },
     text: {
-        fontSize: 18,
-        color: "blue",
-        textDecorationLine: "underline",
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: 'white',
     },
 });
 
-export default ScanQR;
+export default ScanQR

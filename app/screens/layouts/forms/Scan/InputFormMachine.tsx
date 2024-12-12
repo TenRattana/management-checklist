@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo, useRef } from "react";
 import axiosInstance from "@/config/axios";
-import { Card } from "react-native-paper";
+import { Card, Divider } from "react-native-paper";
 import { FlatList, Pressable, ViewStyle, View, TouchableOpacity } from "react-native";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useToast } from "@/app/contexts/useToast";
@@ -11,7 +11,6 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { PreviewProps } from "@/typing/tag";
 import { ScanParams } from "@/typing/tag";
 import { Formik } from 'formik';
-import { Stack, useNavigation } from "expo-router";
 import useForm from "@/hooks/custom/useForm";
 import { DataType } from "@/typing/type";
 import { useSelector } from "react-redux";
@@ -26,8 +25,8 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
   const { groupCheckListOption, dataType, found } = useForm(route);
 
   const state = useSelector((state: any) => state.form);
+  const user = useSelector((state: any) => state.user)
 
-  const navigation = useNavigation();
   const prefix = useSelector((state: any) => state.prefix);
 
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -82,9 +81,16 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
       })),
     }));
 
+    const userData = {
+      UserID: user.UserID,
+      UserName: user.Full_Name,
+      GUserID: user.GUserID,
+    }
+
     const data = {
       Prefix: prefix.ExpectedResult,
-      FormData: JSON.stringify(updatedSubForms)
+      FormData: JSON.stringify(updatedSubForms),
+      UserInfo: JSON.stringify(userData)
     };
 
     try {
@@ -94,11 +100,10 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
     } catch (error) {
       handleError(error);
     }
-  }, [showSuccess, handleError, state.subForms, state.MachineID]);
+  }, [showSuccess, handleError, state.subForms, state.MachineID, user]);
 
   return found ? (
     <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]}>
-
       {!isSubmitted ? (
         <Formik
           initialValues={formValues}
@@ -116,10 +121,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
 
                   return (
                     <Card style={masterdataStyles.card} key={item.SFormID}>
-                      <Card.Title
-                        title={item.SFormName}
-                        titleStyle={masterdataStyles.cardTitle}
-                      />
+
                       <Card.Content style={[masterdataStyles.subFormContainer]}>
                         {item.Fields?.map((field: BaseFormState, fieldIndex: number) => {
                           const containerStyle: ViewStyle = {
@@ -172,6 +174,13 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
                   );
                 }}
                 keyExtractor={(_, index) => `index-preview-${index}`}
+                ListHeaderComponent={() => (
+                  <>
+                    <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
+                    <Divider />
+                    <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
+                  </>
+                )}
                 ListFooterComponent={() => (
                   <AccessibleView name="form-action-scan" style={[masterdataStyles.containerAction]}>
                     <TouchableOpacity
@@ -199,7 +208,6 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
           <Text style={masterdataStyles.text}>บันทึกเสร็จสิ้น</Text>
           <Pressable onPress={() => {
             setIsSubmitted(false);
-            navigation.goBack();
           }} style={masterdataStyles.button}>
             <Text style={[masterdataStyles.textBold, masterdataStyles.text, { color: theme.colors.blue }]}>กลับไปยังหน้าก่อนหน้า</Text>
           </Pressable>

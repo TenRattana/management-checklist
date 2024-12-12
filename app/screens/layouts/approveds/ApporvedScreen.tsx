@@ -9,6 +9,7 @@ import { ExpectedResult, Machine, UsersPermission } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { StyleSheet } from "react-native";
+import { useSelector } from "react-redux";
 
 const fetchMachines = async (): Promise<Machine[]> => {
     const response = await axiosInstance.post("Machine_service.asmx/GetMachines");
@@ -25,8 +26,14 @@ const fetchUserPermission = async (): Promise<UsersPermission[]> => {
     return response.data.data ?? [];
 };
 
-const SaveApporved = async (data: string[]): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("ExpectedResult_service.asmx/SaveApporved", { TableID: JSON.stringify(data) });
+const SaveApporved = async (data: {
+    TableID: string[], UserData: {
+        UserID: any;
+        UserName: any;
+        GUserID: any;
+    }
+}): Promise<{ message: string }> => {
+    const response = await axiosInstance.post("ExpectedResult_service.asmx/SaveApporved", { TableID: JSON.stringify(data.TableID), UserInfo: JSON.stringify(data.UserData) });
     return response.data;
 };
 
@@ -39,6 +46,7 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
+    const user = useSelector((state: any) => state.user)
 
     const { data: machines = [], } = useQuery<Machine[], Error>(
         'machines',
@@ -85,7 +93,13 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
                     });
                 }
             } else if (action === "Apporved") {
-                mutation.mutate(selectedRows);
+                const UserData = {
+                    UserID: user.UserID,
+                    UserName: user.Full_Name,
+                    GUserID: user.GUserID,
+                }
+
+                mutation.mutate({ TableID: selectedRows, UserData });
                 setSelectedRows([])
             } else if (action === "ResetRow") {
                 setSelectedRows([])
@@ -93,7 +107,7 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
         } catch (error) {
             handleError(error);
         }
-    }, [handleError, expectedResult, selectedRows]);
+    }, [handleError, expectedResult, selectedRows, user]);
 
     const convertToThaiDateTime = (dateString: string) => {
         const date = new Date(dateString);
@@ -177,7 +191,7 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
     return (
         <AccessibleView name="container-checklist" style={styles.container}>
             <Card.Title
-                title="List Apporved"
+                title="List Acknowledged"
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
             <Card.Content style={styles.cardcontent}>

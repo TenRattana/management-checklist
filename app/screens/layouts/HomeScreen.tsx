@@ -10,12 +10,14 @@ import useMasterdataStyles from '@/styles/common/masterdata';
 import { TimeScheduleProps } from '@/typing/type';
 import { groupBy } from 'lodash';
 import moment from 'moment-timezone';
-import React, { useCallback, useMemo, useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, FlatList } from 'react-native';
+import React, { Suspense, useCallback, useMemo, useState } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { Calendar, CalendarProvider, CalendarUtils, DateData, Timeline, TimelineList, TimelineListRenderItemInfo, TimelineProps } from 'react-native-calendars';
 import { Checkbox, Icon } from 'react-native-paper';
 import Animated, { Easing, FadeIn, FadeOut, runOnJS } from 'react-native-reanimated';
 import { useQuery } from 'react-query';
+
+const Timelines = React.lazy(() => import('@/components/screens/TimeLines'));
 
 const fetchTimeSchedules = async (): Promise<TimeScheduleProps[]> => {
   const response = await axiosInstance.post("TimeSchedule_service.asmx/GetSchedules");
@@ -225,46 +227,6 @@ const HomeScreen = () => {
 
   const hideDialog = () => runOnJS(setDialogVisible)(false);
 
-  const timelineProps = useMemo(() => {
-    return {
-      format24h: true,
-      overlapEventsSpacing: 8,
-      rightEdgeSpacing: 8,
-      start: 0,
-      end: 24,
-      unavailableHours: [{ start: 0, end: getCurrentTime().getHours() }],
-      unavailableHoursColor: darkMode ? '#484848' : "#f0f0f0",
-      styles: {
-        contentStyle: {
-          backgroundColor: theme.colors.background,
-        },
-        timelineContainer: {
-          backgroundColor: theme.colors.background,
-          borderRadius: 8
-        },
-        event: {
-          backgroundColor: '#e3f2fd',
-          borderRadius: 8,
-          padding: 8,
-          margin: 4,
-        },
-        eventTitle: {
-          color: theme.colors.fff,
-          fontSize: spacing.small,
-          fontWeight: 'bold',
-        },
-        eventSummary: {
-          color: theme.colors.fff,
-          fontSize: spacing.small,
-        },
-        eventTimes: {
-          color: theme.colors.fff,
-          fontSize: spacing.small,
-        },
-
-      },
-    }
-  }, [])
 
   function getTheme() {
     return {
@@ -368,14 +330,15 @@ const HomeScreen = () => {
               <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginBottom: 10, fontSize: spacing.medium }]}>
                 {currentDate} - {Clock()} - Timeline
               </Text>
-              <TimelineList
-                events={eventsByDateS}
-                timelineProps={timelineProps}
-                showNowIndicator
-                scrollToNow
-                initialTime={initialTime}
-                renderItem={renderItem}
-              />
+
+              {eventsByDateS && initialTime ? (
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                  <Timelines eventsByDateS={eventsByDateS} initialTime={initialTime} renderItem={renderItem} />
+                </Suspense>
+              ) : (
+                <Text>Loading data...</Text>
+              )}
+
             </View>
           </View>
         </View>

@@ -47,6 +47,8 @@ export default {
         backgroundColor: "#ffffff",
       },
       package: "com.m_checklist_test",
+      permissions: ["CAMERA"],
+      targetSdkVersion: 34,
     },
     web: {
       bundler: "metro",

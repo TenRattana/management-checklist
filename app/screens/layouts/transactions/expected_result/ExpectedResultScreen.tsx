@@ -98,7 +98,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
             { label: "Machine Name", align: "flex-start" },
             { label: "Form Name", align: "flex-start" },
             { label: "User", align: "flex-start" },
-            { label: "Apporved", align: "flex-start" },
+            { label: "Acknowledged", align: "flex-start" },
             { label: "Time Submit", align: "flex-start" },
             { label: "Preview", align: "center" },
         ],

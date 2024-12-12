@@ -38,7 +38,7 @@ const LoginScreen: React.FC = React.memo(() => {
     <AccessibleView name="login-container" style={[masterdataStyles.container, { alignContent: 'center', justifyContent: 'center', height: '100%' }]}>
       <Card style={{ width: responsive === "large" ? 500 : responsive === "medium" ? '60%' : "80%", alignSelf: 'center' }}>
         <Card.Title
-          title={`Login ${process.env.EXPO_PUBLIC_API_URL} ${process.env.EXPO_PUBLIC_APP_ENV}`}
+          title={`Login`}
           titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
         />
         <Card.Content style={{ padding: 2, paddingVertical: 10 }}>

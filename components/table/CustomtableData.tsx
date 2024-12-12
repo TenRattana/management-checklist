@@ -143,9 +143,7 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                 contentContainerStyle={{ flexGrow: 1 }}
                 nestedScrollEnabled={true}
                 showsVerticalScrollIndicator={false}
-                initialNumToRender={20}
                 removeClippedSubviews={true}
-                maxToRenderPerBatch={20}
                 windowSize={10}
                 onEndReachedThreshold={0.5}
             />

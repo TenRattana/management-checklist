@@ -122,10 +122,8 @@ const subFormSlice = createSlice({
       });
     },
     addSubForm: (state, action: PayloadAction<{ subForm: BaseSubForm }>) => {
-
       const { subForm } = action.payload;
-      console.log(subForm);
-      
+
       state.subForms.push({
         ...subForm,
         SFormID: String(state.subForms.length + 1),

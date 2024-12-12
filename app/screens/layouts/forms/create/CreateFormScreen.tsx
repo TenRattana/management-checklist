@@ -42,7 +42,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
         setInitialSaveDialog(false);
     }, []);
 
-    const { checkList, groupCheckListOption, checkListType, dataType, isLoading } = useForm(route);
+    const { checkList, groupCheckListOption, checkListType, dataType, isLoading, checkListOption } = useForm(route);
     const dispatch = useDispatch<AppDispatch>();
     const state = useSelector((state: any) => state.form);
     const [edit, setEdit] = useState<{ [key: string]: boolean }>({
@@ -114,7 +114,10 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
         const selectedChecklist = checkList.find((v: Checklist) => v.CListID === "CL000") || checkList?.[0];
         const selectedDataType = dataType.find((v: DataType) => item.CTypeTitle === "Number Answer" ? v.DTypeName === "Number" : v.DTypeName === "String") || dataType?.[0];
 
-        if (cardIndex >= 0) {
+        if (item.CTypeName === "SubForm") {
+            const subForm = { SFormID: "", SFormName: "New Setion", Columns: 1, Fields: [], FormID: state.FormID || "", MachineID: state.MachineID || "" }
+            runOnJS(dispatch)(addSubForm({ subForm: subForm }));
+        } else if (cardIndex >= 0) {
             const targetSubForm = state.subForms[cardIndex];
             const idMcl = `MCL-ADD-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
             const newField: BaseFormState = {
@@ -130,7 +133,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                 Important: false,
                 ImportantList: [{
                     MCListID: idMcl,
-                    Value: undefined,
+                    Value: [],
                     MinLength: undefined,
                     MaxLength: undefined
                 }],
@@ -144,9 +147,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
             };
 
             runOnJS(dispatch)(defaultDataForm({ currentField: newField }));
-        } else if (item.CTypeName === "SubForm") {
-            const subForm = { SFormID: "", SFormName: "New Setion", Columns: 1, Fields: [], FormID: state.FormID || "", MachineID: state.MachineID || "" }
-            runOnJS(dispatch)(addSubForm({ subForm: subForm }));
         }
 
     }, [checkList, dataType, groupCheckListOption, state.subForms, dispatch]);
@@ -234,44 +234,44 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
     return (
         <GestureHandlerRootView style={[createform.container, { flex: 1 }]}>
             <AccessibleView name="container-create-form" style={styles.container}>
-                <GestureDetector gesture={panGesture}>
-                    <Animated.View
-                        style={[
-                            styles.content,
-                            mainContentStyle,
-                        ]}
-                    >
-                        <View style={styles.buttonContainer}>
-                            <TouchableOpacity
-                                onPress={() => !drawerOpen || drawerContent !== "main" ? runOnJS(openDrawer)('main') : runOnJS(closeDrawer)()}
-                                style={!drawerOpen || drawerContent !== "main" ? styles.openButton : styles.openButtonActive}
-                            >
-                                <Icon source={"format-list-bulleted"} size={spacing.large} color={theme.colors.fff} key={"icon-tool"} />
-                                <Text style={[masterdataStyles.text, masterdataStyles.textFFF, { marginLeft: 10, padding: 2 }]}>FormDetail</Text>
-                            </TouchableOpacity>
+                {/* <GestureDetector gesture={panGesture}> */}
+                <Animated.View
+                    style={[
+                        styles.content,
+                        mainContentStyle,
+                    ]}
+                >
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity
+                            onPress={() => !drawerOpen || drawerContent !== "main" ? runOnJS(openDrawer)('main') : runOnJS(closeDrawer)()}
+                            style={!drawerOpen || drawerContent !== "main" ? styles.openButton : styles.openButtonActive}
+                        >
+                            <Icon source={"format-list-bulleted"} size={spacing.large} color={theme.colors.fff} key={"icon-tool"} />
+                            <Text style={[masterdataStyles.text, masterdataStyles.textFFF, { marginLeft: 10, padding: 2 }]}>FormDetail</Text>
+                        </TouchableOpacity>
 
-                            <TouchableOpacity
-                                onPress={() => !drawerOpen || drawerContent !== "toolbox" ? runOnJS(openDrawer)('toolbox') : runOnJS(closeDrawer)()}
-                                style={!drawerOpen || drawerContent !== "toolbox" ? styles.openButton : styles.openButtonActive}
-                            >
-                                <Icon source={"tools"} size={spacing.large} color={theme.colors.fff} key={"icon-tool"} />
-                                <Text style={[masterdataStyles.text, masterdataStyles.textFFF, { marginLeft: 10, padding: 2 }]}>ToolBar</Text>
-                            </TouchableOpacity>
-                        </View>
+                        <TouchableOpacity
+                            onPress={() => !drawerOpen || drawerContent !== "toolbox" ? runOnJS(openDrawer)('toolbox') : runOnJS(closeDrawer)()}
+                            style={!drawerOpen || drawerContent !== "toolbox" ? styles.openButton : styles.openButtonActive}
+                        >
+                            <Icon source={"tools"} size={spacing.large} color={theme.colors.fff} key={"icon-tool"} />
+                            <Text style={[masterdataStyles.text, masterdataStyles.textFFF, { marginLeft: 10, padding: 2 }]}>ToolBar</Text>
+                        </TouchableOpacity>
+                    </View>
 
-                        <AccessibleView name="container-preview" style={[createform.containerL2, { marginTop: 80, marginHorizontal: 10 }]}>
-                            <Preview
-                                route={route}
-                                ref={childRef}
-                                validationSchema={validationSchema}
-                                groupCheckListOption={groupCheckListOption}
-                                dataType={dataType}
-                                isLoading={isLoading}
-                            />
-                        </AccessibleView>
+                    <AccessibleView name="container-preview" style={[createform.containerL2, { marginTop: 80, marginHorizontal: 10 }]}>
+                        <Preview
+                            route={route}
+                            ref={childRef}
+                            validationSchema={validationSchema}
+                            groupCheckListOption={groupCheckListOption}
+                            dataType={dataType}
+                            isLoading={isLoading}
+                        />
+                    </AccessibleView>
 
-                    </Animated.View>
-                </GestureDetector>
+                </Animated.View>
+                {/* </GestureDetector> */}
 
                 <Animated.View style={[styles.drawer, drawerStyle]}>
                     {drawerContent === 'main' && drawerContent && (

@@ -62,8 +62,8 @@ const createSubFormsAndFields = (
                 DTypeID: itemOption.DTypeID,
                 DTypeValue: itemOption.DTypeValue,
                 SFormID: itemOption.SFormID,
-                Required: itemOption.Required,
-                Important: itemOption.Important,
+                Required: Boolean(itemOption.Required),
+                Important: Boolean(itemOption.Important ?? false),
                 ImportantList: itemOption?.ImportantList?.length
                     ? [{
                         MCListID: itemOption?.ImportantList[0]?.MCListID,
