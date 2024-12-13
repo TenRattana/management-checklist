@@ -26,11 +26,7 @@ const Home_dialog = React.memo(({ dialogVisible, hideDialog, selectedEvent }: Ho
     const { theme } = useTheme()
     const { data: machine = [], isLoading } = useQuery<TimeScheduleMachine[], Error>(
         ['machine', selectedEvent?.ScheduleID],
-        () => fetchMachines({ ScheduleID: selectedEvent?.ScheduleID || '' }),
-        {
-            enabled: dialogVisible && !!selectedEvent?.ScheduleID,
-            refetchOnWindowFocus: false,
-        }
+        () => fetchMachines({ ScheduleID: selectedEvent?.ScheduleID || '' })
     );
 
     const tableData = useMemo(() => machine.map((item) => [

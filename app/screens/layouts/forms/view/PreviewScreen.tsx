@@ -11,6 +11,7 @@ import { DataType } from "@/typing/type";
 import { useSelector } from "react-redux";
 import useForm from "@/hooks/custom/useForm";
 import * as Yup from 'yup';
+import { Stack } from "expo-router";
 
 interface FormValues {
     [key: string]: any;

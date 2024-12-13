@@ -3,7 +3,7 @@ import { Selects, Radios, Textareas, Inputs, Checkboxs } from "@/components/comm
 import { CheckListOption } from '@/typing/type';
 import { DynamicFormProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
 import { Text } from "react-native-paper";
@@ -155,14 +155,16 @@ const DynamicForm = React.memo(({
 
   return (
     <View id="form-layout2">
-      <Text
-        variant="bodyMedium"
-        style={[masterdataStyles.text, CTypeName === "Text" ? styles.text : undefined, { color: exp && (messageminOrmax || isValidImportantList) ? theme.colors.error : theme.colors.onBackground }]}
-      >
-        {CListName} {" "}
-        {Required && <Text style={{ color: theme.colors.error }}>(*)</Text>}
-      </Text>
-      {renderField()}
+      <TouchableOpacity onPress={() => console.log(MCListID)}>
+        <Text
+          variant="bodyMedium"
+          style={[masterdataStyles.text, CTypeName === "Text" ? styles.text : undefined, { color: exp && (messageminOrmax || isValidImportantList) ? theme.colors.error : theme.colors.onBackground }]}
+        >
+          {CListName} {" "}
+          {Required && <Text style={{ color: theme.colors.error }}>(*)</Text>}
+        </Text>
+        {renderField()}
+      </TouchableOpacity>
     </View>
   );
 });

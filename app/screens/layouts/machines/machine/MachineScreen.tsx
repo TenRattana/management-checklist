@@ -54,24 +54,12 @@ const MachineGroupScreen: React.FC = React.memo(() => {
 
     const { data: machines = [], isLoading, } = useQuery<Machine[], Error>(
         'machines',
-        fetchMachines,
-        {
-            staleTime: 1000 * 60 * 5,
-            cacheTime: 1000 * 60 * 10,
-            refetchInterval: 1000 * 30,
-            enabled: true,
-        }
+        fetchMachines
     );
 
     const { data: machineGroups = [] } = useQuery<GroupMachine[], Error>(
         'machineGroups',
-        fetchMachineGroups,
-        {
-            staleTime: 1000 * 60 * 5,
-            cacheTime: 1000 * 60 * 10,
-            refetchInterval: 1000 * 30,
-            enabled: true,
-        }
+        fetchMachineGroups
     );
 
     const mutation = useMutation(saveMachine, {

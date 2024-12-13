@@ -2,7 +2,7 @@ import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
 import { convertScheduleToTimeline, getDate, parseTimeScheduleToTimeline } from '@/app/mocks/timeline';
 import { Text } from '@/components';
-import { Clock } from '@/components/common/Clock';
+// import { Clock } from '@/components/common/Clock';
 import Home_dialog from '@/components/screens/Home_dialog';
 import Timelines from '@/components/screens/TimeLines';
 import axiosInstance from '@/config/axios';
@@ -289,7 +289,7 @@ const HomeScreen = React.memo(() => {
                   {`${currentDate} Time : `}
                 </Text>
                 <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginBottom: 10, fontSize: spacing.medium }]}>
-                  {Clock()}
+                  {/* {Clock()} */}
                 </Text>
               </View>
 
