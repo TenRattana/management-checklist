@@ -98,7 +98,7 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
     const dropdataType = dataType.filter(v => v.IsActive);
     const dropgroupCheckListOption = groupCheckListOption.filter(v => v.IsActive);
 
-    const RowItem = ({ item, drag, isActive }: RowItemProps<BaseFormState>) => {
+    const RowItem = React.memo(({ item, drag, isActive }: RowItemProps<BaseFormState>) => {
         return (
             <TouchableOpacity
                 onPress={() => {
@@ -111,14 +111,31 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
                 style={[createformStyles.fieldContainer, isActive && createformStyles.active]}
                 testID={`dg-FD-${item.SFormID}`}
             >
-                <IconButton icon={checkListTypes.find((v) => v.CTypeID === item.CTypeID)?.Icon ?? "camera"} style={createformStyles.icon} iconColor={theme.colors.fff} size={spacing.large} animated />
-                <Text style={[createformStyles.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]} numberOfLines={1} ellipsizeMode="tail">
+                <IconButton
+                    icon={checkListTypes.find((v) => v.CTypeID === item.CTypeID)?.Icon ?? "camera"}
+                    style={createformStyles.icon}
+                    iconColor={theme.colors.fff}
+                    size={spacing.large}
+                    animated
+                />
+                <Text
+                    style={[createformStyles.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                >
                     {item.CListName}
                 </Text>
-                <IconButton icon="chevron-right" iconColor={theme.colors.fff} size={spacing.large} style={createformStyles.icon} animated />
+                <IconButton
+                    icon="chevron-right"
+                    iconColor={theme.colors.fff}
+                    size={spacing.large}
+                    style={createformStyles.icon}
+                    animated
+                />
             </TouchableOpacity>
         );
-    }
+    });
+
 
     const renderField = useCallback((params: RenderItemParams<BaseFormState>) => {
         return (
@@ -132,17 +149,15 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
 
     const MemoFieldDialog = React.memo(FieldDialog)
     return (
-        <>
-            <NestableScrollContainer>
-                <NestableDraggableFlatList
-                    data={data}
-                    renderItem={renderField}
-                    keyExtractor={(item, index) => `FD-${item.SFormID}-${index}`}
-                    onDragEnd={({ data }) => handleDropField(data)}
-                    getItemLayout={(data, index) => ({ length: 60, offset: 60 * index, index })}
-                    activationDistance={1}
-                />
-            </NestableScrollContainer>
+        <NestableScrollContainer>
+            <NestableDraggableFlatList
+                data={data}
+                renderItem={renderField}
+                keyExtractor={(item, index) => `FD-${item.SFormID}-${index}`}
+                onDragEnd={({ data }) => handleDropField(data)}
+                getItemLayout={(data, index) => ({ length: 60, offset: 60 * index, index })}
+                activationDistance={1}
+            />
 
             <TouchableOpacity
                 onPress={() => {
@@ -155,22 +170,24 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
                 <Text style={[masterdataStyles.textFFF, { marginLeft: 8, paddingVertical: 10 }]}>Add Field</Text>
             </TouchableOpacity>
 
-            <MemoFieldDialog
-                isVisible={dialogVisible}
-                formState={currentField}
-                onDeleteField={(SFormID, MCListID) => dispatch(deleteField({ SFormID, MCListID }))}
-                setShowDialogs={handleDialogToggle}
-                editMode={isEditing}
-                saveField={handleSaveField}
-                checkListType={checkListTypes}
-                dataType={dataType}
-                dropcheckList={dropcheckList}
-                dropcheckListType={dropcheckListType}
-                dropdataType={dropdataType}
-                dropgroupCheckListOption={dropgroupCheckListOption}
-                checkListOption={checkListOption}
-            />
-        </>
+            {dialogVisible && (
+                <MemoFieldDialog
+                    isVisible={dialogVisible}
+                    formState={currentField}
+                    onDeleteField={(SFormID, MCListID) => dispatch(deleteField({ SFormID, MCListID }))}
+                    setShowDialogs={handleDialogToggle}
+                    editMode={isEditing}
+                    saveField={handleSaveField}
+                    checkListType={checkListTypes}
+                    dataType={dataType}
+                    dropcheckList={dropcheckList}
+                    dropcheckListType={dropcheckListType}
+                    dropdataType={dropdataType}
+                    dropgroupCheckListOption={dropgroupCheckListOption}
+                    checkListOption={checkListOption}
+                />
+            )}
+        </NestableScrollContainer >
     );
 })
 

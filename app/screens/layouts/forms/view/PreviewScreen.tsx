@@ -104,7 +104,7 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
                                                 width: responsive === "small" ? "100%" : `${98 / columns}%`,
                                                 flexShrink: 1,
                                                 flexGrow: field.Rowcolumn || 1,
-                                                flexBasis: `${100 / (columns / (field.Rowcolumn || 1))}%`,
+                                                flexBasis: responsive === "small" ? "100%" : `${100 / (columns / (field.Rowcolumn || 1))}%`,
                                                 padding: 5,
                                             };
 

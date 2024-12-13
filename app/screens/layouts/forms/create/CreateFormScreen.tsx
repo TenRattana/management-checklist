@@ -50,7 +50,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
     });
 
     const openDrawer = (content: any) => {
-        runOnJS(setDrawerContent)(content);
+        setDrawerContent(content);
         translateX.value = withTiming(0, { duration: 300 });
         mainTranslateX.value = withTiming(DRAWER_WIDTH, { duration: 300 });
         setDrawerOpen(true);
@@ -229,7 +229,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                 >
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity
-                            onPress={() => !drawerOpen || drawerContent !== "main" ? openDrawer('main') : closeDrawer()}
+                            onPress={() => !drawerOpen || drawerContent !== "main" ? runOnJS(openDrawer)('main') : closeDrawer()}
                             style={!drawerOpen || drawerContent !== "main" ? styles.openButton : styles.openButtonActive}
                         >
                             <Icon source={"format-list-bulleted"} size={spacing.large} color={theme.colors.fff} key={"icon-tool"} />
@@ -237,7 +237,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                            onPress={() => !drawerOpen || drawerContent !== "toolbox" ? openDrawer('toolbox') : closeDrawer()}
+                            onPress={() => !drawerOpen || drawerContent !== "toolbox" ? runOnJS(openDrawer)('toolbox') : closeDrawer()}
                             style={!drawerOpen || drawerContent !== "toolbox" ? styles.openButton : styles.openButtonActive}
                         >
                             <Icon source={"tools"} size={spacing.large} color={theme.colors.fff} key={"icon-tool"} />
@@ -255,89 +255,90 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                             isLoading={isLoading}
                         />
                     </AccessibleView>
-
                 </Animated.View>
 
-                <Animated.View style={[styles.drawer, drawerStyle]}>
-                    {drawerContent === 'main' && drawerContent && (
-                        <>
-                            {responsive === "small" && (
-                                <TouchableOpacity
-                                    onPress={() => closeDrawer()}
-                                    style={[styles.openButtonActive, { marginHorizontal: 16 }]}
-                                >
-                                    <Icon source={"arrow-left-circle"} size={spacing.large} color={theme.colors.fff} key={"icon-tool"} />
-                                    <Text style={[masterdataStyles.text, masterdataStyles.textFFF, { marginLeft: 10, padding: 2 }]}>Close Drawer</Text>
-                                </TouchableOpacity>
-                            )}
-
-                            <MemoDragsubform
-                                navigation={navigation}
-                                state={state}
-                                dispatch={dispatch}
-                                checkList={checkList ?? []}
-                                dataType={dataType ?? []}
-                                checkListType={checkListType ?? []}
-                                groupCheckListOption={groupCheckListOption ?? []}
-                                checkListOption={checkListOption}
-                            />
-                        </>
-                    )}
-
-                    {drawerContent === 'toolbox' && (
-                        <ScrollView
-                            style={{ display: drawerContent === "toolbox" ? 'flex' : 'none', marginTop: 20 }}
-                            showsVerticalScrollIndicator={false}
-                        >
-                            {responsive === "small" && (
-                                <TouchableOpacity
-                                    onPress={() => closeDrawer()}
-                                    style={[styles.openButtonActive, { marginHorizontal: 16 }]}
-                                >
-                                    <Icon source={"arrow-left-circle"} size={spacing.large} color={theme.colors.fff} key={"icon-tool"} />
-                                    <Text style={[masterdataStyles.text, masterdataStyles.textFFF, { marginLeft: 10, padding: 2 }]}>Close Drawer</Text>
-                                </TouchableOpacity>
-                            )}
-
-                            <AccessibleView name="container-formname" style={{ marginHorizontal: 10, marginTop: responsive === "small" ? 5 : 5 }}>
-                                {['FormName', 'Description'].map((item) => (
-                                    <MemoConfigItemForm
-                                        key={item}
-                                        label={item}
-                                        value={state[item]}
-                                        editable={edit[item]}
-                                        onEdit={(v: boolean) => setEdit(prev => ({ ...prev, [item]: v }))} />
-                                ))}
-                            </AccessibleView>
-
-                            <TouchableOpacity
-                                onPress={() => setInitialSaveDialog(true)}
-                                style={[createform.saveButton, { justifyContent: "center" }]}
-                            >
-                                <Text style={masterdataStyles.textFFF}>Save Form</Text>
-                            </TouchableOpacity>
-
-                            <View style={styles.groupContainer}>
-
-                                {checkListType && checkListType.length > 0 ? checkListType.map((item: CheckListType, index) => (
-                                    item.IsActive && (
-                                        <View key={index}>
-                                            <View style={styles.fieldContainer}>
-                                                <Text style={[masterdataStyles.text, { marginTop: 10 }]}>{item.GTypeName}</Text>
-
-                                                <Divider bold style={[{ marginVertical: 10, height: 1, backgroundColor: theme.colors.onBackground }]} />
-
-                                                <MemoDraggableItem data={item?.CheckList || []} key={`drag-${index}`} onDrop={handleDrop} />
-                                            </View>
-                                        </View>
-                                    )
-                                )) : (
-                                    <Text style={masterdataStyles.text}>No Fields Available</Text>
+                {drawerOpen && (
+                    <Animated.View style={[styles.drawer, drawerStyle]}>
+                        {drawerContent === 'main' && drawerContent && (
+                            <>
+                                {responsive === "small" && (
+                                    <TouchableOpacity
+                                        onPress={() => closeDrawer()}
+                                        style={[styles.openButtonActive, { marginHorizontal: 16 }]}
+                                    >
+                                        <Icon source={"arrow-left-circle"} size={spacing.large} color={theme.colors.fff} key={"icon-tool"} />
+                                        <Text style={[masterdataStyles.text, masterdataStyles.textFFF, { marginLeft: 10, padding: 2 }]}>Close Drawer</Text>
+                                    </TouchableOpacity>
                                 )}
-                            </View>
-                        </ScrollView>
-                    )}
-                </Animated.View>
+
+                                <MemoDragsubform
+                                    navigation={navigation}
+                                    state={state}
+                                    dispatch={dispatch}
+                                    checkList={checkList ?? []}
+                                    dataType={dataType ?? []}
+                                    checkListType={checkListType ?? []}
+                                    groupCheckListOption={groupCheckListOption ?? []}
+                                    checkListOption={checkListOption}
+                                />
+                            </>
+                        )}
+
+                        {drawerContent === 'toolbox' && (
+                            <ScrollView
+                                style={{ display: drawerContent === "toolbox" ? 'flex' : 'none', marginTop: 20 }}
+                                showsVerticalScrollIndicator={false}
+                            >
+                                {responsive === "small" && (
+                                    <TouchableOpacity
+                                        onPress={() => closeDrawer()}
+                                        style={[styles.openButtonActive, { marginHorizontal: 16 }]}
+                                    >
+                                        <Icon source={"arrow-left-circle"} size={spacing.large} color={theme.colors.fff} key={"icon-tool"} />
+                                        <Text style={[masterdataStyles.text, masterdataStyles.textFFF, { marginLeft: 10, padding: 2 }]}>Close Drawer</Text>
+                                    </TouchableOpacity>
+                                )}
+
+                                <AccessibleView name="container-formname" style={{ marginHorizontal: 10, marginTop: responsive === "small" ? 5 : 5 }}>
+                                    {['FormName', 'Description'].map((item) => (
+                                        <MemoConfigItemForm
+                                            key={item}
+                                            label={item}
+                                            value={state[item]}
+                                            editable={edit[item]}
+                                            onEdit={(v: boolean) => setEdit(prev => ({ ...prev, [item]: v }))} />
+                                    ))}
+                                </AccessibleView>
+
+                                <TouchableOpacity
+                                    onPress={() => setInitialSaveDialog(true)}
+                                    style={[createform.saveButton, { justifyContent: "center" }]}
+                                >
+                                    <Text style={masterdataStyles.textFFF}>Save Form</Text>
+                                </TouchableOpacity>
+
+                                <View style={styles.groupContainer}>
+
+                                    {checkListType && checkListType.length > 0 ? checkListType.map((item: CheckListType, index) => (
+                                        item.IsActive && (
+                                            <View key={index}>
+                                                <View style={styles.fieldContainer}>
+                                                    <Text style={[masterdataStyles.text, { marginTop: 10 }]}>{item.GTypeName}</Text>
+
+                                                    <Divider bold style={[{ marginVertical: 10, height: 1, backgroundColor: theme.colors.onBackground }]} />
+
+                                                    <MemoDraggableItem data={item?.CheckList || []} key={`drag-${index}`} onDrop={handleDrop} />
+                                                </View>
+                                            </View>
+                                        )
+                                    )) : (
+                                        <Text style={masterdataStyles.text}>No Fields Available</Text>
+                                    )}
+                                </View>
+                            </ScrollView>
+                        )}
+                    </Animated.View>
+                )}
             </AccessibleView>
 
             <MemoSaveDialog

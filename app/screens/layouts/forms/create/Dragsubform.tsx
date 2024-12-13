@@ -120,9 +120,6 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, d
         );
     }, [RowItem]);
 
-
-    console.log("Sub");
-
     return (
         <>
             <TouchableOpacity
@@ -153,17 +150,20 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, d
                 />
             </NestableScrollContainer>
 
-            <SubFormDialog
-                isVisible={initialDialog}
-                setIsVisible={handelSetDialog}
-                isEditing={editMode}
-                initialValues={initialSubForm}
-                saveData={handelSaveSubForm}
-                onDelete={(SFormID: string) => {
-                    dispatch(deleteSubForm({ SFormID }));
-                    handelSetDialog();
-                }}
-            />
+            {initialDialog && (
+                <SubFormDialog
+                    isVisible={initialDialog}
+                    setIsVisible={handelSetDialog}
+                    isEditing={editMode}
+                    initialValues={initialSubForm}
+                    saveData={handelSaveSubForm}
+                    onDelete={(SFormID: string) => {
+                        dispatch(deleteSubForm({ SFormID }));
+                        handelSetDialog();
+                    }}
+                />
+            )}
+
         </>
     )
 })
