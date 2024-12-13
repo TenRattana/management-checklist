@@ -48,6 +48,7 @@ export interface BaseFormState {
   Required: boolean;
   Important: boolean;
   ImportantList?: BaseImportant[]; 
+  Rowcolumn? : number;
   Placeholder?: string;
   Hint?: string;
   DisplayOrder?: number;

@@ -117,6 +117,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                 SFormID: targetSubForm.SFormID,
                 Required: false,
                 Important: false,
+                Rowcolumn: 1,
                 ImportantList: [{
                     MCListID: idMcl,
                     Value: [],

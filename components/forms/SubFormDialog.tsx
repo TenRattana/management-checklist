@@ -1,5 +1,5 @@
 import React from "react";
-import { TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Inputs } from "@/components/common";
 import { Portal, Dialog } from "react-native-paper";
 import { FastField, Formik } from "formik";
@@ -24,6 +24,12 @@ const SubFormDialog = React.memo(({
 }: SubFormDialogProps<BaseSubForm>) => {
     const masterdataStyles = useMasterdataStyles();
 
+    const styles = StyleSheet.create({
+        actionButton: {
+            margin: 5,
+            padding: 10
+        },
+    })
     return (
         <Portal>
             <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={masterdataStyles.containerDialog}>
@@ -99,7 +105,23 @@ const SubFormDialog = React.memo(({
                                         )}
                                     </FastField >
 
-                                    <View id="sfd-action" style={masterdataStyles.containerAction}>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }} id="sfd-action">
+                                        <TouchableOpacity onPress={() => handleSubmit()} style={styles.actionButton}>
+                                            <Text style={masterdataStyles.text}>{isEditing ? "Update SubForm" : "Add SubForm"}</Text>
+                                        </TouchableOpacity>
+
+                                        {isEditing && (
+                                            <TouchableOpacity onPress={() => onDelete(values.SFormID)} style={styles.actionButton}>
+                                                <Text style={masterdataStyles.text}>Delete</Text>
+                                            </TouchableOpacity>
+                                        )}
+
+                                        <TouchableOpacity onPress={() => setIsVisible(false)} style={styles.actionButton}>
+                                            <Text style={masterdataStyles.text}>Cancel</Text>
+                                        </TouchableOpacity>
+                                    </View>
+
+                                    {/* <View id="sfd-action" style={masterdataStyles.containerAction}>
                                         <TouchableOpacity
                                             onPress={() => handleSubmit()}
                                             disabled={!isValid || !dirty}
@@ -154,7 +176,7 @@ const SubFormDialog = React.memo(({
                                                 Cancel
                                             </Text>
                                         </TouchableOpacity>
-                                    </View>
+                                    </View> */}
                                 </View>
                             )}
                         </Formik>

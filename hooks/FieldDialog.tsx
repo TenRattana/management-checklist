@@ -78,6 +78,7 @@ const useField = (checkListType?: CheckList[], dataType?: DataType[]) => {
                 }
                 return Yup.string().nullable();
             }),
+            Rowcolumn: Yup.number().typeError("The row column must be a number.").nullable(),
             GCLOptionID: Yup.lazy((value, context) => {
                 const CTypeID = checkListType?.find((v) => v.CTypeID === context.context.CTypeID)?.CTypeName;
                 if (CTypeID && ['Dropdown', 'Checkbox', 'Radio'].includes(CTypeID)) {

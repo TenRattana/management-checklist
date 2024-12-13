@@ -101,7 +101,9 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
 
                                             const containerStyle: ViewStyle = {
                                                 width: responsive === "small" ? "100%" : `${98 / columns}%`,
-                                                flexGrow: field.DisplayOrder || 1,
+                                                flexShrink: 1,
+                                                flexGrow: field.Rowcolumn || 1,
+                                                flexBasis: `${100 / (columns / (field.Rowcolumn || 1))}%`,
                                                 padding: 5,
                                             };
 

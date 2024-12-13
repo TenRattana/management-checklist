@@ -331,6 +331,21 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                                 </RenderView>
                                             )}
 
+                                            <FastField name="Rowcolumn">
+                                                {({ field, form }: any) => (
+                                                    <Inputs
+                                                        placeholder="Columns"
+                                                        label="Column in row"
+                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                        handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                        value={String(field.value ?? "")}
+                                                        error={form.touched?.Rowcolumn && Boolean(form.errors?.Rowcolumn)}
+                                                        errorMessage={form.touched?.Rowcolumn ? form.errors?.Rowcolumn : ""}
+                                                        testId={`Rowcolumn-form`}
+                                                    />
+                                                )}
+                                            </FastField >
+
                                             {shouldRenderDT && (
                                                 <RenderView style={Platform.OS === 'web' ? memoizedAnimatedDT : { opacity: 1 }}>
                                                     <FastField name="DTypeValue">

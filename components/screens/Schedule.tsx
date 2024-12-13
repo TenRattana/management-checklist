@@ -78,7 +78,7 @@ export const styles = StyleSheet.create({
     alignSelf: 'center'
   },
   actionButton: {
-    marginHorizontal: 5,
+    margin: 5,
     padding: 10
   },
 });
