@@ -106,7 +106,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
             convertToThaiDateTime(item.CreateDate),
             item.TableID,
         ]);
-    }, [expectedResult, debouncedSearchQuery]);
+    }, [expectedResult, debouncedSearchQuery, userPermission]);
 
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,

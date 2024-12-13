@@ -83,6 +83,7 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
                         validateOnBlur={true}
                         validateOnChange={false}
                         onSubmit={(value) => console.log(value)}
+                        enableReinitialize={true}
                         key={exp ? `Form-Expected-${subForm.SFormID}-${subForm.Columns}` : `Form-Preview-${subForm.SFormID}-${subForm.Columns}`}
                     >
                         {({ errors, touched, setFieldValue, setTouched }) => (
