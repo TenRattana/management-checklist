@@ -4,12 +4,10 @@ import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import { Checkboxs, Inputs } from "@/components/common";
 import { Portal, Dialog, Switch, Icon } from "react-native-paper";
 import { Formik, FastField } from "formik";
-import Checklist_dialog from "../screens/Checklist_dialog";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
-import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
-import Animated, { runOnJS, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { FieldDialogProps } from "@/typing/tag";
 import Text from "@/components/Text";
 import { useFocusEffect } from "@react-navigation/native";
@@ -20,12 +18,10 @@ import CheckListCreate_dialog from "../screens/CheckListCreate_dialog";
 import { styles } from "../screens/Schedule";
 
 const AnimatedView = Animated.createAnimatedComponent(View);
-const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode, saveField, setShowDialogs
-    , checkListType, dataType, dropcheckListType, dropdataType, dropgroupCheckListOption, checkListOption
-}: FieldDialogProps) => {
-    const { dialogAdd, info, initialCheckList, initialGroupCheckList,
-        saveCheckListOption, saveDataCheckList, saveDataGroupCheckList, handelInfo, handelAdd, checkList, groupCheckListOption } = useField();
 
+const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode, saveField, setShowDialogs, checkListType, dataType, dropcheckListType, dropdataType, dropgroupCheckListOption, checkListOption }: FieldDialogProps) => {
+
+    const { dialogAdd, info, initialCheckList, initialGroupCheckList, saveDataCheckList, saveDataGroupCheckList, handelInfo, handelAdd, checkList, groupCheckListOption, validationSchema } = useField(checkListType, dataType);
     const masterdataStyles = useMasterdataStyles()
     const [option, setOption] = useState<{ label: string; value: string; }[]>([])
     const [shouldRender, setShouldRender] = useState<string>("");
@@ -36,101 +32,6 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
     const { spacing, responsive } = useRes()
     const { theme } = useTheme()
-
-    const validationSchema = useMemo(() => {
-        return Yup.object().shape({
-            CListID: Yup.string().required("The checklist field is required."),
-            CTypeID: Yup.string().required("The checklist type field is required."),
-            Required: Yup.boolean().required("The required field is required."),
-            Important: Yup.boolean().required("The important field is required."),
-            DTypeID: Yup.lazy((value, context) => {
-                const CTypeID = checkListType.find(v => v.CTypeID === context.parent.CTypeID)?.CTypeName;
-                if (CTypeID && ['Textinput'].includes(CTypeID)) {
-                    return Yup.string().required("Data Type is required for Text.");
-                }
-                return Yup.string().nullable();
-            }),
-            DTypeValue: Yup.lazy((value, context) => {
-                const DTypeID = dataType.find(v => v.DTypeID === context.context.DTypeID)?.DTypeName;
-                if (DTypeID === "Number") {
-                    return Yup.number().typeError("The digit value must be a number.").nullable();
-                }
-                return Yup.string().nullable();
-            }),
-            GCLOptionID: Yup.lazy((value, context) => {
-                const CTypeID = checkListType.find(v => v.CTypeID === context.context.CTypeID)?.CTypeName;
-                if (CTypeID && ['Dropdown', 'Checkbox', 'Radio'].includes(CTypeID)) {
-                    return Yup.string().required("GCLOptionID is required for Dropdown/Select/Radio.");
-                }
-                return Yup.string().nullable();
-            }),
-            ImportantList: Yup.array().of(
-                Yup.object().shape({
-                    Value: Yup.lazy((value, context) => {
-                        const isImportant = context.context?.Important || false;
-                        const hasGCLOptionID = context.context?.GCLOptionID;
-
-                        if (isImportant && hasGCLOptionID) {
-                            if (Array.isArray(value)) {
-                                return Yup.array()
-                                    .of(Yup.string().required("Each selected option is required."))
-                                    .min(1, "You must select at least one option.")
-                                    .required("Important value is required when marked as important.");
-                            } else {
-                                return Yup.string()
-                                    .required("Important value is required when marked as important.")
-                                    .nullable();
-                            }
-                        }
-                        return Yup.mixed().nullable();
-                    }),
-                    MinLength: Yup.lazy((value, context) => {
-                        const DTypeID = dataType.find(v => v.DTypeID === context.context?.DTypeID)?.DTypeName;
-                        const max = context.parent.MaxLength;
-                        const isImportant = context.context?.Important;
-
-                        if (DTypeID === "Number" && isImportant) {
-                            if (!max && !value) {
-                                return Yup.number()
-                                    .typeError("The min value control must be a number.")
-                                    .required("The min value control is required.");
-                            } else if (max) {
-                                return Yup.number()
-                                    .typeError("The max value control must be a number.")
-                                    .max(max, 'Min length must be less than or equal to Max length');
-                            }
-                        }
-
-                        return Yup.number()
-                            .typeError("The min value control must be a number.")
-                            .nullable();
-                    }),
-                    MaxLength: Yup.lazy((value, context) => {
-                        const DTypeID = dataType.find(v => v.DTypeID === context.context?.DTypeID)?.DTypeName;
-                        const min = context.parent.MinLength;
-                        const isImportant = context.context?.Important;
-
-                        if (DTypeID === "Number" && isImportant) {
-                            if (!min && !value) {
-                                return Yup.number()
-                                    .typeError("The max value control must be a number.")
-                                    .min(min + 1, 'Max length must be greater than or equal to Min length')
-                                    .required("The max value control is required.");
-                            } else if (min) {
-                                return Yup.number()
-                                    .typeError("The max value control must be a number.")
-                                    .min(min, 'Max length must be greater than or equal to Min length');
-                            }
-                        }
-
-                        return Yup.number()
-                            .typeError("The max value control must be a number.")
-                            .nullable();
-                    }),
-                })
-            )
-        });
-    }, [checkListType, dataType]);
 
     const RenderView = Platform.OS === 'web' ? AnimatedView : View;
 
@@ -176,18 +77,13 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
     return (
         <Portal>
-            <Dialog visible={isVisible} onDismiss={() => setShowDialogs()} style={[masterdataStyles.containerDialog, {
-                width: responsive === "large" ? 700 : '80%',
-            }]}>
-
+            <Dialog visible={isVisible} onDismiss={() => setShowDialogs()} style={[masterdataStyles.containerDialog, { width: responsive === "large" ? 700 : '80%' }]}>
                 <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]}>
                     {editMode ? "Edit check list" : "Create check list"}
                 </Dialog.Title>
 
                 <Dialog.Content>
-                    <Text
-                        style={[masterdataStyles.text, masterdataStyles.textDark, { marginBottom: 10, paddingLeft: 10 }]}
-                    >
+                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginBottom: 10, paddingLeft: 10 }]}>
                         {editMode ? "Edit the details of the field." : "Enter the details for the new field."}
                     </Text>
 
@@ -276,7 +172,6 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
                                 return (
                                     <View id="form-fd">
-
                                         <ScrollView
                                             contentContainerStyle={{ paddingBottom: 5, paddingHorizontal: 10 }}
                                             showsVerticalScrollIndicator={false}
@@ -595,42 +490,6 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                         </View>
 
                                         <View id="form-action-fd" style={masterdataStyles.containerAction}>
-                                            {/* <TouchableOpacity
-                                                onPress={() => handleSubmit()}
-                                                disabled={!isValid || !dirty}
-                                                style={[
-                                                    masterdataStyles.button,
-                                                    masterdataStyles.backMain,
-                                                    { opacity: isValid && dirty ? 1 : 0.5 }
-                                                ]}
-                                            >
-                                                <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
-                                                    {editMode ? "Update Field" : "Add Field"}
-                                                </Text>
-                                            </TouchableOpacity> */}
-
-                                            {/* {editMode && (
-                                                <TouchableOpacity
-                                                    onPress={() => {
-                                                        onDeleteField(values.SFormID, values.MCListID);
-                                                        setShowDialogs();
-                                                    }}
-                                                    style={[masterdataStyles.button, masterdataStyles.backMain]}
-                                                >
-                                                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
-                                                        Delete Field
-                                                    </Text>
-                                                </TouchableOpacity>
-                                            )} */}
-
-                                            {/* <TouchableOpacity
-                                                onPress={() => setShowDialogs()}
-                                                style={[masterdataStyles.button, masterdataStyles.backMain]}
-                                            >
-                                                <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
-                                                    Cancel
-                                                </Text>
-                                            </TouchableOpacity> */}
                                         </View>
                                     </View>
                                 );

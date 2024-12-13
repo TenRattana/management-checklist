@@ -241,35 +241,13 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                                                         }}
                                                         title={`${interval}`}
                                                     />
-                                                )
-                                                )}
+                                                ))}
                                             </Menu>
                                         </View>
 
                                         <HelperText type="error" visible={touched.Type_schedule && Boolean(errors.Type_schedule)} style={[{ display: touched.Type_schedule && Boolean(errors.Type_schedule) ? 'flex' : 'none' }, masterdataStyles.errorText]}>
                                             {errors.Type_schedule}
                                         </HelperText>
-
-                                        {/* {values.Type_schedule === "Custom" && (
-                                            <View style={[styles.timeIntervalMenu, { marginBottom: 0 }]}>
-                                                <View id="form-active-md" style={[masterdataStyles.containerSwitch]}>
-                                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                        <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginRight: 12 }]}>
-                                                            Type Schedule: {values.Custom ? "Every Year" : "One-time Year"}
-                                                        </Text>
-                                                        <Switch
-                                                            style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                                            color={values.Custom ? theme.colors.inversePrimary : theme.colors.onPrimaryContainer}
-                                                            value={values.Custom}
-                                                            onValueChange={(v: boolean) => {
-                                                                setFieldValue("Custom", v);
-                                                            }}
-                                                            testID="Custom-md"
-                                                        />
-                                                    </View>
-                                                </View>
-                                            </View>
-                                        )} */}
 
                                         <ScrollView showsVerticalScrollIndicator={false} style={{ display: values.Type_schedule ? 'flex' : 'none' }}>
                                             <Animated.View entering={FadeInRight} exiting={FadeOutRight} style={{ display: values.Type_schedule === "Daily" ? 'flex' : 'none' }} >

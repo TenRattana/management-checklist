@@ -49,6 +49,8 @@ const Week_dialog = React.memo(({ theme, spacing, responsive, showError, showSuc
         setIndexThirDialog(day);
     }, []);
 
+    const MemoInfoSchedule_dialog = React.memo(InfoSchedule_dialog)
+    
     return (
         <>
             <View style={styles.timeIntervalMenu}>
@@ -114,7 +116,7 @@ const Week_dialog = React.memo(({ theme, spacing, responsive, showError, showSuc
                 ))}
             </ScrollView>
 
-            <InfoSchedule_dialog
+            <MemoInfoSchedule_dialog
                 selectedDay={IndexThirDialo}
                 values={values[IndexThirDialo]}
                 key={`infoshedule`}

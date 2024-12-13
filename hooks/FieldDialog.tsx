@@ -1,11 +1,12 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts/useToast";
 import { useFocusEffect } from "@react-navigation/native";
-import { Checklist, GroupCheckListOption } from "@/typing/type";
+import { CheckList, Checklist, CheckListType, DataType, GroupCheckListOption } from "@/typing/type";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { InitialValuesChecklist, InitialValuesGroupCheckList } from "@/typing/value";
+import * as Yup from 'yup'
 
 const saveCheckList = async (data: {
     Prefix: any;
@@ -52,10 +53,105 @@ const fetchGroupCheckList = async (): Promise<GroupCheckListOption[]> => {
     return response.data.data ?? [];
 };
 
-const useField = () => {
+const useField = (checkListType?: CheckList[], dataType?: DataType[]) => {
     const { handleError, showSuccess } = useToast();
     const state = useSelector((state: any) => state.prefix);
     const queryClient = useQueryClient();
+
+    const validationSchema = useMemo(() => {
+        return Yup.object().shape({
+            CListID: Yup.string().required("The checklist field is required."),
+            CTypeID: Yup.string().required("The checklist type field is required."),
+            Required: Yup.boolean().required("The required field is required."),
+            Important: Yup.boolean().required("The important field is required."),
+            DTypeID: Yup.lazy((value, context) => {
+                const CTypeID = checkListType?.find(v => v.CTypeID === context.parent.CTypeID)?.CTypeName;
+                if (CTypeID && ['Textinput'].includes(CTypeID)) {
+                    return Yup.string().required("Data Type is required for Text.");
+                }
+                return Yup.string().nullable();
+            }),
+            DTypeValue: Yup.lazy((value, context) => {
+                const DTypeID = dataType?.find(v => v.DTypeID === context.context.DTypeID)?.DTypeName;
+                if (DTypeID === "Number") {
+                    return Yup.number().typeError("The digit value must be a number.").nullable();
+                }
+                return Yup.string().nullable();
+            }),
+            GCLOptionID: Yup.lazy((value, context) => {
+                const CTypeID = checkListType?.find((v) => v.CTypeID === context.context.CTypeID)?.CTypeName;
+                if (CTypeID && ['Dropdown', 'Checkbox', 'Radio'].includes(CTypeID)) {
+                    return Yup.string().required("GCLOptionID is required for Dropdown/Select/Radio.");
+                }
+                return Yup.string().nullable();
+            }),
+            ImportantList: Yup.array().of(
+                Yup.object().shape({
+                    Value: Yup.lazy((value, context) => {
+                        const isImportant = context.context?.Important || false;
+                        const hasGCLOptionID = context.context?.GCLOptionID;
+
+                        if (isImportant && hasGCLOptionID) {
+                            if (Array.isArray(value)) {
+                                return Yup.array()
+                                    .of(Yup.string().required("Each selected option is required."))
+                                    .min(1, "You must select at least one option.")
+                                    .required("Important value is required when marked as important.");
+                            } else {
+                                return Yup.string()
+                                    .required("Important value is required when marked as important.")
+                                    .nullable();
+                            }
+                        }
+                        return Yup.mixed().nullable();
+                    }),
+                    MinLength: Yup.lazy((value, context) => {
+                        const DTypeID = dataType?.find(v => v.DTypeID === context.context?.DTypeID)?.DTypeName;
+                        const max = context.parent.MaxLength;
+                        const isImportant = context.context?.Important;
+
+                        if (DTypeID === "Number" && isImportant) {
+                            if (!max && !value) {
+                                return Yup.number()
+                                    .typeError("The min value control must be a number.")
+                                    .required("The min value control is required.");
+                            } else if (max) {
+                                return Yup.number()
+                                    .typeError("The max value control must be a number.")
+                                    .max(max, 'Min length must be less than or equal to Max length');
+                            }
+                        }
+
+                        return Yup.number()
+                            .typeError("The min value control must be a number.")
+                            .nullable();
+                    }),
+                    MaxLength: Yup.lazy((value, context) => {
+                        const DTypeID = dataType?.find(v => v.DTypeID === context.context?.DTypeID)?.DTypeName;
+                        const min = context.parent.MinLength;
+                        const isImportant = context.context?.Important;
+
+                        if (DTypeID === "Number" && isImportant) {
+                            if (!min && !value) {
+                                return Yup.number()
+                                    .typeError("The max value control must be a number.")
+                                    .min(min + 1, 'Max length must be greater than or equal to Min length')
+                                    .required("The max value control is required.");
+                            } else if (min) {
+                                return Yup.number()
+                                    .typeError("The max value control must be a number.")
+                                    .min(min, 'Max length must be greater than or equal to Min length');
+                            }
+                        }
+
+                        return Yup.number()
+                            .typeError("The max value control must be a number.")
+                            .nullable();
+                    }),
+                })
+            )
+        });
+    }, [checkListType, dataType]);
 
     const { data: checkList = [] } = useQuery<Checklist[], Error>(
         'checkList',
@@ -183,7 +279,8 @@ const useField = () => {
         handelInfo,
         handelAdd,
         checkList: checkList.filter(v => v.IsActive),
-        groupCheckListOption: groupCheckListOption
+        groupCheckListOption: groupCheckListOption,
+        validationSchema
     };
 };
 

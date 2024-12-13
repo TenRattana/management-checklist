@@ -64,8 +64,7 @@ const RenderFormik: React.FC<{ field: string; setEdit: (v: boolean) => void }> =
     ({ field, setEdit }) => {
         const dispatch = useDispatch();
         const state = useSelector((state: any) => state.form);
-        const { spacing, responsive } = useRes();
-        const { theme } = useTheme();
+        const { responsive } = useRes();
         const masterdataStyles = useMasterdataStyles()
 
         return (
