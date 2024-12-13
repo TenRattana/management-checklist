@@ -7,9 +7,7 @@ import {
 import moment from "moment";
 import { CustomLightTheme } from '@/constants/CustomColor';
 
-const today = getCurrentTime();
-
-export const getDate = (offset = 0) => CalendarUtils.getCalendarDateString(today.setDate(today.getDate() + offset));
+export const getDate = (offset = 0) => CalendarUtils.getCalendarDateString(getCurrentTime().setDate(getCurrentTime().getDate() + offset));
 
 export interface TimeScheduleProps {
     ScheduleID: string;

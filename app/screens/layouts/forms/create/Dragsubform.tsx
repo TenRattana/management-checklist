@@ -17,7 +17,6 @@ import {
     ShadowDecorator
 } from "react-native-draggable-flatlist";
 import { IconButton } from "react-native-paper";
-import { runOnJS } from "react-native-reanimated";
 import { spacing } from "@/constants/Spacing";
 import Dragfield from "./Dragfield";
 import { BaseSubForm, RowItemProps } from '@/typing/form'
@@ -38,7 +37,7 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, d
     const { handleError } = useToast();
 
     const handleDropSubForm = (data: Omit<BaseSubForm, 'DisplayOrder'>[]) => {
-        runOnJS(dispatch)(setDragSubForm({ data }));
+        dispatch(setDragSubForm({ data }));
     };
 
     const handelSetDialog = useCallback(() => {
@@ -68,16 +67,18 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, d
     }, [dispatch, handleError, handelSetDialog]);
 
     const MemoDragfield = React.memo(Dragfield)
-    
-    const RowItem = ({ item, drag, isActive }: RowItemProps<BaseSubForm>) => {
+
+    const onPressEdit = useCallback((item: BaseSubForm) => {
+        setEditMode(true);
+        setInitialDialog(true);
+        handelSubForm(item);
+    }, [handelSubForm]);
+
+    const RowItem = React.memo(({ item, drag, isActive }: RowItemProps<BaseSubForm>) => {
         return (
             <>
                 <TouchableOpacity
-                    onPress={() => {
-                        setEditMode(true);
-                        setInitialDialog(true);
-                        handelSubForm(item);
-                    }}
+                    onPress={() => onPressEdit(item)}
                     onLongPress={drag}
                     disabled={isActive}
                     style={[
@@ -107,9 +108,9 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, d
                 </AccessibleView>
             </>
         );
-    }
+    })
 
-    const renderSubForm = (params: RenderItemParams<BaseSubForm>) => {
+    const renderSubForm = useCallback((params: RenderItemParams<BaseSubForm>) => {
         return (
             <ShadowDecorator>
                 <ScaleDecorator activeScale={0.90}>
@@ -117,7 +118,10 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, d
                 </ScaleDecorator>
             </ShadowDecorator>
         );
-    }
+    }, [RowItem]);
+
+
+    console.log("Sub");
 
     return (
         <>
@@ -142,7 +146,7 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, d
                 <NestableDraggableFlatList
                     data={state.subForms}
                     renderItem={renderSubForm}
-                    keyExtractor={(item, index) => `SF-${index}-${index}`}
+                    keyExtractor={(item) => item.SFormID}
                     onDragEnd={({ data }) => handleDropSubForm(data)}
                     getItemLayout={(data, index) => ({ length: 60, offset: 60 * index, index })}
                     activationDistance={10}
@@ -156,7 +160,7 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, d
                 initialValues={initialSubForm}
                 saveData={handelSaveSubForm}
                 onDelete={(SFormID: string) => {
-                    runOnJS(dispatch)(deleteSubForm({ SFormID }));
+                    dispatch(deleteSubForm({ SFormID }));
                     handelSetDialog();
                 }}
             />

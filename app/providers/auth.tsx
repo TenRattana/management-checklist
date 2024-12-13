@@ -120,10 +120,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const updateSession = useCallback(async (UserName: string, Password: string, TokenAuth: string) => {
-    const token = TokenAuth;
-
-    if (token && token.split('.').length === 3) {
-      try {
+    try {
+      const token = TokenAuth;
+      if (token && token.split('.').length === 3) {
         const payload: any = jwtDecode(token);
 
         if (payload.exp) {
@@ -131,40 +130,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const currentTime = Date.now();
 
           if (currentTime < expirationTime) {
-            setUserData(payload)
+            setUserData(payload);
           } else {
             await deleteData('userToken');
-            return
+            setLoading(false);
+            return;
           }
         }
-      } catch (error) {
-        handleError(error);
-      }
-    } else {
-      const data = {
-        UserName: UserName,
-        Password: Password,
-        TokenAuth: TokenAuth
-      };
+      } else {
+        const response = await axiosInstance.post("User_service.asmx/GetAD", {
+          UserName,
+          Password,
+          TokenAuth,
+        });
 
-      try {
-        const response = await axiosInstance.post("User_service.asmx/GetAD", data);
         if (response.data && response.data.token) {
           await saveData('userToken', response.data.token);
           const payload = jwtDecode(response.data.token);
-          setUserData(payload)
+          setUserData(payload);
         }
-      } catch (error) {
-        handleError(error);
       }
+    } catch (error) {
+      handleError(error);
+      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     if (UserData) {
-      dispatch(initializeApp({ UserData }));
-      setLoading(true)
-      showSuccess("Login Success!")
+      (async () => {
+        await dispatch(initializeApp({ UserData }));
+        showSuccess("Login Success!");
+        setLoading(false);
+      })();
     }
   }, [UserData, dispatch]);
 

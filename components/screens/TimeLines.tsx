@@ -1,23 +1,12 @@
 import { useRes } from "@/app/contexts/useRes";
 import { useTheme } from "@/app/contexts/useTheme";
 import { getCurrentTime } from "@/config/timezoneUtils";
-import React, { useState, useEffect, useMemo } from "react";
-import { Dimensions } from "react-native";
+import React, { useMemo } from "react";
 import { TimelineList } from "react-native-calendars";
 
 const Timelines = React.memo(({ eventsByDateS, initialTime, renderItem }: { eventsByDateS: any, initialTime: any, renderItem: any }) => {
     const { theme, darkMode } = useTheme();
     const { spacing } = useRes();
-
-    const [screenSize, setScreenSize] = useState(Dimensions.get("window"));
-
-    useEffect(() => {
-        const onChange = ({ window }: { window: any }) => {
-            setScreenSize(window);
-        };
-        const subscription = Dimensions.addEventListener("change", onChange);
-        return () => subscription.remove();
-    }, []);
 
     const timelineProps = useMemo(() => {
         return {
@@ -57,13 +46,12 @@ const Timelines = React.memo(({ eventsByDateS, initialTime, renderItem }: { even
                 },
             },
         };
-    }, [theme, darkMode, spacing, screenSize]);
+    }, [theme, darkMode, spacing]);
 
     return (
         <TimelineList
-            key={JSON.stringify(darkMode)}
             events={eventsByDateS}
-            timelineProps={{...timelineProps }}
+            timelineProps={{ ...timelineProps }}
             showNowIndicator
             scrollToNow
             initialTime={initialTime}

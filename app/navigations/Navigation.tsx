@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useRef, useCallback, useState, useMemo } from 'react';
+import React, { lazy, Suspense, useRef, useCallback, useState, useMemo, useEffect } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import {
@@ -33,7 +33,6 @@ import { initializeLogout } from '../providers';
 import CustomMenu from '@/components/navigation/CustomMenu'
 import Setting_dialog from "@/components/screens/Setting_dialog"
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { runOnJS } from 'react-native-reanimated';
 import TimescheduleTrack from '../screens/layouts/schedule/TimescheduleTrack';
 
 const Drawer = createDrawerNavigator();
@@ -79,25 +78,26 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
     const [menuSetting, setMenuSetting] = useState(false);
 
     const handleSettings = useCallback(() => {
-        runOnJS(setMenuSetting)(true)
-        runOnJS(setMenuVisible)(false);
+        setMenuSetting(true);
+        setMenuVisible(false);
     }, []);
 
     const handleLogout = useCallback(() => {
         dispatch(initializeLogout());
-        runOnJS(setMenuVisible)(false);
+        setMenuVisible(false);
     }, [dispatch]);
 
     const toggleMenu = useCallback(() => {
-        runOnJS(setMenuVisible)((prev) => !prev);
+        setMenuVisible((prev) => !prev);
     }, []);
 
     const closeMenu = useCallback(() => {
-        runOnJS(setMenuVisible)(false);
+        setMenuVisible(false);
     }, []);
 
     const menuScreens = useMemo(() => {
-        if (!user.IsAuthenticated || user.Screen.length === 0) {
+        if (!user.IsAuthenticated || !user.Screen || user.Screen.length === 0) {
+
             return [
                 <Drawer.Screen
                     key="login"
@@ -168,13 +168,13 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                     unmountOnBlur: true,
                     freezeOnBlur: true,
                 }}
-                initialRouteName={user.initialRoute}
+                initialRouteName={user.initialRoute || "Login"}
                 id="nav"
             >
                 {menuScreens}
             </Drawer.Navigator>
 
-            <MemoSetting_dialog isVisible={menuSetting} setVisible={() => runOnJS(setMenuSetting)(false)} />
+            <MemoSetting_dialog isVisible={menuSetting} setVisible={() => setMenuSetting(false)} />
         </SafeAreaView>
     );
 });

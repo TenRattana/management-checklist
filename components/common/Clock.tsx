@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import moment from "moment-timezone";
-import { runOnJS } from "react-native-reanimated";
 
 const DEFAULT_TIMEZONE = "Asia/Bangkok";
 
@@ -10,7 +9,7 @@ export function Clock(): string {
 
     const updateTime = () => {
         const currentTime = moment().tz(DEFAULT_TIMEZONE).format("HH:mm");
-        runOnJS(setTime)(currentTime);
+        setTime(currentTime);
     };
 
     useEffect(() => {

@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useMemo, useEffect } from "react";
-import { ActivityIndicator, View, TouchableOpacity } from "react-native";
+import React, { useCallback, useMemo } from "react";
+import { View, TouchableOpacity } from "react-native";
 import { Card } from "react-native-paper";
 import { FastField, Formik } from "formik";
 import * as Yup from "yup";

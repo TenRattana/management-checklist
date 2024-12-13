@@ -18,12 +18,10 @@ import { Checkbox, Icon } from 'react-native-paper';
 import Animated, { Easing, FadeIn, FadeOut, runOnJS } from 'react-native-reanimated';
 import { useQuery } from 'react-query';
 
-
 const fetchTimeSchedules = async (): Promise<TimeScheduleProps[]> => {
   const response = await axiosInstance.post("TimeSchedule_service.asmx/GetSchedules");
   return response.data.data ?? [];
 };
-
 FadeIn.duration(300).easing(Easing.out(Easing.ease))
 FadeOut.duration(300).easing(Easing.out(Easing.ease))
 
@@ -62,7 +60,7 @@ const RenderEvent = ({ event }: { event: any }) => {
   );
 }
 
-const HomeScreen = () => {
+const HomeScreen = React.memo(() => {
   const { theme, darkMode } = useTheme();
   const { responsive, spacing } = useRes();
   const [currentDate, setCurrentDate] = useState<string>(getDate());
@@ -73,52 +71,36 @@ const HomeScreen = () => {
   const [dialogVisible, setDialogVisible] = useState(false);
   const masterdataStyles = useMasterdataStyles()
 
-  const { data: timeSchedule = [] } = useQuery<TimeScheduleProps[], Error>(
-    'timeSchedule',
-    fetchTimeSchedules,
-    {
-      staleTime: 1000 * 60 * 1,
-      cacheTime: 1000 * 60 * 2,
-      refetchInterval: 1000 * 30,
-      enabled: true,
-    }
-  );
+  const { data: timeSchedule = [] } = useQuery<TimeScheduleProps[], Error>('timeSchedule', fetchTimeSchedules);
 
   const [checkedItems, setCheckedItems] = useState<Record<any, boolean>>({ 1: true, 2: true, 3: true });
 
   const toggleCheckbox = useCallback((id: string, title: string) => {
-    const secondPart = title.split(" ")[1] || "";
-
     setCheckedItems((prevState) => {
       const updatedCheckedState = { ...prevState, [id]: !prevState[id] };
+      const secondPart = title.split(" ")[1] || "";
 
-      if (updatedCheckedState[id]) {
-        runOnJS(setFilterTitle)((prevFilter) =>
-          prevFilter.includes(secondPart) ? prevFilter : [...prevFilter, secondPart]
-        );
-      } else {
-        runOnJS(setFilterTitle)((prevFilter) => prevFilter.filter((value) => value !== secondPart));
-      }
+      setFilterTitle((prevFilter) => {
+        if (updatedCheckedState[id]) {
+          return prevFilter.includes(secondPart) ? prevFilter : [...prevFilter, secondPart];
+        }
+        return prevFilter.filter((value) => value !== secondPart);
+      });
 
       return updatedCheckedState;
     });
   }, []);
 
-  const timelineItems = useMemo(() => parseTimeScheduleToTimeline(timeSchedule), [timeSchedule]);
+  const timelineItems = parseTimeScheduleToTimeline(timeSchedule);
 
-  const { markedDates, timeline } = useMemo(() => convertScheduleToTimeline(timelineItems), [timelineItems]);
+  const { markedDates, timeline } = convertScheduleToTimeline(timelineItems);
 
-  const eventsByDate = useMemo(
-    () => groupBy(timeline, (e) => CalendarUtils.getCalendarDateString(e.start)),
-    [timeline]
-  );
+  const eventsByDate = groupBy(timeline, (e) => CalendarUtils.getCalendarDateString(e.start))
 
-  const markedDatesS = useMemo(() => {
-    return {
-      ...markedDates,
-      [currentDate]: { selected: true, selectedColor: theme.colors.drag, selectedTextColor: theme.colors.fff },
-    };
-  }, [currentDate, markedDates]);
+  const markedDatesS = useMemo(() => ({
+    ...markedDates,
+    [currentDate]: { selected: true, selectedColor: theme.colors.drag, selectedTextColor: theme.colors.fff },
+  }), [currentDate, markedDates]);
 
   const initialTime = {
     hour: getCurrentTime().getHours(),
@@ -144,7 +126,7 @@ const HomeScreen = () => {
     });
 
     return groupedEvents;
-  }, [filterStatus, currentDate, filterTitle]);
+  }, [filterStatus, currentDate, filterTitle, eventsByDate]);
 
 
   const styles = StyleSheet.create({
@@ -253,20 +235,17 @@ const HomeScreen = () => {
       >
         <View style={{ flex: 1, flexDirection: responsive === "small" ? 'column' : 'row' }}>
           {showCalendar && (
-            <Animated.View
-              entering={FadeIn}
-              exiting={FadeOut}
-            >
+            <Animated.View entering={FadeIn} exiting={FadeOut}>
               <View style={styles.calendarContainer}>
                 <FlatList
                   data={categories}
                   keyExtractor={(item) => item.id}
-                  getItemLayout={(data, index) => ({ length: 40, offset: 40 * index, index })}
+                  getItemLayout={(data, index) => ({ length: 50, offset: 50 * index, index })}
                   renderItem={({ item }) => (
                     <View style={styles.itemContainer}>
                       <Checkbox
                         status={checkedItems?.[item.id] ? 'checked' : 'unchecked'}
-                        onPress={() => runOnJS(toggleCheckbox)(item.id, item.title)}
+                        onPress={() => toggleCheckbox(item.id, item.title)}
                         color={item.color}
                       />
                       <Text style={[masterdataStyles.text, { color: item.color, paddingLeft: 5 }]}>{item.title}</Text>
@@ -275,7 +254,7 @@ const HomeScreen = () => {
                   ListHeaderComponent={() => (
                     <>
                       <Calendar
-                        onDayPress={(day: DateData) => runOnJS(setCurrentDate)(day.dateString)}
+                        onDayPress={(day: DateData) => setCurrentDate(day.dateString)}
                         markedDates={markedDatesS}
                         markingType="multi-dot"
                         style={styles.calendar}
@@ -307,7 +286,7 @@ const HomeScreen = () => {
             <View style={styles.timelineListContainer}>
               <View style={{ flexDirection: 'row' }}>
                 <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginBottom: 10, fontSize: spacing.medium }]}>
-                  {`${currentDate} Time : `} 
+                  {`${currentDate} Time : `}
                 </Text>
                 <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginBottom: 10, fontSize: spacing.medium }]}>
                   {Clock()}
@@ -321,10 +300,18 @@ const HomeScreen = () => {
           </View>
         </View>
 
-        <MemoHome_dialog dialogVisible={dialogVisible} hideDialog={() => setDialogVisible(false)} selectedEvent={selectedEvent} key={`Home_dialog`} />
+        {dialogVisible && (
+          <MemoHome_dialog
+            dialogVisible={dialogVisible}
+            hideDialog={() => setDialogVisible(false)}
+            selectedEvent={selectedEvent}
+            key={`Home_dialog`}
+          />
+        )}
+
       </CalendarProvider>
     </View>
   );
-};
+});
 
 export default HomeScreen;

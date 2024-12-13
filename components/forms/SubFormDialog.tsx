@@ -8,6 +8,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { SubFormDialogProps } from "@/typing/value";
 import { BaseSubForm } from "@/typing/form";
 import Text from "@/components/Text";
+import { useRes } from "@/app/contexts/useRes";
 
 const validationSchemaSubForm = Yup.object().shape({
     SFormName: Yup.string().required("The machine group name field is required."),
@@ -23,6 +24,7 @@ const SubFormDialog = React.memo(({
     onDelete,
 }: SubFormDialogProps<BaseSubForm>) => {
     const masterdataStyles = useMasterdataStyles();
+    const { responsive } = useRes()
 
     const styles = StyleSheet.create({
         actionButton: {
@@ -32,7 +34,7 @@ const SubFormDialog = React.memo(({
     })
     return (
         <Portal>
-            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={masterdataStyles.containerDialog}>
+            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={[masterdataStyles.containerDialog, { width: responsive === "large" ? 550 : '60%', }]}>
                 <Dialog.Title
                     style={[
                         masterdataStyles.text,
@@ -64,16 +66,7 @@ const SubFormDialog = React.memo(({
                                 saveData(values, isEditing ? "update" : "add");
                             }}
                         >
-                            {({
-                                handleChange,
-                                handleBlur,
-                                values,
-                                errors,
-                                touched,
-                                handleSubmit,
-                                isValid,
-                                dirty,
-                            }) => (
+                            {({ handleSubmit, values }) => (
                                 <View id="sfd">
                                     <FastField name="SFormName">
                                         {({ field, form }: any) => (

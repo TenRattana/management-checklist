@@ -9,7 +9,6 @@ import {
 import FieldDialog from "@/components/forms/FieldDialog";
 import { IconButton } from "react-native-paper";
 import { NestableDraggableFlatList, NestableScrollContainer, RenderItemParams, ScaleDecorator, ShadowDecorator } from "react-native-draggable-flatlist";
-import { runOnJS } from "react-native-reanimated";
 import { spacing } from "@/constants/Spacing";
 import useCreateformStyle from "@/styles/createform";
 import { BaseFormState, RowItemProps } from '@/typing/form'
@@ -41,12 +40,12 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
         .filter((checkList): checkList is CheckList => checkList !== undefined);
 
     const handleDropField = (data: Omit<BaseFormState, 'DisplayOrder'>[]) => {
-        runOnJS(dispatch)(setDragField({ data }));
+        dispatch(setDragField({ data }));
     };
 
     const handleDialogToggle = useCallback(() => {
         setIsEditing(false);
-        runOnJS(setDialogVisible)((prev) => !prev);
+        setDialogVisible((prev) => !prev);
     }, []);
 
     const handleField = (item?: BaseFormState) => {
@@ -159,7 +158,7 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
             <MemoFieldDialog
                 isVisible={dialogVisible}
                 formState={currentField}
-                onDeleteField={(SFormID, MCListID) => runOnJS(dispatch)(deleteField({ SFormID, MCListID }))}
+                onDeleteField={(SFormID, MCListID) => dispatch(deleteField({ SFormID, MCListID }))}
                 setShowDialogs={handleDialogToggle}
                 editMode={isEditing}
                 saveField={handleSaveField}
