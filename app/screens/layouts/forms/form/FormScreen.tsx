@@ -9,6 +9,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { FormScreenProps } from "@/typing/tag";
 import { Form } from "@/typing/type";
 import { useQuery, useQueryClient } from 'react-query';
+import debounce from "lodash.debounce";
 
 const fetchForm = async (): Promise<Form[]> => {
     const response = await axiosInstance.post("Form_service.asmx/GetForms");
@@ -17,38 +18,26 @@ const fetchForm = async (): Promise<Form[]> => {
 
 const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
-    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
-    const [show, setShow] = useState<boolean>(false)
+    const [show, setShow] = useState<boolean>(false);
     const { messages } = route.params || {};
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
-    const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
 
-    const { data: form = [], isLoading } = useQuery<Form[], Error>(
-        'form',
-        fetchForm,
-        {
-            refetchOnWindowFocus: true,
-        });
-
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedSearchQuery(searchQuery);
-        }, 300);
-
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [searchQuery]);
+    const { data: form = [], isLoading } = useQuery<Form[], Error>('form', fetchForm);
 
     useEffect(() => {
         if (messages && show) {
             showSuccess(String(messages));
-            setShow(false)
+            setShow(false);
         }
-    }, [messages, show]);
+    }, [messages, show, showSuccess]);
+
+    const debouncedSetSearchQuery = useMemo(
+        () => debounce(setSearchQuery, 300),
+        []
+    );
 
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
@@ -67,18 +56,20 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
         } catch (error) {
             handleError(error);
         }
-    }, [handleError, queryClient]);
+    }, [handleError, queryClient, navigation, showSuccess]);
 
-    const handleNewForm = () => {
+    const handleNewForm = useCallback(() => {
         navigation.navigate("Create_form");
-    };
+    }, [navigation]);
 
     const tableData = useMemo(() => {
         return form.map((item) => [
             item.Disables,
             item.FormName,
             item.Description,
+            !item.Disables ? "Draf" : "Used",
             item.IsActive,
+            item.FormID,
             item.FormID,
             item.FormID,
             item.FormID,
@@ -91,35 +82,19 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
             { label: "", align: "flex-start" },
             { label: "Form Name", align: "flex-start" },
             { label: "Form Description", align: "flex-start" },
+            { label: "Form Status", align: "center" },
             { label: "Status", align: "center" },
             { label: "Change", align: "center" },
             { label: "Copy", align: "center" },
             { label: "View", align: "center" },
+            { label: "Delete", align: "center" },
         ],
-        flexArr: [0, 2, 4, 1, 1, 1, 1],
-        actionIndex: [{ disables: 0, changeIndex: 4, copyIndex: 5, preIndex: 6 }],
+        flexArr: [0, 2, 2, 1, 1, 1, 1, 1, 1],
+        actionIndex: [{ disables: 0, changeIndex: 5, copyIndex: 6, preIndex: 7, delOnlyIndex: 8 }],
         showMessage: 1,
         handleAction,
-        searchQuery: debouncedSearchQuery,
-    }), [tableData, debouncedSearchQuery, handleAction]);
-
-    const styles = StyleSheet.create({
-        container: {
-            flex: 1
-        },
-        header: {
-            fontSize: spacing.large,
-            marginTop: spacing.small,
-            paddingVertical: fontSize === "large" ? 7 : 5
-        },
-        functionname: {
-            textAlign: 'center'
-        },
-        cardcontent: {
-            padding: 2,
-            flex: 1
-        }
-    })
+        searchQuery,
+    }), [tableData, searchQuery, handleAction]);
 
     return (
         <AccessibleView name="container-form" style={styles.container}>
@@ -131,7 +106,7 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
                 <Searchbar
                     placeholder="Search Form..."
                     value={searchQuery}
-                    onChange={setSearchQuery}
+                    onChange={debouncedSetSearchQuery}
                     testId="search-form"
                 />
                 <TouchableOpacity onPress={handleNewForm} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
@@ -143,6 +118,24 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
             </Card.Content>
         </AccessibleView>
     );
+});
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    header: {
+        fontSize: 24,
+        marginTop: 10,
+        paddingVertical: 8,
+    },
+    functionname: {
+        textAlign: 'center',
+    },
+    cardcontent: {
+        padding: 2,
+        flex: 1,
+    },
 });
 
 export default FormScreen;

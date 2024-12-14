@@ -9,37 +9,23 @@ import { Dialog, List, Text } from "react-native-paper";
 const InfoGroup_dialog = ({
     setDialogAdd,
     option,
-    glc
-}: { setDialogAdd: () => void, option: GroupCheckListOption[], glc: string | undefined }) => {
-    const [options, setOptions] = useState<{ label: string; value: string; }[]>([]);
-    const [GCLOptionName, setGCLOptionName] = useState<string | undefined>(undefined);
+}: { setDialogAdd: () => void, option: {
+    label: string;
+    value: string;
+}[] }) => {
     const masterdataStyles = useMasterdataStyles();
     const { spacing } = useRes()
-
-    useEffect(() => {
-        if (option.length > 0 && glc !== undefined) {
-            const filtered = option.find((item: GroupCheckListOption) => item.GCLOptionID === glc);
-            if (filtered) {
-                const filteredOptions = filtered.CheckListOptions?.map((op: CheckListOption) => ({
-                    label: op.CLOptionName,
-                    value: op.CLOptionID,
-                })) || [];
-                setGCLOptionName(filtered.GCLOptionName);
-                setOptions(filteredOptions);
-            }
-        }
-    }, [option, glc]);
-
+    
     return (
         <GestureHandlerRootView style={{ flexGrow: 1 }}>
             <View style={styles.dialog}>
-                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold]}>{GCLOptionName || "Group Checklist Info"}</Dialog.Title>
+                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold]}>{"Group Checklist Info"}</Dialog.Title>
                 <View style={{ marginHorizontal: 10 }}>
-                    {options.length > 0 ? (
-                        options.map((option, index) => (
+                    {option?.length > 0 ? (
+                        option?.map((op, index) => (
                             <List.Item
                                 key={index}
-                                title={option.label}
+                                title={op.label}
                                 style={styles.optionItem}
                                 descriptionStyle={{ fontSize: spacing.small }}
                                 titleStyle={{ fontSize: spacing.small }}

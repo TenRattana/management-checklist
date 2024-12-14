@@ -1,28 +1,34 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Selects, Radios, Textareas, Inputs, Checkboxs } from "@/components/common";
-import { CheckListOption } from '@/typing/type';
 import { DynamicFormProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
 import { Text } from "react-native-paper";
+import useField from "@/hooks/FieldDialog";
 
 const DynamicForm = React.memo(({
   field,
   values,
   handleChange,
   handleBlur,
-  groupCheckListOption,
   error,
   errorMessages,
   type,
-  exp
+  exp,
+  showField
 }: DynamicFormProps) => {
-  const { CTypeName, CListName, MCListID, GCLOptionID, Required, Important, ImportantList } = field;
+  const { CTypeName, CListName, MCListID, GCLOptionID, Required, Important, ImportantList, SFormID } = field;
   const masterdataStyles = useMasterdataStyles();
   const { theme } = useTheme()
   const { fontSize } = useRes()
+  const { groupCheckListOption, queryClient } = useField();
+
+  useEffect(() => {
+    queryClient.invalidateQueries("checkList");
+    queryClient.invalidateQueries("groupCheckListOption");
+  }, []);
 
   const [textColor, setTextColor] = useState(theme.colors.onBackground);
   const [messageminOrmax, setMessageMinOrMax] = useState("");
@@ -55,10 +61,12 @@ const DynamicForm = React.memo(({
   const option = useMemo(() =>
     groupCheckListOption
       .filter(option => option.GCLOptionID === GCLOptionID)
-      .flatMap(v => v.CheckListOptions?.map((item: CheckListOption) => ({
-        label: item.CLOptionName,
-        value: item.CLOptionID,
-      })) || []),
+      .flatMap(option => option.CheckListOptions?.filter(item => item.IsActive)
+        .map(item => ({
+          label: item.CLOptionName,
+          value: item.CLOptionID,
+        })) || []
+      ),
     [groupCheckListOption, GCLOptionID]
   );
 
@@ -155,7 +163,7 @@ const DynamicForm = React.memo(({
 
   return (
     <View id="form-layout2">
-      <TouchableOpacity onPress={() => console.log(MCListID)}>
+      <TouchableOpacity onPress={() => showField && showField(String(MCListID), String(SFormID))}>
         <Text
           variant="bodyMedium"
           style={[masterdataStyles.text, CTypeName === "Text" ? styles.text : undefined, { color: exp && (messageminOrmax || isValidImportantList) ? theme.colors.error : theme.colors.onBackground }]}

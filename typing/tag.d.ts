@@ -96,11 +96,12 @@ export interface DynamicFormProps {
   values: any;
   handleChange: (fieldName: string, value: any) => void;
   handleBlur?: () => void;
-  groupCheckListOption: GroupCheckListOption[];
+  // groupCheckListOption: GroupCheckListOption[];
   error?: boolean;
   errorMessages?: FormikErrors<{ [key: string]: any }>;
   type?: string;
   exp?: boolean;
+  showField?: (value: string , value: string) => void;
 }
 
 export interface PreviewProps<T extends PreviewParams | ScanParams> {
@@ -146,33 +147,28 @@ export interface CustomTableProps {
   showData?: TypeConfig[];
   showColumn?: string;
   detail?: boolean;
-  detailKey?:string;
-  showDetailwithKey?:string[];
-  detailKeyrow?:number;
+  detailKey?: string;
+  showDetailwithKey?: string[];
+  detailKeyrow?: number;
   detailData?: TypeConfig[];
-  ShowTitle?:string;
+  ShowTitle?: string;
 }
 
 export interface DragfieldProps {
   data: BaseFormState[];
   SFormID: string;
   dispatch: any;
-  checkList: Checklist[];
-  dataType: DataType[];
-  checkListType: CheckListType[];
-  groupCheckListOption: GroupCheckListOption[];
   checkListOption: CheckListOption[];
+  checkListType: checkListTypes[];
+  index?:string;
 }
 
 export interface DragsubformProps {
   state: Form;
   dispatch: (action: AppActions) => void;
-  checkList: Checklist[];
-  dataType: DataType[];
-  checkListType: CheckListType[];
-  groupCheckListOption: GroupCheckListOption[];
   checkListOption: CheckListOption[];
-  navigation: NavigationProp<any>;
+  checkListType: checkListTypes[];
+  index?:string;
 }
 // validationSchema: Yup.ObjectSchema<{[x: string]: any;},Yup.AnyObject,{[x: string]: any;},"" >;
 
@@ -199,13 +195,6 @@ export interface FieldDialogProps {
   onDeleteField: (SFormID: string, MCListID: string) => void;
   setShowDialogs: () => void;
   editMode: boolean;
-  saveField: (values: BaseFormState, mode: string) => void;
-  checkListType: CheckList[];
-  dataType: DataType[];
-  dropcheckList: Checklist[];
-  dropcheckListType: CheckList[];
-  dropdataType: DataType[];
-  dropgroupCheckListOption: GroupCheckListOption[];
   checkListOption: CheckListOption[];
 }
 
@@ -246,10 +235,10 @@ export interface CustomtableSmallProps {
   showColumn?: string;
   handleDialog: (action?: string, data?: string) => void;
   toggleSelect: (value: string) => void;
-   detail?: boolean;
-  detailKey?:string;
-  detailKeyrow?:number;
-  showDetailwithKey?:string[];
+  detail?: boolean;
+  detailKey?: string;
+  detailKeyrow?: number;
+  showDetailwithKey?: string[];
   detailData?: TypeConfig[];
 }
 
@@ -263,8 +252,8 @@ export interface CustomtableDataProps {
   selectedRows?: string[];
   toggleSelect: (value: string) => void;
   detail?: boolean;
-  detailKey?:string;
-  detailKeyrow?:number;
-  showDetailwithKey?:string[];
+  detailKey?: string;
+  detailKeyrow?: number;
+  showDetailwithKey?: string[];
   detailData?: TypeConfig[];
 }

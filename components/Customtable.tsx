@@ -7,10 +7,12 @@ import CustomtableData from "./table/CustomtableData";
 import { CustomTableProps } from '@/typing/tag';
 
 const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, actionIndex, searchQuery, showMessage, selectedRows, setRow, showFilter, showData, showColumn, detail, detailData, detailKey, detailKeyrow, showDetailwithKey, ShowTitle }: CustomTableProps) => {
-  const [sortColumn, setSortColumn] = useState<number | null>(null);
-  const [sortDirection, setSortDirection] = useState<"ascending" | "descending" | undefined>(undefined);
   const [displayData, setDisplayData] = useState<(string | number | boolean)[][]>([]);
   const [filter, setFilter] = useState<string | null>(null);
+  const [sortConfig, setSortConfig] = useState<{ column: number | null; direction: "ascending" | "descending" | undefined }>({
+    column: null,
+    direction: undefined,
+  });
 
   const toggleSelectAll = useCallback(() => {
     if (selectedRows && setRow) {
@@ -39,37 +41,30 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
   const { responsive } = useRes();
 
   const handleSort = useCallback((columnIndex: number) => {
-    setSortColumn((prev) => (prev === columnIndex && sortDirection === "descending" ? null : columnIndex));
-    setSortDirection((prev) =>
-      prev === 'ascending' ? 'descending' : prev === "descending" ? undefined : prev === undefined ? 'ascending' : undefined
-    );
-
-  }, [sortDirection, sortColumn]);
+    setSortConfig((prev) => ({
+      column: prev?.column === columnIndex && prev.direction === "descending" ? null : columnIndex,
+      direction: prev?.direction === "ascending" ? "descending" : prev?.direction === "descending" ? undefined : "ascending",
+    }));
+  }, []);
 
   const sortedData = useMemo(() => {
-    if (sortColumn === null) return Tabledata;
-
+    if (!sortConfig.column) return Tabledata;
+  
     return [...Tabledata].sort((a, b) => {
-      const aValue = a[sortColumn];
-      const bValue = b[sortColumn];
-
+      const aValue = a[sortConfig.column!];
+      const bValue = b[sortConfig.column!];
+  
       if (typeof aValue === "string" && typeof bValue === "string") {
-        return sortDirection === "ascending" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+        return sortConfig.direction === "ascending" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
       }
-      return sortDirection === "ascending" ? (aValue < bValue ? -1 : 1) : (aValue > bValue ? -1 : 1);
+      return sortConfig.direction === "ascending" ? (aValue < bValue ? -1 : 1) : (aValue > bValue ? -1 : 1);
     });
-  }, [Tabledata, sortColumn, sortDirection]);
-
+  }, [Tabledata, sortConfig]);
+  
   const filteredData = useMemo(() => {
-    let data = sortedData.filter((row) =>
-      row.some((cell) => cell.toString().toLowerCase().includes(searchQuery.toLowerCase()))
-    );
-
-    if (filter) {
-      data = data.filter((row) => row.includes(filter));
-    }
-
-    return data;
+    return sortedData.filter((row) =>
+      row.some((cell) => cell?.toString().toLowerCase().includes(searchQuery.toLowerCase()))
+    ).filter((row) => (filter ? row.includes(filter) : true));
   }, [sortedData, searchQuery, filter]);
 
   useEffect(() => {
@@ -115,8 +110,8 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
             Tablehead={Tablehead}
             flexArr={flexArr}
             handleSort={handleSort}
-            sortColumn={sortColumn}
-            sortDirection={sortDirection}
+            sortColumn={sortConfig.column}
+            sortDirection={sortConfig.direction}
             selectedRows={selectedRows}
             toggleSelectAll={toggleSelectAll}
             displayData={displayData}

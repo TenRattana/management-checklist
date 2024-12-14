@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { TouchableOpacity } from "react-native";
 import {
     setDragSubForm,
@@ -26,7 +26,7 @@ import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
 import useMasterdataStyles from "@/styles/common/masterdata";
 
-const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, dataType, checkListType, groupCheckListOption, checkList, navigation, checkListOption }) => {
+const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, checkListOption, checkListType }) => {
     const [initialDialog, setInitialDialog] = useState<boolean>(false)
     const [initialSubForm, setInitialSubForm] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", MachineID: "", Fields: [] });
     const [editMode, setEditMode] = useState<boolean>(false)
@@ -99,11 +99,8 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, d
                         data={item.Fields ?? []}
                         SFormID={item.SFormID}
                         dispatch={dispatch}
-                        checkList={checkList}
-                        dataType={dataType}
-                        checkListType={checkListType}
-                        groupCheckListOption={groupCheckListOption}
                         checkListOption={checkListOption}
+                        checkListType={checkListType}
                     />
                 </AccessibleView>
             </>

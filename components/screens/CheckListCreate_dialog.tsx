@@ -1,5 +1,5 @@
 import { View } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { InitialValuesChecklist } from '@/typing/value'
 import { Switch } from 'react-native-paper'
 import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler'
@@ -16,16 +16,23 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The active field is required."),
 });
 
-const CheckListCreate_dialog = React.memo(({ setIsVisible, initialValues, saveData }: { setIsVisible: () => void, initialValues: InitialValuesChecklist, saveData: any }) => {
+const CheckListCreate_dialog = React.memo(({ setIsVisible, saveData }: { setIsVisible: () => void,  saveData: any }) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
+
+    const [initialCheckList] = useState({
+        checkListId: "",
+        checkListName: "",
+        isActive: true,
+        disables: false,
+    });
 
     return (
         <GestureHandlerRootView style={{ flexGrow: 1 }}>
             <Text>Create Check List</Text>
 
             <Formik
-                initialValues={initialValues}
+                initialValues={initialCheckList}
                 validationSchema={validationSchema}
                 validateOnBlur={true}
                 validateOnChange={false}

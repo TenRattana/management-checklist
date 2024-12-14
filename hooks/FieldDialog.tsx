@@ -1,63 +1,49 @@
-import { useState, useCallback, useMemo } from "react";
-import { useSelector } from "react-redux";
-import axiosInstance from "@/config/axios";
-import { useToast } from "@/app/contexts/useToast";
-import { useFocusEffect } from "@react-navigation/native";
-import { CheckList, Checklist, CheckListType, DataType, GroupCheckListOption } from "@/typing/type";
+import { useMemo, useCallback, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useToast } from "@/app/contexts/useToast";
+import { AppDispatch } from "@/stores";
+import { addField, updateField } from "@/slices";
+import * as Yup from "yup";
+import { fetchCheckList, fetchCheckListType, fetchDataType, fetchGroupCheckList, saveCheckList, saveGroupCheckListOption, saveCheckListOption } from "@/app/services";
 import { InitialValuesChecklist, InitialValuesGroupCheckList } from "@/typing/value";
-import * as Yup from 'yup'
+import { CheckList } from "@/typing/type";
 
-const saveCheckList = async (data: {
-    Prefix: any;
-    CListID: string;
-    CListName: string;
-    IsActive: boolean;
-    Disables: boolean;
-}): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("CheckList_service.asmx/SaveCheckList", data);
-    return response.data;
-};
-
-const saveCheckListOption = async (data: {
-    Prefix: any;
-    CLOptionID: string;
-    CLOptionName: string;
-    IsActive: boolean;
-    Disables: boolean;
-}): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("CheckListOption_service.asmx/SaveCheckListOption", data);
-    return response.data;
-};
-
-const saveGroupCheckListOption = async (data: {
-    Prefix: any;
-    PrefixMatch: any,
-    GCLOptionID: string;
-    GCLOptionName: string;
-    IsActive: boolean;
-    Disables: boolean;
-    Options: string
-}): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("GroupCheckListOption_service.asmx/SaveGroupCheckListAndOptionMatch", data);
-    return response.data;
-};
-
-const fetchCheckList = async (): Promise<Checklist[]> => {
-    const response = await axiosInstance.post("CheckList_service.asmx/GetCheckLists");
-    return response.data.data ?? [];
-};
-
-const fetchGroupCheckList = async (): Promise<GroupCheckListOption[]> => {
-    const response = await axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions");
-    return response.data.data ?? [];
-};
-
-const useField = (checkListType?: CheckList[], dataType?: DataType[]) => {
+const useField = () => {
+    const dispatch = useDispatch<AppDispatch>();
+    const queryClient = useQueryClient();
     const { handleError, showSuccess } = useToast();
     const state = useSelector((state: any) => state.prefix);
-    const queryClient = useQueryClient();
+    
+    const { data: checkList = [] } = useQuery("checkList", fetchCheckList, {
+        staleTime: 1000 * 60 * 24,
+        cacheTime: 1000 * 60 * 25,
+    });
 
+    const { data: groupCheckListOption = [] } = useQuery("groupCheckListOption", fetchGroupCheckList, {
+        staleTime: 1000 * 60 * 24,
+        cacheTime: 1000 * 60 * 25,
+    });
+
+    const { data: checkListType = [] } = useQuery("checkListType", fetchCheckListType, {
+        staleTime: 1000 * 60 * 24,
+        cacheTime: 1000 * 60 * 25,
+    });
+
+    const { data: dataType = [] } = useQuery("dataType", fetchDataType, {
+        staleTime: 1000 * 60 * 24,
+        cacheTime: 1000 * 60 * 25,
+    });
+
+    const checkListTypes = useMemo(
+        () =>
+            checkListType
+                .filter(group => group.CheckList)
+                .flatMap(group => group.CheckList)
+                .filter((checkList): checkList is CheckList => checkList !== undefined),
+        [checkListType]
+    );
+        
     const validationSchema = useMemo(() => {
         return Yup.object().shape({
             CListID: Yup.string().required("The checklist field is required."),
@@ -65,7 +51,7 @@ const useField = (checkListType?: CheckList[], dataType?: DataType[]) => {
             Required: Yup.boolean().required("The required field is required."),
             Important: Yup.boolean().required("The important field is required."),
             DTypeID: Yup.lazy((value, context) => {
-                const CTypeID = checkListType?.find(v => v.CTypeID === context.parent.CTypeID)?.CTypeName;
+                const CTypeID = checkListTypes?.find(v => v.CTypeID === context.parent.CTypeID)?.CTypeName;
                 if (CTypeID && ['Textinput'].includes(CTypeID)) {
                     return Yup.string().required("Data Type is required for Text.");
                 }
@@ -80,7 +66,7 @@ const useField = (checkListType?: CheckList[], dataType?: DataType[]) => {
             }),
             Rowcolumn: Yup.number().typeError("The row column must be a number.").nullable(),
             GCLOptionID: Yup.lazy((value, context) => {
-                const CTypeID = checkListType?.find((v) => v.CTypeID === context.context.CTypeID)?.CTypeName;
+                const CTypeID = checkListTypes?.find((v) => v.CTypeID === context.context.CTypeID)?.CTypeName;
                 if (CTypeID && ['Dropdown', 'Checkbox', 'Radio'].includes(CTypeID)) {
                     return Yup.string().required("GCLOptionID is required for Dropdown/Select/Radio.");
                 }
@@ -154,70 +140,10 @@ const useField = (checkListType?: CheckList[], dataType?: DataType[]) => {
         });
     }, [checkListType, dataType]);
 
-    const { data: checkList = [] } = useQuery<Checklist[], Error>(
-        'checkList',
-        fetchCheckList,
-        {
-            refetchOnWindowFocus: false,
-            enabled: true,
-            keepPreviousData: true,
-            staleTime: 1000 * 60 * 5,
-            cacheTime: 1000 * 60 * 10,
-        }
-    );
-
-    const { data: groupCheckListOption = [] } = useQuery<GroupCheckListOption[], Error>(
-        'groupCheckListOption',
-        fetchGroupCheckList,
-        {
-            refetchOnWindowFocus: false,
-            enabled: true,
-            keepPreviousData: true,
-            staleTime: 1000 * 60 * 60,
-            cacheTime: 1000 * 60 * 80,
-        }
-    );
-    useFocusEffect(
-        useCallback(() => {
-            return (() => {
-                setInfo({ GroupCheckList: false })
-                setDialogAdd({ CheckList: false, GroupCheckList: false, CheckListOption: false })
-                setInitialCheckList({ checkListId: "", checkListName: "", isActive: true, disables: false });
-                setInitialGroupCheckList({ groupCheckListOptionId: "", groupCheckListOptionName: "", isActive: true, disables: false });
-            })
-        }, [])
-    )
-
-    const [dialogAdd, setDialogAdd] = useState<{ CheckList: boolean, GroupCheckList: boolean, CheckListOption: boolean }>({ CheckList: false, GroupCheckList: false, CheckListOption: false });
-    const [info, setInfo] = useState<{ GroupCheckList: boolean }>({ GroupCheckList: false })
-
-    const [initialCheckList, setInitialCheckList] = useState<InitialValuesChecklist>({
-        checkListId: "",
-        checkListName: "",
-        isActive: true,
-        disables: false
-    });
-
-    const [initialGroupCheckList, setInitialGroupCheckList] = useState<InitialValuesGroupCheckList>({
-        groupCheckListOptionId: "",
-        groupCheckListOptionName: "",
-        isActive: true,
-        disables: false
-    });
-
-    const handelInfo = useCallback((v: boolean, field: string) => {
-        setInfo((prev) => ({ ...prev, [field]: v }))
-    }, [])
-
-    const handelAdd = useCallback((v: boolean, field: string) => {
-        setDialogAdd((prev) => ({ ...prev, [field]: v }))
-    }, [])
-
     const mutation = useMutation(saveCheckList, {
         onSuccess: (data) => {
             showSuccess(data.message);
-            setDialogAdd((prev) => ({ ...prev, CheckList: false }))
-            queryClient.invalidateQueries('checkList');
+            queryClient.invalidateQueries("checkList");
         },
         onError: handleError,
     });
@@ -225,8 +151,7 @@ const useField = (checkListType?: CheckList[], dataType?: DataType[]) => {
     const mutationG = useMutation(saveGroupCheckListOption, {
         onSuccess: (data) => {
             showSuccess(data.message);
-            setDialogAdd((prev) => ({ ...prev, GroupCheckList: false }))
-            queryClient.invalidateQueries('groupCheckListOption');
+            queryClient.invalidateQueries("groupCheckListOption");
         },
         onError: handleError,
     });
@@ -234,55 +159,79 @@ const useField = (checkListType?: CheckList[], dataType?: DataType[]) => {
     const mutationCL = useMutation(saveCheckListOption, {
         onSuccess: (data) => {
             showSuccess(data.message);
-            setDialogAdd((prev) => ({ ...prev, CheckListOption: false }))
-            queryClient.invalidateQueries('checkListOption');
+            queryClient.invalidateQueries("checkListOption");
         },
         onError: handleError,
     });
 
-    const saveDataCheckList = useCallback(async (values: InitialValuesChecklist) => {
-        const data = {
+    const saveDataCheckList = useCallback((values: InitialValuesChecklist) => {
+        mutation.mutate({
             Prefix: state.CheckList ?? "",
             CListID: "",
             CListName: values.checkListName,
             IsActive: values.isActive,
-            Disables: values.disables
-        };
+            Disables: values.disables,
+        });
+    },
+        [mutation, state.CheckList]
+    );
 
-        mutation.mutate(data);
-    }, [mutation]);
-
-    const saveDataGroupCheckList = useCallback(async (values: InitialValuesGroupCheckList, options: string[]) => {
-
-        const data = {
+    const saveDataGroupCheckList = useCallback((values: InitialValuesGroupCheckList, options: string[]) => {
+        mutationG.mutate({
             Prefix: state.GroupCheckList ?? "",
             PrefixMatch: state.MatchCheckListOption ?? "",
             GCLOptionID: values.groupCheckListOptionId,
             GCLOptionName: values.groupCheckListOptionName,
             IsActive: values.isActive,
             Disables: values.disables,
-            Options: JSON.stringify(options)
-        };
+            Options: JSON.stringify(options),
+        });
+    },
+        [mutationG, state.GroupCheckList, state.MatchCheckListOption]
+    );
 
-        mutationG.mutate(data);
-    }, [mutationG]);
+    const handleSaveField = useCallback((values: any, mode: string) => {
+        const payload = { BaseFormState: values, checkList, checkListType: checkListTypes, dataType };
 
-    return {
-        dialogAdd,
-        saveCheckList,
-        saveCheckListOption,
-        saveDataCheckList,
-        saveDataGroupCheckList,
-        saveGroupCheckListOption,
-        initialCheckList,
-        initialGroupCheckList,
-        info,
-        handelInfo,
-        handelAdd,
-        checkList: checkList.filter(v => v.IsActive),
-        groupCheckListOption: groupCheckListOption,
-        validationSchema
-    };
+        try {
+            if (mode === "add") {
+                dispatch(addField(payload));
+            } else if (mode === "update") {
+                dispatch(updateField(payload));
+            }
+        } catch (error) {
+            handleError(error);
+        }
+    },
+        [dispatch, handleError, checkList, checkListTypes, dataType]
+    );
+
+    return useMemo(
+        () => ({
+            saveDataCheckList,
+            saveDataGroupCheckList,
+            checkList: checkList.filter(v => v.IsActive),
+            groupCheckListOption: groupCheckListOption.filter(v => v.IsActive),
+            checkListType,
+            dataType,
+            checkListTypes,
+            validationSchema,
+            handleSaveField,
+            queryClient
+        }),
+        [
+            saveDataCheckList,
+            saveDataGroupCheckList,
+            checkList,
+            groupCheckListOption,
+            checkListType,
+            dataType,
+            checkListTypes,
+            validationSchema,
+            handleSaveField,
+            queryClient
+        ]
+    );
 };
 
 export default useField;

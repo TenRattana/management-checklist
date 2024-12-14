@@ -119,6 +119,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                         key={screen.MenuID}
                         name={screen.NavigationTo}
                         component={renderComponent(screen.NavigationTo as ComponentNames | ComponentNameNoLazy)}
+                        options={{ freezeOnBlur: true }}
                     />
                 );
             }
@@ -130,7 +131,8 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                             key={parentScreen.MenuID}
                             name={parentScreen.NavigationTo}
                             component={renderComponent(parentScreen.NavigationTo as ComponentNames | ComponentNameNoLazy)}
-                        />
+                            options={{ freezeOnBlur: true }}
+                            />
                     );
                 });
             }
@@ -166,7 +168,6 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                         />
                     ),
                     unmountOnBlur: true,
-                    freezeOnBlur: true,
                 }}
                 initialRouteName={user.initialRoute || "Login"}
                 id="nav"

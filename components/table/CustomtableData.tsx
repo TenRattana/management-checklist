@@ -23,21 +23,29 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
     const customtable = useCustomtableStyles();
     const masterdataStyles = useMasterdataStyles();
     const { theme } = useTheme()
-    const [isVisible, setIsVisible] = useState<boolean>(false);
-    const [dialogAction, setDialogAction] = useState<string>("");
-    const [dialogMessage, setDialogMessage] = useState<string>("");
-    const [dialogTitle, setDialogTitle] = useState<string>("");
-    const [dialogData, setDialogData] = useState<string>("");
-    const [isDetailVisible, setIsDetailVisible] = useState<boolean[]>([])
+    const [dialogState, setDialogState] = useState({
+        isVisible: false,
+        action: "",
+        message: "",
+        title: "",
+        data: "",
+    });
+    const [visibleDetails, setVisibleDetails] = useState<Set<number>>(new Set());
 
     const handlePress = useCallback(({ action, data, message, visible, Change }: HandelPrssProps) => {
-        setDialogAction(action);
-        setDialogData(String(data));
-        setDialogTitle(Change ? Change : action === "editIndex" ? "Edit" : action === "delIndex" ? "Delete" : "");
-        const messages = Array.isArray(showMessage) ? showMessage.map(key => message[key]).join(" ") : message[showMessage];
-        setDialogMessage(String(`${messages}`));
-        setIsVisible((visible || action === "editIndex" || action === "changeIndex" || action === "copyIndex" || action === "preIndex"));
-    }, [setDialogAction, setDialogData, setDialogTitle, setDialogMessage, setIsVisible, showMessage]);
+        const title = Change || (action === "editIndex" ? "Edit" : action === "delIndex" ? "Delete" : "");
+        const messages = Array.isArray(showMessage)
+            ? showMessage.map((key) => message[key]).join(" ")
+            : message[showMessage];
+
+        setDialogState({
+            isVisible: visible || ["editIndex", "changeIndex", "copyIndex", "preIndex"].includes(action),
+            action,
+            message: String(messages),
+            title,
+            data: String(data),
+        });
+    }, [showMessage]);
 
     const findIndex = (row: (string | number | boolean)[]) => {
         return detailData?.findIndex(item => {
@@ -45,10 +53,22 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
         }) ?? -1;
     };
 
+    const toggleDetailVisibility = useCallback((rowIndex: number) => {
+        setVisibleDetails((prev) => {
+            const newSet = new Set(prev);
+            if (newSet.has(rowIndex)) {
+                newSet.delete(rowIndex);
+            } else {
+                newSet.add(rowIndex);
+            }
+            return newSet;
+        });
+    }, []);
+
     const renderTableData = useCallback((row: (string | number | boolean)[], rowIndex: number) => {
         return (
             <View key={`row-${rowIndex}`} style={{ flex: 1 }}>
-                <DataTable.Row onPress={() => detail ? setIsDetailVisible((prev) => ({ ...prev, [findIndex(row)]: !isDetailVisible[findIndex(row)] })) : null} disabled={!detail} key={`data-row-${rowIndex}`} style={{ backgroundColor: theme.colors.background }}>
+                <DataTable.Row onPress={() => detail && toggleDetailVisibility(findIndex(row))} disabled={!detail} style={{ backgroundColor: theme.colors.background }}>
                     {row.map((cell, cellIndex) => {
                         const Align: justifyContent = Tablehead[cellIndex]?.align as justifyContent;
                         const justifyContent = {
@@ -64,7 +84,6 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                                                 return (
                                                     <AccessibleView name={`action-${rowIndex}-${key}-${index}`} key={`action-${rowIndex}-${cellIndex}-${key}`} style={customtable.eventColumn}>
                                                         <Actioncontent
-                                                            key={`action-${rowIndex}-${key}-${index}-editIndex`}
                                                             data={String(row[cellIndex])}
                                                             action={"editIndex"}
                                                             row={row}
@@ -74,7 +93,6 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                                                             selectedRows={selectedRows}
                                                         />
                                                         <Actioncontent
-                                                            key={`action-${rowIndex}-${key}-${index}-delIndex`}
                                                             data={String(row[cellIndex])}
                                                             action={"delIndex"}
                                                             row={row}
@@ -90,7 +108,6 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                                                     <AccessibleView name={`anoter-action-${rowIndex}-${key}-${index}`} key={`action-${rowIndex}-${cellIndex}-${key}`} style={customtable.eventColumn}>
                                                         <Actioncontent
                                                             data={String(row[cellIndex])}
-                                                            key={`anoter-action-${rowIndex}-${key}-${index}-${key}`}
                                                             action={key}
                                                             row={row}
                                                             rowIndex={rowIndex}
@@ -118,9 +135,9 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                     })}
                 </DataTable.Row>
 
-                {isDetailVisible[findIndex(row)] && (
-                    <AccessibleView name="containerdetail" key={`index-${findIndex(row)}`} style={{ padding: 10 }}>
-                        <Animated.View entering={FadeInUp} exiting={FadeOutDown} >
+                {visibleDetails.has(findIndex(row)) && (
+                    <AccessibleView name="containerdetail" style={{ padding: 10 }}>
+                        <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
                             <DetailContent detailData={detailData?.[findIndex(row)] || []} showDetailwithKey={showDetailwithKey} />
                         </Animated.View>
                     </AccessibleView>
@@ -150,13 +167,13 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
             />
 
             <Dialogs
-                isVisible={isVisible}
-                title={dialogTitle}
-                setIsVisible={setIsVisible}
+                isVisible={dialogState.isVisible}
+                title={dialogState.title}
+                setIsVisible={() => setDialogState((prev) => ({...prev , isVisible: false}))}
                 handleDialog={handleDialog}
-                actions={dialogAction}
-                messages={dialogMessage}
-                data={dialogData}
+                actions={dialogState.action}
+                messages={dialogState.message}
+                data={dialogState.data}
                 key={`dialog-datatable`}
             />
         </>

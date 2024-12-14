@@ -1,5 +1,5 @@
 import React, { useEffect, useState, forwardRef, useMemo, useRef } from "react";
-import { View, ViewStyle, FlatList } from "react-native";
+import { View, ViewStyle, FlatList, TouchableOpacity } from "react-native";
 import { Card, Divider } from "react-native-paper";
 import { useRes } from "@/app/contexts/useRes";
 import { useTheme } from "@/app/contexts/useTheme";
@@ -11,7 +11,6 @@ import { DataType } from "@/typing/type";
 import { useSelector } from "react-redux";
 import useForm from "@/hooks/custom/useForm";
 import * as Yup from 'yup';
-import { Stack } from "expo-router";
 
 interface FormValues {
     [key: string]: any;
@@ -19,7 +18,7 @@ interface FormValues {
 
 const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
     const { route } = props;
-    const { groupCheckListOption, dataType, exp } = useForm(route);
+    const { dataType, exp } = useForm(route);
 
     const state = useSelector((state: any) => state.form);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -73,8 +72,18 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
         }
     }, [state]);
 
+    const HeaderLeftComponent = ({ navigation }: any) => (
+        <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{ paddingHorizontal: 10 }}
+        >
+            <Text style={{ color: 'blue' }}>Back</Text>
+        </TouchableOpacity>
+    );
+
     return (
         <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]}>
+            
             <FlatList
                 data={[{}]}
                 renderItem={() => state.subForms.map((subForm: BaseSubForm, index: number) => (
@@ -83,7 +92,7 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
                         validationSchema={validationSchema}
                         validateOnBlur={true}
                         validateOnChange={false}
-                        onSubmit={(value) => console.log(value)}
+                        onSubmit={(value) => { }}
                         enableReinitialize={true}
                         key={exp ? `Form-Expected-${subForm.SFormID}-${subForm.Columns}` : `Form-Preview-${subForm.SFormID}-${subForm.Columns}`}
                     >
@@ -154,7 +163,6 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
                                                                     values={String(fastFieldProps.value ?? "")}
                                                                     handleChange={handleChange}
                                                                     handleBlur={handleBlur}
-                                                                    groupCheckListOption={groupCheckListOption ?? []}
                                                                     error={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
                                                                     errorMessages={errors}
                                                                     exp={exp}

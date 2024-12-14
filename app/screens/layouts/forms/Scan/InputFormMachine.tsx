@@ -15,6 +15,7 @@ import useForm from "@/hooks/custom/useForm";
 import { DataType } from "@/typing/type";
 import { useSelector } from "react-redux";
 import * as Yup from 'yup';
+import { Stack } from "expo-router";
 
 interface FormValues {
   [key: string]: any;
@@ -22,7 +23,7 @@ interface FormValues {
 
 const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) => {
   const { route } = props;
-  const { groupCheckListOption, dataType, found } = useForm(route);
+  const { dataType, found } = useForm(route);
 
   const state = useSelector((state: any) => state.form);
   const user = useSelector((state: any) => state.user)
@@ -102,8 +103,29 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
     }
   }, [showSuccess, handleError, state.subForms, state.MachineID, user]);
 
+  const HeaderLeftComponent = ({ navigation }: any) => (
+    <TouchableOpacity
+      onPress={() => navigation.goBack()}
+      style={{ paddingHorizontal: 10 }}
+    >
+      <Text style={{ color: 'blue' }}>Back</Text>
+    </TouchableOpacity>
+  );
+
   return found ? (
     <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]}>
+      <Stack.Screen
+        options={{
+          headerLeft: () => (
+            <View style={{ alignItems: 'center', justifyContent: 'center', paddingRight: 20 }}>
+              <Text style={[{ fontSize: 14, fontWeight: 'bold' }]}>
+                {state.MachineName || "Machine Name"}
+              </Text>
+            </View>
+          )
+        }}
+      />
+
       {!isSubmitted ? (
         <Formik
           initialValues={formValues}
@@ -163,7 +185,6 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
                                 values={String(values[fieldName] ?? "")}
                                 handleChange={handleChange}
                                 handleBlur={handleBlur}
-                                groupCheckListOption={groupCheckListOption ?? []}
                                 error={Boolean(touched[fieldName] && errors[fieldName])}
                                 errorMessages={errors}
                                 type={type}

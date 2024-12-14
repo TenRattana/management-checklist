@@ -5,7 +5,7 @@ import { Divider, Icon } from "react-native-paper";
 import useCreateformStyle from "@/styles/createform";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import useForm from "@/hooks/custom/useForm";
-import { AccessibleView, ConfigItemForm, SaveDialog, Text } from "@/components";
+import { AccessibleView, ConfigItemForm, FieldDialog, SaveDialog, Text } from "@/components";
 import Dragsubform from "./Dragsubform";
 import Preview from "@/app/screens/layouts/forms/create/ShowForm";
 import { CreateFormProps } from "@/typing/tag";
@@ -13,7 +13,7 @@ import { BaseFormState, BaseSubForm } from "@/typing/form";
 import { CheckList, Checklist, CheckListType, DataType, GroupCheckListOption } from "@/typing/type";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
-import { addSubForm, defaultDataForm } from "@/slices";
+import { addSubForm, defaultDataForm, deleteField } from "@/slices";
 import DraggableItem from "./DraggableItem";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/stores";
@@ -24,12 +24,13 @@ import Animated, {
     withTiming,
     runOnJS,
 } from 'react-native-reanimated';
+import Create from "./Create";
 
 const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigation }) => {
     const { responsive, fontSize, spacing } = useRes();
     const { width } = useWindowDimensions();
-
     const DRAWER_WIDTH = responsive === "small" ? width : fontSize === "large" ? 430 : 370;
+    const [dialogVisible, setDialogVisible] = useState<boolean>(false);
 
     const translateX = useSharedValue(-DRAWER_WIDTH);
     const mainTranslateX = useSharedValue(0);
@@ -37,11 +38,18 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
     const [drawerContent, setDrawerContent] = useState(null);
     const [initialSaveDialog, setInitialSaveDialog] = useState(false);
 
-    const handleSaveDialog = useCallback(() => {
-        setInitialSaveDialog(false);
-    }, []);
+    const { isLoading, checkListOption, checkList, groupCheckListOption, checkListType, dataType } = useForm(route);
+    const styles = Create(width, drawerOpen)
 
-    const { checkList, groupCheckListOption, checkListType, dataType, isLoading, checkListOption } = useForm(route);
+    const checkListTypes = useMemo(
+        () =>
+            checkListType
+                .filter(group => group.CheckList)
+                .flatMap(group => group.CheckList)
+                .filter((checkList): checkList is CheckList => checkList !== undefined),
+        [checkListType]
+    );
+
     const dispatch = useDispatch<AppDispatch>();
     const state = useSelector((state: any) => state.form);
     const [edit, setEdit] = useState<{ [key: string]: boolean }>({
@@ -71,22 +79,31 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
         transform: [{ translateX: mainTranslateX.value }],
     }));
 
-    const validationSchema = useMemo(() => {
+    const validationSchemaShow = useMemo(() => {
         const shape: Record<string, any> = {};
         state.subForms.forEach((subForm: BaseSubForm) => {
             subForm.Fields.forEach((field: BaseFormState) => {
                 const dataTypeName = dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName;
                 let validator;
+
                 if (dataTypeName === "Number") {
                     validator = Yup.number()
                         .nullable()
                         .typeError(`The ${field.CListName} field must be a valid number`);
+                } else if (field.CTypeName === "Checkbox") {
+                    validator = Yup.array()
+                        .of(Yup.string().required("Each selected option is required."))
                 } else {
                     validator = Yup.string()
                         .nullable()
                         .typeError(`The ${field.CListName} field must be a valid string`);
                 }
                 if (field.Required) validator = validator.required(`The ${field.CListName} field is required`);
+
+                if (field.Required && field.CTypeName === "Checkbox") {
+                    validator = validator.min(1, "You must select at least one option.").required("Important value is required when marked as important.");
+                }
+
                 shape[field.MCListID] = validator;
             });
         });
@@ -147,76 +164,33 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
     const MemoDraggableItem = React.memo(DraggableItem)
     const MemoSaveDialog = React.memo(SaveDialog)
 
-    const styles = StyleSheet.create({
-        container: {
-            flex: 1,
-        },
-        content: {
-            flex: 1,
-            backgroundColor: theme.colors.background,
-            borderLeftWidth: 1,
-            borderColor: '#eaeaea',
-            width: drawerOpen ? width - DRAWER_WIDTH : width,
-            display: responsive === "small" && drawerOpen ? 'none' : 'flex',
-        },
-        buttonContainer: {
-            flexDirection: 'row',
-            position: 'absolute',
-            top: 20,
-            left: 20,
-            zIndex: 6
-        },
-        openButton: {
-            backgroundColor: theme.colors.drag,
-            alignItems: 'center',
-            flexDirection: 'row',
-            padding: 10,
-            borderRadius: 5,
-            marginRight: 10,
-        },
-        openButtonActive: {
-            backgroundColor: theme.colors.error,
-            alignItems: 'center',
-            flexDirection: 'row',
-            padding: 10,
-            borderRadius: 5,
-            marginRight: 10,
-        },
-        drawer: {
-            position: 'absolute',
-            top: 0,
-            bottom: 0,
-            left: 0,
-            width: DRAWER_WIDTH,
-        },
-        groupContainer: {
-            marginVertical: 20,
-            paddingBottom: 10,
-        },
-        groupTitle: {
-            fontSize: 18,
-            fontWeight: 'bold',
-            marginBottom: 10,
-            textAlign: 'center',
-        },
-        fieldList: {
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'flex-start',
-        },
-        fieldContainer: {
-            marginHorizontal: 10,
-            flex: 1,
-        },
-        iconButton: {
-            marginBottom: 5,
-        },
-        fieldTitle: {
-            textAlign: 'center',
-            color: 'black',
-            fontSize: 12,
-        },
+    const [currentField, setCurrentField] = useState<BaseFormState>({
+        MCListID: "", CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: "",
+        Required: false, Important: false, ImportantList: [], EResult: "", CListName: "", DTypeValue: undefined,
     });
+
+    const handleSaveDialog = useCallback(() => {
+        setInitialSaveDialog(false);
+        handleDialogToggle()
+    }, []);
+
+
+    const showField = useCallback(async (mclo: string, sform: string) => {
+        if (mclo) {
+            const data = await state.subForms
+                ?.find((v: BaseSubForm) => v.SFormID === sform)
+                ?.Fields?.find((v: BaseFormState) => String(v.MCListID) === mclo);
+
+            setCurrentField(data)
+            handleDialogToggle()
+        }
+    }, [state])
+
+    const handleDialogToggle = useCallback(() => {
+        setDialogVisible((prev) => !prev);
+    }, []);
+
+    const MemoFieldDialog = React.memo(FieldDialog)
 
     return (
         <GestureHandlerRootView style={[createform.container, { flex: 1 }]}>
@@ -249,9 +223,9 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                         <Preview
                             route={route}
                             ref={childRef}
-                            validationSchema={validationSchema}
-                            groupCheckListOption={groupCheckListOption}
+                            validationSchema={validationSchemaShow}
                             dataType={dataType}
+                            showField={showField}
                             isLoading={isLoading}
                         />
                     </AccessibleView>
@@ -272,14 +246,10 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                                 )}
 
                                 <MemoDragsubform
-                                    navigation={navigation}
                                     state={state}
                                     dispatch={dispatch}
-                                    checkList={checkList ?? []}
-                                    dataType={dataType ?? []}
-                                    checkListType={checkListType ?? []}
-                                    groupCheckListOption={groupCheckListOption ?? []}
                                     checkListOption={checkListOption}
+                                    checkListType={checkListTypes}
                                 />
                             </>
                         )}
@@ -341,12 +311,26 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                 )}
             </AccessibleView>
 
-            <MemoSaveDialog
-                state={state}
-                isVisible={initialSaveDialog}
-                setIsVisible={handleSaveDialog}
-                navigation={navigation}
-            />
+            {dialogVisible && (
+                <MemoFieldDialog
+                    isVisible={dialogVisible}
+                    formState={currentField}
+                    onDeleteField={(SFormID, MCListID) => dispatch(deleteField({ SFormID, MCListID }))}
+                    setShowDialogs={handleDialogToggle}
+                    editMode={true}
+                    checkListOption={checkListOption}
+                />
+            )}
+
+            {initialSaveDialog && (
+                <MemoSaveDialog
+                    state={state}
+                    isVisible={initialSaveDialog}
+                    setIsVisible={handleSaveDialog}
+                    navigation={navigation}
+                />
+            )}
+
         </GestureHandlerRootView>
     );
 });

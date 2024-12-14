@@ -52,17 +52,11 @@ const MatchCheckListOptionScreen = React.memo(() => {
 
     const { data: checkListOption = [] } = useQuery<CheckListOption[], Error>(
         'checkListOption',
-        fetchCheckListOptions,
-        {
-            refetchOnWindowFocus: true,
-        });
+        fetchCheckListOptions);
 
     const { data: groupCheckListOption = [] } = useQuery<GroupCheckListOption[], Error>(
         'groupCheckListOption',
-        fetchGroupCheckListOptions,
-        {
-            refetchOnWindowFocus: true,
-        });
+        fetchGroupCheckListOptions);
 
     const { data: matchCheckListOption = [], isLoading } = useQuery<MatchCheckListOption[], Error>(
         'matchCheckListOption',
