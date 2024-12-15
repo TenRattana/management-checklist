@@ -55,3 +55,8 @@ export const fetchDataType = async (): Promise<DataType[]> => {
     const response = await axiosInstance.post("DataType_service.asmx/GetDataTypes");
     return response.data.data ?? [];
 };
+
+export const fetchTimeSchedules = async () => {
+    const response = await axiosInstance.post("TimeSchedule_service.asmx/GetSchedules");
+    return response.data.data ?? [];
+  };

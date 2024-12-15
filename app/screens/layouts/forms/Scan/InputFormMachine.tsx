@@ -133,6 +133,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
           validateOnBlur={true}
           validateOnChange={false}
           onSubmit={onFormSubmit}
+          enableReinitialize={true}
         >
           {({ errors, touched, setFieldValue, setTouched, values, dirty, isValid, handleSubmit }) => (
             <>

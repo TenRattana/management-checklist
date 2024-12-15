@@ -1,97 +1,39 @@
-
-import { getCurrentTime } from '@/config/timezoneUtils'
+import { getCurrentTime } from '@/config/timezoneUtils';
 import {
     CalendarUtils,
     TimelineEventProps,
 } from 'react-native-calendars';
-import moment from "moment";
+import moment from 'moment';
 import { CustomLightTheme } from '@/constants/CustomColor';
 
-export const getDate = (offset = 0) => CalendarUtils.getCalendarDateString(getCurrentTime().setDate(getCurrentTime().getDate() + offset));
+type ScheduleType = 'Daily' | 'Weekly' | 'Custom';
+
+type Day = {
+    start: string | null;
+    end: string | null;
+};
 
 export interface TimeScheduleProps {
     ScheduleID: string;
     ScheduleName: string;
     MachineGroup?: string | string[];
-    Type_schedule: string;
+    Type_schedule: ScheduleType;
     Tracking: boolean;
     IsActive: boolean;
     Custom: boolean;
     TimeSlots?: Day[];
     TimeCustom?: Day[];
-    TimeWeek?: { [key: string]: Day[] };
+    TimeWeek?: Record<string, Day[]>;
 }
 
-export interface Day {
-    start: string | null;
-    end: string | null;
-}
-
-export const parseTimeScheduleToTimeline = (schedules: TimeScheduleProps[]): TimelineItem[] => {
-    const timeline: TimelineItem[] = [];
-
-    schedules?.forEach((schedule) => {
-        const { ScheduleID, ScheduleName, Type_schedule, TimeSlots, TimeCustom, TimeWeek, IsActive } = schedule;
-
-        if (Type_schedule === "Daily" && Array.isArray(TimeSlots)) {
-            TimeSlots?.forEach((slot) => {
-                if (slot.start && slot.end) {
-                    timeline.push({
-                        ScheduleID: ScheduleID,
-                        date: "Recurring Daily",
-                        name: ScheduleName,
-                        time: `${slot.start} - ${slot.end}`,
-                        status: IsActive
-                    });
-                }
-            });
-        }
-
-        if (Type_schedule === "Weekly" && TimeWeek && typeof TimeWeek === 'object') {
-            Object.entries(TimeWeek)?.forEach(([day, slots]) => {
-                if (Array.isArray(slots)) {
-                    slots?.forEach((slot) => {
-                        if (slot.start && slot.end) {
-                            timeline.push({
-                                ScheduleID: ScheduleID,
-                                date: `Weekly (${day})`,
-                                name: ScheduleName,
-                                time: `${slot.start} - ${slot.end}`,
-                                status: IsActive
-                            });
-                        }
-                    });
-                }
-            });
-        }
-
-        if (Type_schedule === "Custom" && Array.isArray(TimeCustom)) {
-            TimeCustom?.forEach((customSlot) => {
-                if (customSlot.start && customSlot.end) {
-                    const [startDate, startTime] = customSlot.start.split(" ");
-                    const [, endTime] = customSlot.end.split(" ");
-                    timeline.push({
-                        ScheduleID: ScheduleID,
-                        date: `Custom (${startDate})`,
-                        name: ScheduleName,
-                        time: `${startTime} - ${endTime}`,
-                        status: IsActive
-                    });
-                }
-            });
-        }
-    });
-
-    return timeline;
-};
-
-export type TimelineItem = {
+export interface TimelineItem {
     ScheduleID: string;
     date: string;
     name: string;
     time: string;
     status: boolean;
-};
+}
+
 export interface Tracking {
     ScheduleID: string;
     Tracking: boolean;
@@ -103,238 +45,250 @@ export interface TimeLine extends TimelineEventProps {
     ScheduleID: string;
     status: boolean;
     type?: string;
-    info?: TimeScheduleProps
-    Tracking?: Tracking[],
+    info?: TimeScheduleProps;
+    Tracking?: Tracking[];
     statustype: string;
 }
 
-interface MarkedDates {
-    [date: string]: { dots: DOT[] };
-}
+type MarkedDates = Record<string, { dots: DOT[] }>;
 
-interface DOT {
+type DOT = {
     color: string;
     selectedDotColor: string;
-    type?: string; // Optional type property
-}
+    type?: ScheduleType;
+};
 
-/**
- * Converts a schedule into timeline items, including recurring weekly and daily events.
- * @param {Array} schedule - Array of schedule items.
- * @returns {Array} Timeline items with recurring events and markedDates.
- */
+const optimizeMoment = (date: moment.Moment, time: string): string => {
+    const [hour, minute] = time.split(':').map(Number);
+    return date.clone().set({ hour, minute, second: 0, millisecond: 0 }).toISOString();
+};
+
+export const parseTimeScheduleToTimeline = (schedules: TimeScheduleProps[]): TimelineItem[] => {
+    const timeline: TimelineItem[] = [];
+
+    schedules?.forEach((schedule) => {
+        const { ScheduleID, ScheduleName, Type_schedule, TimeSlots, TimeCustom, TimeWeek, IsActive } = schedule;
+
+        if (Type_schedule === "Daily" && Array.isArray(TimeSlots)) {
+            const dailySlots = TimeSlots.filter(slot => slot.start && slot.end);
+            dailySlots.forEach((slot) => {
+                timeline.push({
+                    ScheduleID,
+                    date: "Recurring Daily",
+                    name: ScheduleName,
+                    time: `${slot.start} - ${slot.end}`,
+                    status: IsActive
+                });
+            });
+        }
+
+        if (Type_schedule === "Weekly" && TimeWeek && typeof TimeWeek === 'object') {
+            Object.entries(TimeWeek).forEach(([day, slots]) => {
+                if (Array.isArray(slots)) {
+                    const weeklySlots = slots.filter(slot => slot.start && slot.end);
+                    weeklySlots.forEach((slot) => {
+                        timeline.push({
+                            ScheduleID,
+                            date: `Weekly (${day})`,
+                            name: ScheduleName,
+                            time: `${slot.start} - ${slot.end}`,
+                            status: IsActive
+                        });
+                    });
+                }
+            });
+        }
+
+        if (Type_schedule === "Custom" && Array.isArray(TimeCustom)) {
+            const customSlots = TimeCustom.filter(customSlot => customSlot.start && customSlot.end);
+        
+            customSlots.forEach((customSlot: Day) => {
+                const [startDate = '', startTime = ''] = (customSlot.start ?? '').split(" ") || [];
+                const [, endTime = ''] = (customSlot.end ?? '').split(" ") || [];
+        
+                timeline.push({
+                    ScheduleID,
+                    date: `Custom (${startDate})`,
+                    name: ScheduleName,
+                    time: `${startTime} - ${endTime}`,
+                    status: IsActive
+                });
+            });
+        }
+    });
+
+    return timeline;
+};
+
 export const convertScheduleToTimeline = (
     schedule: TimelineItem[]
 ): { timeline: TimeLine[]; markedDates: MarkedDates } => {
     const today = moment();
-    const startOfYear = moment().startOf("year");
-    const endOfYear = moment().endOf("year");
+    const startOfYear = moment().startOf('year');
+    const endOfYear = moment().endOf('year');
     const timeline: TimeLine[] = [];
     const markedDates: MarkedDates = {};
-
-    const getColorForType = (type: string) => {
-        switch (type) {
-            case "Weekly":
-                return CustomLightTheme.drag;
-            case "Daily":
-                return CustomLightTheme.green;
-            case "Custom":
-                return CustomLightTheme.error;
-            default:
-                return CustomLightTheme.text;
-        }
+    
+    const getColorForType = (type: ScheduleType): string => {
+        return CustomLightTheme[
+            type === 'Weekly' ? 'drag' : type === 'Daily' ? 'green' : 'error'
+        ];
     };
 
-    const getSelectedColorForType = (type: string) => {
-        switch (type) {
-            case "Weekly":
-                return '#f2f2f2';
-            case "Daily":
-                return '#f4f4f4';
-            case "Custom":
-                return '#f6f6f6';
-            default:
-                return '#f8f8f8';
-        }
+    const getSelectedColorForType = (type: ScheduleType): string => {
+        return {
+            Weekly: '#f2f2f2',
+            Daily: '#f4f4f4',
+            Custom: '#f6f6f6',
+        }[type] || '#f8f8f8';
     };
 
     schedule.forEach((item) => {
-        const { date, name, time, ScheduleID, status }: any = item;
+        const { date, name, time, ScheduleID, status } = item;
 
-        if (date.startsWith("Weekly")) {
-            const weekday = date.match(/\((.*?)\)/)[1];
+        if (date && date.startsWith('Weekly')) {
+            const weekday = date.match(/\((.*?)\)/)?.[1];
+
+            if (!weekday) return;
 
             let day = startOfYear.clone().day(weekday);
 
             if (day.isBefore(startOfYear)) {
-                day.add(7, "days");
+                day.add(7, 'days');
             }
 
-            while (day.isBetween(startOfYear, endOfYear, "days", "[]")) {
-                const [startTime, endTime] = time.split(" - ");
-                const start = day
-                    .clone()
-                    .set({
-                        hour: parseInt(startTime.split(":")[0], 10),
-                        minute: parseInt(startTime.split(":")[1], 10),
-                    })
-                    .toISOString();
-                const end = day
-                    .clone()
-                    .set({
-                        hour: parseInt(endTime.split(":")[0], 10),
-                        minute: parseInt(endTime.split(":")[1], 10),
-                    })
-                    .toISOString();
-
-                const starts = moment(start).tz("Asia/Bangkok").toDate();
-                const ends = moment(end).tz("Asia/Bangkok").toDate();
+            while (day.isBetween(startOfYear, endOfYear, 'days', '[]')) {
+                const [startTime, endTime] = time.split(' - ');
+                const start = optimizeMoment(day, startTime);
+                const end = optimizeMoment(day, endTime);
                 const now = moment(getCurrentTime());
-                const intime = now.isBetween(starts, ends, undefined, "[]");
+                const intime = now.isBetween(moment(start), moment(end), undefined, '[]');
 
                 timeline.push({
-                    ScheduleID: ScheduleID,
+                    ScheduleID,
                     title: name,
                     start,
                     end,
                     summary: `${date} (${time})`,
                     color: CustomLightTheme.drag,
-                    type: "Weekly",
-                    status: status,
-                    statustype: status && intime ? "running" : status && (now.toISOString() > end) ? "end" : status ? "wait" : "stop",
+                    type: 'Weekly',
+                    status,
+                    statustype:
+                        status && intime
+                            ? 'running'
+                            : status && now.isAfter(end)
+                                ? 'end'
+                                : status
+                                    ? 'wait'
+                                    : 'stop',
                 });
 
-                const dateKey = day.format("YYYY-MM-DD");
+                
+                const dateKey = day.format('YYYY-MM-DD');
                 if (!markedDates[dateKey]) {
                     markedDates[dateKey] = { dots: [] };
                 }
 
-                const weeklyDotExists = markedDates[dateKey].dots.some(dot => dot.type === "Weekly");
-                if (!weeklyDotExists) {
+                if (!markedDates[dateKey].dots.some((dot) => dot.type === 'Weekly')) {
                     markedDates[dateKey].dots.push({
-                        color: getColorForType("Weekly"),
-                        selectedDotColor: getSelectedColorForType("Weekly"),
-                        type: "Weekly",
+                        color: getColorForType('Weekly'),
+                        selectedDotColor: getSelectedColorForType('Weekly'),
+                        type: 'Weekly',
                     });
                 }
 
-                day.add(7, "days");
+                day.add(7, 'days');
             }
-        } else if (date === "Recurring Daily") {
+        } else if (date === 'Recurring Daily') {
             let day = startOfYear.clone();
 
-            while (day.isBetween(startOfYear, endOfYear, "days", "[]")) {
-                const [startTime, endTime] = time.split(" - ");
-                const start = day
-                    .clone()
-                    .set({
-                        hour: parseInt(startTime.split(":")[0], 10),
-                        minute: parseInt(startTime.split(":")[1], 10),
-                    })
-                    .toISOString();
-                const end = day
-                    .clone()
-                    .set({
-                        hour: parseInt(endTime.split(":")[0], 10),
-                        minute: parseInt(endTime.split(":")[1], 10),
-                    })
-                    .toISOString();
-
-                const starts = moment(start).tz("Asia/Bangkok").toDate();
-                const ends = moment(end).tz("Asia/Bangkok").toDate();
+            while (day.isBetween(startOfYear, endOfYear, 'days', '[]')) {
+                const [startTime, endTime] = time.split(' - ');
+                const start = optimizeMoment(day, startTime);
+                const end = optimizeMoment(day, endTime);
                 const now = moment(getCurrentTime());
-                const intime = now.isBetween(starts, ends, undefined, "[]");
+                const intime = now.isBetween(moment(start), moment(end), undefined, '[]');
 
                 timeline.push({
-                    ScheduleID: ScheduleID,
+                    ScheduleID,
                     title: name,
                     start,
                     end,
                     summary: `${date} (${time})`,
                     color: CustomLightTheme.green,
-                    type: "Daily",
-                    status: status,
-                    statustype: status && intime ? "running" : status && (now.toISOString() > end) ? "end" : status ? "wait" : "stop"
+                    type: 'Daily',
+                    status,
+                    statustype:
+                        status && intime
+                            ? 'running'
+                            : status && now.isAfter(end)
+                                ? 'end'
+                                : status
+                                    ? 'wait'
+                                    : 'stop',
                 });
 
-                const dateKey = day.format("YYYY-MM-DD");
+                const dateKey = day.format('YYYY-MM-DD');
                 if (!markedDates[dateKey]) {
                     markedDates[dateKey] = { dots: [] };
                 }
 
-                const dailyDotExists = markedDates[dateKey].dots.some(dot => dot.type === "Daily");
-                if (!dailyDotExists) {
+                if (!markedDates[dateKey].dots.some((dot) => dot.type === 'Daily')) {
                     markedDates[dateKey].dots.push({
-                        color: getColorForType("Daily"),
-                        selectedDotColor: getSelectedColorForType("Daily"),
-                        type: "Daily"
+                        color: getColorForType('Daily'),
+                        selectedDotColor: getSelectedColorForType('Daily'),
+                        type: 'Daily',
                     });
                 }
 
-                day.add(1, "day");
+                day.add(1, 'day');
             }
-        } else if (date.startsWith("Custom")) {
+        } else if (date && date.startsWith('Custom')) {
             const match = date.match(/\((.*?)\)/);
+            const eventDate = match ? moment(match[1], 'DD-MM-YYYY') : null;
 
-            if (match && match[1]) {
-                const eventDate = moment(match[1], "DD-MM-YYYY");
+            if (!eventDate) return;
 
-                const gregorianDate = eventDate.clone().subtract(543, 'years');
+            const gregorianDate = eventDate.clone().subtract(543, 'years');
+            const [startTime, endTime] = time.split(' - ');
+            const start = optimizeMoment(gregorianDate, startTime);
+            const end = optimizeMoment(gregorianDate, endTime);
+            const now = moment(getCurrentTime());
+            const intime = now.isBetween(moment(start), moment(end), undefined, '[]');
 
-                const [startTime, endTime] = time.split(" - ");
+            timeline.push({
+                ScheduleID,
+                title: name,
+                start,
+                end,
+                summary: `${date} (${time})`,
+                color: CustomLightTheme.error,
+                type: 'Custom',
+                status,
+                statustype:
+                    status && intime
+                        ? 'running'
+                        : status && now.isAfter(end)
+                            ? 'end'
+                            : status
+                                ? 'wait'
+                                : 'stop',
+            });
 
-                const start = gregorianDate
-                    .clone()
-                    .set({
-                        hour: parseInt(startTime.split(":")[0], 10),
-                        minute: parseInt(startTime.split(":")[1], 10),
-                    })
-                    .toISOString();
+            const dateKey = gregorianDate.format('YYYY-MM-DD');
+            if (!markedDates[dateKey]) {
+                markedDates[dateKey] = { dots: [] };
+            }
 
-                const end = gregorianDate
-                    .clone()
-                    .set({
-                        hour: parseInt(endTime.split(":")[0], 10),
-                        minute: parseInt(endTime.split(":")[1], 10),
-                    })
-                    .toISOString();
-
-                const starts = moment(start).tz("Asia/Bangkok").toDate();
-                const ends = moment(end).tz("Asia/Bangkok").toDate();
-                const now = moment(getCurrentTime())
-                const intime = now.isBetween(starts, ends, undefined, "[]");
-
-                timeline.push({
-                    ScheduleID: ScheduleID,
-                    title: name,
-                    start,
-                    end,
-                    summary: `${date} (${time})`,
-                    color: CustomLightTheme.error,
-                    type: "Custom",
-                    status: status,
-                    statustype: status && intime ? "running" : status && (now.toISOString() > end) ? "end" : status ? "wait" : "stop"
+            if (!markedDates[dateKey].dots.some((dot) => dot.type === 'Custom')) {
+                markedDates[dateKey].dots.push({
+                    color: getColorForType('Custom'),
+                    selectedDotColor: getSelectedColorForType('Custom'),
+                    type: 'Custom',
                 });
-
-                const dateKey = gregorianDate.format("YYYY-MM-DD");
-
-                if (!markedDates[dateKey]) {
-                    markedDates[dateKey] = { dots: [] };
-                }
-
-                const customDotExists = markedDates[dateKey].dots.some(dot => dot.type === "Custom");
-
-                if (!customDotExists) {
-                    markedDates[dateKey].dots.push({
-                        color: getColorForType("Custom"),
-                        selectedDotColor: getSelectedColorForType("Custom"),
-                        type: "Custom",
-                    });
-                }
             }
         }
     });
 
     return { timeline, markedDates };
 };
-
