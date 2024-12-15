@@ -103,14 +103,14 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
     }
   }, [showSuccess, handleError, state.subForms, state.MachineID, user]);
 
-  const HeaderLeftComponent = ({ navigation }: any) => (
-    <TouchableOpacity
-      onPress={() => navigation.goBack()}
-      style={{ paddingHorizontal: 10 }}
-    >
-      <Text style={{ color: 'blue' }}>Back</Text>
-    </TouchableOpacity>
-  );
+  const countRef = useRef(1);
+
+  const incrementCount = (value: boolean) => {
+    if (value)
+      countRef.current += 1
+    else
+      countRef.current = 1
+  };
 
   return found ? (
     <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]}>
@@ -129,96 +129,104 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
           onSubmit={onFormSubmit}
           enableReinitialize={true}
         >
-          {({ errors, touched, setFieldValue, setTouched, values, dirty, isValid, handleSubmit }) => (
-            <>
-              <FlatList
-                data={state.subForms}
-                renderItem={({ item }) => {
-                  const columns = item.Columns ?? 1;
+          {({ errors, touched, setFieldValue, setTouched, values, dirty, isValid, handleSubmit }) => {
+            incrementCount(false);
 
-                  return (
-                    <Card style={masterdataStyles.card} key={item.SFormID}>
+            return (
+              <>
+                <FlatList
+                  data={state.subForms}
+                  renderItem={({ item }) => {
+                    const columns = item.Columns ?? 1;
 
-                      <Card.Content style={[masterdataStyles.subFormContainer]}>
-                        {item.Fields?.map((field: BaseFormState, fieldIndex: number) => {
-                          const containerStyle: ViewStyle = {
-                            width: responsive === "small" ? "100%" : `${98 / columns}%`,
-                            flexShrink: 1,
-                            flexGrow: field.Rowcolumn || 1,
-                            flexBasis: `${100 / (columns / (field.Rowcolumn || 1))}%`,
-                            padding: 5,
-                          };
+                    return (
+                      <Card style={masterdataStyles.card} key={item.SFormID}>
 
-                          const fieldName = field.MCListID;
-                          const type = dataType.find((v: DataType) => v.DTypeID === field.DTypeID)?.DTypeName;
+                        <Card.Content style={[masterdataStyles.subFormContainer]}>
+                          {item.Fields?.map((field: BaseFormState, fieldIndex: number) => {
+                            const containerStyle: ViewStyle = {
+                              width: responsive === "small" ? "100%" : `${98 / columns}%`,
+                              flexShrink: 1,
+                              flexGrow: field.Rowcolumn || 1,
+                              flexBasis: `${100 / (columns / (field.Rowcolumn || 1))}%`,
+                              padding: 5,
+                            };
 
-                          const handleBlur = () => {
-                            if (type === "Number") {
-                              const numericValue = Number(values[fieldName]);
-                              if (!isNaN(numericValue) && Number(field.DTypeValue) > 0) {
-                                const formattedValue = numericValue.toFixed(Number(field.DTypeValue));
-                                setFieldValue(fieldName, formattedValue);
+                            const fieldName = field.MCListID;
+                            const type = dataType.find((v: DataType) => v.DTypeID === field.DTypeID)?.DTypeName;
+
+                            const ChheckList = item.Number ? `${countRef.current}. ${field.CListName}` : field.CListName;
+                            incrementCount(item.Number);
+
+                            const handleBlur = () => {
+                              if (type === "Number") {
+                                const numericValue = Number(values[fieldName]);
+                                if (!isNaN(numericValue) && Number(field.DTypeValue) > 0) {
+                                  const formattedValue = numericValue.toFixed(Number(field.DTypeValue));
+                                  setFieldValue(fieldName, formattedValue);
+                                }
                               }
-                            }
-                            setTouched({ ...touched, [fieldName]: true });
-                          };
+                              setTouched({ ...touched, [fieldName]: true });
+                            };
 
-                          const handleChange = (fieldName: string, value: any) => {
-                            setFieldValue(fieldName, value);
+                            const handleChange = (fieldName: string, value: any) => {
+                              setFieldValue(fieldName, value);
 
-                            if (timeoutRef.current) {
-                              clearTimeout(timeoutRef.current);
-                            }
+                              if (timeoutRef.current) {
+                                clearTimeout(timeoutRef.current);
+                              }
 
-                            timeoutRef.current = setTimeout(() => setTouched({ ...touched, [fieldName]: true }), 0);
-                          };
+                              timeoutRef.current = setTimeout(() => setTouched({ ...touched, [fieldName]: true }), 0);
+                            };
 
-                          return (
-                            <View id="container-layout2" style={containerStyle} key={`field-${fieldIndex}`}>
-                              <Dynamic
-                                field={field}
-                                values={String(values[fieldName] ?? "")}
-                                handleChange={handleChange}
-                                handleBlur={handleBlur}
-                                error={Boolean(touched[fieldName] && errors[fieldName])}
-                                errorMessages={errors}
-                                type={type}
-                              />
-                            </View>
-                          );
-                        })}
-                      </Card.Content>
-                    </Card>
-                  );
-                }}
-                keyExtractor={(_, index) => `index-preview-${index}`}
-                ListHeaderComponent={() => (
-                  <>
-                    <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
-                    <Divider />
-                    <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
-                  </>
-                )}
-                ListFooterComponent={() => (
-                  <AccessibleView name="form-action-scan" style={[masterdataStyles.containerAction]}>
-                    <TouchableOpacity
-                      onPress={() => handleSubmit()}
-                      style={[
-                        masterdataStyles.button,
-                        masterdataStyles.backMain,
-                        { opacity: isValid && dirty ? 1 : 0.5 },
-                      ]}
-                      disabled={!dirty || !isValid}
-                    >
-                      <Text style={[masterdataStyles.textBold, masterdataStyles.textFFF]}>Submit Form</Text>
-                    </TouchableOpacity>
-                  </AccessibleView>
-                )}
-                contentContainerStyle={{ paddingBottom: 20 }}
-                removeClippedSubviews={true}
-              />
-            </>
-          )}
+                            return (
+                              <View id="container-layout2" style={containerStyle} key={`field-${fieldIndex}`}>
+                                <Dynamic
+                                  field={field}
+                                  values={String(values[fieldName] ?? "")}
+                                  handleChange={handleChange}
+                                  handleBlur={handleBlur}
+                                  error={Boolean(touched[fieldName] && errors[fieldName])}
+                                  errorMessages={errors}
+                                  number={ChheckList}
+                                  type={type}
+                                />
+                              </View>
+                            );
+                          })}
+                        </Card.Content>
+                      </Card>
+                    );
+                  }}
+                  keyExtractor={(_, index) => `index-preview-${index}`}
+                  ListHeaderComponent={() => (
+                    <>
+                      <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
+                      <Divider />
+                      <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
+                    </>
+                  )}
+                  ListFooterComponent={() => (
+                    <AccessibleView name="form-action-scan" style={[masterdataStyles.containerAction]}>
+                      <TouchableOpacity
+                        onPress={() => handleSubmit()}
+                        style={[
+                          masterdataStyles.button,
+                          masterdataStyles.backMain,
+                          { opacity: isValid && dirty ? 1 : 0.5 },
+                        ]}
+                        disabled={!dirty || !isValid}
+                      >
+                        <Text style={[masterdataStyles.textBold, masterdataStyles.textFFF]}>Submit Form</Text>
+                      </TouchableOpacity>
+                    </AccessibleView>
+                  )}
+                  contentContainerStyle={{ paddingBottom: 20 }}
+                  removeClippedSubviews={true}
+                />
+              </>
+            )
+          }}
         </Formik>
 
       ) : (

@@ -19,7 +19,8 @@ const DynamicForm = React.memo(({
   errorMessages,
   type,
   exp,
-  showField
+  showField,
+  number
 }: DynamicFormProps) => {
   const { CTypeName, CListName, MCListID, GCLOptionID, Required, Important, ImportantList, SFormID } = field;
   const masterdataStyles = useMasterdataStyles();
@@ -43,7 +44,6 @@ const DynamicForm = React.memo(({
       const maxLength = Number(ImportantList?.[0]?.MaxLength) || Infinity;
 
       if (numericValue <= minLength) {
-
         setTextColor(theme.colors.yellow);
         setMessageMinOrMax("Min value control is overlength");
       }
@@ -55,10 +55,8 @@ const DynamicForm = React.memo(({
         setTextColor(theme.colors.onBackground);
         setMessageMinOrMax("");
       }
-
     }
   }, [Important, values, ImportantList, theme.colors]);
-
 
   const option = useMemo(() =>
     groupCheckListOption
@@ -169,7 +167,7 @@ const DynamicForm = React.memo(({
       paddingHorizontal: 20,
       paddingTop: fontSize === "large" ? 15 : 5
     }
-  })
+  });
 
   const isValidImportantList = values && ImportantList && ImportantList.length > 0 ? ImportantList?.every(
     (value) => value.Value && value.Value?.includes(values)
@@ -180,9 +178,8 @@ const DynamicForm = React.memo(({
       <TouchableOpacity onPress={() => showField && showField(String(MCListID), String(SFormID))}>
         <Text
           variant="bodyMedium"
-          style={[masterdataStyles.text, CTypeName === "Text" ? styles.text : undefined, { color: exp && (messageminOrmax || isValidImportantList) ? theme.colors.error : theme.colors.onBackground }]}
-        >
-          {CListName} {" "}
+          style={[masterdataStyles.text, CTypeName === "Text" ? styles.text : undefined, { color: exp && (messageminOrmax || isValidImportantList) ? theme.colors.error : theme.colors.onBackground }]}>
+          {number}{" "}
           {Required && <Text style={{ color: theme.colors.error }}>(*)</Text>}
         </Text>
         {renderField()}

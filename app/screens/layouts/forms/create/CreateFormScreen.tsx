@@ -118,7 +118,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
         const selectedDataType = dataType.find((v: DataType) => item.CTypeTitle === "Number Answer" ? v.DTypeName === "Number" : v.DTypeName === "String") || dataType?.[0];
 
         if (item.CTypeName === "SubForm") {
-            const subForm = { SFormID: "", SFormName: "New Setion", Columns: 1, Fields: [], FormID: state.FormID || "", MachineID: state.MachineID || "" }
+            const subForm = { SFormID: "", SFormName: "New Setion", Columns: 1, Fields: [], Number: false, FormID: state.FormID || "", MachineID: state.MachineID || "" }
             runOnJS(dispatch)(addSubForm({ subForm: subForm }));
         } else if (cardIndex >= 0) {
             const targetSubForm = state.subForms[cardIndex];

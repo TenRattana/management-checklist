@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Inputs } from "@/components/common";
-import { Portal, Dialog } from "react-native-paper";
+import { Portal, Dialog, Switch } from "react-native-paper";
 import { FastField, Formik } from "formik";
 import * as Yup from "yup";
 import useMasterdataStyles from "@/styles/common/masterdata";
@@ -9,10 +9,12 @@ import { SubFormDialogProps } from "@/typing/value";
 import { BaseSubForm } from "@/typing/form";
 import Text from "@/components/Text";
 import { useRes } from "@/app/contexts/useRes";
+import { useTheme } from "@/app/contexts/useTheme";
 
 const validationSchemaSubForm = Yup.object().shape({
     SFormName: Yup.string().required("The machine group name field is required."),
     Columns: Yup.number().typeError(`The column field must be a valid number`).required("The columns field is required."),
+    Number: Yup.boolean().typeError('The number field must be a true or false').required("The number field is required.")
 });
 
 const SubFormDialog = React.memo(({
@@ -25,6 +27,7 @@ const SubFormDialog = React.memo(({
 }: SubFormDialogProps<BaseSubForm>) => {
     const masterdataStyles = useMasterdataStyles();
     const { responsive } = useRes()
+    const { theme } = useTheme();
 
     const styles = StyleSheet.create({
         actionButton: {
@@ -66,7 +69,7 @@ const SubFormDialog = React.memo(({
                                 saveData(values, isEditing ? "update" : "add");
                             }}
                         >
-                            {({ handleSubmit, values }) => (
+                            {({ handleSubmit, values, setFieldValue }) => (
                                 <View id="sfd">
                                     <FastField name="SFormName">
                                         {({ field, form }: any) => (
@@ -98,6 +101,23 @@ const SubFormDialog = React.memo(({
                                         )}
                                     </FastField >
 
+                                    <View id="form-active-md" style={masterdataStyles.containerSwitch}>
+                                        <View style={{ flex: 1, flexDirection: 'row' }}>
+                                            <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
+                                                Add number in front checklist: {values.Number ? "Add" : "None"}
+                                            </Text>
+                                            <Switch
+                                                style={{ transform: [{ scale: 1.1 }], top: 2 }}
+                                                color={values.Number ? theme.colors.inversePrimary : theme.colors.onPrimaryContainer}
+                                                value={values.Number}
+                                                onValueChange={(v: boolean) => {
+                                                    setFieldValue("Number", v);
+                                                }}
+                                                testID="Number-md"
+                                            />
+                                        </View>
+                                    </View>
+
                                     <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }} id="sfd-action">
                                         <TouchableOpacity onPress={() => handleSubmit()} style={styles.actionButton}>
                                             <Text style={masterdataStyles.text}>{isEditing ? "Update SubForm" : "Add SubForm"}</Text>
@@ -113,63 +133,6 @@ const SubFormDialog = React.memo(({
                                             <Text style={masterdataStyles.text}>Cancel</Text>
                                         </TouchableOpacity>
                                     </View>
-
-                                    {/* <View id="sfd-action" style={masterdataStyles.containerAction}>
-                                        <TouchableOpacity
-                                            onPress={() => handleSubmit()}
-                                            disabled={!isValid || !dirty}
-                                            style={[
-                                                masterdataStyles.button,
-                                                masterdataStyles.backMain,
-                                                { opacity: isValid && dirty ? 1 : 0.5 }
-                                            ]}
-                                        >
-                                            <Text
-                                                style={[
-                                                    masterdataStyles.textFFF,
-                                                    masterdataStyles.textBold,
-                                                ]}
-                                            >
-                                                {isEditing ? "Update SubForm" : "Add SubForm"}
-                                            </Text>
-                                        </TouchableOpacity>
-
-                                        {isEditing && (
-                                            <TouchableOpacity
-                                                onPress={() => onDelete(values.SFormID)}
-                                                style={[
-                                                    masterdataStyles.button,
-                                                    masterdataStyles.backMain,
-                                                ]}
-                                            >
-                                                <Text
-                                                    style={[
-                                                        masterdataStyles.textFFF,
-                                                        masterdataStyles.textBold,
-                                                    ]}
-                                                >
-                                                    Delete sub form
-                                                </Text>
-                                            </TouchableOpacity>
-                                        )}
-
-                                        <TouchableOpacity
-                                            onPress={() => setIsVisible(false)}
-                                            style={[
-                                                masterdataStyles.button,
-                                                masterdataStyles.backMain,
-                                            ]}
-                                        >
-                                            <Text
-                                                style={[
-                                                    masterdataStyles.textFFF,
-                                                    masterdataStyles.textBold,
-                                                ]}
-                                            >
-                                                Cancel
-                                            </Text>
-                                        </TouchableOpacity>
-                                    </View> */}
                                 </View>
                             )}
                         </Formik>

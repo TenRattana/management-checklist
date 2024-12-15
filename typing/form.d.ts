@@ -15,6 +15,7 @@ export interface Form extends BaseForm {
 export interface BaseSubForm {
   SFormID: string;
   SFormName: string;
+  Number: boolean;
   FormID: string;
   Columns?: number;
   DisplayOrder?: number;
@@ -47,8 +48,8 @@ export interface BaseFormState {
   SFormID: string;
   Required: boolean;
   Important: boolean;
-  ImportantList?: BaseImportant[]; 
-  Rowcolumn? : number;
+  ImportantList?: BaseImportant[];
+  Rowcolumn?: number;
   Placeholder?: string;
   Hint?: string;
   DisplayOrder?: number;

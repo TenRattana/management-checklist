@@ -54,6 +54,7 @@ const subFormSlice = createSlice({
           ...sub,
           Columns: sub.Columns,
           DisplayOrder: sub.DisplayOrder || index,
+          Number: sub.Number || false,
         }))
       };
 
@@ -100,6 +101,7 @@ const subFormSlice = createSlice({
         ...sub,
         Columns: sub.Columns,
         DisplayOrder: index,
+        Number: sub.Number,
       }));
 
       sortSubForms(state.subForms);
@@ -142,6 +144,7 @@ const subFormSlice = createSlice({
             ...existingSub,
             SFormName: subForm.SFormName,
             Columns: subForm.Columns,
+            Number: subForm.Number,
           };
         }
         return existingSub;

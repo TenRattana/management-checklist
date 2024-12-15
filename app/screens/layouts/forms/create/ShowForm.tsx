@@ -1,4 +1,4 @@
-import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef, useCallback, useMemo } from "react";
+import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef, useCallback } from "react";
 import { View, ViewStyle, FlatList } from "react-native";
 import { Card, Divider } from "react-native-paper";
 import { useTheme } from "@/app/contexts/useTheme";
@@ -22,7 +22,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
     const cardRef = useRef<View>(null);
     const { responsive } = useRes();
     const [formValues, setFormValues] = useState<FormValues>({});
-    const { theme } = useTheme()
+    const { theme } = useTheme();
     const cardRefs = useRef<(View | null)[]>([]);
     const cardPositions = useRef<{ x: number; y: number; width: number; height: number }[]>([]);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -87,107 +87,119 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
         }
     }, [state.subForms]);
 
+    const countRef = useRef(1);
+
+    const incrementCount = (value: boolean) => {
+        if (value)
+            countRef.current += 1
+        else
+            countRef.current = 1
+    };
 
     return (
         <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]}>
             <FlatList
                 data={[{}]}
-                renderItem={() => state.subForms.map((subForm: BaseSubForm, index: number) => {
-                    return (
-                        <Formik
-                            initialValues={formValues}
-                            validationSchema={validationSchema}
-                            validateOnBlur={true}
-                            validateOnChange={false}
-                            onSubmit={(value) => { }}
-                            enableReinitialize={true}
-                            key={JSON.stringify({ SFormID: subForm.SFormID, Column: subForm.Columns, fields: subForm.Fields })}
-                        >
-                            {({ errors, touched, setFieldValue, setTouched, setFieldError }) => (
-                                <>
-                                    <Card
-                                        style={masterdataStyles.card}
-                                        ref={(el) => (cardRefs.current[index] = el)}
-                                        key={subForm.SFormID}
-                                    >
-                                        <Card.Title
-                                            title={subForm.SFormName}
-                                            titleStyle={masterdataStyles.cardTitle}
-                                        />
-                                        <Card.Content style={[masterdataStyles.subFormContainer, { marginHorizontal: 20 }]}>
-                                            {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
-                                                const columns = subForm.Columns ?? 1;
+                renderItem={() =>
+                    state.subForms.map((subForm: BaseSubForm, index: number) => {
+                        return (
+                            <Formik
+                                initialValues={formValues}
+                                validationSchema={validationSchema}
+                                validateOnBlur={true}
+                                validateOnChange={false}
+                                onSubmit={(value) => { }}
+                                enableReinitialize={true}
+                                key={JSON.stringify({ SFormID: subForm.SFormID, Column: subForm.Columns, fields: subForm.Fields })}
+                            >
+                                {({ errors, touched, setFieldValue, setTouched, setFieldError }) => {
+                                    incrementCount(false);
 
-                                                const containerStyle: ViewStyle = {
-                                                    width: responsive === "small" ? "100%" : `${98 / columns}%`,
-                                                    flexShrink: 1,
-                                                    flexGrow: field.Rowcolumn || 1,
-                                                    flexBasis: responsive === "small" ? "100%" : `${100 / (columns / (field.Rowcolumn || 1))}%`,
-                                                    padding: 5,
-                                                };
+                                    return (
+                                        <Card
+                                            style={masterdataStyles.card}
+                                            ref={(el) => (cardRefs.current[index] = el)}
+                                            key={subForm.SFormID}
+                                        >
+                                            <Card.Title
+                                                title={subForm.SFormName}
+                                                titleStyle={masterdataStyles.cardTitle}
+                                            />
+                                            <Card.Content style={[masterdataStyles.subFormContainer, { marginHorizontal: 20 }]}>
+                                                {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
+                                                    const columns = subForm.Columns ?? 1;
+                                                    const ChheckList = subForm.Number ? `${countRef.current}. ${field.CListName}` : field.CListName;
+                                                    incrementCount(subForm.Number);
 
-                                                return (
-                                                    <Field name={field.MCListID} key={`field-${fieldIndex}-${subForm.Columns}`}>
-                                                        {({ field: fastFieldProps }: FieldProps) => {
+                                                    const containerStyle: ViewStyle = {
+                                                        width: responsive === "small" ? "100%" : `${98 / columns}%`,
+                                                        flexShrink: 1,
+                                                        flexGrow: field.Rowcolumn || 1,
+                                                        flexBasis: responsive === "small" ? "100%" : `${100 / (columns / (field.Rowcolumn || 1))}%`,
+                                                        padding: 5,
+                                                    };
 
-                                                            const type = dataType.find((v: DataType) => v.DTypeID === field.DTypeID)?.DTypeName;
+                                                    return (
+                                                        <Field name={field.MCListID} key={`field-${fieldIndex}-${subForm.Columns}`}>
+                                                            {({ field: fastFieldProps }: FieldProps) => {
+                                                                const type = dataType.find((v: DataType) => v.DTypeID === field.DTypeID)?.DTypeName;
 
-                                                            const handleBlur = () => {
-                                                                if (type === "Number") {
-                                                                    const numericValue = Number(fastFieldProps.value);
+                                                                const handleBlur = () => {
+                                                                    if (type === "Number") {
+                                                                        const numericValue = Number(fastFieldProps.value);
 
-                                                                    if (!isNaN(numericValue) && Number(field.DTypeValue) > 0 && numericValue) {
-                                                                        const formattedValue = numericValue.toFixed(Number(field.DTypeValue));
-                                                                        setFieldValue(fastFieldProps.name, formattedValue);
-                                                                        setTouched({
-                                                                            ...touched,
-                                                                            [fastFieldProps.name]: true,
-                                                                        });
-
-                                                                    } else if (isNaN(numericValue)) {
-                                                                        setFieldValue(fastFieldProps.name, fastFieldProps.value);
-                                                                        setTouched({
-                                                                            ...touched,
-                                                                            [fastFieldProps.name]: true,
-                                                                        });
+                                                                        if (!isNaN(numericValue) && Number(field.DTypeValue) > 0 && numericValue) {
+                                                                            const formattedValue = numericValue.toFixed(Number(field.DTypeValue));
+                                                                            setFieldValue(fastFieldProps.name, formattedValue);
+                                                                            setTouched({
+                                                                                ...touched,
+                                                                                [fastFieldProps.name]: true,
+                                                                            });
+                                                                        } else if (isNaN(numericValue)) {
+                                                                            setFieldValue(fastFieldProps.name, fastFieldProps.value);
+                                                                            setTouched({
+                                                                                ...touched,
+                                                                                [fastFieldProps.name]: true,
+                                                                            });
+                                                                        }
                                                                     }
-                                                                }
-                                                            };
+                                                                };
 
-                                                            return (
-                                                                <View id="container-layout2" style={containerStyle}>
-                                                                    <Dynamic
-                                                                        field={field}
-                                                                        values={String(fastFieldProps.value ?? "")}
-                                                                        handleChange={(fieldname: string, value: any) => {
-                                                                            setFieldValue(fastFieldProps.name, value);
-                                                                            setTimeout(() => {
-                                                                                setTouched({
-                                                                                    ...touched,
-                                                                                    [fastFieldProps.name]: true,
-                                                                                });
-                                                                            }, 0);
-                                                                        }}
-                                                                        handleBlur={handleBlur}
-                                                                        error={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
-                                                                        errorMessages={errors}
-                                                                        showField={showField}
-                                                                        type={type}
-                                                                    />
-                                                                </View>
-                                                            );
-                                                        }}
-                                                    </Field>
-                                                );
-                                            })}
-                                        </Card.Content>
-                                    </Card>
-                                </>
-                            )}
-                        </Formik>
-                    )
+                                                                return (
+                                                                    <View id="container-layout2" style={containerStyle}>
+                                                                        <Dynamic
+                                                                            field={field}
+                                                                            values={String(fastFieldProps.value ?? "")}
+                                                                            handleChange={(fieldname: string, value: any) => {
+                                                                                setFieldValue(fastFieldProps.name, value);
+                                                                                setTimeout(() => {
+                                                                                    setTouched({
+                                                                                        ...touched,
+                                                                                        [fastFieldProps.name]: true,
+                                                                                    });
+                                                                                }, 0);
+                                                                            }}
+                                                                            handleBlur={handleBlur}
+                                                                            error={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
+                                                                            errorMessages={errors}
+                                                                            number={ChheckList}
+                                                                            showField={showField}
+                                                                            type={type}
+                                                                        />
+                                                                    </View>
+                                                                );
+                                                            }}
+                                                        </Field>
+                                                    );
+                                                })}
+                                            </Card.Content>
+                                        </Card>
+                                    );
+                                }}
+                            </Formik>
+                        );
+                    })
                 }
-                )}
                 ListHeaderComponent={() => (
                     <>
                         <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>

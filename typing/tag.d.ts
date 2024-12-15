@@ -101,7 +101,8 @@ export interface DynamicFormProps {
   errorMessages?: FormikErrors<{ [key: string]: any }>;
   type?: string;
   exp?: boolean;
-  showField?: (value: string , value: string) => void;
+  showField?: (value: string, value: string) => void;
+  number?: string;
 }
 
 export interface PreviewProps<T extends PreviewParams | ScanParams> {
@@ -160,7 +161,7 @@ export interface DragfieldProps {
   dispatch: any;
   checkListOption: CheckListOption[];
   checkListType: checkListTypes[];
-  index?:string;
+  index?: string;
 }
 
 export interface DragsubformProps {
@@ -168,7 +169,7 @@ export interface DragsubformProps {
   dispatch: (action: AppActions) => void;
   checkListOption: CheckListOption[];
   checkListType: checkListTypes[];
-  index?:string;
+  index?: string;
 }
 // validationSchema: Yup.ObjectSchema<{[x: string]: any;},Yup.AnyObject,{[x: string]: any;},"" >;
 

@@ -28,7 +28,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 
 const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, checkListOption, checkListType }) => {
     const [initialDialog, setInitialDialog] = useState<boolean>(false)
-    const [initialSubForm, setInitialSubForm] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", MachineID: "", Fields: [] });
+    const [initialSubForm, setInitialSubForm] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", Number: false, MachineID: "", Fields: [] });
     const [editMode, setEditMode] = useState<boolean>(false)
     const masterdataStyles = useMasterdataStyles()
     const { fontSize } = useRes()
@@ -47,7 +47,7 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, c
 
     const handelSubForm = useCallback((item?: BaseSubForm) => {
         item ? setInitialSubForm(item) :
-            setInitialSubForm({ SFormID: "", SFormName: "", FormID: "", MachineID: "", Fields: [] })
+            setInitialSubForm({ SFormID: "", SFormName: "", FormID: "", Number: false, MachineID: "", Fields: [] })
     }, [])
 
     const handelSaveSubForm = useCallback((values: BaseSubForm, mode: string) => {

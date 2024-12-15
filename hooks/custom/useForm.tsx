@@ -39,6 +39,7 @@ const createSubFormsAndFields = (
             SFormName: subFormItem.SFormName,
             FormID: subFormItem.FormID,
             Columns: subFormItem.Columns,
+            Number: Boolean(subFormItem.Number ?? false),
             DisplayOrder: subFormItem.DisplayOrder,
             MachineID: subFormItem.MachineID,
             Fields: []
