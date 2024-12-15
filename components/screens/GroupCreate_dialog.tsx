@@ -83,8 +83,8 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, saveData
                         </View>
 
                         <View style={styles.timeIntervalMenu}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                                <View style={{ flex: 1 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <View>
                                     <CustomDropdownMultiple
                                         data={checkListOption}
                                         handleBlur={() => { }}

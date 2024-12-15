@@ -612,48 +612,46 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             }}
                         </Formik>
                     )}
+                    {dialogAdd.CheckList && (
+                        <Dialog visible={dialogAdd.CheckList} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center', borderRadius: 8, padding: 20 }} onDismiss={() => handelAdd(false, "CheckList")}>
+                            <MemoChecklist_dialog
+                                setIsVisible={() => {
+                                    handelAdd(false, "CheckList");
+                                }}
+                                saveData={(value: any) => {
+                                    saveDataCheckList(value);
+                                    handelAdd(false, "CheckList");
+                                }}
+                            />
+                        </Dialog>
+                    )}
+
+                    {info.GroupCheckList && (
+                        <Dialog visible={info.GroupCheckList} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center' }} onDismiss={() => handelInfo(false, "GroupCheckList")}>
+                            <InfoGroup_dialog
+                                setDialogAdd={() => handelInfo(false, "GroupCheckList")}
+                                option={option}
+                            />
+                        </Dialog>
+                    )}
+
+                    {dialogAdd.GroupCheckList && (
+                        <Dialog visible={dialogAdd.GroupCheckList} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center', borderRadius: 8, padding: 20 }} onDismiss={() => handelAdd(false, "GroupCheckList")}>
+                            <MemoCreateGroupOption_dialog
+                                setIsVisible={() => {
+                                    handelAdd(false, "GroupCheckList");
+                                }}
+                                saveDataCheckListOption={saveDataCheckListOption}
+                                checkListOption={checkListOption}
+                                saveData={(value: any, mode: any) => {
+                                    saveDataGroupCheckList(value, mode);
+                                    handelAdd(false, "GroupCheckList");
+                                }}
+                            />
+                        </Dialog>
+                    )}
                 </Dialog.Content>
             </Dialog>
-
-            {dialogAdd.CheckList && (
-                <Dialog visible={dialogAdd.CheckList} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center', borderRadius: 8, padding: 20 }} onDismiss={() => handelAdd(false, "CheckList")}>
-                    <MemoChecklist_dialog
-                        setIsVisible={() => {
-                            handelAdd(false, "CheckList");
-                        }}
-                        saveData={(value: any) => {
-                            saveDataCheckList(value);
-                            handelAdd(false, "CheckList");
-                        }}
-                    />
-                </Dialog>
-            )}
-
-            {info.GroupCheckList && (
-                <Dialog visible={info.GroupCheckList} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center' }} onDismiss={() => handelInfo(false, "GroupCheckList")}>
-                    <InfoGroup_dialog
-                        setDialogAdd={() => handelInfo(false, "GroupCheckList")}
-                        option={option}
-                    />
-                </Dialog>
-            )}
-
-            {dialogAdd.GroupCheckList && (
-                <Dialog visible={dialogAdd.GroupCheckList} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center', borderRadius: 8, padding: 20 }} onDismiss={() => handelAdd(false, "GroupCheckList")}>
-                    <MemoCreateGroupOption_dialog
-                        setIsVisible={() => {
-                            handelAdd(false, "GroupCheckList");
-                        }}
-                        saveDataCheckListOption={saveDataCheckListOption}
-                        checkListOption={checkListOption}
-                        saveData={(value: any, mode: any) => {
-                            saveDataGroupCheckList(value, mode);
-                            handelAdd(false, "GroupCheckList");
-                        }}
-                    />
-                </Dialog>
-            )}
-
         </Portal>
     );
 });
