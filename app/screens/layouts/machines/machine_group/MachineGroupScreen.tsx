@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { TouchableOpacity, StyleSheet } from "react-native";
-import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
 import { LoadingSpinner, AccessibleView, Searchbar, Customtable, Text } from "@/components";
@@ -11,22 +10,8 @@ import { GroupMachine } from '@/typing/type';
 import { InitialValuesGroupMachine } from '@/typing/value';
 import { useMutation, useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
-
-const fetchMachineGroups = async (): Promise<GroupMachine[]> => {
-    const response = await axiosInstance.post("GroupMachine_service.asmx/GetGroupMachines");
-    return response.data.data ?? [];
-};
-
-const saveGroupMachine = async (data: {
-    Prefix: any;
-    GMachineID: string;
-    GMachineName: string;
-    Description: string;
-    IsActive: boolean;
-}): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("GroupMachine_service.asmx/SaveGroupMachine", data);
-    return response.data;
-};
+import { fetchMachineGroups, saveGroupMachine } from "@/app/services";
+import axiosInstance from "@/config/axios";
 
 const MachineGroupScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");

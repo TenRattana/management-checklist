@@ -11,21 +11,7 @@ import { Machine, GroupMachine } from '@/typing/type';
 import { InitialValuesMachine } from '@/typing/value';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSelector } from "react-redux";
-
-const fetchMachines = async (): Promise<Machine[]> => {
-    const response = await axiosInstance.post("Machine_service.asmx/GetMachines");
-    return response.data.data ?? [];
-};
-
-const fetchMachineGroups = async (): Promise<GroupMachine[]> => {
-    const response = await axiosInstance.post("GroupMachine_service.asmx/GetGroupMachines");
-    return response.data.data ?? [];
-};
-
-const saveMachine = async (data: Machine): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("Machine_service.asmx/SaveMachine", data);
-    return response.data;
-};
+import { fetchMachineGroups, fetchMachines, saveMachine } from "@/app/services";
 
 const MachineGroupScreen: React.FC = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");

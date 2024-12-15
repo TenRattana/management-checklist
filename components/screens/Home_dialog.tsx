@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react'
 import { Button, Dialog, Portal } from 'react-native-paper'
 import useMasterdataStyles from '@/styles/common/masterdata';
-import axiosInstance from '@/config/axios';
 import { TimeScheduleMachine } from '@/typing/type';
 import { useQuery } from 'react-query';
 import { LoadingSpinner } from '../common';
@@ -9,6 +8,7 @@ import { Customtable } from '..';
 import { useTheme } from '@/app/contexts/useTheme';
 import { Platform, View } from 'react-native';
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { fetchTimeMachines } from '@/app/services';
 
 interface Home_dialogProps {
     dialogVisible: boolean;
@@ -16,17 +16,14 @@ interface Home_dialogProps {
     selectedEvent: any;
 }
 
-const fetchMachines = async (data: { ScheduleID: string }): Promise<TimeScheduleMachine[]> => {
-    const response = await axiosInstance.post("TimeSchedule_service.asmx/GetScheduleMachine", data);
-    return response.data.data ?? [];
-};
-
 const Home_dialog = React.memo(({ dialogVisible, hideDialog, selectedEvent }: Home_dialogProps) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
+    console.log(selectedEvent);
+    
     const { data: machine = [], isLoading } = useQuery<TimeScheduleMachine[], Error>(
         ['machine', selectedEvent?.ScheduleID],
-        () => fetchMachines({ ScheduleID: selectedEvent?.ScheduleID || '' })
+        () => fetchTimeMachines({ ScheduleID: selectedEvent?.ScheduleID || '' })
     );
 
     const tableData = useMemo(() => machine.map((item) => [

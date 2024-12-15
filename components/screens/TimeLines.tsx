@@ -1,5 +1,5 @@
 import React, { lazy, useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme } from '@/app/contexts/useTheme';
 import moment from 'moment-timezone';
 import { groupBy } from 'lodash';
@@ -62,16 +62,18 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
     };
 
     const RenderEvent = React.memo(({ item }: { item: Event }) => (
-        <View>
+        <TouchableOpacity onPress={() => handleEventClick(item)}>
             <Text style={styles.eventTitle}>{item.title}</Text>
             <Text style={styles.eventTime}>
                 {formatTime(item.start)} - {formatTime(item.end)}
             </Text>
             {item.summary && <Text style={styles.eventSummary}>{item.summary}</Text>}
-        </View>
+        </TouchableOpacity>
     ));
 
     const handleEventClick = useCallback((event: any) => {
+        console.log(event);
+
         setSelectedEvent(event)
         setDialogVisible(true)
     }, []);
@@ -81,7 +83,6 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
             <Timeline
                 {...timelineProps}
                 styles={{ contentStyle: { backgroundColor: theme.colors.fff } }}
-                onEventPress={handleEventClick}
                 renderEvent={(event) => <RenderEvent item={event} />}
             />
         );

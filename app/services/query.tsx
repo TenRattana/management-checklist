@@ -1,5 +1,5 @@
 import axiosInstance from "@/config/axios";
-import { Checklist, CheckListOption, CheckListType, DataType, GroupCheckListOption } from "@/typing/type";
+import { Checklist, CheckListOption, CheckListType, DataType, GroupCheckListOption, GroupMachine, Machine, TimeScheduleMachine } from "@/typing/type";
 
 export const saveCheckList = async (data: {
     Prefix: any;
@@ -63,5 +63,41 @@ export const fetchTimeSchedules = async () => {
 
 export const fetchCheckListOption = async (): Promise<CheckListOption[]> => {
     const response = await axiosInstance.post("CheckListOption_service.asmx/GetCheckListOptions");
+    return response.data.data ?? [];
+};
+
+export const fetchTimeMachines = async (data: { ScheduleID: string }): Promise<TimeScheduleMachine[]> => {
+    const response = await axiosInstance.post("TimeSchedule_service.asmx/GetScheduleMachine", data);
+    return response.data.data ?? [];
+};
+
+export const fetchMachines = async (): Promise<Machine[]> => {
+    const response = await axiosInstance.post("Machine_service.asmx/GetMachines");
+    return response.data.data ?? [];
+};
+
+export const fetchMachineGroups = async (): Promise<GroupMachine[]> => {
+    const response = await axiosInstance.post("GroupMachine_service.asmx/GetGroupMachines");
+    return response.data.data ?? [];
+};
+
+export const saveMachine = async (data: Machine): Promise<{ message: string }> => {
+    const response = await axiosInstance.post("Machine_service.asmx/SaveMachine", data);
+    return response.data;
+};
+
+export const saveGroupMachine = async (data: {
+    Prefix: any;
+    GMachineID: string;
+    GMachineName: string;
+    Description: string;
+    IsActive: boolean;
+}): Promise<{ message: string }> => {
+    const response = await axiosInstance.post("GroupMachine_service.asmx/SaveGroupMachine", data);
+    return response.data;
+};
+
+export const fetchGroupCheckListOption = async (): Promise<GroupCheckListOption[]> => {
+    const response = await axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions");
     return response.data.data ?? [];
 };

@@ -11,22 +11,7 @@ import { Checklist } from '@/typing/type';
 import { InitialValuesChecklist } from '@/typing/value';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSelector } from "react-redux";
-
-const fetchCheckList = async (): Promise<Checklist[]> => {
-    const response = await axiosInstance.post("CheckList_service.asmx/GetCheckLists");
-    return response.data.data ?? [];
-};
-
-const saveCheckList = async (data: {
-    Prefix: any;
-    CListID: string;
-    CListName: string;
-    IsActive: boolean;
-    Disables: boolean;
-}): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("CheckList_service.asmx/SaveCheckList", data);
-    return response.data;
-};
+import { fetchCheckList, saveCheckList } from "@/app/services";
 
 const CheckListScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -48,10 +33,7 @@ const CheckListScreen = React.memo(() => {
 
     const { data: checkList = [], isLoading } = useQuery<Checklist[], Error>(
         'checkList',
-        fetchCheckList,
-        {
-            refetchOnWindowFocus: true,
-        }
+        fetchCheckList
     );
 
     const mutation = useMutation(saveCheckList, {

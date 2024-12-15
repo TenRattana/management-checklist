@@ -9,7 +9,7 @@ import { SharedValue } from 'react-native-gesture-handler/lib/typescript/handler
 import { getCurrentTime } from '@/config/timezoneUtils';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css"
+import "@/styles/Datapicker.css"
 
 interface Custom_scheduleProps {
     theme: any;
