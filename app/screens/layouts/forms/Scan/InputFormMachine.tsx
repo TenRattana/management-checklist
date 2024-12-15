@@ -116,13 +116,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
     <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]}>
       <Stack.Screen
         options={{
-          headerLeft: () => (
-            <View style={{ alignItems: 'center', justifyContent: 'center', paddingRight: 20 }}>
-              <Text style={[{ fontSize: 14, fontWeight: 'bold' }]}>
-                {state.MachineName || "Machine Name"}
-              </Text>
-            </View>
-          )
+          headerTitle: `${state.MachineName || "Machine Name"}`,
         }}
       />
 

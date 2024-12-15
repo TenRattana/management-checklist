@@ -7,6 +7,8 @@ import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
 import { Text } from "react-native-paper";
 import useField from "@/hooks/FieldDialog";
+import Time from "../common/Time";
+import { convertToDate, convertToThaiDateTime } from "../screens/Schedule";
 
 const DynamicForm = React.memo(({
   field,
@@ -83,6 +85,18 @@ const DynamicForm = React.memo(({
             handleBlur={handleBlur}
             testId={`input-${MCListID}`}
             textColor={textColor}
+            exp={exp}
+          />
+        );
+      case "Time":
+        return (
+          <Time
+            hint={error ? errorMessages?.[MCListID] as string || "" : messageminOrmax ? messageminOrmax : ""}
+            label={CListName}
+            value={values}
+            handleChange={(v: any) => handleChange(MCListID, v)}
+            handleBlur={handleBlur}
+            testId={`time-${MCListID}`}
             exp={exp}
           />
         );

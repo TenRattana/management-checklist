@@ -11,6 +11,7 @@ import { DataType } from "@/typing/type";
 import { useSelector } from "react-redux";
 import useForm from "@/hooks/custom/useForm";
 import * as Yup from 'yup';
+import { Stack } from "expo-router";
 
 interface FormValues {
     [key: string]: any;
@@ -83,7 +84,11 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
 
     return (
         <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]}>
-            
+            <Stack.Screen
+                options={{
+                    headerTitle: `${state.FormName || "Form Name"}`,
+                }}
+            />
             <FlatList
                 data={[{}]}
                 renderItem={() => state.subForms.map((subForm: BaseSubForm, index: number) => (
