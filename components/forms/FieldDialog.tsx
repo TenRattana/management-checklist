@@ -17,13 +17,13 @@ import CheckListCreate_dialog from "../screens/CheckListCreate_dialog";
 import { styles } from "../screens/Schedule";
 import useField from "@/hooks/FieldDialog";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { fetchCheckList, fetchGroupCheckList, saveCheckList, saveGroupCheckListOption } from "@/app/services";
-import { InitialValuesChecklist, InitialValuesGroupCheckList } from "@/typing/value";
+import { fetchCheckList, fetchCheckListOption, fetchGroupCheckList, saveCheckList, saveCheckListOption, saveGroupCheckListOption } from "@/app/services";
+import { InitialValuesChecklist, InitialValuesCheckListOption, InitialValuesGroupCheckList } from "@/typing/value";
 import { useSelector } from "react-redux";
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 
-const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode, setShowDialogs, checkListOption }: FieldDialogProps) => {
+const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode, setShowDialogs }: FieldDialogProps) => {
 
     const masterdataStyles = useMasterdataStyles();
     const [option, setOption] = useState<{ label: string; value: string; }[]>([]);
@@ -65,6 +65,14 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
         onError: handleError,
     });
 
+    const mutationCL = useMutation(saveCheckListOption, {
+        onSuccess: (data) => {
+            showSuccess(data.message);
+            queryClient.invalidateQueries("checkListOption");
+        },
+        onError: handleError,
+    });
+
     const saveDataCheckList = useCallback((values: InitialValuesChecklist) => {
         mutation.mutate({
             Prefix: state.CheckList ?? "",
@@ -76,6 +84,18 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
     },
         [mutation, state.CheckList]
     );
+
+    const saveDataCheckListOption = useCallback(async (values: InitialValuesCheckListOption) => {
+        const data = {
+            Prefix: state.CheckListOption ?? "",
+            CLOptionID: values.checkListOptionId,
+            CLOptionName: values.checkListOptionName,
+            IsActive: values.isActive,
+            Disables: values.disables,
+        };
+
+        mutationCL.mutate(data);
+    }, [mutation]);
 
     const saveDataGroupCheckList = useCallback((values: InitialValuesGroupCheckList, options: string[]) => {
         mutationG.mutate({
@@ -92,6 +112,11 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
     );
 
     const { data: checkList = [] } = useQuery("checkList", fetchCheckList, {
+        staleTime: 1000 * 60 * 24,
+        cacheTime: 1000 * 60 * 25,
+    });
+
+    const { data: checkListOption = [] } = useQuery("checkListOption", fetchCheckListOption, {
         staleTime: 1000 * 60 * 24,
         cacheTime: 1000 * 60 * 25,
     });
@@ -614,6 +639,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                     setIsVisible={() => {
                         handelAdd(false, "GroupCheckList");
                     }}
+                    saveDataCheckListOption={saveDataCheckListOption}
                     checkListOption={checkListOption}
                     saveData={(value: any, mode: any) => {
                         saveDataGroupCheckList(value, mode);

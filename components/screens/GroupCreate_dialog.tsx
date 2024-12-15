@@ -1,8 +1,8 @@
-import { FlatList, StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 import React, { useState } from 'react'
 import { CheckListOption } from '@/typing/type'
-import { InitialValuesCheckListOption, InitialValuesGroupCheckList } from '@/typing/value'
-import { Button, Dialog, Menu, Switch } from 'react-native-paper'
+import { InitialValuesGroupCheckList } from '@/typing/value'
+import { Dialog, Icon, Switch } from 'react-native-paper'
 import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler'
 import useMasterdataStyles from '@/styles/common/masterdata'
 import { FastField, Formik } from 'formik'
@@ -12,6 +12,8 @@ import { useTheme } from '@/app/contexts/useTheme'
 import { styles } from './Schedule'
 import Text from '../Text'
 import CustomDropdownMultiple from '../CustomDropdownMultiple'
+import { useRes } from '@/app/contexts/useRes'
+import CheckListOptionCreate_dialog from './CheckListOptionCreate_dialog'
 
 const validationSchema = Yup.object().shape({
     groupCheckListOptionName: Yup.string().required(
@@ -20,11 +22,13 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The active field is required."),
 });
 
-const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, saveData }:
-    { setIsVisible: () => void, checkListOption: CheckListOption[], saveData: any }) => {
+const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, saveData, saveDataCheckListOption }:
+    { setIsVisible: () => void, checkListOption: CheckListOption[], saveData: any, saveDataCheckListOption: any }) => {
     const masterdataStyles = useMasterdataStyles()
     const [options, setOptions] = useState<string[]>([])
+    const [dialog, setDialog] = useState<boolean>(false)
     const { theme } = useTheme()
+    const { spacing, responsive } = useRes()
 
     const [initialGroupCheckList] = useState({
         groupCheckListOptionId: "",
@@ -32,6 +36,8 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, saveData
         isActive: true,
         disables: false,
     });
+
+    const MemoCheckListOptionCreate_dialog = React.memo(CheckListOptionCreate_dialog)
 
     return (
         <GestureHandlerRootView style={{ flexGrow: 1 }}>
@@ -77,54 +83,38 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, saveData
                         </View>
 
                         <View style={styles.timeIntervalMenu}>
-                            <CustomDropdownMultiple
-                                data={checkListOption}
-                                handleBlur={() => {}}
-                                handleChange={(selectedValues) => {
-                                    let option
-                                    if (options.includes(selectedValues)) {
-                                        option = options.filter((id) => id !== selectedValues);
-                                    } else {
-                                        option = selectedValues;
-                                    }
-                                    setOptions(option);
-                                }}
-                                labels='CLOptionName'
-                                title='Select Check List Option'
-                                value={options}
-                                values='CLOptionID'
-                            />
-                            {/* <Menu
-                                visible={showTimeIntervalMenu}
-                                onDismiss={() => {
-                                    setShowTimeIntervalMenu(false)
-                                }}
-                                style={{ marginTop: 50 }}
-                                anchor={<Button
-                                    mode="outlined"
-                                    style={styles.timeButton}
-                                    onPress={() => setShowTimeIntervalMenu(true)}
-                                >
-                                    <Text style={masterdataStyles.timeText}>{'Select Reange Schedule'}</Text>
-                                </Button>}
-                            >
-                                {checkListOption.map((interval, index) => (
-                                    <Menu.Item
-                                        style={styles.menuItem}
-                                        key={index}
-                                        onPress={() => {
+                            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                                <View style={{ flex: 1 }}>
+                                    <CustomDropdownMultiple
+                                        data={checkListOption}
+                                        handleBlur={() => { }}
+                                        handleChange={(selectedValues) => {
                                             let option
-                                            if (options.includes(interval.CLOptionID)) {
-                                                option = options.filter((id) => id !== interval.CLOptionID);
+                                            if (options.includes(selectedValues)) {
+                                                option = options.filter((id) => id !== selectedValues);
                                             } else {
-                                                option = [...options, interval.CLOptionID];
+                                                option = selectedValues;
                                             }
                                             setOptions(option);
                                         }}
-                                        title={`${options.includes(interval.CLOptionID) ? "✔ " : ""}${interval.CLOptionName}`}
+                                        labels='CLOptionName'
+                                        title='Select Check List Option'
+                                        value={options}
+                                        values='CLOptionID'
                                     />
-                                ))}
-                            </Menu> */}
+                                </View>
+
+                                <TouchableOpacity
+                                    onPress={() => setDialog(true)}
+                                    style={{
+                                        alignItems: 'center',
+                                        paddingRight: 5
+                                    }}
+                                >
+                                    <Icon source={"plus-box"} size={spacing.large + 3} color={theme.colors.drag} />
+                                </TouchableOpacity>
+                            </View>
+
                         </View>
 
                         <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
@@ -138,6 +128,18 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, saveData
                     </View>
                 )}
             </Formik>
+
+            <Dialog visible={dialog} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center', borderRadius: 8, padding: 20 }} onDismiss={() => setDialog(false)}>
+                <MemoCheckListOptionCreate_dialog
+                    setIsVisible={() => {
+                        setDialog(false);
+                    }}
+                    saveData={(value: any) => {
+                        saveDataCheckListOption(value);
+                        setDialog(false);
+                    }}
+                />
+            </Dialog>
         </GestureHandlerRootView>
     )
 })

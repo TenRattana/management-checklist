@@ -1,5 +1,5 @@
 import axiosInstance from "@/config/axios";
-import { Checklist, CheckListType, DataType, GroupCheckListOption } from "@/typing/type";
+import { Checklist, CheckListOption, CheckListType, DataType, GroupCheckListOption } from "@/typing/type";
 
 export const saveCheckList = async (data: {
     Prefix: any;
@@ -59,4 +59,9 @@ export const fetchDataType = async (): Promise<DataType[]> => {
 export const fetchTimeSchedules = async () => {
     const response = await axiosInstance.post("TimeSchedule_service.asmx/GetSchedules");
     return response.data.data ?? [];
-  };
+};
+
+export const fetchCheckListOption = async (): Promise<CheckListOption[]> => {
+    const response = await axiosInstance.post("CheckListOption_service.asmx/GetCheckListOptions");
+    return response.data.data ?? [];
+};

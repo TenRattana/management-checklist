@@ -11,11 +11,7 @@ import { CheckListOption } from '@/typing/type'
 import { InitialValuesCheckListOption } from '@/typing/value'
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSelector } from "react-redux";
-
-const fetchCheckListOption = async (): Promise<CheckListOption[]> => {
-    const response = await axiosInstance.post("CheckListOption_service.asmx/GetCheckListOptions");
-    return response.data.data ?? [];
-};
+import { fetchCheckListOption } from "@/app/services";
 
 const saveCheckListOption = async (data: {
     Prefix: any;
