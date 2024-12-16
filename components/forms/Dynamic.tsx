@@ -89,7 +89,7 @@ const DynamicForm = React.memo(({
       case "Time":
         return (
           <Time
-            hint={error ? errorMessages?.[MCListID] as string || "" : messageminOrmax ? messageminOrmax : ""}
+            hint={error ? errorMessages?.[MCListID] as string : ""}
             label={CListName}
             value={values}
             handleChange={(v: any) => handleChange(MCListID, v)}

@@ -114,7 +114,6 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                             >
                                 {({ errors, touched, setFieldValue, setTouched, setFieldError, values }) => {
                                     incrementCount(false);
-
                                     return (
                                         <Card
                                             style={masterdataStyles.card}

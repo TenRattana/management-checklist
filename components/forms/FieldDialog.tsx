@@ -24,6 +24,7 @@ import { useSelector } from "react-redux";
 const AnimatedView = Animated.createAnimatedComponent(View);
 
 const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode, setShowDialogs }: FieldDialogProps) => {
+    console.log("Field");
 
     const masterdataStyles = useMasterdataStyles();
     const [option, setOption] = useState<{ label: string; value: string; }[]>([]);
@@ -212,10 +213,12 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             glc.current = values.GCLOptionID
 
                             const updateRenderStates = useCallback(() => {
+                                console.log("updateRenderStates");
+
                                 const checkListTypeItem = checkListTypes.find(item => item.CTypeID === values.CTypeID)?.CTypeName ?? "";
                                 const newRender = ["Dropdown", "Radio", "Checkbox"].includes(checkListTypeItem)
                                     ? "detail"
-                                    : ["Textinput"].includes(checkListTypeItem)
+                                    : ["Textinput", "Time"].includes(checkListTypeItem)
                                         ? "text"
                                         : ["Text"].includes(checkListTypeItem) ? "label" : "";
 
@@ -226,10 +229,14 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             }, [values.CTypeID, checkListTypes, shouldRender, setFieldValue]);
 
                             useEffect(() => {
+                                console.log("useEffect");
+
                                 updateRenderStates();
                             }, [values.CTypeID, updateRenderStates]);
 
                             const updateImportantList = useCallback((modifications: { Value?: string | string[]; MinLength?: number; MaxLength?: number; }) => {
+                                console.log("updateImportantList");
+
                                 if (Array.isArray(values.ImportantList)) {
                                     const idMcl = `MCL-ADD-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
                                     const updatedList = values.ImportantList.map(item => ({
@@ -243,8 +250,23 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                 }
                             }, [values.ImportantList, setFieldValue]);
 
-                            const handleDataTypeChange = useCallback(() => {
-                                const dataTypeItem = dataType.find(item => item.DTypeID === values.DTypeID)?.DTypeName;
+                            const handleDataTypeChange = useCallback((dataTypeItem: string | undefined) => {
+                                console.log("handleDataTypeChange");
+
+                                if (values.Important) {
+                                    if (dataTypeItem === "Number") {
+                                        updateImportantList({ Value: undefined });
+                                    } else {
+                                        updateImportantList({ MinLength: undefined, MaxLength: undefined, Value: undefined });
+                                    }
+                                }
+
+                                setShouldRenderDT(dataTypeItem === "Number");
+                            }, [values.Important]);
+
+                            const handleDataOption = useCallback(() => {
+                                console.log("handleDataOption");
+
                                 let options: { label: string; value: string; }[] = [];
 
                                 if (values.GCLOptionID) {
@@ -259,28 +281,30 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                     updateImportantList({ MinLength: undefined, MaxLength: undefined });
                                 }
 
-                                if (values.Important) {
-                                    if (dataTypeItem === "Number") {
-                                        updateImportantList({ Value: undefined });
-                                    } else {
-                                        updateImportantList({ MinLength: undefined, MaxLength: undefined, Value: undefined });
-                                    }
-                                }
-
                                 setOption(prevOptions => {
                                     const isEqual = JSON.stringify(prevOptions) === JSON.stringify(options);
                                     return isEqual ? prevOptions : options;
                                 });
-                                setShouldRenderDT(dataTypeItem === "Number");
-                            }, [values.DTypeID, values.GCLOptionID, values.Important, dataType, groupCheckListOption]);
+
+                            }, [values.GCLOptionID, groupCheckListOption]);
 
                             useEffect(() => {
-                                handleDataTypeChange();
-                            }, [values.DTypeID, values.GCLOptionID, values.Important, handleDataTypeChange]);
+                                console.log("useEffect 2");
+                                const dataTypeItem = values.DTypeID ? dataType.find(item => item.DTypeID === values.DTypeID)?.DTypeName : undefined;
+                                handleDataTypeChange(dataTypeItem);
+                            }, [values.DTypeID, values.Important, handleDataTypeChange, dataType]);
 
                             useEffect(() => {
-                                setShouldRenderIT(values.Important);
+                                console.log("useEffect 3");
+                                handleDataOption();
+                            }, [values.GCLOptionID, handleDataOption]);
+
+                            useEffect(() => {
+                                console.log("useEffect 4");
+                                if (values.Important !== shouldRenderIT)
+                                    setShouldRenderIT(values.Important);
                             }, [values.Important]);
+                            console.log("form");
 
                             return (
                                 <View style={{ marginHorizontal: 12 }}>

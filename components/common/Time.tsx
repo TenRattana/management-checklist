@@ -8,8 +8,9 @@ import useMasterdataStyles from '@/styles/common/masterdata';
 import { useTheme } from '@/app/contexts/useTheme';
 import { convertToDate, convertToThaiDateTime } from '../screens/Schedule';
 import { getCurrentTime } from '@/config/timezoneUtils';
+import { runOnJS } from 'react-native-reanimated';
 
-const Time: React.FC<any> = ({ placeholder, label, error, errorMessage, value, handleChange, handleBlur }) => {
+const Time: React.FC<any> = ({ placeholder, label, error, errorMessage, value, handleChange, handleBlur, hint }) => {
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const { theme } = useTheme();
     const masterdataStyles = useMasterdataStyles();
@@ -23,8 +24,8 @@ const Time: React.FC<any> = ({ placeholder, label, error, errorMessage, value, h
     };
 
     const handleConfirm = (date: Date) => {
-        handleChange(convertToThaiDateTime(new Date(date).toISOString(), true));
-        hideDatePicker();
+        runOnJS(handleChange)(convertToThaiDateTime(new Date(date).toISOString(), true));
+        hideDatePicker()
     };
 
     const CustomInput = React.forwardRef<any, any>(({ onClick, value }, ref) => (
@@ -75,12 +76,7 @@ const Time: React.FC<any> = ({ placeholder, label, error, errorMessage, value, h
                     customInput={<CustomInput />}
                 />
             )}
-
-            {error && (
-                <HelperText type="error" visible={error}>
-                    {errorMessage}
-                </HelperText>
-            )}
+            {hint ? <Text style={masterdataStyles.hint}>{hint}</Text> : false}
         </View>
     );
 };

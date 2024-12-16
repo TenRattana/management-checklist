@@ -27,6 +27,11 @@ import Animated, {
 import Create from "./Create";
 import { useToast } from "@/app/contexts/useToast";
 
+const isValidDateFormatCustom = (value: string) => {
+    const dateRegex = /^(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2})$/;
+    return dateRegex.test(value);
+};
+
 const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigation }) => {
     const { responsive, fontSize, spacing } = useRes();
     const { handleError } = useToast();
@@ -88,10 +93,18 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                 const dataTypeName = dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName;
                 let validator;
 
+                console.log(dataTypeName);
+
                 if (dataTypeName === "Number") {
                     validator = Yup.number()
                         .nullable()
                         .typeError(`The ${field.CListName} field must be a valid number`);
+                } else if (dataTypeName === "Date") {
+                    validator = Yup.string()
+                        .nullable()
+                        .test('is-valid-date', 'Invalid date format', value => {
+                            return value ? isValidDateFormatCustom(String(value)) : true;
+                        })
                 } else if (field.CTypeName === "Checkbox") {
                     validator = Yup.array()
                         .of(Yup.string().required("Each selected option is required."))
@@ -117,7 +130,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
     const handleDrop = useCallback((item: CheckList, absoluteX: number, absoluteY: number) => {
         const cardIndex = childRef.current.checkCardPosition(absoluteX, absoluteY);
         const selectedChecklist = checkList.find((v: Checklist) => v.CListID === "CL000") || checkList?.[0];
-        const selectedDataType = dataType.find((v: DataType) => item.CTypeTitle === "Number Answer" ? v.DTypeName === "Number" : v.DTypeName === "String") || dataType?.[0];
+        const selectedDataType = dataType.find((v: DataType) => item.CTypeTitle === "Number Answer" ? v.DTypeName === "Number" : item.CTypeTitle === "Time/Date" ? v.DTypeName === "Date" : v.DTypeName === "String") || dataType?.[0];
 
         if (item.CTypeName === "SubForm") {
             const subForm = { SFormID: "", SFormName: "New Setion", Columns: 1, Fields: [], Number: false, FormID: state.FormID || "", MachineID: state.MachineID || "" }

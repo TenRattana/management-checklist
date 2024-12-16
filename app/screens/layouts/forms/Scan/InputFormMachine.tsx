@@ -21,6 +21,11 @@ interface FormValues {
   [key: string]: any;
 }
 
+const isValidDateFormatCustom = (value: string) => {
+  const dateRegex = /^(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2})$/;
+  return dateRegex.test(value);
+};
+
 const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) => {
   const { route } = props;
   const { dataType, found } = useForm(route);
@@ -45,6 +50,12 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
           validator = Yup.number()
             .nullable()
             .typeError(`The ${field.CListName} field must be a valid number`);
+        } else if (dataTypeName === "Date") {
+          validator = Yup.string()
+            .nullable()
+            .test('is-valid-date', 'Invalid date format', value => {
+              return value ? isValidDateFormatCustom(String(value)) : true;
+            })
         } else if (field.CTypeName === "Checkbox") {
           validator = Yup.array()
             .of(Yup.string().required("Each selected option is required."))

@@ -121,7 +121,7 @@ const Custom_schedule_dialog = React.memo(({ showError, showSuccess, spacing, se
             const newState = [...values];
             newState[index] = { ...newState[index], [type]: formattedDate };
 
-            setFieldValue(newState);
+            runOnJS(setFieldValue)(newState);
         }
 
     }, [values]);
