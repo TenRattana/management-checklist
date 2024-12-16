@@ -112,7 +112,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                                 enableReinitialize={true}
                                 key={JSON.stringify({ SFormID: subForm.SFormID, Column: subForm.Columns, fields: subForm.Fields })}
                             >
-                                {({ errors, touched, setFieldValue, setTouched, setFieldError }) => {
+                                {({ errors, touched, setFieldValue, setTouched, setFieldError, values }) => {
                                     incrementCount(false);
 
                                     return (

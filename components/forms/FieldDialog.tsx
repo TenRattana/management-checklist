@@ -192,400 +192,400 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                     {editMode ? "Edit check list" : "Create check list"}
                 </Dialog.Title>
 
-                <Dialog.Content>
-                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginBottom: 10, paddingLeft: 10 }]}>
-                        {editMode ? "Edit the details of the field." : "Enter the details for the new field."}
-                    </Text>
+                <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginBottom: 10, paddingLeft: 30 }]}>
+                    {editMode ? "Edit the details of the field." : "Enter the details for the new field."}
+                </Text>
 
-                    {isVisible && (
-                        <Formik
-                            initialValues={formState}
-                            validationSchema={validationSchema}
-                            validateOnBlur={false}
-                            validateOnChange={true}
-                            onSubmit={values => {
-                                handleSaveField(values, editMode ? "update" : "add")
-                                setShowDialogs()
-                            }}
-                            enableReinitialize={true}
-                        >
-                            {({ setFieldValue, values, handleSubmit, isValid, dirty }) => {
-                                glc.current = values.GCLOptionID
+                {isVisible && (
+                    <Formik
+                        initialValues={formState}
+                        validationSchema={validationSchema}
+                        validateOnBlur={false}
+                        validateOnChange={true}
+                        onSubmit={values => {
+                            handleSaveField(values, editMode ? "update" : "add")
+                            setShowDialogs()
+                        }}
+                        enableReinitialize={true}
+                    >
+                        {({ setFieldValue, values, handleSubmit, isValid, dirty }) => {
+                            glc.current = values.GCLOptionID
 
-                                const updateRenderStates = useCallback(() => {
-                                    const checkListTypeItem = checkListTypes.find(item => item.CTypeID === values.CTypeID)?.CTypeName ?? "";
-                                    const newRender = ["Dropdown", "Radio", "Checkbox"].includes(checkListTypeItem)
-                                        ? "detail"
-                                        : ["Textinput"].includes(checkListTypeItem)
-                                            ? "text"
-                                            : ["Text"].includes(checkListTypeItem) ? "label" : "";
+                            const updateRenderStates = useCallback(() => {
+                                const checkListTypeItem = checkListTypes.find(item => item.CTypeID === values.CTypeID)?.CTypeName ?? "";
+                                const newRender = ["Dropdown", "Radio", "Checkbox"].includes(checkListTypeItem)
+                                    ? "detail"
+                                    : ["Textinput"].includes(checkListTypeItem)
+                                        ? "text"
+                                        : ["Text"].includes(checkListTypeItem) ? "label" : "";
 
-                                    if (newRender !== shouldRender) {
-                                        setFieldValue(newRender === "detail" ? "DTypeID" : "GCLOptionID", null);
-                                        setShouldRender(newRender);
+                                if (newRender !== shouldRender) {
+                                    setFieldValue(newRender === "detail" ? "DTypeID" : "GCLOptionID", null);
+                                    setShouldRender(newRender);
+                                }
+                            }, [values.CTypeID, checkListTypes, shouldRender, setFieldValue]);
+
+                            useEffect(() => {
+                                updateRenderStates();
+                            }, [values.CTypeID, updateRenderStates]);
+
+                            const updateImportantList = useCallback((modifications: { Value?: string | string[]; MinLength?: number; MaxLength?: number; }) => {
+                                if (Array.isArray(values.ImportantList)) {
+                                    const idMcl = `MCL-ADD-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+                                    const updatedList = values.ImportantList.map(item => ({
+                                        ...item,
+                                        ...modifications,
+                                        MCListID: item.MCListID || idMcl,
+                                    }));
+                                    if (JSON.stringify(values.ImportantList) !== JSON.stringify(updatedList)) {
+                                        setFieldValue("ImportantList", [...updatedList]);
                                     }
-                                }, [values.CTypeID, checkListTypes, shouldRender, setFieldValue]);
+                                }
+                            }, [values.ImportantList, setFieldValue]);
 
-                                useEffect(() => {
-                                    updateRenderStates();
-                                }, [values.CTypeID, updateRenderStates]);
+                            const handleDataTypeChange = useCallback(() => {
+                                const dataTypeItem = dataType.find(item => item.DTypeID === values.DTypeID)?.DTypeName;
+                                let options: { label: string; value: string; }[] = [];
 
-                                const updateImportantList = useCallback((modifications: { Value?: string | string[]; MinLength?: number; MaxLength?: number; }) => {
-                                    if (Array.isArray(values.ImportantList)) {
-                                        const idMcl = `MCL-ADD-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
-                                        const updatedList = values.ImportantList.map(item => ({
-                                            ...item,
-                                            ...modifications,
-                                            MCListID: item.MCListID || idMcl,
-                                        }));
-                                        if (JSON.stringify(values.ImportantList) !== JSON.stringify(updatedList)) {
-                                            setFieldValue("ImportantList", [...updatedList]);
-                                        }
+                                if (values.GCLOptionID) {
+                                    options = groupCheckListOption
+                                        .filter(option => option.GCLOptionID === values.GCLOptionID)
+                                        .flatMap(option => option.CheckListOptions?.filter(item => item.IsActive)
+                                            .map(item => ({
+                                                label: item.CLOptionName,
+                                                value: item.CLOptionID,
+                                            })) || []
+                                        );
+                                    updateImportantList({ MinLength: undefined, MaxLength: undefined });
+                                }
+
+                                if (values.Important) {
+                                    if (dataTypeItem === "Number") {
+                                        updateImportantList({ Value: undefined });
+                                    } else {
+                                        updateImportantList({ MinLength: undefined, MaxLength: undefined, Value: undefined });
                                     }
-                                }, [values.ImportantList, setFieldValue]);
+                                }
 
-                                const handleDataTypeChange = useCallback(() => {
-                                    const dataTypeItem = dataType.find(item => item.DTypeID === values.DTypeID)?.DTypeName;
-                                    let options: { label: string; value: string; }[] = [];
+                                setOption(prevOptions => {
+                                    const isEqual = JSON.stringify(prevOptions) === JSON.stringify(options);
+                                    return isEqual ? prevOptions : options;
+                                });
+                                setShouldRenderDT(dataTypeItem === "Number");
+                            }, [values.DTypeID, values.GCLOptionID, values.Important, dataType, groupCheckListOption]);
 
-                                    if (values.GCLOptionID) {
-                                        options = groupCheckListOption
-                                            .filter(option => option.GCLOptionID === values.GCLOptionID)
-                                            .flatMap(option => option.CheckListOptions?.filter(item => item.IsActive)
-                                                .map(item => ({
-                                                    label: item.CLOptionName,
-                                                    value: item.CLOptionID,
-                                                })) || []
-                                            );
-                                        updateImportantList({ MinLength: undefined, MaxLength: undefined });
-                                    }
+                            useEffect(() => {
+                                handleDataTypeChange();
+                            }, [values.DTypeID, values.GCLOptionID, values.Important, handleDataTypeChange]);
 
-                                    if (values.Important) {
-                                        if (dataTypeItem === "Number") {
-                                            updateImportantList({ Value: undefined });
-                                        } else {
-                                            updateImportantList({ MinLength: undefined, MaxLength: undefined, Value: undefined });
-                                        }
-                                    }
+                            useEffect(() => {
+                                setShouldRenderIT(values.Important);
+                            }, [values.Important]);
 
-                                    setOption(prevOptions => {
-                                        const isEqual = JSON.stringify(prevOptions) === JSON.stringify(options);
-                                        return isEqual ? prevOptions : options;
-                                    });
-                                    setShouldRenderDT(dataTypeItem === "Number");
-                                }, [values.DTypeID, values.GCLOptionID, values.Important, dataType, groupCheckListOption]);
-
-                                useEffect(() => {
-                                    handleDataTypeChange();
-                                }, [values.DTypeID, values.GCLOptionID, values.Important, handleDataTypeChange]);
-
-                                useEffect(() => {
-                                    setShouldRenderIT(values.Important);
-                                }, [values.Important]);
-
-                                return (
-                                    <View id="form-fd">
-                                        <ScrollView
-                                            contentContainerStyle={{ paddingBottom: 5, paddingHorizontal: 10 }}
-                                            showsVerticalScrollIndicator={false}
-                                            style={{ maxHeight: Platform.OS === "web" ? 330 : '68%' }}
-                                        >
-                                            <FastField name="CListID" key={JSON.stringify(checkList)}>
-                                                {({ field, form }: any) => (
-                                                    <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                                                        <View style={{ flex: 1 }}>
-                                                            <CustomDropdownSingle
-                                                                title="Check List"
-                                                                labels="CListName"
-                                                                values="CListID"
-                                                                data={checkList}
-                                                                value={field.value}
-                                                                handleChange={(value) => {
-                                                                    const stringValue = (value as { value: string }).value;
-                                                                    form.setFieldValue(field.name, stringValue);
-                                                                    form.setFieldTouched(field.name, true);
-                                                                }}
-                                                                handleBlur={() => {
-                                                                    form.setFieldTouched(field.name, true);
-                                                                }}
-                                                                testId={`CListID-form`}
-                                                                error={form.touched.CListID && Boolean(form.errors.CListID)}
-                                                                errorMessage={form.touched.CListID ? form.errors.CListID : ""}
-                                                            />
-                                                        </View>
-
-                                                        <TouchableOpacity
-                                                            onPress={() => handelAdd(true, "CheckList")}
-                                                            style={{
-                                                                alignItems: 'center',
-                                                                paddingRight: 5
+                            return (
+                                <View style={{ marginHorizontal: 12 }}>
+                                    <ScrollView
+                                        contentContainerStyle={{ paddingBottom: 5, paddingHorizontal: 10 }}
+                                        showsVerticalScrollIndicator={false}
+                                        style={{ maxHeight: Platform.OS === "web" ? 330 : '68%' }}
+                                    >
+                                        <FastField name="CListID" key={JSON.stringify(checkList)}>
+                                            {({ field, form }: any) => (
+                                                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                                                    <View style={{ flex: 1 }}>
+                                                        <CustomDropdownSingle
+                                                            title="Check List"
+                                                            labels="CListName"
+                                                            values="CListID"
+                                                            data={checkList}
+                                                            value={field.value}
+                                                            handleChange={(value) => {
+                                                                const stringValue = (value as { value: string }).value;
+                                                                form.setFieldValue(field.name, stringValue);
+                                                                form.setFieldTouched(field.name, true);
                                                             }}
-                                                        >
-                                                            <Icon source={"plus-box"} size={spacing.large + 3} color={theme.colors.drag} />
-                                                        </TouchableOpacity>
+                                                            handleBlur={() => {
+                                                                form.setFieldTouched(field.name, true);
+                                                            }}
+                                                            testId={`CListID-form`}
+                                                            error={form.touched.CListID && Boolean(form.errors.CListID)}
+                                                            errorMessage={form.touched.CListID ? form.errors.CListID : ""}
+                                                        />
                                                     </View>
-                                                )}
-                                            </FastField>
 
-                                            <FastField name="CTypeID">
-                                                {({ field, form }: any) => (
-                                                    <CustomDropdownSingle
-                                                        title="Check List Type"
-                                                        labels="CTypeName"
-                                                        values="CTypeID"
-                                                        data={editMode ? filteredCheckList : filteredCheckList.filter(v => v.IsActive)}
-                                                        value={field.value}
-                                                        handleChange={(value) => {
-                                                            const stringValue = (value as { value: string }).value;
-                                                            form.setFieldValue(field.name, stringValue);
-                                                            form.setFieldTouched(field.name, true);
+                                                    <TouchableOpacity
+                                                        onPress={() => handelAdd(true, "CheckList")}
+                                                        style={{
+                                                            alignItems: 'center',
+                                                            paddingRight: 5
                                                         }}
-                                                        handleBlur={() => {
-                                                            form.setFieldTouched(field.name, true);
-                                                        }}
-                                                        testId={`CTypeID-form`}
-                                                        error={form.touched.CTypeID && Boolean(form.errors.CTypeID)}
-                                                        errorMessage={form.touched.CTypeID ? form.errors.CTypeID : ""}
-                                                    />
-                                                )}
-                                            </FastField>
-
-                                            {shouldRender === "detail" && (
-                                                <RenderView style={Platform.OS === 'web' ? memoizedAnimatedText : { opacity: 1 }}>
-                                                    <FastField name="GCLOptionID" key={JSON.stringify(groupCheckListOption)}>
-                                                        {({ field, form }: any) => (
-                                                            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                                                                <View style={{ flex: 1 }}>
-                                                                    <CustomDropdownSingle
-                                                                        title="Match Check List Option Group"
-                                                                        labels="GCLOptionName"
-                                                                        values="GCLOptionID"
-                                                                        data={groupCheckListOption}
-                                                                        value={field.value}
-                                                                        handleChange={(value) => {
-                                                                            const stringValue = (value as { value: string }).value;
-
-                                                                            form.setFieldValue(field.name, stringValue);
-                                                                            form.setFieldTouched(field.name, true);
-                                                                        }}
-                                                                        handleBlur={() => {
-                                                                            form.setFieldTouched(field.name, true);
-                                                                        }}
-                                                                        testId={`GCLOptionID-form`}
-                                                                        error={form.touched.GCLOptionID && Boolean(form.errors.GCLOptionID)}
-                                                                        errorMessage={form.touched.GCLOptionID ? form.errors.GCLOptionID : ""}
-                                                                    />
-                                                                </View>
-
-                                                                <TouchableOpacity
-                                                                    onPress={() => {
-                                                                        handelInfo(true, "GroupCheckList")
-                                                                    }}
-                                                                    style={{
-                                                                        alignItems: 'center',
-                                                                        paddingRight: 5,
-                                                                        display: glc.current ? 'flex' : 'none'
-                                                                    }}
-                                                                >
-                                                                    <Icon source={"information"} size={spacing.large + 3} color={theme.colors.drag} />
-                                                                </TouchableOpacity>
-
-                                                                <TouchableOpacity
-                                                                    onPress={() => {
-                                                                        handelAdd(true, "GroupCheckList")
-                                                                    }}
-                                                                    style={{
-                                                                        alignItems: 'center',
-                                                                        paddingRight: 5
-                                                                    }}
-                                                                >
-                                                                    <Icon source={"plus-box"} size={spacing.large + 3} color={theme.colors.drag} />
-                                                                </TouchableOpacity>
-                                                            </View>
-                                                        )}
-                                                    </FastField>
-                                                </RenderView>
-                                            )}
-
-                                            {shouldRender === "text" && (
-                                                <RenderView style={Platform.OS === 'web' ? memoizedAnimatedText : { opacity: 1 }}>
-                                                    <FastField name="DTypeID">
-                                                        {({ field, form }: any) => (
-                                                            <CustomDropdownSingle
-                                                                title="Data Type"
-                                                                labels="DTypeName"
-                                                                values="DTypeID"
-                                                                data={editMode ? dataType : dataType.filter(v => v.IsActive)}
-                                                                value={field.value}
-                                                                handleChange={(value) => {
-                                                                    const stringValue = (value as { value: string }).value;
-                                                                    form.setFieldValue(field.name, stringValue);
-                                                                    form.setFieldTouched(field.name, true);
-                                                                }}
-                                                                handleBlur={() => {
-                                                                    form.setFieldTouched(field.name, true);
-                                                                }}
-                                                                testId={`DTypeID-form`}
-                                                                error={form.touched.DTypeID && Boolean(form.errors.DTypeID)}
-                                                                errorMessage={form.touched.DTypeID ? form.errors.DTypeID : ""}
-                                                            />
-                                                        )}
-                                                    </FastField>
-                                                </RenderView>
-                                            )}
-
-                                            <FastField name="Rowcolumn">
-                                                {({ field, form }: any) => (
-                                                    <Inputs
-                                                        placeholder="Columns"
-                                                        label="Column in row"
-                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                        handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                        value={String(field.value ?? "")}
-                                                        error={form.touched?.Rowcolumn && Boolean(form.errors?.Rowcolumn)}
-                                                        errorMessage={form.touched?.Rowcolumn ? form.errors?.Rowcolumn : ""}
-                                                        testId={`Rowcolumn-form`}
-                                                    />
-                                                )}
-                                            </FastField >
-
-                                            {shouldRenderDT && (
-                                                <RenderView style={Platform.OS === 'web' ? memoizedAnimatedDT : { opacity: 1 }}>
-                                                    <FastField name="DTypeValue">
-                                                        {({ field, form }: any) => (
-                                                            <Inputs
-                                                                placeholder="Digis Value"
-                                                                label="Digit number"
-                                                                handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                                value={String(field.value ?? "")}
-                                                                error={form.touched?.DTypeValue && Boolean(form.errors?.DTypeValue)}
-                                                                errorMessage={form.touched?.DTypeValue ? form.errors?.DTypeValue : ""}
-                                                                testId={`DTypeValue-form`}
-                                                            />
-                                                        )}
-                                                    </FastField >
-                                                </RenderView>
-                                            )}
-
-                                            {shouldRender !== "label" && (
-                                                <View id="form-active-fd" style={masterdataStyles.containerSwitch}>
-                                                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
-                                                        Require: {values.Required ? "Yes" : "No"}
-                                                    </Text>
-                                                    <Switch
-                                                        style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                                        value={values.Required}
-                                                        onValueChange={(v: boolean) => {
-                                                            setFieldValue("Required", v);
-                                                        }}
-                                                        id="Required-form"
-                                                    />
+                                                    >
+                                                        <Icon source={"plus-box"} size={spacing.large + 3} color={theme.colors.drag} />
+                                                    </TouchableOpacity>
                                                 </View>
                                             )}
+                                        </FastField>
 
-                                            {shouldRenderIT && option?.length > 0 && (
-                                                <RenderView style={Platform.OS === 'web' ? memoizedAnimatedIT : { opacity: 1 }}>
-                                                    <Text style={{ marginTop: 10, marginBottom: 10, paddingLeft: 10, fontSize: spacing.small, color: theme.colors.error }}>
-                                                        {(values.ImportantList || []).some((item) => item.Value) ? "Select value is important!" : "Input value control!"}
-                                                    </Text>
+                                        <FastField name="CTypeID">
+                                            {({ field, form }: any) => (
+                                                <CustomDropdownSingle
+                                                    title="Check List Type"
+                                                    labels="CTypeName"
+                                                    values="CTypeID"
+                                                    data={editMode ? filteredCheckList : filteredCheckList.filter(v => v.IsActive)}
+                                                    value={field.value}
+                                                    handleChange={(value) => {
+                                                        const stringValue = (value as { value: string }).value;
+                                                        form.setFieldValue(field.name, stringValue);
+                                                        form.setFieldTouched(field.name, true);
+                                                    }}
+                                                    handleBlur={() => {
+                                                        form.setFieldTouched(field.name, true);
+                                                    }}
+                                                    testId={`CTypeID-form`}
+                                                    error={form.touched.CTypeID && Boolean(form.errors.CTypeID)}
+                                                    errorMessage={form.touched.CTypeID ? form.errors.CTypeID : ""}
+                                                />
+                                            )}
+                                        </FastField>
 
-                                                    <FastField name="ImportantList[0].Value" key={JSON.stringify(option)}>
-                                                        {({ field, form }: any) => {
-                                                            return (
-                                                                <Checkboxs
-                                                                    option={option}
+                                        {shouldRender === "detail" && (
+                                            <RenderView style={Platform.OS === 'web' ? memoizedAnimatedText : { opacity: 1 }}>
+                                                <FastField name="GCLOptionID" key={JSON.stringify(groupCheckListOption)}>
+                                                    {({ field, form }: any) => (
+                                                        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                                                            <View style={{ flex: 1 }}>
+                                                                <CustomDropdownSingle
+                                                                    title="Match Check List Option Group"
+                                                                    labels="GCLOptionName"
+                                                                    values="GCLOptionID"
+                                                                    data={groupCheckListOption}
+                                                                    value={field.value}
                                                                     handleChange={(value) => {
-                                                                        const processedValues = Array.isArray(value)
-                                                                            ? value.filter((v: string) => v.trim() !== '')
-                                                                            : String(value).split(',').filter((v: string) => v.trim() !== '');
+                                                                        const stringValue = (value as { value: string }).value;
 
-                                                                        form.setFieldValue(field.name, processedValues);
+                                                                        form.setFieldValue(field.name, stringValue);
                                                                         form.setFieldTouched(field.name, true);
                                                                     }}
-                                                                    value={String(field.value ?? "")}
-                                                                    error={form.touched?.ImportantList?.[0]?.Value && Boolean(form.errors?.ImportantList?.[0]?.Value)}
-                                                                    errorMessage={form.touched?.ImportantList?.[0]?.Value ? form.errors?.ImportantList?.[0]?.Value : ""}
                                                                     handleBlur={() => {
                                                                         form.setFieldTouched(field.name, true);
                                                                     }}
-                                                                    testId="Value-Important-form-combined"
+                                                                    testId={`GCLOptionID-form`}
+                                                                    error={form.touched.GCLOptionID && Boolean(form.errors.GCLOptionID)}
+                                                                    errorMessage={form.touched.GCLOptionID ? form.errors.GCLOptionID : ""}
                                                                 />
-                                                            );
-                                                        }}
-                                                    </FastField>
+                                                            </View>
 
-                                                </RenderView>
-                                            )}
+                                                            <TouchableOpacity
+                                                                onPress={() => {
+                                                                    handelInfo(true, "GroupCheckList")
+                                                                }}
+                                                                style={{
+                                                                    alignItems: 'center',
+                                                                    paddingRight: 5,
+                                                                    display: glc.current ? 'flex' : 'none'
+                                                                }}
+                                                            >
+                                                                <Icon source={"information"} size={spacing.large + 3} color={theme.colors.drag} />
+                                                            </TouchableOpacity>
 
-                                            {shouldRenderIT && shouldRenderDT && (
-                                                <RenderView style={Platform.OS === 'web' ? memoizedAnimatedIT : { opacity: 1 }}>
-                                                    <Text
-                                                        style={[
-                                                            { marginTop: 10, marginBottom: 10, paddingLeft: 10, fontSize: spacing.small, color: theme.colors.error }
-                                                        ]}
-                                                    >
-                                                        Input value control!
-                                                    </Text>
-                                                    <>
-                                                        <FastField name="ImportantList[0].MinLength">
-                                                            {({ field, form }: any) => {
-                                                                return (
-                                                                    <Inputs
-                                                                        placeholder="Min Value"
-                                                                        label="Min Value Control"
-                                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                                        handleBlur={() => {
-                                                                            form.setFieldTouched(field.name, true);
-                                                                        }}
-                                                                        value={String(field.value ?? "")}
-                                                                        error={form.touched?.ImportantList?.[0]?.MinLength && Boolean(form.errors?.ImportantList?.[0]?.MinLength)}
-                                                                        errorMessage={form.touched?.ImportantList?.[0]?.MinLength ? form.errors?.ImportantList?.[0]?.MinLength : ""}
-                                                                        testId={`MinLength-form`}
-                                                                    />
-                                                                )
+                                                            <TouchableOpacity
+                                                                onPress={() => {
+                                                                    handelAdd(true, "GroupCheckList")
+                                                                }}
+                                                                style={{
+                                                                    alignItems: 'center',
+                                                                    paddingRight: 5
+                                                                }}
+                                                            >
+                                                                <Icon source={"plus-box"} size={spacing.large + 3} color={theme.colors.drag} />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                    )}
+                                                </FastField>
+                                            </RenderView>
+                                        )}
+
+                                        {shouldRender === "text" && (
+                                            <RenderView style={Platform.OS === 'web' ? memoizedAnimatedText : { opacity: 1 }}>
+                                                <FastField name="DTypeID">
+                                                    {({ field, form }: any) => (
+                                                        <CustomDropdownSingle
+                                                            title="Data Type"
+                                                            labels="DTypeName"
+                                                            values="DTypeID"
+                                                            data={editMode ? dataType : dataType.filter(v => v.IsActive)}
+                                                            value={field.value}
+                                                            handleChange={(value) => {
+                                                                const stringValue = (value as { value: string }).value;
+                                                                form.setFieldValue(field.name, stringValue);
+                                                                form.setFieldTouched(field.name, true);
                                                             }}
-                                                        </FastField>
+                                                            handleBlur={() => {
+                                                                form.setFieldTouched(field.name, true);
+                                                            }}
+                                                            testId={`DTypeID-form`}
+                                                            error={form.touched.DTypeID && Boolean(form.errors.DTypeID)}
+                                                            errorMessage={form.touched.DTypeID ? form.errors.DTypeID : ""}
+                                                        />
+                                                    )}
+                                                </FastField>
+                                            </RenderView>
+                                        )}
 
-                                                        <FastField name="ImportantList[0].MaxLength">
-                                                            {({ field, form }: any) => (
+                                        <FastField name="Rowcolumn">
+                                            {({ field, form }: any) => (
+                                                <Inputs
+                                                    placeholder="Columns"
+                                                    label="Column in row"
+                                                    handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                    handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                    value={String(field.value ?? "")}
+                                                    error={form.touched?.Rowcolumn && Boolean(form.errors?.Rowcolumn)}
+                                                    errorMessage={form.touched?.Rowcolumn ? form.errors?.Rowcolumn : ""}
+                                                    testId={`Rowcolumn-form`}
+                                                />
+                                            )}
+                                        </FastField >
+
+                                        {shouldRenderDT && (
+                                            <RenderView style={Platform.OS === 'web' ? memoizedAnimatedDT : { opacity: 1 }}>
+                                                <FastField name="DTypeValue">
+                                                    {({ field, form }: any) => (
+                                                        <Inputs
+                                                            placeholder="Digis Value"
+                                                            label="Digit number"
+                                                            handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                            handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                            value={String(field.value ?? "")}
+                                                            error={form.touched?.DTypeValue && Boolean(form.errors?.DTypeValue)}
+                                                            errorMessage={form.touched?.DTypeValue ? form.errors?.DTypeValue : ""}
+                                                            testId={`DTypeValue-form`}
+                                                        />
+                                                    )}
+                                                </FastField >
+                                            </RenderView>
+                                        )}
+
+                                        {shouldRender !== "label" && (
+                                            <View id="form-active-fd" style={masterdataStyles.containerSwitch}>
+                                                <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
+                                                    Require: {values.Required ? "Yes" : "No"}
+                                                </Text>
+                                                <Switch
+                                                    style={{ transform: [{ scale: 1.1 }], top: 2 }}
+                                                    value={values.Required}
+                                                    onValueChange={(v: boolean) => {
+                                                        setFieldValue("Required", v);
+                                                    }}
+                                                    id="Required-form"
+                                                />
+                                            </View>
+                                        )}
+
+                                        {shouldRenderIT && option?.length > 0 && (
+                                            <RenderView style={Platform.OS === 'web' ? memoizedAnimatedIT : { opacity: 1 }}>
+                                                <Text style={{ marginTop: 10, marginBottom: 10, paddingLeft: 10, fontSize: spacing.small, color: theme.colors.error }}>
+                                                    {(values.ImportantList || []).some((item) => item.Value) ? "Select value is important!" : "Input value control!"}
+                                                </Text>
+
+                                                <FastField name="ImportantList[0].Value" key={JSON.stringify(option)}>
+                                                    {({ field, form }: any) => {
+                                                        return (
+                                                            <Checkboxs
+                                                                option={option}
+                                                                handleChange={(value) => {
+                                                                    const processedValues = Array.isArray(value)
+                                                                        ? value.filter((v: string) => v.trim() !== '')
+                                                                        : String(value).split(',').filter((v: string) => v.trim() !== '');
+
+                                                                    form.setFieldValue(field.name, processedValues);
+                                                                    form.setFieldTouched(field.name, true);
+                                                                }}
+                                                                value={String(field.value ?? "")}
+                                                                error={form.touched?.ImportantList?.[0]?.Value && Boolean(form.errors?.ImportantList?.[0]?.Value)}
+                                                                errorMessage={form.touched?.ImportantList?.[0]?.Value ? form.errors?.ImportantList?.[0]?.Value : ""}
+                                                                handleBlur={() => {
+                                                                    form.setFieldTouched(field.name, true);
+                                                                }}
+                                                                testId="Value-Important-form-combined"
+                                                            />
+                                                        );
+                                                    }}
+                                                </FastField>
+
+                                            </RenderView>
+                                        )}
+
+                                        {shouldRenderIT && shouldRenderDT && (
+                                            <RenderView style={Platform.OS === 'web' ? memoizedAnimatedIT : { opacity: 1 }}>
+                                                <Text
+                                                    style={[
+                                                        { marginTop: 10, marginBottom: 10, paddingLeft: 10, fontSize: spacing.small, color: theme.colors.error }
+                                                    ]}
+                                                >
+                                                    Input value control!
+                                                </Text>
+                                                <>
+                                                    <FastField name="ImportantList[0].MinLength">
+                                                        {({ field, form }: any) => {
+                                                            return (
                                                                 <Inputs
-                                                                    placeholder="Max Value"
-                                                                    label="Max Value Control"
+                                                                    placeholder="Min Value"
+                                                                    label="Min Value Control"
                                                                     handleChange={(value) => form.setFieldValue(field.name, value)}
                                                                     handleBlur={() => {
                                                                         form.setFieldTouched(field.name, true);
                                                                     }}
                                                                     value={String(field.value ?? "")}
-                                                                    error={form.touched?.ImportantList?.[0]?.MaxLength && Boolean(form.errors?.ImportantList?.[0]?.MaxLength)}
-                                                                    errorMessage={form.touched?.ImportantList?.[0]?.MaxLength ? form.errors?.ImportantList?.[0]?.MaxLength : ""}
-                                                                    testId={`MaxLength-form`}
+                                                                    error={form.touched?.ImportantList?.[0]?.MinLength && Boolean(form.errors?.ImportantList?.[0]?.MinLength)}
+                                                                    errorMessage={form.touched?.ImportantList?.[0]?.MinLength ? form.errors?.ImportantList?.[0]?.MinLength : ""}
+                                                                    testId={`MinLength-form`}
                                                                 />
-                                                            )}
-                                                        </FastField>
-                                                    </>
-                                                </RenderView>
-
-                                            )}
-
-                                            {shouldRender !== "label" && (
-                                                <View id="form-important-fd" style={masterdataStyles.containerSwitch}>
-                                                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
-                                                        Important: {values.Important ? "Yes" : "No"}
-                                                    </Text>
-                                                    <Switch
-                                                        style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                                        value={values.Important}
-                                                        onValueChange={(v: boolean) => {
-                                                            setFieldValue("Important", v);
+                                                            )
                                                         }}
-                                                        id="Important-form"
-                                                    />
-                                                </View>
-                                            )}
+                                                    </FastField>
 
-                                        </ScrollView>
+                                                    <FastField name="ImportantList[0].MaxLength">
+                                                        {({ field, form }: any) => (
+                                                            <Inputs
+                                                                placeholder="Max Value"
+                                                                label="Max Value Control"
+                                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                                handleBlur={() => {
+                                                                    form.setFieldTouched(field.name, true);
+                                                                }}
+                                                                value={String(field.value ?? "")}
+                                                                error={form.touched?.ImportantList?.[0]?.MaxLength && Boolean(form.errors?.ImportantList?.[0]?.MaxLength)}
+                                                                errorMessage={form.touched?.ImportantList?.[0]?.MaxLength ? form.errors?.ImportantList?.[0]?.MaxLength : ""}
+                                                                testId={`MaxLength-form`}
+                                                            />
+                                                        )}
+                                                    </FastField>
+                                                </>
+                                            </RenderView>
 
+                                        )}
+
+                                        {shouldRender !== "label" && (
+                                            <View id="form-important-fd" style={masterdataStyles.containerSwitch}>
+                                                <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
+                                                    Important: {values.Important ? "Yes" : "No"}
+                                                </Text>
+                                                <Switch
+                                                    style={{ transform: [{ scale: 1.1 }], top: 2 }}
+                                                    value={values.Important}
+                                                    onValueChange={(v: boolean) => {
+                                                        setFieldValue("Important", v);
+                                                    }}
+                                                    id="Important-form"
+                                                />
+                                            </View>
+                                        )}
+
+                                    </ScrollView>
+
+                                    <Dialog.Actions>
                                         <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                                             <TouchableOpacity onPress={() => handleSubmit()} style={styles.actionButton}>
                                                 <Text style={masterdataStyles.text}>{editMode ? "Update Field" : "Add Field"}</Text>
@@ -604,54 +604,52 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                                 <Text style={masterdataStyles.text}>Cancel</Text>
                                             </TouchableOpacity>
                                         </View>
-
-                                        <View id="form-action-fd" style={masterdataStyles.containerAction}>
-                                        </View>
-                                    </View>
-                                );
-                            }}
-                        </Formik>
-                    )}
-                    {dialogAdd.CheckList && (
-                        <Dialog visible={dialogAdd.CheckList} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center', borderRadius: 8, padding: 20 }} onDismiss={() => handelAdd(false, "CheckList")}>
-                            <MemoChecklist_dialog
-                                setIsVisible={() => {
-                                    handelAdd(false, "CheckList");
-                                }}
-                                saveData={(value: any) => {
-                                    saveDataCheckList(value);
-                                    handelAdd(false, "CheckList");
-                                }}
-                            />
-                        </Dialog>
-                    )}
-
-                    {info.GroupCheckList && (
-                        <Dialog visible={info.GroupCheckList} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center' }} onDismiss={() => handelInfo(false, "GroupCheckList")}>
-                            <InfoGroup_dialog
-                                setDialogAdd={() => handelInfo(false, "GroupCheckList")}
-                                option={option}
-                            />
-                        </Dialog>
-                    )}
-
-                    {dialogAdd.GroupCheckList && (
-                        <Dialog visible={dialogAdd.GroupCheckList} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center', borderRadius: 8, padding: 20 }} onDismiss={() => handelAdd(false, "GroupCheckList")}>
-                            <MemoCreateGroupOption_dialog
-                                setIsVisible={() => {
-                                    handelAdd(false, "GroupCheckList");
-                                }}
-                                saveDataCheckListOption={saveDataCheckListOption}
-                                checkListOption={checkListOption}
-                                saveData={(value: any, mode: any) => {
-                                    saveDataGroupCheckList(value, mode);
-                                    handelAdd(false, "GroupCheckList");
-                                }}
-                            />
-                        </Dialog>
-                    )}
-                </Dialog.Content>
+                                    </Dialog.Actions>
+                                </View>
+                            );
+                        }}
+                    </Formik>
+                )}
             </Dialog>
+
+            {dialogAdd.CheckList && (
+                <Dialog visible={dialogAdd.CheckList} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center', borderRadius: 8, padding: 20 }} onDismiss={() => handelAdd(false, "CheckList")}>
+                    <MemoChecklist_dialog
+                        setIsVisible={() => {
+                            handelAdd(false, "CheckList");
+                        }}
+                        saveData={(value: any) => {
+                            saveDataCheckList(value);
+                            handelAdd(false, "CheckList");
+                        }}
+                    />
+                </Dialog>
+            )}
+
+            {info.GroupCheckList && (
+                <Dialog visible={info.GroupCheckList} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center' }} onDismiss={() => handelInfo(false, "GroupCheckList")}>
+                    <InfoGroup_dialog
+                        setDialogAdd={() => handelInfo(false, "GroupCheckList")}
+                        option={option}
+                    />
+                </Dialog>
+            )}
+
+            {dialogAdd.GroupCheckList && (
+                <Dialog visible={dialogAdd.GroupCheckList} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center', borderRadius: 8, padding: 20 }} onDismiss={() => handelAdd(false, "GroupCheckList")}>
+                    <MemoCreateGroupOption_dialog
+                        setIsVisible={() => {
+                            handelAdd(false, "GroupCheckList");
+                        }}
+                        saveDataCheckListOption={saveDataCheckListOption}
+                        checkListOption={checkListOption}
+                        saveData={(value: any, mode: any) => {
+                            saveDataGroupCheckList(value, mode);
+                            handelAdd(false, "GroupCheckList");
+                        }}
+                    />
+                </Dialog>
+            )}
         </Portal>
     );
 });

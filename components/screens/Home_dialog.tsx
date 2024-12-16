@@ -19,8 +19,7 @@ interface Home_dialogProps {
 const Home_dialog = React.memo(({ dialogVisible, hideDialog, selectedEvent }: Home_dialogProps) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
-    console.log(selectedEvent);
-    
+
     const { data: machine = [], isLoading } = useQuery<TimeScheduleMachine[], Error>(
         ['machine', selectedEvent?.ScheduleID],
         () => fetchTimeMachines({ ScheduleID: selectedEvent?.ScheduleID || '' })

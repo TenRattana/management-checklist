@@ -74,7 +74,6 @@ const useMasterdataStyles = () => {
         containerSwitch: {
             flexDirection: "row",
             alignItems: "center",
-            marginVertical: 10,
         },
         containerAction: {
             flexDirection: "row",

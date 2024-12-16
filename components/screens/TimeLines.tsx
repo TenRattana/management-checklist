@@ -72,8 +72,6 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
     ));
 
     const handleEventClick = useCallback((event: any) => {
-        console.log(event);
-
         setSelectedEvent(event)
         setDialogVisible(true)
     }, []);
@@ -83,6 +81,7 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
             <Timeline
                 {...timelineProps}
                 styles={{ contentStyle: { backgroundColor: theme.colors.fff } }}
+                onEventPress={handleEventClick}
                 renderEvent={(event) => <RenderEvent item={event} />}
             />
         );

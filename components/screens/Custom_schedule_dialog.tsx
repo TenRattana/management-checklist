@@ -7,9 +7,9 @@ import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler'
 import { convertToDate, convertToThaiDateTime, styles } from './Schedule';
 import { SharedValue } from 'react-native-gesture-handler/lib/typescript/handlers/gestures/reanimatedWrapper';
 import { getCurrentTime } from '@/config/timezoneUtils';
-import RNDateTimePicker from '@react-native-community/datetimepicker';
 import DatePicker from 'react-datepicker';
 import "@/styles/Datapicker.css"
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 interface Custom_scheduleProps {
     theme: any;
@@ -112,68 +112,18 @@ const Custom_schedule_dialog = React.memo(({ showError, showSuccess, spacing, se
         };
     }, [isPickerVisible]);
 
-    const toggleTimePicker = useCallback((index: number, type: "start" | "end", visible: boolean) => {
-
-        setTimePickerVisible(isTimePickerVisible.map((v, i) => i === index ? { ...v, [type]: visible } : v));
-    }, [isTimePickerVisible])
-
     const handleTimeChange = useCallback(async (index: number, type: "start" | "end", selectedTime?: Date, isTime?: boolean) => {
 
-        if (Platform.OS === "web") {
-            let formattedDate = "";
+        let formattedDate = "";
 
-            if (selectedTime) {
-                formattedDate = `${convertToThaiDateTime(selectedTime.toISOString(), true)}`;
-                const newState = [...values];
-                newState[index] = { ...newState[index], [type]: formattedDate };
+        if (selectedTime) {
+            formattedDate = `${convertToThaiDateTime(selectedTime.toISOString(), true)}`;
+            const newState = [...values];
+            newState[index] = { ...newState[index], [type]: formattedDate };
 
-                setFieldValue(newState);
-            }
-        } else {
-            const currentValues = values?.[index]?.[type] || null;
-
-            let updatedDate;
-            let formattedDate = "";
-
-            if (isTime && currentValues) {
-
-                const existingDate = convertToDate(currentValues);
-
-                if (existingDate && selectedTime) {
-                    updatedDate = new Date(existingDate.setHours(selectedTime.getHours(), selectedTime.getMinutes()));
-                    formattedDate = convertToThaiDateTime(updatedDate.toISOString(), true);
-
-                    if (formattedDate !== values[index]?.[type]) {
-                        const newState = [...values];
-                        newState[index] = { ...newState[index], [type]: formattedDate };
-
-                        runOnJS(setFieldValue)(newState);
-                    }
-
-                    showSuccess('Date and Time selected successfully!');
-                    toggleTimePicker(index, type, false);
-                }
-            } else {
-                togglePicker(index, type, false);
-
-                if (selectedTime) {
-                    updatedDate = new Date(selectedTime.setHours(
-                        currentValues ? new Date(currentValues).getHours() : 0,
-                        currentValues ? new Date(currentValues).getMinutes() : 0
-                    ));
-                    formattedDate = convertToThaiDateTime(updatedDate.toISOString());
-
-                    if (formattedDate !== values[index]?.[type]) {
-                        const newState = [...values];
-                        newState[index] = { ...newState[index], [type]: formattedDate };
-
-                        setFieldValue(newState);
-                    }
-                    toggleTimePicker(index, type, true);
-                    showSuccess('Date and Time selected successfully!');
-                }
-            }
+            setFieldValue(newState);
         }
+
     }, [values]);
 
     const CustomInput = React.forwardRef<any, any>(({ onClick, show }, ref) => (
@@ -195,27 +145,13 @@ const Custom_schedule_dialog = React.memo(({ showError, showSuccess, spacing, se
             <View style={styles.slotContainer}>
                 <Text style={[masterdataStyles.text]}>{type === 'start' ? "Start Day" : "End Day"}</Text>
                 {Platform.OS === 'android' || Platform.OS === 'ios' ? (
-                    <>
-                        {isPickerVisible[index]?.[type] && (
-                            <RNDateTimePicker
-                                value={showDate}
-                                onChange={(event, selectedDate) => event.type === "set" ? handleTimeChange(index, type, selectedDate) : togglePicker(index, type, false)}
-                                is24Hour={true}
-                                mode='date'
-                                display="default"
-                            />
-                        )}
-                        {isTimePickerVisible[index]?.[type] && (
-                            <RNDateTimePicker
-                                value={showDate}
-                                onChange={(event, selectedDate) => event.type === "set" ? handleTimeChange(index, type, selectedDate, true) : toggleTimePicker(index, type, false)}
-                                mode='time'
-                                minuteInterval={10}
-                                is24Hour={true}
-                                display="default"
-                            />
-                        )}
-                    </>
+                    <DateTimePickerModal
+                        isVisible={isPickerVisible[index]?.[type]}
+                        mode='datetime'
+                        date={showDate}
+                        onConfirm={(date) => handleTimeChange(index, type, date)}
+                        onCancel={() => togglePicker(index, type, false)}
+                    />
                 ) : Platform.OS === "web" && isPickerVisible[index]?.[type] && (
                     <Portal>
                         <Dialog

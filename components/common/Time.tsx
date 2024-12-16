@@ -1,34 +1,31 @@
 import React, { useState } from 'react';
 import { Platform, View } from 'react-native';
-import { HelperText, Button, Portal, Dialog, Text } from 'react-native-paper';
-import RNDateTimePicker from '@react-native-community/datetimepicker';
+import { HelperText, Button, Text } from 'react-native-paper';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import DatePicker from 'react-datepicker';
-import "@/styles/Datapicker.css"
+import "@/styles/Datapicker.css";
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { useTheme } from '@/app/contexts/useTheme';
+import { convertToDate, convertToThaiDateTime } from '../screens/Schedule';
+import { getCurrentTime } from '@/config/timezoneUtils';
 
 const Time: React.FC<any> = ({ placeholder, label, error, errorMessage, value, handleChange, handleBlur }) => {
-    const [selectedDate, setSelectedDate] = useState<Date | null>(value || new Date());
-    const [isPickerVisible, setIsPickerVisible] = useState(false);
+    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const { theme } = useTheme();
-
-    const togglePicker = () => {
-        setIsPickerVisible(!isPickerVisible);
-    };
-
-    const onDateChange = (event: any, date: Date | undefined) => {
-        if (date) {
-            setSelectedDate(date);
-            handleChange(date);
-            setIsPickerVisible(false);
-        }
-    };
-
-    const formatDate = (date: Date) => {
-        return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`;
-    };
-
     const masterdataStyles = useMasterdataStyles();
+
+    const showDatePicker = () => {
+        setDatePickerVisibility(true);
+    };
+
+    const hideDatePicker = () => {
+        setDatePickerVisibility(false);
+    };
+
+    const handleConfirm = (date: Date) => {
+        handleChange(convertToThaiDateTime(new Date(date).toISOString(), true));
+        hideDatePicker();
+    };
 
     const CustomInput = React.forwardRef<any, any>(({ onClick, value }, ref) => (
         <Button
@@ -46,24 +43,30 @@ const Time: React.FC<any> = ({ placeholder, label, error, errorMessage, value, h
         <View style={{ margin: 20 }}>
             {Platform.OS === 'android' || Platform.OS === 'ios' ? (
                 <View>
-                    <Button mode="outlined" onPress={togglePicker}>
-                        {selectedDate ? formatDate(selectedDate) : placeholder}
+                    <Button
+                        mode='outlined'
+                        style={{ borderRadius: 8, backgroundColor: theme.colors.background }}
+                        onPress={showDatePicker}
+                    >
+                        <Text style={masterdataStyles.timeText}>
+                            {value ? value : "N/A"}
+                        </Text>
                     </Button>
-                    {isPickerVisible && (
-                        <RNDateTimePicker
-                            value={selectedDate || new Date()}
-                            mode="datetime"
-                            display="default"
-                            onChange={onDateChange}
-                        />
-                    )}
+
+                    <DateTimePickerModal
+                        isVisible={isDatePickerVisible}
+                        mode='datetime'
+                        date={value ? convertToDate(String(value && value)) : getCurrentTime()}
+                        onConfirm={handleConfirm}
+                        onCancel={hideDatePicker}
+                    />
                 </View>
             ) : (
                 <DatePicker
-                    selected={selectedDate}
+                    selected={value ? convertToDate(String(value && value)) : getCurrentTime()}
                     onChange={(date) => {
-                        setSelectedDate(date);
-                        handleChange(date);
+                        if (date)
+                            handleChange(convertToThaiDateTime(new Date(date).toISOString(), true));
                     }}
                     showTimeInput
                     timeInputLabel="Start Time:"

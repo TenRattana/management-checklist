@@ -2,7 +2,7 @@ import { View } from 'react-native'
 import React, { useState } from 'react'
 import { CheckListOption } from '@/typing/type'
 import { InitialValuesGroupCheckList } from '@/typing/value'
-import { Dialog, Icon, Switch } from 'react-native-paper'
+import { Dialog, Icon, Portal, Switch } from 'react-native-paper'
 import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler'
 import useMasterdataStyles from '@/styles/common/masterdata'
 import { FastField, Formik } from 'formik'
@@ -82,39 +82,36 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, saveData
                             />
                         </View>
 
-                        <View style={styles.timeIntervalMenu}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <View>
-                                    <CustomDropdownMultiple
-                                        data={checkListOption}
-                                        handleBlur={() => { }}
-                                        handleChange={(selectedValues) => {
-                                            let option
-                                            if (options.includes(selectedValues)) {
-                                                option = options.filter((id) => id !== selectedValues);
-                                            } else {
-                                                option = selectedValues;
-                                            }
-                                            setOptions(option);
-                                        }}
-                                        labels='CLOptionName'
-                                        title='Select Check List Option'
-                                        value={options}
-                                        values='CLOptionID'
-                                    />
-                                </View>
-
-                                <TouchableOpacity
-                                    onPress={() => setDialog(true)}
-                                    style={{
-                                        alignItems: 'center',
-                                        paddingRight: 5
+                        <View id="form-ac-cgd" style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <View style={{ flex: 1 }}>
+                                <CustomDropdownMultiple
+                                    data={checkListOption}
+                                    handleBlur={() => { }}
+                                    handleChange={(selectedValues) => {
+                                        let option
+                                        if (options.includes(selectedValues)) {
+                                            option = options.filter((id) => id !== selectedValues);
+                                        } else {
+                                            option = selectedValues;
+                                        }
+                                        setOptions(option);
                                     }}
-                                >
-                                    <Icon source={"plus-box"} size={spacing.large + 3} color={theme.colors.drag} />
-                                </TouchableOpacity>
+                                    labels='CLOptionName'
+                                    title='Select Check List Option'
+                                    value={options}
+                                    values='CLOptionID'
+                                />
                             </View>
 
+                            <TouchableOpacity
+                                onPress={() => setDialog(true)}
+                                style={{
+                                    alignItems: 'center',
+                                    paddingRight: 5
+                                }}
+                            >
+                                <Icon source={"plus-box"} size={spacing.large + 3} color={theme.colors.drag} />
+                            </TouchableOpacity>
                         </View>
 
                         <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
@@ -129,17 +126,20 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, saveData
                 )}
             </Formik>
 
-            <Dialog visible={dialog} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center', borderRadius: 8, padding: 20 }} onDismiss={() => setDialog(false)}>
-                <MemoCheckListOptionCreate_dialog
-                    setIsVisible={() => {
-                        setDialog(false);
-                    }}
-                    saveData={(value: any) => {
-                        saveDataCheckListOption(value);
-                        setDialog(false);
-                    }}
-                />
-            </Dialog>
+            <Portal>
+                <Dialog visible={dialog} style={{ zIndex: 5, width: "50%", alignSelf: 'center', borderRadius: 8, padding: 20 }} onDismiss={() => setDialog(false)}>
+                    <MemoCheckListOptionCreate_dialog
+                        setIsVisible={() => {
+                            setDialog(false);
+                        }}
+                        saveData={(value: any) => {
+                            saveDataCheckListOption(value);
+                            setDialog(false);
+                        }}
+                    />
+                </Dialog>
+            </Portal>
+
         </GestureHandlerRootView>
     )
 })
