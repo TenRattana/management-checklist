@@ -38,9 +38,24 @@ const MachineGroupScreen: React.FC = React.memo(() => {
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
 
-    const { data: machines = [], isLoading, } = useQuery<Machine[], Error>(
-        'machines',
-        fetchMachines
+    const [paginationInfo, setPaginationInfo] = useState({
+        currentPage: 1,
+        pageSize: 10000,
+        filter: null,
+    });
+
+    const handlePaginationChange = (currentPage: number, pageSize: number, filter: any) => {
+        setPaginationInfo({ currentPage, pageSize, filter });
+        console.log(paginationInfo);
+
+    };
+
+    const { data: machines = [], isLoading } = useQuery<Machine[], Error>(
+        ['machines', paginationInfo],
+        () => fetchMachines(paginationInfo.currentPage, paginationInfo.pageSize, paginationInfo.filter),
+        {
+            keepPreviousData: true,
+        }
     );
 
     const { data: machineGroups = [] } = useQuery<GroupMachine[], Error>(
@@ -206,7 +221,7 @@ const MachineGroupScreen: React.FC = React.memo(() => {
                 </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />}
             </Card.Content>
 
             <MemoMachine_dialog

@@ -71,10 +71,23 @@ export const fetchTimeMachines = async (data: { ScheduleID: string }): Promise<T
     return response.data.data ?? [];
 };
 
-export const fetchMachines = async (): Promise<Machine[]> => {
-    const response = await axiosInstance.post("Machine_service.asmx/GetMachines");
-    return response.data.data ?? [];
-};
+export const fetchMachines = async (
+    currentPage: number,
+    pageSize: number,
+    filter: any
+  ): Promise<Machine[]> => {
+    try {
+      const response = await axiosInstance.post("Machine_service.asmx/GetMachines", {
+        page: currentPage,
+        pageSize: pageSize,
+        filter: filter,
+      });
+      return response.data.data ?? [];
+    } catch (error) {
+      console.error("Error fetching machines:", error);
+      throw new Error('Failed to fetch machines');
+    }
+  };
 
 export const fetchMachineGroups = async (): Promise<GroupMachine[]> => {
     const response = await axiosInstance.post("GroupMachine_service.asmx/GetGroupMachines");

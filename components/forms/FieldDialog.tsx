@@ -24,8 +24,6 @@ import { useSelector } from "react-redux";
 const AnimatedView = Animated.createAnimatedComponent(View);
 
 const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode, setShowDialogs }: FieldDialogProps) => {
-    console.log("Field");
-
     const masterdataStyles = useMasterdataStyles();
     const [option, setOption] = useState<{ label: string; value: string; }[]>([]);
     const [shouldRender, setShouldRender] = useState<string>('');
@@ -112,7 +110,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
         [mutationG, state.GroupCheckList, state.MatchCheckListOption]
     );
 
-    const { data: checkList = [] } = useQuery("checkList", fetchCheckList, {
+    const { data: checkList = [], isLoading: LoadCL } = useQuery("checkList", fetchCheckList, {
         staleTime: 1000 * 60 * 24,
         cacheTime: 1000 * 60 * 25,
     });
@@ -122,7 +120,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
         cacheTime: 1000 * 60 * 25,
     });
 
-    const { data: groupCheckListOption = [] } = useQuery("groupCheckListOption", fetchGroupCheckList, {
+    const { data: groupCheckListOption = [], isLoading: LoadG } = useQuery("groupCheckListOption", fetchGroupCheckList, {
         staleTime: 1000 * 60 * 24,
         cacheTime: 1000 * 60 * 25,
     });
@@ -162,6 +160,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
     }, [shouldRenderIT, shouldRenderDT, option]);
 
     useEffect(() => {
+
         if (!isVisible) {
             setOption([]);
             setShouldRender('');
@@ -171,6 +170,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
     }, [isVisible]);
 
     const handleDismissDialog = useCallback(() => {
+
         if (!isVisible) {
             setShowDialogs();
         }
@@ -181,10 +181,6 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
     const memoizedAnimatedText = useMemo(() => animatedText, [shouldRender]);
     const memoizedAnimatedDT = useMemo(() => animatedStyleNumber, [shouldRenderDT]);
     const memoizedAnimatedIT = useMemo(() => animatedStyleIT, [shouldRenderIT, shouldRenderDT, option]);
-
-    const filteredCheckList = checkListTypes.filter((item, index, self) =>
-        item.CTypeName === "Textinput" ? index === self.findIndex(t => t.CTypeName === "Textinput") : true
-    );
 
     return (
         <Portal>
@@ -213,7 +209,6 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             glc.current = values.GCLOptionID
 
                             const updateRenderStates = useCallback(() => {
-                                console.log("updateRenderStates");
 
                                 const checkListTypeItem = checkListTypes.find(item => item.CTypeID === values.CTypeID)?.CTypeName ?? "";
                                 const newRender = ["Dropdown", "Radio", "Checkbox"].includes(checkListTypeItem)
@@ -229,13 +224,10 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             }, [values.CTypeID, checkListTypes, shouldRender, setFieldValue]);
 
                             useEffect(() => {
-                                console.log("useEffect");
-
-                                updateRenderStates();
-                            }, [values.CTypeID, updateRenderStates]);
+                                values.CTypeID && updateRenderStates();
+                            }, [values.CTypeID]);
 
                             const updateImportantList = useCallback((modifications: { Value?: string | string[]; MinLength?: number; MaxLength?: number; }) => {
-                                console.log("updateImportantList");
 
                                 if (Array.isArray(values.ImportantList)) {
                                     const idMcl = `MCL-ADD-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
@@ -248,24 +240,9 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                         setFieldValue("ImportantList", [...updatedList]);
                                     }
                                 }
-                            }, [values.ImportantList, setFieldValue]);
-
-                            // const handleDataTypeChange = useCallback((dataTypeItem: string | undefined) => {
-                            //     console.log("handleDataTypeChange");
-
-                            //     if (values.Important) {
-                            //         if (dataTypeItem === "Number") {
-                            //             updateImportantList({ Value: undefined });
-                            //         } else {
-                            //             updateImportantList({ MinLength: undefined, MaxLength: undefined, Value: undefined });
-                            //         }
-                            //     }
-
-                            //     setShouldRenderDT(dataTypeItem === "Number");
-                            // }, [values.Important]);
+                            }, [values.ImportantList]);
 
                             const handleDataOption = useCallback(() => {
-                                console.log("handleDataOption");
 
                                 let options: { label: string; value: string; }[] = [];
 
@@ -289,7 +266,6 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             }, [values.GCLOptionID, groupCheckListOption]);
 
                             useEffect(() => {
-                                console.log("useEffect 2");
                                 if (values.Important !== shouldRenderIT) {
                                     setShouldRenderIT(values.Important);
 
@@ -308,11 +284,8 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             }, [values.DTypeID, values.Important, dataType]);
 
                             useEffect(() => {
-                                console.log("useEffect 3");
-                                handleDataOption();
-                            }, [values.GCLOptionID, handleDataOption]);
-
-                            console.log("form");
+                                values.GCLOptionID && handleDataOption();
+                            }, [values.GCLOptionID]);
 
                             return (
                                 <View style={{ marginHorizontal: 12 }}>
@@ -362,9 +335,9 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                             {({ field, form }: any) => (
                                                 <CustomDropdownSingle
                                                     title="Check List Type"
-                                                    labels="CTypeName"
+                                                    labels="CTypeTitle"
                                                     values="CTypeID"
-                                                    data={editMode ? filteredCheckList : filteredCheckList.filter(v => v.IsActive)}
+                                                    data={editMode ? checkListTypes : checkListTypes.filter(v => v.IsActive)}
                                                     value={field.value}
                                                     handleChange={(value) => {
                                                         const stringValue = (value as { value: string }).value;

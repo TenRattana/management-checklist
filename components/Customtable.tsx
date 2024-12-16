@@ -5,14 +5,19 @@ import CustomtableHead from "./table/CustomtableHead";
 import CustomtableSmall from "./table/CustomtableSmall";
 import CustomtableData from "./table/CustomtableData";
 import { CustomTableProps } from '@/typing/tag';
+import { TouchableOpacity, View } from "react-native";
+import { Text } from "react-native-paper";
 
-const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, actionIndex, searchQuery, showMessage, selectedRows, setRow, showFilter, showData, showColumn, detail, detailData, detailKey, detailKeyrow, showDetailwithKey, ShowTitle }: CustomTableProps) => {
+const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, actionIndex, searchQuery, showMessage, selectedRows, setRow, showFilter, showData, showColumn, detail, detailData, detailKey, detailKeyrow, showDetailwithKey, ShowTitle,handlePaginationChange }: CustomTableProps) => {
   const [displayData, setDisplayData] = useState<(string | number | boolean)[][]>([]);
   const [filter, setFilter] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<{ column: number | null; direction: "ascending" | "descending" | undefined }>({
     column: null,
     direction: undefined,
   });
+
+  const [currentPage, setCurrentPage] = useState(1); 
+  const pageSize = 10; 
 
   const toggleSelectAll = useCallback(() => {
     if (selectedRows && setRow) {
@@ -21,7 +26,6 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
       } else {
         const selectedIndices = displayData.map((row, index) => {
           const selectIndex = actionIndex.find(item => item.selectIndex !== undefined)?.selectIndex;
-
           return Number(selectIndex) > -1 ? String(row[Number(selectIndex)]) : ""
         }).filter(v => v !== null)
 
@@ -49,27 +53,31 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
 
   const sortedData = useMemo(() => {
     if (!sortConfig.column) return Tabledata;
-  
     return [...Tabledata].sort((a, b) => {
       const aValue = a[sortConfig.column!];
       const bValue = b[sortConfig.column!];
-  
       if (typeof aValue === "string" && typeof bValue === "string") {
         return sortConfig.direction === "ascending" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
       }
       return sortConfig.direction === "ascending" ? (aValue < bValue ? -1 : 1) : (aValue > bValue ? -1 : 1);
     });
   }, [Tabledata, sortConfig]);
-  
+
   const filteredData = useMemo(() => {
     return sortedData.filter((row) =>
       row.some((cell) => cell?.toString().toLowerCase().includes(searchQuery.toLowerCase()))
     ).filter((row) => (filter ? row.includes(filter) : true));
   }, [sortedData, searchQuery, filter]);
 
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = currentPage * pageSize;
+    return filteredData.slice(startIndex, endIndex);
+  }, [filteredData, currentPage]);
+
   useEffect(() => {
-    setDisplayData(filteredData);
-  }, [filteredData]);
+    setDisplayData(paginatedData);
+  }, [paginatedData]);
 
   const handleDialog = useCallback((action?: string, data?: string) => {
     if (handleAction) {
@@ -79,10 +87,17 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
 
   const handelSetFilter = useCallback((value: string) => {
     setFilter(value)
-  }, [])
+  }, []);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    console.log(newPage , currentPage);
+    
+    // handlePaginationChange(newPage,currentPage)
+  }
 
   return (
-    <AccessibleView name="customtable" style={{ flex: 1 }} >
+    <AccessibleView name="customtable" style={{ flex: 1 }}>
       {responsive === "small" ? (
         <CustomtableSmall
           displayData={displayData}
@@ -104,7 +119,7 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
           showDetailwithKey={showDetailwithKey}
           key={"CustomtableSmall"}
         />
-      ) :
+      ) : (
         <AccessibleView name="data" style={{ flex: 1 }}>
           <CustomtableHead
             Tablehead={Tablehead}
@@ -124,7 +139,6 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
             ShowTitle={ShowTitle}
             key={"CustomtableHead"}
           />
-
           <CustomtableData
             Tablehead={Tablehead}
             actionIndex={actionIndex}
@@ -141,8 +155,17 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
             showDetailwithKey={showDetailwithKey}
             key={"CustomtableData"}
           />
+          <View>
+            <TouchableOpacity disabled={currentPage === 1} onPress={() => handlePageChange(currentPage - 1)}>
+              Prev
+            </TouchableOpacity>
+            <Text>{currentPage}</Text>
+            <TouchableOpacity disabled={currentPage * pageSize >= filteredData.length} onPress={() => handlePageChange(currentPage + 1)}>
+              Next
+            </TouchableOpacity>
+          </View>
         </AccessibleView>
-      }
+      )}
     </AccessibleView>
   );
 });
