@@ -101,6 +101,7 @@ export interface Form {
   FormID: string;
   FormName: string;
   IsActive: boolean;
+  FormState?: string;
   Description: string;
   Disables: boolean;
 }
@@ -212,10 +213,33 @@ export interface TimeScheduleMachine {
   IsActive: boolean;
 }
 
-export type ComponentNames =  "InputFormMachine" | "Preview";
+export type ComponentNames =
+  | "InputFormMachine"
+  | "Preview"
+  | "Create_form"
+  | "Home"
+  | "Apporved"
+  | "Machine_group"
+  | "Machine"
+  | "Checklist"
+  | "Login"
+  | "ScanQR"
+  | "Setting"
+  | "Config"
+  | "Permission_deny"
+  | "Checklist_option"
+  | "Checklist_group"
+  | "Form"
+  | "Expected_result"
+  | "Match_checklist_option"
+  | "Match_form_machine"
+  | "Managepermissions"
+  | "Test"
+  | "Time"
+  | "TimeTrack";
 
 export type ComponentNameNoLazy =
-  "Create_form"
+  | "Create_form"
   | "Home"
   | "Apporved"
   | "Machine_group"

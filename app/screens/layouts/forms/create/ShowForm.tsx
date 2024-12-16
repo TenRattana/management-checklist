@@ -1,5 +1,5 @@
 import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef, useCallback } from "react";
-import { View, ViewStyle, FlatList } from "react-native";
+import { View, ViewStyle, FlatList, TouchableOpacity } from "react-native";
 import { Card, Divider } from "react-native-paper";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
@@ -121,10 +121,14 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                                             ref={(el) => (cardRefs.current[index] = el)}
                                             key={subForm.SFormID}
                                         >
-                                            <Card.Title
-                                                title={subForm.SFormName}
-                                                titleStyle={masterdataStyles.cardTitle}
-                                            />
+                                            <TouchableOpacity onPress={() => showField && showField(undefined, String(subForm.SFormID))}>
+                                                <Card.Title
+                                                    title={subForm.SFormName}
+                                                    titleStyle={masterdataStyles.cardTitle}
+
+                                                />
+                                            </TouchableOpacity>
+
                                             <Card.Content style={[masterdataStyles.subFormContainer, { marginHorizontal: 20 }]}>
                                                 {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
                                                     const columns = subForm.Columns ?? 1;

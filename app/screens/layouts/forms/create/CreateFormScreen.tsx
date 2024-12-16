@@ -5,7 +5,7 @@ import { Divider, Icon } from "react-native-paper";
 import useCreateformStyle from "@/styles/createform";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import useForm from "@/hooks/custom/useForm";
-import { AccessibleView, ConfigItemForm, FieldDialog, SaveDialog, Text } from "@/components";
+import { AccessibleView, ConfigItemForm, FieldDialog, SaveDialog, SubFormDialog, Text } from "@/components";
 import Dragsubform from "./Dragsubform";
 import Preview from "@/app/screens/layouts/forms/create/ShowForm";
 import { CreateFormProps } from "@/typing/tag";
@@ -13,7 +13,7 @@ import { BaseFormState, BaseSubForm } from "@/typing/form";
 import { CheckList, Checklist, CheckListType, DataType, GroupCheckListOption } from "@/typing/type";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
-import { addSubForm, defaultDataForm, deleteField } from "@/slices";
+import { addSubForm, defaultDataForm, deleteField, deleteSubForm, updateSubForm } from "@/slices";
 import DraggableItem from "./DraggableItem";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/stores";
@@ -25,12 +25,14 @@ import Animated, {
     runOnJS,
 } from 'react-native-reanimated';
 import Create from "./Create";
+import { useToast } from "@/app/contexts/useToast";
 
 const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigation }) => {
     const { responsive, fontSize, spacing } = useRes();
+    const { handleError } = useToast();
     const { width } = useWindowDimensions();
     const DRAWER_WIDTH = responsive === "small" ? width : fontSize === "large" ? 430 : 370;
-    const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+    const [dialogVisible, setDialogVisible] = useState<{ sub: boolean, field: boolean }>({ sub: false, field: false });
 
     const translateX = useSharedValue(-DRAWER_WIDTH);
     const mainTranslateX = useSharedValue(0);
@@ -159,11 +161,13 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
     const masterdataStyles = useMasterdataStyles();
     const { theme } = useTheme();
 
+    const MemoSubFormDialog = React.memo(SubFormDialog)
     const MemoDragsubform = React.memo(Dragsubform)
     const MemoConfigItemForm = React.memo(ConfigItemForm)
     const MemoDraggableItem = React.memo(DraggableItem)
     const MemoSaveDialog = React.memo(SaveDialog)
 
+    const [currentSub, setCurrentSub] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", Number: false, MachineID: "", Fields: [] });
     const [currentField, setCurrentField] = useState<BaseFormState>({
         MCListID: "", CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: "",
         Required: false, Important: false, ImportantList: [], EResult: "", CListName: "", DTypeValue: undefined,
@@ -171,23 +175,43 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
 
     const handleSaveDialog = useCallback(() => {
         setInitialSaveDialog(false);
-        handleDialogToggle()
+        handleDialogToggle("field", false)
     }, []);
 
 
     const showField = useCallback(async (mclo: string, sform: string) => {
-        if (mclo) {
+        if (mclo && sform) {
             const data = await state.subForms
                 ?.find((v: BaseSubForm) => v.SFormID === sform)
                 ?.Fields?.find((v: BaseFormState) => String(v.MCListID) === mclo);
 
             setCurrentField(data)
-            handleDialogToggle()
+            handleDialogToggle("field", true)
+        } else if (mclo === undefined && sform) {
+            console.log("SFORM", sform);
+            const data = await state.subForms
+                ?.find((v: BaseSubForm) => v.SFormID === sform)
+            setCurrentSub(data)
+            handleDialogToggle("sub", true)
         }
     }, [state])
 
-    const handleDialogToggle = useCallback(() => {
-        setDialogVisible((prev) => !prev);
+    const handelSaveSubForm = useCallback((values: BaseSubForm, mode: string) => {
+        const payload = { subForm: values };
+
+        try {
+            if (mode === "update") {
+                dispatch(updateSubForm(payload));
+            }
+        } catch (error) {
+            handleError(error)
+        } finally {
+            handleDialogToggle("sub", false)
+        }
+    }, [dispatch]);
+
+    const handleDialogToggle = useCallback((field: string, value: boolean) => {
+        setDialogVisible((prev) => ({ ...prev, [field]: value }));
     }, []);
 
     const MemoFieldDialog = React.memo(FieldDialog)
@@ -311,12 +335,26 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                 )}
             </AccessibleView>
 
-            {dialogVisible && (
+            {dialogVisible.sub && (
+                <MemoSubFormDialog
+                    isVisible={dialogVisible.sub}
+                    setIsVisible={() => handleDialogToggle("sub", false)}
+                    isEditing={true}
+                    initialValues={currentSub}
+                    saveData={handelSaveSubForm}
+                    onDelete={(SFormID: string) => {
+                        dispatch(deleteSubForm({ SFormID }));
+                        handleDialogToggle("sub", false)
+                    }}
+                />
+            )}
+
+            {dialogVisible.field && (
                 <MemoFieldDialog
-                    isVisible={dialogVisible}
+                    isVisible={dialogVisible.field}
                     formState={currentField}
                     onDeleteField={(SFormID, MCListID) => dispatch(deleteField({ SFormID, MCListID }))}
-                    setShowDialogs={handleDialogToggle}
+                    setShowDialogs={() => handleDialogToggle("field", false)}
                     editMode={true}
                     checkListOption={checkListOption}
                 />

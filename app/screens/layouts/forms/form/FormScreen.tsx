@@ -2,14 +2,12 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { TouchableOpacity, StyleSheet } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts/useToast";
-import { useRes } from "@/app/contexts/useRes";
 import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { FormScreenProps } from "@/typing/tag";
 import { Form } from "@/typing/type";
 import { useQuery, useQueryClient } from 'react-query';
-import debounce from "lodash.debounce";
 
 const fetchForm = async (): Promise<Form[]> => {
     const response = await axiosInstance.post("Form_service.asmx/GetForms");
@@ -20,6 +18,7 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [show, setShow] = useState<boolean>(false);
     const { messages } = route.params || {};
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
@@ -34,10 +33,15 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
         }
     }, [messages, show, showSuccess]);
 
-    const debouncedSetSearchQuery = useMemo(
-        () => debounce(setSearchQuery, 300),
-        []
-    );
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 300);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchQuery]);
 
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
@@ -67,7 +71,7 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
             item.Disables,
             item.FormName,
             item.Description,
-            !item.Disables ? "Draf" : "Used",
+            item.FormState ?? "-",
             item.IsActive,
             item.FormID,
             item.FormID,
@@ -93,8 +97,8 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
         actionIndex: [{ disables: 0, changeIndex: 5, copyIndex: 6, preIndex: 7, delOnlyIndex: 8 }],
         showMessage: 1,
         handleAction,
-        searchQuery,
-    }), [tableData, searchQuery, handleAction]);
+        searchQuery: debouncedSearchQuery,
+    }), [tableData, searchQuery, handleAction, debouncedSearchQuery]);
 
     return (
         <AccessibleView name="container-form" style={styles.container}>
@@ -106,7 +110,7 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
                 <Searchbar
                     placeholder="Search Form..."
                     value={searchQuery}
-                    onChange={debouncedSetSearchQuery}
+                    onChange={setSearchQuery}
                     testId="search-form"
                 />
                 <TouchableOpacity onPress={handleNewForm} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>

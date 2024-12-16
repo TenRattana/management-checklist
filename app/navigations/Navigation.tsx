@@ -1,39 +1,18 @@
 import React, { lazy, Suspense, useRef, useCallback, useState, useMemo, useEffect } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import {
-    ScanQR,
-    SettingScreen,
-    ConfigulationScreen,
-    MachineGroupScreen,
-    MachineScreen,
-    CheckListScreen,
-    ChecklistGroupScreen,
-    CheckListOptionScreen,
-    FormScreen,
-    ExpectedResultScreen,
-    MatchCheckListOptionScreen,
-    MatchFormMachineScreen,
-    Managepermissions,
-    LoginScreen,
-    TimescheduleScreen,
-    ApprovedScreen,
-    HomeScreen,
-    CreateFormScreen
-} from '@/app/screens';
+import { LoginScreen } from '@/app/screens';
 import PermissionDeny from '../screens/layouts/PermissionDeny';
 import { useRes } from "@/app/contexts/useRes";
 import CustomDrawerContent from '@/components/navigation/CustomDrawer';
 import { useTheme } from '@/app/contexts/useTheme';
 import { useDispatch, useSelector } from "react-redux";
-import TestComponent from '../screens/TestComponent';
-import { ComponentNames, ComponentNameNoLazy, ParentMenu, Menus } from '@/typing/type';
+import { ComponentNames, ParentMenu, Menus } from '@/typing/type';
 import { AppDispatch } from '@/stores';
 import { initializeLogout } from '../providers';
 import CustomMenu from '@/components/navigation/CustomMenu'
 import Setting_dialog from "@/components/screens/Setting_dialog"
 import { SafeAreaView } from 'react-native-safe-area-context';
-import TimescheduleTrack from '../screens/layouts/schedule/TimescheduleTrack';
 
 const Drawer = createDrawerNavigator();
 const MemoSetting_dialog = React.memo(Setting_dialog)
@@ -41,30 +20,27 @@ const MemoSetting_dialog = React.memo(Setting_dialog)
 const components: Record<ComponentNames, () => Promise<{ default: React.ComponentType<any> }>> = {
     InputFormMachine: () => import('@/app/screens/layouts/forms/Scan/InputFormMachine'),
     Preview: () => import('@/app/screens/layouts/forms/view/PreviewScreen'),
-};
-
-const nonLazyComponents: Record<ComponentNameNoLazy, React.ComponentType<any>> = {
-    Create_form: CreateFormScreen,
-    Home: HomeScreen,
-    Login: LoginScreen,
-    Machine_group: MachineGroupScreen,
-    Machine: MachineScreen,
-    Checklist: CheckListScreen,
-    Checklist_group: ChecklistGroupScreen,
-    Checklist_option: CheckListOptionScreen,
-    Form: FormScreen,
-    Expected_result: ExpectedResultScreen,
-    Match_checklist_option: MatchCheckListOptionScreen,
-    Match_form_machine: MatchFormMachineScreen,
-    Managepermissions: Managepermissions,
-    ScanQR: ScanQR,
-    Setting: SettingScreen,
-    Config: ConfigulationScreen,
-    Permission_deny: PermissionDeny,
-    Test: TestComponent,
-    Time: TimescheduleScreen,
-    TimeTrack: TimescheduleTrack,
-    Apporved: ApprovedScreen
+    Apporved: () => import('@/app/screens/layouts/approveds/ApporvedScreen'),
+    Checklist: () => import('@/app/screens/layouts/checklists/checklist/CheckListScreen'),
+    Checklist_group: () => import('@/app/screens/layouts/checklists/checklist_group/ChecklistGroupScreen'),
+    Checklist_option: () => import('@/app/screens/layouts/checklists/checklist_option/CheckListOptionScreen'),
+    Machine: () => import('@/app/screens/layouts/machines/machine/MachineScreen'),
+    Machine_group: () => import('@/app/screens/layouts/machines/machine_group/MachineGroupScreen'),
+    Match_checklist_option: () => import('@/app/screens/layouts/matchs/match_checklist_option/MatchCheckListOptionScreen'),
+    Match_form_machine: () => import('@/app/screens/layouts/matchs/match_form_machine/MatchFormMachineScreen'),
+    Config: () => import('@/app/screens/layouts/Configulation'),
+    Create_form: () => import('@/app/screens/layouts/forms/create/CreateFormScreen'),
+    Expected_result: () => import('@/app/screens/layouts/transactions/expected_result/ExpectedResultScreen'),
+    Form: () => import('@/app/screens/layouts/forms/form/FormScreen'),
+    Home: () => import('@/app/screens/layouts/HomeScreen'),
+    Login: () => import('@/app/screens/layouts/LoginScreen'),
+    Managepermissions: () => import('@/app/screens/SAdmin/Managepermissions'),
+    Permission_deny: () => import('@/app/screens/NotFoundScreen404'),
+    ScanQR: () => import('@/app/screens/layouts/actions/camera/ScanQR'),
+    Setting: () => import('@/app/screens/layouts/SettingScreen'),
+    Test: () => import('@/app/screens/TestComponent'),
+    Time: () => import('@/app/screens/layouts/schedule/TimescheduleScreen'),
+    TimeTrack: () => import('@/app/screens/layouts/schedule/TimescheduleTrack'),
 };
 
 const DrawerNav = React.memo(({ renderComponent, user }: any) => {
@@ -118,7 +94,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                     <Drawer.Screen
                         key={screen.MenuID}
                         name={screen.NavigationTo}
-                        component={renderComponent(screen.NavigationTo as ComponentNames | ComponentNameNoLazy)}
+                        component={renderComponent(screen.NavigationTo as ComponentNames)}
                         options={{ freezeOnBlur: true }}
                     />
                 );
@@ -130,9 +106,9 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                         <Drawer.Screen
                             key={parentScreen.MenuID}
                             name={parentScreen.NavigationTo}
-                            component={renderComponent(parentScreen.NavigationTo as ComponentNames | ComponentNameNoLazy)}
+                            component={renderComponent(parentScreen.NavigationTo as ComponentNames)}
                             options={{ freezeOnBlur: true }}
-                            />
+                        />
                     );
                 });
             }
@@ -185,11 +161,7 @@ const Navigation: React.FC = React.memo(() => {
 
     const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
 
-    const renderComponent = useCallback((name: ComponentNames | ComponentNameNoLazy) => {
-        if (name in nonLazyComponents) {
-            const Component = nonLazyComponents[name as ComponentNameNoLazy];
-            return (props: any) => <Component {...props} />;
-        }
+    const renderComponent = useCallback((name: ComponentNames) => {
 
         if (cachedComponents.current[name]) {
             const Component = cachedComponents.current[name];

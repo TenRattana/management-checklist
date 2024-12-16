@@ -8,5 +8,9 @@ module.exports = async function (env, argv) {
     use: ["style-loader", "css-loader"],
   });
 
+  config.optimization = {
+    runtimeChunk: "single",
+  };
+
   return config;
 };
