@@ -250,19 +250,19 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                 }
                             }, [values.ImportantList, setFieldValue]);
 
-                            const handleDataTypeChange = useCallback((dataTypeItem: string | undefined) => {
-                                console.log("handleDataTypeChange");
+                            // const handleDataTypeChange = useCallback((dataTypeItem: string | undefined) => {
+                            //     console.log("handleDataTypeChange");
 
-                                if (values.Important) {
-                                    if (dataTypeItem === "Number") {
-                                        updateImportantList({ Value: undefined });
-                                    } else {
-                                        updateImportantList({ MinLength: undefined, MaxLength: undefined, Value: undefined });
-                                    }
-                                }
+                            //     if (values.Important) {
+                            //         if (dataTypeItem === "Number") {
+                            //             updateImportantList({ Value: undefined });
+                            //         } else {
+                            //             updateImportantList({ MinLength: undefined, MaxLength: undefined, Value: undefined });
+                            //         }
+                            //     }
 
-                                setShouldRenderDT(dataTypeItem === "Number");
-                            }, [values.Important]);
+                            //     setShouldRenderDT(dataTypeItem === "Number");
+                            // }, [values.Important]);
 
                             const handleDataOption = useCallback(() => {
                                 console.log("handleDataOption");
@@ -290,20 +290,28 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
                             useEffect(() => {
                                 console.log("useEffect 2");
+                                if (values.Important !== shouldRenderIT) {
+                                    setShouldRenderIT(values.Important);
+
+                                }
                                 const dataTypeItem = values.DTypeID ? dataType.find(item => item.DTypeID === values.DTypeID)?.DTypeName : undefined;
-                                handleDataTypeChange(dataTypeItem);
-                            }, [values.DTypeID, values.Important, handleDataTypeChange, dataType]);
+
+                                if (values.Important) {
+                                    if (dataTypeItem === "Number") {
+                                        updateImportantList({ Value: undefined });
+                                    } else {
+                                        updateImportantList({ MinLength: undefined, MaxLength: undefined, Value: undefined });
+                                    }
+                                }
+
+                                setShouldRenderDT(dataTypeItem === "Number");
+                            }, [values.DTypeID, values.Important, dataType]);
 
                             useEffect(() => {
                                 console.log("useEffect 3");
                                 handleDataOption();
                             }, [values.GCLOptionID, handleDataOption]);
 
-                            useEffect(() => {
-                                console.log("useEffect 4");
-                                if (values.Important !== shouldRenderIT)
-                                    setShouldRenderIT(values.Important);
-                            }, [values.Important]);
                             console.log("form");
 
                             return (
