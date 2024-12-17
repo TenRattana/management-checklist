@@ -1,157 +1,167 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, {
-    useSharedValue,
-    useAnimatedStyle,
-    withTiming,
-} from 'react-native-reanimated';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import DropDownPicker from 'react-native-dropdown-picker';
+import { useInfiniteQuery } from 'react-query';
+import { fetchMachineGroups, fetchSearchMachineGroups } from '../services';
 
-const { width } = Dimensions.get('window');
-const DRAWER_WIDTH = width * 0.2;
+const InfiniteDropdown = () => {
+  const [selectedValue, setSelectedValue] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [items, setItems] = useState<any[]>([]);
+  const [open, setOpen] = useState(false);
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>('');
 
-const TestComponent = () => {
-    const translateX = useSharedValue(-DRAWER_WIDTH);
-    const mainTranslateX = useSharedValue(0);
-    const [drawerOpen, setDrawerOpen] = useState(false);
-    const [drawerContent, setDrawerContent] = useState(null);
+  const {
+    data,
+    isFetching,
+    fetchNextPage,
+    hasNextPage,
+  } = useInfiniteQuery(
+    ['machineGroup', debouncedSearchQuery],
+    ({ pageParam = 0 }) => {
+      return debouncedSearchQuery
+        ? fetchSearchMachineGroups(debouncedSearchQuery)
+        : fetchMachineGroups(pageParam, 100);
+    },
+    {
+      getNextPageParam: (lastPage, allPages) => {
+        return lastPage.length === 100 ? allPages.length : undefined;
+      },
+      enabled: true,
+      onSuccess: (newData) => {
+        const newItems = newData.pages.flat().map((item) => ({
+          label: item.GMachineName || 'Unknown',
+          value: item.GMachineID || '',
+        }));
 
-    const openDrawer = (content: any) => {
-        setDrawerContent(content);
-        translateX.value = withTiming(0, { duration: 300 });
-        mainTranslateX.value = withTiming(DRAWER_WIDTH, { duration: 300 });
-        setDrawerOpen(true);
-    };
-
-    const closeDrawer = () => {
-        translateX.value = withTiming(-DRAWER_WIDTH, { duration: 300 });
-        mainTranslateX.value = withTiming(0, { duration: 300 });
-        setDrawerOpen(false);
-        setDrawerContent(null);
-    };
-
-    const drawerStyle = useAnimatedStyle(() => ({
-        transform: [{ translateX: translateX.value }],
-    }));
-
-    const mainContentStyle = useAnimatedStyle(() => ({
-        transform: [{ translateX: mainTranslateX.value }],
-    }));
-
-    const panGesture = Gesture.Pan()
-        .onUpdate((event) => {
-            const newValue = Math.max(-DRAWER_WIDTH, Math.min(0, translateX.value + event.translationX));
-            translateX.value = newValue;
-            mainTranslateX.value = Math.max(0, DRAWER_WIDTH + newValue);
-        })
-        .onEnd(() => {
-            if (translateX.value > -DRAWER_WIDTH / 2) {
-                openDrawer(drawerContent || 'main');
-            } else {
-                closeDrawer();
+        setItems((prevItems) => {
+          const newItemsSet = new Set(prevItems.map(item => item.value));
+          newData.pages.flat().forEach(item => {
+            if (!newItemsSet.has(item.GMachineID)) {
+              newItemsSet.add(item.GMachineID);
+              prevItems.push({ label: item.GMachineName || 'Unknown', value: item.GMachineID });
             }
+          });
+          return [...prevItems];
         });
+      },
+    }
+  );
 
-    return (
-        <View style={styles.container}>
-            <GestureDetector gesture={panGesture}>
-                <Animated.View
-                    style={[
-                        styles.content,
-                        mainContentStyle,
-                        { width: drawerOpen ? width - DRAWER_WIDTH : width },
-                    ]}
-                >
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity onPress={() => openDrawer('main')} style={styles.openButton}>
-                            <Text style={styles.buttonText}>Open Drawer</Text>
-                        </TouchableOpacity>
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
 
-                        <TouchableOpacity onPress={() => openDrawer('toolbox')} style={styles.toolboxButton}>
-                            <Text style={styles.buttonText}>Toolbox</Text>
-                        </TouchableOpacity>
-                    </View>
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchQuery]);
 
-                    <Text style={styles.contentText}>Main Content</Text>
-                </Animated.View>
-            </GestureDetector>
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setItems([]); 
+  };
 
-            <Animated.View style={[styles.drawer, drawerStyle]}>
-                <TouchableOpacity onPress={closeDrawer} style={styles.closeButton}>
-                    <Text style={styles.buttonText}>Close Drawer</Text>
-                </TouchableOpacity>
+  const handleScroll = (event: any) => {
+    const contentHeight = event.nativeEvent.contentSize.height;
+    const layoutHeight = event.nativeEvent.layoutMeasurement.height;
+    const offsetY = event.nativeEvent.contentOffset.y;
 
-                {drawerContent === 'main' && (
-                    <Text style={styles.drawerContent}>Drawer Content</Text>
-                )}
+    // ตรวจสอบว่าเราสามารถดึงข้อมูลต่อไปได้หรือไม่
+    if (
+      contentHeight - layoutHeight - offsetY <= 0 && // ตรวจสอบว่าเราอยู่ที่จุดล่างสุดของ scroll
+      hasNextPage && // ตรวจสอบว่า `hasNextPage` เป็น `true`
+      !isFetching // ตรวจสอบว่าไม่มีการ `fetch` อยู่
+    ) {
+      fetchNextPage();
+    }
+  };
 
-                {drawerContent === 'toolbox' && (
-                    <Text style={styles.drawerContent}>Toolbox Content</Text>
-                )}
-            </Animated.View>
-        </View>
-    );
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Select Machine Group</Text>
+
+      <DropDownPicker
+        mode="SIMPLE"
+        maxHeight={300}
+        setOpen={() => {}}
+        open={open}
+        value={selectedValue}
+        items={items}
+        setValue={setSelectedValue}
+        placeholder="Search for a machine group..."
+        containerStyle={styles.dropdownContainer}
+        loading={isFetching}
+        style={styles.dropDownStyle}
+        listMode="SCROLLVIEW"
+        searchable={true}
+        searchPlaceholder="Search for a machine group..."
+        onChangeSearchText={handleSearch}
+        scrollViewProps={{
+          onScroll: handleScroll,
+        }}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
+        searchTextInputStyle={styles.searchInput}  // เพิ่มสไตล์ให้กับช่องค้นหา
+      />
+
+      {isFetching && items.length > 0 && (
+        <ActivityIndicator size="small" color="#007bff" style={styles.loader} />
+      )}
+
+      {items.length === 0 && !isFetching && (
+        <Text style={styles.noResultsText}>No results found</Text>
+      )}
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#f4f4f4',
+      padding: 20,
+      backgroundColor: '#f5f5f5',  // เพิ่มสีพื้นหลังให้กับ container
+      flex: 1,
     },
-    content: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        overflow: 'hidden',
-        position: 'relative',
+    title: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginBottom: 16,
+      color: '#333',  // สีของข้อความ title
+      textAlign: 'center',  // จัดข้อความให้อยู่กลาง
     },
-    buttonContainer: {
-        flexDirection: 'row',
-        position: 'absolute',
-        top: 20,
-        left: 20,
+    loader: {
+      marginTop: 10,
     },
-    openButton: {
-        backgroundColor: '#3498db',
-        padding: 10,
-        borderRadius: 5,
-        marginRight: 10,
+    dropdownContainer: {
+      width: '100%',
+      marginBottom: 20,  // เพิ่มระยะห่างด้านล่าง
     },
-    toolboxButton: {
-        backgroundColor: '#e67e22',
-        padding: 10,
-        borderRadius: 5,
+    dropDownStyle: {
+      backgroundColor: 'white',
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: '#ddd',
+      paddingHorizontal: 10,  // เพิ่ม padding ด้านใน
+      boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',  // ใช้ boxShadow แทน shadow properties
+      elevation: 3,  // เพิ่มเงาให้กับ Android
     },
-    contentText: {
-        fontSize: 18,
-        fontWeight: 'bold',
+    searchInput: {
+      backgroundColor: '#f9f9f9',  // เพิ่มสีพื้นหลังให้ช่องค้นหา
+      borderRadius: 8,  // ทำให้มุมของช่องค้นหานุ่มนวล
+      borderWidth: 1,
+      borderColor: '#ddd',
+      paddingLeft: 10,
+      height: 40,  // เพิ่มความสูงให้ช่องค้นหา
+      fontSize: 16,  // ขยายขนาดตัวอักษรให้ใหญ่ขึ้น
     },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
+    noResultsText: {
+      fontSize: 16,
+      color: '#888',
+      textAlign: 'center',
+      marginTop: 20,  // เพิ่มระยะห่างด้านบน
     },
-    drawer: {
-        position: 'absolute',
-        top: 0,
-        bottom: 0,
-        left: 0,
-        width: DRAWER_WIDTH,
-        backgroundColor: '#2ecc71',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    closeButton: {
-        backgroundColor: '#e74c3c',
-        padding: 10,
-        borderRadius: 5,
-        marginBottom: 20,
-    },
-    drawerContent: {
-        fontSize: 16,
-        color: '#fff',
-    },
-});
+  });
+  
 
-export default TestComponent;
+export default InfiniteDropdown;

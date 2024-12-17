@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import { TouchableOpacity, ScrollView, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { TouchableOpacity, ScrollView, View, ActivityIndicator, StyleSheet } from "react-native";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import { Inputs } from "@/components/common";
 import { Portal, Switch, Dialog, TextInput } from "react-native-paper";
@@ -14,8 +14,9 @@ import { useRes } from "@/app/contexts/useRes";
 import QRCode from "react-native-qrcode-svg";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { Platform } from "react-native";
-import { useQuery } from "react-query";
-import { fetchMachineGroups } from "@/app/services";
+import { useInfiniteQuery, useQuery } from "react-query";
+import { fetchMachineGroups, fetchSearchMachineGroups } from "@/app/services";
+import DropDownPicker from "react-native-dropdown-picker";
 
 const validationSchema = Yup.object().shape({
     machineGroupId: Yup.string().required("The group machine field is required."),
@@ -31,10 +32,78 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
     const { responsive } = useRes()
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    const { data: machineGroups = [] } = useQuery<GroupMachine[], Error>(
-        'machineGroups',
-        fetchMachineGroups
+    const [selectedValue, setSelectedValue] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState<string>('');
+    const [items, setItems] = useState<any[]>([]);
+    const [open, setOpen] = useState(false);
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>('');
+
+    const {
+        data,
+        isFetching,
+        fetchNextPage,
+        hasNextPage,
+    } = useInfiniteQuery(
+        ['machineGroups', debouncedSearchQuery],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQuery
+                ? fetchSearchMachineGroups(debouncedSearchQuery)
+                : fetchMachineGroups(pageParam, 100);
+        },
+        {
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 100 ? allPages.length : undefined;
+            },
+            enabled: true,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat().map((item) => ({
+                    label: item.GMachineName || 'Unknown',
+                    value: item.GMachineID || '',
+                }));
+
+                setItems((prevItems) => {
+                    const newItemsSet = new Set(prevItems.map(item => item.value));
+                    newData.pages.flat().forEach(item => {
+                        if (!newItemsSet.has(item.GMachineID)) {
+                            newItemsSet.add(item.GMachineID);
+                            prevItems.push({ label: item.GMachineName || 'Unknown', value: item.GMachineID });
+                        }
+                    });
+                    return [...prevItems];
+                });
+            },
+        }
     );
+
+     useEffect(() => {
+        const handler = setTimeout(() => {
+          setDebouncedSearchQuery(searchQuery);
+        }, 300);
+    
+        return () => {
+          clearTimeout(handler);
+        };
+      }, [searchQuery]);
+    
+
+    const handleSearch = (query: string) => {
+        setSearchQuery(query);
+        setItems([]);
+    };
+
+    const handleScroll = (event: any) => {
+        const contentHeight = event.nativeEvent.contentSize.height;
+        const layoutHeight = event.nativeEvent.layoutMeasurement.height;
+        const offsetY = event.nativeEvent.contentOffset.y;
+
+        if (
+            contentHeight - layoutHeight - offsetY <= 0 &&
+            hasNextPage &&
+            !isFetching
+        ) {
+            fetchNextPage();
+        }
+    };
 
     return (
         <Portal>
@@ -110,20 +179,53 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                     };
 
                                                     return (
-                                                        <CustomDropdownSingle
-                                                            title="Group Machine"
-                                                            labels="GMachineName"
-                                                            values="GMachineID"
-                                                            data={!isEditing ? machineGroups?.filter((v) => v.IsActive) : machineGroups || []}
-                                                            value={field.value}
-                                                            handleChange={handleChange}
-                                                            handleBlur={() => {
-                                                                form.setFieldTouched(field.name, true);
-                                                            }}
-                                                            testId="machineGroupId-md"
-                                                            error={form.touched.machineGroupId && Boolean(form.errors.machineGroupId)}
-                                                            errorMessage={form.touched.machineGroupId ? form.errors.machineGroupId : ""}
-                                                        />
+                                                        <>
+                                                            <DropDownPicker
+                                                                mode="SIMPLE"
+                                                                maxHeight={300}
+                                                                setOpen={() => { }}
+                                                                open={open}
+                                                                value={selectedValue}
+                                                                items={items}
+                                                                setValue={setSelectedValue}
+                                                                placeholder="Search for a machine group..."
+                                                                containerStyle={styles.dropdownContainer}
+                                                                loading={isFetching}
+                                                                style={styles.dropDownStyle}
+                                                                listMode="SCROLLVIEW"
+                                                                searchable={true}
+                                                                searchPlaceholder="Search for a machine group..."
+                                                                onChangeSearchText={handleSearch}
+                                                                scrollViewProps={{
+                                                                    onScroll: handleScroll,
+                                                                }}
+                                                                onOpen={() => setOpen(true)}
+                                                                onClose={() => setOpen(false)}
+                                                                searchTextInputStyle={styles.searchInput}  // เพิ่มสไตล์ให้กับช่องค้นหา
+                                                            />
+
+                                                            {isFetching && items.length > 0 && (
+                                                                <ActivityIndicator size="small" color="#007bff" style={styles.loader} />
+                                                            )}
+
+                                                            {items.length === 0 && !isFetching && (
+                                                                <Text style={styles.noResultsText}>No results found</Text>
+                                                            )}
+                                                        </>
+                                                        // <CustomDropdownSingle
+                                                        //     title="Group Machine"
+                                                        //     labels="GMachineName"
+                                                        //     values="GMachineID"
+                                                        //     data={!isEditing ? machineGroups?.filter((v) => v.IsActive) : machineGroups || []}
+                                                        //     value={field.value}
+                                                        //     handleChange={handleChange}
+                                                        //     handleBlur={() => {
+                                                        //         form.setFieldTouched(field.name, true);
+                                                        //     }}
+                                                        //     testId="machineGroupId-md"
+                                                        //     error={form.touched.machineGroupId && Boolean(form.errors.machineGroupId)}
+                                                        //     errorMessage={form.touched.machineGroupId ? form.errors.machineGroupId : ""}
+                                                        // />
                                                     )
                                                 }}
                                             </FastField>
@@ -266,5 +368,52 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
         </Portal>
     )
 })
+
+const styles = StyleSheet.create({
+    container: {
+        padding: 20,
+        backgroundColor: '#f5f5f5',  // เพิ่มสีพื้นหลังให้กับ container
+        flex: 1,
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 16,
+        color: '#333',  // สีของข้อความ title
+        textAlign: 'center',  // จัดข้อความให้อยู่กลาง
+    },
+    loader: {
+        marginTop: 10,
+    },
+    dropdownContainer: {
+        width: '100%',
+        marginBottom: 20,  // เพิ่มระยะห่างด้านล่าง
+    },
+    dropDownStyle: {
+        backgroundColor: 'white',
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        paddingHorizontal: 10,  // เพิ่ม padding ด้านใน
+        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',  // ใช้ boxShadow แทน shadow properties
+        elevation: 3,  // เพิ่มเงาให้กับ Android
+    },
+    searchInput: {
+        backgroundColor: '#f9f9f9',  // เพิ่มสีพื้นหลังให้ช่องค้นหา
+        borderRadius: 8,  // ทำให้มุมของช่องค้นหานุ่มนวล
+        borderWidth: 1,
+        borderColor: '#ddd',
+        paddingLeft: 10,
+        height: 40,  // เพิ่มความสูงให้ช่องค้นหา
+        fontSize: 16,  // ขยายขนาดตัวอักษรให้ใหญ่ขึ้น
+    },
+    noResultsText: {
+        fontSize: 16,
+        color: '#888',
+        textAlign: 'center',
+        marginTop: 20,  // เพิ่มระยะห่างด้านบน
+    },
+});
+
 
 export default Machine_dialog
