@@ -1,41 +1,15 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import axiosInstance from "@/config/axios";
 import { useToast } from '@/app/contexts/useToast';
 import { useRes } from '@/app/contexts/useRes';
 import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { ExpectedResult, Machine, UsersPermission } from "@/typing/type";
+import { ExpectedResult } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { StyleSheet } from "react-native";
 import { useSelector } from "react-redux";
-
-const fetchMachines = async (): Promise<Machine[]> => {
-    const response = await axiosInstance.post("Machine_service.asmx/GetMachines");
-    return response.data.data ?? [];
-};
-
-const fetchApporved = async (): Promise<ExpectedResult[]> => {
-    const response = await axiosInstance.post("ExpectedResult_service.asmx/GetApporveds");
-    return response.data.data ?? [];
-};
-
-const fetchUserPermission = async (): Promise<UsersPermission[]> => {
-    const response = await axiosInstance.post("User_service.asmx/GetUsersPermission");
-    return response.data.data ?? [];
-};
-
-const SaveApporved = async (data: {
-    TableID: string[], UserData: {
-        UserID: any;
-        UserName: any;
-        GUserID: any;
-    }
-}): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("ExpectedResult_service.asmx/SaveApporved", { TableID: JSON.stringify(data.TableID), UserInfo: JSON.stringify(data.UserData) });
-    return response.data;
-};
+import { fetchApporved, fetchSearchApporved, SaveApporved } from "@/app/services";
 
 const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -48,26 +22,20 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
     const queryClient = useQueryClient();
     const user = useSelector((state: any) => state.user)
 
-    const { data: machines = [], } = useQuery<Machine[], Error>(
-        'machines',
-        fetchMachines,
-        {
-            refetchOnWindowFocus: true,
-        }
-    );
+    const [paginationInfo, setPaginationInfo] = useState({
+        currentPage: 0,
+        pageSize: 100,
+    });
 
-    const { data: expectedResult = [], isLoading } = useQuery<ExpectedResult[], Error>(
-        'approved',
-        fetchApporved,
-        {
-            refetchOnWindowFocus: true,
-        });
+    const handlePaginationChange = (currentPage: number, pageSize: number) => {
+        setPaginationInfo({ currentPage, pageSize });
+    };
 
-    const { data: userPermission = [] } = useQuery<UsersPermission[], Error>(
-        'userPermission',
-        fetchUserPermission,
+    const { data: approved = [], isLoading } = useQuery<ExpectedResult[], Error>(
+        ['approved', paginationInfo, debouncedSearchQuery],
+        () => debouncedSearchQuery ? fetchSearchApporved(debouncedSearchQuery) : fetchApporved(paginationInfo.currentPage, paginationInfo.pageSize),
         {
-            refetchOnWindowFocus: true,
+            keepPreviousData: true,
         }
     );
 
@@ -82,7 +50,7 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
     }, [searchQuery]);
 
     const handleAction = useCallback(async (action?: string, item?: string) => {
-        const data = expectedResult.find((v) => v.TableID === item);
+        const data = approved.find((v) => v.TableID === item);
 
         try {
             if (action === "preIndex") {
@@ -107,7 +75,7 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
         } catch (error) {
             handleError(error);
         }
-    }, [handleError, expectedResult, selectedRows, user]);
+    }, [handleError, approved, selectedRows, user]);
 
     const convertToThaiDateTime = (dateString: string) => {
         const date = new Date(dateString);
@@ -125,15 +93,15 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
     }, [selectedRows])
 
     const tableData = useMemo(() => {
-        return expectedResult.map((item) => [
+        return approved.map((item) => [
             item.TableID,
             item.MachineName,
             item.FormName,
-            userPermission.find(v => v.UserID === item.UserID)?.UserName || "-",
+            item.UserName || "-",
             convertToThaiDateTime(item.CreateDate),
             item.TableID,
         ]);
-    }, [expectedResult, debouncedSearchQuery, userPermission]);
+    }, [approved, debouncedSearchQuery]);
 
     const mutation = useMutation(SaveApporved, {
         onSuccess: (data) => {
@@ -165,10 +133,6 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
         searchQuery: debouncedSearchQuery,
         selectedRows,
         setRow,
-        ShowTitle: "Machine : ",
-        showFilter: true,
-        showData: machines,
-        showColumn: "MachineName"
     }), [tableData, debouncedSearchQuery, handleAction, setRow, selectedRows]);
 
     const styles = StyleSheet.create({
@@ -196,7 +160,7 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />}
             </Card.Content>
         </AccessibleView>
     );

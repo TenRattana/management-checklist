@@ -11,22 +11,7 @@ import { GroupCheckListOption } from '@/typing/type'
 import { InitialValuesGroupCheckList } from '@/typing/value'
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useSelector } from "react-redux";
-
-const fetchGroupCheckListOption = async (): Promise<GroupCheckListOption[]> => {
-    const response = await axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions");
-    return response.data.data ?? [];
-};
-
-const saveGroupCheckListOption = async (data: {
-    Prefix: any;
-    GCLOptionID: string;
-    GCLOptionName: string;
-    IsActive: boolean;
-    Disables: boolean;
-}): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("GroupCheckListOption_service.asmx/SaveGroupCheckListOption", data);
-    return response.data;
-};
+import { fetchGroupCheckListOption, fetchSearchGroupCheckListOption, saveGroupCheckListNoOption } from "@/app/services";
 
 const ChecklistGroupScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -46,14 +31,24 @@ const ChecklistGroupScreen = React.memo(() => {
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
 
-    const { data: groupCheckListOption = [], isLoading } = useQuery<GroupCheckListOption[], Error>(
-        'groupCheckListOption',
-        fetchGroupCheckListOption,
-        {
-            refetchOnWindowFocus: true,
-        });
+    const [paginationInfo, setPaginationInfo] = useState({
+        currentPage: 0,
+        pageSize: 100,
+    });
 
-    const mutation = useMutation(saveGroupCheckListOption, {
+    const handlePaginationChange = (currentPage: number, pageSize: number) => {
+        setPaginationInfo({ currentPage, pageSize });
+    };
+
+    const { data: groupCheckListOption = [], isLoading } = useQuery<GroupCheckListOption[], Error>(
+        ['machines', paginationInfo, debouncedSearchQuery],
+        () => debouncedSearchQuery ? fetchSearchGroupCheckListOption(debouncedSearchQuery) : fetchGroupCheckListOption(paginationInfo.currentPage, paginationInfo.pageSize),
+        {
+            keepPreviousData: true,
+        }
+    );
+
+    const mutation = useMutation(saveGroupCheckListNoOption, {
         onSuccess: (data) => {
             showSuccess(data.message);
             setIsVisible(false)
@@ -186,7 +181,7 @@ const ChecklistGroupScreen = React.memo(() => {
                 </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />}
             </Card.Content>
 
             <MemoChecklist_group_dialog

@@ -11,7 +11,7 @@ import { Checklist } from '@/typing/type';
 import { InitialValuesChecklist } from '@/typing/value';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSelector } from "react-redux";
-import { fetchCheckList, saveCheckList } from "@/app/services";
+import { fetchCheckList, fetchSearchCheckList, saveCheckList } from "@/app/services";
 
 const CheckListScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -31,9 +31,21 @@ const CheckListScreen = React.memo(() => {
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
 
+    const [paginationInfo, setPaginationInfo] = useState({
+        currentPage: 0,
+        pageSize: 100,
+    });
+
+    const handlePaginationChange = (currentPage: number, pageSize: number) => {
+        setPaginationInfo({ currentPage, pageSize });
+    };
+
     const { data: checkList = [], isLoading } = useQuery<Checklist[], Error>(
-        'checkList',
-        fetchCheckList
+        ['checkList', paginationInfo, debouncedSearchQuery],
+        () => debouncedSearchQuery ? fetchSearchCheckList(debouncedSearchQuery) : fetchCheckList(paginationInfo.currentPage, paginationInfo.pageSize),
+        {
+            keepPreviousData: true,
+        }
     );
 
     const mutation = useMutation(saveCheckList, {
@@ -161,7 +173,7 @@ const CheckListScreen = React.memo(() => {
                 </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />}
             </Card.Content>
 
             <MemoChecklist_dialog

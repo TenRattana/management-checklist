@@ -1,29 +1,14 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from '@/app/contexts/useToast';
-import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
+import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { ExpectedResult, Machine, UsersPermission } from "@/typing/type";
+import { ExpectedResult } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
 import { useQuery } from 'react-query';
 import { StyleSheet } from "react-native";
-
-const fetchMachines = async (): Promise<Machine[]> => {
-    const response = await axiosInstance.post("Machine_service.asmx/GetMachines");
-    return response.data.data ?? [];
-};
-
-const fetchExpectedResults = async (): Promise<ExpectedResult[]> => {
-    const response = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResults");
-    return response.data.data ?? [];
-};
-
-const fetchUserPermission = async (): Promise<UsersPermission[]> => {
-    const response = await axiosInstance.post("User_service.asmx/GetUsersPermission");
-    return response.data.data ?? [];
-};
+import { fetchExpectedResults, fetchSearchExpectedResult } from "@/app/services";
 
 const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -33,29 +18,20 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
 
+    const [paginationInfo, setPaginationInfo] = useState({
+        currentPage: 0,
+        pageSize: 100,
+    });
+
+    const handlePaginationChange = (currentPage: number, pageSize: number) => {
+        setPaginationInfo({ currentPage, pageSize });
+    };
+
     const { data: expectedResult = [], isLoading } = useQuery<ExpectedResult[], Error>(
-        'expectedResult',
-        fetchExpectedResults,
+        ['expectedResult', paginationInfo, debouncedSearchQuery],
+        () => debouncedSearchQuery ? fetchSearchExpectedResult(debouncedSearchQuery) : fetchExpectedResults(paginationInfo.currentPage, paginationInfo.pageSize),
         {
-            refetchOnWindowFocus: true,
-        });
-
-    const { data: userPermission = [] } = useQuery<UsersPermission[], Error>(
-        'userPermission',
-        fetchUserPermission,
-        {
-            refetchOnWindowFocus: true,
-        }
-    );
-
-    const { data: machines = [], } = useQuery<Machine[], Error>(
-        'machines',
-        fetchMachines,
-        {
-            staleTime: 1000 * 60 * 5,
-            cacheTime: 1000 * 60 * 10,
-            refetchInterval: 1000 * 30,
-            enabled: true,
+            keepPreviousData: true,
         }
     );
 
@@ -101,12 +77,12 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
         return expectedResult.map((item) => [
             item.MachineName,
             item.FormName,
-            userPermission.find(v => v.UserID === item.UserID)?.UserName || "-",
-            userPermission.find(v => v.UserID === item.ApporvedID)?.UserName || "-",
+            item.UserName || "-",
+            item.ApporvedName || "-",
             convertToThaiDateTime(item.CreateDate),
             item.TableID,
         ]);
-    }, [expectedResult, debouncedSearchQuery, userPermission]);
+    }, [expectedResult, debouncedSearchQuery]);
 
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
@@ -127,11 +103,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
         handleAction,
         showMessage: [0, 1],
         searchQuery: debouncedSearchQuery,
-        showFilter: true,
-        ShowTitle: "Machine : ",
-        showData: machines,
-        showColumn: "MachineName"
-    }), [tableData, debouncedSearchQuery, handleAction, machines]);
+    }), [tableData, debouncedSearchQuery, handleAction,]);
 
     const styles = StyleSheet.create({
         container: {
@@ -158,7 +130,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />}
             </Card.Content>
         </AccessibleView>
     );

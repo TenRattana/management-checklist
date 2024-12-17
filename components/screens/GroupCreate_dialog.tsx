@@ -88,11 +88,12 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, saveData
                                     data={checkListOption}
                                     handleBlur={() => { }}
                                     handleChange={(selectedValues) => {
-                                        let option
-                                        if (options.includes(selectedValues)) {
+
+                                        let option: string[]
+                                        if (options.includes(selectedValues as string)) {
                                             option = options.filter((id) => id !== selectedValues);
                                         } else {
-                                            option = selectedValues;
+                                            option = selectedValues as string[];
                                         }
                                         setOptions(option);
                                     }}

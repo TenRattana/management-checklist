@@ -7,11 +7,11 @@ import { AccessibleView, Customtable, LoadingSpinner, Searchbar, Text } from "@/
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Machine_dialog from "@/components/screens/Machine_dialog";
-import { Machine, GroupMachine } from '@/typing/type';
+import { Machine } from '@/typing/type';
 import { InitialValuesMachine } from '@/typing/value';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSelector } from "react-redux";
-import { fetchMachineGroups, fetchMachines, saveMachine } from "@/app/services";
+import { fetchMachines, fetchSearchMachines, saveMachine } from "@/app/services";
 
 const MachineGroupScreen: React.FC = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -39,28 +39,20 @@ const MachineGroupScreen: React.FC = React.memo(() => {
     const queryClient = useQueryClient();
 
     const [paginationInfo, setPaginationInfo] = useState({
-        currentPage: 1,
-        pageSize: 10000,
-        filter: null,
+        currentPage: 0,
+        pageSize: 100,
     });
 
-    const handlePaginationChange = (currentPage: number, pageSize: number, filter: any) => {
-        setPaginationInfo({ currentPage, pageSize, filter });
-        console.log(paginationInfo);
-
+    const handlePaginationChange = (currentPage: number, pageSize: number) => {
+        setPaginationInfo({ currentPage, pageSize });
     };
 
     const { data: machines = [], isLoading } = useQuery<Machine[], Error>(
-        ['machines', paginationInfo],
-        () => fetchMachines(paginationInfo.currentPage, paginationInfo.pageSize, paginationInfo.filter),
+        ['machines', paginationInfo, debouncedSearchQuery],
+        () => debouncedSearchQuery ? fetchSearchMachines(debouncedSearchQuery) : fetchMachines(paginationInfo.currentPage, paginationInfo.pageSize),
         {
             keepPreviousData: true,
         }
-    );
-
-    const { data: machineGroups = [] } = useQuery<GroupMachine[], Error>(
-        'machineGroups',
-        fetchMachineGroups
     );
 
     const mutation = useMutation(saveMachine, {
@@ -68,7 +60,6 @@ const MachineGroupScreen: React.FC = React.memo(() => {
             showSuccess(data.message);
             setIsVisible(false)
             queryClient.invalidateQueries('machines');
-            queryClient.refetchQueries('machineGroups');
         },
         onError: handleError,
     });
@@ -126,7 +117,6 @@ const MachineGroupScreen: React.FC = React.memo(() => {
                 const response = await axiosInstance.post(`Machine_service.asmx/${endpoint}`, { MachineID: item });
                 showSuccess(String(response.data.message));
                 queryClient.invalidateQueries('machines');
-                queryClient.refetchQueries('machineGroups');
             }
         } catch (error) {
             handleError(error);
@@ -136,13 +126,13 @@ const MachineGroupScreen: React.FC = React.memo(() => {
     const tableData = useMemo(() => {
         return machines.map((item) => [
             item.Disables,
-            machineGroups.find((group) => group.GMachineID === item.GMachineID)?.GMachineName || "",
+            item.GMachineName || "",
             item.MachineName,
             item.Description,
             item.IsActive,
             item.MachineID,
         ]);
-    }, [machines, machineGroups, debouncedSearchQuery]);
+    }, [machines, debouncedSearchQuery]);
 
     const handleNewData = useCallback(() => {
         setInitialValues({
@@ -178,10 +168,6 @@ const MachineGroupScreen: React.FC = React.memo(() => {
         showMessage: 2,
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);
-
-    const dropmachine = useMemo(() => {
-        return machineGroups.filter(v => v.IsActive || v.GMachineID === initialValues.machineGroupId);
-    }, [machineGroups, initialValues.machineGroupId]);
 
     const styles = StyleSheet.create({
         container: {
@@ -224,15 +210,15 @@ const MachineGroupScreen: React.FC = React.memo(() => {
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />}
             </Card.Content>
 
-            <MemoMachine_dialog
-                isVisible={isVisible}
-                setIsVisible={setIsVisible}
-                isEditing={isEditing}
-                initialValues={initialValues}
-                saveData={saveData}
-                dropmachine={dropmachine}
-                machineGroup={machineGroups}
-            />
+            {isVisible && (
+                <MemoMachine_dialog
+                    isVisible={isVisible}
+                    setIsVisible={setIsVisible}
+                    isEditing={isEditing}
+                    initialValues={initialValues}
+                    saveData={saveData}
+                />
+            )}
         </AccessibleView>
     );
 });

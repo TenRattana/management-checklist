@@ -8,9 +8,9 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import Machine_group_dialog from "@/components/screens/Machine_group_dialog";
 import { GroupMachine } from '@/typing/type';
 import { InitialValuesGroupMachine } from '@/typing/value';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
-import { fetchMachineGroups, saveGroupMachine } from "@/app/services";
+import { fetchMachineGroups, fetchSearchMachineGroups, saveGroupMachine } from "@/app/services";
 import axiosInstance from "@/config/axios";
 
 const MachineGroupScreen = React.memo(() => {
@@ -25,35 +25,34 @@ const MachineGroupScreen = React.memo(() => {
         isActive: true,
         disables: false
     });
-    const [machineGroups, setMachineGroups] = useState<GroupMachine[]>([])
-    const [isLoading, setLoading] = useState<boolean>(true)
     const masterdataStyles = useMasterdataStyles();
     const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
 
-    const fetchData = async () => {
-        try {
-            const data = await fetchMachineGroups();
-            setMachineGroups(data);
-        } catch (error) {
-            handleError(error);
-        } finally {
-            setLoading(false);
-        }
+    const [paginationInfo, setPaginationInfo] = useState({
+        currentPage: 0,
+        pageSize: 100,
+    });
+
+    const handlePaginationChange = (currentPage: number, pageSize: number) => {
+        setPaginationInfo({ currentPage, pageSize });
     };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    const { data: machineGroups = [], isLoading } = useQuery<GroupMachine[], Error>(
+        ['machines', paginationInfo, debouncedSearchQuery],
+        () => debouncedSearchQuery ? fetchSearchMachineGroups(debouncedSearchQuery) : fetchMachineGroups(paginationInfo.currentPage, paginationInfo.pageSize),
+        {
+            keepPreviousData: true,
+        }
+    );
 
     const mutation = useMutation(saveGroupMachine, {
         onSuccess: (data) => {
             showSuccess(data.message);
             setIsVisible(false)
             queryClient.invalidateQueries('machineGroups');
-            fetchData();
         },
         onError: handleError,
     });
@@ -98,7 +97,7 @@ const MachineGroupScreen = React.memo(() => {
                 const endpoint = action === "activeIndex" ? "ChangeGroupMachine" : "DeleteGroupMachine";
                 const response = await axiosInstance.post(`GroupMachine_service.asmx/${endpoint}`, { GMachineID: item });
                 showSuccess(String(response.data.message));
-                await fetchData();
+                queryClient.invalidateQueries('machineGroups');
             }
         } catch (error) {
             handleError(error);
@@ -181,7 +180,7 @@ const MachineGroupScreen = React.memo(() => {
                 </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />}
             </Card.Content>
 
             <MemoMachine_group_dialog

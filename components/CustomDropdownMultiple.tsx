@@ -43,17 +43,16 @@ const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChan
         iconStyle={masterdataStyles.iconStyle}
         itemTextStyle={masterdataStyles.text}
         activeColor={masterdataStyles.backMain.backgroundColor}
-        containerStyle={{
-          flex: 1,
-          position: 'absolute',
-          backgroundColor: theme.colors.background,
-          zIndex: 1000,
-        }}
-        // containerStyle={[masterdataStyles.backLight]}
+        // containerStyle={{
+        //   position: 'absolute',
+        //   backgroundColor: theme.colors.background,
+        //   zIndex: 1000,
+        // }}
+        containerStyle={[masterdataStyles.backLight]}
         searchPlaceholderTextColor={masterdataStyles.text.color}
         data={options}
         search
-        // maxHeight={500}
+        maxHeight={500}
         labelField="label"
         valueField="value"
         placeholder={`Select ${title}`}

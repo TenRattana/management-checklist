@@ -7,8 +7,9 @@ import CustomtableData from "./table/CustomtableData";
 import { CustomTableProps } from '@/typing/tag';
 import { TouchableOpacity, View } from "react-native";
 import { Text } from "react-native-paper";
+import useMasterdataStyles from "@/styles/common/masterdata";
 
-const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, actionIndex, searchQuery, showMessage, selectedRows, setRow, showFilter, showData, showColumn, detail, detailData, detailKey, detailKeyrow, showDetailwithKey, ShowTitle,handlePaginationChange }: CustomTableProps) => {
+const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, actionIndex, searchQuery, showMessage, selectedRows, setRow, showFilter, showData, showColumn, detail, detailData, detailKey, detailKeyrow, showDetailwithKey, ShowTitle, handlePaginationChange }: CustomTableProps) => {
   const [displayData, setDisplayData] = useState<(string | number | boolean)[][]>([]);
   const [filter, setFilter] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<{ column: number | null; direction: "ascending" | "descending" | undefined }>({
@@ -16,8 +17,11 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
     direction: undefined,
   });
 
-  const [currentPage, setCurrentPage] = useState(1); 
-  const pageSize = 10; 
+  const masterdataStyles = useMasterdataStyles();
+
+  const [currentPage, setCurrentPage] = useState(0);
+
+  const [pageSize, setPageSize] = useState<number>(100);
 
   const toggleSelectAll = useCallback(() => {
     if (selectedRows && setRow) {
@@ -69,15 +73,9 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
     ).filter((row) => (filter ? row.includes(filter) : true));
   }, [sortedData, searchQuery, filter]);
 
-  const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = currentPage * pageSize;
-    return filteredData.slice(startIndex, endIndex);
-  }, [filteredData, currentPage]);
-
   useEffect(() => {
-    setDisplayData(paginatedData);
-  }, [paginatedData]);
+    setDisplayData(filteredData);
+  }, [filteredData]);
 
   const handleDialog = useCallback((action?: string, data?: string) => {
     if (handleAction) {
@@ -91,10 +89,11 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
-    console.log(newPage , currentPage);
-    
-    // handlePaginationChange(newPage,currentPage)
   }
+
+  useEffect(() => {
+    handlePaginationChange && handlePaginationChange(currentPage, pageSize)
+  }, [currentPage, pageSize])
 
   return (
     <AccessibleView name="customtable" style={{ flex: 1 }}>
@@ -155,13 +154,13 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
             showDetailwithKey={showDetailwithKey}
             key={"CustomtableData"}
           />
-          <View>
-            <TouchableOpacity disabled={currentPage === 1} onPress={() => handlePageChange(currentPage - 1)}>
-              Prev
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginVertical: 5 }}>
+            <TouchableOpacity disabled={currentPage < 1} onPress={() => handlePageChange(currentPage - 1)} style={{ opacity: currentPage > 0 ? 1 : 0.5 }}>
+              <Text style={masterdataStyles.text}>Prev</Text>
             </TouchableOpacity>
-            <Text>{currentPage}</Text>
-            <TouchableOpacity disabled={currentPage * pageSize >= filteredData.length} onPress={() => handlePageChange(currentPage + 1)}>
-              Next
+            <Text style={[{ marginHorizontal: 10 }, masterdataStyles.text]}>{currentPage + 1}</Text>
+            <TouchableOpacity disabled={filteredData.length < pageSize} onPress={() => handlePageChange(currentPage + 1)} style={{ opacity: filteredData.length == pageSize ? 1 : 0.5 }}>
+              <Text style={masterdataStyles.text}>Next</Text>
             </TouchableOpacity>
           </View>
         </AccessibleView>

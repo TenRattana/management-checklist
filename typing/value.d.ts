@@ -106,10 +106,8 @@ export interface SaveDialogProps extends SetVisible {
   state: any;
 }
 
-export interface MachineDialogProps<V extends Values, D extends TypeConfig>
+export interface MachineDialogProps<V extends Values>
   extends BaseDialogProps<V> {
-  machineGroup?: D[];
-  dropmachine?: D[];
 }
 
 export interface GroupMachineDialogProps<V extends Values>

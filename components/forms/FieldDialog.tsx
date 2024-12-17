@@ -110,17 +110,17 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
         [mutationG, state.GroupCheckList, state.MatchCheckListOption]
     );
 
-    const { data: checkList = [], isLoading: LoadCL } = useQuery("checkList", fetchCheckList, {
+    const { data: checkList = [] } = useQuery("checkList", () => fetchCheckList(0, 10000), {
         staleTime: 1000 * 60 * 24,
         cacheTime: 1000 * 60 * 25,
     });
 
-    const { data: checkListOption = [] } = useQuery("checkListOption", fetchCheckListOption, {
+    const { data: checkListOption = [] } = useQuery("checkListOption", () => fetchCheckListOption(0, 10000), {
         staleTime: 1000 * 60 * 24,
         cacheTime: 1000 * 60 * 25,
     });
 
-    const { data: groupCheckListOption = [], isLoading: LoadG } = useQuery("groupCheckListOption", fetchGroupCheckList, {
+    const { data: groupCheckListOption = [] } = useQuery("groupCheckListOption", () => fetchGroupCheckList(0, 10000), {
         staleTime: 1000 * 60 * 24,
         cacheTime: 1000 * 60 * 25,
     });

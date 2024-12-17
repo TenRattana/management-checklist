@@ -55,7 +55,7 @@ const CustomDropdownSingle = ({
                 searchPlaceholderTextColor={masterdataStyles.text.color}
                 data={options}
                 search
-                // maxHeight={300}
+                maxHeight={500}
                 labelField="label"
                 valueField="value"
                 placeholder={`Select ${title}`}

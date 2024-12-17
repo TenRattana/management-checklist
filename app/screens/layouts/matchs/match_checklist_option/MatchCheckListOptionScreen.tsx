@@ -11,25 +11,7 @@ import { CheckListOption, MatchCheckListOption, GroupCheckListOption, } from '@/
 import { InitialValuesMatchCheckListOption } from '@/typing/value'
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSelector } from "react-redux";
-
-const fetchCheckListOptions = async (): Promise<CheckListOption[]> => {
-    const response = await axiosInstance.post("CheckListOption_service.asmx/GetCheckListOptions");
-    return response.data.data ?? [];
-};
-
-const fetchGroupCheckListOptions = async (): Promise<GroupCheckListOption[]> => {
-    const response = await axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions");
-    return response.data.data ?? [];
-};
-const fetchMatchCheckListOptions = async (): Promise<MatchCheckListOption[]> => {
-    const response = await axiosInstance.post("MatchCheckListOption_service.asmx/GetMatchCheckListOptions");
-    return response.data.data ?? [];
-};
-
-const saveMatchCheckListOptions = async (data: { Prefix: string; MCLOptionID: string; GCLOptionID: string; CLOptionID: string; IsActive: boolean; Disables: boolean; }): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("MatchCheckListOption_service.asmx/SaveMatchCheckListOption", data);
-    return response.data;
-};
+import { fetchCheckListOption, fetchGroupCheckListOption, fetchMatchCheckListOptions, fetchSearchMatchCheckListOptions, saveMatchCheckListOptions } from "@/app/services";
 
 const MatchCheckListOptionScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -50,20 +32,31 @@ const MatchCheckListOptionScreen = React.memo(() => {
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
 
+    const [paginationInfo, setPaginationInfo] = useState({
+        currentPage: 0,
+        pageSize: 100,
+    });
+
+    const handlePaginationChange = (currentPage: number, pageSize: number) => {
+        setPaginationInfo({ currentPage, pageSize });
+    };
+
+
+    const { data: matchCheckListOption = [], isLoading } = useQuery<MatchCheckListOption[], Error>(
+        ['matchCheckListOption', paginationInfo, debouncedSearchQuery],
+        () => debouncedSearchQuery ? fetchSearchMatchCheckListOptions(debouncedSearchQuery) : fetchMatchCheckListOptions(paginationInfo.currentPage, paginationInfo.pageSize),
+        {
+            keepPreviousData: true,
+        }
+    );
+
     const { data: checkListOption = [] } = useQuery<CheckListOption[], Error>(
         'checkListOption',
-        fetchCheckListOptions);
+        () => fetchCheckListOption(0, 10000));
 
     const { data: groupCheckListOption = [] } = useQuery<GroupCheckListOption[], Error>(
         'groupCheckListOption',
-        fetchGroupCheckListOptions);
-
-    const { data: matchCheckListOption = [], isLoading } = useQuery<MatchCheckListOption[], Error>(
-        'matchCheckListOption',
-        fetchMatchCheckListOptions,
-        {
-            refetchOnWindowFocus: true,
-        });
+        () => fetchGroupCheckListOption(0, 10000));
 
     const mutation = useMutation(saveMatchCheckListOptions, {
         onSuccess: (data) => {
@@ -126,19 +119,14 @@ const MatchCheckListOptionScreen = React.memo(() => {
     }, [handleError, queryClient]);
 
     const tableData = useMemo(() => {
-        return matchCheckListOption.flatMap((item) =>
-            item.CheckListOptions.map(option => {
-                const matchedOption = checkListOption.find(group => group.CLOptionID === option.CLOptionID);
-                return [
-                    item.Disables,
-                    item.GCLOptionName,
-                    matchedOption?.CLOptionName || "",
-                    item.IsActive,
-                    item.MCLOptionID,
-                ];
-            })
-        );
-    }, [matchCheckListOption, checkListOption, debouncedSearchQuery]);
+        return matchCheckListOption.map((item) => [
+            item.Disables,
+            item.GCLOptionName || "",
+            item.CLOptionName || "",
+            item.IsActive,
+            item.MCLOptionID,
+        ]);
+    }, [matchCheckListOption, debouncedSearchQuery]);
 
     const handleNewData = useCallback(() => {
         setInitialValues({
@@ -228,7 +216,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
                 </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />}
             </Card.Content>
 
             <MemoMatch_checklist_option

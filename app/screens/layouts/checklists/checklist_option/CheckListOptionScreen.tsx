@@ -11,18 +11,7 @@ import { CheckListOption } from '@/typing/type'
 import { InitialValuesCheckListOption } from '@/typing/value'
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSelector } from "react-redux";
-import { fetchCheckListOption } from "@/app/services";
-
-const saveCheckListOption = async (data: {
-    Prefix: any;
-    CLOptionID: string;
-    CLOptionName: string;
-    IsActive: boolean;
-    Disables: boolean;
-}): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("CheckListOption_service.asmx/SaveCheckListOption", data);
-    return response.data;
-};
+import { fetchCheckListOption, fetchSearchCheckListOption, saveCheckListOption } from "@/app/services";
 
 const CheckListOptionScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -42,12 +31,22 @@ const CheckListOptionScreen = React.memo(() => {
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
 
+    const [paginationInfo, setPaginationInfo] = useState({
+        currentPage: 0,
+        pageSize: 100,
+    });
+
+    const handlePaginationChange = (currentPage: number, pageSize: number) => {
+        setPaginationInfo({ currentPage, pageSize });
+    };
+
     const { data: checkListOption = [], isLoading } = useQuery<CheckListOption[], Error>(
-        'checkListOption',
-        fetchCheckListOption,
+        ['machines', paginationInfo, debouncedSearchQuery],
+        () => debouncedSearchQuery ? fetchSearchCheckListOption(debouncedSearchQuery) : fetchCheckListOption(paginationInfo.currentPage, paginationInfo.pageSize),
         {
-            refetchOnWindowFocus: true,
-        });
+            keepPreviousData: true,
+        }
+    );
 
     const mutation = useMutation(saveCheckListOption, {
         onSuccess: (data) => {
@@ -182,7 +181,7 @@ const CheckListOptionScreen = React.memo(() => {
                 </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />}
             </Card.Content>
 
             <MemoChecklist_option_dialog

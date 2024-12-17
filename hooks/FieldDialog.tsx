@@ -14,13 +14,13 @@ const useField = () => {
     const queryClient = useQueryClient();
     const { handleError, showSuccess } = useToast();
     const state = useSelector((state: any) => state.prefix);
-    
-    const { data: checkList = [] } = useQuery("checkList", fetchCheckList, {
+
+    const { data: checkList = [] } = useQuery("checkList", () => fetchCheckList(0, 10000), {
         staleTime: 1000 * 60 * 24,
         cacheTime: 1000 * 60 * 25,
     });
 
-    const { data: groupCheckListOption = [] } = useQuery("groupCheckListOption", fetchGroupCheckList, {
+    const { data: groupCheckListOption = [] } = useQuery("groupCheckListOption", () => fetchGroupCheckList(0, 10000), {
         staleTime: 1000 * 60 * 24,
         cacheTime: 1000 * 60 * 25,
     });
@@ -43,7 +43,7 @@ const useField = () => {
                 .filter((checkList): checkList is CheckList => checkList !== undefined),
         [checkListType]
     );
-        
+
     const validationSchema = useMemo(() => {
         return Yup.object().shape({
             CListID: Yup.string().required("The checklist field is required."),

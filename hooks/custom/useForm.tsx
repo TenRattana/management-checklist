@@ -108,13 +108,28 @@ const useForm = (route: RouteParams) => {
         setIsLoading(true);
         try {
             const responses = await Promise.all([
-                axiosInstance.post("CheckList_service.asmx/GetCheckLists"),
-                axiosInstance.post("CheckListOption_service.asmx/GetCheckListOptions"),
-                axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions"),
-                axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptionsActive"),
+                axiosInstance.post("CheckList_service.asmx/GetCheckLists", {
+                    page: 0,
+                    pageSize: 10000,
+                }),
+                axiosInstance.post("CheckListOption_service.asmx/GetCheckListOptions", {
+                    page: 0,
+                    pageSize: 10000,
+                }),
+                axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions", {
+                    page: 0,
+                    pageSize: 10000,
+                }),
+                axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptionsActive", {
+                    page: 0,
+                    pageSize: 10000,
+                }),
                 axiosInstance.post("CheckListType_service.asmx/GetCheckListTypes"),
                 axiosInstance.post("DataType_service.asmx/GetDataTypes"),
-                axiosInstance.post("Machine_service.asmx/GetMachines")
+                axiosInstance.post("Machine_service.asmx/GetMachines", {
+                    page: 0,
+                    pageSize: 10000,
+                })
             ]);
 
             setData({

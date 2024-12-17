@@ -12,6 +12,7 @@ export interface GroupMachine {
 export interface Machine {
   GMachineID: string;
   MachineID: string;
+  GMachineName?: string;
   FormID: string | null;
   MachineCode: string | null;
   MachineName: string;
@@ -118,6 +119,8 @@ export interface MatchCheckListOption {
   MCLOptionID: string;
   GCLOptionID: string;
   CheckListOptions: Array<{ CLOptionID: string }>;
+  GCLOptionName?:string;
+  CLOptionName?:string;
   IsActive: boolean;
   GCLOptionName: string;
   Disables: boolean;
@@ -128,7 +131,9 @@ export interface ExpectedResult {
   MachineID: string;
   MachineName: string;
   UserID: string;
+  UserName ?: string;
   ApporvedID: string;
+  ApporvedName?: string;
   FormID: string;
   FormName: string;
   CreateDate: string;

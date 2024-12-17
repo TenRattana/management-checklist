@@ -14,6 +14,8 @@ import { useRes } from "@/app/contexts/useRes";
 import QRCode from "react-native-qrcode-svg";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { Platform } from "react-native";
+import { useQuery } from "react-query";
+import { fetchMachineGroups } from "@/app/services";
 
 const validationSchema = Yup.object().shape({
     machineGroupId: Yup.string().required("The group machine field is required."),
@@ -23,11 +25,16 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The status field is required."),
 });
 
-const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData, dropmachine, machineGroup = [] }: MachineDialogProps<InitialValuesMachine, GroupMachine>) => {
+const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData }: MachineDialogProps<InitialValuesMachine>) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
     const { responsive } = useRes()
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const { data: machineGroups = [] } = useQuery<GroupMachine[], Error>(
+        'machineGroups',
+        fetchMachineGroups
+    );
 
     return (
         <Portal>
@@ -107,7 +114,7 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                             title="Group Machine"
                                                             labels="GMachineName"
                                                             values="GMachineID"
-                                                            data={!isEditing ? machineGroup?.filter((v) => v.IsActive) : dropmachine || []}
+                                                            data={!isEditing ? machineGroups?.filter((v) => v.IsActive) : machineGroups || []}
                                                             value={field.value}
                                                             handleChange={handleChange}
                                                             handleBlur={() => {
