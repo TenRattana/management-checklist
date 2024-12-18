@@ -132,13 +132,7 @@ export interface ManagepermissionDialogProps<
 }
 export interface MatchFormMachineDialogProps<
   V extends Values,
-  D1 extends TypeConfig,
-  D2 extends TypeConfig
 > extends BaseDialogProps<V> {
-  machine?: D1[];
-  dropmachine?: D1[];
-  forms?: D2[];
-  dropform?: D2[];
 }
 
 export interface MatchChecklistOptionProps<

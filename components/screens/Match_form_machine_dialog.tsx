@@ -1,22 +1,130 @@
-import React from "react";
-import { TouchableOpacity, View } from "react-native";
-import CustomDropdownSingle from "@/components/CustomDropdownSingle";
+import React, { useCallback, useEffect, useState } from "react";
+import { Platform, TouchableOpacity, View } from "react-native";
 import { Portal, Dialog } from "react-native-paper";
-import { Formik, FastField } from "formik";
+import { Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { Form, Machine } from '@/typing/type'
 import { MatchFormMachineDialogProps, InitialValuesMatchFormMachine } from '@/typing/value'
 import Text from "@/components/Text";
+import { Dropdown } from "../common";
+import { fetchForm, fetchMachines, fetchSearchFomrs, fetchSearchMachines } from "@/app/services";
+import { useInfiniteQuery } from "react-query";
 
 const validationSchema = Yup.object().shape({
     machineId: Yup.string().required("This machine field is required"),
     formId: Yup.string().required("This form field is required"),
 });
 
-
-const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData, dropmachine, machine = [], forms = [], dropform }: MatchFormMachineDialogProps<InitialValuesMatchFormMachine, Machine, Form>) => {
+const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData }: MatchFormMachineDialogProps<InitialValuesMatchFormMachine>) => {
     const masterdataStyles = useMasterdataStyles()
+
+    const [openMachine, setOpenMachine] = useState(false);
+    const [openForm, setOpenForm] = useState(false);
+    const [debouncedSearchQueryMachine, setDebouncedSearchQueryMachine] = useState('');
+    const [debouncedSearchQueryForm, setDebouncedSearchQueryForm] = useState('');
+    const [itemsMachine, setItemsMachine] = useState<{ label: string; value: string }[]>([]);
+    const [itemsForm, setItemsForm] = useState<{ label: string; value: string }[]>([]);
+
+    const { data: machine, isFetching: isFetchingmachine, fetchNextPage: fetchNextPageMachine, hasNextPage: hasNextPageMachine, refetch: refetchMachine } = useInfiniteQuery(
+        ['machine', debouncedSearchQueryMachine],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQueryMachine
+                ? fetchSearchMachines(debouncedSearchQueryMachine)
+                : fetchMachines(pageParam, 100);
+        },
+        {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 100 ? allPages.length : undefined;
+            },
+            enabled: true,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat().map((item) => ({
+                    label: item.MachineName || 'Unknown',
+                    value: item.MachineID || '',
+                }));
+
+                setItemsMachine((prevItems) => {
+                    const newItemsSet = new Set(prevItems.map((item: any) => item.value));
+                    const mergedItems = prevItems.concat(
+                        newItems.filter((item) => !newItemsSet.has(item.value))
+                    );
+                    return mergedItems;
+                });
+            },
+        }
+    );
+
+    const { data: form, isFetching: isFetchingForm, fetchNextPage: fetchNextPageForm, hasNextPage: hasNextPageForm, refetch: refetchForm } = useInfiniteQuery(
+        ['form', debouncedSearchQueryForm],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQueryForm
+                ? fetchSearchFomrs(debouncedSearchQueryForm)
+                : fetchForm(pageParam, 100);
+        },
+        {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 100 ? allPages.length : undefined;
+            },
+            enabled: true,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat().map((item) => ({
+                    label: item.FormName || 'Unknown',
+                    value: item.FormID || '',
+                }));
+
+                setItemsForm((prevItems) => {
+                    const newItemsSet = new Set(prevItems.map((item: any) => item.value));
+                    const mergedItems = prevItems.concat(
+                        newItems.filter((item) => !newItemsSet.has(item.value))
+                    );
+                    return mergedItems;
+                });
+            },
+        }
+    );
+
+    useEffect(() => {
+        if (debouncedSearchQueryMachine === '') {
+            refetchMachine();
+        } else {
+            setItemsMachine([])
+        }
+
+        if (debouncedSearchQueryForm === '') {
+            refetchForm();
+        } else {
+            setItemsForm([])
+        }
+    }, [debouncedSearchQueryMachine, debouncedSearchQueryForm]);
+
+
+    const handleScrollMachine = ({ nativeEvent }: any) => {
+        if (nativeEvent && nativeEvent.contentSize) {
+            const contentHeight = nativeEvent.contentSize.height;
+            const layoutHeight = nativeEvent.layoutMeasurement.height;
+            const offsetY = nativeEvent.contentOffset.y;
+
+            if (contentHeight - layoutHeight - offsetY <= 0 && hasNextPageMachine && !isFetchingmachine) {
+                fetchNextPageMachine();
+            }
+        }
+    };
+
+    const handleScrollForm = ({ nativeEvent }: any) => {
+        if (nativeEvent && nativeEvent.contentSize) {
+            const contentHeight = nativeEvent.contentSize.height;
+            const layoutHeight = nativeEvent.layoutMeasurement.height;
+            const offsetY = nativeEvent.contentOffset.y;
+
+            if (contentHeight - layoutHeight - offsetY <= 0 && hasNextPageForm && !isFetchingForm) {
+                fetchNextPageForm();
+            }
+        }
+    };
 
     return (
         <Portal>
@@ -34,83 +142,84 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}
-                            validateOnBlur={true}
-                            validateOnChange={false}
+                            validateOnBlur={false}
+                            validateOnChange={true}
                             onSubmit={(values: InitialValuesMatchFormMachine) => saveData(values, isEditing)}
                         >
-                            {({ handleSubmit, dirty, isValid }) => (
-                                <View id="form-mfmd">
-                                    <FastField name="machineId">
-                                        {({ field, form }: any) => (
-                                            <CustomDropdownSingle
-                                                title="Machine"
-                                                labels="MachineName"
-                                                values="MachineID"
-                                                data={!isEditing
-                                                    ? machine.filter((v) => v.IsActive) : dropmachine || []}
-                                                value={field.value}
-                                                handleChange={(value) => {
-                                                    const stringValue = (value as { value: string }).value;
-                                                    form.setFieldValue(field.name, stringValue);
-                                                    setTimeout(() => {
-                                                        form.setFieldTouched(field.name, true);
-                                                    }, 0);
-                                                }}
-                                                handleBlur={() => {
-                                                    form.setFieldTouched(field.name, true);
-                                                }}
-                                                testId={`machineId-mfmd`}
-                                                error={form.touched.machineId && Boolean(form.errors.machineId)}
-                                                errorMessage={form.touched.machineId ? form.errors.machineId : ""}
-                                            />
-                                        )}
-                                    </FastField>
+                            {({ handleSubmit, dirty, isValid, setFieldValue, setFieldTouched, touched, errors, values }) => {
 
-                                    <FastField name="formId">
-                                        {({ field, form }: any) => (
-                                            <CustomDropdownSingle
-                                                title="Form"
-                                                labels="FormName"
-                                                values="FormID"
-                                                data={!isEditing
-                                                    ? forms.filter((v) => v.IsActive) : dropform || []}
-                                                value={field.value}
-                                                handleChange={(value) => {
-                                                    const stringValue = (value as { value: string }).value;
-                                                    form.setFieldValue(field.name, stringValue);
-                                                    setTimeout(() => {
-                                                        form.setFieldTouched(field.name, true);
-                                                    }, 0);
-                                                }}
-                                                handleBlur={() => {
-                                                    form.setFieldTouched(field.name, true);
-                                                }}
-                                                testId={`formId-mfmd`}
-                                                error={form.touched.formId && Boolean(form.errors.formId)}
-                                                errorMessage={form.touched.formId ? form.errors.formId : ""}
-                                            />
-                                        )}
-                                    </FastField>
+                                const handelChange = (field: string, value: any) => {
+                                    setFieldTouched(field, true)
+                                    setFieldValue(field, value)
+                                }
 
-                                    <View id="form-action-mfmd" style={masterdataStyles.containerAction}>
-                                        <TouchableOpacity
-                                            onPress={() => handleSubmit()}
-                                            disabled={!isValid || !dirty}
-                                            style={[
-                                                masterdataStyles.button,
-                                                masterdataStyles.backMain,
-                                                { opacity: isValid && dirty ? 1 : 0.5 }
-                                            ]}
-                                            testID="Save-mfmd"
-                                        >
-                                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Save</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-mfmd">
-                                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Cancel</Text>
-                                        </TouchableOpacity>
+                                return (
+                                    <View id="machine-mfmd">
+                                        <View style={{
+                                            ...(Platform.OS !== 'android' && {
+                                                zIndex: 7,
+                                            }),
+                                        }}>
+                                            <Dropdown
+                                                label='machine'
+                                                open={openMachine}
+                                                setOpen={(v: boolean) => setOpenMachine(v)}
+                                                selectedValue={values.machineId}
+                                                setDebouncedSearchQuery={(value) => setDebouncedSearchQueryMachine(value)}
+                                                items={itemsMachine}
+                                                setSelectedValue={(stringValue: string | null) => {
+                                                    handelChange("machineId", stringValue)
+                                                }}
+                                                isFetching={isFetchingmachine}
+                                                fetchNextPage={fetchNextPageMachine}
+                                                handleScroll={handleScrollMachine}
+                                                error={Boolean(touched.machineId && Boolean(errors.machineId))}
+                                                errorMessage={touched.machineId ? errors.machineId : ""}
+                                            />
+                                        </View>
+                                        <View style={{
+                                            ...(Platform.OS !== 'android' && {
+                                                zIndex: 6,
+                                            }),
+                                        }}>
+                                            <Dropdown
+                                                label='form'
+                                                open={openForm}
+                                                setOpen={(v: boolean) => setOpenForm(v)}
+                                                selectedValue={values.formId}
+                                                setDebouncedSearchQuery={(value) => setDebouncedSearchQueryForm(value)}
+                                                items={itemsForm}
+                                                setSelectedValue={(stringValue: string | null) => {
+                                                    handelChange("formId", stringValue)
+                                                }}
+                                                isFetching={isFetchingForm}
+                                                fetchNextPage={fetchNextPageForm}
+                                                handleScroll={handleScrollForm}
+                                                error={Boolean(touched.formId && Boolean(errors.formId))}
+                                                errorMessage={touched.formId ? errors.formId : ""}
+                                            />
+                                        </View>
+
+                                        <View id="form-action-mfmd" style={masterdataStyles.containerAction}>
+                                            <TouchableOpacity
+                                                onPress={() => handleSubmit()}
+                                                disabled={!isValid || !dirty}
+                                                style={[
+                                                    masterdataStyles.button,
+                                                    masterdataStyles.backMain,
+                                                    { opacity: isValid && dirty ? 1 : 0.5 }
+                                                ]}
+                                                testID="Save-mfmd"
+                                            >
+                                                <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Save</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-mfmd">
+                                                <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Cancel</Text>
+                                            </TouchableOpacity>
+                                        </View>
                                     </View>
-                                </View>
-                            )}
+                                )
+                            }}
                         </Formik>
                     )}
                 </Dialog.Content>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
-import { Checkboxs, Inputs } from "@/components/common";
+import { Checkboxs, Dropdown, Inputs } from "@/components/common";
 import { Portal, Dialog, Switch, Icon } from "react-native-paper";
 import { Formik, FastField } from "formik";
 import { useTheme } from "@/app/contexts/useTheme";
@@ -16,10 +16,11 @@ import GroupCreate_dialog from "../screens/GroupCreate_dialog";
 import CheckListCreate_dialog from "../screens/CheckListCreate_dialog";
 import { styles } from "../screens/Schedule";
 import useField from "@/hooks/FieldDialog";
-import { useMutation, useQuery, useQueryClient } from "react-query";
-import { fetchCheckList, fetchCheckListOption, fetchGroupCheckList, saveCheckList, saveCheckListOption, saveGroupCheckListOption } from "@/app/services";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "react-query";
+import { fetchCheckList, fetchCheckListOption, fetchGroupCheckList, fetchGroupCheckListOption, fetchSearchCheckList, fetchSearchGroupCheckListOption, saveCheckList, saveCheckListOption, saveGroupCheckListOption } from "@/app/services";
 import { InitialValuesChecklist, InitialValuesCheckListOption, InitialValuesGroupCheckList } from "@/typing/value";
 import { useSelector } from "react-redux";
+import { CheckListOption, GroupCheckListOption } from "@/typing/type";
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 
@@ -110,17 +111,113 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
         [mutationG, state.GroupCheckList, state.MatchCheckListOption]
     );
 
-    const { data: checkList = [] } = useQuery("checkList", () => fetchCheckList(0, 10000), {
-        staleTime: 1000 * 60 * 24,
-        cacheTime: 1000 * 60 * 25,
-    });
+    const [open, setOpen] = useState<{ CheckList: boolean, MatchChecklist: boolean }>({ CheckList: false, MatchChecklist: false });
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<{ CheckList: string, MatchChecklist: string }>({ CheckList: '', MatchChecklist: '' });
+    const [itemsCL, setItemsCL] = useState<{ label: string; value: string }[]>([]);
+    const [itemsML, setItemsML] = useState<any[]>([]);
+
+    const { data: checkList, isFetching: isFetchingCL, fetchNextPage: fetchNextPageCL, hasNextPage: hasNextPageCL, refetch: refetchCL } = useInfiniteQuery(
+        ['checkList', debouncedSearchQuery.CheckList],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQuery.CheckList
+                ? fetchSearchCheckList(debouncedSearchQuery.CheckList)
+                : fetchCheckList(pageParam, 100);
+        },
+        {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 100 ? allPages.length : undefined;
+            },
+            enabled: true,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat().map((item) => ({
+                    label: item.CListName || 'Unknown',
+                    value: item.CListID || '',
+                }));
+
+                setItemsCL((prevItems) => {
+                    const newItemsSet = new Set(prevItems.map((item: any) => item.value));
+                    const mergedItems = prevItems.concat(
+                        newItems.filter((item) => !newItemsSet.has(item.value))
+                    );
+                    return mergedItems;
+                });
+            },
+        }
+    );
+
+    const { data: groupCheckListOption, isFetching: isFetchingML, fetchNextPage: fetchNextPageML, hasNextPage: hasNextPageML, refetch: refetchML } = useInfiniteQuery(
+        ['groupCheckListOption', debouncedSearchQuery.MatchChecklist],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQuery.MatchChecklist
+                ? fetchSearchGroupCheckListOption(debouncedSearchQuery.MatchChecklist)
+                : fetchGroupCheckListOption(pageParam, 100);
+        },
+        {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 100 ? allPages.length : undefined;
+            },
+            enabled: true,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat().map((item) => ({
+                    ...item,
+                    label: item.GCLOptionName || 'Unknown',
+                    value: item.GCLOptionID || '',
+                }));
+
+                setItemsML((prevItems) => {
+                    const newItemsSet = new Set(prevItems.map((item: any) => item.value));
+                    const mergedItems = prevItems.concat(
+                        newItems.filter((item) => !newItemsSet.has(item.value))
+                    );
+                    return mergedItems;
+                });
+            },
+        }
+    );
+
+    useEffect(() => {
+        if (debouncedSearchQuery.CheckList === '') {
+            refetchCL();
+        } else {
+            setItemsCL([])
+        }
+
+        if (debouncedSearchQuery.MatchChecklist === '') {
+            refetchML();
+        } else {
+            setItemsML([])
+        }
+    }, [debouncedSearchQuery]);
+
+    const handleScrollCL = ({ nativeEvent }: any) => {
+        if (nativeEvent && nativeEvent.contentSize) {
+            const contentHeight = nativeEvent.contentSize.height;
+            const layoutHeight = nativeEvent.layoutMeasurement.height;
+            const offsetY = nativeEvent.contentOffset.y;
+
+            if (contentHeight - layoutHeight - offsetY <= 0 && hasNextPageCL && !isFetchingCL) {
+                fetchNextPageCL();
+            }
+        }
+    };
+
+    const handleScrollML = ({ nativeEvent }: any) => {
+        if (nativeEvent && nativeEvent.contentSize) {
+            const contentHeight = nativeEvent.contentSize.height;
+            const layoutHeight = nativeEvent.layoutMeasurement.height;
+            const offsetY = nativeEvent.contentOffset.y;
+
+            if (contentHeight - layoutHeight - offsetY <= 0 && hasNextPageML && !isFetchingML) {
+                fetchNextPageML();
+            }
+        }
+    };
 
     const { data: checkListOption = [] } = useQuery("checkListOption", () => fetchCheckListOption(0, 10000), {
-        staleTime: 1000 * 60 * 24,
-        cacheTime: 1000 * 60 * 25,
-    });
-
-    const { data: groupCheckListOption = [] } = useQuery("groupCheckListOption", () => fetchGroupCheckList(0, 10000), {
         staleTime: 1000 * 60 * 24,
         cacheTime: 1000 * 60 * 25,
     });
@@ -197,7 +294,6 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                     <Formik
                         initialValues={formState}
                         validationSchema={validationSchema}
-                        validateOnBlur={false}
                         validateOnChange={true}
                         onSubmit={values => {
                             handleSaveField(values, editMode ? "update" : "add")
@@ -205,7 +301,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                         }}
                         enableReinitialize={true}
                     >
-                        {({ setFieldValue, values, handleSubmit, isValid, dirty }) => {
+                        {({ setFieldValue, values, handleSubmit, isValid, dirty, setFieldTouched, touched, errors }) => {
                             glc.current = values.GCLOptionID
 
                             const updateRenderStates = useCallback(() => {
@@ -242,19 +338,19 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                 }
                             }, [values.ImportantList]);
 
-                            const handleDataOption = useCallback(() => {
-
+                            const handleDataOption = useCallback(async () => {
                                 let options: { label: string; value: string; }[] = [];
 
                                 if (values.GCLOptionID) {
-                                    options = groupCheckListOption
-                                        .filter(option => option.GCLOptionID === values.GCLOptionID)
-                                        .flatMap(option => option.CheckListOptions?.filter(item => item.IsActive)
-                                            .map(item => ({
-                                                label: item.CLOptionName,
-                                                value: item.CLOptionID,
-                                            })) || []
-                                        );
+                                    const filteredItems = groupCheckListOption?.pages[0].filter(option => option.GCLOptionID === values.GCLOptionID);
+
+                                    options = filteredItems?.flatMap(option => {
+                                        return option.CheckListOptions?.map((item: CheckListOption) => ({
+                                            label: item.CLOptionName,
+                                            value: item.CLOptionID,
+                                        })) || [];
+                                    }) || [];
+
                                     updateImportantList({ MinLength: undefined, MaxLength: undefined });
                                 }
 
@@ -287,49 +383,59 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                 values.GCLOptionID && handleDataOption();
                             }, [values.GCLOptionID]);
 
+                            const handelChange = (field: string, value: any) => {
+                                setFieldTouched(field, true)
+                                setFieldValue(field, value)
+                            }
+
                             return (
                                 <View style={{ marginHorizontal: 12 }}>
                                     <ScrollView
                                         contentContainerStyle={{ paddingBottom: 5, paddingHorizontal: 10 }}
                                         showsVerticalScrollIndicator={false}
                                         style={{ maxHeight: Platform.OS === "web" ? 330 : '68%' }}
+                                        keyboardShouldPersistTaps="handled"
+                                        nestedScrollEnabled={true}
                                     >
-                                        <FastField name="CListID" key={JSON.stringify(checkList)}>
-                                            {({ field, form }: any) => (
-                                                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                                                    <View style={{ flex: 1 }}>
-                                                        <CustomDropdownSingle
-                                                            title="Check List"
-                                                            labels="CListName"
-                                                            values="CListID"
-                                                            data={checkList}
-                                                            value={field.value}
-                                                            handleChange={(value) => {
-                                                                const stringValue = (value as { value: string }).value;
-                                                                form.setFieldValue(field.name, stringValue);
-                                                                form.setFieldTouched(field.name, true);
-                                                            }}
-                                                            handleBlur={() => {
-                                                                form.setFieldTouched(field.name, true);
-                                                            }}
-                                                            testId={`CListID-form`}
-                                                            error={form.touched.CListID && Boolean(form.errors.CListID)}
-                                                            errorMessage={form.touched.CListID ? form.errors.CListID : ""}
-                                                        />
-                                                    </View>
 
-                                                    <TouchableOpacity
-                                                        onPress={() => handelAdd(true, "CheckList")}
-                                                        style={{
-                                                            alignItems: 'center',
-                                                            paddingRight: 5
-                                                        }}
-                                                    >
-                                                        <Icon source={"plus-box"} size={spacing.large + 3} color={theme.colors.drag} />
-                                                    </TouchableOpacity>
-                                                </View>
-                                            )}
-                                        </FastField>
+                                        <View style={{
+                                            ...(Platform.OS !== 'android' && {
+                                                zIndex: 8,
+                                                flexDirection: 'row', alignItems: 'center',
+                                            }),
+                                        }}>
+                                            <View style={{ flex: 1 }}>
+                                                <Dropdown
+                                                    label='check list'
+                                                    open={open.CheckList}
+                                                    setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, CheckList: v }))}
+                                                    selectedValue={values.CListID}
+                                                    setDebouncedSearchQuery={(value: string) => setDebouncedSearchQuery((prev) => ({ ...prev, CheckList: value }))}
+                                                    items={itemsCL}
+                                                    setSelectedValue={(stringValue: string | null) => {
+                                                        handelChange("CListID", stringValue)
+                                                    }}
+                                                    isFetching={isFetchingCL}
+                                                    fetchNextPage={fetchNextPageCL}
+                                                    handleScroll={handleScrollCL}
+                                                    error={Boolean(touched.CListID && Boolean(errors.CListID))}
+                                                    errorMessage={touched.CListID ? errors.CListID : ""}
+                                                />
+                                            </View>
+
+                                            <View>
+                                                <TouchableOpacity
+                                                    onPress={() => handelAdd(true, "CheckList")}
+                                                    style={{
+                                                        alignItems: 'center',
+                                                        paddingRight: 5,
+                                                    }}
+                                                >
+                                                    <Icon source={"plus-box"} size={spacing.large + 3} color={theme.colors.drag} />
+                                                </TouchableOpacity>
+                                            </View>
+
+                                        </View>
 
                                         <FastField name="CTypeID">
                                             {({ field, form }: any) => (
@@ -356,58 +462,57 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
                                         {shouldRender === "detail" && (
                                             <RenderView style={Platform.OS === 'web' ? memoizedAnimatedText : { opacity: 1 }}>
-                                                <FastField name="GCLOptionID" key={JSON.stringify(groupCheckListOption)}>
-                                                    {({ field, form }: any) => (
-                                                        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                                                            <View style={{ flex: 1 }}>
-                                                                <CustomDropdownSingle
-                                                                    title="Match Check List Option Group"
-                                                                    labels="GCLOptionName"
-                                                                    values="GCLOptionID"
-                                                                    data={groupCheckListOption}
-                                                                    value={field.value}
-                                                                    handleChange={(value) => {
-                                                                        const stringValue = (value as { value: string }).value;
 
-                                                                        form.setFieldValue(field.name, stringValue);
-                                                                        form.setFieldTouched(field.name, true);
-                                                                    }}
-                                                                    handleBlur={() => {
-                                                                        form.setFieldTouched(field.name, true);
-                                                                    }}
-                                                                    testId={`GCLOptionID-form`}
-                                                                    error={form.touched.GCLOptionID && Boolean(form.errors.GCLOptionID)}
-                                                                    errorMessage={form.touched.GCLOptionID ? form.errors.GCLOptionID : ""}
-                                                                />
-                                                            </View>
+                                                <View style={{
+                                                    ...(Platform.OS !== 'android' && {
+                                                        zIndex: 7,
+                                                        flexDirection: 'row', alignItems: 'center',
+                                                    }),
+                                                }}>
+                                                    <View style={{ flex: 1 }}>
+                                                        <Dropdown
+                                                            label='match check list'
+                                                            open={open.MatchChecklist}
+                                                            setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, MatchChecklist: v }))}
+                                                            selectedValue={values.GCLOptionID}
+                                                            setDebouncedSearchQuery={(value: string) => setDebouncedSearchQuery((prev) => ({ ...prev, MatchChecklist: value }))}
+                                                            items={itemsML}
+                                                            setSelectedValue={(stringValue: string | null) => {
+                                                                handelChange("GCLOptionID", stringValue)
+                                                            }}
+                                                            isFetching={isFetchingCL}
+                                                            fetchNextPage={fetchNextPageML}
+                                                            handleScroll={handleScrollML}
+                                                            error={Boolean(touched.GCLOptionID && Boolean(errors.GCLOptionID))}
+                                                            errorMessage={touched.GCLOptionID ? errors.GCLOptionID : ""}
+                                                        />
+                                                    </View>
 
-                                                            <TouchableOpacity
-                                                                onPress={() => {
-                                                                    handelInfo(true, "GroupCheckList")
-                                                                }}
-                                                                style={{
-                                                                    alignItems: 'center',
-                                                                    paddingRight: 5,
-                                                                    display: glc.current ? 'flex' : 'none'
-                                                                }}
-                                                            >
-                                                                <Icon source={"information"} size={spacing.large + 3} color={theme.colors.drag} />
-                                                            </TouchableOpacity>
+                                                    <TouchableOpacity
+                                                        onPress={() => {
+                                                            handelInfo(true, "GroupCheckList")
+                                                        }}
+                                                        style={{
+                                                            alignItems: 'center',
+                                                            paddingRight: 5,
+                                                            display: glc.current ? 'flex' : 'none'
+                                                        }}
+                                                    >
+                                                        <Icon source={"information"} size={spacing.large + 3} color={theme.colors.drag} />
+                                                    </TouchableOpacity>
 
-                                                            <TouchableOpacity
-                                                                onPress={() => {
-                                                                    handelAdd(true, "GroupCheckList")
-                                                                }}
-                                                                style={{
-                                                                    alignItems: 'center',
-                                                                    paddingRight: 5
-                                                                }}
-                                                            >
-                                                                <Icon source={"plus-box"} size={spacing.large + 3} color={theme.colors.drag} />
-                                                            </TouchableOpacity>
-                                                        </View>
-                                                    )}
-                                                </FastField>
+                                                    <TouchableOpacity
+                                                        onPress={() => {
+                                                            handelAdd(true, "GroupCheckList")
+                                                        }}
+                                                        style={{
+                                                            alignItems: 'center',
+                                                            paddingRight: 5
+                                                        }}
+                                                    >
+                                                        <Icon source={"plus-box"} size={spacing.large + 3} color={theme.colors.drag} />
+                                                    </TouchableOpacity>
+                                                </View>
                                             </RenderView>
                                         )}
 

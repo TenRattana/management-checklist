@@ -2,7 +2,7 @@ import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import React, { useState } from 'react';
-import { View, Text, ScrollView, Dimensions } from 'react-native';
+import { View, Text, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import { Button, Dialog, Portal, Menu, Switch, HelperText } from 'react-native-paper';
 import { Inputs } from '../common';
 import { GroupMachine, TimeScheduleProps } from '@/typing/type';
@@ -16,6 +16,7 @@ import Custom_schedule_dialog from './Custom_schedule_dialog';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { Easing, FadeInLeft, FadeInRight, FadeOutLeft, FadeOutRight } from 'react-native-reanimated';
 import CustomDropdownMultiple from '../CustomDropdownMultiple';
+import { AccessibleView } from '..';
 
 const { height } = Dimensions.get('window');
 
@@ -163,11 +164,18 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                                                     values="GMachineID"
                                                     data={machineGroups?.filter((v) => v.IsActive)}
                                                     value={field.value}
-                                                    handleChange={(value) => {
-                                                        form.setFieldValue(field.name, value);
+                                                    handleChange={(selectedValues) => {
+                                                        let option: string[]
+                                                        if (field.value.includes(selectedValues as string)) {
+                                                            option = field.value.filter((id: any) => id !== selectedValues);
+                                                        } else {
+                                                            option = selectedValues as string[];
+                                                        }
+
+                                                        form.setFieldValue(field.name, option);
                                                         setTimeout(() => {
                                                             form.setFieldTouched(field.name, true);
-                                                        }, 0);
+                                                        }, 0)
                                                     }}
                                                     handleBlur={() => {
                                                         form.setFieldTouched(field.name, true);
@@ -178,6 +186,18 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                                                 />
                                             )}
                                         </FastField>
+
+                                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 10 }}>
+                                            {values.MachineGroup && Array.isArray(values.MachineGroup) && values.MachineGroup.length > 0 && values.MachineGroup?.map((item, index) => (
+                                                <TouchableOpacity onPress={() => {
+                                                    setFieldValue("checkListOptionId", values.MachineGroup && Array.isArray(values.MachineGroup) && values.MachineGroup.filter((id) => id !== item))
+                                                }} key={index}>
+                                                    <AccessibleView name="container-renderSelect" style={masterdataStyles.selectedStyle}>
+                                                        <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{machineGroups.find((v) => v.GMachineID === item)?.GMachineName}</Text>
+                                                    </AccessibleView>
+                                                </TouchableOpacity>
+                                            ))}
+                                        </View>
 
                                         <View style={[styles.timeIntervalMenu, { marginBottom: 0 }]}>
                                             <View id="form-active-point-md" style={[masterdataStyles.containerSwitch]}>

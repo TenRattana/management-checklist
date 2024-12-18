@@ -14,6 +14,7 @@ import Text from '../Text'
 import CustomDropdownMultiple from '../CustomDropdownMultiple'
 import { useRes } from '@/app/contexts/useRes'
 import CheckListOptionCreate_dialog from './CheckListOptionCreate_dialog'
+import { AccessibleView } from '..'
 
 const validationSchema = Yup.object().shape({
     groupCheckListOptionName: Yup.string().required(
@@ -88,7 +89,6 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, saveData
                                     data={checkListOption}
                                     handleBlur={() => { }}
                                     handleChange={(selectedValues) => {
-
                                         let option: string[]
                                         if (options.includes(selectedValues as string)) {
                                             option = options.filter((id) => id !== selectedValues);
@@ -103,7 +103,6 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, saveData
                                     values='CLOptionID'
                                 />
                             </View>
-
                             <TouchableOpacity
                                 onPress={() => setDialog(true)}
                                 style={{
@@ -113,6 +112,18 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, saveData
                             >
                                 <Icon source={"plus-box"} size={spacing.large + 3} color={theme.colors.drag} />
                             </TouchableOpacity>
+                        </View>
+
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 10 }}>
+                            {options.length > 0 && options.map((item, index) => (
+                                <TouchableOpacity onPress={() => {
+                                    setOptions(options.filter((id) => id !== item))
+                                }} key={index}>
+                                    <AccessibleView name="container-renderSelect" style={masterdataStyles.selectedStyle}>
+                                        <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{checkListOption.find((v) => v.CLOptionID === item)?.CLOptionName}</Text>
+                                    </AccessibleView>
+                                </TouchableOpacity>
+                            ))}
                         </View>
 
                         <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>

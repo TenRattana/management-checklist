@@ -152,7 +152,8 @@ const useMasterdataStyles = () => {
             alignItems: 'center',
         },
         commonContainer: {
-            margin: 12,
+            marginHorizontal: 12,
+            marginVertical: 8
         },
         checkboxContainer: {
             flexDirection: "row",

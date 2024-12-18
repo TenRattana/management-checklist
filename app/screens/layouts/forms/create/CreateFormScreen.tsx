@@ -93,8 +93,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                 const dataTypeName = dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName;
                 let validator;
 
-                console.log(dataTypeName);
-
                 if (dataTypeName === "Number") {
                     validator = Yup.number()
                         .nullable()
@@ -201,7 +199,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
             setCurrentField(data)
             handleDialogToggle("field", true)
         } else if (mclo === undefined && sform) {
-            console.log("SFORM", sform);
             const data = await state.subForms
                 ?.find((v: BaseSubForm) => v.SFormID === sform)
             setCurrentSub(data)

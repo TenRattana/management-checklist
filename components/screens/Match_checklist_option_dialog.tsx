@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import CustomDropdownMultiple from "@/components/CustomDropdownMultiple";
@@ -10,6 +10,7 @@ import { CheckListOption, GroupCheckListOption } from '@/typing/type';
 import { InitialValuesMatchCheckListOption, MatchChecklistOptionProps } from '@/typing/value';
 import Text from "@/components/Text";
 import { useTheme } from "@/app/contexts/useTheme";
+import { AccessibleView } from "..";
 
 const validationSchema = Yup.object().shape({
     groupCheckListOptionId: Yup.string().required("This group check list field is required"),
@@ -95,8 +96,15 @@ const Match_checklist_option = React.memo(({
                                                 values="CLOptionID"
                                                 data={filteredData}
                                                 value={field.value}
-                                                handleChange={(value) => {
-                                                    form.setFieldValue(field.name, value);
+                                                handleChange={(selectedValues) => {
+                                                    let option: string[]
+                                                    if (field.value.includes(selectedValues as string)) {
+                                                        option = field.value.filter((id: any) => id !== selectedValues);
+                                                    } else {
+                                                        option = selectedValues as string[];
+                                                    }
+
+                                                    form.setFieldValue(field.name, option);
                                                     setTimeout(() => {
                                                         form.setFieldTouched(field.name, true);
                                                     }, 0)
@@ -110,6 +118,18 @@ const Match_checklist_option = React.memo(({
                                             />
                                         )}
                                     </FastField>
+
+                                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 10 }}>
+                                        {values.checkListOptionId.length > 0 && values.checkListOptionId.map((item, index) => (
+                                            <TouchableOpacity onPress={() => {
+                                                setFieldValue("checkListOptionId", values.checkListOptionId.filter((id) => id !== item))
+                                            }} key={index}>
+                                                <AccessibleView name="container-renderSelect" style={masterdataStyles.selectedStyle}>
+                                                    <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{checkListOption.find((v) => v.CLOptionID === item)?.CLOptionName}</Text>
+                                                </AccessibleView>
+                                            </TouchableOpacity>
+                                        ))}
+                                    </View>
 
                                     <View id="form-active-mcod" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>

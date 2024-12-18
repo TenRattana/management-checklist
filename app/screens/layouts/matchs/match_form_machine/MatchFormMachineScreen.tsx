@@ -12,16 +12,6 @@ import { InitialValuesMatchFormMachine } from '@/typing/value'
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSelector } from "react-redux";
 
-const fetchMachines = async (): Promise<Machine[]> => {
-    const response = await axiosInstance.post("Machine_service.asmx/GetMachines");
-    return response.data.data ?? [];
-};
-
-const fetchForm = async (): Promise<Form[]> => {
-    const response = await axiosInstance.post("Form_service.asmx/GetForms");
-    return response.data.data ?? [];
-};
-
 const fetchMatchFormMchines = async (): Promise<MatchForm[]> => {
     const response = await axiosInstance.post("MatchFormMachine_service.asmx/GetMatchFormMachines");
     return response.data.data ?? [];
@@ -48,19 +38,6 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
 
-    const { data: machine = [] } = useQuery<Machine[], Error>(
-        'machines',
-        fetchMachines,
-        {
-            refetchOnWindowFocus: false,
-        });
-
-    const { data: forms = [] } = useQuery<Form[], Error>(
-        'form',
-        fetchForm,
-        {
-            refetchOnWindowFocus: false,
-        });
     const { data: matchForm = [], isLoading } = useQuery<MatchForm[], Error>(
         'matchForm',
         fetchMatchFormMchines,
@@ -147,22 +124,6 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
         setIsVisible(true);
     }, []);
 
-    const dropmachine = useMemo(() => {
-        return Array.isArray(machine)
-            ? machine.filter(
-                (v) => v.IsActive || v.MachineID === initialValues.machineId
-            )
-            : [];
-    }, [machine, initialValues.machineId]);
-
-    const dropform = useMemo(() => {
-        return Array.isArray(forms)
-            ? forms.filter(
-                (v) => v.IsActive || v.FormID === initialValues.formId
-            )
-            : [];
-    }, [forms, initialValues.formId]);
-
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
@@ -235,10 +196,6 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
                 isEditing={isEditing}
                 initialValues={initialValues}
                 saveData={saveData}
-                machine={machine}
-                dropmachine={dropmachine}
-                forms={forms}
-                dropform={dropform}
             />
         </AccessibleView>
     );

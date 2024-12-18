@@ -88,13 +88,15 @@ const CustomDropdownMultiple = ({ labels, values, title, data, value, handleChan
           </View>
         )}
         renderSelectedItem={(item, unSelect) => (
-          <TouchableOpacity onPress={() => unSelect && unSelect(item)}>
-            <AccessibleView name="container-renderSelect" style={masterdataStyles.selectedStyle}>
-              <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{item.label}</Text>
-              {/* <AntDesign style={styles.icon} name="Safety" size={20} /> */}
-            </AccessibleView>
-          </TouchableOpacity>
-        )}
+          <></>
+        )
+          // <TouchableOpacity onPress={() => unSelect && unSelect(item)}>
+          //   <AccessibleView name="container-renderSelect" style={masterdataStyles.selectedStyle}>
+          //     <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{item.label}</Text>
+          //     {/* <AntDesign style={styles.icon} name="Safety" size={20} /> */}
+          //   </AccessibleView>
+          // </TouchableOpacity>
+        }
         testID={testId}
       />
     </View>

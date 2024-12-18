@@ -1,7 +1,6 @@
 import { useRes } from "@/app/contexts/useRes";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { GroupCheckListOption, CheckListOption } from "@/typing/type";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Dialog, List, Text } from "react-native-paper";
@@ -9,13 +8,15 @@ import { Dialog, List, Text } from "react-native-paper";
 const InfoGroup_dialog = ({
     setDialogAdd,
     option,
-}: { setDialogAdd: () => void, option: {
-    label: string;
-    value: string;
-}[] }) => {
+}: {
+    setDialogAdd: () => void, option: {
+        label: string;
+        value: string;
+    }[]
+}) => {
     const masterdataStyles = useMasterdataStyles();
     const { spacing } = useRes()
-    
+
     return (
         <GestureHandlerRootView style={{ flexGrow: 1 }}>
             <View style={styles.dialog}>
