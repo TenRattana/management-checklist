@@ -1,11 +1,12 @@
 import { useRes } from '@/app/contexts/useRes';
+import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Platform, Modal, StyleSheet } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { HelperText, IconButton, Portal } from 'react-native-paper';
 
-const Dropdown = React.memo(({
+const DropdownMulti = React.memo(({
     label,
     fetchNextPage,
     handleScroll,
@@ -27,7 +28,7 @@ const Dropdown = React.memo(({
     setOpen: (v: boolean) => void;
     selectedValue: any;
     items: { label: string; value: string, icon?: () => JSX.Element }[];
-    setSelectedValue: (value: string | null) => void;
+    setSelectedValue: (value: string | string[] | null) => void;
     isFetching?: boolean;
     fetchNextPage?: () => void;
     handleScroll?: ({ nativeEvent }: any) => void;
@@ -38,7 +39,9 @@ const Dropdown = React.memo(({
 }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const masterdataStyles = useMasterdataStyles();
-    const { spacing } = useRes()
+    const { spacing } = useRes();
+    const { theme ,darkMode} = useTheme()
+
     const handleSearch = (query: string) => {
         setSearchQuery(query);
     };
@@ -53,6 +56,15 @@ const Dropdown = React.memo(({
         };
     }, [searchQuery]);
 
+    const selectedItems = items.filter(item => selectedValue.includes(item.value));
+
+    const safeHandleScroll = (event: any) => {
+        const { nativeEvent } = event;
+        if (nativeEvent && nativeEvent.contentSize) {
+            handleScroll && handleScroll(event);
+        }
+    };
+    
     return (
         <View id="inputs" style={masterdataStyles.commonContainer}>
             <View style={Platform.OS !== 'android' ? { zIndex: 10 } : {}}>
@@ -67,27 +79,32 @@ const Dropdown = React.memo(({
                         <View style={styles.modalContainer}>
                             <View style={styles.modalContent}>
                                 <DropDownPicker
-                                    multiple={false}
+                                    multiple={true}
                                     maxHeight={500}
                                     open={open}
-                                    value={selectedValue ? String(selectedValue) : null}
+                                    value={selectedValue}
                                     items={items}
-                                    containerStyle={{ flex: 1 }}
+                                    theme={darkMode ? 'DARK' : 'LIGHT'}
+                                    containerStyle={{ flex: 1}}
                                     setValue={() => { }}
                                     setOpen={() => setOpen(true)}
                                     placeholder={`Select for a ${label}...`}
                                     loading={isFetching}
                                     searchable={search ?? true}
+                                    searchTextInputStyle={masterdataStyles.text}
                                     searchTextInputProps={{
                                         value: searchQuery,
                                         onChangeText: handleSearch,
                                     }}
                                     renderListItem={({ item }) => (
                                         <TouchableOpacity
-                                            style={{ padding: 15 }}
+                                            style={{ padding: 15, backgroundColor: selectedValue.includes(item.value) ? theme.colors.drag : undefined }}
                                             onPress={() => {
-                                                setSelectedValue(String(item.value));
-                                                setOpen(false);
+                                                if (selectedValue.includes(item.value)) {
+                                                    setSelectedValue(selectedValue.filter((val: string) => val !== item.value));
+                                                } else {
+                                                    setSelectedValue([...selectedValue, item.value]);
+                                                }
                                             }}
                                         >
                                             <Text style={masterdataStyles.text}>{item.label}</Text>
@@ -100,17 +117,11 @@ const Dropdown = React.memo(({
                                     flatListProps={{
                                         data: items,
                                         keyExtractor: (item) => `${item.value}`,
-                                        onScroll: handleScroll,
-                                        onEndReached: handleScroll,
+                                        onScroll: safeHandleScroll, 
+                                        onEndReached: safeHandleScroll,
                                         onEndReachedThreshold: 0.8,
                                         initialNumToRender: 10,
                                         nestedScrollEnabled: true
-                                    }}
-                                    selectedItemContainerStyle={{
-                                        backgroundColor: "grey"
-                                    }}
-                                    selectedItemLabelStyle={{
-                                        fontWeight: "bold"
                                     }}
                                     bottomOffset={100}
                                     dropDownDirection="AUTO"
@@ -123,19 +134,22 @@ const Dropdown = React.memo(({
                 <TouchableOpacity onPress={() => setOpen(true)} style={styles.triggerButton}>
                     <IconButton
                         style={masterdataStyles.icon}
-                        icon={items.find((v) => v.value === selectedValue)?.icon || lefticon || "check-all"}
+                        icon={lefticon || "check-all"}
                         size={spacing.large}
                     />
-                    <Text style={[masterdataStyles.text]}>{selectedValue ? `${items.find((v) => v.value === selectedValue)?.label}` : `Select a ${label}`}</Text>
+                    <Text style={[masterdataStyles.text]}>
+                        {selectedItems.length > 0
+                            ? `${selectedItems.length} ${label}(s) selected: ${selectedItems.map(item => item.label).join(', ')}`
+                            : `Select a ${label}`
+                        }
+                    </Text>
 
-                    {selectedValue ? (
+                    {selectedValue.length > 0 ? (
                         <IconButton
                             style={[masterdataStyles.icon, { right: 8, flex: 1, alignItems: 'flex-end' }]}
                             icon="window-close"
                             size={spacing.large}
-                            onPress={() => {
-                                setSelectedValue("");
-                            }}
+                            onPress={() => setSelectedValue([])}
                         />
                     ) : (
                         <IconButton style={[masterdataStyles.icon, { right: 8, flex: 1, alignItems: 'flex-end' }]} icon="chevron-down" size={spacing.large} />
@@ -175,4 +189,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Dropdown;
+export default DropdownMulti;

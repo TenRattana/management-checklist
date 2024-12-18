@@ -7,3 +7,4 @@ export { default as Searchbar } from "./Searchbar";
 export { default as Selects } from "./Selects";
 export { default as Textareas } from "./Textareas";
 export { default as Dropdown } from "./Dropdown";
+export { default as DropdownMulti } from "./DropdownMulti";

@@ -1,22 +1,20 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
-import CustomDropdownSingle from "@/components/CustomDropdownSingle";
-import CustomDropdownMultiple from "@/components/CustomDropdownMultiple";
-import { Portal, Switch, Dialog } from "react-native-paper";
-import { Formik, FastField } from "formik";
+import { Formik } from "formik";
 import * as Yup from 'yup';
+import { Portal, Switch, Dialog } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { CheckListOption, GroupCheckListOption } from '@/typing/type';
 import { InitialValuesMatchCheckListOption, MatchChecklistOptionProps } from '@/typing/value';
 import Text from "@/components/Text";
 import { useTheme } from "@/app/contexts/useTheme";
-import { AccessibleView } from "..";
+import { fetchCheckListOption, fetchGroupCheckListOption, fetchSearchCheckListOption, fetchSearchGroupCheckListOption } from "@/app/services";
+import { useInfiniteQuery, useQueryClient } from "react-query";
+import { Dropdown, DropdownMulti } from "../common";
 
 const validationSchema = Yup.object().shape({
     groupCheckListOptionId: Yup.string().required("This group check list field is required"),
-    checkListOptionId: Yup.array()
-        .of(Yup.string())
-        .min(1, "The check list option field requires at least one option to be selected"),
+    checkListOptionId: Yup.array().of(Yup.string()).min(1, "The check list option field requires at least one option to be selected"),
     isActive: Yup.boolean().required("The active field is required."),
 });
 
@@ -26,110 +24,173 @@ const Match_checklist_option = React.memo(({
     isEditing,
     initialValues,
     saveData,
-    checkListOption,
-    dropcheckListOption,
-    groupCheckListOption,
-    dropgroupCheckListOption,
-}: MatchChecklistOptionProps<InitialValuesMatchCheckListOption, CheckListOption, GroupCheckListOption>) => {
+}: MatchChecklistOptionProps<InitialValuesMatchCheckListOption>) => {
     const masterdataStyles = useMasterdataStyles();
-    const { theme } = useTheme()
-    const filteredData = useMemo(() => {
-        return !isEditing ? checkListOption.filter((v) => v.IsActive) : dropcheckListOption;
-    }, [isEditing, checkListOption, dropcheckListOption]);
+    const { theme } = useTheme();
+    const [open, setOpen] = useState(false);
+    const [openCO, setOpenCO] = useState(false);
+
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+    const [debouncedSearchQueryCO, setDebouncedSearchQueryCO] = useState('');
+    const [items, setItems] = useState<any[]>([]);
+    const [itemsCO, setItemsCO] = useState<any[]>([]);
+
+    const { data: checkListOption, isFetching: isFetchingCO, fetchNextPage: fetchNextPageCO, hasNextPage: hasNextPageCO, refetch: refetchCO } = useInfiniteQuery(
+        ['checkListOption', debouncedSearchQueryCO],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQueryCO
+                ? fetchSearchCheckListOption(debouncedSearchQueryCO)
+                : fetchCheckListOption(pageParam, 100);
+        },
+        {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 100 ? allPages.length : undefined;
+            },
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat().map((item) => ({
+                    ...item,
+                    label: item.CLOptionName || 'Unknown',
+                    value: item.CLOptionID || '',
+                }));
+
+                setItemsCO((prevItems) => {
+                    const newItemsSet = new Set(prevItems.map((item: any) => item.value));
+                    return [...prevItems, ...newItems.filter((item) => !newItemsSet.has(item.value))];
+                });
+            },
+        }
+    );
+
+    const { data, isFetching:isFetchingCL, fetchNextPage:fetchNextPageCL, hasNextPage:hasNextPageCL, refetch:refetchCL } = useInfiniteQuery(
+        ['groupCheckListOption', debouncedSearchQuery],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQuery
+                ? fetchSearchGroupCheckListOption(debouncedSearchQuery)
+                : fetchGroupCheckListOption(pageParam, 100);
+        },
+        {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 100 ? allPages.length : undefined;
+            },
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat().map((item) => ({
+                    ...item,
+                    label: item.GCLOptionName || 'Unknown',
+                    value: item.GCLOptionID || '',
+                }));
+
+                setItems((prevItems) => {
+                    const newItemsSet = new Set(prevItems.map((item: any) => item.value));
+                    return [...prevItems, ...newItems.filter((item) => !newItemsSet.has(item.value))];
+                });
+            },
+        }
+    );
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        debouncedSearchQuery === '' && refetchCL()
+        debouncedSearchQueryCO === '' && refetchCO()
+    }, [debouncedSearchQuery, debouncedSearchQueryCO]);
+
+    useEffect(() => {
+        setDebouncedSearchQuery(initialValues.groupCheckListOptionId ?? "");
+        queryClient.invalidateQueries('checkListOption');
+
+    }, [initialValues]);
+
+    const handleScroll = ({ nativeEvent }: any) => {
+        if (nativeEvent.contentSize && nativeEvent.layoutMeasurement) {
+            const { contentHeight, layoutHeight, contentOffset } = nativeEvent;
+            if (contentHeight - layoutHeight - contentOffset.y <= 0 && hasNextPageCL && !isFetchingCL) {
+                fetchNextPageCL();
+            }
+        }
+    };
+
+    const handleScrollCO = ({ nativeEvent }: any) => {
+        if (nativeEvent.contentSize && nativeEvent.layoutMeasurement) {
+            const { contentHeight, layoutHeight, contentOffset } = nativeEvent;
+            if (contentHeight - layoutHeight - contentOffset.y <= 0 && hasNextPageCO && !isFetchingCO) {
+                fetchNextPageCO();
+            }
+        }
+    };
 
     return (
         <Portal>
-            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={masterdataStyles.containerDialog} testID="dialog-mcod">
-                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]} testID="dialog-title-mcod">
-                    {isEditing ? "Edit" : "Create"}
-                </Dialog.Title>
+            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={masterdataStyles.containerDialog}>
+                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold]}>{isEditing ? "Edit" : "Create"}</Dialog.Title>
                 <Dialog.Content>
-
-                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginBottom: 10, paddingLeft: 10 }]}>
-                        {isEditing
-                            ? "Edit the details of the match check list option & group check list option."
-                            : "Enter the details for the match check list option & group check list option."}
+                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginBottom: 10 }]}>
+                        {isEditing ? "Edit the details of the match check list option & group check list option." : "Enter the details for the match check list option & group check list option."}
                     </Text>
-                    {isVisible && (
-                        <Formik
-                            initialValues={initialValues}
-                            validationSchema={validationSchema}
-                            validateOnBlur={true}
-                            validateOnChange={false}
-                            onSubmit={(values: InitialValuesMatchCheckListOption) => saveData(values)}
-                        >
-                            {({ values, errors, touched, handleSubmit, setFieldValue, dirty, isValid }) => (
+
+                    <Formik
+                        initialValues={initialValues}
+                        validationSchema={validationSchema}
+                        onSubmit={(values: InitialValuesMatchCheckListOption) => saveData(values)}
+                    >
+                        {({ values, errors, touched, handleSubmit, setFieldValue, dirty, isValid, setFieldTouched }) => {
+                            const handleDataOption = useCallback(async () => {
+                                let options: { label: string; value: string; }[] = [];
+                                if (values.groupCheckListOptionId) {
+                                    const filteredItems = items.filter(option => option.GCLOptionID === values.groupCheckListOptionId);
+                                    options = filteredItems.flatMap(option => option.CheckListOptions?.map((item: CheckListOption) => ({
+                                        label: item.CLOptionName,
+                                        value: item.CLOptionID,
+                                    })) || []);
+                                }
+
+                                setItemsCO(prevOptions => {
+                                    return JSON.stringify(prevOptions) === JSON.stringify(options) ? prevOptions : options;
+                                });
+                            }, [values.groupCheckListOptionId, items]);
+
+                            useEffect(() => {
+                                if (values.groupCheckListOptionId && isEditing) handleDataOption();
+                            }, [values.groupCheckListOptionId, items]);
+
+                            const handelChange = (field: string, value: any) => {
+                                setFieldTouched(field, true);
+                                setFieldValue(field, value);
+                            };
+
+                            return (
                                 <View id="form-mcod">
+                                    <Dropdown
+                                        label='Group Check List Type'
+                                        open={open}
+                                        setOpen={setOpen}
+                                        setDebouncedSearchQuery={setDebouncedSearchQuery}
+                                        items={items}
+                                        isFetching={isFetchingCL}
+                                        fetchNextPage={fetchNextPageCL}
+                                        handleScroll={handleScroll}
+                                        selectedValue={values.groupCheckListOptionId}
+                                        setSelectedValue={(value: string | null) => handelChange("groupCheckListOptionId", value)}
+                                        error={Boolean(touched.groupCheckListOptionId && errors.groupCheckListOptionId)}
+                                        errorMessage={errors.groupCheckListOptionId || ""}
+                                    />
 
-                                    <FastField name="groupCheckListOptionId">
-                                        {({ field, form }: any) => (
-                                            <CustomDropdownSingle
-                                                title="Group Check List Option"
-                                                labels="GCLOptionName"
-                                                values="GCLOptionID"
-                                                data={!isEditing
-                                                    ? groupCheckListOption.filter((v) => v.IsActive)
-                                                    : dropgroupCheckListOption}
-                                                value={field.value}
-                                                handleChange={(value) => {
-                                                    const stringValue = (value as { value: string }).value;
-                                                    form.setFieldValue(field.name, stringValue);
-                                                    setTimeout(() => {
-                                                        form.setFieldTouched(field.name, true);
-                                                    }, 0);
-                                                }}
-                                                handleBlur={() => {
-                                                    form.setFieldTouched(field.name, true);
-                                                }}
-                                                testId="groupCheckListOptionId-mcod"
-                                                error={form.touched.groupCheckListOptionId && Boolean(form.errors.groupCheckListOptionId)}
-                                                errorMessage={form.touched.groupCheckListOptionId ? form.errors.groupCheckListOptionId : ""}
-                                            />
-                                        )}
-                                    </FastField>
-
-                                    <FastField name="checkListOptionId">
-                                        {({ field, form }: any) => (
-                                            <CustomDropdownMultiple
-                                                title="Check List Option"
-                                                labels="CLOptionName"
-                                                values="CLOptionID"
-                                                data={filteredData}
-                                                value={field.value}
-                                                handleChange={(selectedValues) => {
-                                                    let option: string[]
-                                                    if (field.value.includes(selectedValues as string)) {
-                                                        option = field.value.filter((id: any) => id !== selectedValues);
-                                                    } else {
-                                                        option = selectedValues as string[];
-                                                    }
-
-                                                    form.setFieldValue(field.name, option);
-                                                    setTimeout(() => {
-                                                        form.setFieldTouched(field.name, true);
-                                                    }, 0)
-                                                }}
-                                                handleBlur={() => {
-                                                    form.setFieldTouched(field.name, true);
-                                                }}
-                                                testId="checkListOptionId-mcod"
-                                                error={form.touched.checkListOptionId && Boolean(form.errors.checkListOptionId)}
-                                                errorMessage={form.touched.checkListOptionId ? form.errors.checkListOptionId : ""}
-                                            />
-                                        )}
-                                    </FastField>
-
-                                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 10 }}>
-                                        {values.checkListOptionId.length > 0 && values.checkListOptionId.map((item, index) => (
-                                            <TouchableOpacity onPress={() => {
-                                                setFieldValue("checkListOptionId", values.checkListOptionId.filter((id) => id !== item))
-                                            }} key={index}>
-                                                <AccessibleView name="container-renderSelect" style={masterdataStyles.selectedStyle}>
-                                                    <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{checkListOption.find((v) => v.CLOptionID === item)?.CLOptionName}</Text>
-                                                </AccessibleView>
-                                            </TouchableOpacity>
-                                        ))}
-                                    </View>
+                                    <DropdownMulti
+                                        label='Check List Type'
+                                        open={openCO}
+                                        setOpen={setOpenCO}
+                                        setDebouncedSearchQuery={setDebouncedSearchQueryCO}
+                                        items={itemsCO}
+                                        isFetching={isFetchingCO}
+                                        fetchNextPage={fetchNextPageCO}
+                                        handleScroll={handleScrollCO}
+                                        selectedValue={values.checkListOptionId}
+                                        setSelectedValue={(value: string | string[] | null) => handelChange("checkListOptionId", value)}
+                                        error={Boolean(touched.checkListOptionId && errors.checkListOptionId)}
+                                        errorMessage={String(errors.checkListOptionId || "")}
+                                    />
 
                                     <View id="form-active-mcod" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
@@ -146,6 +207,7 @@ const Match_checklist_option = React.memo(({
                                             testID="isActive-mcod"
                                         />
                                     </View>
+
                                     <View id="form-action-mcod" style={masterdataStyles.containerAction}>
                                         <TouchableOpacity
                                             onPress={() => handleSubmit()}
@@ -164,9 +226,9 @@ const Match_checklist_option = React.memo(({
                                         </TouchableOpacity>
                                     </View>
                                 </View>
-                            )}
-                        </Formik>
-                    )}
+                            );
+                        }}
+                    </Formik>
                 </Dialog.Content>
             </Dialog>
         </Portal>

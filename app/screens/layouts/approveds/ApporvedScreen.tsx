@@ -35,6 +35,8 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
         ['approved', paginationInfo, debouncedSearchQuery],
         () => debouncedSearchQuery ? fetchSearchApporved(debouncedSearchQuery) : fetchApporved(paginationInfo.currentPage, paginationInfo.pageSize),
         {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
             keepPreviousData: true,
         }
     );

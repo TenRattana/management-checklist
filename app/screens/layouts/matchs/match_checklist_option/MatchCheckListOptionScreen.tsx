@@ -46,17 +46,12 @@ const MatchCheckListOptionScreen = React.memo(() => {
         ['matchCheckListOption', paginationInfo, debouncedSearchQuery],
         () => debouncedSearchQuery ? fetchSearchMatchCheckListOptions(debouncedSearchQuery) : fetchMatchCheckListOptions(paginationInfo.currentPage, paginationInfo.pageSize),
         {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
             keepPreviousData: true,
         }
     );
 
-    const { data: checkListOption = [] } = useQuery<CheckListOption[], Error>(
-        'checkListOption',
-        () => fetchCheckListOption(0, 10000));
-
-    const { data: groupCheckListOption = [] } = useQuery<GroupCheckListOption[], Error>(
-        'groupCheckListOption',
-        () => fetchGroupCheckListOption(0, 10000));
 
     const mutation = useMutation(saveMatchCheckListOptions, {
         onSuccess: (data) => {
@@ -140,22 +135,6 @@ const MatchCheckListOptionScreen = React.memo(() => {
         setIsVisible(true);
     }, []);
 
-    const dropcheckListOption = useMemo(() => {
-        return Array.isArray(checkListOption)
-            ? checkListOption.filter(
-                (v) => v.IsActive || v.CLOptionID === initialValues.checkListOptionId[0]
-            )
-            : [];
-    }, [checkListOption, initialValues.checkListOptionId]);
-
-    const dropgroupCheckListOption = useMemo(() => {
-        return Array.isArray(groupCheckListOption)
-            ? groupCheckListOption.filter(
-                (v) => v.IsActive || v.GCLOptionID === initialValues.groupCheckListOptionId
-            )
-            : [];
-    }, [groupCheckListOption, initialValues.groupCheckListOptionId]);
-
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
@@ -225,12 +204,8 @@ const MatchCheckListOptionScreen = React.memo(() => {
                 isEditing={isEditing}
                 initialValues={initialValues}
                 saveData={saveData}
-                dropcheckListOption={dropcheckListOption}
-                checkListOption={checkListOption}
-                groupCheckListOption={groupCheckListOption}
-                dropgroupCheckListOption={dropgroupCheckListOption}
             />
-        </AccessibleView>
+        </AccessibleView>   
     );
 });
 

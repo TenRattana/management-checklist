@@ -8,7 +8,7 @@ import { MatchFormMachineDialogProps, InitialValuesMatchFormMachine } from '@/ty
 import Text from "@/components/Text";
 import { Dropdown } from "../common";
 import { fetchForm, fetchMachines, fetchSearchFomrs, fetchSearchMachines } from "@/app/services";
-import { useInfiniteQuery } from "react-query";
+import { useInfiniteQuery, useQueryClient } from "react-query";
 
 const validationSchema = Yup.object().shape({
     machineId: Yup.string().required("This machine field is required"),
@@ -90,17 +90,25 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
     useEffect(() => {
         if (debouncedSearchQueryMachine === '') {
             refetchMachine();
-        } else {
-            setItemsMachine([])
         }
 
         if (debouncedSearchQueryForm === '') {
             refetchForm();
-        } else {
-            setItemsForm([])
         }
     }, [debouncedSearchQueryMachine, debouncedSearchQueryForm]);
 
+    const queryClient = useQueryClient();
+    
+    useEffect(() => {
+        if(isEditing){
+            setDebouncedSearchQueryForm(initialValues.formId ?? "")
+            setDebouncedSearchQueryMachine(initialValues.machineId ?? "")
+        }else{
+            queryClient.invalidateQueries("form")
+            queryClient.invalidateQueries("machine")
+        }
+
+    }, []);
 
     const handleScrollMachine = ({ nativeEvent }: any) => {
         if (nativeEvent && nativeEvent.contentSize) {
@@ -155,50 +163,39 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
 
                                 return (
                                     <View id="machine-mfmd">
-                                        <View style={{
-                                            ...(Platform.OS !== 'android' && {
-                                                zIndex: 7,
-                                            }),
-                                        }}>
-                                            <Dropdown
-                                                label='machine'
-                                                open={openMachine}
-                                                setOpen={(v: boolean) => setOpenMachine(v)}
-                                                selectedValue={values.machineId}
-                                                setDebouncedSearchQuery={(value) => setDebouncedSearchQueryMachine(value)}
-                                                items={itemsMachine}
-                                                setSelectedValue={(stringValue: string | null) => {
-                                                    handelChange("machineId", stringValue)
-                                                }}
-                                                isFetching={isFetchingmachine}
-                                                fetchNextPage={fetchNextPageMachine}
-                                                handleScroll={handleScrollMachine}
-                                                error={Boolean(touched.machineId && Boolean(errors.machineId))}
-                                                errorMessage={touched.machineId ? errors.machineId : ""}
-                                            />
-                                        </View>
-                                        <View style={{
-                                            ...(Platform.OS !== 'android' && {
-                                                zIndex: 6,
-                                            }),
-                                        }}>
-                                            <Dropdown
-                                                label='form'
-                                                open={openForm}
-                                                setOpen={(v: boolean) => setOpenForm(v)}
-                                                selectedValue={values.formId}
-                                                setDebouncedSearchQuery={(value) => setDebouncedSearchQueryForm(value)}
-                                                items={itemsForm}
-                                                setSelectedValue={(stringValue: string | null) => {
-                                                    handelChange("formId", stringValue)
-                                                }}
-                                                isFetching={isFetchingForm}
-                                                fetchNextPage={fetchNextPageForm}
-                                                handleScroll={handleScrollForm}
-                                                error={Boolean(touched.formId && Boolean(errors.formId))}
-                                                errorMessage={touched.formId ? errors.formId : ""}
-                                            />
-                                        </View>
+                                        <Dropdown
+                                            label='machine'
+                                            open={openMachine}
+                                            setOpen={(v: boolean) => setOpenMachine(v)}
+                                            selectedValue={values.machineId}
+                                            setDebouncedSearchQuery={(value) => setDebouncedSearchQueryMachine(value)}
+                                            items={itemsMachine}
+                                            setSelectedValue={(stringValue: string | null) => {
+                                                handelChange("machineId", stringValue)
+                                            }}
+                                            isFetching={isFetchingmachine}
+                                            fetchNextPage={fetchNextPageMachine}
+                                            handleScroll={handleScrollMachine}
+                                            error={Boolean(touched.machineId && Boolean(errors.machineId))}
+                                            errorMessage={touched.machineId ? errors.machineId : ""}
+                                        />
+
+                                        <Dropdown
+                                            label='form'
+                                            open={openForm}
+                                            setOpen={(v: boolean) => setOpenForm(v)}
+                                            selectedValue={values.formId}
+                                            setDebouncedSearchQuery={(value) => setDebouncedSearchQueryForm(value)}
+                                            items={itemsForm}
+                                            setSelectedValue={(stringValue: string | null) => {
+                                                handelChange("formId", stringValue)
+                                            }}
+                                            isFetching={isFetchingForm}
+                                            fetchNextPage={fetchNextPageForm}
+                                            handleScroll={handleScrollForm}
+                                            error={Boolean(touched.formId && Boolean(errors.formId))}
+                                            errorMessage={touched.formId ? errors.formId : ""}
+                                        />
 
                                         <View id="form-action-mfmd" style={masterdataStyles.containerAction}>
                                             <TouchableOpacity

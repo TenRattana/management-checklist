@@ -44,6 +44,8 @@ const MachineGroupScreen = React.memo(() => {
         ['machines', paginationInfo, debouncedSearchQuery],
         () => debouncedSearchQuery ? fetchSearchMachineGroups(debouncedSearchQuery) : fetchMachineGroups(paginationInfo.currentPage, paginationInfo.pageSize),
         {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
             keepPreviousData: true,
         }
     );

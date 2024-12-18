@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
-import CustomDropdownSingle from "@/components/CustomDropdownSingle";
 import { Checkboxs, Dropdown, Inputs } from "@/components/common";
 import { Portal, Dialog, Switch, Icon } from "react-native-paper";
 import { Formik, FastField } from "formik";
@@ -17,10 +16,10 @@ import CheckListCreate_dialog from "../screens/CheckListCreate_dialog";
 import { styles } from "../screens/Schedule";
 import useField from "@/hooks/FieldDialog";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "react-query";
-import { fetchCheckList, fetchCheckListOption, fetchGroupCheckList, fetchGroupCheckListOption, fetchSearchCheckList, fetchSearchGroupCheckListOption, saveCheckList, saveCheckListOption, saveGroupCheckListOption } from "@/app/services";
+import { fetchCheckList, fetchCheckListOption, fetchGroupCheckListOption, fetchSearchCheckList, fetchSearchGroupCheckListOption, saveCheckList, saveCheckListOption, saveGroupCheckListOption } from "@/app/services";
 import { InitialValuesChecklist, InitialValuesCheckListOption, InitialValuesGroupCheckList } from "@/typing/value";
 import { useSelector } from "react-redux";
-import { CheckListOption, GroupCheckListOption } from "@/typing/type";
+import { CheckListOption } from "@/typing/type";
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 
@@ -111,7 +110,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
         [mutationG, state.GroupCheckList, state.MatchCheckListOption]
     );
 
-    const [open, setOpen] = useState<{ CheckList: boolean, MatchChecklist: boolean }>({ CheckList: false, MatchChecklist: false });
+    const [open, setOpen] = useState<{ CheckList: boolean, MatchChecklist: boolean, CheckListType: boolean, DataType: boolean }>({ CheckList: false, MatchChecklist: false, CheckListType: false, DataType: false });
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<{ CheckList: string, MatchChecklist: string }>({ CheckList: '', MatchChecklist: '' });
     const [itemsCL, setItemsCL] = useState<{ label: string; value: string }[]>([]);
     const [itemsML, setItemsML] = useState<any[]>([]);
@@ -175,21 +174,18 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                     );
                     return mergedItems;
                 });
-            },
+            }
+
         }
     );
 
     useEffect(() => {
-        if (debouncedSearchQuery.CheckList === '') {
+        if (debouncedSearchQuery.CheckList !== '') {
             refetchCL();
-        } else {
-            setItemsCL([])
         }
 
-        if (debouncedSearchQuery.MatchChecklist === '') {
+        if (debouncedSearchQuery.MatchChecklist !== '') {
             refetchML();
-        } else {
-            setItemsML([])
         }
     }, [debouncedSearchQuery]);
 
@@ -223,8 +219,12 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
     });
 
     useEffect(() => {
-        queryClient.invalidateQueries("checkList");
-        queryClient.invalidateQueries("groupCheckListOption");
+        if(editMode) { 
+            setDebouncedSearchQuery({ CheckList: formState.CListName ?? "", MatchChecklist: formState.GCLOptionID ?? "" })
+        }else{
+            queryClient.invalidateQueries("checkList")
+            queryClient.invalidateQueries("groupCheckListOption")
+        }
     }, []);
 
     const { spacing, responsive } = useRes();
@@ -342,7 +342,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                 let options: { label: string; value: string; }[] = [];
 
                                 if (values.GCLOptionID) {
-                                    const filteredItems = groupCheckListOption?.pages[0].filter(option => option.GCLOptionID === values.GCLOptionID);
+                                    const filteredItems = itemsML.filter(option => option.GCLOptionID === values.GCLOptionID);
 
                                     options = filteredItems?.flatMap(option => {
                                         return option.CheckListOptions?.map((item: CheckListOption) => ({
@@ -359,7 +359,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                     return isEqual ? prevOptions : options;
                                 });
 
-                            }, [values.GCLOptionID, groupCheckListOption]);
+                            }, [values.GCLOptionID, itemsML]);
 
                             useEffect(() => {
                                 if (values.Important !== shouldRenderIT) {
@@ -381,7 +381,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
                             useEffect(() => {
                                 values.GCLOptionID && handleDataOption();
-                            }, [values.GCLOptionID]);
+                            }, [values.GCLOptionID, itemsML]);
 
                             const handelChange = (field: string, value: any) => {
                                 setFieldTouched(field, true)
@@ -397,13 +397,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                         keyboardShouldPersistTaps="handled"
                                         nestedScrollEnabled={true}
                                     >
-
-                                        <View style={{
-                                            ...(Platform.OS !== 'android' && {
-                                                zIndex: 8,
-                                                flexDirection: 'row', alignItems: 'center',
-                                            }),
-                                        }}>
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                             <View style={{ flex: 1 }}>
                                                 <Dropdown
                                                     label='check list'
@@ -434,41 +428,31 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                                     <Icon source={"plus-box"} size={spacing.large + 3} color={theme.colors.drag} />
                                                 </TouchableOpacity>
                                             </View>
-
                                         </View>
 
-                                        <FastField name="CTypeID">
-                                            {({ field, form }: any) => (
-                                                <CustomDropdownSingle
-                                                    title="Check List Type"
-                                                    labels="CTypeTitle"
-                                                    values="CTypeID"
-                                                    data={editMode ? checkListTypes : checkListTypes.filter(v => v.IsActive)}
-                                                    value={field.value}
-                                                    handleChange={(value) => {
-                                                        const stringValue = (value as { value: string }).value;
-                                                        form.setFieldValue(field.name, stringValue);
-                                                        form.setFieldTouched(field.name, true);
-                                                    }}
-                                                    handleBlur={() => {
-                                                        form.setFieldTouched(field.name, true);
-                                                    }}
-                                                    testId={`CTypeID-form`}
-                                                    error={form.touched.CTypeID && Boolean(form.errors.CTypeID)}
-                                                    errorMessage={form.touched.CTypeID ? form.errors.CTypeID : ""}
-                                                />
-                                            )}
-                                        </FastField>
+                                        <Dropdown
+                                            label='check list type'
+                                            search={false}
+                                            open={open.CheckListType}
+                                            setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, CheckListType: v }))}
+                                            selectedValue={values.CTypeID}
+                                            items={editMode ? checkListTypes.map((v => ({
+                                                label: v.CTypeTitle,
+                                                value: v.CTypeID,
+                                            }))) : checkListTypes.filter(v => v.IsActive).map((v => ({
+                                                label: v.CTypeTitle,
+                                                value: v.CTypeID,
+                                            })))}
+                                            setSelectedValue={(stringValue: string | null) => {
+                                                handelChange("CTypeID", stringValue)
+                                            }}
+                                            error={Boolean(touched.CTypeID && Boolean(errors.CTypeID))}
+                                            errorMessage={touched.CTypeID ? errors.CTypeID : ""}
+                                        />
 
                                         {shouldRender === "detail" && (
                                             <RenderView style={Platform.OS === 'web' ? memoizedAnimatedText : { opacity: 1 }}>
-
-                                                <View style={{
-                                                    ...(Platform.OS !== 'android' && {
-                                                        zIndex: 7,
-                                                        flexDirection: 'row', alignItems: 'center',
-                                                    }),
-                                                }}>
+                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                                     <View style={{ flex: 1 }}>
                                                         <Dropdown
                                                             label='match check list'
@@ -518,28 +502,25 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
                                         {shouldRender === "text" && (
                                             <RenderView style={Platform.OS === 'web' ? memoizedAnimatedText : { opacity: 1 }}>
-                                                <FastField name="DTypeID">
-                                                    {({ field, form }: any) => (
-                                                        <CustomDropdownSingle
-                                                            title="Data Type"
-                                                            labels="DTypeName"
-                                                            values="DTypeID"
-                                                            data={editMode ? dataType : dataType.filter(v => v.IsActive)}
-                                                            value={field.value}
-                                                            handleChange={(value) => {
-                                                                const stringValue = (value as { value: string }).value;
-                                                                form.setFieldValue(field.name, stringValue);
-                                                                form.setFieldTouched(field.name, true);
-                                                            }}
-                                                            handleBlur={() => {
-                                                                form.setFieldTouched(field.name, true);
-                                                            }}
-                                                            testId={`DTypeID-form`}
-                                                            error={form.touched.DTypeID && Boolean(form.errors.DTypeID)}
-                                                            errorMessage={form.touched.DTypeID ? form.errors.DTypeID : ""}
-                                                        />
-                                                    )}
-                                                </FastField>
+                                                <Dropdown
+                                                    label='data type'
+                                                    search={false}
+                                                    open={open.DataType}
+                                                    setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, DataType: v }))}
+                                                    selectedValue={values.DTypeID}
+                                                    items={editMode ? dataType.map((v => ({
+                                                        label: v.DTypeName,
+                                                        value: v.DTypeID,
+                                                    }))) : dataType.filter(v => v.IsActive).map((v => ({
+                                                        label: v.DTypeName,
+                                                        value: v.DTypeID,
+                                                    })))}
+                                                    setSelectedValue={(stringValue: string | null) => {
+                                                        handelChange("DTypeID", stringValue)
+                                                    }}
+                                                    error={Boolean(touched.DTypeID && Boolean(errors.DTypeID))}
+                                                    errorMessage={touched.DTypeID ? errors.DTypeID : ""}
+                                                />
                                             </RenderView>
                                         )}
 

@@ -43,6 +43,8 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
         fetchMatchFormMchines,
         {
             refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            keepPreviousData:true,
         });
 
     const mutation = useMutation(SaveMatchFormMachine, {

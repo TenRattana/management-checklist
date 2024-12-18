@@ -12,7 +12,7 @@ import { useRes } from "@/app/contexts/useRes";
 import QRCode from "react-native-qrcode-svg";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { Platform } from "react-native";
-import { useInfiniteQuery } from "react-query";
+import { useInfiniteQuery, useQueryClient } from "react-query";
 import { fetchMachineGroups, fetchSearchMachineGroups } from "@/app/services";
 
 const validationSchema = Yup.object().shape({
@@ -69,6 +69,16 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
         }
 
     }, [debouncedSearchQuery]);
+
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        if (isEditing) {
+            setDebouncedSearchQuery(initialValues.machineGroupId ?? "")
+        } else {
+            queryClient.invalidateQueries("machineGroups")
+        }
+    }, []);
 
     const handleScroll = ({ nativeEvent }: any) => {
         if (nativeEvent && nativeEvent.contentSize) {
@@ -146,28 +156,20 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                 contentContainerStyle={{ paddingBottom: 5, paddingHorizontal: 10 }}
                                                 showsVerticalScrollIndicator={false}
                                             >
-                                                <View style={{
-                                                    paddingTop: 20,
-                                                    ...(Platform.OS !== 'android' && {
-                                                        zIndex: 8,
-                                                    }),
-                                                }}>
-                                                    <Dropdown
-                                                        label='group machine'
-                                                        open={open}
-                                                        setOpen={(v: boolean) => setOpen(v)}
-                                                        selectedValue={values.machineGroupId}
-                                                        setDebouncedSearchQuery={(value) => setDebouncedSearchQuery(value)}
-                                                        items={items}
-                                                        setSelectedValue={(stringValue: string | null) => handelChange("machineGroupId", stringValue)}
-                                                        isFetching={isFetching}
-                                                        fetchNextPage={fetchNextPage}
-                                                        handleScroll={handleScroll}
-                                                        error={Boolean(touched.machineGroupId && Boolean(errors.machineGroupId))}
-                                                        errorMessage={touched.machineGroupId ? errors.machineGroupId : ""}
-                                                    />
-
-                                                </View>
+                                                <Dropdown
+                                                    label='group machine'
+                                                    open={open}
+                                                    setOpen={(v: boolean) => setOpen(v)}
+                                                    selectedValue={values.machineGroupId}
+                                                    setDebouncedSearchQuery={(value) => setDebouncedSearchQuery(value)}
+                                                    items={items}
+                                                    setSelectedValue={(stringValue: string | null) => handelChange("machineGroupId", stringValue)}
+                                                    isFetching={isFetching}
+                                                    fetchNextPage={fetchNextPage}
+                                                    handleScroll={handleScroll}
+                                                    error={Boolean(touched.machineGroupId && Boolean(errors.machineGroupId))}
+                                                    errorMessage={touched.machineGroupId ? errors.machineGroupId : ""}
+                                                />
 
                                                 <FastField name="machineName">
                                                     {({ field, form }: any) => (

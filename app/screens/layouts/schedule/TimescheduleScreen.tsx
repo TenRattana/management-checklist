@@ -16,16 +16,10 @@ const fetchTimeSchedules = async (): Promise<TimeScheduleProps[]> => {
     return response.data.data ?? [];
 };
 
-const fetchMachineGroups = async (): Promise<GroupMachine[]> => {
-    const response = await axiosInstance.post("GroupMachine_service.asmx/GetGroupMachines");
-    return response.data.data ?? [];
-};
-
 const saveTimeSchedule = async (data: { Prefix: any; Schedule: string; }): Promise<{ message: string }> => {
     const response = await axiosInstance.post("TimeSchedule_service.asmx/SaveSchedule", data);
     return response.data;
 };
-
 
 const TimescheduleScreen: React.FC = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -50,14 +44,6 @@ const TimescheduleScreen: React.FC = React.memo(() => {
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
-
-    const { data: machineGroups = [] } = useQuery<GroupMachine[], Error>(
-        'machineGroups',
-        fetchMachineGroups,
-        {
-            refetchOnWindowFocus: true,
-        }
-    );
 
     const { data: timeSchedule = [], isLoading, } = useQuery<TimeScheduleProps[], Error>(
         'timeSchedule',
@@ -128,17 +114,12 @@ const TimescheduleScreen: React.FC = React.memo(() => {
     const tableData = useMemo(() => {
         return timeSchedule.map((item) => [
             item.ScheduleName,
-            machineGroups.flatMap((v) =>
-                Array.isArray(item.MachineGroup)
-                    ? item.MachineGroup.map(m => m === v.GMachineID ? v.GMachineName : null)
-                    : []
-            ).filter(name => name !== null).join(", "),
             item.Type_schedule,
             item.Tracking ? "track" : "not track",
             item.IsActive,
             item.ScheduleID
         ]);
-    }, [timeSchedule, debouncedSearchQuery, machineGroups]);
+    }, [timeSchedule, debouncedSearchQuery]);
 
     const handleNewData = useCallback(() => {
         setInitialValues({
@@ -161,14 +142,13 @@ const TimescheduleScreen: React.FC = React.memo(() => {
         Tabledata: tableData,
         Tablehead: [
             { label: "Schedule Name", align: "flex-start" },
-            { label: "Group Machine", align: "flex-start" },
             { label: "Type", align: "center" },
             { label: "Tracking", align: "center" },
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
         ],
-        flexArr: [2, 1, 1, 1, 1, 1],
-        actionIndex: [{ editIndex: 5, delIndex: 6 }],
+        flexArr: [2, 1, 1, 1, 1],
+        actionIndex: [{ editIndex: 4, delIndex: 5 }],
         handleAction,
         showMessage: 0,
         detail: true,
@@ -222,7 +202,6 @@ const TimescheduleScreen: React.FC = React.memo(() => {
 
             <MemoScheduleDialog
                 isVisible={isVisible}
-                machineGroups={machineGroups}
                 setIsVisible={setIsVisible}
                 isEditing={isEditing}
                 initialValues={initialValues}

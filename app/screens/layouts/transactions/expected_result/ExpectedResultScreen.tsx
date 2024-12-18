@@ -31,6 +31,8 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
         ['expectedResult', paginationInfo, debouncedSearchQuery],
         () => debouncedSearchQuery ? fetchSearchExpectedResult(debouncedSearchQuery) : fetchExpectedResults(paginationInfo.currentPage, paginationInfo.pageSize),
         {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
             keepPreviousData: true,
         }
     );

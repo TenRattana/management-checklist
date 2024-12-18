@@ -137,11 +137,5 @@ export interface MatchFormMachineDialogProps<
 
 export interface MatchChecklistOptionProps<
   V extends Values,
-  D1 extends TypeConfig,
-  D2 extends TypeConfig
 > extends BaseDialogProps<V> {
-  checkListOption: D1[];
-  dropcheckListOption: D1[];
-  groupCheckListOption: D2[];
-  dropgroupCheckListOption: D2[];
 }

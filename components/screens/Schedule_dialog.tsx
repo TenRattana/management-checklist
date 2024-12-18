@@ -34,7 +34,6 @@ interface ScheduleDialogProps {
     saveData: (values: any) => void;
     initialValues: TimeScheduleProps;
     isEditing: boolean;
-    machineGroups: GroupMachine[];
 }
 FadeInLeft.duration(300).easing(Easing.ease);
 FadeOutLeft.duration(300).easing(Easing.ease);
@@ -42,7 +41,7 @@ FadeOutLeft.duration(300).easing(Easing.ease);
 FadeInRight.duration(300).easing(Easing.ease);
 FadeOutRight.duration(300).easing(Easing.ease);
 
-const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialValues, isEditing, machineGroups }: ScheduleDialogProps) => {
+const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialValues, isEditing }: ScheduleDialogProps) => {
     const { theme } = useTheme();
     const { spacing, responsive } = useRes();
     const { showError, showSuccess } = useToast()

@@ -44,6 +44,8 @@ const CheckListOptionScreen = React.memo(() => {
         ['machines', paginationInfo, debouncedSearchQuery],
         () => debouncedSearchQuery ? fetchSearchCheckListOption(debouncedSearchQuery) : fetchCheckListOption(paginationInfo.currentPage, paginationInfo.pageSize),
         {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
             keepPreviousData: true,
         }
     );
