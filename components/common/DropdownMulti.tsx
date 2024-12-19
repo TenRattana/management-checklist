@@ -16,6 +16,7 @@ const DropdownMulti = React.memo(({
     search,
     setOpen,
     selectedValue,
+    searchQuery,
     setSelectedValue,
     setDebouncedSearchQuery,
     error,
@@ -27,6 +28,7 @@ const DropdownMulti = React.memo(({
     open: boolean;
     setOpen: (v: boolean) => void;
     selectedValue: any;
+    searchQuery?: string;
     items: { label: string; value: string, icon?: () => JSX.Element }[];
     setSelectedValue: (value: string | string[] | null) => void;
     isFetching?: boolean;
@@ -37,24 +39,28 @@ const DropdownMulti = React.memo(({
     errorMessage?: string;
     lefticon?: string
 }) => {
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuerys, setSearchQuery] = useState('');
     const masterdataStyles = useMasterdataStyles();
     const { spacing } = useRes();
-    const { theme ,darkMode} = useTheme()
+    const { theme, darkMode } = useTheme()
 
     const handleSearch = (query: string) => {
         setSearchQuery(query);
     };
 
     useEffect(() => {
+        searchQuery && setSearchQuery(searchQuery);
+    }, [searchQuery]);
+
+    useEffect(() => {
         const handler = setTimeout(() => {
-            setDebouncedSearchQuery && setDebouncedSearchQuery(searchQuery);
+            setDebouncedSearchQuery && setDebouncedSearchQuery(searchQuerys);
         }, 300);
 
         return () => {
             clearTimeout(handler);
         };
-    }, [searchQuery]);
+    }, [searchQuerys]);
 
     const selectedItems = items.filter(item => selectedValue.includes(item.value));
 
@@ -64,7 +70,7 @@ const DropdownMulti = React.memo(({
             handleScroll && handleScroll(event);
         }
     };
-    
+
     return (
         <View id="inputs" style={masterdataStyles.commonContainer}>
             <View style={Platform.OS !== 'android' ? { zIndex: 10 } : {}}>
@@ -85,7 +91,7 @@ const DropdownMulti = React.memo(({
                                     value={selectedValue}
                                     items={items}
                                     theme={darkMode ? 'DARK' : 'LIGHT'}
-                                    containerStyle={{ flex: 1}}
+                                    containerStyle={{ flex: 1 }}
                                     setValue={() => { }}
                                     setOpen={() => setOpen(true)}
                                     placeholder={`Select for a ${label}...`}
@@ -117,7 +123,7 @@ const DropdownMulti = React.memo(({
                                     flatListProps={{
                                         data: items,
                                         keyExtractor: (item) => `${item.value}`,
-                                        onScroll: safeHandleScroll, 
+                                        onScroll: safeHandleScroll,
                                         onEndReached: safeHandleScroll,
                                         onEndReachedThreshold: 0.8,
                                         initialNumToRender: 10,

@@ -219,9 +219,9 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
     });
 
     useEffect(() => {
-        if(editMode) { 
+        if (editMode) {
             setDebouncedSearchQuery({ CheckList: formState.CListName ?? "", MatchChecklist: formState.GCLOptionID ?? "" })
-        }else{
+        } else {
             queryClient.invalidateQueries("checkList")
             queryClient.invalidateQueries("groupCheckListOption")
         }
@@ -402,6 +402,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                                 <Dropdown
                                                     label='check list'
                                                     open={open.CheckList}
+                                                    searchQuery={debouncedSearchQuery.CheckList}
                                                     setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, CheckList: v }))}
                                                     selectedValue={values.CListID}
                                                     setDebouncedSearchQuery={(value: string) => setDebouncedSearchQuery((prev) => ({ ...prev, CheckList: value }))}
@@ -459,6 +460,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                                             open={open.MatchChecklist}
                                                             setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, MatchChecklist: v }))}
                                                             selectedValue={values.GCLOptionID}
+                                                            searchQuery={debouncedSearchQuery.MatchChecklist}
                                                             setDebouncedSearchQuery={(value: string) => setDebouncedSearchQuery((prev) => ({ ...prev, MatchChecklist: value }))}
                                                             items={itemsML}
                                                             setSelectedValue={(stringValue: string | null) => {

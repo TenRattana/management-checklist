@@ -63,7 +63,7 @@ const Match_checklist_option = React.memo(({
         }
     );
 
-    const { data, isFetching:isFetchingCL, fetchNextPage:fetchNextPageCL, hasNextPage:hasNextPageCL, refetch:refetchCL } = useInfiniteQuery(
+    const { data, isFetching: isFetchingCL, fetchNextPage: fetchNextPageCL, hasNextPage: hasNextPageCL, refetch: refetchCL } = useInfiniteQuery(
         ['groupCheckListOption', debouncedSearchQuery],
         ({ pageParam = 0 }) => {
             return debouncedSearchQuery
@@ -167,6 +167,7 @@ const Match_checklist_option = React.memo(({
                                         open={open}
                                         setOpen={setOpen}
                                         setDebouncedSearchQuery={setDebouncedSearchQuery}
+                                        searchQuery={debouncedSearchQuery}
                                         items={items}
                                         isFetching={isFetchingCL}
                                         fetchNextPage={fetchNextPageCL}
@@ -181,6 +182,7 @@ const Match_checklist_option = React.memo(({
                                         label='Check List Type'
                                         open={openCO}
                                         setOpen={setOpenCO}
+                                        searchQuery={debouncedSearchQueryCO}
                                         setDebouncedSearchQuery={setDebouncedSearchQueryCO}
                                         items={itemsCO}
                                         isFetching={isFetchingCO}

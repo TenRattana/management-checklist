@@ -18,6 +18,7 @@ const Dropdown = React.memo(({
     setSelectedValue,
     setDebouncedSearchQuery,
     error,
+    searchQuery,
     errorMessage,
     lefticon
 }: {
@@ -33,10 +34,11 @@ const Dropdown = React.memo(({
     handleScroll?: ({ nativeEvent }: any) => void;
     setDebouncedSearchQuery?: (value: string) => void;
     error?: boolean;
+    searchQuery?: string;
     errorMessage?: string;
     lefticon?: string
 }) => {
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuerys, setSearchQuery] = useState('');
     const masterdataStyles = useMasterdataStyles();
     const { spacing } = useRes()
     const handleSearch = (query: string) => {
@@ -44,14 +46,18 @@ const Dropdown = React.memo(({
     };
 
     useEffect(() => {
+        searchQuery && setSearchQuery(searchQuery)
+    }, [searchQuery])
+
+    useEffect(() => {
         const handler = setTimeout(() => {
-            setDebouncedSearchQuery && setDebouncedSearchQuery(searchQuery);
+            setDebouncedSearchQuery && setDebouncedSearchQuery(searchQuerys);
         }, 300);
 
         return () => {
             clearTimeout(handler);
         };
-    }, [searchQuery]);
+    }, [searchQuerys]);
 
     return (
         <View id="inputs" style={masterdataStyles.commonContainer}>

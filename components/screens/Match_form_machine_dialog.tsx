@@ -98,12 +98,12 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
     }, [debouncedSearchQueryMachine, debouncedSearchQueryForm]);
 
     const queryClient = useQueryClient();
-    
+
     useEffect(() => {
-        if(isEditing){
+        if (isEditing) {
             setDebouncedSearchQueryForm(initialValues.formId ?? "")
             setDebouncedSearchQueryMachine(initialValues.machineId ?? "")
-        }else{
+        } else {
             queryClient.invalidateQueries("form")
             queryClient.invalidateQueries("machine")
         }
@@ -168,6 +168,7 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
                                             open={openMachine}
                                             setOpen={(v: boolean) => setOpenMachine(v)}
                                             selectedValue={values.machineId}
+                                            searchQuery={debouncedSearchQueryMachine}
                                             setDebouncedSearchQuery={(value) => setDebouncedSearchQueryMachine(value)}
                                             items={itemsMachine}
                                             setSelectedValue={(stringValue: string | null) => {
@@ -185,6 +186,7 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
                                             open={openForm}
                                             setOpen={(v: boolean) => setOpenForm(v)}
                                             selectedValue={values.formId}
+                                            searchQuery={debouncedSearchQueryForm}
                                             setDebouncedSearchQuery={(value) => setDebouncedSearchQueryForm(value)}
                                             items={itemsForm}
                                             setSelectedValue={(stringValue: string | null) => {
