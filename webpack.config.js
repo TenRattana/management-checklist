@@ -16,8 +16,8 @@ module.exports = async function (env, argv) {
       minSize: 20000,
       maxSize: 70000,
       minChunks: 1,
-      maxAsyncRequests: 30,
-      maxInitialRequests: 30,
+      maxAsyncRequests: 20,
+      maxInitialRequests: 20,
       automaticNameDelimiter: "~",
       automaticNameMaxLength: 30,
       cacheGroups: {
