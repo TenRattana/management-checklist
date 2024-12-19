@@ -1,4 +1,5 @@
 import { useRes } from '@/app/contexts/useRes';
+import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Platform, Modal, StyleSheet } from 'react-native';
@@ -41,6 +42,7 @@ const Dropdown = React.memo(({
 }) => {
     const [searchQuerys, setSearchQuery] = useState('');
     const masterdataStyles = useMasterdataStyles();
+    const { theme } = useTheme()
     const { spacing, responsive } = useRes()
     const handleSearch = (query: string) => {
         setSearchQuery(query);
@@ -93,7 +95,7 @@ const Dropdown = React.memo(({
                                     }}
                                     renderListItem={({ item }) => (
                                         <TouchableOpacity
-                                            style={{ padding: 15 }}
+                                            style={{ padding: 15, backgroundColor: selectedValue.includes(item.value) ? theme.colors.drag : undefined }}
                                             onPress={() => {
                                                 setSelectedValue(String(item.value));
                                                 setOpen(false);

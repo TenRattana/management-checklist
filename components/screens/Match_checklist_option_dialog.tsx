@@ -49,7 +49,7 @@ const Match_checklist_option = React.memo(({
                 return lastPage.length === 100 ? allPages.length : undefined;
             },
             onSuccess: (newData) => {
-                const newItems = newData.pages.flat().map((item) => ({
+                const newItems = newData.pages.flat().filter((item) => !isEditing ? item.IsActive : item).map((item) => ({
                     ...item,
                     label: item.CLOptionName || 'Unknown',
                     value: item.CLOptionID || '',
@@ -77,7 +77,7 @@ const Match_checklist_option = React.memo(({
                 return lastPage.length === 100 ? allPages.length : undefined;
             },
             onSuccess: (newData) => {
-                const newItems = newData.pages.flat().map((item) => ({
+                const newItems = newData.pages.flat().filter((item) => !isEditing ? item.IsActive : item).map((item) => ({
                     ...item,
                     label: item.GCLOptionName || 'Unknown',
                     value: item.GCLOptionID || '',
@@ -93,18 +93,19 @@ const Match_checklist_option = React.memo(({
     const queryClient = useQueryClient();
 
     useEffect(() => {
-        debouncedSearchQuery === '' && refetchCL()
-        debouncedSearchQueryCO === '' && refetchCO()
-    }, [debouncedSearchQuery, debouncedSearchQueryCO]);
+        if (isEditing) {
+            setDebouncedSearchQuery(initialValues.groupCheckListOptionName ?? "");
+            queryClient.invalidateQueries('checkListOption');
 
-    useEffect(() => {
-        setDebouncedSearchQuery(initialValues.groupCheckListOptionId ?? "");
-        queryClient.invalidateQueries('checkListOption');
+        } else {
+            queryClient.invalidateQueries('checkListOption');
+            queryClient.invalidateQueries('groupCheckListOption');
+        }
 
-    }, [initialValues]);
+    }, [initialValues, isEditing]);
 
     const handleScroll = ({ nativeEvent }: any) => {
-        if (nativeEvent.contentSize && nativeEvent.layoutMeasurement) {
+        if (nativeEvent?.contentSize && nativeEvent?.layoutMeasurement) {
             const { contentHeight, layoutHeight, contentOffset } = nativeEvent;
             if (contentHeight - layoutHeight - contentOffset.y <= 0 && hasNextPageCL && !isFetchingCL) {
                 fetchNextPageCL();
@@ -113,7 +114,7 @@ const Match_checklist_option = React.memo(({
     };
 
     const handleScrollCO = ({ nativeEvent }: any) => {
-        if (nativeEvent.contentSize && nativeEvent.layoutMeasurement) {
+        if (nativeEvent?.contentSize && nativeEvent?.layoutMeasurement) {
             const { contentHeight, layoutHeight, contentOffset } = nativeEvent;
             if (contentHeight - layoutHeight - contentOffset.y <= 0 && hasNextPageCO && !isFetchingCO) {
                 fetchNextPageCO();
@@ -146,8 +147,9 @@ const Match_checklist_option = React.memo(({
                                     })) || []);
                                 }
 
-                                setItemsCO(prevOptions => {
-                                    return JSON.stringify(prevOptions) === JSON.stringify(options) ? prevOptions : options;
+                                setItemsCO((prevItems) => {
+                                    const newItemsSet = new Set(prevItems.map((item: any) => item.value));
+                                    return [...prevItems, ...options.filter((item) => !newItemsSet.has(item.value))];
                                 });
                             }, [values.groupCheckListOptionId, items]);
 

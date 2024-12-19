@@ -44,7 +44,7 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
         {
             refetchOnWindowFocus: false,
             refetchOnMount: false,
-            keepPreviousData:true,
+            keepPreviousData: true,
         });
 
     const mutation = useMutation(SaveMatchFormMachine, {
@@ -93,6 +93,8 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
                 setInitialValues({
                     machineId: machineData.MachineID ?? "",
                     formId: machineData.FormID ?? "",
+                    machineName: machineData?.MachineName,
+                    formName: machineData?.FormName
                 });
                 setIsVisible(true);
                 setIsEditing(true);

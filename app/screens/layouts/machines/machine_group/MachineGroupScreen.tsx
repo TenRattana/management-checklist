@@ -41,12 +41,13 @@ const MachineGroupScreen = React.memo(() => {
     };
 
     const { data: machineGroups = [], isLoading } = useQuery<GroupMachine[], Error>(
-        ['machines', paginationInfo, debouncedSearchQuery],
+        ['machineGroups', paginationInfo, debouncedSearchQuery],
         () => debouncedSearchQuery ? fetchSearchMachineGroups(debouncedSearchQuery) : fetchMachineGroups(paginationInfo.currentPage, paginationInfo.pageSize),
         {
             refetchOnWindowFocus: false,
             refetchOnMount: false,
             keepPreviousData: true,
+            enabled: true
         }
     );
 

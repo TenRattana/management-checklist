@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useToast } from '@/app/contexts/useToast';
 import { useRes } from '@/app/contexts/useRes';
-import { Customtable, LoadingSpinner, AccessibleView } from "@/components";
+import { Customtable, LoadingSpinner, AccessibleView, Searchbar } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { ExpectedResult } from "@/typing/type";
@@ -161,6 +161,14 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
                 title="List Acknowledged"
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
+            <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
+                <Searchbar
+                    placeholder="Search Acknowledged..."
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    testId="search-ac"
+                />
+            </AccessibleView>
             <Card.Content style={styles.cardcontent}>
                 {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />}
             </Card.Content>

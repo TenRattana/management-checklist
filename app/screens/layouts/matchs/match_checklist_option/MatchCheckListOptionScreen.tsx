@@ -96,6 +96,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
                 setInitialValues({
                     matchCheckListOptionId: matchCheckListOption.MCLOptionID ?? "",
                     groupCheckListOptionId: matchCheckListOption.GCLOptionID ?? "",
+                    groupCheckListOptionName: matchCheckListOption?.GCLOptionName,
                     checkListOptionId: option,
                     isActive: Boolean(matchCheckListOption.IsActive),
                     disables: Boolean(matchCheckListOption.Disables),
@@ -205,7 +206,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
                 initialValues={initialValues}
                 saveData={saveData}
             />
-        </AccessibleView>   
+        </AccessibleView>
     );
 });
 

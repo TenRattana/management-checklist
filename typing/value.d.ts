@@ -49,13 +49,15 @@ export interface InitialValuesGroupCheckList extends  Active {
 export interface InitialValuesMatchFormMachine {
   machineId: string;
   formId: string;
-  
+  formName?:string;
+  machineName?:string;
 }
 
 export interface InitialValuesMatchCheckListOption extends Active {
   matchCheckListOptionId: string;
   checkListOptionId: string[];
   groupCheckListOptionId: string;
+  groupCheckListOptionName?: string;
   disables:boolean;
 }
 

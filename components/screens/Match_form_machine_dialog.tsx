@@ -7,7 +7,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { MatchFormMachineDialogProps, InitialValuesMatchFormMachine } from '@/typing/value'
 import Text from "@/components/Text";
 import { Dropdown } from "../common";
-import { fetchForm, fetchMachines, fetchSearchFomrs, fetchSearchMachines } from "@/app/services";
+import { fetchForms, fetchMachines, fetchSearchFomrs, fetchSearchMachines } from "@/app/services";
 import { useInfiniteQuery, useQueryClient } from "react-query";
 
 const validationSchema = Yup.object().shape({
@@ -40,7 +40,7 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
             },
             enabled: true,
             onSuccess: (newData) => {
-                const newItems = newData.pages.flat().map((item) => ({
+                const newItems = newData.pages.flat().filter((item) => !isEditing ? item.IsActive : item).map((item) => ({
                     label: item.MachineName || 'Unknown',
                     value: item.MachineID || '',
                 }));
@@ -61,7 +61,7 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
         ({ pageParam = 0 }) => {
             return debouncedSearchQueryForm
                 ? fetchSearchFomrs(debouncedSearchQueryForm)
-                : fetchForm(pageParam, 100);
+                : fetchForms(pageParam, 100);
         },
         {
             refetchOnWindowFocus: false,
@@ -71,7 +71,7 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
             },
             enabled: true,
             onSuccess: (newData) => {
-                const newItems = newData.pages.flat().map((item) => ({
+                const newItems = newData.pages.flat().filter((item) => !isEditing ? item.IsActive : item).map((item) => ({
                     label: item.FormName || 'Unknown',
                     value: item.FormID || '',
                 }));
@@ -87,22 +87,12 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
         }
     );
 
-    useEffect(() => {
-        if (debouncedSearchQueryMachine === '') {
-            refetchMachine();
-        }
-
-        if (debouncedSearchQueryForm === '') {
-            refetchForm();
-        }
-    }, [debouncedSearchQueryMachine, debouncedSearchQueryForm]);
-
     const queryClient = useQueryClient();
 
     useEffect(() => {
         if (isEditing) {
-            setDebouncedSearchQueryForm(initialValues.formId ?? "")
-            setDebouncedSearchQueryMachine(initialValues.machineId ?? "")
+            setDebouncedSearchQueryForm(initialValues.formName ?? "")
+            setDebouncedSearchQueryMachine(initialValues.machineName ?? "")
         } else {
             queryClient.invalidateQueries("form")
             queryClient.invalidateQueries("machine")
@@ -111,10 +101,10 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
     }, []);
 
     const handleScrollMachine = ({ nativeEvent }: any) => {
-        if (nativeEvent && nativeEvent.contentSize) {
-            const contentHeight = nativeEvent.contentSize.height;
-            const layoutHeight = nativeEvent.layoutMeasurement.height;
-            const offsetY = nativeEvent.contentOffset.y;
+        if (nativeEvent && nativeEvent?.contentSize) {
+            const contentHeight = nativeEvent?.contentSize.height;
+            const layoutHeight = nativeEvent?.layoutMeasurement.height;
+            const offsetY = nativeEvent?.contentOffset.y;
 
             if (contentHeight - layoutHeight - offsetY <= 0 && hasNextPageMachine && !isFetchingmachine) {
                 fetchNextPageMachine();
@@ -123,10 +113,10 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
     };
 
     const handleScrollForm = ({ nativeEvent }: any) => {
-        if (nativeEvent && nativeEvent.contentSize) {
-            const contentHeight = nativeEvent.contentSize.height;
-            const layoutHeight = nativeEvent.layoutMeasurement.height;
-            const offsetY = nativeEvent.contentOffset.y;
+        if (nativeEvent && nativeEvent?.contentSize) {
+            const contentHeight = nativeEvent?.contentSize.height;
+            const layoutHeight = nativeEvent?.layoutMeasurement.height;
+            const offsetY = nativeEvent?.contentOffset.y;
 
             if (contentHeight - layoutHeight - offsetY <= 0 && hasNextPageForm && !isFetchingForm) {
                 fetchNextPageForm();

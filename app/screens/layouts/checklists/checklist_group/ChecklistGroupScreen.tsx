@@ -41,7 +41,7 @@ const ChecklistGroupScreen = React.memo(() => {
     };
 
     const { data: groupCheckListOption = [], isLoading } = useQuery<GroupCheckListOption[], Error>(
-        ['machines', paginationInfo, debouncedSearchQuery],
+        ['groupCheckListOption', paginationInfo, debouncedSearchQuery],
         () => debouncedSearchQuery ? fetchSearchGroupCheckListOption(debouncedSearchQuery) : fetchGroupCheckListOption(paginationInfo.currentPage, paginationInfo.pageSize),
         {
             refetchOnWindowFocus: false,

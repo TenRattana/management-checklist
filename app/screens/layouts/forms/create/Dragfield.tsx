@@ -16,12 +16,14 @@ import Text from '@/components/Text'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { CheckList } from "@/typing/type";
 
-const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatch, checkListOption , checkListType }) => {
+const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatch, checkListOption, checkListType }) => {
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const [currentField, setCurrentField] = useState<BaseFormState>({
         MCListID: "", CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: SFormID,
         Required: false, Important: false, ImportantList: [], EResult: "", CListName: "", DTypeValue: undefined,
     });
+
+    console.log("Dragfield");
 
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const { theme } = useTheme()

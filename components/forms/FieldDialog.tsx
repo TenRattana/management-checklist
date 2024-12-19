@@ -28,6 +28,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
     const [option, setOption] = useState<{ label: string; value: string; }[]>([]);
     const [shouldRender, setShouldRender] = useState<string>('');
     const [shouldRenderDT, setShouldRenderDT] = useState<boolean>(false);
+    console.log("FieldDialog");
 
     const [shouldRenderIT, setShouldRenderIT] = useState<boolean>(false);
     const [dialogAdd, setDialogAdd] = useState<{ CheckList: boolean, GroupCheckList: boolean, CheckListOption: boolean }>({ CheckList: false, GroupCheckList: false, CheckListOption: false });
@@ -179,21 +180,11 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
         }
     );
 
-    useEffect(() => {
-        if (debouncedSearchQuery.CheckList !== '') {
-            refetchCL();
-        }
-
-        if (debouncedSearchQuery.MatchChecklist !== '') {
-            refetchML();
-        }
-    }, [debouncedSearchQuery]);
-
     const handleScrollCL = ({ nativeEvent }: any) => {
-        if (nativeEvent && nativeEvent.contentSize) {
-            const contentHeight = nativeEvent.contentSize.height;
-            const layoutHeight = nativeEvent.layoutMeasurement.height;
-            const offsetY = nativeEvent.contentOffset.y;
+        if (nativeEvent && nativeEvent?.contentSize) {
+            const contentHeight = nativeEvent?.contentSize.height;
+            const layoutHeight = nativeEvent?.layoutMeasurement.height;
+            const offsetY = nativeEvent?.contentOffset.y;
 
             if (contentHeight - layoutHeight - offsetY <= 0 && hasNextPageCL && !isFetchingCL) {
                 fetchNextPageCL();
@@ -202,10 +193,10 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
     };
 
     const handleScrollML = ({ nativeEvent }: any) => {
-        if (nativeEvent && nativeEvent.contentSize) {
-            const contentHeight = nativeEvent.contentSize.height;
-            const layoutHeight = nativeEvent.layoutMeasurement.height;
-            const offsetY = nativeEvent.contentOffset.y;
+        if (nativeEvent && nativeEvent?.contentSize) {
+            const contentHeight = nativeEvent?.contentSize.height;
+            const layoutHeight = nativeEvent?.layoutMeasurement.height;
+            const offsetY = nativeEvent?.contentOffset.y;
 
             if (contentHeight - layoutHeight - offsetY <= 0 && hasNextPageML && !isFetchingML) {
                 fetchNextPageML();
@@ -219,13 +210,15 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
     });
 
     useEffect(() => {
+        console.log("useEffect 1");
+
         if (editMode) {
             setDebouncedSearchQuery({ CheckList: formState.CListName ?? "", MatchChecklist: formState.GCLOptionName ?? "" })
         } else {
             queryClient.invalidateQueries("checkList")
             queryClient.invalidateQueries("groupCheckListOption")
         }
-    }, []);
+    }, [editMode]);
 
     const { spacing, responsive } = useRes();
     const { theme } = useTheme();
@@ -257,6 +250,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
     }, [shouldRenderIT, shouldRenderDT, option]);
 
     useEffect(() => {
+        console.log("useEffect 3");
 
         if (!isVisible) {
             setOption([]);
@@ -267,7 +261,6 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
     }, [isVisible]);
 
     const handleDismissDialog = useCallback(() => {
-
         if (!isVisible) {
             setShowDialogs();
         }
@@ -305,6 +298,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             glc.current = values.GCLOptionID
 
                             const updateRenderStates = useCallback(() => {
+                                console.log("updateRenderStates");
 
                                 const checkListTypeItem = checkListTypes.find(item => item.CTypeID === values.CTypeID)?.CTypeName ?? "";
                                 const newRender = ["Dropdown", "Radio", "Checkbox"].includes(checkListTypeItem)
@@ -325,10 +319,13 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             }, [values.CTypeID, checkListTypes, shouldRender, setFieldValue]);
 
                             useEffect(() => {
+                                console.log("useEffect form 3");
+
                                 values.CTypeID && updateRenderStates();
                             }, [values.CTypeID]);
 
                             const updateImportantList = useCallback((modifications: { Value?: string | string[]; MinLength?: number; MaxLength?: number; }) => {
+                                console.log("updateImportantList");
 
                                 if (Array.isArray(values.ImportantList)) {
                                     const idMcl = `MCL-ADD-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
@@ -344,6 +341,8 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             }, [values.ImportantList]);
 
                             const handleDataOption = useCallback(async () => {
+                                console.log("handleDataOption");
+
                                 let options: { label: string; value: string; }[] = [];
 
                                 if (values.GCLOptionID) {
@@ -369,6 +368,8 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             }, [values.GCLOptionID, itemsML]);
 
                             useEffect(() => {
+                                console.log("useEffect form 2");
+
                                 if (values.Important !== shouldRenderIT) {
                                     setShouldRenderIT(values.Important);
 
@@ -376,6 +377,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                 const dataTypeItem = values.DTypeID ? dataType.find(item => item.DTypeID === values.DTypeID)?.DTypeName : undefined;
 
                                 if (values.Important) {
+
                                     if (dataTypeItem === "Number") {
                                         updateImportantList({ Value: undefined });
                                     } else {
@@ -383,14 +385,21 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                     }
                                 }
 
-                                setShouldRenderDT(dataTypeItem === "Number");
+                                setShouldRenderDT(prevOptions => {
+                                    const isEqual = prevOptions && (dataTypeItem === "Number")
+                                    return isEqual ? prevOptions : isEqual;
+                                });
                             }, [values.DTypeID, values.Important, dataType]);
 
                             useEffect(() => {
+                                console.log("useEffect form 1");
+
                                 values.GCLOptionID && handleDataOption();
                             }, [values.GCLOptionID, itemsML]);
 
                             const handelChange = (field: string, value: any) => {
+                                console.log("handelChange");
+
                                 setFieldTouched(field, true)
                                 setFieldValue(field, value)
                             }

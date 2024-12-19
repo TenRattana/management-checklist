@@ -47,7 +47,7 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
             },
             enabled: true,
             onSuccess: (newData) => {
-                const newItems = newData.pages.flat().map((item) => ({
+                const newItems = newData.pages.flat().filter((item) => !isEditing ? item.IsActive : item).map((item) => ({
                     label: item.GMachineName || 'Unknown',
                     value: item.GMachineID || '',
                 }));
@@ -63,13 +63,6 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
         }
     );
 
-    useEffect(() => {
-        if (debouncedSearchQuery === '') {
-            refetch();
-        }
-
-    }, [debouncedSearchQuery]);
-
     const queryClient = useQueryClient();
 
     useEffect(() => {
@@ -81,10 +74,10 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
     }, []);
 
     const handleScroll = ({ nativeEvent }: any) => {
-        if (nativeEvent && nativeEvent.contentSize) {
-            const contentHeight = nativeEvent.contentSize.height;
-            const layoutHeight = nativeEvent.layoutMeasurement.height;
-            const offsetY = nativeEvent.contentOffset.y;
+        if (nativeEvent && nativeEvent?.contentSize) {
+            const contentHeight = nativeEvent?.contentSize.height;
+            const layoutHeight = nativeEvent?.layoutMeasurement.height;
+            const offsetY = nativeEvent?.contentOffset.y;
 
             if (contentHeight - layoutHeight - offsetY <= 0 && hasNextPage && !isFetching) {
                 fetchNextPage();

@@ -41,7 +41,7 @@ const CheckListOptionScreen = React.memo(() => {
     };
 
     const { data: checkListOption = [], isLoading } = useQuery<CheckListOption[], Error>(
-        ['machines', paginationInfo, debouncedSearchQuery],
+        ['checkListOption', paginationInfo, debouncedSearchQuery],
         () => debouncedSearchQuery ? fetchSearchCheckListOption(debouncedSearchQuery) : fetchCheckListOption(paginationInfo.currentPage, paginationInfo.pageSize),
         {
             refetchOnWindowFocus: false,

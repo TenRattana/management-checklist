@@ -5,7 +5,7 @@ import { Divider, Icon } from "react-native-paper";
 import useCreateformStyle from "@/styles/createform";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import useForm from "@/hooks/custom/useForm";
-import { AccessibleView, ConfigItemForm, FieldDialog, SaveDialog, SubFormDialog, Text } from "@/components";
+import { ConfigItemForm, FieldDialog, SaveDialog, SubFormDialog, Text } from "@/components";
 import Dragsubform from "./Dragsubform";
 import Preview from "@/app/screens/layouts/forms/create/ShowForm";
 import { CreateFormProps } from "@/typing/tag";
@@ -38,6 +38,8 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
     const { width } = useWindowDimensions();
     const DRAWER_WIDTH = responsive === "small" ? width : fontSize === "large" ? 430 : 370;
     const [dialogVisible, setDialogVisible] = useState<{ sub: boolean, field: boolean }>({ sub: false, field: false });
+
+    console.log("CreateFormScreen");
 
     const translateX = useSharedValue(-DRAWER_WIDTH);
     const mainTranslateX = useSharedValue(0);
@@ -229,7 +231,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
 
     return (
         <GestureHandlerRootView style={[createform.container, { flex: 1 }]}>
-            <AccessibleView name="container-create-form" style={styles.container}>
+            <View id="container-create-form" style={styles.container}>
                 <Animated.View
                     style={[
                         styles.content,
@@ -254,7 +256,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                         </TouchableOpacity>
                     </View>
 
-                    <AccessibleView name="container-preview" style={[createform.containerL2, { marginTop: 80, marginHorizontal: 10 }]}>
+                    <View id="container-preview" style={[createform.containerL2, { marginTop: 80, marginHorizontal: 10 }]}>
                         <Preview
                             route={route}
                             ref={childRef}
@@ -263,7 +265,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                             showField={showField}
                             isLoading={isLoading}
                         />
-                    </AccessibleView>
+                    </View>
                 </Animated.View>
 
                 {drawerOpen && (
@@ -304,7 +306,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                                     </TouchableOpacity>
                                 )}
 
-                                <AccessibleView name="container-formname" style={{ marginHorizontal: 10, marginTop: responsive === "small" ? 5 : 5 }}>
+                                <View id="container-formname" style={{ marginHorizontal: 10, marginTop: responsive === "small" ? 5 : 5 }}>
                                     {['FormName', 'Description'].map((item) => (
                                         <MemoConfigItemForm
                                             key={item}
@@ -313,7 +315,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                                             editable={edit[item]}
                                             onEdit={(v: boolean) => setEdit(prev => ({ ...prev, [item]: v }))} />
                                     ))}
-                                </AccessibleView>
+                                </View>
 
                                 <TouchableOpacity
                                     onPress={() => setInitialSaveDialog(true)}
@@ -344,7 +346,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                         )}
                     </Animated.View>
                 )}
-            </AccessibleView>
+            </View>
 
             {dialogVisible.sub && (
                 <MemoSubFormDialog

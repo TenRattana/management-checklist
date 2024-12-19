@@ -67,7 +67,7 @@ const DropdownMulti = React.memo(({
 
     const safeHandleScroll = (event: any) => {
         const { nativeEvent } = event;
-        if (nativeEvent && nativeEvent.contentSize) {
+        if (nativeEvent && nativeEvent?.contentSize) {
             handleScroll && handleScroll(event);
         }
     };
