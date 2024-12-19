@@ -153,7 +153,7 @@ export interface CustomTableProps {
   detailKeyrow?: number;
   detailData?: TypeConfig[];
   ShowTitle?: string;
-  handlePaginationChange?:(currentPage:number , Page:number) => void;
+  handlePaginationChange?:() => void;
 }
 
 export interface DragfieldProps {
@@ -258,4 +258,5 @@ export interface CustomtableDataProps {
   detailKeyrow?: number;
   showDetailwithKey?: string[];
   detailData?: TypeConfig[];
+  handlePaginationChange?:() => void;
 }

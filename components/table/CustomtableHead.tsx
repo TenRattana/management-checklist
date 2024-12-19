@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { Checkbox, DataTable } from "react-native-paper";
 import Text from "@/components/Text";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import AccessibleView from "@/components/AccessibleView";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useRes } from '@/app/contexts/useRes'
 import { Picker } from "@react-native-picker/picker";
@@ -28,7 +27,6 @@ interface CustomTableHeadProps {
     ShowTitle?: string;
 }
 
-
 const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({ Tablehead, flexArr, handleSort, sortColumn, sortDirection, selectedRows, toggleSelectAll, displayData, showFilter, filter, handelSetFilter, showData, showColumn, handleDialog, ShowTitle }) => {
     const masterdataStyles = useMasterdataStyles();
 
@@ -50,13 +48,13 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({ Tablehead,
     })
 
     return (
-        <AccessibleView name="container-datahead">
-            <AccessibleView name="Approve" style={{
+        <View id="container-datahead">
+            <View id="Approve" style={{
                 flexDirection: responsive === "small" ? 'column' : 'row', justifyContent: 'space-between',
                 marginHorizontal: responsive === "small" ? '2%' : 0,
 
             }}>
-                <AccessibleView name="" style={{ flexDirection: responsive === "small" ? 'column' : 'row' }}>
+                <View id="" style={{ flexDirection: responsive === "small" ? 'column' : 'row' }}>
                     {selectedRows && selectedRows.length > 0 && (
                         <>
                             <TouchableOpacity
@@ -102,10 +100,10 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({ Tablehead,
                             </TouchableOpacity>
                         </>
                     )}
-                </AccessibleView>
+                </View>
 
                 {showFilter && (
-                    <AccessibleView name="filter" style={{
+                    <View id="filter" style={{
                         flexDirection: responsive === "small" ? 'column' : 'row', justifyContent: 'flex-end', marginBottom: 10,
                         marginLeft: responsive === "small" ? 0 : 10,
                     }}>
@@ -124,9 +122,9 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({ Tablehead,
                                 <Picker.Item key={`item-${index}`} label={String(option)} value={option} />
                             ))}
                         </Picker>
-                    </AccessibleView>
+                    </View>
                 )}
-            </AccessibleView>
+            </View>
 
             <DataTable>
                 <DataTable.Header>
@@ -160,7 +158,7 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({ Tablehead,
                     })}
                 </DataTable.Header>
             </DataTable>
-        </AccessibleView>
+        </View>
     )
 })
 

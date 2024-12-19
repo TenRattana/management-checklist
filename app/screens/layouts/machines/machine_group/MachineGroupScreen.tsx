@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { TouchableOpacity, StyleSheet } from "react-native";
+import { TouchableOpacity, StyleSheet, View } from "react-native";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
-import { LoadingSpinner, AccessibleView, Searchbar, Customtable, Text } from "@/components";
+import { Searchbar, Customtable, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Machine_group_dialog from "@/components/screens/Machine_group_dialog";
 import { GroupMachine } from '@/typing/type';
 import { InitialValuesGroupMachine } from '@/typing/value';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
 import { fetchMachineGroups, fetchSearchMachineGroups, saveGroupMachine } from "@/app/services";
 import axiosInstance from "@/config/axios";
+import { useTheme } from "@/app/contexts/useTheme";
 
 const MachineGroupScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -29,27 +30,50 @@ const MachineGroupScreen = React.memo(() => {
     const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
+    const { theme } = useTheme();
     const queryClient = useQueryClient();
+    const [machineGroup, setMachineGroup] = useState<GroupMachine[]>([])
 
-    const [paginationInfo, setPaginationInfo] = useState({
-        currentPage: 0,
-        pageSize: 100,
-    });
-
-    const handlePaginationChange = (currentPage: number, pageSize: number) => {
-        setPaginationInfo({ currentPage, pageSize });
+    const handlePaginationChange = () => {
+        hasNextPage && !isFetching && fetchNextPage()
     };
 
-    const { data: machineGroups = [], isLoading } = useQuery<GroupMachine[], Error>(
-        ['machineGroups', paginationInfo, debouncedSearchQuery],
-        () => debouncedSearchQuery ? fetchSearchMachineGroups(debouncedSearchQuery) : fetchMachineGroups(paginationInfo.currentPage, paginationInfo.pageSize),
+    const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
+        ['machineGroups', debouncedSearchQuery],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQuery
+                ? fetchSearchMachineGroups(debouncedSearchQuery)
+                : fetchMachineGroups(pageParam, 50);
+        },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: false,
-            keepPreviousData: true,
-            enabled: true
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 50 ? allPages.length : undefined;
+            },
+            enabled: true,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat()
+
+                setMachineGroup((prevItems) => {
+                    const newItemsSet = new Set(prevItems.map((item: GroupMachine) => item.GMachineID));
+                    const mergedItems = prevItems.concat(
+                        newItems.filter((item) => !newItemsSet.has(item.GMachineID))
+                    );
+                    return mergedItems;
+                });
+            },
         }
     );
+
+    useEffect(() => {
+        if (debouncedSearchQuery === "") {
+            setMachineGroup([])
+            remove()
+        } else {
+            setMachineGroup([])
+        }
+    }, [debouncedSearchQuery, remove])
 
     const mutation = useMutation(saveGroupMachine, {
         onSuccess: (data) => {
@@ -108,14 +132,14 @@ const MachineGroupScreen = React.memo(() => {
     }, [handleError, queryClient]);
 
     const tableData = useMemo(() => {
-        return machineGroups.map(item => [
+        return machineGroup.map(item => [
             item.Disables,
             item.GMachineName,
             item.Description,
             item.IsActive,
             item.GMachineID,
         ]);
-    }, [machineGroups, debouncedSearchQuery]);
+    }, [machineGroup, debouncedSearchQuery]);
 
     const handleNewData = useCallback(() => {
         setInitialValues({
@@ -147,7 +171,8 @@ const MachineGroupScreen = React.memo(() => {
 
     const styles = StyleSheet.create({
         container: {
-            flex: 1
+            flex: 1,
+            backgroundColor: theme.colors.background
         },
         header: {
             fontSize: spacing.large,
@@ -166,12 +191,12 @@ const MachineGroupScreen = React.memo(() => {
     const MemoMachine_group_dialog = React.memo(Machine_group_dialog)
 
     return (
-        <AccessibleView name="container-groupmachine" style={styles.container}>
+        <View id="container-groupmachine" style={styles.container}>
             <Card.Title
                 title="Create Group Machine"
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
-            <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
+            <View id="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
                     placeholder="Search Machine Group..."
                     value={searchQuery}
@@ -181,9 +206,9 @@ const MachineGroupScreen = React.memo(() => {
                 <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                     <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Group Machine</Text>
                 </TouchableOpacity>
-            </AccessibleView>
+            </View>
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />}
+                <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
             </Card.Content>
 
             <MemoMachine_group_dialog
@@ -193,7 +218,7 @@ const MachineGroupScreen = React.memo(() => {
                 initialValues={initialValues}
                 saveData={saveData}
             />
-        </AccessibleView>
+        </View>
     );
 });
 

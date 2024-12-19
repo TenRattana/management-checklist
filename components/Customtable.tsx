@@ -1,13 +1,10 @@
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { useRes } from "@/app/contexts/useRes";
-import AccessibleView from "@/components/AccessibleView";
 import CustomtableHead from "./table/CustomtableHead";
 import CustomtableSmall from "./table/CustomtableSmall";
 import CustomtableData from "./table/CustomtableData";
 import { CustomTableProps } from '@/typing/tag';
-import { TouchableOpacity, View } from "react-native";
-import { Text } from "react-native-paper";
-import useMasterdataStyles from "@/styles/common/masterdata";
+import { View } from "react-native";
 
 const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, actionIndex, searchQuery, showMessage, selectedRows, setRow, showFilter, showData, showColumn, detail, detailData, detailKey, detailKeyrow, showDetailwithKey, ShowTitle, handlePaginationChange }: CustomTableProps) => {
   const [displayData, setDisplayData] = useState<(string | number | boolean)[][]>([]);
@@ -17,43 +14,7 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
     direction: undefined,
   });
 
-  const masterdataStyles = useMasterdataStyles();
-
-  const [currentPage, setCurrentPage] = useState(0);
-
-  const [pageSize, setPageSize] = useState<number>(100);
-
-  const toggleSelectAll = useCallback(() => {
-    if (selectedRows && setRow) {
-      if (selectedRows.length === displayData.length) {
-        setRow([]);
-      } else {
-        const selectedIndices = displayData.map((row, index) => {
-          const selectIndex = actionIndex.find(item => item.selectIndex !== undefined)?.selectIndex;
-          return Number(selectIndex) > -1 ? String(row[Number(selectIndex)]) : ""
-        }).filter(v => v !== null)
-
-        setRow(selectedIndices);
-      }
-    }
-  }, [selectedRows, displayData, setRow])
-
-  const toggleSelect = useCallback((value: string) => {
-    if (selectedRows && setRow) {
-      setRow(selectedRows.includes(value)
-        ? selectedRows.filter((item) => item !== value)
-        : [...selectedRows, value]);
-    }
-  }, [selectedRows, displayData, setRow])
-
   const { responsive } = useRes();
-
-  const handleSort = useCallback((columnIndex: number) => {
-    setSortConfig((prev) => ({
-      column: prev?.column === columnIndex && prev.direction === "descending" ? null : columnIndex,
-      direction: prev?.direction === "ascending" ? "descending" : prev?.direction === "descending" ? undefined : "ascending",
-    }));
-  }, []);
 
   const sortedData = useMemo(() => {
     if (!sortConfig.column) return Tabledata;
@@ -68,14 +29,46 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
   }, [Tabledata, sortConfig]);
 
   const filteredData = useMemo(() => {
-    return sortedData.filter((row) =>
-      row.some((cell) => cell?.toString().toLowerCase().includes(searchQuery.toLowerCase()))
-    ).filter((row) => (filter ? row.includes(filter) : true));
+    return sortedData
+      .filter((row) => row.some((cell) => cell?.toString().toLowerCase().includes(searchQuery.toLowerCase())))
+      .filter((row) => (filter ? row.includes(filter) : true));
   }, [sortedData, searchQuery, filter]);
 
   useEffect(() => {
-    setDisplayData(filteredData);
-  }, [filteredData]);
+    if (JSON.stringify(filteredData) !== JSON.stringify(displayData)) {
+      setDisplayData(filteredData);
+    }
+  }, [filteredData, displayData]);
+
+  const toggleSelectAll = useCallback(() => {
+    if (selectedRows && setRow) {
+      if (selectedRows.length === displayData.length) {
+        setRow([]);
+      } else {
+        const selectedIndices = displayData.map((row, index) => {
+          const selectIndex = actionIndex.find(item => item.selectIndex !== undefined)?.selectIndex;
+          return Number(selectIndex) > -1 ? String(row[Number(selectIndex)]) : "";
+        }).filter(v => v !== null);
+
+        setRow(selectedIndices);
+      }
+    }
+  }, [selectedRows, displayData, setRow, actionIndex]);
+
+  const toggleSelect = useCallback((value: string) => {
+    if (selectedRows && setRow) {
+      setRow(selectedRows.includes(value)
+        ? selectedRows.filter((item) => item !== value)
+        : [...selectedRows, value]);
+    }
+  }, [selectedRows, setRow])
+
+  const handleSort = useCallback((columnIndex: number) => {
+    setSortConfig((prev) => ({
+      column: prev?.column === columnIndex && prev.direction === "descending" ? null : columnIndex,
+      direction: prev?.direction === "ascending" ? "descending" : prev?.direction === "descending" ? undefined : "ascending",
+    }));
+  }, []);
 
   const handleDialog = useCallback((action?: string, data?: string) => {
     if (handleAction) {
@@ -84,21 +77,17 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
   }, [handleAction]);
 
   const handelSetFilter = useCallback((value: string) => {
-    setFilter(value)
+    setFilter(value);
   }, []);
 
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
-  }
-
-  useEffect(() => {
-    handlePaginationChange && handlePaginationChange(currentPage, pageSize)
-  }, [currentPage, pageSize])
+  const MemoCustomtableSmall = React.memo(CustomtableSmall)
+  const MemoCustomtableHead = React.memo(CustomtableHead)
+  // const MemoCustomtableData = React.memo(CustomtableData)
 
   return (
-    <AccessibleView name="customtable" style={{ flex: 1 }}>
+    <View id="customtable" style={{ flex: 1 }}>
       {responsive === "small" ? (
-        <CustomtableSmall
+        <MemoCustomtableSmall
           displayData={displayData}
           Tablehead={Tablehead}
           actionIndex={actionIndex}
@@ -119,8 +108,8 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
           key={"CustomtableSmall"}
         />
       ) : (
-        <AccessibleView name="data" style={{ flex: 1 }}>
-          <CustomtableHead
+        <View id="data" style={{ flex: 1 }}>
+          <MemoCustomtableHead
             Tablehead={Tablehead}
             flexArr={flexArr}
             handleSort={handleSort}
@@ -152,20 +141,12 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
             detailKey={detailKey}
             detailKeyrow={detailKeyrow}
             showDetailwithKey={showDetailwithKey}
+            handlePaginationChange={handlePaginationChange}
             key={"CustomtableData"}
           />
-          <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginVertical: 5 }}>
-            <TouchableOpacity disabled={currentPage < 1} onPress={() => handlePageChange(currentPage - 1)} style={{ opacity: currentPage > 0 ? 1 : 0.5 }}>
-              <Text style={masterdataStyles.text}>Prev</Text>
-            </TouchableOpacity>
-            <Text style={[{ marginHorizontal: 10 }, masterdataStyles.text]}>{currentPage + 1}</Text>
-            <TouchableOpacity disabled={filteredData.length < pageSize} onPress={() => handlePageChange(currentPage + 1)} style={{ opacity: filteredData.length == pageSize ? 1 : 0.5 }}>
-              <Text style={masterdataStyles.text}>Next</Text>
-            </TouchableOpacity>
-          </View>
-        </AccessibleView>
+        </View>
       )}
-    </AccessibleView>
+    </View>
   );
 });
 

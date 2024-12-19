@@ -2,10 +2,11 @@ import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Platform, Modal, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, Platform, Modal, StyleSheet } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { HelperText, IconButton, Portal } from 'react-native-paper';
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import Text from '../Text';
 
 const DropdownMulti = React.memo(({
     label,
@@ -100,11 +101,19 @@ const DropdownMulti = React.memo(({
                                     placeholder={`Select for a ${label}...`}
                                     loading={isFetching}
                                     searchable={search ?? true}
-                                    searchTextInputStyle={masterdataStyles.text}
                                     searchTextInputProps={{
                                         value: searchQuerys,
                                         onChangeText: handleSearch,
                                     }}
+                                    searchTextInputStyle={{ fontFamily: 'Poppins', fontSize: spacing.small, borderRadius: 5, padding: 10, borderWidth: 0.01 }}
+                                    searchPlaceholder={`Search for a ${label}...`}
+
+                                    style={{ padding: 10, borderRadius: 0 }}
+                                    textStyle={{
+                                        fontFamily: 'Poppins', fontSize: spacing.medium, padding: 5,
+                                        marginVertical: 5,
+                                    }}
+
                                     renderListItem={({ item }) => (
                                         <TouchableOpacity
                                             style={{ padding: 15, backgroundColor: selectedValue.includes(item.value) ? theme.colors.drag : undefined }}
@@ -119,8 +128,7 @@ const DropdownMulti = React.memo(({
                                             <Text style={masterdataStyles.text}>{item.label}</Text>
                                         </TouchableOpacity>
                                     )}
-                                    ListEmptyComponent={() => <Text>No machine groups found</Text>}
-                                    searchPlaceholder={`Search for a ${label}...`}
+                                    ListEmptyComponent={() => <Text>No data found</Text>}
                                     onOpen={fetchNextPage}
                                     onClose={() => setOpen(false)}
                                     flatListProps={{

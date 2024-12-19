@@ -1,8 +1,7 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useRef, useEffect } from "react";
 import { FlatList, View } from "react-native";
 import { DataTable } from "react-native-paper";
 import Text from "../Text";
-import AccessibleView from "@/components/AccessibleView";
 import useCustomtableStyles from "@/styles/customtable";
 import Cellcontent from "./Contents/Cellcontent";
 import { Dialogs } from "../common";
@@ -19,7 +18,7 @@ type justifyContent = 'flex-start' | 'flex-end' | 'center' | 'space-between' | '
 FadeInUp.duration(300).easing(Easing.ease);
 FadeOutDown.duration(300).easing(Easing.ease);
 
-const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead, flexArr, actionIndex, displayData, handleDialog, showMessage, selectedRows, toggleSelect, detail, detailKey, detailData, detailKeyrow, showDetailwithKey }) => {
+const CustomtableData = React.memo(({ Tablehead, flexArr, actionIndex, displayData, handleDialog, showMessage, selectedRows, toggleSelect, detail, detailKey, detailData, detailKeyrow, showDetailwithKey, handlePaginationChange }: CustomtableDataProps) => {
     const customtable = useCustomtableStyles();
     const masterdataStyles = useMasterdataStyles();
     const { theme } = useTheme()
@@ -82,7 +81,7 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                                         ? filteredEntries.map(([key]) => {
                                             if (key === "editIndex" || key === "delIndex") {
                                                 return (
-                                                    <AccessibleView name={`action-${rowIndex}-${key}-${index}`} key={`action-${rowIndex}-${cellIndex}-${key}`} style={customtable.eventColumn}>
+                                                    <View id={`action-${rowIndex}-${key}-${index}`} key={`action-${rowIndex}-${cellIndex}-${key}`} style={customtable.eventColumn}>
                                                         <Actioncontent
                                                             data={String(row[cellIndex])}
                                                             action={"editIndex"}
@@ -101,11 +100,11 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                                                             handlePress={handlePress}
                                                             selectedRows={selectedRows}
                                                         />
-                                                    </AccessibleView>
+                                                    </View>
                                                 );
                                             } else {
                                                 return (
-                                                    <AccessibleView name={`anoter-action-${rowIndex}-${key}-${index}`} key={`action-${rowIndex}-${cellIndex}-${key}`} style={customtable.eventColumn}>
+                                                    <View id={`anoter-action-${rowIndex}-${key}-${index}`} key={`action-${rowIndex}-${cellIndex}-${key}`} style={customtable.eventColumn}>
                                                         <Actioncontent
                                                             data={String(row[cellIndex])}
                                                             action={key}
@@ -116,7 +115,7 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                                                             selectedRows={selectedRows}
                                                             toggleSelect={toggleSelect}
                                                         />
-                                                    </AccessibleView>
+                                                    </View>
                                                 )
                                             }
                                         })
@@ -136,15 +135,15 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                 </DataTable.Row>
 
                 {visibleDetails.has(findIndex(row)) && (
-                    <AccessibleView name="containerdetail" style={{ padding: 10 }}>
+                    <View id="containerdetail" style={{ padding: 10 }}>
                         <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
                             <DetailContent detailData={detailData?.[findIndex(row)] || []} showDetailwithKey={showDetailwithKey} />
                         </Animated.View>
-                    </AccessibleView>
+                    </View>
                 )}
             </View>
         );
-    }, [Tablehead, flexArr, actionIndex, customtable.eventColumn, detail, detailKey, detailData]);
+    }, []);
 
     return (
         <>
@@ -153,29 +152,33 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
                 renderItem={({ item, index }) => renderTableData(item, index)}
                 keyExtractor={(item, index) => `key-${index}`}
                 ListEmptyComponent={() => (
-                    <Text style={[masterdataStyles.text, { textAlign: 'center', fontStyle: 'italic', paddingVertical: 20 }]}>
+                    <Text style={[masterdataStyles.text, { textAlign: 'center', fontStyle: 'italic' }]}>
                         No data found...
                     </Text>
                 )}
                 contentContainerStyle={{ flexGrow: 1 }}
                 nestedScrollEnabled={true}
-                showsVerticalScrollIndicator={false}
-                removeClippedSubviews={true}
+                showsVerticalScrollIndicator={true}
+                removeClippedSubviews={false}
+                onEndReachedThreshold={0.8}
+                initialNumToRender={50}
                 windowSize={10}
-                onEndReachedThreshold={0.5}
-                getItemLayout={(data, index) => ({ length: 58, offset: 58 * index, index })}
+                onEndReached={handlePaginationChange}
+                getItemLayout={(data, index) => ({ length: 100, offset: 55 * index, index })}
             />
 
-            <Dialogs
-                isVisible={dialogState.isVisible}
-                title={dialogState.title}
-                setIsVisible={() => setDialogState((prev) => ({ ...prev, isVisible: false }))}
-                handleDialog={handleDialog}
-                actions={dialogState.action}
-                messages={dialogState.message}
-                data={dialogState.data}
-                key={`dialog-datatable`}
-            />
+            {dialogState.isVisible && (
+                <Dialogs
+                    isVisible={dialogState.isVisible}
+                    title={dialogState.title}
+                    setIsVisible={() => setDialogState((prev) => ({ ...prev, isVisible: false }))}
+                    handleDialog={handleDialog}
+                    actions={dialogState.action}
+                    messages={dialogState.message}
+                    data={dialogState.data}
+                    key={`dialog-datatable`}
+                />
+            )}
         </>
     );
 });
