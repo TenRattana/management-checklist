@@ -27,7 +27,8 @@ interface FormDataState {
 
 const createSubFormsAndFields = (
     formData: FormData,
-    expectedResult: Record<string, any> = {}
+    expectedResult: Record<string, any> = {},
+    groupCheckListOption: GroupCheckListOption[]
 ) => {
 
     const subForms: SubForm[] = [];
@@ -59,6 +60,7 @@ const createSubFormsAndFields = (
                 MCListID: itemOption.MCListID,
                 CListID: itemOption.CListID,
                 GCLOptionID: itemOption.GCLOptionID,
+                GCLOptionName: groupCheckListOption.find((v) => v.GCLOptionID === itemOption.GCLOptionID)?.GCLOptionName,
                 CTypeID: itemOption.CTypeID,
                 DTypeID: itemOption.DTypeID,
                 DTypeValue: itemOption.DTypeValue,
@@ -168,7 +170,8 @@ const useForm = (route: RouteParams) => {
 
             const { subForms, fields } = createSubFormsAndFields(
                 response.data?.data[0],
-                fetchedExpectedResult
+                fetchedExpectedResult,
+                data.groupCheckListOption || data.groupCheckListOptionActive
             );
 
             if (mode && response.data?.status) {
