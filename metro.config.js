@@ -1,13 +1,13 @@
-const { getDefaultConfig } = require("expo/metro-config");
+const { getDefaultConfig } = require('expo/metro-config');
 
 const defaultConfig = getDefaultConfig(__dirname);
 
 module.exports = {
   ...defaultConfig,
-  watchFolders: ["./app"],
+  watchFolders: ['./app' , './components'], 
   transformer: {
     ...defaultConfig.transformer,
-    babelTransformerPath: require.resolve("react-native-svg-transformer"),
+    babelTransformerPath: require.resolve('react-native-svg-transformer'), 
     getTransformOptions: async () => ({
       transform: {
         experimentalImportSupport: false,
@@ -17,15 +17,15 @@ module.exports = {
   },
   resolver: {
     ...defaultConfig.resolver,
-    blacklistRE: /node_modules\/.*\/node_modules\/react-native\/.*/,
+    blacklistRE: /node_modules\/.*\/node_modules\/react-native\/.*/, 
     assetExts: [
       ...defaultConfig.resolver.assetExts,
-      "png",
-      "jpg",
-      "jpeg",
-      "svg",
-      "ttf",
-      "otf",
+      'png',
+      'jpg',
+      'jpeg',
+      'svg',
+      'ttf',
+      'otf',
     ],
   },
 };

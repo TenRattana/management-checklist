@@ -1,24 +1,36 @@
-const createExpoWebpackConfigAsync = require("@expo/webpack-config");
+const createExpoWebpackConfigAsync = require('@expo/webpack-config');
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = async function (env, argv) {
   const config = await createExpoWebpackConfigAsync(env, argv);
 
   config.module.rules.push({
     test: /\.css$/,
-    use: ["style-loader", "css-loader"],
+    use: ['style-loader', 'css-loader'],
   });
 
+  config.optimization.minimize = true;
+  config.optimization.minimizer = [
+    new TerserPlugin({
+      terserOptions: {
+        compress: {
+          drop_console: true,
+        },
+      },
+    }),
+  ];
+
   config.optimization = {
-    runtimeChunk: "single",
+    runtimeChunk: 'single',
     usedExports: true,
     splitChunks: {
-      chunks: "all",
+      chunks: 'all',
       minSize: 20000,
       maxSize: 70000,
       minChunks: 1,
       maxAsyncRequests: 20,
       maxInitialRequests: 20,
-      automaticNameDelimiter: "~",
+      automaticNameDelimiter: '~',
       automaticNameMaxLength: 30,
       cacheGroups: {
         default: {
