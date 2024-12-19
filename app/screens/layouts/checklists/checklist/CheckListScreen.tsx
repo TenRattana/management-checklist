@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { TouchableOpacity, StyleSheet } from "react-native";
 import axiosInstance from "@/config/axios";
-import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
+import { Customtable, AccessibleView, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useToast } from '@/app/contexts/useToast';
@@ -9,7 +9,7 @@ import { useRes } from '@/app/contexts/useRes';
 import Checklist_dialog from "@/components/screens/Checklist_dialog";
 import { Checklist } from '@/typing/type';
 import { InitialValuesChecklist } from '@/typing/value';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
 import { useSelector } from "react-redux";
 import { fetchCheckList, fetchSearchCheckList, saveCheckList } from "@/app/services";
 
@@ -30,25 +30,41 @@ const CheckListScreen = React.memo(() => {
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
+    const [checkList, setCheckList] = useState<Checklist[]>([])
 
-    const [paginationInfo, setPaginationInfo] = useState({
-        currentPage: 0,
-        pageSize: 100,
-    });
-
-    const handlePaginationChange = (currentPage: number, pageSize: number) => {
-        setPaginationInfo({ currentPage, pageSize });
+    const handlePaginationChange = () => {
+        hasNextPage && !isFetching && fetchNextPage()
     };
 
-    const { data: checkList = [], isLoading } = useQuery<Checklist[], Error>(
-        ['checkList', paginationInfo, debouncedSearchQuery],
-        () => debouncedSearchQuery ? fetchSearchCheckList(debouncedSearchQuery) : fetchCheckList(paginationInfo.currentPage, paginationInfo.pageSize),
+    const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
+        ['checkList', debouncedSearchQuery],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQuery
+                ? fetchSearchCheckList(debouncedSearchQuery)
+                : fetchCheckList(pageParam, 50);
+        },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: false,
-            keepPreviousData: true,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 50 ? allPages.length : undefined;
+            },
+            enabled: true,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat()
+                setCheckList(newItems);
+            },
         }
     );
+
+    useEffect(() => {
+        if (debouncedSearchQuery === "") {
+            setCheckList([])
+            remove()
+        } else {
+            setCheckList([])
+        }
+    }, [debouncedSearchQuery, remove])
 
     const mutation = useMutation(saveCheckList, {
         onSuccess: (data) => {
@@ -175,16 +191,18 @@ const CheckListScreen = React.memo(() => {
                 </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />}
+                <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
             </Card.Content>
-
-            <MemoChecklist_dialog
-                isVisible={isVisible}
-                setIsVisible={setIsVisible}
-                isEditing={isEditing}
-                initialValues={initialValues}
-                saveData={saveData}
-            />
+            
+            {isVisible && (
+                <MemoChecklist_dialog
+                    isVisible={isVisible}
+                    setIsVisible={setIsVisible}
+                    isEditing={isEditing}
+                    initialValues={initialValues}
+                    saveData={saveData}
+                />
+            )}
         </AccessibleView>
     );
 });

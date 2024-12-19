@@ -3,15 +3,15 @@ import { TouchableOpacity, StyleSheet } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
-import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
+import { Customtable, AccessibleView, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Match_checklist_option from "@/components/screens/Match_checklist_option_dialog";
-import { CheckListOption, MatchCheckListOption, GroupCheckListOption, } from '@/typing/type'
+import { MatchCheckListOption } from '@/typing/type'
 import { InitialValuesMatchCheckListOption } from '@/typing/value'
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
 import { useSelector } from "react-redux";
-import { fetchCheckListOption, fetchGroupCheckListOption, fetchMatchCheckListOptions, fetchSearchMatchCheckListOptions, saveMatchCheckListOptions } from "@/app/services";
+import { fetchMatchCheckListOptions, fetchSearchMatchCheckListOptions, saveMatchCheckListOptions } from "@/app/services";
 
 const MatchCheckListOptionScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -31,27 +31,41 @@ const MatchCheckListOptionScreen = React.memo(() => {
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
+    const [matchCheckListOption, setMatchCheckListOption] = useState<MatchCheckListOption[]>([])
 
-    const [paginationInfo, setPaginationInfo] = useState({
-        currentPage: 0,
-        pageSize: 100,
-    });
-
-    const handlePaginationChange = (currentPage: number, pageSize: number) => {
-        setPaginationInfo({ currentPage, pageSize });
+    const handlePaginationChange = () => {
+        hasNextPage && !isFetching && fetchNextPage()
     };
 
-
-    const { data: matchCheckListOption = [], isLoading } = useQuery<MatchCheckListOption[], Error>(
-        ['matchCheckListOption', paginationInfo, debouncedSearchQuery],
-        () => debouncedSearchQuery ? fetchSearchMatchCheckListOptions(debouncedSearchQuery) : fetchMatchCheckListOptions(paginationInfo.currentPage, paginationInfo.pageSize),
+    const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
+        ['matchCheckListOption', debouncedSearchQuery],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQuery
+                ? fetchSearchMatchCheckListOptions(debouncedSearchQuery)
+                : fetchMatchCheckListOptions(pageParam, 50);
+        },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: false,
-            keepPreviousData: true,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 50 ? allPages.length : undefined;
+            },
+            enabled: true,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat()
+                setMatchCheckListOption(newItems);
+            },
         }
     );
 
+    useEffect(() => {
+        if (debouncedSearchQuery === "") {
+            setMatchCheckListOption([])
+            remove()
+        } else {
+            setMatchCheckListOption([])
+        }
+    }, [debouncedSearchQuery, remove])
 
     const mutation = useMutation(saveMatchCheckListOptions, {
         onSuccess: (data) => {
@@ -196,7 +210,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
                 </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />}
+                <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
             </Card.Content>
 
             <MemoMatch_checklist_option

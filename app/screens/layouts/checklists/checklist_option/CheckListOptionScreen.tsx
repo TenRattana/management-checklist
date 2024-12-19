@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { TouchableOpacity, StyleSheet } from "react-native";
 import axiosInstance from "@/config/axios";
-import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
+import { Customtable, AccessibleView, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useToast } from '@/app/contexts/useToast';
@@ -9,7 +9,7 @@ import { useRes } from '@/app/contexts/useRes';
 import Checklist_option_dialog from "@/components/screens/Checklist_option_dialog";
 import { CheckListOption } from '@/typing/type'
 import { InitialValuesCheckListOption } from '@/typing/value'
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
 import { useSelector } from "react-redux";
 import { fetchCheckListOption, fetchSearchCheckListOption, saveCheckListOption } from "@/app/services";
 
@@ -30,25 +30,41 @@ const CheckListOptionScreen = React.memo(() => {
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
+    const [checkListOption, setCheckListOption] = useState<CheckListOption[]>([])
 
-    const [paginationInfo, setPaginationInfo] = useState({
-        currentPage: 0,
-        pageSize: 100,
-    });
-
-    const handlePaginationChange = (currentPage: number, pageSize: number) => {
-        setPaginationInfo({ currentPage, pageSize });
+    const handlePaginationChange = () => {
+        hasNextPage && !isFetching && fetchNextPage()
     };
 
-    const { data: checkListOption = [], isLoading } = useQuery<CheckListOption[], Error>(
-        ['checkListOption', paginationInfo, debouncedSearchQuery],
-        () => debouncedSearchQuery ? fetchSearchCheckListOption(debouncedSearchQuery) : fetchCheckListOption(paginationInfo.currentPage, paginationInfo.pageSize),
+    const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
+        ['checkListOption', debouncedSearchQuery],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQuery
+                ? fetchSearchCheckListOption(debouncedSearchQuery)
+                : fetchCheckListOption(pageParam, 50);
+        },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: false,
-            keepPreviousData: true,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 50 ? allPages.length : undefined;
+            },
+            enabled: true,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat()
+                setCheckListOption(newItems);
+            },
         }
     );
+
+    useEffect(() => {
+        if (debouncedSearchQuery === "") {
+            setCheckListOption([])
+            remove()
+        } else {
+            setCheckListOption([])
+        }
+    }, [debouncedSearchQuery, remove])
 
     const mutation = useMutation(saveCheckListOption, {
         onSuccess: (data) => {
@@ -183,16 +199,18 @@ const CheckListOptionScreen = React.memo(() => {
                 </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />}
+                <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
             </Card.Content>
 
-            <MemoChecklist_option_dialog
-                isVisible={isVisible}
-                setIsVisible={setIsVisible}
-                isEditing={isEditing}
-                initialValues={initialValues}
-                saveData={saveData}
-            />
+            {isVisible && (
+                <MemoChecklist_option_dialog
+                    isVisible={isVisible}
+                    setIsVisible={setIsVisible}
+                    isEditing={isEditing}
+                    initialValues={initialValues}
+                    saveData={saveData}
+                />
+            )}
         </AccessibleView>
     );
 });

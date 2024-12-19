@@ -3,13 +3,13 @@ import { TouchableOpacity, StyleSheet } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
-import { AccessibleView, Customtable, LoadingSpinner, Searchbar, Text } from "@/components";
+import { AccessibleView, Customtable, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Machine_dialog from "@/components/screens/Machine_dialog";
 import { Machine } from '@/typing/type';
 import { InitialValuesMachine } from '@/typing/value';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
 import { useSelector } from "react-redux";
 import { fetchMachines, fetchSearchMachines, saveMachine } from "@/app/services";
 
@@ -37,25 +37,41 @@ const MachineGroupScreen: React.FC = React.memo(() => {
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
+    const [machines, setMachine] = useState<Machine[]>([])
 
-    const [paginationInfo, setPaginationInfo] = useState({
-        currentPage: 0,
-        pageSize: 100,
-    });
-
-    const handlePaginationChange = (currentPage: number, pageSize: number) => {
-        setPaginationInfo({ currentPage, pageSize });
+    const handlePaginationChange = () => {
+        hasNextPage && !isFetching && fetchNextPage()
     };
 
-    const { data: machines = [], isLoading } = useQuery<Machine[], Error>(
-        ['machines', paginationInfo, debouncedSearchQuery],
-        () => debouncedSearchQuery ? fetchSearchMachines(debouncedSearchQuery) : fetchMachines(paginationInfo.currentPage, paginationInfo.pageSize),
+    const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
+        ['machine', debouncedSearchQuery],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQuery
+                ? fetchSearchMachines(debouncedSearchQuery)
+                : fetchMachines(pageParam, 50);
+        },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: false,
-            keepPreviousData: true,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 50 ? allPages.length : undefined;
+            },
+            enabled: true,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat()
+                setMachine(newItems);
+            },
         }
     );
+
+    useEffect(() => {
+        if (debouncedSearchQuery === "") {
+            setMachine([])
+            remove()
+        } else {
+            setMachine([])
+        }
+    }, [debouncedSearchQuery, remove])
 
     const mutation = useMutation(saveMachine, {
         onSuccess: (data) => {
@@ -209,7 +225,7 @@ const MachineGroupScreen: React.FC = React.memo(() => {
                 </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />}
+                <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
             </Card.Content>
 
             {isVisible && (

@@ -153,7 +153,7 @@ const TimescheduleScreen: React.FC = React.memo(() => {
         showMessage: 0,
         detail: true,
         detailKey: "ScheduleID",
-        detailKeyrow: 5,
+        detailKeyrow: 4,
         showDetailwithKey: ["Type_schedule", "TimeSlots", "TimeWeek", "TimeCustom"],
         detailData: timeSchedule,
         searchQuery: debouncedSearchQuery,

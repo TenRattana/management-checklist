@@ -29,8 +29,7 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
   }, [Tabledata, sortConfig]);
 
   const filteredData = useMemo(() => {
-    return sortedData
-      .filter((row) => row.some((cell) => cell?.toString().toLowerCase().includes(searchQuery.toLowerCase())))
+    return sortedData.filter((row) => row.some((cell) => cell?.toString().toLowerCase().includes(searchQuery.toLowerCase())))
       .filter((row) => (filter ? row.includes(filter) : true));
   }, [sortedData, searchQuery, filter]);
 
@@ -57,11 +56,13 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
 
   const toggleSelect = useCallback((value: string) => {
     if (selectedRows && setRow) {
-      setRow(selectedRows.includes(value)
+      const newSelectedRows = selectedRows.includes(value)
         ? selectedRows.filter((item) => item !== value)
-        : [...selectedRows, value]);
+        : [...selectedRows, value];
+
+      setRow(newSelectedRows);
     }
-  }, [selectedRows, setRow])
+  }, [selectedRows, setRow]);
 
   const handleSort = useCallback((columnIndex: number) => {
     setSortConfig((prev) => ({

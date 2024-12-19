@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { TouchableOpacity, StyleSheet } from "react-native";
 import axiosInstance from "@/config/axios";
-import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
+import { Customtable, AccessibleView, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useToast } from '@/app/contexts/useToast';
@@ -9,7 +9,7 @@ import { useRes } from '@/app/contexts/useRes';
 import Checklist_group_dialog from "@/components/screens/Checklist_group_dialog";
 import { GroupCheckListOption } from '@/typing/type'
 import { InitialValuesGroupCheckList } from '@/typing/value'
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import { useSelector } from "react-redux";
 import { fetchGroupCheckListOption, fetchSearchGroupCheckListOption, saveGroupCheckListNoOption } from "@/app/services";
 
@@ -30,25 +30,41 @@ const ChecklistGroupScreen = React.memo(() => {
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
+    const [groupCheckListOption, setGroupCheckListOption] = useState<GroupCheckListOption[]>([])
 
-    const [paginationInfo, setPaginationInfo] = useState({
-        currentPage: 0,
-        pageSize: 100,
-    });
-
-    const handlePaginationChange = (currentPage: number, pageSize: number) => {
-        setPaginationInfo({ currentPage, pageSize });
+    const handlePaginationChange = () => {
+        hasNextPage && !isFetching && fetchNextPage()
     };
 
-    const { data: groupCheckListOption = [], isLoading } = useQuery<GroupCheckListOption[], Error>(
-        ['groupCheckListOption', paginationInfo, debouncedSearchQuery],
-        () => debouncedSearchQuery ? fetchSearchGroupCheckListOption(debouncedSearchQuery) : fetchGroupCheckListOption(paginationInfo.currentPage, paginationInfo.pageSize),
+    const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
+        ['groupCheckListOption', debouncedSearchQuery],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQuery
+                ? fetchSearchGroupCheckListOption(debouncedSearchQuery)
+                : fetchGroupCheckListOption(pageParam, 50);
+        },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: false,
-            keepPreviousData: true,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 50 ? allPages.length : undefined;
+            },
+            enabled: true,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat()
+                setGroupCheckListOption(newItems);
+            },
         }
     );
+
+    useEffect(() => {
+        if (debouncedSearchQuery === "") {
+            setGroupCheckListOption([])
+            remove()
+        } else {
+            setGroupCheckListOption([])
+        }
+    }, [debouncedSearchQuery, remove])
 
     const mutation = useMutation(saveGroupCheckListNoOption, {
         onSuccess: (data) => {
@@ -183,16 +199,18 @@ const ChecklistGroupScreen = React.memo(() => {
                 </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />}
+                <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
             </Card.Content>
-
-            <MemoChecklist_group_dialog
-                isVisible={isVisible}
-                setIsVisible={setIsVisible}
-                isEditing={isEditing}
-                initialValues={initialValues}
-                saveData={saveData}
-            />
+            
+            {isVisible && (
+                <MemoChecklist_group_dialog
+                    isVisible={isVisible}
+                    setIsVisible={setIsVisible}
+                    isEditing={isEditing}
+                    initialValues={initialValues}
+                    saveData={saveData}
+                />
+            )}
         </AccessibleView>
     );
 });

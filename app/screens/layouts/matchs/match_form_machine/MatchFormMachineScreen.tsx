@@ -3,24 +3,15 @@ import { TouchableOpacity, StyleSheet } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
-import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
+import { Customtable, AccessibleView, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Match_form_machine_dialog from "@/components/screens/Match_form_machine_dialog";
-import { Form, MatchForm, Machine } from '@/typing/type'
+import { MatchForm } from '@/typing/type'
 import { InitialValuesMatchFormMachine } from '@/typing/value'
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
 import { useSelector } from "react-redux";
-
-const fetchMatchFormMchines = async (): Promise<MatchForm[]> => {
-    const response = await axiosInstance.post("MatchFormMachine_service.asmx/GetMatchFormMachines");
-    return response.data.data ?? [];
-};
-
-const SaveMatchFormMachine = async (data: { Prefix: any; MachineID: string; FormID: string; Mode: string; }): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("MatchFormMachine_service.asmx/SaveMatchFormMachine", data);
-    return response.data;
-};
+import { fetchMatchFormMchines, fetchSearchMatchFormMchine, SaveMatchFormMachine } from "@/app/services";
 
 const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -37,15 +28,41 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
+    const [matchForm, setMatchForm] = useState<MatchForm[]>([])
 
-    const { data: matchForm = [], isLoading } = useQuery<MatchForm[], Error>(
-        'matchForm',
-        fetchMatchFormMchines,
+    const handlePaginationChange = () => {
+        hasNextPage && !isFetching && fetchNextPage()
+    };
+
+    const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
+        ['matchForm', debouncedSearchQuery],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQuery
+                ? fetchSearchMatchFormMchine(debouncedSearchQuery)
+                : fetchMatchFormMchines(pageParam, 50);
+        },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: false,
-            keepPreviousData: true,
-        });
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 50 ? allPages.length : undefined;
+            },
+            enabled: true,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat()
+                setMatchForm(newItems);
+            },
+        }
+    );
+
+    useEffect(() => {
+        if (debouncedSearchQuery === "") {
+            setMatchForm([])
+            remove()
+        } else {
+            setMatchForm([])
+        }
+    }, [debouncedSearchQuery, remove])
 
     const mutation = useMutation(SaveMatchFormMachine, {
         onSuccess: (data) => {
@@ -191,16 +208,18 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
                 </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+                <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
             </Card.Content>
 
-            <MemoMatch_form_machine_dialog
-                isVisible={isVisible}
-                setIsVisible={setIsVisible}
-                isEditing={isEditing}
-                initialValues={initialValues}
-                saveData={saveData}
-            />
+            {isVisible && (
+                <MemoMatch_form_machine_dialog
+                    isVisible={isVisible}
+                    setIsVisible={setIsVisible}
+                    isEditing={isEditing}
+                    initialValues={initialValues}
+                    saveData={saveData}
+                />
+            )}
         </AccessibleView>
     );
 });

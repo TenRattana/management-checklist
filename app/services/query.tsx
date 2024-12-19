@@ -1,5 +1,5 @@
 import axiosInstance from "@/config/axios";
-import { Form } from "@/typing/type";
+import { Form, MatchForm } from "@/typing/type";
 import { Checklist, CheckListOption, CheckListType, DataType, ExpectedResult, GroupCheckListOption, GroupMachine, Machine, MatchCheckListOption, TimeScheduleMachine } from "@/typing/type";
 
 // Check List Type
@@ -403,5 +403,46 @@ export const SaveApporved = async (data: {
     }
 }): Promise<{ message: string }> => {
     const response = await axiosInstance.post("ExpectedResult_service.asmx/SaveApporved", { TableID: JSON.stringify(data.TableID), UserInfo: JSON.stringify(data.UserData) });
+    return response.data;
+};
+
+// Match Form Machine
+export const fetchMatchFormMchines = async (
+    currentPage: number,
+    pageSize: number,
+): Promise<MatchForm[]> => {
+    try {
+        const response = await axiosInstance.post("MatchFormMachine_service.asmx/GetMatchFormMachines", {
+            page: currentPage,
+            pageSize: pageSize,
+        });
+        return response.data.data ?? [];
+    } catch (error) {
+        console.error("Error fetching :", error);
+        throw new Error('Failed to fetch');
+    }
+};
+
+export const fetchSearchMatchFormMchine = async (
+    debouncedSearchQuery: string
+): Promise<MatchForm[]> => {
+    try {
+        const response = await axiosInstance.post("MatchFormMachine_service.asmx/SearchMatchCheckListOptions", {
+            Messages: debouncedSearchQuery
+        });
+        return response.data.data ?? [];
+    } catch (error) {
+        console.error("Error fetching :", error);
+        throw new Error('Failed to fetch');
+    }
+}
+
+export const SaveMatchFormMachine = async (data: {
+    Prefix: any;
+    MachineID: string;
+    FormID: string;
+    Mode: string;
+}): Promise<{ message: string }> => {
+    const response = await axiosInstance.post("MatchFormMachine_service.asmx/SearchMatchCheckListOptions", data);
     return response.data;
 };

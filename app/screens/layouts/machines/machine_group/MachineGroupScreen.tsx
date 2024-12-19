@@ -34,10 +34,6 @@ const MachineGroupScreen = React.memo(() => {
     const queryClient = useQueryClient();
     const [machineGroup, setMachineGroup] = useState<GroupMachine[]>([])
 
-    const handlePaginationChange = () => {
-        hasNextPage && !isFetching && fetchNextPage()
-    };
-
     const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
         ['machineGroups', debouncedSearchQuery],
         ({ pageParam = 0 }) => {
@@ -51,34 +47,32 @@ const MachineGroupScreen = React.memo(() => {
             getNextPageParam: (lastPage, allPages) => {
                 return lastPage.length === 50 ? allPages.length : undefined;
             },
-            enabled: true,
             onSuccess: (newData) => {
                 const newItems = newData.pages.flat()
-
-                setMachineGroup((prevItems) => {
-                    const newItemsSet = new Set(prevItems.map((item: GroupMachine) => item.GMachineID));
-                    const mergedItems = prevItems.concat(
-                        newItems.filter((item) => !newItemsSet.has(item.GMachineID))
-                    );
-                    return mergedItems;
-                });
+                setMachineGroup(newItems);
             },
         }
     );
 
+    const handlePaginationChange = useCallback(() => {
+        if (hasNextPage && !isFetching) {
+            fetchNextPage();
+        }
+    }, [hasNextPage, isFetching, fetchNextPage]);
+
     useEffect(() => {
         if (debouncedSearchQuery === "") {
-            setMachineGroup([])
-            remove()
+            setMachineGroup([]);
+            remove();
         } else {
-            setMachineGroup([])
+            setMachineGroup([]);
         }
-    }, [debouncedSearchQuery, remove])
+    }, [debouncedSearchQuery, remove]);
 
     const mutation = useMutation(saveGroupMachine, {
         onSuccess: (data) => {
             showSuccess(data.message);
-            setIsVisible(false)
+            setIsVisible(false);
             queryClient.invalidateQueries('machineGroups');
         },
         onError: handleError,
@@ -139,7 +133,7 @@ const MachineGroupScreen = React.memo(() => {
             item.IsActive,
             item.GMachineID,
         ]);
-    }, [machineGroup, debouncedSearchQuery]);
+    }, [machineGroup]);
 
     const handleNewData = useCallback(() => {
         setInitialValues({
@@ -186,9 +180,9 @@ const MachineGroupScreen = React.memo(() => {
             padding: 2,
             flex: 1
         }
-    })
+    });
 
-    const MemoMachine_group_dialog = React.memo(Machine_group_dialog)
+    const MemoMachine_group_dialog = React.memo(Machine_group_dialog);
 
     return (
         <View id="container-groupmachine" style={styles.container}>

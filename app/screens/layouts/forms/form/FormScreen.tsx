@@ -2,13 +2,14 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { TouchableOpacity, StyleSheet } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts/useToast";
-import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
+import { Customtable, AccessibleView, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { FormScreenProps } from "@/typing/tag";
 import { Form } from "@/typing/type";
-import { useQuery, useQueryClient } from 'react-query';
+import { useInfiniteQuery, useQueryClient } from 'react-query';
 import { fetchForms, fetchSearchFomrs } from "@/app/services";
+import { useRes } from "@/app/contexts/useRes";
 
 const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -18,26 +19,43 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
+    const { spacing } = useRes();
     const queryClient = useQueryClient();
+    const [form, setForm] = useState<Form[]>([])
 
-    const [paginationInfo, setPaginationInfo] = useState({
-        currentPage: 0,
-        pageSize: 100,
-    });
-
-    const handlePaginationChange = (currentPage: number, pageSize: number) => {
-        setPaginationInfo({ currentPage, pageSize });
+    const handlePaginationChange = () => {
+        hasNextPage && !isFetching && fetchNextPage()
     };
 
-    const { data: form = [], isLoading } = useQuery<Form[], Error>(
-        ['form', paginationInfo, debouncedSearchQuery],
-        () => debouncedSearchQuery ? fetchSearchFomrs(debouncedSearchQuery) : fetchForms(paginationInfo.currentPage, paginationInfo.pageSize),
+    const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
+        ['form', debouncedSearchQuery],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQuery
+                ? fetchSearchFomrs(debouncedSearchQuery)
+                : fetchForms(pageParam, 50);
+        },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: false,
-            keepPreviousData: true,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 50 ? allPages.length : undefined;
+            },
+            enabled: true,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat()
+                setForm(newItems);
+            },
         }
     );
+
+    useEffect(() => {
+        if (debouncedSearchQuery === "") {
+            setForm([])
+            remove()
+        } else {
+            setForm([])
+        }
+    }, [debouncedSearchQuery, remove])
 
     useEffect(() => {
         if (messages && show) {
@@ -113,6 +131,24 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
         searchQuery: debouncedSearchQuery,
     }), [tableData, searchQuery, handleAction, debouncedSearchQuery]);
 
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+        },
+        header: {
+            fontSize: spacing.medium,
+            marginTop: 10,
+            paddingVertical: 8,
+        },
+        functionname: {
+            textAlign: 'center',
+        },
+        cardcontent: {
+            padding: 2,
+            flex: 1,
+        },
+    });
+
     return (
         <AccessibleView name="container-form" style={styles.container}>
             <Card.Title
@@ -131,28 +167,10 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
                 </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />}
+                <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
             </Card.Content>
         </AccessibleView>
     );
-});
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    header: {
-        fontSize: 24,
-        marginTop: 10,
-        paddingVertical: 8,
-    },
-    functionname: {
-        textAlign: 'center',
-    },
-    cardcontent: {
-        padding: 2,
-        flex: 1,
-    },
 });
 
 export default FormScreen;

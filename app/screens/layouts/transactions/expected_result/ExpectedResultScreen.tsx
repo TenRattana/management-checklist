@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from '@/app/contexts/useToast';
-import { Customtable, LoadingSpinner, AccessibleView, Searchbar } from "@/components";
+import { Customtable, AccessibleView, Searchbar } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { ExpectedResult } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
-import { useQuery } from 'react-query';
+import { useInfiniteQuery } from 'react-query';
 import { StyleSheet } from "react-native";
 import { fetchExpectedResults, fetchSearchExpectedResult } from "@/app/services";
 
@@ -15,27 +15,43 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
 
     const masterdataStyles = useMasterdataStyles();
-    const { showSuccess, handleError } = useToast();
+    const {  handleError } = useToast();
     const { spacing, fontSize } = useRes();
+    const [expectedResult, setExpectedResult] = useState<ExpectedResult[]>([])
 
-    const [paginationInfo, setPaginationInfo] = useState({
-        currentPage: 0,
-        pageSize: 100,
-    });
-
-    const handlePaginationChange = (currentPage: number, pageSize: number) => {
-        setPaginationInfo({ currentPage, pageSize });
+    const handlePaginationChange = () => {
+        hasNextPage && !isFetching && fetchNextPage()
     };
 
-    const { data: expectedResult = [], isLoading } = useQuery<ExpectedResult[], Error>(
-        ['expectedResult', paginationInfo, debouncedSearchQuery],
-        () => debouncedSearchQuery ? fetchSearchExpectedResult(debouncedSearchQuery) : fetchExpectedResults(paginationInfo.currentPage, paginationInfo.pageSize),
+    const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
+        ['expectedResult', debouncedSearchQuery],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQuery
+                ? fetchSearchExpectedResult(debouncedSearchQuery)
+                : fetchExpectedResults(pageParam, 50);
+        },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: false,
-            keepPreviousData: true,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 50 ? allPages.length : undefined;
+            },
+            enabled: true,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat()
+                setExpectedResult(newItems);
+            },
         }
     );
+
+    useEffect(() => {
+        if (debouncedSearchQuery === "") {
+            setExpectedResult([])
+            remove()
+        } else {
+            setExpectedResult([])
+        }
+    }, [debouncedSearchQuery, remove])
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -140,7 +156,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
                 />
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />}
+                <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
             </Card.Content>
         </AccessibleView>
     );
