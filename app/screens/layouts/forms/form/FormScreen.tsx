@@ -8,11 +8,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { FormScreenProps } from "@/typing/tag";
 import { Form } from "@/typing/type";
 import { useQuery, useQueryClient } from 'react-query';
-
-const fetchForm = async (): Promise<Form[]> => {
-    const response = await axiosInstance.post("Form_service.asmx/GetForms");
-    return response.data.data ?? [];
-};
+import { fetchForms, fetchSearchFomrs } from "@/app/services";
 
 const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -24,7 +20,24 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
     const { showSuccess, handleError } = useToast();
     const queryClient = useQueryClient();
 
-    const { data: form = [], isLoading } = useQuery<Form[], Error>('form', fetchForm);
+    const [paginationInfo, setPaginationInfo] = useState({
+        currentPage: 0,
+        pageSize: 100,
+    });
+
+    const handlePaginationChange = (currentPage: number, pageSize: number) => {
+        setPaginationInfo({ currentPage, pageSize });
+    };
+
+    const { data: form = [], isLoading } = useQuery<Form[], Error>(
+        ['form', paginationInfo, debouncedSearchQuery],
+        () => debouncedSearchQuery ? fetchSearchFomrs(debouncedSearchQuery) : fetchForms(paginationInfo.currentPage, paginationInfo.pageSize),
+        {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            keepPreviousData: true,
+        }
+    );
 
     useEffect(() => {
         if (messages && show) {
@@ -118,7 +131,7 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
                 </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+                {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />}
             </Card.Content>
         </AccessibleView>
     );

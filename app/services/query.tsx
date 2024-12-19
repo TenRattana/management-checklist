@@ -1,5 +1,5 @@
 import axiosInstance from "@/config/axios";
-import { Form } from "@/typing/form";
+import { Form } from "@/typing/type";
 import { Checklist, CheckListOption, CheckListType, DataType, ExpectedResult, GroupCheckListOption, GroupMachine, Machine, MatchCheckListOption, TimeScheduleMachine } from "@/typing/type";
 
 // Check List Type
@@ -303,7 +303,7 @@ export const saveMatchCheckListOptions = async (
 };
 
 // Forms
-export const fetchForm = async (
+export const fetchForms = async (
     currentPage: number,
     pageSize: number,
 ): Promise<Form[]> => {
