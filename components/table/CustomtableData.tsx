@@ -47,11 +47,11 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
         });
     }, [showMessage]);
 
-    const findIndex = (row: (string | number | boolean)[]) => {
+    const findIndex = useCallback((row: (string | number | boolean)[]) => {
         return detailData?.findIndex(item => {
             return detailKey && item[detailKey] === (detailKeyrow && row[Number(detailKeyrow)]);
         }) ?? -1;
-    };
+    }, []);
 
     const toggleDetailVisibility = useCallback((rowIndex: number) => {
         setVisibleDetails((prev) => {
@@ -169,7 +169,7 @@ const CustomtableData: React.FC<CustomtableDataProps> = React.memo(({ Tablehead,
             <Dialogs
                 isVisible={dialogState.isVisible}
                 title={dialogState.title}
-                setIsVisible={() => setDialogState((prev) => ({...prev , isVisible: false}))}
+                setIsVisible={() => setDialogState((prev) => ({ ...prev, isVisible: false }))}
                 handleDialog={handleDialog}
                 actions={dialogState.action}
                 messages={dialogState.message}
