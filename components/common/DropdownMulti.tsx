@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Platform, Modal, StyleSheet } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { HelperText, IconButton, Portal } from 'react-native-paper';
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 const DropdownMulti = React.memo(({
     label,
@@ -86,10 +87,12 @@ const DropdownMulti = React.memo(({
                             <View style={styles.modalContent}>
                                 <DropDownPicker
                                     multiple={true}
-                                    maxHeight={500}
+                                    maxHeight={hp(Platform.OS === "web" ? '50%' : '70&')}
                                     open={open}
                                     value={selectedValue}
-                                    items={items}
+                                    items={items.filter(item =>
+                                        item.label.toLowerCase().includes(searchQuerys.toLowerCase())
+                                    )}
                                     theme={darkMode ? 'DARK' : 'LIGHT'}
                                     containerStyle={{ flex: 1 }}
                                     setValue={() => { }}
@@ -99,7 +102,7 @@ const DropdownMulti = React.memo(({
                                     searchable={search ?? true}
                                     searchTextInputStyle={masterdataStyles.text}
                                     searchTextInputProps={{
-                                        value: searchQuery,
+                                        value: searchQuerys,
                                         onChangeText: handleSearch,
                                     }}
                                     renderListItem={({ item }) => (
@@ -121,7 +124,9 @@ const DropdownMulti = React.memo(({
                                     onOpen={fetchNextPage}
                                     onClose={() => setOpen(false)}
                                     flatListProps={{
-                                        data: items,
+                                        data: items.filter(item =>
+                                            item.label.toLowerCase().includes(searchQuerys.toLowerCase())
+                                        ),
                                         keyExtractor: (item) => `${item.value}`,
                                         onScroll: safeHandleScroll,
                                         onEndReached: safeHandleScroll,
@@ -181,7 +186,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     modalContent: {
-        width: '100%',
+        width: 800,
         height: 50,
         padding: 20,
         top: -250,

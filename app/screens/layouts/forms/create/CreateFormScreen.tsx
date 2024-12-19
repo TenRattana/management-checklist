@@ -161,6 +161,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                 CTypeName: item.CTypeName,
                 DTypeValue: undefined,
                 DTypeName: selectedDataType?.DTypeName ?? "",
+                GCLOptionName: (groupCheckListOption.find((v: GroupCheckListOption) => v.GCLOptionID === "GCLO000") || groupCheckListOption?.[0])?.GCLOptionName
             };
 
             runOnJS(dispatch)(defaultDataForm({ currentField: newField }));

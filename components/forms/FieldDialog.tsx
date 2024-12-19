@@ -220,7 +220,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
     useEffect(() => {
         if (editMode) {
-            setDebouncedSearchQuery({ CheckList: formState.CListName ?? "", MatchChecklist: formState.GCLOptionID ?? "" })
+            setDebouncedSearchQuery({ CheckList: formState.CListName ?? "", MatchChecklist: formState.GCLOptionName ?? "" })
         } else {
             queryClient.invalidateQueries("checkList")
             queryClient.invalidateQueries("groupCheckListOption")
@@ -314,7 +314,12 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                         : ["Text"].includes(checkListTypeItem) ? "label" : "";
 
                                 if (newRender !== shouldRender) {
-                                    setFieldValue(newRender === "detail" ? "DTypeID" : "GCLOptionID", null);
+                                    if (newRender === "detail") {
+                                        setFieldValue("DTypeID", null);
+                                    } else {
+                                        setFieldValue("GCLOptionID", null);
+                                        setFieldValue("GCLOptionName", null)
+                                    }
                                     setShouldRender(newRender);
                                 }
                             }, [values.CTypeID, checkListTypes, shouldRender, setFieldValue]);
@@ -343,6 +348,8 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
                                 if (values.GCLOptionID) {
                                     const filteredItems = itemsML.filter(option => option.GCLOptionID === values.GCLOptionID);
+
+                                    setFieldValue("GCLOptionName", filteredItems[0]?.GCLOptionName)
 
                                     options = filteredItems?.flatMap(option => {
                                         return option.CheckListOptions?.map((item: CheckListOption) => ({

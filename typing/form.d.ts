@@ -56,6 +56,7 @@ export interface BaseFormState {
   EResult?: any;
   CTypeName?: string;
   CListName?: string;
+  GCLOptionName?:string;
 }
 
 export interface RowItemProps<V extends BaseFormState | BaseSubForm> {

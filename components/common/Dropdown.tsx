@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Platform, Modal, StyleSheet } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { HelperText, IconButton, Portal } from 'react-native-paper';
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 const Dropdown = React.memo(({
     label,
@@ -40,7 +41,7 @@ const Dropdown = React.memo(({
 }) => {
     const [searchQuerys, setSearchQuery] = useState('');
     const masterdataStyles = useMasterdataStyles();
-    const { spacing } = useRes()
+    const { spacing, responsive } = useRes()
     const handleSearch = (query: string) => {
         setSearchQuery(query);
     };
@@ -74,10 +75,12 @@ const Dropdown = React.memo(({
                             <View style={styles.modalContent}>
                                 <DropDownPicker
                                     multiple={false}
-                                    maxHeight={500}
+                                    maxHeight={hp(Platform.OS === "web" ? '50%' : '70%')}
                                     open={open}
                                     value={selectedValue ? String(selectedValue) : null}
-                                    items={items}
+                                    items={items.filter(item =>
+                                        item.label.toLowerCase().includes(searchQuerys.toLowerCase())
+                                    )}
                                     containerStyle={{ flex: 1 }}
                                     setValue={() => { }}
                                     setOpen={() => setOpen(true)}
@@ -85,7 +88,7 @@ const Dropdown = React.memo(({
                                     loading={isFetching}
                                     searchable={search ?? true}
                                     searchTextInputProps={{
-                                        value: searchQuery,
+                                        value: searchQuerys,
                                         onChangeText: handleSearch,
                                     }}
                                     renderListItem={({ item }) => (
@@ -104,7 +107,9 @@ const Dropdown = React.memo(({
                                     onOpen={fetchNextPage}
                                     onClose={() => setOpen(false)}
                                     flatListProps={{
-                                        data: items,
+                                        data: items.filter(item =>
+                                            item.label.toLowerCase().includes(searchQuerys.toLowerCase())
+                                        ),
                                         keyExtractor: (item) => `${item.value}`,
                                         onScroll: handleScroll,
                                         onEndReached: handleScroll,
@@ -119,7 +124,7 @@ const Dropdown = React.memo(({
                                         fontWeight: "bold"
                                     }}
                                     bottomOffset={100}
-                                    dropDownDirection="AUTO"
+                                    dropDownDirection="BOTTOM"
                                 />
                             </View>
                         </View>
@@ -167,7 +172,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     modalContent: {
-        width: '100%',
+        width: 800,
         height: 50,
         padding: 20,
         top: -250,
