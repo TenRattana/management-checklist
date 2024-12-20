@@ -205,13 +205,15 @@ const MachineGroupScreen = React.memo(() => {
                 <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
             </Card.Content>
 
-            <MemoMachine_group_dialog
-                isVisible={isVisible}
-                setIsVisible={setIsVisible}
-                isEditing={isEditing}
-                initialValues={initialValues}
-                saveData={saveData}
-            />
+            {isVisible && (
+                <MemoMachine_group_dialog
+                    isVisible={isVisible}
+                    setIsVisible={setIsVisible}
+                    isEditing={isEditing}
+                    initialValues={initialValues}
+                    saveData={saveData}
+                />
+            )}
         </View>
     );
 });

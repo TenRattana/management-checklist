@@ -3,23 +3,16 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
-import { AccessibleView, Customtable, LoadingSpinner, Searchbar, Text } from "@/components";
+import { Customtable, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { GroupMachine, TimeScheduleProps } from '@/typing/type';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { InfiniteData, useMutation, useQuery, useQueryClient } from 'react-query';
 import { useSelector } from "react-redux";
 import ScheduleDialog from "@/components/screens/Schedule_dialog";
+import { fetchSearchTimeSchedules, fetchTimeSchedules, saveTimeSchedule } from "@/app/services";
+import { useTheme } from "@/app/contexts/useTheme";
 
-const fetchTimeSchedules = async (): Promise<TimeScheduleProps[]> => {
-    const response = await axiosInstance.post("TimeSchedule_service.asmx/GetSchedules");
-    return response.data.data ?? [];
-};
-
-const saveTimeSchedule = async (data: { Prefix: any; Schedule: string; }): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("TimeSchedule_service.asmx/SaveSchedule", data);
-    return response.data;
-};
 
 const TimescheduleScreen: React.FC = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -31,7 +24,7 @@ const TimescheduleScreen: React.FC = React.memo(() => {
         ScheduleName: "",
         IsActive: false,
         Tracking: false,
-        MachineGroup: "",
+        MachineGroup: [],
         Type_schedule: "",
         Custom: false,
         TimeSlots: [],
@@ -42,16 +35,36 @@ const TimescheduleScreen: React.FC = React.memo(() => {
     const masterdataStyles = useMasterdataStyles();
     const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
+    const { theme } = useTheme()
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
+    const [timeSchedule, setTimeSchedule] = useState<TimeScheduleProps[]>([])
 
-    const { data: timeSchedule = [], isLoading, } = useQuery<TimeScheduleProps[], Error>(
-        'timeSchedule',
-        fetchTimeSchedules,
+    const { data, isLoading, remove } = useQuery(
+        ['timeSchedule', debouncedSearchQuery],
+        () => {
+            return debouncedSearchQuery
+                ? fetchSearchTimeSchedules(debouncedSearchQuery)
+                : fetchTimeSchedules();
+        },
         {
-            refetchOnWindowFocus: true,
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            onSuccess: (NewData: InfiniteData<TimeScheduleProps[]>) => {
+                const newItems = NewData?.pages?.flat() || NewData
+                setTimeSchedule(newItems)
+            }
         }
     );
+
+    useEffect(() => {
+        if (debouncedSearchQuery === "") {
+            setTimeSchedule([])
+            remove()
+        } else {
+            setTimeSchedule([])
+        }
+    }, [debouncedSearchQuery, remove])
 
     const mutation = useMutation(saveTimeSchedule, {
         onSuccess: (data) => {
@@ -85,11 +98,13 @@ const TimescheduleScreen: React.FC = React.memo(() => {
             if (action === "editIndex") {
                 const response = await axiosInstance.post("TimeSchedule_service.asmx/GetSchedule", { ScheduleID: item });
                 const timeschedule = response.data.data[0] ?? [];
+                const option = timeschedule.MachineGroup?.map((v: { GMachineID: string }) => v.GMachineID) || [];
+
                 setInitialValues({
                     ScheduleID: timeschedule.ScheduleID ?? "",
                     ScheduleName: timeschedule.ScheduleName ?? "",
                     IsActive: timeschedule.IsActive ?? "",
-                    MachineGroup: timeschedule.MachineGroup ?? "",
+                    MachineGroup: option,
                     Type_schedule: timeschedule.Type_schedule ?? "",
                     Tracking: Boolean(timeschedule.Tracking),
                     Custom: Boolean(timeschedule.Custom),
@@ -114,11 +129,12 @@ const TimescheduleScreen: React.FC = React.memo(() => {
     const tableData = useMemo(() => {
         return timeSchedule.map((item) => [
             item.ScheduleName,
+            item.MachineGroup?.map((v) => v.GMachineName).join(', ') || "",
             item.Type_schedule,
             item.Tracking ? "track" : "not track",
             item.IsActive,
             item.ScheduleID
-        ]);
+        ]) || [];
     }, [timeSchedule, debouncedSearchQuery]);
 
     const handleNewData = useCallback(() => {
@@ -142,26 +158,28 @@ const TimescheduleScreen: React.FC = React.memo(() => {
         Tabledata: tableData,
         Tablehead: [
             { label: "Schedule Name", align: "flex-start" },
+            { label: "Group Machine Name", align: "flex-start" },
             { label: "Type", align: "center" },
             { label: "Tracking", align: "center" },
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
         ],
-        flexArr: [2, 1, 1, 1, 1],
-        actionIndex: [{ editIndex: 4, delIndex: 5 }],
+        flexArr: [2, 1, 1, 1, 1, 1],
+        actionIndex: [{ editIndex: 5, delIndex: 6 }],
         handleAction,
         showMessage: 0,
         detail: true,
         detailKey: "ScheduleID",
-        detailKeyrow: 4,
-        showDetailwithKey: ["Type_schedule", "TimeSlots", "TimeWeek", "TimeCustom"],
+        detailKeyrow: 5,
+        showDetailwithKey: ["MachineGroup", "Type_schedule", "TimeSlots", "TimeWeek", "TimeCustom"],
         detailData: timeSchedule,
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction, timeSchedule]);
 
     const styles = StyleSheet.create({
         container: {
-            flex: 1
+            flex: 1,
+            backgroundColor: theme.colors.background
         },
         header: {
             fontSize: spacing.large,
@@ -180,12 +198,12 @@ const TimescheduleScreen: React.FC = React.memo(() => {
     const MemoScheduleDialog = React.memo(ScheduleDialog)
 
     return (
-        <AccessibleView name="container-schedule" style={styles.container}>
+        <View id="container-schedule" style={styles.container}>
             <Card.Title
                 title="List Time Schedule"
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
-            <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
+            <View id="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
                     placeholder="Search Schedule..."
                     value={searchQuery}
@@ -195,19 +213,21 @@ const TimescheduleScreen: React.FC = React.memo(() => {
                 <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                     <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Add New Schedule</Text>
                 </TouchableOpacity>
-            </AccessibleView>
+            </View>
             <Card.Content style={styles.cardcontent}>
-                {isLoading ? <LoadingSpinner /> : <Customtable {...CustomtableProps} />}
+                <Customtable {...CustomtableProps} />
             </Card.Content>
 
-            <MemoScheduleDialog
-                isVisible={isVisible}
-                setIsVisible={setIsVisible}
-                isEditing={isEditing}
-                initialValues={initialValues}
-                saveData={saveData}
-            />
-        </AccessibleView>
+            {isVisible && (
+                <MemoScheduleDialog
+                    isVisible={isVisible}
+                    setIsVisible={setIsVisible}
+                    isEditing={isEditing}
+                    initialValues={initialValues}
+                    saveData={saveData}
+                />
+            )}
+        </View>
     );
 });
 

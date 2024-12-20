@@ -1,5 +1,5 @@
 import axiosInstance from "@/config/axios";
-import { Form, MatchForm } from "@/typing/type";
+import { Form, MatchForm, TimeScheduleProps } from "@/typing/type";
 import { Checklist, CheckListOption, CheckListType, DataType, ExpectedResult, GroupCheckListOption, GroupMachine, Machine, MatchCheckListOption, TimeScheduleMachine } from "@/typing/type";
 
 // Check List Type
@@ -15,16 +15,39 @@ export const fetchDataType = async (): Promise<DataType[]> => {
 };
 
 // Time Schedule
-export const fetchTimeSchedules = async () => {
-    const response = await axiosInstance.post("TimeSchedule_service.asmx/GetSchedules");
-    return response.data.data ?? [];
+export const fetchTimeSchedules = async (): Promise<TimeScheduleProps[]> => {
+    try {
+        const response = await axiosInstance.post("TimeSchedule_service.asmx/GetSchedules");
+        return response.data.data ?? [];
+    } catch (error) {
+        console.error("Error fetching :", error);
+        throw new Error('Failed to fetch');
+    }
 };
+
+export const fetchSearchTimeSchedules = async (
+    debouncedSearchQuery: string
+): Promise<TimeScheduleProps[]> => {
+    try {
+        const response = await axiosInstance.post("TimeSchedule_service.asmx/SearchTimeSchedule", {
+            Messages: debouncedSearchQuery
+        });
+        return response.data.data ?? [];
+    } catch (error) {
+        console.error("Error fetching :", error);
+        throw new Error('Failed to fetch');
+    }
+}
 
 export const fetchTimeMachines = async (data: { ScheduleID: string }): Promise<TimeScheduleMachine[]> => {
     const response = await axiosInstance.post("TimeSchedule_service.asmx/GetScheduleMachine", data);
     return response.data.data ?? [];
 };
 
+export const saveTimeSchedule = async (data: { Prefix: any; Schedule: string; }): Promise<{ message: string }> => {
+    const response = await axiosInstance.post("TimeSchedule_service.asmx/SaveSchedule", data);
+    return response.data;
+};
 // Machine
 export const fetchMachines = async (
     currentPage: number,

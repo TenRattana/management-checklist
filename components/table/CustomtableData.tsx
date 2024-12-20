@@ -1,5 +1,5 @@
 import React, { useState, Suspense } from "react";
-import { ActivityIndicator } from "react-native";
+import { AccessibilityInfo, ActivityIndicator } from "react-native";
 import Text from "../Text";
 import { Dialogs } from "../common";
 import { CustomtableDataProps } from "@/typing/tag";
@@ -21,7 +21,6 @@ const CustomtableData = React.memo(({ Tablehead, flexArr, actionIndex, displayDa
         offset: 55 * index,
         index,
     });
-
 
     return (
         <>
@@ -57,11 +56,11 @@ const CustomtableData = React.memo(({ Tablehead, flexArr, actionIndex, displayDa
                 contentContainerStyle={{ flexGrow: 1 }}
                 nestedScrollEnabled={true}
                 showsVerticalScrollIndicator={true}
-                removeClippedSubviews={false}
+                removeClippedSubviews
                 onEndReachedThreshold={0.2}
-                initialNumToRender={50}
-                windowSize={50}
-                maxToRenderPerBatch={50}
+                initialNumToRender={30}
+                // windowSize={50}
+                // maxToRenderPerBatch={50}
                 onEndReached={handlePaginationChange}
                 getItemLayout={getItemLayout}
             />

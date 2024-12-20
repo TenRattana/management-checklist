@@ -39,7 +39,7 @@ export interface TimeSchedule {
 export interface TimeScheduleProps {
   ScheduleID: string;
   ScheduleName: string;
-  MachineGroup?: string | string[];
+  MachineGroup?: GroupMachine[];
   Type_schedule: string;
   Tracking: boolean;
   IsActive: boolean;

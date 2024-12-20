@@ -8,7 +8,7 @@ import { View } from "react-native";
 import { debounce, throttle } from "lodash";
 
 const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, actionIndex, searchQuery, showMessage, selectedRows, setRow,
-  showFilter, showData, showColumn, detail, detailData, detailKey, detailKeyrow, showDetailwithKey, ShowTitle, handlePaginationChange }: CustomTableProps) => {
+  showFilter, showData, showColumn, detail, detailData, detailKey, detailKeyrow, showDetailwithKey, ShowTitle, handlePaginationChange, isFetching }: CustomTableProps) => {
 
   const [displayData, setDisplayData] = useState<(string | number | boolean)[][]>([]);
   const [filter, setFilter] = useState<string | null>(null);
@@ -85,13 +85,10 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
     setFilter(value);
   }, []);
 
-  const MemoCustomtableSmall = React.memo(CustomtableSmall)
-  const MemoCustomtableHead = React.memo(CustomtableHead)
-
   return (
     <View id="customtable" style={{ flex: 1 }}>
       {responsive === "small" ? (
-        <MemoCustomtableSmall
+        <CustomtableSmall
           displayData={displayData}
           Tablehead={Tablehead}
           actionIndex={actionIndex}
@@ -113,7 +110,7 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
         />
       ) : (
         <View id="data" style={{ flex: 1 }}>
-          <MemoCustomtableHead
+          <CustomtableHead
             Tablehead={Tablehead}
             flexArr={flexArr}
             handleSort={handleSortDebounced}

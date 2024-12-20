@@ -1,7 +1,7 @@
 import { useRes } from "@/app/contexts/useRes";
 import { useTheme } from "@/app/contexts/useTheme";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import { View, StyleSheet } from "react-native";
 import Text from "@/components/Text";
 
@@ -10,10 +10,9 @@ type DetailContentProps = {
     showDetailwithKey?: string[];
 };
 
-const DetailContent = ({ detailData, showDetailwithKey }: DetailContentProps) => {
-    useEffect(() => { }, [detailData])
+const DetailContent = React.memo(({ detailData, showDetailwithKey }: DetailContentProps) => {
     const { spacing } = useRes();
-    const { theme } = useTheme()
+    const { theme, darkMode } = useTheme()
 
     const masterdataStyles = useMasterdataStyles()
 
@@ -114,22 +113,20 @@ const DetailContent = ({ detailData, showDetailwithKey }: DetailContentProps) =>
 
         return (
             <View style={styles.containerDetail} key={`container-${detailData}`}>
-                <View>
-                    {Object.entries(detailData).map(([key, value]) => showDetailwithKey && showDetailwithKey.includes(key) && value !== null && (
-                        <View style={styles.detailRowItem} key={`${key}-value-${value}`}>
-                            <Text style={[masterdataStyles.text, styles.keyText]}>
-                                {`${key.charAt(0).toUpperCase() + key.slice(1)}:`}
-                            </Text>
+                {Object.entries(detailData).map(([key, value]) => showDetailwithKey && showDetailwithKey.includes(key) && value !== null && (
+                    <View style={styles.detailRowItem} key={`${key}-value-${value}`}>
+                        <Text style={[masterdataStyles.text, styles.keyText]}>
+                            {`${key.charAt(0).toUpperCase() + key.slice(1)}:`}
+                        </Text>
 
-                            {renderValue(value)}
-                        </View>
-                    ))}
-                </View>
+                        {renderValue(value)}
+                    </View>
+                ))}
             </View>
         );
-    }, [detailData, showDetailwithKey]);
+    }, [detailData, showDetailwithKey, darkMode]);
 
     return <View>{renderDetails()}</View>;
-};
+});
 
 export default DetailContent;

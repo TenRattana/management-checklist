@@ -1,10 +1,10 @@
 import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import { Button, Dialog, Portal, Menu, Switch, HelperText } from 'react-native-paper';
-import { Inputs } from '../common';
+import { DropdownMulti, Inputs } from '../common';
 import { GroupMachine, TimeScheduleProps } from '@/typing/type';
 import { useToast } from '@/app/contexts/useToast';
 import { FastField, Formik } from 'formik';
@@ -17,6 +17,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { Easing, FadeInLeft, FadeInRight, FadeOutLeft, FadeOutRight } from 'react-native-reanimated';
 import CustomDropdownMultiple from '../CustomDropdownMultiple';
 import { AccessibleView } from '..';
+import { useInfiniteQuery, useQueryClient } from 'react-query';
+import { fetchMachineGroups, fetchSearchMachineGroups, fetchSearchTimeSchedules, fetchTimeSchedules } from '@/app/services';
 
 const { height } = Dimensions.get('window');
 
@@ -113,14 +115,89 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
         ),
     });
 
+    const [open, setOpen] = useState<{ Machine: boolean, Schedule: boolean }>({ Machine: false, Schedule: false })
+
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<{ Machine: string, Schedule: string }>({ Machine: '', Schedule: '' });
+    const [machineGroups, setItemsMachine] = useState<any[]>([]);
+
+    const { data: machineGroup, isFetching: isFetchingMG, fetchNextPage: fetchNextPageMG, hasNextPage: hasNextPageMG, refetch: refetchMG } = useInfiniteQuery(
+        ['machineGroups', debouncedSearchQuery.Machine],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQuery.Machine
+                ? fetchSearchMachineGroups(debouncedSearchQuery.Machine)
+                : fetchMachineGroups(pageParam, 100);
+        },
+        {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 100 ? allPages.length : undefined;
+            },
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat().map((item) => ({
+                    label: item.GMachineName || 'Unknown',
+                    value: item.GMachineID || '',
+                }));
+
+                setItemsMachine((prevItems) => {
+                    const newItemsSet = new Set(prevItems.map((item: any) => item.value));
+                    return [...prevItems, ...newItems.filter((item) => !newItemsSet.has(item.value))];
+                });
+            },
+        }
+    );
+
+    const { } = useInfiniteQuery(
+        ['timeSchedule', debouncedSearchQuery.Schedule],
+        () => {
+            return debouncedSearchQuery.Schedule && fetchSearchTimeSchedules(debouncedSearchQuery.Schedule) || []
+        },
+        {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat();
+
+                const newItemsMG = newItems.flatMap((item) => (item.MachineGroup?.map((v) => ({
+                    label: v.GMachineName || 'Unknown',
+                    value: v.GMachineID || '',
+                }))));
+
+                setItemsMachine((prevItems) => {
+                    const newItemsSet = new Set(prevItems.map((item: any) => item.value));
+                    return [...prevItems, ...newItemsMG.filter((item) => !newItemsSet.has(item))];
+                });
+            },
+        }
+    );
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        if (isEditing) {
+            setDebouncedSearchQuery((prev) => ({ ...prev, Schedule: initialValues.ScheduleName ?? "" }));
+            queryClient.invalidateQueries('machineGroups');
+        } else {
+            queryClient.invalidateQueries('machineGroups');
+        }
+
+    }, [initialValues, isEditing]);
+
+    const handleScrollMG = ({ nativeEvent }: any) => {
+        if (nativeEvent?.contentSize && nativeEvent?.layoutMeasurement) {
+            const { contentHeight, layoutHeight, contentOffset } = nativeEvent;
+            if (contentHeight - layoutHeight - contentOffset.y <= 0 && hasNextPageMG && !isFetchingMG) {
+                fetchNextPageMG();
+            }
+        }
+    };
+
     return (
         <GestureHandlerRootView style={{ display: isVisible ? 'flex' : 'none' }}>
             <Portal>
                 <Formik
                     initialValues={initialValues}
                     validationSchema={validationSchema}
-                    validateOnBlur={true}
-                    validateOnChange={false}
+                    validateOnChange={true}
                     onSubmit={(values, formikHelpers) => {
                         saveData(values);
                         formikHelpers.resetForm();
@@ -129,6 +206,12 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                     enableReinitialize={true}
                 >
                     {({ values, handleSubmit, setFieldValue, dirty, isValid, errors, touched, setFieldTouched, resetForm }) => {
+
+                        const handelChange = (field: string, value: any) => {
+                            setFieldTouched(field, true);
+                            setFieldValue(field, value);
+                        };
+
                         return (
                             <Dialog visible={isVisible} style={[masterdataStyles.containerDialog, { width: responsive === "large" ? 1000 : "80%" }]}>
                                 <Dialog.Title style={{ marginLeft: 30 }}>{isEditing ? "Edit Schedule" : "Add Schedule"}</Dialog.Title>
@@ -155,45 +238,30 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                                             )}
                                         </FastField>
 
-                                        <FastField name="MachineGroup">
-                                            {({ field, form }: any) => (
-                                                <CustomDropdownMultiple
-                                                    title="Group Machine"
-                                                    labels="GMachineName"
-                                                    values="GMachineID"
-                                                    data={machineGroups?.filter((v) => v.IsActive)}
-                                                    value={field.value}
-                                                    handleChange={(selectedValues) => {
-                                                        let option: string[]
-                                                        if (field.value.includes(selectedValues as string)) {
-                                                            option = field.value.filter((id: any) => id !== selectedValues);
-                                                        } else {
-                                                            option = selectedValues as string[];
-                                                        }
-
-                                                        form.setFieldValue(field.name, option);
-                                                        setTimeout(() => {
-                                                            form.setFieldTouched(field.name, true);
-                                                        }, 0)
-                                                    }}
-                                                    handleBlur={() => {
-                                                        form.setFieldTouched(field.name, true);
-                                                    }}
-                                                    testId="MachineGroup-md"
-                                                    error={form.touched.MachineGroup && Boolean(form.errors.MachineGroup)}
-                                                    errorMessage={form.touched.MachineGroup ? form.errors.MachineGroup : ""}
-                                                />
-                                            )}
-                                        </FastField>
+                                        <DropdownMulti
+                                            label='machine group'
+                                            open={open.Machine}
+                                            setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, Machine: v }))}
+                                            searchQuery={debouncedSearchQuery.Machine}
+                                            setDebouncedSearchQuery={(v: string) => setDebouncedSearchQuery((prev) => ({ ...prev, Machine: v }))}
+                                            items={machineGroups}
+                                            isFetching={isFetchingMG}
+                                            fetchNextPage={fetchNextPageMG}
+                                            handleScroll={handleScrollMG}
+                                            selectedValue={values.MachineGroup}
+                                            setSelectedValue={(value: string | string[] | null) => handelChange("MachineGroup", value)}
+                                            error={Boolean(touched.MachineGroup && errors.MachineGroup)}
+                                            errorMessage={String(errors.MachineGroup || "")}
+                                        />
 
                                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 10 }}>
                                             {values.MachineGroup && Array.isArray(values.MachineGroup) && values.MachineGroup.length > 0 && values.MachineGroup?.map((item, index) => (
                                                 <TouchableOpacity onPress={() => {
-                                                    setFieldValue("checkListOptionId", values.MachineGroup && Array.isArray(values.MachineGroup) && values.MachineGroup.filter((id) => id !== item))
+                                                    setFieldValue("MachineGroup", values.MachineGroup && Array.isArray(values.MachineGroup) && values.MachineGroup.filter((id) => id !== item))
                                                 }} key={index}>
-                                                    <AccessibleView name="container-renderSelect" style={masterdataStyles.selectedStyle}>
-                                                        <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{machineGroups.find((v) => v.GMachineID === item)?.GMachineName}</Text>
-                                                    </AccessibleView>
+                                                    <View id="container-renderSelect" style={masterdataStyles.selectedStyle}>
+                                                        <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{machineGroups.find((v) => v.value === item)?.label}</Text>
+                                                    </View>
                                                 </TouchableOpacity>
                                             ))}
                                         </View>

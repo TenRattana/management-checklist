@@ -52,6 +52,7 @@ const SettingsScreen = React.memo(() => {
       borderWidth: 0,
       padding: 10,
       borderRadius: 8,
+      flex: 1
     },
     switchContainer: {
       alignSelf: 'center',
@@ -108,10 +109,10 @@ const SettingsScreen = React.memo(() => {
       </AccessibleView>
       <Divider style={styles.divider} />
 
-      <AccessibleView name="setting-font" style={[masterdataStyles.settingItem]}>
+      <View id="setting-font" style={[masterdataStyles.settingItem]}>
         <Text style={[masterdataStyles.text, { alignSelf: 'center', alignItems: 'center' }]}>Font Size</Text>
         {PickerFont}
-      </AccessibleView>
+      </View>
 
       <Divider style={styles.divider} />
     </AccessibleView>

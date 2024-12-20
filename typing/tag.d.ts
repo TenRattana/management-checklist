@@ -154,6 +154,7 @@ export interface CustomTableProps {
   detailData?: TypeConfig[];
   ShowTitle?: string;
   handlePaginationChange?:() => void;
+  isFetching?:boolean;
 }
 
 export interface DragfieldProps {
@@ -259,4 +260,5 @@ export interface CustomtableDataProps {
   showDetailwithKey?: string[];
   detailData?: TypeConfig[];
   handlePaginationChange?:() => void;
+  isFetching?:boolean;
 }
