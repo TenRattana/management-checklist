@@ -5,8 +5,11 @@ import CustomtableSmall from "./table/CustomtableSmall";
 import CustomtableData from "./table/CustomtableData";
 import { CustomTableProps } from '@/typing/tag';
 import { View } from "react-native";
+import { debounce, throttle } from "lodash";
 
-const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, actionIndex, searchQuery, showMessage, selectedRows, setRow, showFilter, showData, showColumn, detail, detailData, detailKey, detailKeyrow, showDetailwithKey, ShowTitle, handlePaginationChange }: CustomTableProps) => {
+const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, actionIndex, searchQuery, showMessage, selectedRows, setRow,
+  showFilter, showData, showColumn, detail, detailData, detailKey, detailKeyrow, showDetailwithKey, ShowTitle, handlePaginationChange }: CustomTableProps) => {
+
   const [displayData, setDisplayData] = useState<(string | number | boolean)[][]>([]);
   const [filter, setFilter] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<{ column: number | null; direction: "ascending" | "descending" | undefined }>({
@@ -29,8 +32,9 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
   }, [Tabledata, sortConfig]);
 
   const filteredData = useMemo(() => {
-    return sortedData.filter((row) => row.some((cell) => cell?.toString().toLowerCase().includes(searchQuery.toLowerCase())))
-      .filter((row) => (filter ? row.includes(filter) : true));
+    return sortedData.filter((row) => {
+      return row.some((cell) => cell?.toString().toLowerCase().includes(searchQuery.toLowerCase())) && (filter ? row.includes(filter) : true);
+    });
   }, [sortedData, searchQuery, filter]);
 
   useEffect(() => {
@@ -39,7 +43,7 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
     }
   }, [filteredData, displayData]);
 
-  const toggleSelectAll = useCallback(() => {
+  const toggleSelectAll = throttle(() => {
     if (selectedRows && setRow) {
       if (selectedRows.length === displayData.length) {
         setRow([]);
@@ -52,7 +56,7 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
         setRow(selectedIndices);
       }
     }
-  }, [selectedRows, displayData, setRow, actionIndex]);
+  }, 300);
 
   const toggleSelect = useCallback((value: string) => {
     if (selectedRows && setRow) {
@@ -64,12 +68,12 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
     }
   }, [selectedRows, setRow]);
 
-  const handleSort = useCallback((columnIndex: number) => {
+  const handleSortDebounced = debounce((columnIndex) => {
     setSortConfig((prev) => ({
       column: prev?.column === columnIndex && prev.direction === "descending" ? null : columnIndex,
       direction: prev?.direction === "ascending" ? "descending" : prev?.direction === "descending" ? undefined : "ascending",
     }));
-  }, []);
+  }, 300);
 
   const handleDialog = useCallback((action?: string, data?: string) => {
     if (handleAction) {
@@ -83,7 +87,6 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
 
   const MemoCustomtableSmall = React.memo(CustomtableSmall)
   const MemoCustomtableHead = React.memo(CustomtableHead)
-  // const MemoCustomtableData = React.memo(CustomtableData)
 
   return (
     <View id="customtable" style={{ flex: 1 }}>
@@ -113,7 +116,7 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
           <MemoCustomtableHead
             Tablehead={Tablehead}
             flexArr={flexArr}
-            handleSort={handleSort}
+            handleSort={handleSortDebounced}
             sortColumn={sortConfig.column}
             sortDirection={sortConfig.direction}
             selectedRows={selectedRows}
