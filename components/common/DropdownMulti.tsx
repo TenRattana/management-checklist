@@ -51,7 +51,7 @@ const DropdownMulti = React.memo(({
     };
 
     useEffect(() => {
-        searchQuery && setSearchQuery(searchQuery);
+        searchQuery !== "" && searchQuery && setSearchQuery(searchQuery)
     }, [searchQuery]);
 
     useEffect(() => {
@@ -92,7 +92,7 @@ const DropdownMulti = React.memo(({
                                     open={open}
                                     value={selectedValue}
                                     items={items.filter(item =>
-                                        item.label.toLowerCase().includes(searchQuerys.toLowerCase())
+                                        searchQuerys === "" ? item : item.label.toLowerCase().includes(searchQuerys.toLowerCase())
                                     )}
                                     theme={darkMode ? 'DARK' : 'LIGHT'}
                                     containerStyle={{ flex: 1 }}
@@ -116,7 +116,7 @@ const DropdownMulti = React.memo(({
 
                                     renderListItem={({ item }) => (
                                         <TouchableOpacity
-                                            style={{ padding: 15, backgroundColor: selectedValue.includes(item.value) ? theme.colors.drag : undefined }}
+                                            style={{ padding: 15, backgroundColor: selectedValue.length > 0 && selectedValue.includes(item.value) ? theme.colors.drag : undefined }}
                                             onPress={() => {
                                                 if (selectedValue.includes(item.value)) {
                                                     setSelectedValue(selectedValue.filter((val: string) => val !== item.value));
@@ -133,7 +133,7 @@ const DropdownMulti = React.memo(({
                                     onClose={() => setOpen(false)}
                                     flatListProps={{
                                         data: items.filter(item =>
-                                            item.label.toLowerCase().includes(searchQuerys.toLowerCase())
+                                            searchQuerys === "" ? item : item.label.toLowerCase().includes(searchQuerys.toLowerCase())
                                         ),
                                         keyExtractor: (item) => `${item.value}`,
                                         onScroll: safeHandleScroll,
@@ -157,8 +157,8 @@ const DropdownMulti = React.memo(({
                         size={spacing.large}
                     />
                     <Text style={[masterdataStyles.text]}>
-                        {selectedItems.length > 0
-                            ? `${selectedItems.length} ${label}(s) selected: ${selectedItems.map(item => item.label).join(', ')}`
+                        {selectedItems
+                            ? `${selectedItems.length} ${label} selected`
                             : `Select a ${label}`
                         }
                     </Text>

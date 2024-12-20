@@ -50,8 +50,8 @@ const Dropdown = React.memo(({
     };
 
     useEffect(() => {
-        searchQuery && setSearchQuery(searchQuery)
-    }, [searchQuery])
+        searchQuery !== "" && searchQuery && setSearchQuery(searchQuery)
+    }, [searchQuery]);
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -82,7 +82,7 @@ const Dropdown = React.memo(({
                                     open={open}
                                     value={selectedValue ? String(selectedValue) : null}
                                     items={items.filter(item =>
-                                        item.label.toLowerCase().includes(searchQuerys.toLowerCase())
+                                        searchQuerys === "" ? item : item.label.toLowerCase().includes(searchQuerys.toLowerCase())
                                     )}
 
                                     theme={darkMode ? 'DARK' : 'LIGHT'}
@@ -109,7 +109,7 @@ const Dropdown = React.memo(({
 
                                     renderListItem={({ item }) => (
                                         <TouchableOpacity
-                                            style={{ padding: 15, backgroundColor: selectedValue.includes(item.value) ? theme.colors.drag : undefined }}
+                                            style={{ padding: 15, backgroundColor: selectedValue === item.value ? theme.colors.drag : undefined }}
                                             onPress={() => {
                                                 setSelectedValue(String(item.value));
                                                 setOpen(false);
@@ -123,7 +123,7 @@ const Dropdown = React.memo(({
                                     onClose={() => setOpen(false)}
                                     flatListProps={{
                                         data: items.filter(item =>
-                                            item.label.toLowerCase().includes(searchQuerys.toLowerCase())
+                                            searchQuerys === "" ? item : item.label.toLowerCase().includes(searchQuerys.toLowerCase())
                                         ),
                                         keyExtractor: (item) => `${item.value}`,
                                         onScroll: handleScroll,

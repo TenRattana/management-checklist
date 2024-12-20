@@ -214,11 +214,12 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
         if (editMode) {
             setDebouncedSearchQuery({ CheckList: formState.CListName ?? "", MatchChecklist: formState.GCLOptionName ?? "" })
+            queryClient.invalidateQueries("groupCheckListOption")
         } else {
             queryClient.invalidateQueries("checkList")
             queryClient.invalidateQueries("groupCheckListOption")
         }
-    }, [editMode]);
+    }, [editMode, formState]);
 
     const { spacing, responsive } = useRes();
     const { theme } = useTheme();
