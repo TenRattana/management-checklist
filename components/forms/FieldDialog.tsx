@@ -386,10 +386,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                     }
                                 }
 
-                                setShouldRenderDT(prevOptions => {
-                                    const isEqual = prevOptions && (dataTypeItem === "Number")
-                                    return isEqual ? prevOptions : isEqual;
-                                });
+                                setShouldRenderDT(dataTypeItem === "Number");
                             }, [values.DTypeID, values.Important, dataType]);
 
                             useEffect(() => {
