@@ -61,10 +61,14 @@ export default {
     },
     web: {
       bundler: "metro",
-      output: "server",
+      output: "web-build",
       favicon: "./assets/images/Icon-app.png",
       splitChunks: true,
       cache: true,
+      ServiceWorker: true,
+      build: {
+        development: false,
+      },
     },
     assetBundlePatterns: ["assets/fonts/*", "assets/images/*"],
     plugins: [

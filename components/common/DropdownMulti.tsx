@@ -41,6 +41,9 @@ const DropdownMulti = React.memo(({
     errorMessage?: string;
     lefticon?: string
 }) => {
+    DropDownPicker.setListMode("FLATLIST");
+    const isSelected = new Set(selectedValue);
+
     const [searchQuerys, setSearchQuery] = useState('');
     const masterdataStyles = useMasterdataStyles();
     const { spacing } = useRes();
@@ -66,12 +69,9 @@ const DropdownMulti = React.memo(({
 
     const selectedItems = items.filter(item => selectedValue.includes(item.value));
 
-    const safeHandleScroll = (event: any) => {
-        const { nativeEvent } = event;
-        if (nativeEvent && nativeEvent?.contentSize) {
-            handleScroll && handleScroll(event);
-        }
-    };
+    const filteredItems = items.filter(item =>
+        searchQuerys === "" ? item : item.label.toLowerCase().includes(searchQuerys.toLowerCase())
+    );
 
     return (
         <View id="inputs" style={masterdataStyles.commonContainer}>
@@ -80,7 +80,6 @@ const DropdownMulti = React.memo(({
                 <Portal>
                     <Modal
                         visible={open}
-                        animationType="fade"
                         transparent={true}
                         onRequestClose={() => setOpen(false)}
                     >
@@ -91,9 +90,7 @@ const DropdownMulti = React.memo(({
                                     maxHeight={hp(Platform.OS === "web" ? '50%' : '70&')}
                                     open={open}
                                     value={selectedValue}
-                                    items={items.filter(item =>
-                                        searchQuerys === "" ? item : item.label.toLowerCase().includes(searchQuerys.toLowerCase())
-                                    )}
+                                    items={filteredItems}
                                     theme={darkMode ? 'DARK' : 'LIGHT'}
                                     containerStyle={{ flex: 1 }}
                                     setValue={() => { }}
@@ -116,9 +113,16 @@ const DropdownMulti = React.memo(({
 
                                     renderListItem={({ item }) => (
                                         <TouchableOpacity
-                                            style={{ padding: 15, backgroundColor: selectedValue.length > 0 && selectedValue.includes(item.value) ? theme.colors.drag : undefined }}
+                                            style={{
+                                                paddingVertical: isSelected.has(item.value) ? 20 : 15,
+                                                paddingHorizontal: 15,
+                                                borderBottomWidth: 1,
+                                                backgroundColor: isSelected.has(item.value) ? theme.colors.drag : undefined,
+                                                borderBottomColor: isSelected.has(item.value) ? theme.colors.onBackground : '#d0d0d0',
+                                                justifyContent: 'center'
+                                            }}
                                             onPress={() => {
-                                                if (selectedValue.includes(item.value)) {
+                                                if (isSelected.has(item.value)) {
                                                     setSelectedValue(selectedValue.filter((val: string) => val !== item.value));
                                                 } else {
                                                     setSelectedValue([...selectedValue, item.value]);
@@ -132,18 +136,17 @@ const DropdownMulti = React.memo(({
                                     onOpen={fetchNextPage}
                                     onClose={() => setOpen(false)}
                                     flatListProps={{
-                                        data: items.filter(item =>
-                                            searchQuerys === "" ? item : item.label.toLowerCase().includes(searchQuerys.toLowerCase())
-                                        ),
+                                        data: filteredItems,
                                         keyExtractor: (item) => `${item.value}`,
-                                        onScroll: safeHandleScroll,
-                                        onEndReached: safeHandleScroll,
-                                        onEndReachedThreshold: 0.8,
+                                        onScroll: handleScroll,
+                                        onEndReached: handleScroll,
+                                        onEndReachedThreshold: 0.5,
                                         initialNumToRender: 10,
+                                        maxToRenderPerBatch: 10,
+                                        windowSize: 5,
                                         nestedScrollEnabled: true
                                     }}
                                     bottomOffset={100}
-                                    dropDownDirection="AUTO"
                                 />
                             </View>
                         </View>
@@ -185,7 +188,14 @@ const DropdownMulti = React.memo(({
             </HelperText>
         </View>
     );
-});
+}, (prevProps, nextProps) => {
+    return (
+        prevProps.selectedValue === nextProps.selectedValue &&
+        prevProps.items === nextProps.items &&
+        prevProps.open === nextProps.open &&
+        prevProps.searchQuery === nextProps.searchQuery
+    );
+})
 
 const styles = StyleSheet.create({
     modalContainer: {

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { ScrollView, TouchableOpacity, View } from "react-native";
 import { Formik } from "formik";
 import * as Yup from 'yup';
 import { Portal, Switch, Dialog } from "react-native-paper";
@@ -197,17 +197,19 @@ const Match_checklist_option = React.memo(({
                                         errorMessage={String(errors.checkListOptionId || "")}
                                     />
 
-                                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 10 }}>
-                                        {values.checkListOptionId && Array.isArray(values.checkListOptionId) && values.checkListOptionId.length > 0 && values.checkListOptionId?.map((item, index) => (
-                                            <TouchableOpacity onPress={() => {
-                                                setFieldValue("checkListOptionId", values.checkListOptionId && Array.isArray(values.checkListOptionId) && values.checkListOptionId.filter((id) => id !== item))
-                                            }} key={index}>
-                                                <View id="container-renderSelect" style={masterdataStyles.selectedStyle}>
-                                                    <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{itemsCO.find((v) => v.value === item)?.label}</Text>
-                                                </View>
-                                            </TouchableOpacity>
-                                        ))}
-                                    </View>
+                                    <ScrollView showsVerticalScrollIndicator={false}>
+                                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 10 }}>
+                                            {values.checkListOptionId && Array.isArray(values.checkListOptionId) && values.checkListOptionId.length > 0 && values.checkListOptionId?.map((item, index) => (
+                                                <TouchableOpacity onPress={() => {
+                                                    setFieldValue("checkListOptionId", values.checkListOptionId && Array.isArray(values.checkListOptionId) && values.checkListOptionId.filter((id) => id !== item))
+                                                }} key={index}>
+                                                    <View id="container-renderSelect" style={masterdataStyles.selectedStyle}>
+                                                        <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{itemsCO.find((v) => v.value === item)?.label}</Text>
+                                                    </View>
+                                                </TouchableOpacity>
+                                            ))}
+                                        </View>
+                                    </ScrollView>
 
                                     <View id="form-active-mcod" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>

@@ -41,16 +41,18 @@ const Dropdown = React.memo(({
     errorMessage?: string;
     lefticon?: string
 }) => {
+    DropDownPicker.setListMode("FLATLIST");
     const [searchQuerys, setSearchQuery] = useState('');
     const masterdataStyles = useMasterdataStyles();
-    const { theme, darkMode } = useTheme()
-    const { spacing } = useRes()
+    const { theme, darkMode } = useTheme();
+    const { spacing } = useRes();
+
     const handleSearch = (query: string) => {
         setSearchQuery(query);
     };
 
     useEffect(() => {
-        searchQuery !== "" && searchQuery && setSearchQuery(searchQuery)
+        searchQuery && setSearchQuery(searchQuery)
     }, [searchQuery]);
 
     useEffect(() => {
@@ -63,14 +65,19 @@ const Dropdown = React.memo(({
         };
     }, [searchQuerys]);
 
+    const sortedItems = selectedValue
+        ? [
+            items.find(item => item.value === selectedValue),
+            ...items.filter(item => item.value !== selectedValue)
+        ]
+        : items;
+
     return (
         <View id="inputs" style={masterdataStyles.commonContainer}>
             <View style={Platform.OS !== 'android' ? { zIndex: 10 } : {}}>
-
                 <Portal>
                     <Modal
                         visible={open}
-                        animationType="fade"
                         transparent={true}
                         onRequestClose={() => setOpen(false)}
                     >
@@ -81,12 +88,8 @@ const Dropdown = React.memo(({
                                     maxHeight={hp(Platform.OS === "web" ? '50%' : '70%')}
                                     open={open}
                                     value={selectedValue ? String(selectedValue) : null}
-                                    items={items.filter(item =>
-                                        searchQuerys === "" ? item : item.label.toLowerCase().includes(searchQuerys.toLowerCase())
-                                    )}
-
+                                    items={sortedItems}
                                     theme={darkMode ? 'DARK' : 'LIGHT'}
-
                                     searchable={search ?? true}
                                     searchTextInputProps={{
                                         value: searchQuerys,
@@ -94,7 +97,6 @@ const Dropdown = React.memo(({
                                     }}
                                     searchTextInputStyle={{ fontFamily: 'Poppins', fontSize: spacing.small, borderRadius: 5, padding: 10, borderWidth: 0.01 }}
                                     searchPlaceholder={`Search for a ${label}...`}
-
                                     style={{ padding: 10, borderRadius: 0 }}
                                     textStyle={{
                                         fontFamily: 'Poppins', fontSize: spacing.medium, padding: 5,
@@ -104,12 +106,17 @@ const Dropdown = React.memo(({
                                     setValue={() => { }}
                                     setOpen={() => setOpen(true)}
                                     placeholder={`Select for a ${label}...`}
-
                                     loading={isFetching}
-
                                     renderListItem={({ item }) => (
                                         <TouchableOpacity
-                                            style={{ padding: 15, backgroundColor: selectedValue === item.value ? theme.colors.drag : undefined }}
+                                            style={{
+                                                paddingVertical: selectedValue === item.value ? 30 : 15,
+                                                paddingHorizontal: 15,
+                                                borderBottomWidth: 1,
+                                                backgroundColor: selectedValue === item.value ? theme.colors.drag : undefined,
+                                                borderBottomColor: selectedValue === item.value ? theme.colors.onBackground : '#d0d0d0',
+                                                justifyContent: 'center'
+                                            }}
                                             onPress={() => {
                                                 setSelectedValue(String(item.value));
                                                 setOpen(false);
@@ -122,14 +129,14 @@ const Dropdown = React.memo(({
                                     onOpen={fetchNextPage}
                                     onClose={() => setOpen(false)}
                                     flatListProps={{
-                                        data: items.filter(item =>
-                                            searchQuerys === "" ? item : item.label.toLowerCase().includes(searchQuerys.toLowerCase())
-                                        ),
+                                        data: sortedItems,
                                         keyExtractor: (item) => `${item.value}`,
                                         onScroll: handleScroll,
                                         onEndReached: handleScroll,
-                                        onEndReachedThreshold: 0.8,
+                                        onEndReachedThreshold: 0.5,
                                         initialNumToRender: 10,
+                                        maxToRenderPerBatch: 10,
+                                        windowSize: 5,
                                         nestedScrollEnabled: true
                                     }}
                                     selectedItemContainerStyle={{
@@ -139,7 +146,6 @@ const Dropdown = React.memo(({
                                         fontWeight: "bold"
                                     }}
                                     bottomOffset={100}
-                                    dropDownDirection="BOTTOM"
                                 />
                             </View>
                         </View>
@@ -177,6 +183,13 @@ const Dropdown = React.memo(({
                 {errorMessage}
             </HelperText>
         </View>
+    );
+}, (prevProps, nextProps) => {
+    return (
+        prevProps.selectedValue === nextProps.selectedValue &&
+        prevProps.items === nextProps.items &&
+        prevProps.open === nextProps.open &&
+        prevProps.searchQuery === nextProps.searchQuery
     );
 });
 

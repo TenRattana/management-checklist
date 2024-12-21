@@ -341,33 +341,6 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                 }
                             }, [values.ImportantList]);
 
-                            const handleDataOption = useCallback(async () => {
-                                console.log("handleDataOption");
-
-                                let options: { label: string; value: string; }[] = [];
-
-                                if (values.GCLOptionID) {
-                                    const filteredItems = itemsML.filter(option => option.GCLOptionID === values.GCLOptionID);
-
-                                    setFieldValue("GCLOptionName", filteredItems[0]?.GCLOptionName)
-
-                                    options = filteredItems?.flatMap(option => {
-                                        return option.CheckListOptions?.map((item: CheckListOption) => ({
-                                            label: item.CLOptionName,
-                                            value: item.CLOptionID,
-                                        })) || [];
-                                    }) || [];
-
-                                    updateImportantList({ MinLength: undefined, MaxLength: undefined });
-                                }
-
-                                setOption(prevOptions => {
-                                    const isEqual = JSON.stringify(prevOptions) === JSON.stringify(options);
-                                    return isEqual ? prevOptions : options;
-                                });
-
-                            }, [values.GCLOptionID, itemsML]);
-
                             useEffect(() => {
                                 console.log("useEffect form 2");
 
@@ -392,7 +365,27 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             useEffect(() => {
                                 console.log("useEffect form 1");
 
-                                values.GCLOptionID && handleDataOption();
+                                let options: { label: string; value: string; }[] = [];
+
+                                if (values.GCLOptionID) {
+                                    const filteredItems = itemsML.filter(option => option.GCLOptionID === values.GCLOptionID);
+
+                                    setFieldValue("GCLOptionName", filteredItems[0]?.GCLOptionName)
+
+                                    options = filteredItems?.flatMap(option => {
+                                        return option.CheckListOptions?.map((item: CheckListOption) => ({
+                                            label: item.CLOptionName,
+                                            value: item.CLOptionID,
+                                        })) || [];
+                                    }) || [];
+
+                                    updateImportantList({ MinLength: undefined, MaxLength: undefined });
+                                }
+
+                                setOption(prevOptions => {
+                                    const isEqual = JSON.stringify(prevOptions) === JSON.stringify(options);
+                                    return isEqual ? prevOptions : options;
+                                });
                             }, [values.GCLOptionID, itemsML]);
 
                             const handelChange = (field: string, value: any) => {

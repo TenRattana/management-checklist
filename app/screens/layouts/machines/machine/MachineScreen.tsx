@@ -118,6 +118,7 @@ const MachineGroupScreen: React.FC = React.memo(() => {
                 setInitialValues({
                     machineId: machineData.MachineID ?? "",
                     machineGroupId: machineData.GMachineID ?? "",
+                    machineGroupName: machineData.GMachineName ?? "",
                     machineName: machineData.MachineName ?? "",
                     formId: machineData.FormID ?? "",
                     machineCode: machineData.MachineCode ?? "",

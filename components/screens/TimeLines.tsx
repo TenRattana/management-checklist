@@ -6,6 +6,7 @@ import { groupBy } from 'lodash';
 import { CalendarUtils, Timeline, TimelineListRenderItemInfo, TimelineProps } from 'react-native-calendars';
 import { getCurrentTime } from '@/config/timezoneUtils';
 import Home_dialog from './Home_dialog';
+import useMasterdataStyles from '@/styles/common/masterdata';
 
 const LazyTimelineList = lazy(() => import('react-native-calendars').then(module => ({ default: module.TimelineList })));
 const MemoHome_dialog = React.memo(Home_dialog)
@@ -28,8 +29,9 @@ type TimelinesProps = {
 
 const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, currentDate, timeline }) => {
     const { theme } = useTheme();
-    const [dialogVisible, setDialogVisible] = useState<boolean>(false)
-    const [selectedEvent, setSelectedEvent] = useState<any>()
+    const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+    const [selectedEvent, setSelectedEvent] = useState<any>(null);
+    const masterdataStyles = useMasterdataStyles();
 
     const initialTime = useMemo(() => ({
         hour: getCurrentTime().getHours(),
@@ -61,19 +63,25 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
         return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
     };
 
+    // Render event
     const RenderEvent = React.memo(({ item }: { item: Event }) => (
         <TouchableOpacity onPress={() => handleEventClick(item)}>
-            <Text style={styles.eventTitle}>{item.title}</Text>
-            <Text style={styles.eventTime}>
+            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>{item.title}</Text>
+            <Text style={masterdataStyles.textFFF}>
                 {formatTime(item.start)} - {formatTime(item.end)}
             </Text>
-            {item.summary && <Text style={styles.eventSummary}>{item.summary}</Text>}
+            {item.summary && <Text style={masterdataStyles.textFFF}>{item.summary}</Text>}
         </TouchableOpacity>
     ));
 
-    const handleEventClick = useCallback((event: any) => {
-        setSelectedEvent(event)
-        setDialogVisible(true)
+    // Handle event click
+    const handleEventClick = useCallback((event: Event) => {
+        if (event) {
+            setSelectedEvent(event);
+            setDialogVisible(true);
+        } else {
+            console.warn('Event is undefined:', event);
+        }
     }, []);
 
     const renderItem = useCallback((timelineProps: TimelineProps, info: TimelineListRenderItemInfo) => {
@@ -85,7 +93,7 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
                 renderEvent={(event) => <RenderEvent item={event} />}
             />
         );
-    }, []);
+    }, [theme]);
 
     return (
         <>
@@ -97,7 +105,7 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
                 initialTime={initialTime}
             />
 
-            {dialogVisible && (
+            {dialogVisible && selectedEvent && (
                 <MemoHome_dialog
                     dialogVisible={dialogVisible}
                     hideDialog={() => setDialogVisible(false)}
@@ -106,33 +114,7 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
                 />
             )}
         </>
-
     );
 };
-
-const styles = StyleSheet.create({
-    eventContainer: {
-        padding: 8,
-        borderRadius: 5,
-        marginVertical: 4,
-    },
-    eventTitle: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#fff',
-    },
-    eventTime: {
-        fontSize: 14,
-        color: '#fff',
-    },
-    eventSummary: {
-        fontSize: 12,
-        color: '#fff',
-    },
-    timelineListContainer: {
-        flex: 1,
-        padding: 10,
-    },
-});
 
 export default Timelines;

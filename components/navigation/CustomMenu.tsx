@@ -13,7 +13,7 @@ interface CustomMenuProps {
     onShow: () => void;
 }
 
-const CustomMenu: React.FC<CustomMenuProps> = ({
+const CustomMenu: React.FC<CustomMenuProps> = React.memo(({
     visible,
     onDismiss,
     onSettingsPress,
@@ -75,7 +75,7 @@ const CustomMenu: React.FC<CustomMenuProps> = ({
             </Menu>
         </View>
     );
-};
+});
 
 
 export default CustomMenu;

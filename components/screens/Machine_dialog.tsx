@@ -67,11 +67,11 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
 
     useEffect(() => {
         if (isEditing) {
-            setDebouncedSearchQuery(initialValues.machineGroupId ?? "")
+            setDebouncedSearchQuery(initialValues.machineGroupName ?? "")
         } else {
             queryClient.invalidateQueries("machineGroups")
         }
-    }, []);
+    }, [isEditing, initialValues]);
 
     const handleScroll = ({ nativeEvent }: any) => {
         if (nativeEvent && nativeEvent?.contentSize) {
@@ -154,6 +154,7 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                     open={open}
                                                     setOpen={(v: boolean) => setOpen(v)}
                                                     selectedValue={values.machineGroupId}
+                                                    searchQuery={debouncedSearchQuery}
                                                     setDebouncedSearchQuery={(value) => setDebouncedSearchQuery(value)}
                                                     items={items}
                                                     setSelectedValue={(stringValue: string | null) => handelChange("machineGroupId", stringValue)}

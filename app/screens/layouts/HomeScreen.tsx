@@ -36,7 +36,10 @@ const HomeScreen = React.memo(() => {
     '3': true,
   });
 
-  const { data: timeSchedule = [] } = useQuery('timeSchedule', fetchTimeSchedules);
+  const { data: timeSchedule = [] } = useQuery('timeSchedule', fetchTimeSchedules, {
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
 
   const time = parseTimeScheduleToTimeline(timeSchedule);
   const timelineItems = useMemo(() => convertScheduleToTimeline(time), [timeSchedule]);
@@ -109,7 +112,10 @@ const HomeScreen = React.memo(() => {
                 renderItem={renderCategoryItem}
                 ListHeaderComponent={
                   <LazyCalendar
-                    onDayPress={(day) => setCurrentDate(day.dateString)}
+                    onDayPress={(day) => {
+                      console.log('Day selected:', day.dateString);
+                      setCurrentDate(day.dateString);
+                    }}
                     markedDates={markedDatesS}
                     markingType="multi-dot"
                   />
@@ -143,3 +149,4 @@ const HomeScreen = React.memo(() => {
 });
 
 export default HomeScreen;
+

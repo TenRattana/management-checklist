@@ -12,6 +12,7 @@
     "typecheck": "tsc --watch",
     "typecheck-only": "tsc",
     "build": "expo build",
+    "build:web": "expo export -p web && npx workbox-cli generateSW workbox-config.js",
     "analyze:web": "source-map-explorer 'dist/_expo/static/js/web/*.js' 'dist/_expo/static/js/web/*.js.map'"
   },
   "jest": {
@@ -77,6 +78,7 @@
     "react-redux": "^9.1.2",
     "redux": "^5.0.1",
     "ts-loader": "^9.5.1",
+    "workbox-cli": "^7.3.0",
     "yup": "^1.4.0"
   },
   "devDependencies": {
@@ -99,7 +101,8 @@
     "source-map-explorer": "^2.5.3",
     "style-loader": "^4.0.0",
     "ts-jest": "^29.2.5",
-    "typescript": "~5.3.3"
+    "typescript": "~5.3.3",
+    "webpack-bundle-analyzer": "^4.10.2"
   },
   "private": true
 }

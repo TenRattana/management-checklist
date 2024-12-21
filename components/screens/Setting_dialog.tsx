@@ -26,9 +26,9 @@ import { useMutation, useQueryClient } from 'react-query';
 import { AppProps } from '@/typing/type';
 import axiosInstance from '@/config/axios';
 import { useToast } from '@/app/contexts/useToast';
-import SettingsScreen from '@/app/screens/layouts/SettingScreen';
-import ConfigulationScreen from '@/app/screens/layouts/Configulation';
-import Auther from '@/app/screens/layouts/Auther';
+import SettingsScreen from '@/app/screens/layouts/settings/SettingScreen';
+import ConfigulationScreen from '@/app/screens/layouts/settings/Configulation';
+import Auther from '@/app/screens/layouts/settings/Auther';
 
 const { height } = Dimensions.get('window');
 

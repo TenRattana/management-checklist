@@ -1,11 +1,11 @@
 import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import { Button, Dialog, Portal, Menu, Switch, HelperText } from 'react-native-paper';
 import { DropdownMulti, Inputs } from '../common';
-import { GroupMachine, TimeScheduleProps } from '@/typing/type';
+import { TimeScheduleProps } from '@/typing/type';
 import { useToast } from '@/app/contexts/useToast';
 import { FastField, Formik } from 'formik';
 import * as Yup from 'yup'
@@ -15,10 +15,8 @@ import { convertToDate, styles } from './Schedule';
 import Custom_schedule_dialog from './Custom_schedule_dialog';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { Easing, FadeInLeft, FadeInRight, FadeOutLeft, FadeOutRight } from 'react-native-reanimated';
-import CustomDropdownMultiple from '../CustomDropdownMultiple';
-import { AccessibleView } from '..';
 import { useInfiniteQuery, useQueryClient } from 'react-query';
-import { fetchMachineGroups, fetchSearchMachineGroups, fetchSearchTimeSchedules, fetchTimeSchedules } from '@/app/services';
+import { fetchMachineGroups, fetchSearchMachineGroups, fetchSearchTimeSchedules } from '@/app/services';
 
 const { height } = Dimensions.get('window');
 
@@ -120,7 +118,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<{ Machine: string, Schedule: string }>({ Machine: '', Schedule: '' });
     const [machineGroups, setItemsMachine] = useState<any[]>([]);
 
-    const { data: machineGroup, isFetching: isFetchingMG, fetchNextPage: fetchNextPageMG, hasNextPage: hasNextPageMG, refetch: refetchMG } = useInfiniteQuery(
+    const { data, isFetching, fetchNextPage, hasNextPage, refetch } = useInfiniteQuery(
         ['machineGroups', debouncedSearchQuery.Machine],
         ({ pageParam = 0 }) => {
             return debouncedSearchQuery.Machine
@@ -133,15 +131,19 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
             getNextPageParam: (lastPage, allPages) => {
                 return lastPage.length === 100 ? allPages.length : undefined;
             },
+            enabled: true,
             onSuccess: (newData) => {
-                const newItems = newData.pages.flat().map((item) => ({
+                const newItems = newData.pages.flat().filter((item) => !isEditing ? item.IsActive : item).map((item) => ({
                     label: item.GMachineName || 'Unknown',
                     value: item.GMachineID || '',
                 }));
 
                 setItemsMachine((prevItems) => {
                     const newItemsSet = new Set(prevItems.map((item: any) => item.value));
-                    return [...prevItems, ...newItems.filter((item) => !newItemsSet.has(item.value))];
+                    const mergedItems = prevItems.concat(
+                        newItems.filter((item) => !newItemsSet.has(item.value))
+                    );
+                    return mergedItems;
                 });
             },
         }
@@ -182,11 +184,14 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
 
     }, [initialValues, isEditing]);
 
-    const handleScrollMG = ({ nativeEvent }: any) => {
-        if (nativeEvent?.contentSize && nativeEvent?.layoutMeasurement) {
-            const { contentHeight, layoutHeight, contentOffset } = nativeEvent;
-            if (contentHeight - layoutHeight - contentOffset.y <= 0 && hasNextPageMG && !isFetchingMG) {
-                fetchNextPageMG();
+    const handleScroll = ({ nativeEvent }: any) => {
+        if (nativeEvent && nativeEvent?.contentSize) {
+            const contentHeight = nativeEvent?.contentSize.height;
+            const layoutHeight = nativeEvent?.layoutMeasurement.height;
+            const offsetY = nativeEvent?.contentOffset.y;
+
+            if (contentHeight - layoutHeight - offsetY <= 0 && hasNextPage && !isFetching) {
+                fetchNextPage();
             }
         }
     };
@@ -245,26 +250,29 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                                             searchQuery={debouncedSearchQuery.Machine}
                                             setDebouncedSearchQuery={(v: string) => setDebouncedSearchQuery((prev) => ({ ...prev, Machine: v }))}
                                             items={machineGroups}
-                                            isFetching={isFetchingMG}
-                                            fetchNextPage={fetchNextPageMG}
-                                            handleScroll={handleScrollMG}
+                                            isFetching={isFetching}
+                                            fetchNextPage={fetchNextPage}
+                                            handleScroll={handleScroll}
                                             selectedValue={values.MachineGroup}
                                             setSelectedValue={(value: string | string[] | null) => handelChange("MachineGroup", value)}
                                             error={Boolean(touched.MachineGroup && errors.MachineGroup)}
                                             errorMessage={String(errors.MachineGroup || "")}
                                         />
 
-                                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 10 }}>
-                                            {values.MachineGroup && Array.isArray(values.MachineGroup) && values.MachineGroup.length > 0 && values.MachineGroup?.map((item, index) => (
-                                                <TouchableOpacity onPress={() => {
-                                                    setFieldValue("MachineGroup", values.MachineGroup && Array.isArray(values.MachineGroup) && values.MachineGroup.filter((id) => id !== item))
-                                                }} key={index}>
-                                                    <View id="container-renderSelect" style={masterdataStyles.selectedStyle}>
-                                                        <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{machineGroups.find((v) => v.value === item)?.label}</Text>
-                                                    </View>
-                                                </TouchableOpacity>
-                                            ))}
-                                        </View>
+                                        <ScrollView showsVerticalScrollIndicator={false} style={{ flexGrow: 0 }}>
+                                            <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 8 }}>
+                                                {values.MachineGroup && Array.isArray(values.MachineGroup) && values.MachineGroup.length > 0 && values.MachineGroup?.map((item, index) => (
+                                                    <TouchableOpacity onPress={() => {
+                                                        setFieldValue("MachineGroup", values.MachineGroup && Array.isArray(values.MachineGroup) && values.MachineGroup.filter((id) => id !== item))
+                                                    }} key={index}>
+                                                        <View id="container-renderSelect" style={masterdataStyles.selectedStyle}>
+                                                            <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{machineGroups.find((v) => v.value === item)?.label}</Text>
+                                                        </View>
+                                                    </TouchableOpacity>
+                                                ))}
+                                            </View>
+                                        </ScrollView>
+
 
                                         <View style={[styles.timeIntervalMenu, { marginBottom: 0 }]}>
                                             <View id="form-active-point-md" style={[masterdataStyles.containerSwitch]}>
@@ -431,7 +439,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                     }}
                 </Formik>
             </Portal >
-        </GestureHandlerRootView>
+        </GestureHandlerRootView >
     );
 });
 

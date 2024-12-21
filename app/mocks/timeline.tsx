@@ -5,6 +5,7 @@ import {
 } from 'react-native-calendars';
 import moment from 'moment';
 import { CustomLightTheme } from '@/constants/CustomColor';
+import { GroupMachine } from '@/typing/type';
 
 type ScheduleType = 'Daily' | 'Weekly' | 'Custom';
 
@@ -16,7 +17,7 @@ type Day = {
 export interface TimeScheduleProps {
     ScheduleID: string;
     ScheduleName: string;
-    MachineGroup?: string | string[];
+    MachineGroup?: GroupMachine[];
     Type_schedule: ScheduleType;
     Tracking: boolean;
     IsActive: boolean;
@@ -101,11 +102,11 @@ export const parseTimeScheduleToTimeline = (schedules: TimeScheduleProps[]): Tim
 
         if (Type_schedule === "Custom" && Array.isArray(TimeCustom)) {
             const customSlots = TimeCustom.filter(customSlot => customSlot.start && customSlot.end);
-        
+
             customSlots.forEach((customSlot: Day) => {
                 const [startDate = '', startTime = ''] = (customSlot.start ?? '').split(" ") || [];
                 const [, endTime = ''] = (customSlot.end ?? '').split(" ") || [];
-        
+
                 timeline.push({
                     ScheduleID,
                     date: `Custom (${startDate})`,
@@ -128,7 +129,7 @@ export const convertScheduleToTimeline = (
     const endOfYear = moment().endOf('year');
     const timeline: TimeLine[] = [];
     const markedDates: MarkedDates = {};
-    
+
     const getColorForType = (type: ScheduleType): string => {
         return CustomLightTheme[
             type === 'Weekly' ? 'drag' : type === 'Daily' ? 'green' : 'error'
@@ -183,7 +184,7 @@ export const convertScheduleToTimeline = (
                                     : 'stop',
                 });
 
-                
+
                 const dateKey = day.format('YYYY-MM-DD');
                 if (!markedDates[dateKey]) {
                     markedDates[dateKey] = { dots: [] };

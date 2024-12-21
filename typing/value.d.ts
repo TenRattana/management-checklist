@@ -12,45 +12,46 @@ export interface Detail {
 
 export interface InitialValuesMachine extends Detail, Active {
   machineGroupId?: string;
+  machineGroupName?: string;
   machineId: string;
-  machineCode:string | null;
-  formId:string | null;
-  building:string | null;
-  floor:string | null;
-  area:string | null;
+  machineCode: string | null;
+  formId: string | null;
+  building: string | null;
+  floor: string | null;
+  area: string | null;
   machineName: string;
-  disables:boolean;
+  disables: boolean;
 }
 
 export interface InitialValuesGroupMachine extends Detail, Active {
   machineGroupId: string;
   machineGroupName: string;
-  disables: boolean; 
+  disables: boolean;
 }
 
 export interface InitialValuesChecklist extends Active {
   checkListId: string;
   checkListName: string;
-  disables:boolean;
+  disables: boolean;
 }
 
 export interface InitialValuesCheckListOption extends Active {
   checkListOptionId: string;
   checkListOptionName: string;
-  disables:boolean;
+  disables: boolean;
 }
 
-export interface InitialValuesGroupCheckList extends  Active {
+export interface InitialValuesGroupCheckList extends Active {
   groupCheckListOptionId: string;
   groupCheckListOptionName: string;
-  disables:boolean;
+  disables: boolean;
 }
 
 export interface InitialValuesMatchFormMachine {
   machineId: string;
   formId: string;
-  formName?:string;
-  machineName?:string;
+  formName?: string;
+  machineName?: string;
 }
 
 export interface InitialValuesMatchCheckListOption extends Active {
@@ -58,7 +59,7 @@ export interface InitialValuesMatchCheckListOption extends Active {
   checkListOptionId: string[];
   groupCheckListOptionId: string;
   groupCheckListOptionName?: string;
-  disables:boolean;
+  disables: boolean;
 }
 
 export interface InitialValuesManagepermission {
@@ -109,8 +110,7 @@ export interface SaveDialogProps extends SetVisible {
 }
 
 export interface MachineDialogProps<V extends Values>
-  extends BaseDialogProps<V> {
-}
+  extends BaseDialogProps<V> {}
 
 export interface GroupMachineDialogProps<V extends Values>
   extends BaseDialogProps<V> {}
@@ -132,12 +132,8 @@ export interface ManagepermissionDialogProps<
   users: D1[];
   groupUser: D2[];
 }
-export interface MatchFormMachineDialogProps<
-  V extends Values,
-> extends BaseDialogProps<V> {
-}
+export interface MatchFormMachineDialogProps<V extends Values>
+  extends BaseDialogProps<V> {}
 
-export interface MatchChecklistOptionProps<
-  V extends Values,
-> extends BaseDialogProps<V> {
-}
+export interface MatchChecklistOptionProps<V extends Values>
+  extends BaseDialogProps<V> {}

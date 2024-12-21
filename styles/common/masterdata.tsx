@@ -263,7 +263,7 @@ const useMasterdataStyles = () => {
             backgroundColor: theme.colors.background,
             marginTop: 8,
             marginRight: 12,
-            paddingHorizontal: 20,
+            paddingHorizontal: 10,
             paddingVertical: 10
         },
         menuItemNav: {

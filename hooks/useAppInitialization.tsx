@@ -3,7 +3,7 @@ import * as Font from "expo-font";
 import { Asset } from "expo-asset";
 import * as SplashScreen from 'expo-splash-screen';
 
-export const useAppInitialization = () => {
+const useAppInitialization = () => {
     const [isInitialized, setIsInitialized] = useState(false);
 
     const prepareApp = async () => {
@@ -38,3 +38,5 @@ export const useAppInitialization = () => {
 
     return isInitialized;
 };
+
+export default useAppInitialization

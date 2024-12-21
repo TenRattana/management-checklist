@@ -1,6 +1,7 @@
 import axiosInstance from "@/config/axios";
-import { Form, MatchForm, TimeScheduleProps } from "@/typing/type";
+import { Form, MatchForm } from "@/typing/type";
 import { Checklist, CheckListOption, CheckListType, DataType, ExpectedResult, GroupCheckListOption, GroupMachine, Machine, MatchCheckListOption, TimeScheduleMachine } from "@/typing/type";
+import { TimeScheduleProps } from "../mocks/timeline";
 
 // Check List Type
 export const fetchCheckListType = async (): Promise<CheckListType[]> => {

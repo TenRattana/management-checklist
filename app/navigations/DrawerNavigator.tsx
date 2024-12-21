@@ -1,22 +1,23 @@
-import React, { lazy, Suspense, useRef, useCallback, useState, useMemo, useEffect } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import React, { lazy, Suspense, useCallback, useRef, useState } from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-// import { LoginScreen } from '@/app/screens';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useDispatch, useSelector } from 'react-redux';
+import { ActivityIndicator, Text } from 'react-native-paper';
+import { getMenuScreens } from './getMenuScreens';
+import { ComponentNames } from '@/typing/type';
 import PermissionDeny from '../screens/layouts/PermissionDeny';
-import { useRes } from "@/app/contexts/useRes";
+import CustomMenu from '@/components/navigation/CustomMenu';
+import { useTheme } from '../contexts/useTheme';
+import { useRes } from '../contexts/useRes';
 import CustomDrawerContent from '@/components/navigation/CustomDrawer';
-import { useTheme } from '@/app/contexts/useTheme';
-import { useDispatch, useSelector } from "react-redux";
-import { ComponentNames, ParentMenu, Menus } from '@/typing/type';
 import { AppDispatch } from '@/stores';
 import { initializeLogout } from '../providers';
-import CustomMenu from '@/components/navigation/CustomMenu'
-import Setting_dialog from "@/components/screens/Setting_dialog"
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text } from 'react-native-paper';
+import Setting_dialog from '@/components/screens/Setting_dialog';
+import { View } from 'react-native';
 
 const Drawer = createDrawerNavigator();
 const MemoSetting_dialog = React.memo(Setting_dialog)
+const MemoCustomMenu = React.memo(CustomMenu)
 
 const components: Record<ComponentNames, () => Promise<{ default: React.ComponentType<any> }>> = {
     InputFormMachine: () => import('@/app/screens/layouts/forms/Scan/InputFormMachine'),
@@ -44,14 +45,17 @@ const components: Record<ComponentNames, () => Promise<{ default: React.Componen
     TimeTrack: () => import('@/app/screens/layouts/schedule/TimescheduleTrack'),
 };
 
-const DrawerNav = React.memo(({ renderComponent, user }: any) => {
-    console.log("DrawerNav");
-
+const DrawerNav = React.memo(({ renderComponent }: { renderComponent: (name: ComponentNames) => (props: any) => React.JSX.Element }) => {
     const { theme } = useTheme();
     const { fontSize } = useRes();
-    const state = useSelector((state: any) => state.prefix);
+
+    const Screen = useSelector((state: any) => state.user.Screen);
+    const FirstPage = useSelector((state: any) => state.user.initialRoute) || "Home";
+    const Appname = useSelector((state: any) => state.prefix.AppName);
     const drawerWidth = fontSize === "small" ? 300 : fontSize === "medium" ? 350 : 400;
     const dispatch = useDispatch<AppDispatch>();
+
+    const menuScreens = getMenuScreens(Screen, renderComponent);
 
     const [menuVisible, setMenuVisible] = useState(false);
     const [menuSetting, setMenuSetting] = useState(false);
@@ -74,77 +78,52 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
         setMenuVisible(false);
     }, []);
 
-    const menuScreens = useMemo(() => {
-        const screens: JSX.Element[] = [];
-        user.Screen.forEach((screen: Menus) => {
-            if (screen.NavigationTo) {
-                screens.push(
-                    <Drawer.Screen
-                        key={screen.MenuID}
-                        name={screen.NavigationTo}
-                        component={renderComponent(screen.NavigationTo as ComponentNames)}
-                    // options={{ freezeOnBlur: true }}
-                    />
-                );
-            }
-
-            if (screen.ParentMenu && screen.ParentMenu.length > 0) {
-                screen.ParentMenu.forEach((parentScreen: ParentMenu) => {
-                    screens.push(
-                        <Drawer.Screen
-                            key={parentScreen.MenuID}
-                            name={parentScreen.NavigationTo}
-                            component={renderComponent(parentScreen.NavigationTo as ComponentNames)}
-                        // options={{ freezeOnBlur: true }}
-                        />
-                    );
-                });
-            }
-        });
-
-        return screens;
-    }, [user.IsAuthenticated, user.Screen, renderComponent]);
+    console.log("Drawe");
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
-            <Drawer.Navigator
-                drawerContent={(props) => <CustomDrawerContent {...props} />}
-                screenOptions={{
-                    drawerHideStatusBarOnOpen: false,
-                    drawerStatusBarAnimation: 'none',
-                    drawerStyle: {
-                        backgroundColor: theme.colors.background,
-                        width: drawerWidth,
-                    },
-                    headerTitle: state.AppName || "",
-                    headerTitleStyle: {
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                        color: '#333',
-                    },
-                    headerRight: () => (
-                        <CustomMenu
-                            visible={menuVisible}
-                            onShow={toggleMenu}
-                            onDismiss={closeMenu}
-                            onSettingsPress={handleSettings}
-                            onLogoutPress={handleLogout}
-                        />
-                    ),
-                    unmountOnBlur: true,
-                }}
-                initialRouteName={user.initialRoute || "Login"}
-                id="nav"
-            >
-                {menuScreens}
-            </Drawer.Navigator>
+            {menuScreens.length > 0 ? (
+                <Drawer.Navigator
+                    drawerContent={(props) => <CustomDrawerContent {...props} />}
+                    screenOptions={{
+                        drawerHideStatusBarOnOpen: false,
+                        drawerStatusBarAnimation: 'none',
+                        drawerStyle: {
+                            backgroundColor: theme.colors.background,
+                            width: drawerWidth,
+                        },
+                        headerTitle: Appname || "",
+                        headerTitleStyle: {
+                            fontSize: 14,
+                            fontWeight: 'bold',
+                            color: '#333',
+                        },
+                        headerRight: () => (
+                            <MemoCustomMenu
+                                visible={menuVisible}
+                                onShow={toggleMenu}
+                                onDismiss={closeMenu}
+                                onSettingsPress={handleSettings}
+                                onLogoutPress={handleLogout}
+                            />
+                        ),
+                        unmountOnBlur: true,
+                        freezeOnBlur: true
+                    }}
+                    initialRouteName={FirstPage}
+                >
+                    {menuScreens}
+                </Drawer.Navigator>
+            ) : <PermissionDeny />}
 
-            <MemoSetting_dialog isVisible={menuSetting} setVisible={() => setMenuSetting(false)} />
+            {menuSetting && (
+                <MemoSetting_dialog isVisible={menuSetting} setVisible={() => setMenuSetting(false)} />
+            )}
         </SafeAreaView>
     );
 });
 
-const Navigation: React.FC = React.memo(() => {
+const DrawerNavigator: React.FC = React.memo(() => {
     const user = useSelector((state: any) => state.user);
 
     const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
@@ -188,10 +167,9 @@ const Navigation: React.FC = React.memo(() => {
     return (
         <DrawerNav
             renderComponent={renderComponent}
-            user={user}
         />
     );
 });
 
 
-export default Navigation;
+export default DrawerNavigator;
