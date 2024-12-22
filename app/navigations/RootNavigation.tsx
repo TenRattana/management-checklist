@@ -4,7 +4,8 @@ import AuthStack from './AuthStack';
 import MainStack from './MainStack';
 import { useSelector } from 'react-redux';
 import { navigationRef } from './navigationUtils';
-import { ActivityIndicator } from 'react-native-paper';
+import { ActivityIndicator, Text } from 'react-native-paper';
+import { Platform } from 'react-native';
 
 const RootNavigation = () => {
     console.log("RootNavigation");
@@ -13,6 +14,12 @@ const RootNavigation = () => {
     const isLoggedIn = useSelector((state: any) => state.user.IsAuthenticated);
     const loadgin = useSelector((state: any) => state.user.loadgin);
     console.log(isLoggedIn, loadgin);
+
+    // if (Platform.OS === 'web') {
+    //     return <Text>Welcome to the Web Version</Text>;
+    // } else {
+    //     return <Text>Welcome to the Mobile Version</Text>;
+    // }
 
     return (
         <NavigationContainer independent={true} ref={navigationRef}>

@@ -25,7 +25,8 @@ const environment = process.env.EXPO_PUBLIC_API_URL || "development";
 export default {
   expo: {
     name: "PMCheck List",
-    slug: "m_checklist",
+    platforms: ["ios", "android", "web"],
+    slug: "pmchecklist",
     version: "1.0.0",
     sdkVersion: "51.0.0",
     orientation: "landscape",
@@ -61,14 +62,15 @@ export default {
     },
     web: {
       bundler: "metro",
-      output: "web-build",
+      output: "server",
       favicon: "./assets/images/Icon-app.png",
       splitChunks: true,
       cache: true,
-      ServiceWorker: true,
-      build: {
-        development: false,
-      },
+      // ServiceWorker: true,
+      // build: {
+      //   html: "./public/index.html",
+      //   development: false,
+      // },
     },
     assetBundlePatterns: ["assets/fonts/*", "assets/images/*"],
     plugins: [
@@ -108,7 +110,7 @@ export default {
     extra: {
       ...getEnvVars(environment),
       eas: {
-        projectId: "0f2240ee-c314-4fa4-b36a-6038aa1ba0da",
+        projectId: "6ae04db7-93f3-48cb-976a-e5b6558751df",
       },
       updates: {
         assetPatternsToBeBundled: [

@@ -11,9 +11,7 @@
     "lint": "expo lint",
     "typecheck": "tsc --watch",
     "typecheck-only": "tsc",
-    "build": "expo build",
-    "build:web": "expo export -p web && npx workbox-cli generateSW workbox-config.js",
-    "analyze:web": "source-map-explorer 'dist/_expo/static/js/web/*.js' 'dist/_expo/static/js/web/*.js.map'"
+    "build": "expo build"
   },
   "jest": {
     "preset": "jest-expo",
