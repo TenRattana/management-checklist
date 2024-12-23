@@ -63,7 +63,6 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
         return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
     };
 
-    // Render event
     const RenderEvent = React.memo(({ item }: { item: Event }) => (
         <TouchableOpacity onPress={() => handleEventClick(item)}>
             <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>{item.title}</Text>
@@ -74,7 +73,6 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
         </TouchableOpacity>
     ));
 
-    // Handle event click
     const handleEventClick = useCallback((event: Event) => {
         if (event) {
             setSelectedEvent(event);

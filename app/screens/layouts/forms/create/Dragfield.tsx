@@ -23,8 +23,6 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
         Required: false, Important: false, ImportantList: [], EResult: "", CListName: "", DTypeValue: undefined,
     });
 
-    console.log("Dragfield");
-
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const { theme } = useTheme()
     const createformStyles = useCreateformStyle();

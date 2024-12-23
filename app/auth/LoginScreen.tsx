@@ -17,7 +17,6 @@ const validationSchema = Yup.object().shape({
 });
 
 const LoginScreen: React.FC = React.memo(() => {
-  console.log("Logon");
 
   const { handleError } = useToast();
   const { login } = useAuth();

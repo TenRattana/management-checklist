@@ -1,8 +1,8 @@
-import React, { useState, useMemo, useCallback, lazy, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, lazy } from 'react';
 import { View, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { Checkbox, Icon, Text } from 'react-native-paper';
 import { useQuery } from 'react-query';
-import { Calendar, CalendarProvider, CalendarUtils } from 'react-native-calendars';
+import { CalendarProvider, CalendarUtils } from 'react-native-calendars';
 import { useTheme } from '@/app/contexts/useTheme';
 import { useRes } from '@/app/contexts/useRes';
 import { convertScheduleToTimeline, parseTimeScheduleToTimeline } from '@/app/mocks/timeline';
@@ -113,7 +113,6 @@ const HomeScreen = React.memo(() => {
                 ListHeaderComponent={
                   <LazyCalendar
                     onDayPress={(day) => {
-                      console.log('Day selected:', day.dateString);
                       setCurrentDate(day.dateString);
                     }}
                     markedDates={markedDatesS}

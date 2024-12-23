@@ -1,17 +1,15 @@
 import { View } from 'react-native'
 import React, { useState } from 'react'
-import { CheckListOption } from '@/typing/type'
-import { InitialValuesGroupCheckList } from '@/typing/value'
+import { InitialValuesCheckListOption, InitialValuesGroupCheckList } from '@/typing/value'
 import { Dialog, Icon, Portal, Switch } from 'react-native-paper'
-import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler'
+import { GestureHandlerRootView, ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 import useMasterdataStyles from '@/styles/common/masterdata'
 import { FastField, Formik } from 'formik'
 import * as Yup from 'yup'
-import { Inputs } from '../common'
+import { DropdownMulti, Inputs } from '../common'
 import { useTheme } from '@/app/contexts/useTheme'
 import { styles } from './Schedule'
 import Text from '../Text'
-import CustomDropdownMultiple from '../CustomDropdownMultiple'
 import { useRes } from '@/app/contexts/useRes'
 import CheckListOptionCreate_dialog from './CheckListOptionCreate_dialog'
 import { AccessibleView } from '..'
@@ -23,14 +21,17 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The active field is required."),
 });
 
-const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, saveData, saveDataCheckListOption }:
-    { setIsVisible: () => void, checkListOption: CheckListOption[], saveData: any, saveDataCheckListOption: any }) => {
+const GroupCreate_dialog = React.memo(({ setIsVisible, saveData, saveDataCheckListOption, isFetching, fetchNextPage, handleScroll, debouncedSearchQuery, setDebouncedSearchQuery, itemsCLO }:
+    {
+        setIsVisible: () => void, saveData: any, saveDataCheckListOption: (values: InitialValuesCheckListOption) => Promise<void>, isFetching: boolean, fetchNextPage?: (() => void) | undefined,
+        handleScroll: ({ nativeEvent }: any) => void, debouncedSearchQuery: string, setDebouncedSearchQuery: (value: string) => void, itemsCLO: any[]
+    }) => {
     const masterdataStyles = useMasterdataStyles()
     const [options, setOptions] = useState<string[]>([])
     const [dialog, setDialog] = useState<boolean>(false)
     const { theme } = useTheme()
     const { spacing, responsive } = useRes()
-
+    const [open, setOpen] = useState<boolean>(false);
     const [initialGroupCheckList] = useState({
         groupCheckListOptionId: "",
         groupCheckListOptionName: "",
@@ -85,10 +86,18 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, saveData
 
                         <View id="form-ac-cgd" style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <View style={{ flex: 1 }}>
-                                <CustomDropdownMultiple
-                                    data={checkListOption}
-                                    handleBlur={() => { }}
-                                    handleChange={(selectedValues) => {
+                                <DropdownMulti
+                                    label='Check List Type'
+                                    open={open}
+                                    setOpen={setOpen}
+                                    searchQuery={debouncedSearchQuery}
+                                    setDebouncedSearchQuery={setDebouncedSearchQuery}
+                                    items={itemsCLO}
+                                    isFetching={isFetching}
+                                    fetchNextPage={fetchNextPage}
+                                    handleScroll={handleScroll}
+                                    selectedValue={options}
+                                    setSelectedValue={(selectedValues) => {
                                         let option: string[]
                                         if (options.includes(selectedValues as string)) {
                                             option = options.filter((id) => id !== selectedValues);
@@ -97,34 +106,36 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, checkListOption, saveData
                                         }
                                         setOptions(option);
                                     }}
-                                    labels='CLOptionName'
-                                    title='Select Check List Option'
-                                    value={options}
-                                    values='CLOptionID'
                                 />
                             </View>
-                            <TouchableOpacity
-                                onPress={() => setDialog(true)}
-                                style={{
-                                    alignItems: 'center',
-                                    paddingRight: 5
-                                }}
-                            >
-                                <Icon source={"plus-box"} size={spacing.large + 3} color={theme.colors.drag} />
-                            </TouchableOpacity>
+
+                            <View>
+                                <TouchableOpacity
+                                    onPress={() => setDialog(true)}
+                                    style={{
+                                        alignItems: 'center',
+                                        paddingRight: 5
+                                    }}
+                                >
+                                    <Icon source={"plus-box"} size={spacing.large + 3} color={theme.colors.drag} />
+                                </TouchableOpacity>
+                            </View>
+
                         </View>
 
-                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 10 }}>
-                            {options.length > 0 && options.map((item, index) => (
-                                <TouchableOpacity onPress={() => {
-                                    setOptions(options.filter((id) => id !== item))
-                                }} key={index}>
-                                    <AccessibleView name="container-renderSelect" style={masterdataStyles.selectedStyle}>
-                                        <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{checkListOption.find((v) => v.CLOptionID === item)?.CLOptionName}</Text>
-                                    </AccessibleView>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
+                        <ScrollView showsVerticalScrollIndicator={false}>
+                            <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 10 }}>
+                                {options.length > 0 && options.map((item, index) => (
+                                    <TouchableOpacity onPress={() => {
+                                        setOptions(options.filter((id) => id !== item))
+                                    }} key={index}>
+                                        <AccessibleView name="container-renderSelect" style={masterdataStyles.selectedStyle}>
+                                            <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{itemsCLO.find((v) => v.CLOptionID === item)?.CLOptionName}</Text>
+                                        </AccessibleView>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        </ScrollView>
 
                         <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                             <TouchableOpacity onPress={() => handleSubmit()} style={styles.actionButton}>

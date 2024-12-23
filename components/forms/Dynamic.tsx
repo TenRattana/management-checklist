@@ -8,7 +8,6 @@ import { useRes } from "@/app/contexts/useRes";
 import { Text } from "react-native-paper";
 import useField from "@/hooks/FieldDialog";
 import Time from "../common/Time";
-import { convertToDate, convertToThaiDateTime } from "../screens/Schedule";
 
 const DynamicForm = React.memo(({
   field,

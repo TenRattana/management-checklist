@@ -4,6 +4,8 @@ import { Provider as ReduxProvider } from "react-redux";
 import { store } from "@/stores";
 import * as SplashScreen from 'expo-splash-screen';
 import { ThemeProvider, TimezoneProvider } from "@/app/providers";
+import { View, StyleSheet } from "react-native";
+import LottieView from 'lottie-react-native';
 
 const ToastProvider = lazy(() => import('@/app/providers/toastify').then(module => ({ default: module.ToastProvider })));
 const AuthProvider = lazy(() => import('@/app/providers/auth').then(module => ({ default: module.AuthProvider })));
@@ -34,8 +36,22 @@ const AppProviders = ({ children }: any) => (
 );
 
 const LoadingScreen = () => (
-    <div>Loading...</div>
+    <View style={styles.container}>
+        <LottieView
+            source={require('@/assets/animations/loading.json')}
+            autoPlay
+            loop
+        />
+    </View>
 );
 
-export default AppProviders;
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+    },
+});
 
+export default AppProviders;

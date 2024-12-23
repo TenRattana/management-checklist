@@ -153,6 +153,11 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
                     return (
                       <Card style={masterdataStyles.card} key={item.SFormID}>
 
+                        <Card.Title
+                          title={item.SFormName}
+                          titleStyle={masterdataStyles.cardTitle}
+                        />
+
                         <Card.Content style={[masterdataStyles.subFormContainer]}>
                           {item.Fields?.map((field: BaseFormState, fieldIndex: number) => {
                             const containerStyle: ViewStyle = {

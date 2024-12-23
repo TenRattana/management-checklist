@@ -62,15 +62,15 @@ export default {
     },
     web: {
       bundler: "metro",
-      output: "server",
+      output: "single",
       favicon: "./assets/images/Icon-app.png",
       splitChunks: true,
       cache: true,
-      // ServiceWorker: true,
-      // build: {
-      //   html: "./public/index.html",
-      //   development: false,
-      // },
+      ServiceWorker: true,
+      build: {
+        html: "./public/index.html",
+        development: false,
+      },
     },
     assetBundlePatterns: ["assets/fonts/*", "assets/images/*"],
     plugins: [

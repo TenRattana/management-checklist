@@ -16,19 +16,31 @@ import CheckListCreate_dialog from "../screens/CheckListCreate_dialog";
 import { styles } from "../screens/Schedule";
 import useField from "@/hooks/FieldDialog";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "react-query";
-import { fetchCheckList, fetchCheckListOption, fetchGroupCheckListOption, fetchSearchCheckList, fetchSearchGroupCheckListOption, saveCheckList, saveCheckListOption, saveGroupCheckListOption } from "@/app/services";
+import { fetchCheckList, fetchCheckListOption, fetchGroupCheckListOption, fetchSearchCheckList, fetchSearchCheckListOption, fetchSearchGroupCheckListOption, saveCheckList, saveCheckListOption, saveGroupCheckListOption } from "@/app/services";
 import { InitialValuesChecklist, InitialValuesCheckListOption, InitialValuesGroupCheckList } from "@/typing/value";
 import { useSelector } from "react-redux";
 import { CheckListOption } from "@/typing/type";
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 
+
+const CustomDialog = ({ visible, onDismiss, children }: { visible: boolean, onDismiss: any, children: any }) => {
+    const { responsive } = useRes();
+
+    return <Dialog
+        visible={visible}
+        style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center', padding: 20, borderRadius: 0 }}
+        onDismiss={onDismiss}
+    >
+        {children}
+    </Dialog>
+};
+
 const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode, setShowDialogs }: FieldDialogProps) => {
     const masterdataStyles = useMasterdataStyles();
     const [option, setOption] = useState<{ label: string; value: string; }[]>([]);
     const [shouldRender, setShouldRender] = useState<string>('');
     const [shouldRenderDT, setShouldRenderDT] = useState<boolean>(false);
-    console.log("FieldDialog");
 
     const [shouldRenderIT, setShouldRenderIT] = useState<boolean>(false);
     const [dialogAdd, setDialogAdd] = useState<{ CheckList: boolean, GroupCheckList: boolean, CheckListOption: boolean }>({ CheckList: false, GroupCheckList: false, CheckListOption: false });
@@ -73,6 +85,18 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
         onError: handleError,
     });
 
+    const saveDataCheckListOption = useCallback(async (values: InitialValuesCheckListOption) => {
+        const data = {
+            Prefix: state.CheckListOption ?? "",
+            CLOptionID: values.checkListOptionId,
+            CLOptionName: values.checkListOptionName,
+            IsActive: values.isActive,
+            Disables: values.disables,
+        };
+
+        mutationCL.mutate(data);
+    }, [mutationCL]);
+
     const saveDataCheckList = useCallback((values: InitialValuesChecklist) => {
         mutation.mutate({
             Prefix: state.CheckList ?? "",
@@ -84,18 +108,6 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
     },
         [mutation, state.CheckList]
     );
-
-    const saveDataCheckListOption = useCallback(async (values: InitialValuesCheckListOption) => {
-        const data = {
-            Prefix: state.CheckListOption ?? "",
-            CLOptionID: values.checkListOptionId,
-            CLOptionName: values.checkListOptionName,
-            IsActive: values.isActive,
-            Disables: values.disables,
-        };
-
-        mutationCL.mutate(data);
-    }, [mutation]);
 
     const saveDataGroupCheckList = useCallback((values: InitialValuesGroupCheckList, options: string[]) => {
         mutationG.mutate({
@@ -204,21 +216,16 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
         }
     };
 
-    const { data: checkListOption = [] } = useQuery("checkListOption", () => fetchCheckListOption(0, 10000), {
-        staleTime: 1000 * 60 * 24,
-        cacheTime: 1000 * 60 * 25,
-    });
-
     useEffect(() => {
-        console.log("useEffect 1");
 
         if (editMode) {
             setDebouncedSearchQuery({ CheckList: formState.CListName ?? "", MatchChecklist: formState.GCLOptionName ?? "" })
-            queryClient.invalidateQueries("groupCheckListOption")
         } else {
             queryClient.invalidateQueries("checkList")
-            queryClient.invalidateQueries("groupCheckListOption")
         }
+        queryClient.invalidateQueries("groupCheckListOption")
+        queryClient.invalidateQueries("checkListOption")
+
     }, [editMode, formState]);
 
     const { spacing, responsive } = useRes();
@@ -251,8 +258,6 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
     }, [shouldRenderIT, shouldRenderDT, option]);
 
     useEffect(() => {
-        console.log("useEffect 3");
-
         if (!isVisible) {
             setOption([]);
             setShouldRender('');
@@ -272,6 +277,54 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
     const memoizedAnimatedText = useMemo(() => animatedText, [shouldRender]);
     const memoizedAnimatedDT = useMemo(() => animatedStyleNumber, [shouldRenderDT]);
     const memoizedAnimatedIT = useMemo(() => animatedStyleIT, [shouldRenderIT, shouldRenderDT, option]);
+
+    const [itemsCLO, setItemsCLO] = useState<any[]>([]);
+    const [debouncedSearchQueryCLO, setDebouncedSearchQueryCLO] = useState("");
+
+    const { data: checkListOption, isFetching: isFetchingCLO, fetchNextPage: fetchNextPageCLO, hasNextPage: hasNextPageCLO, refetch: refetchCLO } = useInfiniteQuery(
+        ['checkListOption', debouncedSearchQueryCLO],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQueryCLO
+                ? fetchSearchCheckListOption(debouncedSearchQueryCLO)
+                : fetchCheckListOption(pageParam, 100);
+        },
+        {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 100 ? allPages.length : undefined;
+            },
+            enabled: true,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat().map((item) => ({
+                    ...item,
+                    label: item.CLOptionName || 'Unknown',
+                    value: item.CLOptionID || '',
+                }));
+
+                setItemsCLO((prevItems) => {
+                    const newItemsSet = new Set(prevItems.map((item: any) => item.value));
+                    const mergedItems = prevItems.concat(
+                        newItems.filter((item) => !newItemsSet.has(item.value))
+                    );
+                    return mergedItems;
+                });
+            }
+
+        }
+    );
+
+    const handleScrollCLO = ({ nativeEvent }: any) => {
+        if (nativeEvent && nativeEvent?.contentSize) {
+            const contentHeight = nativeEvent?.contentSize.height;
+            const layoutHeight = nativeEvent?.layoutMeasurement.height;
+            const offsetY = nativeEvent?.contentOffset.y;
+
+            if (contentHeight - layoutHeight - offsetY <= 0 && hasNextPageCLO && !isFetchingCLO) {
+                fetchNextPageCLO();
+            }
+        }
+    };
 
     return (
         <Portal>
@@ -299,7 +352,6 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             glc.current = values.GCLOptionID
 
                             const updateRenderStates = useCallback(() => {
-                                console.log("updateRenderStates");
 
                                 const checkListTypeItem = checkListTypes.find(item => item.CTypeID === values.CTypeID)?.CTypeName ?? "";
                                 const newRender = ["Dropdown", "Radio", "Checkbox"].includes(checkListTypeItem)
@@ -320,13 +372,11 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             }, [values.CTypeID, checkListTypes, shouldRender, setFieldValue]);
 
                             useEffect(() => {
-                                console.log("useEffect form 3");
 
                                 values.CTypeID && updateRenderStates();
                             }, [values.CTypeID]);
 
                             const updateImportantList = useCallback((modifications: { Value?: string | string[]; MinLength?: number; MaxLength?: number; }) => {
-                                console.log("updateImportantList");
 
                                 if (Array.isArray(values.ImportantList)) {
                                     const idMcl = `MCL-ADD-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
@@ -342,7 +392,6 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             }, [values.ImportantList]);
 
                             useEffect(() => {
-                                console.log("useEffect form 2");
 
                                 if (values.Important !== shouldRenderIT) {
                                     setShouldRenderIT(values.Important);
@@ -363,7 +412,6 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             }, [values.DTypeID, values.Important, dataType]);
 
                             useEffect(() => {
-                                console.log("useEffect form 1");
 
                                 let options: { label: string; value: string; }[] = [];
 
@@ -389,7 +437,6 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             }, [values.GCLOptionID, itemsML]);
 
                             const handelChange = (field: string, value: any) => {
-                                console.log("handelChange");
 
                                 setFieldTouched(field, true)
                                 setFieldValue(field, value)
@@ -713,7 +760,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
             </Dialog>
 
             {dialogAdd.CheckList && (
-                <Dialog visible={dialogAdd.CheckList} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center', borderRadius: 8, padding: 20 }} onDismiss={() => handelAdd(false, "CheckList")}>
+                <CustomDialog visible={dialogAdd.CheckList} onDismiss={() => handelAdd(false, "CheckList")}>
                     <MemoChecklist_dialog
                         setIsVisible={() => {
                             handelAdd(false, "CheckList");
@@ -723,32 +770,37 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             handelAdd(false, "CheckList");
                         }}
                     />
-                </Dialog>
+                </CustomDialog>
             )}
 
             {info.GroupCheckList && (
-                <Dialog visible={info.GroupCheckList} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center' }} onDismiss={() => handelInfo(false, "GroupCheckList")}>
+                <CustomDialog visible={info.GroupCheckList} onDismiss={() => handelInfo(false, "GroupCheckList")}>
                     <InfoGroup_dialog
                         setDialogAdd={() => handelInfo(false, "GroupCheckList")}
                         option={option}
                     />
-                </Dialog>
+                </CustomDialog>
             )}
 
             {dialogAdd.GroupCheckList && (
-                <Dialog visible={dialogAdd.GroupCheckList} style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center', borderRadius: 8, padding: 20 }} onDismiss={() => handelAdd(false, "GroupCheckList")}>
+                <CustomDialog visible={dialogAdd.GroupCheckList} onDismiss={() => handelAdd(false, "GroupCheckList")}>
                     <MemoCreateGroupOption_dialog
                         setIsVisible={() => {
                             handelAdd(false, "GroupCheckList");
                         }}
-                        saveDataCheckListOption={saveDataCheckListOption}
-                        checkListOption={checkListOption}
                         saveData={(value: any, mode: any) => {
                             saveDataGroupCheckList(value, mode);
                             handelAdd(false, "GroupCheckList");
                         }}
+                        itemsCLO={itemsCLO}
+                        debouncedSearchQuery={debouncedSearchQueryCLO}
+                        setDebouncedSearchQuery={setDebouncedSearchQueryCLO}
+                        handleScroll={handleScrollCLO}
+                        isFetching={isFetchingCLO}
+                        saveDataCheckListOption={saveDataCheckListOption}
+                        key={`memooption`}
                     />
-                </Dialog>
+                </CustomDialog>
             )}
         </Portal>
     );

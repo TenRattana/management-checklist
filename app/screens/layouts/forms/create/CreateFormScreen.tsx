@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useMemo } from "react";
 import { useWindowDimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
-import { Divider, Icon } from "react-native-paper";
+import { DialogProps, Divider, Icon } from "react-native-paper";
 import useCreateformStyle from "@/styles/createform";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import useForm from "@/hooks/custom/useForm";
@@ -24,7 +24,7 @@ import Animated, {
     withTiming,
     runOnJS,
 } from 'react-native-reanimated';
-import Create from "./Create";
+import Create from "@/styles/Create";
 import { useToast } from "@/app/contexts/useToast";
 
 const isValidDateFormatCustom = (value: string) => {
@@ -38,8 +38,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
     const { width } = useWindowDimensions();
     const DRAWER_WIDTH = responsive === "small" ? width : fontSize === "large" ? 430 : 370;
     const [dialogVisible, setDialogVisible] = useState<{ sub: boolean, field: boolean }>({ sub: false, field: false });
-
-    console.log("CreateFormScreen");
 
     const translateX = useSharedValue(-DRAWER_WIDTH);
     const mainTranslateX = useSharedValue(0);

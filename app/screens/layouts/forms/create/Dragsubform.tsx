@@ -35,7 +35,6 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, c
     const { theme } = useTheme()
     const createform = useCreateformStyle();
     const { handleError } = useToast();
-    console.log("Dragsubform");
 
     const handleDropSubForm = (data: Omit<BaseSubForm, 'DisplayOrder'>[]) => {
         dispatch(setDragSubForm({ data }));

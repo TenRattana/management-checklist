@@ -11,6 +11,7 @@ const Create = (width: number, drawerOpen: boolean) => {
     return StyleSheet.create({
         container: {
             flex: 1,
+            backgroundColor: theme.colors.background,
         },
         content: {
             flex: 1,

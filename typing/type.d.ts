@@ -239,7 +239,6 @@ export type ComponentNames =
   | "Match_checklist_option"
   | "Match_form_machine"
   | "Managepermissions"
-  | "Test"
   | "Time"
   | "TimeTrack";
 

@@ -1,7 +1,6 @@
-import React, { lazy, Suspense, useRef, useCallback, useState, useMemo, useEffect } from 'react';
+import React, { lazy, Suspense, useRef, useCallback, useState, useMemo } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-// import { LoginScreen } from '@/app/screens';
 import PermissionDeny from '../screens/layouts/PermissionDeny';
 import { useRes } from "@/app/contexts/useRes";
 import CustomDrawerContent from '@/components/navigation/CustomDrawer';
@@ -39,13 +38,11 @@ const components: Record<ComponentNames, () => Promise<{ default: React.Componen
     Permission_deny: () => import('@/app/screens/NotFoundScreen404'),
     ScanQR: () => import('@/app/screens/layouts/actions/camera/ScanQR'),
     Setting: () => import('@/app/screens/layouts/settings/SettingScreen'),
-    Test: () => import('@/app/screens/TestComponent'),
     Time: () => import('@/app/screens/layouts/schedule/TimescheduleScreen'),
     TimeTrack: () => import('@/app/screens/layouts/schedule/TimescheduleTrack'),
 };
 
 const DrawerNav = React.memo(({ renderComponent, user }: any) => {
-    console.log("DrawerNav");
 
     const { theme } = useTheme();
     const { fontSize } = useRes();
@@ -83,7 +80,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                         key={screen.MenuID}
                         name={screen.NavigationTo}
                         component={renderComponent(screen.NavigationTo as ComponentNames)}
-                    // options={{ freezeOnBlur: true }}
+                        options={{ title: screen.MenuLabel }}
                     />
                 );
             }
@@ -95,7 +92,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                             key={parentScreen.MenuID}
                             name={parentScreen.NavigationTo}
                             component={renderComponent(parentScreen.NavigationTo as ComponentNames)}
-                        // options={{ freezeOnBlur: true }}
+                            options={{ title: screen.MenuLabel }}
                         />
                     );
                 });
@@ -131,7 +128,6 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                             onLogoutPress={handleLogout}
                         />
                     ),
-                    unmountOnBlur: true,
                 }}
                 initialRouteName={user.initialRoute || "Login"}
                 id="nav"
@@ -192,6 +188,5 @@ const Navigation: React.FC = React.memo(() => {
         />
     );
 });
-
 
 export default Navigation;

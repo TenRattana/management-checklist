@@ -292,7 +292,7 @@ const useMasterdataStyles = () => {
             color: theme.colors.onBackground,
         },
         settingItem: {
-            paddingVertical: 5,
+            paddingVertical: 10,
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'flex-start',

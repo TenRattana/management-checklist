@@ -40,7 +40,7 @@ const ConfigItemForm: React.FC<CreateForm> = React.memo(({ label, value, editabl
                         style={[
                             masterdataStyles.text,
                             masterdataStyles.settingText,
-                            styles.labelText,
+                            { flex: 1 }
                         ]}
                         ellipsizeMode="tail"
                         numberOfLines={1}
@@ -149,11 +149,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         flex: 1,
-    },
-    labelText: {
-        flex: 1,
-        marginRight: 10,
-        color: "#555",
     },
     formContainer: {
         flexBasis: '100%',
