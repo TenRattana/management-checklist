@@ -44,9 +44,11 @@ const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
                 navigation.navigate('InputFormMachine', {
                     machineId: value,
                 });
+                setScanned(false);
             }
         } catch (error) {
             handleError(error);
+            setScanned(false);
         }
     };
 

@@ -1,19 +1,15 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Platform, TouchableOpacity, View } from "react-native";
-import { Portal, Dialog } from "react-native-paper";
-import { Formik } from "formik";
+import { Portal, Dialog, HelperText } from "react-native-paper";
+import { Field, Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { MatchFormMachineDialogProps, InitialValuesMatchFormMachine } from '@/typing/value'
 import Text from "@/components/Text";
-import { Dropdown } from "../common";
+import Dropdown from "../common/Dropdown";
 import { fetchForms, fetchMachines, fetchSearchFomrs, fetchSearchMachines } from "@/app/services";
 import { useInfiniteQuery, useQueryClient } from "react-query";
 
-const validationSchema = Yup.object().shape({
-    machineId: Yup.string().required("This machine field is required"),
-    formId: Yup.string().required("This form field is required"),
-});
 
 const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData }: MatchFormMachineDialogProps<InitialValuesMatchFormMachine>) => {
     const masterdataStyles = useMasterdataStyles()
@@ -89,6 +85,11 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
 
     const queryClient = useQueryClient();
 
+    const validationSchema = Yup.object().shape({
+        machineId: Yup.string().required("This machine field is required"),
+        formId: Yup.string().required("This form field is required"),
+    })
+
     useEffect(() => {
         if (isEditing) {
             setDebouncedSearchQueryForm(initialValues.formName ?? "")
@@ -141,15 +142,9 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
                             initialValues={initialValues}
                             validationSchema={validationSchema}
                             validateOnBlur={false}
-                            validateOnChange={true}
                             onSubmit={(values: InitialValuesMatchFormMachine) => saveData(values, isEditing)}
                         >
                             {({ handleSubmit, dirty, isValid, setFieldValue, setFieldTouched, touched, errors, values }) => {
-
-                                const handelChange = (field: string, value: any) => {
-                                    setFieldTouched(field, true)
-                                    setFieldValue(field, value)
-                                }
 
                                 return (
                                     <View id="machine-mfmd">
@@ -162,14 +157,22 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
                                             setDebouncedSearchQuery={(value) => setDebouncedSearchQueryMachine(value)}
                                             items={itemsMachine}
                                             setSelectedValue={(stringValue: string | null) => {
-                                                handelChange("machineId", stringValue)
+                                                setFieldValue("machineId", stringValue);
+                                                setFieldTouched("machineId", true);
                                             }}
                                             isFetching={isFetchingmachine}
                                             fetchNextPage={fetchNextPageMachine}
                                             handleScroll={handleScrollMachine}
-                                            error={Boolean(touched.machineId && Boolean(errors.machineId))}
-                                            errorMessage={touched.machineId ? errors.machineId : ""}
+                                            key={JSON.stringify({ machine: values.machineId })}
                                         />
+
+                                        <HelperText
+                                            type="error"
+                                            visible={Boolean(touched.machineId && errors.machineId)}
+                                            style={[{ display: Boolean(touched.machineId && errors.machineId) ? 'flex' : 'none' }, masterdataStyles.errorText]}
+                                        >
+                                            {touched.machineId ? errors.machineId : ""}
+                                        </HelperText>
 
                                         <Dropdown
                                             label='form'
@@ -180,14 +183,22 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
                                             setDebouncedSearchQuery={(value) => setDebouncedSearchQueryForm(value)}
                                             items={itemsForm}
                                             setSelectedValue={(stringValue: string | null) => {
-                                                handelChange("formId", stringValue)
+                                                setFieldValue("formId", stringValue);
+                                                setFieldTouched("formId", true);
                                             }}
                                             isFetching={isFetchingForm}
                                             fetchNextPage={fetchNextPageForm}
                                             handleScroll={handleScrollForm}
-                                            error={Boolean(touched.formId && Boolean(errors.formId))}
-                                            errorMessage={touched.formId ? errors.formId : ""}
+                                            key={JSON.stringify({ form: values.formId })}
                                         />
+
+                                        <HelperText
+                                            type="error"
+                                            visible={Boolean(touched.formId && errors.formId)}
+                                            style={[{ display: Boolean(touched.formId && errors.formId) ? 'flex' : 'none' }, masterdataStyles.errorText]}
+                                        >
+                                            {touched.formId ? errors.formId : ""}
+                                        </HelperText>
 
                                         <View id="form-action-mfmd" style={masterdataStyles.containerAction}>
                                             <TouchableOpacity

@@ -4,7 +4,7 @@ import { InitialValuesCheckListOption } from '@/typing/value'
 import { Switch } from 'react-native-paper'
 import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler'
 import useMasterdataStyles from '@/styles/common/masterdata'
-import { FastField, Formik } from 'formik'
+import { FastField, Field, Formik } from 'formik'
 import * as Yup from 'yup'
 import { Inputs } from '../common'
 import { useTheme } from '@/app/contexts/useTheme'
@@ -36,14 +36,13 @@ const CheckListOptionCreate_dialog = React.memo(({ setIsVisible, saveData }: { s
             <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}
-                validateOnBlur={true}
-                validateOnChange={false}
+                validateOnBlur={false}
                 onSubmit={(values: InitialValuesCheckListOption) => saveData(values)}
             >
                 {({ values, handleSubmit, setFieldValue }) => (
                     <View id="form-cd">
 
-                        <FastField name="checkListOptionName">
+                        <Field name="checkListOptionName">
                             {({ field, form }: any) => (
                                 <Inputs
                                     placeholder="Enter Check List Option"
@@ -56,7 +55,7 @@ const CheckListOptionCreate_dialog = React.memo(({ setIsVisible, saveData }: { s
                                     testId="checkListOptionName-cod"
                                 />
                             )}
-                        </FastField >
+                        </Field>
 
                         <View id="form-active-cd" style={masterdataStyles.containerSwitch}>
                             <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
@@ -73,6 +72,7 @@ const CheckListOptionCreate_dialog = React.memo(({ setIsVisible, saveData }: { s
                                 testID="isActive-cd"
                             />
                         </View>
+
                         <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                             <TouchableOpacity onPress={() => handleSubmit()} style={styles.actionButton}>
                                 <Text style={masterdataStyles.text}>Save</Text>

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 import { Formik } from "formik";
 import * as Yup from 'yup';
-import { Portal, Switch, Dialog } from "react-native-paper";
+import { Portal, Switch, Dialog, HelperText } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { CheckListOption, GroupCheckListOption } from '@/typing/type';
 import { InitialValuesMatchCheckListOption, MatchChecklistOptionProps } from '@/typing/value';
@@ -134,6 +134,7 @@ const Match_checklist_option = React.memo(({
                     <Formik
                         initialValues={initialValues}
                         validationSchema={validationSchema}
+                        validateOnBlur={false}
                         onSubmit={(values: InitialValuesMatchCheckListOption) => saveData(values)}
                     >
                         {({ values, errors, touched, handleSubmit, setFieldValue, dirty, isValid, setFieldTouched }) => {
@@ -177,9 +178,15 @@ const Match_checklist_option = React.memo(({
                                         handleScroll={handleScroll}
                                         selectedValue={values.groupCheckListOptionId}
                                         setSelectedValue={(value: string | null) => handelChange("groupCheckListOptionId", value)}
-                                        error={Boolean(touched.groupCheckListOptionId && errors.groupCheckListOptionId)}
-                                        errorMessage={errors.groupCheckListOptionId || ""}
                                     />
+
+                                    <HelperText
+                                        type="error"
+                                        visible={Boolean(touched.groupCheckListOptionId && errors.groupCheckListOptionId)}
+                                        style={[{ display: Boolean(touched.groupCheckListOptionId && errors.groupCheckListOptionId) ? 'flex' : 'none' }, masterdataStyles.errorText]}
+                                    >
+                                        {errors.groupCheckListOptionId || ""}
+                                    </HelperText>
 
                                     <DropdownMulti
                                         label='Check List Type'
@@ -193,9 +200,15 @@ const Match_checklist_option = React.memo(({
                                         handleScroll={handleScrollCO}
                                         selectedValue={values.checkListOptionId}
                                         setSelectedValue={(value: string | string[] | null) => handelChange("checkListOptionId", value)}
-                                        error={Boolean(touched.checkListOptionId && errors.checkListOptionId)}
-                                        errorMessage={String(errors.checkListOptionId || "")}
                                     />
+
+                                    <HelperText
+                                        type="error"
+                                        visible={Boolean(touched.checkListOptionId && errors.checkListOptionId)}
+                                        style={[{ display: Boolean(touched.checkListOptionId && errors.checkListOptionId) ? 'flex' : 'none' }, masterdataStyles.errorText]}
+                                    >
+                                        {errors.checkListOptionId || ""}
+                                    </HelperText>
 
                                     <ScrollView showsVerticalScrollIndicator={false}>
                                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 10 }}>

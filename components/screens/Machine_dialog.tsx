@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { TouchableOpacity, ScrollView, View, StyleSheet } from "react-native";
 import { Inputs, Dropdown } from "@/components/common";
-import { Portal, Switch, Dialog, TextInput } from "react-native-paper";
-import { Formik, FastField } from "formik";
+import { Portal, Switch, Dialog, TextInput, HelperText } from "react-native-paper";
+import { Formik, FastField, Field } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { MachineDialogProps, InitialValuesMachine } from '@/typing/value'
@@ -101,14 +101,14 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}
-                            validateOnBlur={true}
+                            validateOnBlur={false}
                             onSubmit={(values: InitialValuesMachine) => saveData(values)}
                         >
                             {({ values, handleSubmit, setFieldValue, dirty, isValid, touched, errors, setFieldTouched }) => {
 
                                 const handelChange = (field: string, value: any) => {
-                                    setFieldTouched(field, true)
                                     setFieldValue(field, value)
+                                    setFieldTouched(field, true)
                                 }
 
                                 return (
@@ -157,15 +157,24 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                     searchQuery={debouncedSearchQuery}
                                                     setDebouncedSearchQuery={(value) => setDebouncedSearchQuery(value)}
                                                     items={items}
-                                                    setSelectedValue={(stringValue: string | null) => handelChange("machineGroupId", stringValue)}
+                                                    setSelectedValue={(stringValue: string | null) => {
+                                                        setFieldValue("machineGroupId", stringValue);
+                                                        setFieldTouched("machineGroupId", true);
+                                                    }}
                                                     isFetching={isFetching}
                                                     fetchNextPage={fetchNextPage}
                                                     handleScroll={handleScroll}
-                                                    error={Boolean(touched.machineGroupId && Boolean(errors.machineGroupId))}
-                                                    errorMessage={touched.machineGroupId ? errors.machineGroupId : ""}
                                                 />
 
-                                                <FastField name="machineName">
+                                                <HelperText
+                                                    type="error"
+                                                    visible={Boolean(touched.machineGroupId && Boolean(errors.machineGroupId))}
+                                                    style={[{ display: Boolean(touched.machineGroupId && Boolean(errors.machineGroupId)) ? 'flex' : 'none' }, masterdataStyles.errorText]}
+                                                >
+                                                    {touched.machineGroupId ? errors.machineGroupId : ""}
+                                                </HelperText>
+
+                                                <Field name="machineName">
                                                     {({ field, form }: any) => (
                                                         <Inputs
                                                             placeholder="Enter Machine Name"
@@ -178,9 +187,9 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                             testId="machineName-md"
                                                         />
                                                     )}
-                                                </FastField >
+                                                </Field>
 
-                                                <FastField name="machineCode">
+                                                <Field name="machineCode">
                                                     {({ field, form }: any) => (
                                                         <Inputs
                                                             placeholder="Enter machine Code"
@@ -193,9 +202,9 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                             testId="machineCode-md"
                                                         />
                                                     )}
-                                                </FastField>
+                                                </Field>
 
-                                                <FastField name="description">
+                                                <Field name="description">
                                                     {({ field, form }: any) => (
                                                         <Inputs
                                                             placeholder="Enter Description"
@@ -208,9 +217,9 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                             testId="description-md"
                                                         />
                                                     )}
-                                                </FastField>
+                                                </Field>
 
-                                                <FastField name="building">
+                                                <Field name="building">
                                                     {({ field, form }: any) => (
                                                         <Inputs
                                                             placeholder="Enter Building"
@@ -223,9 +232,9 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                             testId="building-md"
                                                         />
                                                     )}
-                                                </FastField>
+                                                </Field>
 
-                                                <FastField name="floor">
+                                                <Field name="floor">
                                                     {({ field, form }: any) => (
                                                         <Inputs
                                                             placeholder="Enter Floor"
@@ -238,9 +247,9 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                             testId="floor-md"
                                                         />
                                                     )}
-                                                </FastField>
+                                                </Field>
 
-                                                <FastField name="area">
+                                                <Field name="area">
                                                     {({ field, form }: any) => (
                                                         <Inputs
                                                             placeholder="Enter Area"
@@ -253,7 +262,7 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                             testId="area-md"
                                                         />
                                                     )}
-                                                </FastField>
+                                                </Field>
 
 
                                                 <View id="form-active-md" style={masterdataStyles.containerSwitch}>

@@ -2,7 +2,7 @@ import React from "react";
 import { TouchableOpacity, View } from "react-native";
 import { Inputs } from "@/components/common";
 import { Portal, Switch, Dialog } from "react-native-paper";
-import { FastField, Formik } from "formik";
+import { FastField, Field, Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { InitialValuesCheckListOption, CheckListOptionProps } from '@/typing/value'
@@ -41,14 +41,13 @@ const Checklist_option_dialog = React.memo(({ isVisible, setIsVisible, isEditing
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}
-                            validateOnBlur={true}
-                            validateOnChange={false}
+                            validateOnBlur={false}
                             onSubmit={(values: InitialValuesCheckListOption) => saveData(values)}
                         >
                             {({ values, handleSubmit, setFieldValue, dirty, isValid }) => (
                                 <View id="form-cod">
 
-                                    <FastField name="checkListOptionName">
+                                    <Field name="checkListOptionName">
                                         {({ field, form }: any) => (
                                             <Inputs
                                                 placeholder="Enter Check List Option"
@@ -61,7 +60,7 @@ const Checklist_option_dialog = React.memo(({ isVisible, setIsVisible, isEditing
                                                 testId="checkListOptionName-cod"
                                             />
                                         )}
-                                    </FastField >
+                                    </Field >
 
                                     <View id="form-active-cod" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
@@ -78,6 +77,7 @@ const Checklist_option_dialog = React.memo(({ isVisible, setIsVisible, isEditing
                                             testID="isActive-cod"
                                         />
                                     </View>
+
                                     <View id="form-action-cod" style={masterdataStyles.containerAction}>
                                         <TouchableOpacity
                                             onPress={() => handleSubmit()}

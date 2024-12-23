@@ -2,7 +2,7 @@ import React from "react";
 import { TouchableOpacity, View } from "react-native";
 import { Inputs } from "@/components/common";
 import { Portal, Switch, Dialog } from "react-native-paper";
-import { FastField, Formik } from "formik";
+import { FastField, Field, Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { ChecklistGroupDialogProps, InitialValuesGroupCheckList } from '@/typing/value'
@@ -43,14 +43,13 @@ const Checklist_group_dialog = React.memo(({ isVisible, setIsVisible, isEditing,
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}
-                            validateOnBlur={true}
-                            validateOnChange={false}
+                            validateOnBlur={false}
                             onSubmit={(values: InitialValuesGroupCheckList) => saveData(values)}
                         >
                             {({ values, handleSubmit, setFieldValue, isValid, dirty }) => (
                                 <View id="form-cgd">
 
-                                    <FastField name="groupCheckListOptionName">
+                                    <Field name="groupCheckListOptionName">
                                         {({ field, form }: any) => (
                                             <Inputs
                                                 placeholder="Enter Group Check List"
@@ -63,7 +62,7 @@ const Checklist_group_dialog = React.memo(({ isVisible, setIsVisible, isEditing,
                                                 testId="groupCheckListOptionName-cgd"
                                             />
                                         )}
-                                    </FastField >
+                                    </Field >
 
                                     <View id="form-active-cgd" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
@@ -78,6 +77,7 @@ const Checklist_group_dialog = React.memo(({ isVisible, setIsVisible, isEditing,
                                             testID="isActive-cgd"
                                         />
                                     </View>
+
                                     <View id="form-action-cgd" style={masterdataStyles.containerAction}>
                                         <TouchableOpacity
                                             onPress={() => handleSubmit()}

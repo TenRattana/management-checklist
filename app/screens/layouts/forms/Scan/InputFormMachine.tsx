@@ -105,6 +105,8 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
       UserInfo: JSON.stringify(userData)
     };
 
+    console.log(data);
+
     try {
       const response = await axiosInstance.post("ExpectedResult_service.asmx/SaveExpectedResult", data);
       showSuccess(String(response.data.message));

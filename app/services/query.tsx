@@ -467,6 +467,6 @@ export const SaveMatchFormMachine = async (data: {
     FormID: string;
     Mode: string;
 }): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("MatchFormMachine_service.asmx/SearchMatchCheckListOptions", data);
+    const response = await axiosInstance.post("MatchFormMachine_service.asmx/SaveMatchFormMachine", data);
     return response.data;
 };

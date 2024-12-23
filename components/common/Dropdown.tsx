@@ -65,12 +65,16 @@ const Dropdown = React.memo(({
         };
     }, [searchQuerys]);
 
-    const sortedItems = selectedValue
-        ? [
-            items.find(item => item.value === selectedValue),
-            ...items.filter(item => item.value !== selectedValue)
-        ]
-        : items;
+    // const sortedItems = selectedValue
+    //     ? [
+    //         items.find(item => item.value === selectedValue),
+    //         ...items.filter(item => item.value !== selectedValue)
+    //     ]
+    //     : items;
+
+    const filteredItems = items.filter(item =>
+        searchQuerys === "" ? item : item.label.toLowerCase().includes(searchQuerys.toLowerCase())
+    );
 
     return (
         <View id="inputs" style={masterdataStyles.commonContainer}>
@@ -88,7 +92,7 @@ const Dropdown = React.memo(({
                                     maxHeight={hp(Platform.OS === "web" ? '50%' : '70%')}
                                     open={open}
                                     value={selectedValue ? String(selectedValue) : null}
-                                    items={sortedItems}
+                                    items={filteredItems}
                                     theme={darkMode ? 'DARK' : 'LIGHT'}
                                     searchable={search ?? true}
                                     searchTextInputProps={{
@@ -129,7 +133,7 @@ const Dropdown = React.memo(({
                                     onOpen={fetchNextPage}
                                     onClose={() => setOpen(false)}
                                     flatListProps={{
-                                        data: sortedItems,
+                                        data: filteredItems,
                                         keyExtractor: (item) => `${item.value}`,
                                         onScroll: handleScroll,
                                         onEndReached: handleScroll,
