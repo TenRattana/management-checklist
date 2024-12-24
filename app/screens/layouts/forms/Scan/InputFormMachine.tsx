@@ -16,6 +16,7 @@ import { DataType } from "@/typing/type";
 import { useSelector } from "react-redux";
 import * as Yup from 'yup';
 import { Stack } from "expo-router";
+import { navigate } from "@/app/navigations/navigationUtils";
 
 interface FormValues {
   [key: string]: any;
@@ -104,8 +105,6 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
       FormData: JSON.stringify(updatedSubForms),
       UserInfo: JSON.stringify(userData)
     };
-
-    console.log(data);
 
     try {
       const response = await axiosInstance.post("ExpectedResult_service.asmx/SaveExpectedResult", data);
@@ -249,11 +248,12 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
 
       ) : (
         <AccessibleView name="form-success" style={masterdataStyles.containerScccess}>
-          <Text style={masterdataStyles.text}>บันทึกเสร็จสิ้น</Text>
+          <Text style={masterdataStyles.text}>Save success</Text>
           <TouchableOpacity onPress={() => {
             setIsSubmitted(false);
+            navigate("ScanQR")
           }} style={masterdataStyles.button}>
-            <Text style={[masterdataStyles.textBold, masterdataStyles.text, { color: theme.colors.blue }]}>กลับไปยังหน้าก่อนหน้า</Text>
+            <Text style={[masterdataStyles.textBold, masterdataStyles.text, { color: theme.colors.blue }]}>Scan agian</Text>
           </TouchableOpacity>
         </AccessibleView>
       )}

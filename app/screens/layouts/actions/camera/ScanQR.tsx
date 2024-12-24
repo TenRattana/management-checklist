@@ -5,7 +5,7 @@ import { useToast } from '@/app/contexts/useToast';
 import React from 'react';
 import { ScanQRProps } from '@/typing/tag';
 
-const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
+const ScanQR: React.FC<ScanQRProps> = React.memo(({ navigation }) => {
     const [facing, setFacing] = useState<CameraType>('back');
     const [permission, requestPermission] = useCameraPermissions();
     const [scanned, setScanned] = useState(false);
@@ -33,7 +33,6 @@ const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
         if (!scanned) {
             setScanned(true);
             setQrValue(data);
-
             handleAction(data);
         }
     };
@@ -45,10 +44,12 @@ const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
                     machineId: value,
                 });
                 setScanned(false);
+                setQrValue(null);
             }
         } catch (error) {
             handleError(error);
             setScanned(false);
+            setQrValue(null);
         }
     };
 
@@ -70,7 +71,7 @@ const ScanQR: React.FC<ScanQRProps> = ({ navigation }) => {
             </CameraView>
         </View>
     );
-}
+})
 
 const styles = StyleSheet.create({
     container: {
