@@ -27,6 +27,7 @@ module.exports = {
       "svg",
       "ttf",
       "otf",
+      "lottie",
     ],
   },
 };
