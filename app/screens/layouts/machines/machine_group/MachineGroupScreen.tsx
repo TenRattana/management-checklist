@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { TouchableOpacity, StyleSheet, View } from "react-native";
+import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
+import { TouchableOpacity, StyleSheet, View, ActivityIndicator } from "react-native";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
-import { Searchbar, Customtable, Text } from "@/components";
+import { Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import Machine_group_dialog from "@/components/screens/Machine_group_dialog";
 import { GroupMachine } from '@/typing/type';
 import { InitialValuesGroupMachine } from '@/typing/value';
 import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
@@ -13,6 +12,9 @@ import { useSelector } from 'react-redux';
 import { fetchMachineGroups, fetchSearchMachineGroups, saveGroupMachine } from "@/app/services";
 import axiosInstance from "@/config/axios";
 import { useTheme } from "@/app/contexts/useTheme";
+
+const Machine_group_dialog = lazy(() => import("@/components/screens/Machine_group_dialog"));
+const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
 const MachineGroupScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -32,7 +34,7 @@ const MachineGroupScreen = React.memo(() => {
     const { spacing, fontSize } = useRes();
     const { theme } = useTheme();
     const queryClient = useQueryClient();
-    const [machineGroup, setMachineGroup] = useState<GroupMachine[]>([])
+    const [machineGroup, setMachineGroup] = useState<GroupMachine[]>([]);
 
     const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
         ['machineGroups', debouncedSearchQuery],
@@ -48,7 +50,7 @@ const MachineGroupScreen = React.memo(() => {
                 return lastPage.length === 50 ? allPages.length : undefined;
             },
             onSuccess: (newData) => {
-                const newItems = newData.pages.flat()
+                const newItems = newData.pages.flat();
                 setMachineGroup(newItems);
             },
         }
@@ -182,8 +184,6 @@ const MachineGroupScreen = React.memo(() => {
         }
     });
 
-    const MemoMachine_group_dialog = React.memo(Machine_group_dialog);
-
     return (
         <View id="container-groupmachine" style={styles.container}>
             <Card.Title
@@ -202,17 +202,21 @@ const MachineGroupScreen = React.memo(() => {
                 </TouchableOpacity>
             </View>
             <Card.Content style={styles.cardcontent}>
-                <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                    <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                </Suspense>
             </Card.Content>
 
             {isVisible && (
-                <MemoMachine_group_dialog
-                    isVisible={isVisible}
-                    setIsVisible={setIsVisible}
-                    isEditing={isEditing}
-                    initialValues={initialValues}
-                    saveData={saveData}
-                />
+                <Suspense fallback={<ActivityIndicator size="large" color={theme.colors.primary} />}>
+                    <Machine_group_dialog
+                        isVisible={isVisible}
+                        setIsVisible={setIsVisible}
+                        isEditing={isEditing}
+                        initialValues={initialValues}
+                        saveData={saveData}
+                    />
+                </Suspense>
             )}
         </View>
     );

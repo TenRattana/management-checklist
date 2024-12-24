@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { TouchableOpacity, StyleSheet } from "react-native";
+import React, { useState, useEffect, useCallback, useMemo, Suspense, lazy } from "react";
+import { TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
 import axiosInstance from "@/config/axios";
 import { Customtable, AccessibleView, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
@@ -12,6 +12,9 @@ import { InitialValuesCheckListOption } from '@/typing/value'
 import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
 import { useSelector } from "react-redux";
 import { fetchCheckListOption, fetchSearchCheckListOption, saveCheckListOption } from "@/app/services";
+
+const Checklist_group_dialog = lazy(() => import("@/components/screens/Checklist_group_dialog"));
+const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
 const CheckListOptionScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -203,13 +206,16 @@ const CheckListOptionScreen = React.memo(() => {
             </Card.Content>
 
             {isVisible && (
-                <MemoChecklist_option_dialog
-                    isVisible={isVisible}
-                    setIsVisible={setIsVisible}
-                    isEditing={isEditing}
-                    initialValues={initialValues}
-                    saveData={saveData}
-                />
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                    <MemoChecklist_option_dialog
+                        isVisible={isVisible}
+                        setIsVisible={setIsVisible}
+                        isEditing={isEditing}
+                        initialValues={initialValues}
+                        saveData={saveData}
+                    />
+                </Suspense>
+
             )}
         </AccessibleView>
     );

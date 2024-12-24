@@ -1,17 +1,19 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { TouchableOpacity, StyleSheet } from "react-native";
+import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
+import { TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
 import axiosInstance from "@/config/axios";
-import { Customtable, AccessibleView, Searchbar, Text } from "@/components";
+import { AccessibleView, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useToast } from '@/app/contexts/useToast';
 import { useRes } from '@/app/contexts/useRes';
-import Checklist_dialog from "@/components/screens/Checklist_dialog";
 import { Checklist } from '@/typing/type';
 import { InitialValuesChecklist } from '@/typing/value';
 import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
 import { useSelector } from "react-redux";
 import { fetchCheckList, fetchSearchCheckList, saveCheckList } from "@/app/services";
+
+const Checklist_dialog = lazy(() => import("@/components/screens/Checklist_dialog"));
+const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
 const CheckListScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -169,9 +171,7 @@ const CheckListScreen = React.memo(() => {
             padding: 2,
             flex: 1
         }
-    })
-
-    const MemoChecklist_dialog = React.memo(Checklist_dialog)
+    });
 
     return (
         <AccessibleView name="container-checklist" style={styles.container}>
@@ -191,17 +191,21 @@ const CheckListScreen = React.memo(() => {
                 </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-                <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                    <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                </Suspense>
             </Card.Content>
-            
+
             {isVisible && (
-                <MemoChecklist_dialog
-                    isVisible={isVisible}
-                    setIsVisible={setIsVisible}
-                    isEditing={isEditing}
-                    initialValues={initialValues}
-                    saveData={saveData}
-                />
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                    <Checklist_dialog
+                        isVisible={isVisible}
+                        setIsVisible={setIsVisible}
+                        isEditing={isEditing}
+                        initialValues={initialValues}
+                        saveData={saveData}
+                    />
+                </Suspense>
             )}
         </AccessibleView>
     );

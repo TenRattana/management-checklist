@@ -1,5 +1,5 @@
-import React, { lazy, useCallback, useMemo, useState } from 'react';
-import { Text, TouchableOpacity } from 'react-native';
+import React, { lazy, Suspense, useCallback, useMemo, useState } from 'react';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@/app/contexts/useTheme';
 import moment from 'moment-timezone';
 import { groupBy } from 'lodash';
@@ -8,10 +8,11 @@ import { getCurrentTime } from '@/config/timezoneUtils';
 import Home_dialog from './Home_dialog';
 import useMasterdataStyles from '@/styles/common/masterdata';
 
+// Lazy loading components
 const LazyTimelineList = lazy(() => import('react-native-calendars').then(module => ({ default: module.TimelineList })));
 const LazyTimeline = lazy(() => import('react-native-calendars').then(module => ({ default: module.Timeline })));
 
-const MemoHome_dialog = React.memo(Home_dialog)
+const MemoHome_dialog = React.memo(Home_dialog);
 
 type Event = {
     title: string;
@@ -86,17 +87,23 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
 
     const renderItem = useCallback((timelineProps: TimelineProps, info: TimelineListRenderItemInfo) => {
         return (
-            <LazyTimeline
-                {...timelineProps}
-                styles={{ contentStyle: { backgroundColor: theme.colors.fff } }}
-                onEventPress={handleEventClick}
-                renderEvent={(event) => <RenderEvent item={event} />}
-            />
+            <Suspense fallback={<ActivityIndicator size="small" color={theme.colors.primary} />}>
+                <LazyTimeline
+                    {...timelineProps}
+                    styles={{ contentStyle: { backgroundColor: theme.colors.fff } }}
+                    onEventPress={handleEventClick}
+                    renderEvent={(event) => <RenderEvent item={event} />}
+                />
+            </Suspense>
         );
     }, [theme]);
 
     return (
-        <>
+        <Suspense fallback={
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
+            </View>
+        }>
             <LazyTimelineList
                 events={eventsByDateS}
                 renderItem={renderItem}
@@ -113,7 +120,7 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
                     key={`Home_dialog`}
                 />
             )}
-        </>
+        </Suspense>
     );
 };
 

@@ -1,17 +1,19 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { TouchableOpacity, StyleSheet } from "react-native";
+import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
+import { TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
 import axiosInstance from "@/config/axios";
-import { Customtable, AccessibleView, Searchbar, Text } from "@/components";
+import { AccessibleView, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useToast } from '@/app/contexts/useToast';
 import { useRes } from '@/app/contexts/useRes';
-import Checklist_group_dialog from "@/components/screens/Checklist_group_dialog";
 import { GroupCheckListOption } from '@/typing/type'
 import { InitialValuesGroupCheckList } from '@/typing/value'
 import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import { useSelector } from "react-redux";
 import { fetchGroupCheckListOption, fetchSearchGroupCheckListOption, saveGroupCheckListNoOption } from "@/app/services";
+
+const Checklist_group_dialog = lazy(() => import("@/components/screens/Checklist_group_dialog"));
+const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
 const ChecklistGroupScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -30,10 +32,10 @@ const ChecklistGroupScreen = React.memo(() => {
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
     const queryClient = useQueryClient();
-    const [groupCheckListOption, setGroupCheckListOption] = useState<GroupCheckListOption[]>([])
+    const [groupCheckListOption, setGroupCheckListOption] = useState<GroupCheckListOption[]>([]);
 
     const handlePaginationChange = () => {
-        hasNextPage && !isFetching && fetchNextPage()
+        hasNextPage && !isFetching && fetchNextPage();
     };
 
     const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
@@ -51,7 +53,7 @@ const ChecklistGroupScreen = React.memo(() => {
             },
             enabled: true,
             onSuccess: (newData) => {
-                const newItems = newData.pages.flat()
+                const newItems = newData.pages.flat();
                 setGroupCheckListOption(newItems);
             },
         }
@@ -59,17 +61,17 @@ const ChecklistGroupScreen = React.memo(() => {
 
     useEffect(() => {
         if (debouncedSearchQuery === "") {
-            setGroupCheckListOption([])
-            remove()
+            setGroupCheckListOption([]);
+            remove();
         } else {
-            setGroupCheckListOption([])
+            setGroupCheckListOption([]);
         }
-    }, [debouncedSearchQuery, remove])
+    }, [debouncedSearchQuery, remove]);
 
     const mutation = useMutation(saveGroupCheckListNoOption, {
         onSuccess: (data) => {
             showSuccess(data.message);
-            setIsVisible(false)
+            setIsVisible(false);
             queryClient.invalidateQueries('groupCheckListOption');
         },
         onError: handleError,
@@ -102,9 +104,7 @@ const ChecklistGroupScreen = React.memo(() => {
             if (action === "editIndex") {
                 const response = await axiosInstance.post(
                     "GroupCheckListOption_service.asmx/GetGroupCheckListOption",
-                    {
-                        GCLOptionID: item,
-                    }
+                    { GCLOptionID: item }
                 );
                 const groupCheckListOptionData = response.data.data[0] ?? {};
                 setInitialValues({
@@ -177,9 +177,7 @@ const ChecklistGroupScreen = React.memo(() => {
             padding: 2,
             flex: 1
         }
-    })
-
-    const MemoChecklist_group_dialog = React.memo(Checklist_group_dialog)
+    });
 
     return (
         <AccessibleView name="container-groupchecklist" style={styles.container}>
@@ -199,17 +197,21 @@ const ChecklistGroupScreen = React.memo(() => {
                 </TouchableOpacity>
             </AccessibleView>
             <Card.Content style={styles.cardcontent}>
-                <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                    <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                </Suspense>
             </Card.Content>
-            
+
             {isVisible && (
-                <MemoChecklist_group_dialog
-                    isVisible={isVisible}
-                    setIsVisible={setIsVisible}
-                    isEditing={isEditing}
-                    initialValues={initialValues}
-                    saveData={saveData}
-                />
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                    <Checklist_group_dialog
+                        isVisible={isVisible}
+                        setIsVisible={setIsVisible}
+                        isEditing={isEditing}
+                        initialValues={initialValues}
+                        saveData={saveData}
+                    />
+                </Suspense>
             )}
         </AccessibleView>
     );
