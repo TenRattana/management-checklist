@@ -1,17 +1,19 @@
-import React, { useState, useMemo, useCallback, lazy } from 'react';
-import { View, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import React, { useState, useMemo, useCallback, lazy, useEffect } from 'react';
+import { View, StyleSheet, TouchableOpacity, FlatList, Platform } from 'react-native';
 import { Checkbox, Icon, Text } from 'react-native-paper';
 import { useQuery } from 'react-query';
-import { CalendarProvider, CalendarUtils } from 'react-native-calendars';
+import { CalendarUtils } from 'react-native-calendars';
 import { useTheme } from '@/app/contexts/useTheme';
 import { useRes } from '@/app/contexts/useRes';
-import { convertScheduleToTimeline, parseTimeScheduleToTimeline } from '@/app/mocks/timeline';
+import { convertScheduleToTimeline, parseTimeScheduleToTimeline, TimeLine } from '@/app/mocks/timeline';
 import { fetchTimeSchedules } from '@/app/services';
 import { getCurrentTime } from '@/config/timezoneUtils';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import Timelines from '@/components/screens/TimeLines';
+import { MarkedDates } from 'react-native-calendars/src/types';
 
 const LazyCalendar = lazy(() => import('react-native-calendars').then(module => ({ default: module.Calendar })));
+const LazyCalendarProvider = lazy(() => import('react-native-calendars').then(module => ({ default: module.CalendarProvider })));
 
 const categories = [
   { id: '1', title: 'Schedule Daily', color: '#27ae60' },
@@ -41,8 +43,20 @@ const HomeScreen = React.memo(() => {
     refetchOnMount: false,
   });
 
-  const time = parseTimeScheduleToTimeline(timeSchedule);
-  const timelineItems = useMemo(() => convertScheduleToTimeline(time), [timeSchedule]);
+  const [timelineItems, setTimelineItems] = useState<{
+    timeline: TimeLine[];
+    markedDates: MarkedDates;
+  }>({ timeline: [], markedDates: {} });
+
+  const fetchTimelineItems = useCallback(async () => {
+    const time = await parseTimeScheduleToTimeline(timeSchedule);
+    const timeline = await convertScheduleToTimeline(time);
+    setTimelineItems(timeline);
+  }, [timeSchedule]);
+
+  useEffect(() => {
+    fetchTimelineItems();
+  }, [timeSchedule]);
 
   const markedDatesS = useMemo(() => {
     const { markedDates } = timelineItems;
@@ -66,9 +80,10 @@ const HomeScreen = React.memo(() => {
 
   const toggleSwitch = useCallback(() => setShowCalendar((prev) => !prev), []);
 
+  // Define styles with dynamic values for the theme
   const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.colors.background },
-    calendarContainer: { padding: 10, width: responsive === "small" ? "100%" : 400 },
+    calendarContainer: { padding: 10, width: responsive === 'small' ? '100%' : 400 },
     filterContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
     timelineListContainer: { flex: 1 },
     filterButton: {
@@ -96,13 +111,35 @@ const HomeScreen = React.memo(() => {
       />
       <Text style={[masterdataStyles.text, { color: item.color }]}>{item.title}</Text>
     </View>
-  ),
-    [checkedItems, toggleCheckbox, masterdataStyles.text]
-  );
+  ), [checkedItems, toggleCheckbox, masterdataStyles.text]);
+
+  // Memoize calendar theme to make it consistent
+  const calendarTheme = useMemo(() => ({
+    backgroundColor: theme.colors.background,
+    arrowColor: theme.colors.blue,
+    arrowStyle: { padding: 0 },
+    monthTextColor: theme.colors.blue,
+    textMonthFontSize: spacing.small,
+    textMonthFontFamily: 'Poppins',
+    textMonthFontWeight: 'bold' as const,
+    textSectionTitleColor: theme.colors.blue,
+    textDayHeaderFontSize: spacing.small,
+    textDayHeaderFontFamily: 'Poppins',
+    textDayHeaderFontWeight: 'normal' as const,
+    dayTextColor: theme.colors.blue,
+    todayTextColor: '#af0078',
+    textDayFontSize: spacing.small,
+    textDayFontFamily: 'Poppins',
+    textDayFontWeight: '500' as const,
+    textDayStyle: { marginTop: Platform.OS === 'android' ? 2 : 4 },
+    selectedDayBackgroundColor: theme.colors.blue,
+    selectedDayTextColor: theme.colors.yellow,
+    textDisabledColor: theme.colors.yellow,
+  }), [theme, spacing]);
 
   return (
     <View style={styles.container}>
-      <CalendarProvider date={currentDate} onDateChanged={setCurrentDate} showTodayButton>
+      <LazyCalendarProvider date={currentDate} onDateChanged={setCurrentDate} showTodayButton theme={calendarTheme}>
         <View style={{ flex: 1, flexDirection: responsive === 'small' ? 'column' : 'row' }}>
           {showCalendar && (
             <View style={styles.calendarContainer}>
@@ -117,6 +154,8 @@ const HomeScreen = React.memo(() => {
                     }}
                     markedDates={markedDatesS}
                     markingType="multi-dot"
+                    theme={calendarTheme}
+                    style={{ borderRadius: 10 }}
                   />
                 }
               />
@@ -142,10 +181,9 @@ const HomeScreen = React.memo(() => {
             <Timelines filterStatus={filterStatus} filterTitle={filterTitle} currentDate={currentDate} timeline={timelineItems.timeline} />
           </View>
         </View>
-      </CalendarProvider>
+      </LazyCalendarProvider>
     </View>
   );
 });
 
 export default HomeScreen;
-

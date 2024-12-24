@@ -47,7 +47,7 @@ const CustomtableData = React.memo(({ Tablehead, flexArr, actionIndex, displayDa
                         />
                     </Suspense>
                 }
-                keyExtractor={(item, index) => `${item}`}
+                keyExtractor={(item, index) => `${index}`}
                 ListEmptyComponent={() => (
                     <Text style={[masterdataStyles.text, { textAlign: 'center', fontStyle: 'italic' }]}>
                         No data found...

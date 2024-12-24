@@ -13,6 +13,7 @@ import CustomMenu from '@/components/navigation/CustomMenu'
 import Setting_dialog from "@/components/screens/Setting_dialog"
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text } from 'react-native-paper';
+import { navigate } from './navigationUtils';
 
 const Drawer = createDrawerNavigator();
 const MemoSetting_dialog = React.memo(Setting_dialog)
@@ -61,6 +62,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
     const handleLogout = useCallback(() => {
         dispatch(initializeLogout());
         setMenuVisible(false);
+        navigate("Login")
     }, [dispatch]);
 
     const toggleMenu = useCallback(() => {

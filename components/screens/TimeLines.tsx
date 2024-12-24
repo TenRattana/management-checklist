@@ -1,14 +1,16 @@
 import React, { lazy, useCallback, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, TouchableOpacity } from 'react-native';
 import { useTheme } from '@/app/contexts/useTheme';
 import moment from 'moment-timezone';
 import { groupBy } from 'lodash';
-import { CalendarUtils, Timeline, TimelineListRenderItemInfo, TimelineProps } from 'react-native-calendars';
+import { CalendarUtils, TimelineListRenderItemInfo, TimelineProps } from 'react-native-calendars';
 import { getCurrentTime } from '@/config/timezoneUtils';
 import Home_dialog from './Home_dialog';
 import useMasterdataStyles from '@/styles/common/masterdata';
 
 const LazyTimelineList = lazy(() => import('react-native-calendars').then(module => ({ default: module.TimelineList })));
+const LazyTimeline = lazy(() => import('react-native-calendars').then(module => ({ default: module.Timeline })));
+
 const MemoHome_dialog = React.memo(Home_dialog)
 
 type Event = {
@@ -84,7 +86,7 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
 
     const renderItem = useCallback((timelineProps: TimelineProps, info: TimelineListRenderItemInfo) => {
         return (
-            <Timeline
+            <LazyTimeline
                 {...timelineProps}
                 styles={{ contentStyle: { backgroundColor: theme.colors.fff } }}
                 onEventPress={handleEventClick}
