@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
-import { TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
+import { TouchableOpacity, StyleSheet, ActivityIndicator, View } from "react-native";
 import axiosInstance from "@/config/axios";
-import { AccessibleView, Searchbar, Text } from "@/components";
+import { Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useToast } from '@/app/contexts/useToast';
@@ -11,8 +11,9 @@ import { InitialValuesGroupCheckList } from '@/typing/value'
 import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import { useSelector } from "react-redux";
 import { fetchGroupCheckListOption, fetchSearchGroupCheckListOption, saveGroupCheckListNoOption } from "@/app/services";
+import { useTheme } from "@/app/contexts/useTheme";
 
-const Checklist_group_dialog = lazy(() => import("@/components/screens/Checklist_group_dialog"));
+const LazyChecklist_group_dialog = lazy(() => import("@/components/screens/Checklist_group_dialog"));
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
 const ChecklistGroupScreen = React.memo(() => {
@@ -31,12 +32,9 @@ const ChecklistGroupScreen = React.memo(() => {
     const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
+    const { theme } = useTheme();
     const queryClient = useQueryClient();
     const [groupCheckListOption, setGroupCheckListOption] = useState<GroupCheckListOption[]>([]);
-
-    const handlePaginationChange = () => {
-        hasNextPage && !isFetching && fetchNextPage();
-    };
 
     const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
         ['groupCheckListOption', debouncedSearchQuery],
@@ -58,6 +56,12 @@ const ChecklistGroupScreen = React.memo(() => {
             },
         }
     );
+
+    const handlePaginationChange = useCallback(() => {
+        if (hasNextPage && !isFetching) {
+            fetchNextPage();
+        }
+    }, [hasNextPage, isFetching, fetchNextPage]);
 
     useEffect(() => {
         if (debouncedSearchQuery === "") {
@@ -163,7 +167,8 @@ const ChecklistGroupScreen = React.memo(() => {
 
     const styles = StyleSheet.create({
         container: {
-            flex: 1
+            flex: 1,
+            backgroundColor: theme.colors.background
         },
         header: {
             fontSize: spacing.large,
@@ -180,12 +185,12 @@ const ChecklistGroupScreen = React.memo(() => {
     });
 
     return (
-        <AccessibleView name="container-groupchecklist" style={styles.container}>
+        <View id="container-groupchecklist" style={styles.container}>
             <Card.Title
                 title="Create Group Option"
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
-            <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
+            <View id="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
                     placeholder="Search Group CheckList..."
                     value={searchQuery}
@@ -195,7 +200,7 @@ const ChecklistGroupScreen = React.memo(() => {
                 <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                     <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Group Option</Text>
                 </TouchableOpacity>
-            </AccessibleView>
+            </View>
             <Card.Content style={styles.cardcontent}>
                 <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
@@ -204,7 +209,7 @@ const ChecklistGroupScreen = React.memo(() => {
 
             {isVisible && (
                 <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
-                    <Checklist_group_dialog
+                    <LazyChecklist_group_dialog
                         isVisible={isVisible}
                         setIsVisible={setIsVisible}
                         isEditing={isEditing}
@@ -213,7 +218,7 @@ const ChecklistGroupScreen = React.memo(() => {
                     />
                 </Suspense>
             )}
-        </AccessibleView>
+        </View>
     );
 });
 

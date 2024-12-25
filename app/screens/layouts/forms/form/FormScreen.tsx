@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { TouchableOpacity, StyleSheet } from "react-native";
+import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
+import { TouchableOpacity, StyleSheet, View, ActivityIndicator } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts/useToast";
-import { Customtable, AccessibleView, Searchbar, Text } from "@/components";
+import { Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { FormScreenProps } from "@/typing/tag";
@@ -10,6 +10,9 @@ import { Form } from "@/typing/type";
 import { useInfiniteQuery, useQueryClient } from 'react-query';
 import { fetchForms, fetchSearchFomrs } from "@/app/services";
 import { useRes } from "@/app/contexts/useRes";
+import { useTheme } from "@/app/contexts/useTheme";
+
+const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
 const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -20,12 +23,9 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
     const { spacing } = useRes();
+    const { theme } = useTheme();
     const queryClient = useQueryClient();
     const [form, setForm] = useState<Form[]>([])
-
-    const handlePaginationChange = () => {
-        hasNextPage && !isFetching && fetchNextPage()
-    };
 
     const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
         ['form', debouncedSearchQuery],
@@ -47,6 +47,12 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
             },
         }
     );
+
+    const handlePaginationChange = useCallback(() => {
+        if (hasNextPage && !isFetching) {
+            fetchNextPage();
+        }
+    }, [hasNextPage, isFetching, fetchNextPage]);
 
     useEffect(() => {
         if (debouncedSearchQuery === "") {
@@ -134,6 +140,7 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
     const styles = StyleSheet.create({
         container: {
             flex: 1,
+            backgroundColor: theme.colors.background
         },
         header: {
             fontSize: spacing.medium,
@@ -150,12 +157,12 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
     });
 
     return (
-        <AccessibleView name="container-form" style={styles.container}>
+        <View id="container-form" style={styles.container}>
             <Card.Title
                 title="Forms"
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
-            <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
+            <View id="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
                     placeholder="Search Form..."
                     value={searchQuery}
@@ -165,11 +172,13 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
                 <TouchableOpacity onPress={handleNewForm} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                     <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>New Form</Text>
                 </TouchableOpacity>
-            </AccessibleView>
+            </View>
             <Card.Content style={styles.cardcontent}>
-                <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                    <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                </Suspense>
             </Card.Content>
-        </AccessibleView>
+        </View>
     );
 });
 

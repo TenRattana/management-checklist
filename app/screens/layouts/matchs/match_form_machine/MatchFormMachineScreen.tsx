@@ -1,17 +1,20 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { TouchableOpacity, StyleSheet } from "react-native";
+import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
+import { TouchableOpacity, StyleSheet, View, ActivityIndicator } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
-import { Customtable, AccessibleView, Searchbar, Text } from "@/components";
+import { Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import Match_form_machine_dialog from "@/components/screens/Match_form_machine_dialog";
 import { MatchForm } from '@/typing/type'
 import { InitialValuesMatchFormMachine } from '@/typing/value'
 import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
 import { useSelector } from "react-redux";
 import { fetchMatchFormMchines, fetchSearchMatchFormMchine, SaveMatchFormMachine } from "@/app/services";
+import { useTheme } from "@/app/contexts/useTheme";
+
+const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
+const LazyMatch_form_machine_dialog = lazy(() => import("@/components/screens/Match_form_machine_dialog"));
 
 const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -27,12 +30,9 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
     const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
+    const { theme } = useTheme();
     const queryClient = useQueryClient();
     const [matchForm, setMatchForm] = useState<MatchForm[]>([])
-
-    const handlePaginationChange = () => {
-        hasNextPage && !isFetching && fetchNextPage()
-    };
 
     const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
         ['matchForm', debouncedSearchQuery],
@@ -54,6 +54,12 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
             },
         }
     );
+
+    const handlePaginationChange = useCallback(() => {
+        if (hasNextPage && !isFetching) {
+            fetchNextPage();
+        }
+    }, [hasNextPage, isFetching, fetchNextPage]);
 
     useEffect(() => {
         if (debouncedSearchQuery === "") {
@@ -172,7 +178,8 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
 
     const styles = StyleSheet.create({
         container: {
-            flex: 1
+            flex: 1,
+            backgroundColor: theme.colors.background
         },
         header: {
             fontSize: spacing.large,
@@ -188,15 +195,13 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
         }
     })
 
-    const MemoMatch_form_machine_dialog = React.memo(Match_form_machine_dialog)
-
     return (
-        <AccessibleView name="container-checklist" style={styles.container}>
+        <View id="container-checklist" style={styles.container}>
             <Card.Title
                 title="Create Match Machine & Form"
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
-            <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
+            <View id="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
                     placeholder="Search Macht Form Machine..."
                     value={searchQuery}
@@ -206,21 +211,25 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
                 <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                     <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Match Machine & Form</Text>
                 </TouchableOpacity>
-            </AccessibleView>
+            </View>
             <Card.Content style={styles.cardcontent}>
-                <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                    <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                </Suspense>
             </Card.Content>
 
             {isVisible && (
-                <MemoMatch_form_machine_dialog
-                    isVisible={isVisible}
-                    setIsVisible={setIsVisible}
-                    isEditing={isEditing}
-                    initialValues={initialValues}
-                    saveData={saveData}
-                />
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                    <LazyMatch_form_machine_dialog
+                        isVisible={isVisible}
+                        setIsVisible={setIsVisible}
+                        isEditing={isEditing}
+                        initialValues={initialValues}
+                        saveData={saveData}
+                    />
+                </Suspense>
             )}
-        </AccessibleView>
+        </View>
     );
 });
 

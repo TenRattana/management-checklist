@@ -1,15 +1,18 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { useToast } from '@/app/contexts/useToast';
 import { useRes } from '@/app/contexts/useRes';
-import { Customtable, AccessibleView, Searchbar } from "@/components";
+import { Searchbar } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { ExpectedResult } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
 import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
-import { StyleSheet } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { useSelector } from "react-redux";
 import { fetchApporved, fetchSearchApporved, SaveApporved } from "@/app/services";
+import { useTheme } from "@/app/contexts/useTheme";
+
+const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
 const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -19,12 +22,9 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
+    const { theme } = useTheme();
     const queryClient = useQueryClient();
     const [approved, setApproved] = useState<ExpectedResult[]>([])
-
-    const handlePaginationChange = () => {
-        hasNextPage && !isFetching && fetchNextPage()
-    };
 
     const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
         ['machine', debouncedSearchQuery],
@@ -46,6 +46,12 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
             },
         }
     );
+
+    const handlePaginationChange = useCallback(() => {
+        if (hasNextPage && !isFetching) {
+            fetchNextPage();
+        }
+    }, [hasNextPage, isFetching, fetchNextPage]);
 
     useEffect(() => {
         if (debouncedSearchQuery === "") {
@@ -155,7 +161,8 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
 
     const styles = StyleSheet.create({
         container: {
-            flex: 1
+            flex: 1,
+            backgroundColor: theme.colors.background
         },
         header: {
             fontSize: spacing.large,
@@ -172,23 +179,25 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
     })
 
     return (
-        <AccessibleView name="container-checklist" style={styles.container}>
+        <View id="container-checklist" style={styles.container}>
             <Card.Title
                 title="List Acknowledged"
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
-            <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
+            <View id="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
                     placeholder="Search Acknowledged..."
                     value={searchQuery}
                     onChange={setSearchQuery}
                     testId="search-ac"
                 />
-            </AccessibleView>
+            </View>
             <Card.Content style={styles.cardcontent}>
-                <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                    <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                </Suspense>
             </Card.Content>
-        </AccessibleView>
+        </View>
     );
 });
 

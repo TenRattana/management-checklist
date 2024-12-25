@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from '@/app/contexts/useToast';
 import { Customtable, AccessibleView, Searchbar } from "@/components";
@@ -7,21 +7,22 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { ExpectedResult } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
 import { useInfiniteQuery } from 'react-query';
-import { StyleSheet } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { fetchExpectedResults, fetchSearchExpectedResult } from "@/app/services";
+import { useTheme } from "@/app/contexts/useTheme";
+import { getCurrentTime } from "@/config/timezoneUtils";
+
+const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
 const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
 
     const masterdataStyles = useMasterdataStyles();
-    const {  handleError } = useToast();
+    const { handleError } = useToast();
     const { spacing, fontSize } = useRes();
+    const { theme } = useTheme();
     const [expectedResult, setExpectedResult] = useState<ExpectedResult[]>([])
-
-    const handlePaginationChange = () => {
-        hasNextPage && !isFetching && fetchNextPage()
-    };
 
     const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
         ['expectedResult', debouncedSearchQuery],
@@ -43,6 +44,12 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
             },
         }
     );
+
+    const handlePaginationChange = useCallback(() => {
+        if (hasNextPage && !isFetching) {
+            fetchNextPage();
+        }
+    }, [hasNextPage, isFetching, fetchNextPage]);
 
     useEffect(() => {
         if (debouncedSearchQuery === "") {
@@ -120,12 +127,17 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
         ],
         handleAction,
         showMessage: [0, 1],
+        showFilterDate: true,
+        showColumn: "Date",
+        ShowTitle: "Select Date :",
+        showData: [{ Date: "To Day" }, { Date: "To Week" }, { Date: "To Month" }, { Date: "To Year" }],
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction,]);
 
     const styles = StyleSheet.create({
         container: {
-            flex: 1
+            flex: 1,
+            backgroundColor: theme.colors.background
         },
         header: {
             fontSize: spacing.large,
@@ -142,23 +154,25 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
     })
 
     return (
-        <AccessibleView name="container-checklist" style={styles.container}>
+        <View id="container-checklist" style={styles.container}>
             <Card.Title
                 title="ExpectedResult"
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
-            <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
+            <View id="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
                     placeholder="Search ExpectedResult..."
                     value={searchQuery}
                     onChange={setSearchQuery}
                     testId="search-er"
                 />
-            </AccessibleView>
+            </View>
             <Card.Content style={styles.cardcontent}>
-                <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                    <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                </Suspense>
             </Card.Content>
-        </AccessibleView>
+        </View>
     );
 });
 

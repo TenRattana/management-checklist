@@ -1,17 +1,20 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { TouchableOpacity, StyleSheet } from "react-native";
+import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
+import { TouchableOpacity, StyleSheet, View, ActivityIndicator } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
-import { Customtable, AccessibleView, Searchbar, Text } from "@/components";
+import { Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import Match_checklist_option from "@/components/screens/Match_checklist_option_dialog";
 import { MatchCheckListOption } from '@/typing/type'
 import { InitialValuesMatchCheckListOption } from '@/typing/value'
 import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
 import { useSelector } from "react-redux";
 import { fetchMatchCheckListOptions, fetchSearchMatchCheckListOptions, saveMatchCheckListOptions } from "@/app/services";
+import { useTheme } from "@/app/contexts/useTheme";
+
+const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
+const LazyMatch_CheckList_Option_dialog = lazy(() => import("@/components/screens/Match_checklist_option_dialog"));
 
 const MatchCheckListOptionScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -30,12 +33,9 @@ const MatchCheckListOptionScreen = React.memo(() => {
     const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
+    const { theme } = useTheme();
     const queryClient = useQueryClient();
     const [matchCheckListOption, setMatchCheckListOption] = useState<MatchCheckListOption[]>([])
-
-    const handlePaginationChange = () => {
-        hasNextPage && !isFetching && fetchNextPage()
-    };
 
     const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
         ['matchCheckListOption', debouncedSearchQuery],
@@ -57,6 +57,12 @@ const MatchCheckListOptionScreen = React.memo(() => {
             },
         }
     );
+
+    const handlePaginationChange = useCallback(() => {
+        if (hasNextPage && !isFetching) {
+            fetchNextPage();
+        }
+    }, [hasNextPage, isFetching, fetchNextPage]);
 
     useEffect(() => {
         if (debouncedSearchQuery === "") {
@@ -174,7 +180,8 @@ const MatchCheckListOptionScreen = React.memo(() => {
 
     const styles = StyleSheet.create({
         container: {
-            flex: 1
+            flex: 1,
+            backgroundColor: theme.colors.background
         },
         header: {
             fontSize: spacing.large,
@@ -190,15 +197,13 @@ const MatchCheckListOptionScreen = React.memo(() => {
         }
     })
 
-    const MemoMatch_checklist_option = React.memo(Match_checklist_option)
-
     return (
-        <AccessibleView name="container-matchchecklist" style={styles.container}>
+        <View id="container-matchchecklist" style={styles.container}>
             <Card.Title
                 title="Create Match Group & Option"
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
-            <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
+            <View id="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
                     placeholder="Search Match Checklist Machine..."
                     value={searchQuery}
@@ -208,19 +213,25 @@ const MatchCheckListOptionScreen = React.memo(() => {
                 <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                     <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Match Group & Option</Text>
                 </TouchableOpacity>
-            </AccessibleView>
+            </View>
             <Card.Content style={styles.cardcontent}>
-                <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                    <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                </Suspense>
             </Card.Content>
 
-            <MemoMatch_checklist_option
-                isVisible={isVisible}
-                setIsVisible={setIsVisible}
-                isEditing={isEditing}
-                initialValues={initialValues}
-                saveData={saveData}
-            />
-        </AccessibleView>
+            {isVisible && (
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                    <LazyMatch_CheckList_Option_dialog
+                        isVisible={isVisible}
+                        setIsVisible={setIsVisible}
+                        isEditing={isEditing}
+                        initialValues={initialValues}
+                        saveData={saveData}
+                    />
+                </Suspense>
+            )}
+        </View>
     );
 });
 

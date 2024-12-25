@@ -13,7 +13,7 @@ import { fetchMachineGroups, fetchSearchMachineGroups, saveGroupMachine } from "
 import axiosInstance from "@/config/axios";
 import { useTheme } from "@/app/contexts/useTheme";
 
-const Machine_group_dialog = lazy(() => import("@/components/screens/Machine_group_dialog"));
+const LazyMachine_group_dialog = lazy(() => import("@/components/screens/Machine_group_dialog"));
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
 const MachineGroupScreen = React.memo(() => {
@@ -209,7 +209,7 @@ const MachineGroupScreen = React.memo(() => {
 
             {isVisible && (
                 <Suspense fallback={<ActivityIndicator size="large" color={theme.colors.primary} />}>
-                    <Machine_group_dialog
+                    <LazyMachine_group_dialog
                         isVisible={isVisible}
                         setIsVisible={setIsVisible}
                         isEditing={isEditing}

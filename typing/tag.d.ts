@@ -155,6 +155,7 @@ export interface CustomTableProps {
   ShowTitle?: string;
   handlePaginationChange?:() => void;
   isFetching?:boolean;
+  showFilterDate?:boolean;
 }
 
 export interface DragfieldProps {

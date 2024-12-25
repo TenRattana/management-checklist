@@ -13,7 +13,6 @@ import ScheduleDialog from "@/components/screens/Schedule_dialog";
 import { fetchSearchTimeSchedules, fetchTimeSchedules, saveTimeSchedule } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 
-
 const TimescheduleScreen: React.FC = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");

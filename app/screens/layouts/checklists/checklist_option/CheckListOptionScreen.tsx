@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useCallback, useMemo, Suspense, lazy } from "react";
-import { TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
+import { TouchableOpacity, StyleSheet, ActivityIndicator, View } from "react-native";
 import axiosInstance from "@/config/axios";
-import { Customtable, AccessibleView, Searchbar, Text } from "@/components";
+import { Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useToast } from '@/app/contexts/useToast';
 import { useRes } from '@/app/contexts/useRes';
-import Checklist_option_dialog from "@/components/screens/Checklist_option_dialog";
 import { CheckListOption } from '@/typing/type'
 import { InitialValuesCheckListOption } from '@/typing/value'
 import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
 import { useSelector } from "react-redux";
 import { fetchCheckListOption, fetchSearchCheckListOption, saveCheckListOption } from "@/app/services";
+import { useTheme } from "@/app/contexts/useTheme";
 
-const Checklist_group_dialog = lazy(() => import("@/components/screens/Checklist_group_dialog"));
+const LazyChecklist_group_dialog = lazy(() => import("@/components/screens/Checklist_option_dialog"));
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
 const CheckListOptionScreen = React.memo(() => {
@@ -32,12 +32,9 @@ const CheckListOptionScreen = React.memo(() => {
     const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
+    const { theme } = useTheme();
     const queryClient = useQueryClient();
     const [checkListOption, setCheckListOption] = useState<CheckListOption[]>([])
-
-    const handlePaginationChange = () => {
-        hasNextPage && !isFetching && fetchNextPage()
-    };
 
     const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
         ['checkListOption', debouncedSearchQuery],
@@ -59,6 +56,12 @@ const CheckListOptionScreen = React.memo(() => {
             },
         }
     );
+
+    const handlePaginationChange = useCallback(() => {
+        if (hasNextPage && !isFetching) {
+            fetchNextPage();
+        }
+    }, [hasNextPage, isFetching, fetchNextPage]);
 
     useEffect(() => {
         if (debouncedSearchQuery === "") {
@@ -166,7 +169,8 @@ const CheckListOptionScreen = React.memo(() => {
 
     const styles = StyleSheet.create({
         container: {
-            flex: 1
+            flex: 1,
+            backgroundColor: theme.colors.background
         },
         header: {
             fontSize: spacing.large,
@@ -182,15 +186,13 @@ const CheckListOptionScreen = React.memo(() => {
         }
     })
 
-    const MemoChecklist_option_dialog = React.memo(Checklist_option_dialog)
-
     return (
-        <AccessibleView name="container-checklistoption" style={styles.container}>
+        <View id="container-checklistoption" style={styles.container}>
             <Card.Title
                 title="Create Option"
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
-            <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
+            <View id="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
                     placeholder="Search Checklist Option..."
                     value={searchQuery}
@@ -200,14 +202,16 @@ const CheckListOptionScreen = React.memo(() => {
                 <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                     <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Option</Text>
                 </TouchableOpacity>
-            </AccessibleView>
+            </View>
             <Card.Content style={styles.cardcontent}>
-                <Customtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                    <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                </Suspense>
             </Card.Content>
 
             {isVisible && (
                 <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
-                    <MemoChecklist_option_dialog
+                    <LazyChecklist_group_dialog
                         isVisible={isVisible}
                         setIsVisible={setIsVisible}
                         isEditing={isEditing}
@@ -217,7 +221,7 @@ const CheckListOptionScreen = React.memo(() => {
                 </Suspense>
 
             )}
-        </AccessibleView>
+        </View>
     );
 });
 

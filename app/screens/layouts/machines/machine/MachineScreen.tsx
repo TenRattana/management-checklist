@@ -3,7 +3,7 @@ import { TouchableOpacity, StyleSheet, ActivityIndicator, View } from "react-nat
 import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
-import { AccessibleView, Searchbar, Text } from "@/components";
+import { Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { Machine } from '@/typing/type';
@@ -11,11 +11,12 @@ import { InitialValuesMachine } from '@/typing/value';
 import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
 import { useSelector } from "react-redux";
 import { fetchMachines, fetchSearchMachines, saveMachine } from "@/app/services";
+import { useTheme } from "@/app/contexts/useTheme";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 const LazyMachine_dialog = lazy(() => import("@/components/screens/Machine_dialog"));
 
-const MachineGroupScreen: React.FC = React.memo(() => {
+const MachineGroupScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -38,12 +39,9 @@ const MachineGroupScreen: React.FC = React.memo(() => {
     const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize } = useRes();
+    const { theme } = useTheme();
     const queryClient = useQueryClient();
     const [machines, setMachine] = useState<Machine[]>([]);
-
-    const handlePaginationChange = () => {
-        hasNextPage && !isFetching && fetchNextPage();
-    };
 
     const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
         ['machine', debouncedSearchQuery],
@@ -65,6 +63,12 @@ const MachineGroupScreen: React.FC = React.memo(() => {
             },
         }
     );
+
+    const handlePaginationChange = useCallback(() => {
+        if (hasNextPage && !isFetching) {
+            fetchNextPage();
+        }
+    }, [hasNextPage, isFetching, fetchNextPage]);
 
     useEffect(() => {
         if (debouncedSearchQuery === "") {
@@ -192,7 +196,8 @@ const MachineGroupScreen: React.FC = React.memo(() => {
 
     const styles = StyleSheet.create({
         container: {
-            flex: 1
+            flex: 1,
+            backgroundColor: theme.colors.background
         },
         header: {
             fontSize: spacing.large,
@@ -209,12 +214,12 @@ const MachineGroupScreen: React.FC = React.memo(() => {
     });
 
     return (
-        <AccessibleView name="container-machine" style={styles.container}>
+        <View id="container-machine" style={styles.container}>
             <Card.Title
                 title="Create Machine"
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
-            <AccessibleView name="container-search" style={masterdataStyles.containerSearch}>
+            <View id="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
                     placeholder="Search Machine..."
                     value={searchQuery}
@@ -224,7 +229,7 @@ const MachineGroupScreen: React.FC = React.memo(() => {
                 <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
                     <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Machine</Text>
                 </TouchableOpacity>
-            </AccessibleView>
+            </View>
             <Card.Content style={styles.cardcontent}>
                 <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
@@ -242,7 +247,7 @@ const MachineGroupScreen: React.FC = React.memo(() => {
                     />
                 </Suspense>
             )}
-        </AccessibleView>
+        </View>
     );
 });
 
