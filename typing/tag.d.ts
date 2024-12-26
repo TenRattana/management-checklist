@@ -19,7 +19,6 @@ import * as Yup from "yup";
 import { FormikErrors } from "formik";
 
 export type CreateFormParams = { formId: string };
-export type FormParams = { messages: string };
 export type PreviewParams = { formId: string; action?: string };
 export type ScanParams = { machineId: string };
 
@@ -113,7 +112,7 @@ export interface PreviewProps<T extends PreviewParams | ScanParams> {
 
 export interface FormScreenProps {
   navigation: NavigationProp<any>;
-  route: Route<FormParams>;
+  route: any;
 }
 
 export interface CreateFormProps {

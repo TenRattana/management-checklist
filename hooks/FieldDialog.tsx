@@ -138,7 +138,7 @@ const useField = () => {
                 })
             )
         });
-    }, [checkListType, dataType]);
+    }, [checkListTypes, dataType]);
 
     const mutation = useMutation(saveCheckList, {
         onSuccess: (data) => {

@@ -168,31 +168,33 @@ const useForm = (route: RouteParams) => {
                 setExp(true)
             }
 
-            const { subForms, fields } = createSubFormsAndFields(
-                response.data?.data[0],
-                fetchedExpectedResult,
-                data.groupCheckListOption || data.groupCheckListOptionActive
-            );
+            if (response.data?.data?.[0]) {
+                const { subForms, fields } = createSubFormsAndFields(
+                    response.data?.data?.[0],
+                    fetchedExpectedResult,
+                    data.groupCheckListOption || data.groupCheckListOptionActive
+                );
+                if (mode && response.data?.status) {
+                    setFound(true)
+                }
 
-            if (mode && response.data?.status) {
-                setFound(true)
-            }
+                const checkListType = data.checkListType
+                    .filter(group => group.CheckList !== null)
+                    .flatMap(group => group.CheckList)
+                    .filter((checkList): checkList is CheckList => checkList !== undefined);
 
-            const checkListType = data.checkListType
-                .filter(group => group.CheckList !== null)
-                .flatMap(group => group.CheckList)
-                .filter((checkList): checkList is CheckList => checkList !== undefined);
+                dispatch(
+                    setFormData({
+                        form: action === "copy" ? {} : response.data?.data[0],
+                        subForms,
+                        BaseFormState: fields,
+                        checkList: data.checkList,
+                        checkListType: checkListType,
+                        dataType: data.dataType
+                    })
+                );
+            } else { setFound(false) }
 
-            dispatch(
-                setFormData({
-                    form: action === "copy" ? {} : response.data?.data[0],
-                    subForms,
-                    BaseFormState: fields,
-                    checkList: data.checkList,
-                    checkListType: checkListType,
-                    dataType: data.dataType
-                })
-            );
         } catch (error) {
             handleError(error);
         }

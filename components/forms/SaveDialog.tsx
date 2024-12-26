@@ -7,6 +7,7 @@ import { useToast } from "@/app/contexts/useToast";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
 import { useSelector } from "react-redux";
+import { navigate } from "@/app/navigations/navigationUtils";
 
 const SaveDialog = React.memo(({
     state,
@@ -15,7 +16,7 @@ const SaveDialog = React.memo(({
     navigation
 }: SaveDialogProps & { navigation: any }) => {
     const prefix = useSelector((state: any) => state.prefix);
-    const { handleError } = useToast();
+    const { handleError, showSuccess } = useToast();
     const masterdataStyles = useMasterdataStyles();
 
     const saveForm = useCallback(async () => {
@@ -38,7 +39,8 @@ const SaveDialog = React.memo(({
         try {
             const response = await axiosInstance.post("MatchCheckList_service.asmx/SaveFormCheckList", data);
             messages = (String(response.data.message));
-            navigation.navigate("Form", { messages });
+            showSuccess(messages);
+            navigate("Form", { fet: true });
         } catch (error) {
             handleError(error)
         } finally {
