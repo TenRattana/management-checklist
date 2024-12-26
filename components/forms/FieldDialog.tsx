@@ -15,7 +15,7 @@ import GroupCreate_dialog from "../screens/GroupCreate_dialog";
 import CheckListCreate_dialog from "../screens/CheckListCreate_dialog";
 import { styles } from "../screens/Schedule";
 import useField from "@/hooks/FieldDialog";
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import { fetchCheckList, fetchCheckListOption, fetchGroupCheckListOption, fetchSearchCheckList, fetchSearchCheckListOption, fetchSearchGroupCheckListOption, saveCheckList, saveCheckListOption, saveGroupCheckListOption } from "@/app/services";
 import { InitialValuesChecklist, InitialValuesCheckListOption, InitialValuesGroupCheckList } from "@/typing/value";
 import { useSelector } from "react-redux";
@@ -348,7 +348,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                         }}
                         enableReinitialize={true}
                     >
-                        {({ setFieldValue, values, handleSubmit, isValid, dirty, setFieldTouched, touched, errors }) => {
+                        {({ setFieldValue, values, handleSubmit, setFieldTouched, touched, errors }) => {
                             glc.current = values.GCLOptionID
 
                             const updateRenderStates = useCallback(() => {
@@ -393,26 +393,6 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
                             useEffect(() => {
 
-                                if (values.Important !== shouldRenderIT) {
-                                    setShouldRenderIT(values.Important);
-
-                                }
-                                const dataTypeItem = values.DTypeID ? dataType.find(item => item.DTypeID === values.DTypeID)?.DTypeName : undefined;
-
-                                if (values.Important) {
-
-                                    if (dataTypeItem === "Number") {
-                                        updateImportantList({ Value: undefined });
-                                    } else {
-                                        updateImportantList({ MinLength: undefined, MaxLength: undefined, Value: undefined });
-                                    }
-                                }
-
-                                setShouldRenderDT(dataTypeItem === "Number");
-                            }, [values.DTypeID, values.Important, dataType]);
-
-                            useEffect(() => {
-
                                 let options: { label: string; value: string; }[] = [];
 
                                 if (values.GCLOptionID) {
@@ -426,17 +406,31 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                             value: item.CLOptionID,
                                         })) || [];
                                     }) || [];
-
-                                    updateImportantList({ MinLength: undefined, MaxLength: undefined });
                                 }
 
                                 setOption(prevOptions => {
                                     const isEqual = JSON.stringify(prevOptions) === JSON.stringify(options);
                                     return isEqual ? prevOptions : options;
                                 });
-                            }, [values.GCLOptionID, itemsML]);
+
+                                if (values.Important !== shouldRenderIT) {
+                                    setShouldRenderIT(values.Important);
+                                }
+
+                                const dataTypeItem = values.DTypeID ? dataType.find(item => item.DTypeID === values.DTypeID)?.DTypeName : undefined;
+
+                                if (values.Important) {
+                                    if (dataTypeItem === "Number") {
+                                        updateImportantList({ Value: undefined });
+                                    } else {
+                                        updateImportantList({ MinLength: undefined, MaxLength: undefined });
+                                    }
+                                }
+                                setShouldRenderDT(dataTypeItem === "Number");
+                            }, [values.GCLOptionID, itemsML, values.DTypeID, values.Important, dataType]);
 
                             const handelChange = (field: string, value: any) => {
+                                field === "GCLOptionID" && values.Important && updateImportantList({ Value: undefined })
 
                                 setFieldTouched(field, true)
                                 setFieldValue(field, value)
