@@ -19,8 +19,8 @@ const optimizeMoment = (date: moment.Moment, time: string): string => {
 
 export const convertSchedule = (schedule: TimelineItem[]): { timeline: TimeLine[]; markedDates: MarkedDates } => {
     const today = moment();
-    const startOfYear = today.clone().startOf('year');
-    const endOfYear = today.clone().endOf('year');
+    const startOfYear = today.clone().startOf('week');
+    const endOfYear = today.clone().endOf('week');
     const timeline: TimeLine[] = [];
     const markedDates: MarkedDates = {};
 

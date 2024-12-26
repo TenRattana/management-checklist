@@ -2,16 +2,19 @@ import React, { lazy, Suspense, useCallback, useEffect, useMemo, useState } from
 import { ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 import { useTheme } from '@/app/contexts/useTheme';
 import moment from 'moment-timezone';
-import { TimelineEventProps, TimelineListRenderItemInfo, TimelineProps } from 'react-native-calendars';
+import { CalendarUtils, TimelineEventProps, TimelineListRenderItemInfo, TimelineProps } from 'react-native-calendars';
 import { getCurrentTime } from '@/config/timezoneUtils';
 import Home_dialog from './Home_dialog';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { useQuery } from 'react-query';
 import { fetchTimeSchedules } from '@/app/services';
 import { GroupMachine } from '@/typing/type';
-import { CustomLightTheme } from '@/constants/CustomColor';
+import { parseTimeScheduleToTimeline } from '@/app/mocks/parseTimeScheduleToTimeline';
+import { convertSchedule } from '@/app/mocks/convertSchedule';
+import { groupBy } from 'lodash';
+import { TimeLine } from '@/app/mocks/timeline';
 
-// const LazyTimelineList = lazy(() => import('react-native-calendars').then(module => ({ default: module.TimelineList })));
+const LazyTimelineList = lazy(() => import('react-native-calendars').then(module => ({ default: module.TimelineList })));
 const LazyTimeline = lazy(() => import('react-native-calendars').then(module => ({ default: module.Timeline })));
 
 const MemoHome_dialog = React.memo(Home_dialog);
@@ -32,48 +35,6 @@ type TimelinesProps = {
 };
 
 type ScheduleType = 'Daily' | 'Weekly' | 'Custom';
-
-type Day = {
-    start: string | null;
-    end: string | null;
-};
-
-export interface TimeScheduleProps {
-    ScheduleID: string;
-    ScheduleName: string;
-    MachineGroup?: GroupMachine[];
-    Type_schedule: ScheduleType;
-    Tracking: boolean;
-    IsActive: boolean;
-    Custom: boolean;
-    TimeSlots?: Day[];
-    TimeCustom?: Day[];
-    TimeWeek?: Record<string, Day[]>;
-}
-
-export interface TimelineItem {
-    ScheduleID: string;
-    date: string;
-    name: string;
-    time: string;
-    status: boolean;
-}
-
-export interface Tracking {
-    ScheduleID: string;
-    Tracking: boolean;
-    Status: boolean;
-    TrackingTime: Day[];
-}
-
-export interface TimeLine extends TimelineEventProps {
-    ScheduleID: string;
-    status: boolean;
-    type?: string;
-    info?: TimeScheduleProps;
-    Tracking?: Tracking[];
-    statustype: string;
-}
 
 type MarkedDates = Record<string, { dots: DOT[] }>;
 
@@ -99,101 +60,40 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
         refetchOnMount: false,
     });
 
-    const [timelineItems, setTimelineItems] = useState<{
-        timeline: TimeLine[];
-        markedDates: MarkedDates;
-    }>({ timeline: [], markedDates: {} });
+    const [timelineItems, setTimelineItems] = useState<TimeLine[]>([]);
 
     const computedTimeline = useMemo(() => {
         if (isLoading || !timeSchedule.length) return { timeline: [], markedDates: {} };
-
         const time = parseTimeScheduleToTimeline(timeSchedule);
-        return convertScheduleToTimeline(time);
+
+        return convertSchedule(time);
     }, [timeSchedule, isLoading]);
 
     useEffect(() => {
-        setTimelineItems(computedTimeline);
-    }, [computedTimeline]);
+        console.log("computedTimeline", computedTimeline);
 
+        setTimelineItems(computedTimeline.timeline);
+    }, [timeSchedule, isLoading]);
 
-    const parseTimeScheduleToTimeline = (schedules: TimeScheduleProps[]): TimelineItem[] => {
-        const timeline: TimelineItem[] = [];
+    const eventsByDate = groupBy(timelineItems, (e) => CalendarUtils.getCalendarDateString(e.start));
 
-        schedules.forEach((schedule) => {
-            const { ScheduleID, ScheduleName, Type_schedule, TimeSlots, TimeCustom, TimeWeek, IsActive } = schedule;
+    const eventsByDateS = useMemo(() => {
+        const filteredEvents = eventsByDate[currentDate]?.filter(event => {
+            const statusMatches = filterStatus === "all" || event.statustype === filterStatus;
+            const typeMatches = filterTitle.includes(event.type as string);
+            return statusMatches && typeMatches;
+        }) || [];
 
-            if (Type_schedule === "Daily" && Array.isArray(TimeSlots)) {
-                TimeSlots.forEach((slot) => {
-                    if (slot.start && slot.end) {
-                        timeline.push({
-                            ScheduleID,
-                            date: "Recurring Daily",
-                            name: ScheduleName,
-                            time: `${slot.start} - ${slot.end}`,
-                            status: IsActive
-                        });
-                    }
-                });
+        const groupedEvents = groupBy(filteredEvents, (event) => {
+            if (event.start && typeof event.start === 'string') {
+                const datePart = moment(event.start).format('YYYY-MM-DD');
+                return datePart;
             }
-
-            if (Type_schedule === "Weekly" && TimeWeek && typeof TimeWeek === 'object') {
-                Object.entries(TimeWeek).forEach(([day, slots]) => {
-                    if (Array.isArray(slots)) {
-                        slots.forEach((slot) => {
-                            if (slot.start && slot.end) {
-                                timeline.push({
-                                    ScheduleID,
-                                    date: `Weekly (${day})`,
-                                    name: ScheduleName,
-                                    time: `${slot.start} - ${slot.end}`,
-                                    status: IsActive
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-
-            if (Type_schedule === "Custom" && Array.isArray(TimeCustom)) {
-                TimeCustom.forEach((customSlot: Day) => {
-                    const [startDate = '', startTime = ''] = (customSlot.start ?? '').split(" ") || [];
-                    const [, endTime = ''] = (customSlot.end ?? '').split(" ") || [];
-
-                    if (startDate && startTime && endTime) {
-                        timeline.push({
-                            ScheduleID,
-                            date: `Custom (${startDate})`,
-                            name: ScheduleName,
-                            time: `${startTime} - ${endTime}`,
-                            status: IsActive
-                        });
-                    }
-                });
-            }
+            return 'invalid_date';
         });
 
-        return timeline;
-    };
-
-    // const eventsByDate = groupBy(timelineItems.timeline, (e) => CalendarUtils.getCalendarDateString(e.start));
-
-    // const eventsByDateS = useMemo(() => {
-    //     const filteredEvents = eventsByDate[currentDate]?.filter(event => {
-    //         const statusMatches = filterStatus === "all" || event.statustype === filterStatus;
-    //         const typeMatches = filterTitle.includes(event.type as string);
-    //         return statusMatches && typeMatches;
-    //     }) || [];
-
-    //     const groupedEvents = groupBy(filteredEvents, (event) => {
-    //         if (event.start && typeof event.start === 'string') {
-    //             const datePart = moment(event.start).format('YYYY-MM-DD');
-    //             return datePart;
-    //         }
-    //         return 'invalid_date';
-    //     });
-
-    //     return groupedEvents;
-    // }, [filterStatus, currentDate, filterTitle, eventsByDate]);
+        return groupedEvents;
+    }, [filterStatus, currentDate, filterTitle, eventsByDate]);
 
     const formatTime = (time: string) => {
         const date = new Date(time);
@@ -235,13 +135,13 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
     return (
         <>
             <Suspense fallback={<ActivityIndicator size="large" color={theme.colors.primary} />}>
-                {/* <LazyTimelineList
+                <LazyTimelineList
                     events={eventsByDateS}
                     renderItem={renderItem}
                     showNowIndicator
                     scrollToNow
                     initialTime={initialTime}
-                /> */}
+                />
             </Suspense>
 
 

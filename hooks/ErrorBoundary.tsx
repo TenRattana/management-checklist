@@ -1,3 +1,4 @@
+import { navigate, reset } from '@/app/navigations/navigationUtils';
 import React from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
 interface ErrorBoundaryProps {
@@ -20,6 +21,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
     }
 
     handleRetry = () => {
+        navigate("Home");
         this.setState({ hasError: false });
     };
 
