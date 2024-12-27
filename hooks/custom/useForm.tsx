@@ -5,7 +5,7 @@ import { setFormData, reset, setGroupCheckListinForm } from "@/slices";
 import { useToast } from "@/app/contexts/useToast";
 import { useFocusEffect } from "@react-navigation/native";
 import { BaseFormState, FormData, SubForm } from "@/typing/form";
-import { CheckList, Checklist, CheckListOption, CheckListType, DataType, GroupCheckListOption, Machine } from "@/typing/type";
+import { CheckList, Checklist, CheckListType, DataType, GroupCheckListOption } from "@/typing/type";
 
 interface RouteParams {
     params?: {
@@ -105,9 +105,12 @@ const createSubFormsAndFields = async (
                             ...item,
                             label: item.GCLOptionName || 'Unknown',
                             value: item.GCLOptionID || '',
-                        }));
+                        })) || [];
 
-                        itemsMLL.push(...newItems);
+                        const existingValues = new Set(itemsMLL.map(item => item.value));
+                        const uniqueItems = newItems.filter((item: ({ label: string; value: string } & GroupCheckListOption)) => !existingValues.has(item.value));
+
+                        itemsMLL.push(...uniqueItems);
                     }).catch((error) => {
                         console.error("Error fetching GCLOption by GCLOptionID:", error);
                     })
