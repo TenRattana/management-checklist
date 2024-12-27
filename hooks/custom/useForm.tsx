@@ -79,6 +79,23 @@ const createSubFormsAndFields = async (
         });
     });
 
+    const checkListIdAll = fields.map(((v) => v.CListID)) ?? []
+    const groupCheckListOptionIdAll = fields.filter((v) => v.GCLOptionID !== null).map((v) => v.GCLOptionID) ?? [];
+
+    const DataInfo: Promise<any>[] = [];
+
+    DataInfo.push(axiosInstance.post("CheckList_service.asmx/GetCheckListInForm", { CListIDS: JSON.stringify(checkListIdAll) }));
+    DataInfo.push(axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptionInForm", { GCLOptionIDS: JSON.stringify(groupCheckListOptionIdAll) }));
+
+    if (DataInfo.length > 0) {
+        try {
+            const results = await Promise.all(DataInfo);
+            console.log(results);
+        } catch (error) {
+            console.error("Error occurred while fetching data:", error);
+        }
+    }
+
     const fetchCheckListPromises = fields.map((field) => {
         const checkListPromises: Promise<any>[] = [];
 

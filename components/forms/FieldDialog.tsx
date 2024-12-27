@@ -237,6 +237,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             glc.current = values.GCLOptionID
 
                             const updateImportantList = useCallback((modifications: { Value?: string | string[]; MinLength?: number; MaxLength?: number; }) => {
+
                                 if (Array.isArray(values.ImportantList)) {
                                     const idMcl = `MCL-ADD-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
                                     const updatedList = values.ImportantList.map(item => ({
@@ -252,10 +253,12 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                             }, [values.ImportantList, setFieldValue]);
 
                             useEffect(() => {
-                                if (values.GCLOptionID) {
-                                    const filteredItems = groupCheckListOption.filter(option => option.GCLOptionID === values.GCLOptionID);
 
+                                if (values.GCLOptionID) {
+
+                                    const filteredItems = groupCheckListOption.filter(option => option.GCLOptionID === values.GCLOptionID);
                                     const gclOptionName = filteredItems[0]?.GCLOptionName;
+
                                     if (gclOptionName && gclOptionName !== values.GCLOptionName) {
                                         setFieldValue("GCLOptionName", gclOptionName);
                                     }
@@ -265,15 +268,18 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                         value: item.CLOptionID,
                                     })) || []);
 
-                                    if (newOptions.length !== option.length || newOptions.some((opt, index) => opt.value !== option[index]?.value)) {
+                                    if (JSON.stringify(newOptions) !== JSON.stringify(option)) {
                                         setOption(newOptions);
                                     }
                                 } else {
+
                                     if (option.length > 0) {
                                         setOption([]);
                                     }
                                 }
+                            }, [values.GCLOptionID, groupCheckListOption, option]);
 
+                            useEffect(() => {
                                 const checkListTypeItem = checkListTypes.find(item => item.CTypeID === values.CTypeID)?.CTypeName ?? "";
                                 const newRender = ["Dropdown", "Radio", "Checkbox"].includes(checkListTypeItem)
                                     ? "detail"
@@ -282,18 +288,23 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                         : ["Text"].includes(checkListTypeItem) ? "label" : "";
 
                                 if (newRender !== shouldRender) {
+
                                     if (newRender === "detail") {
                                         setFieldValue("DTypeID", null);
                                     } else {
                                         setFieldValue("GCLOptionID", null);
                                         setFieldValue("GCLOptionName", null);
                                     }
+
                                     setShouldRender(newRender);
                                 }
+                            }, [values.CTypeID, checkListTypes, shouldRender]);
 
+                            useEffect(() => {
                                 const dataTypeItem = values.DTypeID ? dataType.find(item => item.DTypeID === values.DTypeID)?.DTypeName : undefined;
 
                                 if (values.Important) {
+
                                     if (dataTypeItem === "Number") {
                                         updateImportantList({ Value: undefined });
                                     } else {
@@ -312,9 +323,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                 } else if (!values.Important && shouldRenderIT) {
                                     setShouldRenderIT(false);
                                 }
-                            }, [values.GCLOptionID, values.DTypeID, values.Important, dataType, checkListTypes, groupCheckListOption, option, shouldRenderDT, shouldRenderIT, shouldRender]);
-
-                            console.log("values", values);
+                            }, [values.DTypeID, values.Important, dataType, shouldRenderDT, shouldRenderIT]);
 
                             return (
                                 <View style={{ marginHorizontal: 12 }}>

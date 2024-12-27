@@ -1,21 +1,18 @@
 import { useMemo, useCallback, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "react-query";
 import { useToast } from "@/app/contexts/useToast";
 import { AppDispatch } from "@/stores";
 import { addField, updateField } from "@/slices";
 import * as Yup from "yup";
-import { fetchCheckList, fetchCheckListType, fetchDataType, saveCheckList, saveGroupCheckListOption, saveCheckListOption, fetchSearchCheckList, fetchSearchGroupCheckListOption, fetchGroupCheckListOption, fetchSearchCheckListOption, fetchCheckListOption } from "@/app/services";
-import { InitialValuesChecklist, InitialValuesGroupCheckList } from "@/typing/value";
+import { fetchCheckList, fetchCheckListType, fetchDataType, fetchSearchCheckList, fetchSearchGroupCheckListOption, fetchGroupCheckListOption, fetchSearchCheckListOption, fetchCheckListOption } from "@/app/services";
 import { Checklist, CheckList, GroupCheckListOption } from "@/typing/type";
 import { BaseFormState } from "@/typing/form";
 
 const useField = (editMode?: boolean, formState?: BaseFormState) => {
     const dispatch = useDispatch<AppDispatch>();
     const queryClient = useQueryClient();
-    const { handleError, showSuccess } = useToast();
-
-    const state = useSelector((state: any) => state.prefix);
+    const { handleError } = useToast();
     const itemMLL = useSelector((state: any) => state.form);
 
     useEffect(() => {
@@ -144,11 +141,17 @@ const useField = (editMode?: boolean, formState?: BaseFormState) => {
 
 
     const { data: checkListType = [] } = useQuery("checkListType", fetchCheckListType, {
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        enabled: true,
         staleTime: 1000 * 60 * 24,
         cacheTime: 1000 * 60 * 25,
     });
 
     const { data: dataType = [] } = useQuery("dataType", fetchDataType, {
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        enabled: true,
         staleTime: 1000 * 60 * 24,
         cacheTime: 1000 * 60 * 25,
     });
@@ -258,56 +261,6 @@ const useField = (editMode?: boolean, formState?: BaseFormState) => {
         });
     }, [checkListTypes, dataType]);
 
-    const mutation = useMutation(saveCheckList, {
-        onSuccess: (data) => {
-            showSuccess(data.message);
-            queryClient.invalidateQueries("checkList");
-        },
-        onError: handleError,
-    });
-
-    const mutationG = useMutation(saveGroupCheckListOption, {
-        onSuccess: (data) => {
-            showSuccess(data.message);
-            queryClient.invalidateQueries("groupCheckListOption");
-        },
-        onError: handleError,
-    });
-
-    const mutationCL = useMutation(saveCheckListOption, {
-        onSuccess: (data) => {
-            showSuccess(data.message);
-            queryClient.invalidateQueries("checkListOption");
-        },
-        onError: handleError,
-    });
-
-    const saveDataCheckList = useCallback((values: InitialValuesChecklist) => {
-        mutation.mutate({
-            Prefix: state.CheckList ?? "",
-            CListID: "",
-            CListName: values.checkListName,
-            IsActive: values.isActive,
-            Disables: values.disables,
-        });
-    },
-        [mutation, state.CheckList]
-    );
-
-    const saveDataGroupCheckList = useCallback((values: InitialValuesGroupCheckList, options: string[]) => {
-        mutationG.mutate({
-            Prefix: state.GroupCheckList ?? "",
-            PrefixMatch: state.MatchCheckListOption ?? "",
-            GCLOptionID: values.groupCheckListOptionId,
-            GCLOptionName: values.groupCheckListOptionName,
-            IsActive: values.isActive,
-            Disables: values.disables,
-            Options: JSON.stringify(options),
-        });
-    },
-        [mutationG, state.GroupCheckList, state.MatchCheckListOption]
-    );
-
     const handleSaveField = useCallback((values: any, mode: string) => {
         const payload = { BaseFormState: values, checkList: itemsCL, checkListType: checkListTypes, dataType };
 
@@ -333,8 +286,6 @@ const useField = (editMode?: boolean, formState?: BaseFormState) => {
 
     return useMemo(
         () => ({
-            saveDataCheckList,
-            saveDataGroupCheckList,
             checkList: itemsCL.filter(v => v.IsActive),
             groupCheckListOption: itemsML.filter(v => v.IsActive),
             checkListOption: itemsCLO.filter(v => v.IsActive),
@@ -361,8 +312,6 @@ const useField = (editMode?: boolean, formState?: BaseFormState) => {
             debouncedSearchQueryCLO
         }),
         [
-            saveDataCheckList,
-            saveDataGroupCheckList,
             itemsCL,
             checkListType,
             dataType,
