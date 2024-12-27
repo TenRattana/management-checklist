@@ -45,7 +45,6 @@ const Machine_group_dialog = React.memo(({ isVisible, setIsVisible, isEditing, i
                             onSubmit={(values: InitialValuesGroupMachine) => saveData(values)}
                         >
                             {({ values, handleSubmit, setFieldValue, isValid, dirty, touched }) => {
-                                console.log(touched);
 
                                 return (
                                     <View id="form-mgd">

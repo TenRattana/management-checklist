@@ -161,7 +161,6 @@ export interface DragfieldProps {
   data: BaseFormState[];
   SFormID: string;
   dispatch: any;
-  checkListOption: CheckListOption[];
   checkListType: checkListTypes[];
   index?: string;
 }
@@ -169,7 +168,6 @@ export interface DragfieldProps {
 export interface DragsubformProps {
   state: Form;
   dispatch: (action: AppActions) => void;
-  checkListOption: CheckListOption[];
   checkListType: checkListTypes[];
   index?: string;
 }
@@ -198,7 +196,6 @@ export interface FieldDialogProps {
   onDeleteField: (SFormID: string, MCListID: string) => void;
   setShowDialogs: () => void;
   editMode: boolean;
-  checkListOption: CheckListOption[];
 }
 
 export interface ActionProps {

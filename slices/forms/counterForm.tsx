@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { BaseSubForm, BaseFormState, Form, BaseForm } from '@/typing/form'
-import { CheckList, Checklist, DataType } from '@/typing/type'
+import { CheckList, Checklist, DataType, GroupCheckListOption } from '@/typing/type'
 
 
 const initialState: Form = {
@@ -9,7 +9,8 @@ const initialState: Form = {
   Description: "",
   MachineID: "",
   MachineName: "",
-  subForms: []
+  subForms: [],
+  itemsMLL: []
 };
 
 const sortSubForms = (data: BaseSubForm[]) => {
@@ -38,7 +39,7 @@ const subFormSlice = createSlice({
       form?: BaseForm,
       subForms: BaseSubForm[],
       BaseFormState: BaseFormState[],
-      checkList: Checklist[],
+      checkList?: Checklist[],
       checkListType: CheckList[];
       dataType: DataType[]
     }>) => {
@@ -58,7 +59,7 @@ const subFormSlice = createSlice({
         }))
       };
 
-      const checkListMap = new Map(checkList.map(item => [item.CListID, item.CListName]));
+      const checkListMap = new Map(checkList?.map(item => [item.CListID, item.CListName]));
       const checkListTypeMap = new Map(checkListType.map(item => [item.CTypeID, item.CTypeName]));
       const dataTypeMap = new Map(dataType.map(item => [item.DTypeID, item.DTypeName]));
 
@@ -68,7 +69,7 @@ const subFormSlice = createSlice({
         sub.Fields = matchingFields.map((field, index) => ({
           ...field,
           DisplayOrder: field.DisplayOrder || index,
-          CListName: checkListMap.get(field.CListID) || "",
+          CListName: field.CListName || checkListMap.get(field.CListID) || "",
           CTypeName: checkListTypeMap.get(field.CTypeID) || "",
           DTypeName: dataTypeMap.get(field.DTypeID) || ""
         }));
@@ -82,6 +83,15 @@ const subFormSlice = createSlice({
         ...state,
         ...updatedForm
       };
+    },
+    setGroupCheckListinForm: (state, action: PayloadAction<{
+      itemsMLL?: ({
+        label: string;
+        value: string;
+      } & GroupCheckListOption)[]
+    }>) => {
+      const { itemsMLL } = action.payload;
+      state.itemsMLL = itemsMLL || [];
     },
     updateFormName: (state, action: PayloadAction<{ form?: string }>) => {
       const { form } = action.payload;
@@ -292,7 +302,8 @@ export const {
   updateField,
   deleteField,
   reset,
-  defaultDataForm
+  defaultDataForm,
+  setGroupCheckListinForm
 } = subFormSlice.actions;
 
 export default subFormSlice.reducer;

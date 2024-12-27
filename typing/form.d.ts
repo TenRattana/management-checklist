@@ -10,6 +10,10 @@ export interface BaseForm {
 
 export interface Form extends BaseForm {
   subForms: BaseSubForm[];
+  itemsMLL ?: ({
+          label: string;
+          value: string;
+        } & GroupCheckListOption)[]
 }
 
 export interface BaseSubForm {

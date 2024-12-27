@@ -45,7 +45,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
     const [drawerContent, setDrawerContent] = useState(null);
     const [initialSaveDialog, setInitialSaveDialog] = useState(false);
 
-    const { isLoading, checkListOption, checkList, groupCheckListOption, checkListType, dataType } = useForm(route);
+    const { isLoading, checkList, groupCheckListOption, checkListType, dataType } = useForm(route);
     const styles = Create(width, drawerOpen)
 
     const checkListTypes = useMemo(
@@ -127,7 +127,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
 
     const handleDrop = useCallback((item: CheckList, absoluteX: number, absoluteY: number) => {
         const cardIndex = childRef.current.checkCardPosition(absoluteX, absoluteY);
-        const selectedChecklist = checkList.find((v: Checklist) => v.CListID === "CL000") || checkList?.[0];
+        const selectedChecklist = checkList?.[0];
         const selectedDataType = dataType.find((v: DataType) => item.CTypeTitle === "Number Answer" ? v.DTypeName === "Number" : item.CTypeTitle === "Time/Date" ? v.DTypeName === "Date" : v.DTypeName === "String") || dataType?.[0];
 
         if (item.CTypeName === "SubForm") {
@@ -140,7 +140,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                 MCListID: idMcl,
                 CListID: selectedChecklist?.CListID ?? "",
                 GCLOptionID: ["Dropdown", "Radio", "Checkbox"].includes(item.CTypeName)
-                    ? (groupCheckListOption.find((v: GroupCheckListOption) => v.GCLOptionID === "GCLO000") || groupCheckListOption?.[0])?.GCLOptionID
+                    ? groupCheckListOption?.[0]?.GCLOptionID
                     : undefined,
                 CTypeID: item.CTypeID,
                 DTypeID: selectedDataType?.DTypeID ?? "",
@@ -161,7 +161,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                 CTypeName: item.CTypeName,
                 DTypeValue: undefined,
                 DTypeName: selectedDataType?.DTypeName ?? "",
-                GCLOptionName: (groupCheckListOption.find((v: GroupCheckListOption) => v.GCLOptionID === "GCLO000") || groupCheckListOption?.[0])?.GCLOptionName
+                GCLOptionName: groupCheckListOption?.[0]?.GCLOptionName
             };
 
             runOnJS(dispatch)(defaultDataForm({ currentField: newField }));
@@ -283,7 +283,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                                 <MemoDragsubform
                                     state={state}
                                     dispatch={dispatch}
-                                    checkListOption={checkListOption}
                                     checkListType={checkListTypes}
                                 />
                             </>
@@ -367,7 +366,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                     onDeleteField={(SFormID, MCListID) => dispatch(deleteField({ SFormID, MCListID }))}
                     setShowDialogs={() => handleDialogToggle("field", false)}
                     editMode={true}
-                    checkListOption={checkListOption}
                 />
             )}
 
