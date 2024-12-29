@@ -10,7 +10,8 @@ const initialState: Form = {
   MachineID: "",
   MachineName: "",
   subForms: [],
-  itemsMLL: []
+  itemsMLL: [],
+  itemCLL: []
 };
 
 const sortSubForms = (data: BaseSubForm[]) => {
@@ -39,11 +40,15 @@ const subFormSlice = createSlice({
       form?: BaseForm,
       subForms: BaseSubForm[],
       BaseFormState: BaseFormState[],
-      checkList?: Checklist[],
+      checkList?: Checklist[] | ({
+        label: string;
+        value: string;
+    } & Checklist)[],
+      groupCheckListOption?: GroupCheckListOption[];
       checkListType: CheckList[];
       dataType: DataType[]
     }>) => {
-      const { form, subForms, BaseFormState, checkList, checkListType, dataType } = action.payload;
+      const { form, subForms, BaseFormState, checkList, checkListType, dataType, groupCheckListOption } = action.payload;
 
       const updatedForm = {
         FormID: form?.FormID || "",
@@ -62,14 +67,16 @@ const subFormSlice = createSlice({
       const checkListMap = new Map(checkList?.map(item => [item.CListID, item.CListName]));
       const checkListTypeMap = new Map(checkListType.map(item => [item.CTypeID, item.CTypeName]));
       const dataTypeMap = new Map(dataType.map(item => [item.DTypeID, item.DTypeName]));
+      const groupCheckListOptionMap = new Map(groupCheckListOption?.map(item => [item.GCLOptionID, item.GCLOptionName]));
 
       updatedForm.subForms.forEach(sub => {
         const matchingFields = BaseFormState.filter(form => form.SFormID === sub.SFormID);
-
+        
         sub.Fields = matchingFields.map((field, index) => ({
           ...field,
           DisplayOrder: field.DisplayOrder || index,
           CListName: field.CListName || checkListMap.get(field.CListID) || "",
+          GCLOptionName: field.GCLOptionName || field?.GCLOptionID && groupCheckListOptionMap.get(field?.GCLOptionID) || "",
           CTypeName: checkListTypeMap.get(field.CTypeID) || "",
           DTypeName: dataTypeMap.get(field.DTypeID) || ""
         }));
@@ -88,10 +95,15 @@ const subFormSlice = createSlice({
       itemsMLL?: ({
         label: string;
         value: string;
-      } & GroupCheckListOption)[]
+      } & GroupCheckListOption)[],
+      itemCLL: ({
+        label: string;
+        value: string;
+      } & Checklist)[]
     }>) => {
-      const { itemsMLL } = action.payload;
+      const { itemsMLL, itemCLL } = action.payload;
       state.itemsMLL = itemsMLL || [];
+      state.itemCLL = itemCLL || [];
     },
     updateFormName: (state, action: PayloadAction<{ form?: string }>) => {
       const { form } = action.payload;

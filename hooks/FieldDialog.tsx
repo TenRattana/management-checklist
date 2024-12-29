@@ -15,6 +15,10 @@ const useField = (editMode?: boolean, formState?: BaseFormState) => {
     const { handleError } = useToast();
     const itemMLL = useSelector((state: any) => state.form);
 
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<{ CheckList: string, MatchChecklist: string }>({ CheckList: '', MatchChecklist: '' });
+    const [itemsCL, setItemsCL] = useState<({ label: string; value: string } & Checklist)[]>([]);
+    const [itemsML, setItemsML] = useState<({ label: string; value: string } & GroupCheckListOption)[]>([]);
+
     useEffect(() => {
         if (itemMLL.itemsMLL) {
             setItemsML((prevItems) => {
@@ -22,11 +26,13 @@ const useField = (editMode?: boolean, formState?: BaseFormState) => {
                 return [...prevItems, ...itemMLL.itemsMLL.filter((item: any) => !newItemsSet.has(item.value))];
             });
         }
+        if (itemMLL.itemsCLL) {
+            setItemsCL((prevItems) => {
+                const newItemsSet = new Set(prevItems.map((item: any) => item.value));
+                return [...prevItems, ...itemMLL.itemsCLL.filter((item: any) => !newItemsSet.has(item.value))];
+            });
+        }
     }, [itemMLL]);
-
-    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<{ CheckList: string, MatchChecklist: string }>({ CheckList: '', MatchChecklist: '' });
-    const [itemsCL, setItemsCL] = useState<({ label: string; value: string } & Checklist)[]>([]);
-    const [itemsML, setItemsML] = useState<({ label: string; value: string } & GroupCheckListOption)[]>([]);
 
     const { data: checkList, isFetching: isFetchingCL, fetchNextPage: fetchNextPageCL, hasNextPage: hasNextPageCL, refetch: refetchCL } = useInfiniteQuery(
         ['checkList', debouncedSearchQuery.CheckList],
