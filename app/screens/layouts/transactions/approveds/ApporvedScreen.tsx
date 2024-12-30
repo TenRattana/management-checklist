@@ -9,7 +9,7 @@ import { ExpectedResultProps } from "@/typing/tag";
 import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { useSelector } from "react-redux";
-import { fetchApporved, fetchSearchApporved, SaveApporved } from "@/app/services";
+import { fetchApporved, fetchMachines, fetchSearchApporved, fetchSearchMachines, SaveApporved } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
@@ -17,6 +17,7 @@ const LazyCustomtable = lazy(() => import("@/components").then(module => ({ defa
 const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
+    const [debouncedSearchQueryFilter, setDebouncedSearchQueryFilter] = useState<string>("");
     const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
     const masterdataStyles = useMasterdataStyles();
@@ -27,7 +28,7 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
     const [approved, setApproved] = useState<ExpectedResult[]>([])
 
     const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
-        ['machine', debouncedSearchQuery],
+        ['approved', debouncedSearchQuery],
         ({ pageParam = 0 }) => {
             return debouncedSearchQuery
                 ? fetchSearchApporved(debouncedSearchQuery)
@@ -47,11 +48,50 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
         }
     );
 
+    const [machines, setMachine] = useState<{ label: string, value: string | null }[]>([{ label: "Show all", value: "" }]);
+
+    const { data: machine, fetchNextPage: fetchNextPageMG, hasNextPage: hasNextPageMG, isLoading, isFetchingNextPage } = useInfiniteQuery(
+        ['machine', debouncedSearchQueryFilter],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQueryFilter
+                ? fetchSearchMachines(debouncedSearchQueryFilter)
+                : fetchMachines(pageParam, 50);
+        },
+        {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            enabled: true,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 50 ? allPages.length : undefined;
+            },
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat().filter((item) => item.IsActive).map((item) => ({
+                    label: item.MachineName || 'Unknown',
+                    value: item.MachineName || '',
+                }));
+
+                setMachine((prevItems) => {
+                    const newItemsSet = new Set(prevItems.map((item: any) => item.value));
+                    const mergedItems = prevItems.concat(
+                        newItems.filter((item: { label: string, value: string }) => !newItemsSet.has(item.value))
+                    );
+                    return mergedItems;
+                });
+            },
+        }
+    );
+
     const handlePaginationChange = useCallback(() => {
         if (hasNextPage && !isFetching) {
             fetchNextPage();
         }
     }, [hasNextPage, isFetching, fetchNextPage]);
+
+    const handlefilter = useCallback((search?: string | null) => {
+        if (search) {
+            setDebouncedSearchQueryFilter(search)
+        }
+    }, []);
 
     useEffect(() => {
         if (debouncedSearchQuery === "") {
@@ -157,7 +197,17 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
         searchQuery: debouncedSearchQuery,
         selectedRows,
         setRow,
-    }), [tableData, debouncedSearchQuery, handleAction, setRow, selectedRows]);
+        showFilterDate: true,
+        showFilter: true,
+        ShowTitle: "Machine",
+        showData: machines,
+        showColumn: "MachineName",
+        filterColumn: 1,
+        setFilterDate: 4,
+        hasNextPage: hasNextPageMG,
+        isFetchingNextPage: isFetchingNextPage,
+        searchfilter: debouncedSearchQueryFilter
+    }), [tableData, debouncedSearchQuery, handleAction, machines, debouncedSearchQueryFilter, hasNextPageMG, isFetchingNextPage, setRow, selectedRows]);
 
     const styles = StyleSheet.create({
         container: {
@@ -194,7 +244,7 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
             </View>
             <Card.Content style={styles.cardcontent}>
                 <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
-                    <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                    <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} fetchNextPage={fetchNextPageMG} handlefilter={handlefilter} />
                 </Suspense>
             </Card.Content>
         </View>

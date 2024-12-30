@@ -12,9 +12,12 @@ const RootNavigation = () => {
 
     return (
         <NavigationContainer independent={true} ref={navigationRef}>
-            {isLoggedIn ? loadgin > 0 ? <MainStack /> : <ActivityIndicator /> : <AuthStack />}
+            {isLoggedIn ? (
+                loadgin > 0 ? <MainStack /> : <ActivityIndicator />
+            ) : (
+                <AuthStack />
+            )}
         </NavigationContainer>
-
     );
 };
 

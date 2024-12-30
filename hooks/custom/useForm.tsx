@@ -87,28 +87,28 @@ const createSubFormsAndFields = async (
 
     DataInfo.push(axiosInstance.post("CheckList_service.asmx/GetCheckListInForm", { CListIDS: JSON.stringify(checkListIdAll) }));
     DataInfo.push(axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptionInForm", { GCLOptionIDS: JSON.stringify(groupCheckListOptionIdAll) }));
-    
+
     if (DataInfo.length > 0) {
         try {
             const results = await Promise.all(DataInfo);
             const newItems = results[0]?.data?.data?.map((item: Checklist) => ({
                 ...item,
-                label: item.CListName || 'Unknown',  
-                value: item.CListID || '',  
+                label: item.CListName || 'Unknown',
+                value: item.CListID || '',
             })) || [];
-    
+
             const existingValues = new Set(itemsCheckList.map(item => item.value));
-            const uniqueItems = newItems.filter((item:{label:string , value:string }& Checklist) => !existingValues.has(item.value));
+            const uniqueItems = newItems.filter((item: { label: string, value: string } & Checklist) => !existingValues.has(item.value));
             itemsCheckList.push(...uniqueItems);
-    
+
             const newItemsM = results[1]?.data?.data?.map((item: GroupCheckListOption) => ({
                 ...item,
-                label: item.GCLOptionName || 'Unknown',  
-                value: item.GCLOptionID || '',  
+                label: item.GCLOptionName || 'Unknown',
+                value: item.GCLOptionID || '',
             })) || [];
-    
+
             const existingValuesM = new Set(itemsGroupCheckListOption.map(item => item.value));
-            const uniqueItemsM = newItemsM.filter((item:{label:string , value:string }& GroupCheckListOption) => !existingValuesM.has(item.value));
+            const uniqueItemsM = newItemsM.filter((item: { label: string, value: string } & GroupCheckListOption) => !existingValuesM.has(item.value));
             itemsGroupCheckListOption.push(...uniqueItemsM);
 
         } catch (error) {
@@ -116,7 +116,7 @@ const createSubFormsAndFields = async (
         }
     }
 
-    return { subForms, fields, itemsCheckList , itemsGroupCheckListOption };
+    return { subForms, fields, itemsCheckList, itemsGroupCheckListOption };
 };
 
 const useForm = (route?: RouteParams) => {
@@ -177,7 +177,7 @@ const useForm = (route?: RouteParams) => {
             }
 
             if (response.data?.data?.[0]) {
-                const { subForms, fields, itemsCheckList , itemsGroupCheckListOption } = await createSubFormsAndFields(
+                const { subForms, fields, itemsCheckList, itemsGroupCheckListOption } = await createSubFormsAndFields(
                     response.data?.data?.[0],
                     fetchedExpectedResult,
                 );
@@ -191,8 +191,8 @@ const useForm = (route?: RouteParams) => {
                     setFormData({
                         form: action === "copy" ? {} : response.data?.data[0],
                         subForms,
-                        checkList:itemsCheckList,
-                        groupCheckListOption:itemsGroupCheckListOption,
+                        checkList: itemsCheckList,
+                        groupCheckListOption: itemsGroupCheckListOption,
                         BaseFormState: fields,
                         checkListType: checkListType,
                         dataType: data.dataType
@@ -202,7 +202,7 @@ const useForm = (route?: RouteParams) => {
                 dispatch(
                     setGroupCheckListinForm({
                         itemsMLL: itemsGroupCheckListOption,
-                        itemCLL : itemsCheckList
+                        itemCLL: itemsCheckList
                     })
                 );
             } else {

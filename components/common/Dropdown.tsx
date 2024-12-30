@@ -23,7 +23,8 @@ const Dropdown = React.memo(({
     error,
     searchQuery,
     errorMessage,
-    lefticon
+    lefticon,
+    showLefticon
 }: {
     search?: boolean;
     label: string;
@@ -39,7 +40,9 @@ const Dropdown = React.memo(({
     error?: boolean;
     searchQuery?: string;
     errorMessage?: string;
-    lefticon?: string
+    lefticon?: string;
+    showLefticon?: boolean;
+
 }) => {
     DropDownPicker.setListMode("FLATLIST");
     const [searchQuerys, setSearchQuery] = useState('');
@@ -157,14 +160,17 @@ const Dropdown = React.memo(({
                 </Portal>
 
                 <TouchableOpacity onPress={() => setOpen(true)} style={styles.triggerButton}>
-                    <IconButton
-                        style={masterdataStyles.icon}
-                        icon={items.find((v) => v.value === selectedValue)?.icon || lefticon || "check-all"}
-                        size={spacing.large}
-                    />
+                    {!showLefticon && (
+                        <IconButton
+                            style={masterdataStyles.icon}
+                            icon={items.find((v) => v.value === selectedValue)?.icon || lefticon || "check-all"}
+                            size={spacing.large}
+                        />
+                    )}
+
                     <Text style={[masterdataStyles.text]}>{selectedValue ? `${items.find((v) => v.value === selectedValue)?.label}` : `Select a ${label}`}</Text>
 
-                    {selectedValue ? (
+                    {!showLefticon && selectedValue ? (
                         <IconButton
                             style={[masterdataStyles.icon, { right: 8, flex: 1, alignItems: 'flex-end' }]}
                             icon="window-close"

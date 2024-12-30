@@ -8,10 +8,12 @@ import { View } from "react-native";
 import { debounce, throttle } from "lodash";
 
 const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, actionIndex, searchQuery, showMessage, selectedRows, setRow,
-  showFilter, showData, showColumn, detail, detailData, detailKey, detailKeyrow, showDetailwithKey, ShowTitle, handlePaginationChange, isFetching }: CustomTableProps) => {
+  showFilter, showData, showColumn, detail, detailData, detailKey, detailKeyrow, showDetailwithKey, ShowTitle, handlePaginationChange, isFetchingNextPage, hasNextPage, fetchNextPage,
+  showFilterDate, setFilterDate, searchfilter, handlefilter, filterColumn }: CustomTableProps) => {
 
   const [displayData, setDisplayData] = useState<(string | number | boolean)[][]>([]);
   const [filter, setFilter] = useState<string | null>(null);
+  const [Dates, setDate] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<{ column: number | null; direction: "ascending" | "descending" | undefined }>({
     column: null,
     direction: undefined,
@@ -31,11 +33,76 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
     });
   }, [Tabledata, sortConfig]);
 
+  const parseDateFromString = (dateString: string): Date | null => {
+    const regex = /^(\d{2})\/(\d{2})\/(\d{4}) เวลา (\d{2}):(\d{2})$/;
+    const match = dateString.match(regex);
+
+    if (match) {
+      const day = match[1];
+      const month = match[2];
+      const year = match[3];
+      const hour = match[4];
+      const minute = match[5];
+
+      const gregorianYear = parseInt(year) - 543;
+
+      const validDateString = `${gregorianYear}-${month}-${day}T${hour}:${minute}:00`;
+
+      const date = new Date(validDateString);
+
+      return isNaN(date.getTime()) ? null : date;
+    }
+
+    return null;
+  };
+
+  const filterDateHandler = (filter: string | null) => {
+    const currentDate = new Date();
+
+    if (setFilterDate)
+      switch (filter) {
+        case "Today":
+          return sortedData.filter(row => {
+            const rowDate = parseDateFromString(row[setFilterDate] as string);
+            if (rowDate === null) return false;
+            return rowDate.toDateString() === currentDate.toDateString();
+          });
+        case "This week":
+          const startOfWeek = new Date();
+          startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+          return sortedData.filter(row => {
+            const rowDate = parseDateFromString(row[setFilterDate] as string);
+            if (rowDate === null) return false;
+            return rowDate >= startOfWeek && rowDate <= currentDate;
+          });
+        case "This month":
+          return sortedData.filter(row => {
+            const rowDate = parseDateFromString(row[setFilterDate] as string);
+            if (rowDate === null) return false;
+            return (
+              rowDate.getFullYear() === currentDate.getFullYear() &&
+              rowDate.getMonth() === currentDate.getMonth()
+            );
+          });
+        default:
+          return sortedData;
+      }
+  };
+
   const filteredData = useMemo(() => {
+    const filteredByDate = filterDateHandler(Dates);
+
     return sortedData.filter((row) => {
-      return row.some((cell) => cell?.toString().toLowerCase().includes(searchQuery.toLowerCase())) && (filter ? row.includes(filter) : true);
+      const matchesSearchQuery = row.some((cell) =>
+        cell?.toString().toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      const matchesDateFilter = Dates && filteredByDate ? filteredByDate.includes(row) : true;
+      const matchesFilter = filter && filterColumn !== undefined ? row[filterColumn]?.toString().includes(filter) : true;
+
+      return matchesSearchQuery && matchesFilter && matchesDateFilter;
     });
-  }, [sortedData, searchQuery, filter]);
+  }, [sortedData, searchQuery, filter, Dates]);
 
   useEffect(() => {
     if (JSON.stringify(filteredData) !== JSON.stringify(displayData)) {
@@ -81,9 +148,13 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
     }
   }, [handleAction]);
 
-  const handelSetFilter = useCallback((value: string) => {
+  const handelSetFilter = useCallback(debounce((value: string) => {
     setFilter(value);
-  }, []);
+  }, 300), []);
+
+  const filteredDate = useCallback(debounce((value: string) => {
+    setDate(value);
+  }, 300), []);
 
   return (
     <View id="customtable" style={{ flex: 1 }}>
@@ -121,11 +192,19 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
             displayData={displayData}
             handelSetFilter={handelSetFilter}
             filter={filter}
+            Dates={Dates}
             showColumn={showColumn}
             showData={showData}
             showFilter={showFilter}
             handleDialog={handleDialog}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            handleLoadMore={fetchNextPage}
+            handlefilter={handlefilter}
+            searchfilter={searchfilter}
             ShowTitle={ShowTitle}
+            showFilterDate={showFilterDate}
+            filteredDate={filteredDate}
             key={"CustomtableHead"}
           />
           <CustomtableData

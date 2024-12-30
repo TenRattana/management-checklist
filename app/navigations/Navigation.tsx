@@ -13,7 +13,6 @@ import CustomMenu from '@/components/navigation/CustomMenu'
 import Setting_dialog from "@/components/screens/Setting_dialog"
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text } from 'react-native-paper';
-import { navigate } from './navigationUtils';
 
 const Drawer = createDrawerNavigator();
 const MemoSetting_dialog = React.memo(Setting_dialog)
@@ -62,7 +61,6 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
     const handleLogout = useCallback(() => {
         dispatch(initializeLogout());
         setMenuVisible(false);
-        navigate("Login")
     }, [dispatch]);
 
     const toggleMenu = useCallback(() => {
@@ -106,37 +104,39 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
-            <Drawer.Navigator
-                drawerContent={(props) => <CustomDrawerContent {...props} />}
-                screenOptions={{
-                    drawerHideStatusBarOnOpen: false,
-                    drawerStatusBarAnimation: 'none',
-                    drawerStyle: {
-                        backgroundColor: theme.colors.background,
-                        width: drawerWidth,
-                    },
-                    headerTitle: state.AppName || "",
-                    headerTitleStyle: {
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                        color: '#333',
-                    },
-                    headerRight: () => (
-                        <CustomMenu
-                            visible={menuVisible}
-                            onShow={toggleMenu}
-                            onDismiss={closeMenu}
-                            onSettingsPress={handleSettings}
-                            onLogoutPress={handleLogout}
-                        />
-                    ),
-                }}
-                initialRouteName={user.initialRoute || "Login"}
-                id="nav"
-            >
-                {menuScreens}
-            </Drawer.Navigator>
-
+            {user.Screen.length > 0 && (
+                <Drawer.Navigator
+                    drawerContent={(props) => <CustomDrawerContent {...props} />}
+                    screenOptions={{
+                        drawerHideStatusBarOnOpen: false,
+                        drawerStatusBarAnimation: 'none',
+                        drawerStyle: {
+                            backgroundColor: theme.colors.background,
+                            width: drawerWidth,
+                        },
+                        headerTitle: state.AppName || "",
+                        headerTitleStyle: {
+                            fontSize: 14,
+                            fontWeight: 'bold',
+                            color: '#333',
+                        },
+                        headerRight: () => (
+                            <CustomMenu
+                                visible={menuVisible}
+                                onShow={toggleMenu}
+                                onDismiss={closeMenu}
+                                onSettingsPress={handleSettings}
+                                onLogoutPress={handleLogout}
+                            />
+                        ),
+                        unmountOnBlur: true
+                    }}
+                    initialRouteName={user.initialRoute || ""}
+                    id="nav"
+                >
+                    {menuScreens}
+                </Drawer.Navigator>
+            )}
             <MemoSetting_dialog isVisible={menuSetting} setVisible={() => setMenuSetting(false)} />
         </SafeAreaView>
     );

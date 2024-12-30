@@ -146,6 +146,7 @@ export interface CustomTableProps {
   showFilter?: boolean;
   showData?: TypeConfig[];
   showColumn?: string;
+  filterColumn?:number;
   detail?: boolean;
   detailKey?: string;
   showDetailwithKey?: string[];
@@ -153,8 +154,13 @@ export interface CustomTableProps {
   detailData?: TypeConfig[];
   ShowTitle?: string;
   handlePaginationChange?:() => void;
-  isFetching?:boolean;
+  isFetchingNextPage?:boolean;
+  hasNextPage?:boolean;
+  fetchNextPage?:() => void;
   showFilterDate?:boolean;
+  setFilterDate?:number;
+  handlefilter?:(value?:string) => void;
+  searchfilter?:string;
 }
 
 export interface DragfieldProps {

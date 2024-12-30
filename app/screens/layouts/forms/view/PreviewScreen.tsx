@@ -84,15 +84,6 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
         }
     }, [state]);
 
-    const HeaderLeftComponent = ({ navigation }: any) => (
-        <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={{ paddingHorizontal: 10 }}
-        >
-            <Text style={{ color: 'blue' }}>Back</Text>
-        </TouchableOpacity>
-    );
-
     const countRef = useRef(1);
 
     const incrementCount = (value: boolean) => {
