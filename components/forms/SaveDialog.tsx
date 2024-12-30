@@ -13,8 +13,7 @@ const SaveDialog = React.memo(({
     state,
     isVisible,
     setIsVisible,
-    navigation
-}: SaveDialogProps & { navigation: any }) => {
+}: SaveDialogProps) => {
     const prefix = useSelector((state: any) => state.prefix);
     const { handleError, showSuccess } = useToast();
     const masterdataStyles = useMasterdataStyles();
@@ -46,7 +45,7 @@ const SaveDialog = React.memo(({
         } finally {
             setIsVisible(false)
         }
-    }, [state, axiosInstance, handleError, setIsVisible, navigation]);
+    }, [state, axiosInstance, handleError, setIsVisible, navigate]);
 
     return (
         <Portal>

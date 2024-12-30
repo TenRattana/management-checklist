@@ -32,7 +32,7 @@ const isValidDateFormatCustom = (value: string) => {
     return dateRegex.test(value);
 };
 
-const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigation }) => {
+const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route }) => {
     const { responsive, fontSize, spacing } = useRes();
     const { handleError } = useToast();
     const { width } = useWindowDimensions();
@@ -374,7 +374,6 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route, navigat
                     state={state}
                     isVisible={initialSaveDialog}
                     setIsVisible={handleSaveDialog}
-                    navigation={navigation}
                 />
             )}
 

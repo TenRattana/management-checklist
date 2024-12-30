@@ -11,10 +11,11 @@ import { useInfiniteQuery, useQueryClient } from 'react-query';
 import { fetchForms, fetchSearchFomrs } from "@/app/services";
 import { useRes } from "@/app/contexts/useRes";
 import { useTheme } from "@/app/contexts/useTheme";
+import { navigate } from "@/app/navigations/navigationUtils";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
-const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route }) => {
+const FormScreen: React.FC<FormScreenProps> = React.memo(({ route }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
 
@@ -80,11 +81,11 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
             if (action === "changeIndex") {
-                navigation.navigate("Create_form", { formId: item });
+                navigate("Create_form", { formId: item });
             } else if (action === "preIndex") {
-                navigation.navigate("Preview", { formId: item });
+                navigate("Preview", { formId: item });
             } else if (action === "copyIndex") {
-                navigation.navigate("Create_form", { formId: item, action: "copy" });
+                navigate("Create_form", { formId: item, action: "copy" });
             } else {
                 const endpoint = action === "activeIndex" ? "ChangeForm" : "DeleteForm";
                 const response = await axiosInstance.post(`Form_service.asmx/${endpoint}`, { FormID: item });
@@ -94,11 +95,11 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
         } catch (error) {
             handleError(error);
         }
-    }, [handleError, queryClient, navigation, showSuccess]);
+    }, [handleError, queryClient, navigate, showSuccess]);
 
     const handleNewForm = useCallback(() => {
-        navigation.navigate("Create_form");
-    }, [navigation]);
+        navigate("Create_form");
+    }, [navigate]);
 
     const tableData = useMemo(() => {
         return form.map((item) => [

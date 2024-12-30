@@ -4,8 +4,9 @@ import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useToast } from '@/app/contexts/useToast';
 import React from 'react';
 import { ScanQRProps } from '@/typing/tag';
+import { navigate } from '@/app/navigations/navigationUtils';
 
-const ScanQR: React.FC<ScanQRProps> = React.memo(({ navigation }) => {
+const ScanQR: React.FC<ScanQRProps> = React.memo(() => {
     const [facing, setFacing] = useState<CameraType>('back');
     const [permission, requestPermission] = useCameraPermissions();
     const [scanned, setScanned] = useState(false);
@@ -40,7 +41,7 @@ const ScanQR: React.FC<ScanQRProps> = React.memo(({ navigation }) => {
     const handleAction = (value: string | null) => {
         try {
             if (value) {
-                navigation.navigate('InputFormMachine', {
+                navigate('InputFormMachine', {
                     machineId: value,
                 });
                 setScanned(false);

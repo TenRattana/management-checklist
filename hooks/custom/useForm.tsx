@@ -205,6 +205,7 @@ const useForm = (route?: RouteParams) => {
                         itemCLL: itemsCheckList
                     })
                 );
+                setFound(true)
             } else {
                 setFound(false);
             }

@@ -11,10 +11,11 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { useSelector } from "react-redux";
 import { fetchApporved, fetchMachines, fetchSearchApporved, fetchSearchMachines, SaveApporved } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
+import { navigate } from "@/app/navigations/navigationUtils";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
-const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }) => {
+const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [debouncedSearchQueryFilter, setDebouncedSearchQueryFilter] = useState<string>("");
@@ -119,7 +120,7 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
         try {
             if (action === "preIndex") {
                 if (data) {
-                    navigation.navigate("Preview", {
+                    navigate("Preview", {
                         formId: data.FormID,
                         tableId: data.TableID,
                     });
@@ -139,7 +140,7 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }
         } catch (error) {
             handleError(error);
         }
-    }, [handleError, approved, selectedRows, user]);
+    }, [handleError, approved, selectedRows, user, navigate]);
 
     const convertToThaiDateTime = (dateString: string) => {
         const date = new Date(dateString);
