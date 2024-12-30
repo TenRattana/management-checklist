@@ -19,7 +19,6 @@ import * as Yup from "yup";
 import { FormikErrors } from "formik";
 
 export type CreateFormParams = { formId: string };
-export type FormParams = { messages: string };
 export type PreviewParams = { formId: string; action?: string };
 export type ScanParams = { machineId: string };
 
@@ -113,7 +112,7 @@ export interface PreviewProps<T extends PreviewParams | ScanParams> {
 
 export interface FormScreenProps {
   navigation: NavigationProp<any>;
-  route: Route<FormParams>;
+  route: any;
 }
 
 export interface CreateFormProps {
@@ -147,6 +146,7 @@ export interface CustomTableProps {
   showFilter?: boolean;
   showData?: TypeConfig[];
   showColumn?: string;
+  filterColumn?:number;
   detail?: boolean;
   detailKey?: string;
   showDetailwithKey?: string[];
@@ -154,15 +154,19 @@ export interface CustomTableProps {
   detailData?: TypeConfig[];
   ShowTitle?: string;
   handlePaginationChange?:() => void;
-  isFetching?:boolean;
+  isFetchingNextPage?:boolean;
+  hasNextPage?:boolean;
+  fetchNextPage?:() => void;
   showFilterDate?:boolean;
+  setFilterDate?:number;
+  handlefilter?:(value?:string) => void;
+  searchfilter?:string;
 }
 
 export interface DragfieldProps {
   data: BaseFormState[];
   SFormID: string;
   dispatch: any;
-  checkListOption: CheckListOption[];
   checkListType: checkListTypes[];
   index?: string;
 }
@@ -170,7 +174,6 @@ export interface DragfieldProps {
 export interface DragsubformProps {
   state: Form;
   dispatch: (action: AppActions) => void;
-  checkListOption: CheckListOption[];
   checkListType: checkListTypes[];
   index?: string;
 }
@@ -199,7 +202,6 @@ export interface FieldDialogProps {
   onDeleteField: (SFormID: string, MCListID: string) => void;
   setShowDialogs: () => void;
   editMode: boolean;
-  checkListOption: CheckListOption[];
 }
 
 export interface ActionProps {

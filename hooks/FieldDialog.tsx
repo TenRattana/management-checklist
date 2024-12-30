@@ -1,36 +1,163 @@
-import { useMemo, useCallback, useState } from "react";
+import { useMemo, useCallback, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "react-query";
 import { useToast } from "@/app/contexts/useToast";
 import { AppDispatch } from "@/stores";
 import { addField, updateField } from "@/slices";
 import * as Yup from "yup";
-import { fetchCheckList, fetchCheckListType, fetchDataType, fetchGroupCheckList, saveCheckList, saveGroupCheckListOption, saveCheckListOption } from "@/app/services";
-import { InitialValuesChecklist, InitialValuesGroupCheckList } from "@/typing/value";
-import { CheckList } from "@/typing/type";
+import { fetchCheckList, fetchCheckListType, fetchDataType, fetchSearchCheckList, fetchSearchGroupCheckListOption, fetchGroupCheckListOption, fetchSearchCheckListOption, fetchCheckListOption } from "@/app/services";
+import { Checklist, CheckList, GroupCheckListOption } from "@/typing/type";
+import { BaseFormState } from "@/typing/form";
 
-const useField = () => {
+const useField = (editMode?: boolean, formState?: BaseFormState) => {
     const dispatch = useDispatch<AppDispatch>();
     const queryClient = useQueryClient();
-    const { handleError, showSuccess } = useToast();
-    const state = useSelector((state: any) => state.prefix);
+    const { handleError } = useToast();
+    const itemMLL = useSelector((state: any) => state.form);
 
-    const { data: checkList = [] } = useQuery("checkList", () => fetchCheckList(0, 10000), {
-        staleTime: 1000 * 60 * 24,
-        cacheTime: 1000 * 60 * 25,
-    });
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<{ CheckList: string, MatchChecklist: string }>({ CheckList: '', MatchChecklist: '' });
+    const [itemsCL, setItemsCL] = useState<({ label: string; value: string } & Checklist)[]>([]);
+    const [itemsML, setItemsML] = useState<({ label: string; value: string } & GroupCheckListOption)[]>([]);
 
-    const { data: groupCheckListOption = [] } = useQuery("groupCheckListOption", () => fetchGroupCheckList(0, 10000), {
-        staleTime: 1000 * 60 * 24,
-        cacheTime: 1000 * 60 * 25,
-    });
+    useEffect(() => {
+        if (itemMLL.itemsMLL) {
+            setItemsML((prevItems) => {
+                const newItemsSet = new Set(prevItems.map((item: any) => item.value));
+                return [...prevItems, ...itemMLL.itemsMLL.filter((item: any) => !newItemsSet.has(item.value))];
+            });
+        }
+        if (itemMLL.itemsCLL) {
+            setItemsCL((prevItems) => {
+                const newItemsSet = new Set(prevItems.map((item: any) => item.value));
+                return [...prevItems, ...itemMLL.itemsCLL.filter((item: any) => !newItemsSet.has(item.value))];
+            });
+        }
+    }, [itemMLL]);
+
+    const { data: checkList, isFetching: isFetchingCL, fetchNextPage: fetchNextPageCL, hasNextPage: hasNextPageCL, refetch: refetchCL } = useInfiniteQuery(
+        ['checkList', debouncedSearchQuery.CheckList],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQuery.CheckList
+                ? fetchSearchCheckList(debouncedSearchQuery.CheckList)
+                : fetchCheckList(pageParam, 100);
+        },
+        {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 100 ? allPages.length : undefined;
+            },
+            enabled: true,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat().map((item) => ({
+                    ...item,
+                    label: item.CListName || 'Unknown',
+                    value: item.CListID || '',
+                }));
+
+                setItemsCL((prevItems) => {
+                    const newItemsSet = new Set(prevItems.map((item: any) => item.value));
+                    const mergedItems = prevItems.concat(
+                        newItems.filter((item) => !newItemsSet.has(item.value))
+                    );
+                    return mergedItems;
+                });
+            },
+        }
+    );
+
+    const { data: groupCheckListOption, isFetching: isFetchingML, fetchNextPage: fetchNextPageML, hasNextPage: hasNextPageML, refetch: refetchML } = useInfiniteQuery(
+        ['groupCheckListOption', debouncedSearchQuery.MatchChecklist],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQuery.MatchChecklist
+                ? fetchSearchGroupCheckListOption(debouncedSearchQuery.MatchChecklist)
+                : fetchGroupCheckListOption(pageParam, 100);
+        },
+        {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 100 ? allPages.length : undefined;
+            },
+            enabled: true,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat().map((item) => ({
+                    ...item,
+                    label: item.GCLOptionName || 'Unknown',
+                    value: item.GCLOptionID || '',
+                }));
+
+                setItemsML((prevItems) => {
+                    const newItemsSet = new Set(prevItems.map((item: any) => item.value));
+                    const mergedItems = prevItems.concat(
+                        newItems.filter((item) => !newItemsSet.has(item.value))
+                    );
+                    return mergedItems;
+                });
+            }
+        }
+    );
+
+    const [itemsCLO, setItemsCLO] = useState<any[]>([]);
+    const [debouncedSearchQueryCLO, setDebouncedSearchQueryCLO] = useState("");
+
+    const { data: checkListOption, isFetching: isFetchingCLO, fetchNextPage: fetchNextPageCLO, hasNextPage: hasNextPageCLO, refetch: refetchCLO } = useInfiniteQuery(
+        ['checkListOption', debouncedSearchQueryCLO],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQueryCLO
+                ? fetchSearchCheckListOption(debouncedSearchQueryCLO)
+                : fetchCheckListOption(pageParam, 100);
+        },
+        {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 100 ? allPages.length : undefined;
+            },
+            enabled: true,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat().map((item) => ({
+                    ...item,
+                    label: item.CLOptionName || 'Unknown',
+                    value: item.CLOptionID || '',
+                }));
+
+                setItemsCLO((prevItems) => {
+                    const newItemsSet = new Set(prevItems.map((item: any) => item.value));
+                    const mergedItems = prevItems.concat(
+                        newItems.filter((item) => !newItemsSet.has(item.value))
+                    );
+                    return mergedItems;
+                });
+            }
+
+        }
+    );
+
+    useEffect(() => {
+        if (editMode) {
+            setDebouncedSearchQuery({ CheckList: formState?.CListName ?? "", MatchChecklist: formState?.GCLOptionName ?? "" })
+        } else {
+            queryClient.invalidateQueries("checkList")
+            queryClient.invalidateQueries("groupCheckListOption")
+        }
+        queryClient.invalidateQueries("checkListOption")
+
+    }, [editMode, formState]);
+
 
     const { data: checkListType = [] } = useQuery("checkListType", fetchCheckListType, {
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        enabled: true,
         staleTime: 1000 * 60 * 24,
         cacheTime: 1000 * 60 * 25,
     });
 
     const { data: dataType = [] } = useQuery("dataType", fetchDataType, {
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        enabled: true,
         staleTime: 1000 * 60 * 24,
         cacheTime: 1000 * 60 * 25,
     });
@@ -138,60 +265,10 @@ const useField = () => {
                 })
             )
         });
-    }, [checkListType, dataType]);
-
-    const mutation = useMutation(saveCheckList, {
-        onSuccess: (data) => {
-            showSuccess(data.message);
-            queryClient.invalidateQueries("checkList");
-        },
-        onError: handleError,
-    });
-
-    const mutationG = useMutation(saveGroupCheckListOption, {
-        onSuccess: (data) => {
-            showSuccess(data.message);
-            queryClient.invalidateQueries("groupCheckListOption");
-        },
-        onError: handleError,
-    });
-
-    const mutationCL = useMutation(saveCheckListOption, {
-        onSuccess: (data) => {
-            showSuccess(data.message);
-            queryClient.invalidateQueries("checkListOption");
-        },
-        onError: handleError,
-    });
-
-    const saveDataCheckList = useCallback((values: InitialValuesChecklist) => {
-        mutation.mutate({
-            Prefix: state.CheckList ?? "",
-            CListID: "",
-            CListName: values.checkListName,
-            IsActive: values.isActive,
-            Disables: values.disables,
-        });
-    },
-        [mutation, state.CheckList]
-    );
-
-    const saveDataGroupCheckList = useCallback((values: InitialValuesGroupCheckList, options: string[]) => {
-        mutationG.mutate({
-            Prefix: state.GroupCheckList ?? "",
-            PrefixMatch: state.MatchCheckListOption ?? "",
-            GCLOptionID: values.groupCheckListOptionId,
-            GCLOptionName: values.groupCheckListOptionName,
-            IsActive: values.isActive,
-            Disables: values.disables,
-            Options: JSON.stringify(options),
-        });
-    },
-        [mutationG, state.GroupCheckList, state.MatchCheckListOption]
-    );
+    }, [checkListTypes, dataType]);
 
     const handleSaveField = useCallback((values: any, mode: string) => {
-        const payload = { BaseFormState: values, checkList, checkListType: checkListTypes, dataType };
+        const payload = { BaseFormState: values, checkList: itemsCL, checkListType: checkListTypes, dataType };
 
         try {
             if (mode === "add") {
@@ -203,33 +280,68 @@ const useField = () => {
             handleError(error);
         }
     },
-        [dispatch, handleError, checkList, checkListTypes, dataType]
+        [dispatch, handleError, itemsCL, checkListTypes, dataType]
     );
+
+    const handelSetDebouncedSearchQuery = useCallback((key: string, value: string) => {
+        if (key === "CLO")
+            setDebouncedSearchQueryCLO(value);
+        else
+            setDebouncedSearchQuery((prev) => ({ ...prev, [key]: value }));
+    }, []);
 
     return useMemo(
         () => ({
-            saveDataCheckList,
-            saveDataGroupCheckList,
-            checkList: checkList.filter(v => v.IsActive),
-            groupCheckListOption: groupCheckListOption.filter(v => v.IsActive),
+            checkList: itemsCL.filter(v => v.IsActive),
+            groupCheckListOption: itemsML.filter(v => v.IsActive),
+            checkListOption: itemsCLO.filter(v => v.IsActive),
             checkListType,
             dataType,
             checkListTypes,
             validationSchema,
             handleSaveField,
-            queryClient
+            queryClient,
+            isFetchingCL,
+            hasNextPageCL,
+            fetchNextPageCL,
+            refetchCL,
+            debouncedSearchQuery,
+            handelSetDebouncedSearchQuery,
+            isFetchingML,
+            hasNextPageML,
+            fetchNextPageML,
+            refetchML,
+            isFetchingCLO,
+            hasNextPageCLO,
+            fetchNextPageCLO,
+            refetchCLO,
+            debouncedSearchQueryCLO
         }),
         [
-            saveDataCheckList,
-            saveDataGroupCheckList,
-            checkList,
-            groupCheckListOption,
+            itemsCL,
             checkListType,
             dataType,
             checkListTypes,
             validationSchema,
             handleSaveField,
-            queryClient
+            queryClient,
+            isFetchingCL,
+            hasNextPageCL,
+            fetchNextPageCL,
+            refetchCL,
+            debouncedSearchQuery,
+            handelSetDebouncedSearchQuery,
+            itemsML,
+            isFetchingML,
+            hasNextPageML,
+            fetchNextPageML,
+            refetchML,
+            itemsCLO,
+            isFetchingCLO,
+            hasNextPageCLO,
+            fetchNextPageCLO,
+            refetchCLO,
+            debouncedSearchQueryCLO
         ]
     );
 };

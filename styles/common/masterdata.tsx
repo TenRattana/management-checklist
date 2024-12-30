@@ -200,9 +200,14 @@ const useMasterdataStyles = () => {
         picker: {
             height: 50,
             width: '100%',
+            backgroundColor: theme.colors.background,
+            fontFamily: "Poppins"
+        },
+        pickerItem: {
             fontSize: spacing.small,
             color: theme.colors.onBackground,
-            backgroundColor: theme.colors.background
+            fontFamily: "Poppins",
+            letterSpacing: 0.3
         },
         container: {
             flex: 1,

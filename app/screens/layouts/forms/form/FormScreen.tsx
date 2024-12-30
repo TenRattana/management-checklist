@@ -16,8 +16,6 @@ const LazyCustomtable = lazy(() => import("@/components").then(module => ({ defa
 
 const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
-    const [show, setShow] = useState<boolean>(false);
-    const { messages } = route.params || {};
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
 
     const masterdataStyles = useMasterdataStyles();
@@ -64,13 +62,6 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
     }, [debouncedSearchQuery, remove])
 
     useEffect(() => {
-        if (messages && show) {
-            showSuccess(String(messages));
-            setShow(false);
-        }
-    }, [messages, show, showSuccess]);
-
-    useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearchQuery(searchQuery);
         }, 300);
@@ -79,6 +70,12 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ navigation, route })
             clearTimeout(handler);
         };
     }, [searchQuery]);
+
+    useEffect(() => {
+        if (route.params?.fet) {
+            queryClient.invalidateQueries('form');
+        }
+    }, [route.params]);
 
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {

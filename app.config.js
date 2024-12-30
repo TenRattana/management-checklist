@@ -60,6 +60,16 @@ export default {
         barStyle: "dark-content",
       },
     },
+    packagerOpts: {
+      dev: false,
+      minify: true,
+      cache: true,
+    },
+    updates: {
+      enabled: true,
+      checkAutomatically: "ON_LOAD",
+      fallbackToCacheTimeout: 0,
+    },
     web: {
       bundler: "metro",
       output: "single",
@@ -72,7 +82,11 @@ export default {
         development: false,
       },
     },
-    assetBundlePatterns: ["assets/fonts/*", "assets/images/*"],
+    assetBundlePatterns: [
+      "assets/fonts/*",
+      "assets/images/*",
+      "node_modules/react-native/**/*",
+    ],
     plugins: [
       "expo-router",
       [

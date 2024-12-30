@@ -1,11 +1,14 @@
 import React from 'react';
-import { Stack } from 'expo-router';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { LoginScreen } from '../screens';
+
+const Stack = createNativeStackNavigator();
 
 const AuthStack = () => {
     return (
-        <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="auth/LoginScreen" options={{ title: "Login" }} />
-        </Stack>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="Login" component={LoginScreen} />
+        </Stack.Navigator>
     );
 };
 

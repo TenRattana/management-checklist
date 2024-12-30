@@ -1,11 +1,11 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import axiosInstance from "@/config/axios";
-import { setFormData, reset } from "@/slices";
+import { setFormData, reset, setGroupCheckListinForm } from "@/slices";
 import { useToast } from "@/app/contexts/useToast";
 import { useFocusEffect } from "@react-navigation/native";
 import { BaseFormState, FormData, SubForm } from "@/typing/form";
-import { CheckList, Checklist, CheckListOption, CheckListType, DataType, GroupCheckListOption, Machine } from "@/typing/type";
+import { CheckList, Checklist, CheckListType, DataType, GroupCheckListOption } from "@/typing/type";
 
 interface RouteParams {
     params?: {
@@ -17,22 +17,19 @@ interface RouteParams {
 }
 interface FormDataState {
     checkList: Checklist[];
-    checkListOption: CheckListOption[],
-    checkListType: CheckListType[];
-    dataType: DataType[];
+    checkListType: CheckListType[],
     groupCheckListOption: GroupCheckListOption[];
-    groupCheckListOptionActive: GroupCheckListOption[];
-    machine: Machine[];
+    dataType: DataType[];
 }
 
-const createSubFormsAndFields = (
+const createSubFormsAndFields = async (
     formData: FormData,
     expectedResult: Record<string, any> = {},
-    groupCheckListOption: GroupCheckListOption[]
 ) => {
-
     const subForms: SubForm[] = [];
     const fields: BaseFormState[] = [];
+    const itemsCheckList: ({ label: string; value: string } & Checklist)[] = [];
+    const itemsGroupCheckListOption: ({ label: string; value: string } & GroupCheckListOption)[] = [];
 
     formData.SubForm?.forEach((subFormItem) => {
         const subForm: SubForm = {
@@ -60,7 +57,6 @@ const createSubFormsAndFields = (
                 MCListID: itemOption.MCListID,
                 CListID: itemOption.CListID,
                 GCLOptionID: itemOption.GCLOptionID,
-                GCLOptionName: groupCheckListOption.find((v) => v.GCLOptionID === itemOption.GCLOptionID)?.GCLOptionName,
                 CTypeID: itemOption.CTypeID,
                 DTypeID: itemOption.DTypeID,
                 DTypeValue: itemOption.DTypeValue,
@@ -84,64 +80,76 @@ const createSubFormsAndFields = (
         });
     });
 
-    return { subForms, fields };
+    const checkListIdAll = fields.map(((v) => v.CListID)) ?? []
+    const groupCheckListOptionIdAll = fields.filter((v) => v.GCLOptionID !== null).map((v) => v.GCLOptionID) ?? [];
+
+    const DataInfo: Promise<any>[] = [];
+
+    DataInfo.push(axiosInstance.post("CheckList_service.asmx/GetCheckListInForm", { CListIDS: JSON.stringify(checkListIdAll) }));
+    DataInfo.push(axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptionInForm", { GCLOptionIDS: JSON.stringify(groupCheckListOptionIdAll) }));
+
+    if (DataInfo.length > 0) {
+        try {
+            const results = await Promise.all(DataInfo);
+            const newItems = results[0]?.data?.data?.map((item: Checklist) => ({
+                ...item,
+                label: item.CListName || 'Unknown',
+                value: item.CListID || '',
+            })) || [];
+
+            const existingValues = new Set(itemsCheckList.map(item => item.value));
+            const uniqueItems = newItems.filter((item: { label: string, value: string } & Checklist) => !existingValues.has(item.value));
+            itemsCheckList.push(...uniqueItems);
+
+            const newItemsM = results[1]?.data?.data?.map((item: GroupCheckListOption) => ({
+                ...item,
+                label: item.GCLOptionName || 'Unknown',
+                value: item.GCLOptionID || '',
+            })) || [];
+
+            const existingValuesM = new Set(itemsGroupCheckListOption.map(item => item.value));
+            const uniqueItemsM = newItemsM.filter((item: { label: string, value: string } & GroupCheckListOption) => !existingValuesM.has(item.value));
+            itemsGroupCheckListOption.push(...uniqueItemsM);
+
+        } catch (error) {
+            console.error("Error occurred while fetching data:", error);
+        }
+    }
+
+    return { subForms, fields, itemsCheckList, itemsGroupCheckListOption };
 };
 
-const useForm = (route: RouteParams) => {
+const useForm = (route?: RouteParams) => {
     const dispatch = useDispatch();
     const [data, setData] = useState<FormDataState>({
         checkList: [],
-        checkListOption: [],
+        groupCheckListOption: [],
         checkListType: [],
         dataType: [],
-        groupCheckListOption: [],
-        groupCheckListOptionActive: [],
-        machine: []
     });
     const [dataLoaded, setDataLoaded] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [exp, setExp] = useState(false);
     const [found, setFound] = useState(false);
 
-    const { formId, action, machineId, tableId } = route.params || {};
+    const { formId, action, machineId, tableId } = route?.params || {};
     const { handleError } = useToast();
 
     const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
             const responses = await Promise.all([
-                axiosInstance.post("CheckList_service.asmx/GetCheckLists", {
-                    page: 0,
-                    pageSize: 10000,
-                }),
-                axiosInstance.post("CheckListOption_service.asmx/GetCheckListOptions", {
-                    page: 0,
-                    pageSize: 10000,
-                }),
-                axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions", {
-                    page: 0,
-                    pageSize: 10000,
-                }),
-                axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptionsActive", {
-                    page: 0,
-                    pageSize: 10000,
-                }),
+                axiosInstance.post("CheckList_service.asmx/SearchCheckLists", { Messages: "Empty Content" }),
+                axiosInstance.post("GroupCheckListOption_service.asmx/SearchGroupCheckLists", { Messages: "Empty Content Group" }),
                 axiosInstance.post("CheckListType_service.asmx/GetCheckListTypes"),
                 axiosInstance.post("DataType_service.asmx/GetDataTypes"),
-                axiosInstance.post("Machine_service.asmx/GetMachines", {
-                    page: 0,
-                    pageSize: 10000,
-                })
             ]);
 
             setData({
                 checkList: responses[0].data?.data || [],
-                checkListOption: responses[1].data?.data || [],
-                groupCheckListOption: responses[2].data?.data || [],
-                groupCheckListOptionActive: responses[3].data?.data || [],
-                checkListType: responses[4].data?.data || [],
-                dataType: responses[5].data?.data || [],
-                machine: responses[6].data?.data || []
+                groupCheckListOption: responses[1].data?.data || [],
+                checkListType: responses[2].data?.data || [],
+                dataType: responses[3].data?.data || [],
             });
 
             setDataLoaded(true);
@@ -165,40 +173,46 @@ const useForm = (route: RouteParams) => {
                     { TableID: tableId }
                 );
                 fetchedExpectedResult = expectedResultResponse.data?.data[0] || [];
-                setExp(true)
+                setExp(true);
             }
 
-            const { subForms, fields } = createSubFormsAndFields(
-                response.data?.data[0],
-                fetchedExpectedResult,
-                data.groupCheckListOption || data.groupCheckListOptionActive
-            );
+            if (response.data?.data?.[0]) {
+                const { subForms, fields, itemsCheckList, itemsGroupCheckListOption } = await createSubFormsAndFields(
+                    response.data?.data?.[0],
+                    fetchedExpectedResult,
+                );
 
-            if (mode && response.data?.status) {
-                setFound(true)
+                const checkListType = data.checkListType
+                    .filter(group => group.CheckList !== null)
+                    .flatMap(group => group.CheckList)
+                    .filter((checkList): checkList is CheckList => checkList !== undefined);
+
+                dispatch(
+                    setFormData({
+                        form: action === "copy" ? {} : response.data?.data[0],
+                        subForms,
+                        checkList: itemsCheckList,
+                        groupCheckListOption: itemsGroupCheckListOption,
+                        BaseFormState: fields,
+                        checkListType: checkListType,
+                        dataType: data.dataType
+                    })
+                );
+
+                dispatch(
+                    setGroupCheckListinForm({
+                        itemsMLL: itemsGroupCheckListOption,
+                        itemCLL: itemsCheckList
+                    })
+                );
+            } else {
+                setFound(false);
             }
 
-            const checkListType = data.checkListType
-                .filter(group => group.CheckList !== null)
-                .flatMap(group => group.CheckList)
-                .filter((checkList): checkList is CheckList => checkList !== undefined);
-
-            dispatch(
-                setFormData({
-                    form: action === "copy" ? {} : response.data?.data[0],
-                    subForms,
-                    BaseFormState: fields,
-                    checkList: data.checkList,
-                    checkListType: checkListType,
-                    dataType: data.dataType
-                })
-            );
         } catch (error) {
             handleError(error);
         }
-    },
-        [dataLoaded, data.checkList, data.checkListType, data.dataType, handleError, dispatch, exp, found]
-    );
+    }, [dataLoaded, data.checkListType, data.dataType, handleError, dispatch]);
 
     useFocusEffect(
         useCallback(() => {
@@ -214,19 +228,29 @@ const useForm = (route: RouteParams) => {
             if (formId) fetchForm(formId, false, action, tableId);
             if (machineId) fetchForm(machineId, true, action, tableId);
         }
+
     }, [dataLoaded, formId, machineId, action, tableId, fetchForm]);
 
-    return {
-        checkListOption: data.checkListOption,
-        dataType: data.dataType,
-        checkList: data.checkList,
-        checkListType: data.checkListType,
-        groupCheckListOption: tableId || machineId ? data.groupCheckListOption : data.groupCheckListOptionActive,
-        machine: data.machine,
-        isLoading,
-        exp,
-        found
-    };
+    return useMemo(
+        () => ({
+            dataType: data.dataType,
+            checkListType: data.checkListType,
+            isLoading,
+            exp,
+            found,
+            checkList: data.checkList,
+            groupCheckListOption: data.groupCheckListOption,
+        }),
+        [
+            data.dataType,
+            data.checkListType,
+            data.checkList,
+            data.groupCheckListOption,
+            isLoading,
+            exp,
+            found,
+        ]
+    );
 };
 
 export default useForm;

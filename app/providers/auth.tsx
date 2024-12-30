@@ -125,17 +125,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (token && token.split('.').length === 3) {
         const payload: any = jwtDecode(token);
 
-        if (payload.exp) {
-          const expirationTime = payload.exp * 1000;
-          const currentTime = Date.now();
-
-          if (currentTime < expirationTime) {
-            setUserData(payload);
-          } else {
-            await deleteData('userToken');
-            setLoading(false);
-            return;
-          }
+        if (payload.UserID) {
+          setUserData(payload);
         }
       } else {
         const response = await axiosInstance.post("User_service.asmx/GetAD", {

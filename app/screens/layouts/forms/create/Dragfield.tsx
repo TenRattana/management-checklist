@@ -16,7 +16,7 @@ import Text from '@/components/Text'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { CheckList } from "@/typing/type";
 
-const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatch, checkListOption, checkListType }) => {
+const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatch, checkListType }) => {
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const [currentField, setCurrentField] = useState<BaseFormState>({
         MCListID: "", CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: SFormID,
@@ -141,7 +141,6 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
                     onDeleteField={(SFormID, MCListID) => dispatch(deleteField({ SFormID, MCListID }))}
                     setShowDialogs={handleDialogToggle}
                     editMode={isEditing}
-                    checkListOption={checkListOption}
                 />
             )}
         </NestableScrollContainer >

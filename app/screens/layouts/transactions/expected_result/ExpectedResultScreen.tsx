@@ -1,22 +1,22 @@
 import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from '@/app/contexts/useToast';
-import { Customtable, AccessibleView, Searchbar } from "@/components";
+import { Searchbar } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { ExpectedResult } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
 import { useInfiniteQuery } from 'react-query';
 import { ActivityIndicator, StyleSheet, View } from "react-native";
-import { fetchExpectedResults, fetchSearchExpectedResult } from "@/app/services";
+import { fetchExpectedResults, fetchMachines, fetchSearchExpectedResult, fetchSearchMachines } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
-import { getCurrentTime } from "@/config/timezoneUtils";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
 const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
+    const [debouncedSearchQueryFilter, setDebouncedSearchQueryFilter] = useState<string>("");
 
     const masterdataStyles = useMasterdataStyles();
     const { handleError } = useToast();
@@ -45,11 +45,50 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
         }
     );
 
+    const [machines, setMachine] = useState<{ label: string, value: string | null }[]>([{ label: "Show all", value: "" }]);
+
+    const { data: machine, fetchNextPage: fetchNextPageMG, hasNextPage: hasNextPageMG, isLoading, isFetchingNextPage } = useInfiniteQuery(
+        ['machine', debouncedSearchQueryFilter],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQueryFilter
+                ? fetchSearchMachines(debouncedSearchQueryFilter)
+                : fetchMachines(pageParam, 50);
+        },
+        {
+            refetchOnWindowFocus: false,
+            refetchOnMount: true,
+            enabled: true,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 50 ? allPages.length : undefined;
+            },
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat().filter((item) => item.IsActive).map((item) => ({
+                    label: item.MachineName || 'Unknown',
+                    value: item.MachineName || '',
+                }));
+
+                setMachine((prevItems) => {
+                    const newItemsSet = new Set(prevItems.map((item: any) => item.value));
+                    const mergedItems = prevItems.concat(
+                        newItems.filter((item: { label: string, value: string }) => !newItemsSet.has(item.value))
+                    );
+                    return mergedItems;
+                });
+            },
+        }
+    );
+
     const handlePaginationChange = useCallback(() => {
         if (hasNextPage && !isFetching) {
             fetchNextPage();
         }
     }, [hasNextPage, isFetching, fetchNextPage]);
+
+    const handlefilter = useCallback((search?: string | null) => {
+        if (search) {
+            setDebouncedSearchQueryFilter(search)
+        }
+    }, []);
 
     useEffect(() => {
         if (debouncedSearchQuery === "") {
@@ -128,11 +167,17 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
         handleAction,
         showMessage: [0, 1],
         showFilterDate: true,
-        showColumn: "Date",
-        ShowTitle: "Select Date :",
-        showData: [{ Date: "To Day" }, { Date: "To Week" }, { Date: "To Month" }, { Date: "To Year" }],
+        showFilter: true,
+        ShowTitle: "Machine",
+        showData: machines,
+        showColumn: "MachineName",
+        filterColumn: 0,
+        setFilterDate: 4,
         searchQuery: debouncedSearchQuery,
-    }), [tableData, debouncedSearchQuery, handleAction,]);
+        hasNextPage: hasNextPageMG,
+        isFetchingNextPage: isFetchingNextPage,
+        searchfilter: debouncedSearchQueryFilter
+    }), [tableData, debouncedSearchQuery, handleAction, machines, debouncedSearchQueryFilter, hasNextPageMG, isFetchingNextPage]);
 
     const styles = StyleSheet.create({
         container: {
@@ -169,7 +214,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
             </View>
             <Card.Content style={styles.cardcontent}>
                 <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
-                    <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
+                    <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} fetchNextPage={fetchNextPageMG} handlefilter={handlefilter} />
                 </Suspense>
             </Card.Content>
         </View>

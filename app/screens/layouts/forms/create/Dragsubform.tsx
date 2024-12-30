@@ -26,7 +26,7 @@ import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
 import useMasterdataStyles from "@/styles/common/masterdata";
 
-const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, checkListOption, checkListType }) => {
+const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, checkListType }) => {
     const [initialDialog, setInitialDialog] = useState<boolean>(false)
     const [initialSubForm, setInitialSubForm] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", Number: false, MachineID: "", Fields: [] });
     const [editMode, setEditMode] = useState<boolean>(false)
@@ -99,7 +99,6 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, c
                         data={item.Fields ?? []}
                         SFormID={item.SFormID}
                         dispatch={dispatch}
-                        checkListOption={checkListOption}
                         checkListType={checkListType}
                     />
                 </AccessibleView>

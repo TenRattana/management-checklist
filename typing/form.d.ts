@@ -10,6 +10,14 @@ export interface BaseForm {
 
 export interface Form extends BaseForm {
   subForms: BaseSubForm[];
+  itemsMLL?: ({
+    label: string;
+    value: string;
+  } & GroupCheckListOption)[];
+  itemCLL?: ({
+    label: string;
+    value: string;
+  } & Checklist)[];
 }
 
 export interface BaseSubForm {
@@ -56,7 +64,7 @@ export interface BaseFormState {
   EResult?: any;
   CTypeName?: string;
   CListName?: string;
-  GCLOptionName?:string;
+  GCLOptionName?: string;
 }
 
 export interface RowItemProps<V extends BaseFormState | BaseSubForm> {

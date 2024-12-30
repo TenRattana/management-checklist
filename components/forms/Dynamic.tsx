@@ -25,12 +25,7 @@ const DynamicForm = React.memo(({
   const masterdataStyles = useMasterdataStyles();
   const { theme } = useTheme()
   const { fontSize } = useRes()
-  const { groupCheckListOption, queryClient } = useField();
-
-  useEffect(() => {
-    queryClient.invalidateQueries("checkList");
-    queryClient.invalidateQueries("groupCheckListOption");
-  }, []);
+  const { groupCheckListOption } = useField();
 
   const [textColor, setTextColor] = useState(theme.colors.onBackground);
   const [messageminOrmax, setMessageMinOrMax] = useState("");
