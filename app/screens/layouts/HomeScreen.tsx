@@ -36,7 +36,7 @@ const HomeScreen = () => {
   const { theme } = useTheme();
   const { spacing, responsive } = useRes();
 
-  const [checkedItems, setCheckedItems] = useState<Category>({
+  const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({
     '1': true,
     '2': true,
     '3': true,

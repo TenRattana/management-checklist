@@ -116,7 +116,11 @@ export const convertSchedule = (schedule: TimelineItem[]): { timeline: TimeLine[
             const eventDate = match ? moment(match[1], 'DD-MM-YYYY') : null;
             if (!eventDate) return;
 
-            const gregorianDate = eventDate.clone().subtract(543, 'years');
+            const currentYear = moment().year();
+            const eventYear = eventDate.year();
+            const yearDifference = currentYear - eventYear;
+            const gregorianDate = eventDate.clone().add(yearDifference, 'years');
+
             const [startTime, endTime] = time.split(' - ');
             const start = optimizeMoment(gregorianDate, startTime);
             const end = optimizeMoment(gregorianDate, endTime);
