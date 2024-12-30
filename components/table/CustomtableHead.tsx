@@ -182,7 +182,7 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
                             marginLeft: responsive === "small" ? 0 : 10,
                             top: -5
                         }}>
-                            <Text style={[masterdataStyles.text, { alignContent: 'center', paddingRight: 15, alignSelf: 'center' }]}>{ShowTitle || "Title"} :</Text>
+                            <Text style={[masterdataStyles.text, { alignContent: 'center', paddingRight: 15, alignSelf: 'center' }]}>{`${ShowTitle || "Title"} :`}</Text>
 
                             <Dropdown
                                 label={ShowTitle || ""}
