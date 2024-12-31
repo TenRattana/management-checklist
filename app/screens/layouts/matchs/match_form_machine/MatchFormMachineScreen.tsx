@@ -12,11 +12,12 @@ import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
 import { useSelector } from "react-redux";
 import { fetchMatchFormMchines, fetchSearchMatchFormMchine, SaveMatchFormMachine } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
+import { navigate } from "@/app/navigations/navigationUtils";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 const LazyMatch_form_machine_dialog = lazy(() => import("@/components/screens/Match_form_machine_dialog"));
 
-const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
+const MatchFormMachineScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -103,11 +104,11 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
             if (action === "changeIndex") {
-                navigation.navigate("Create_form", { formId: item });
+                navigate("Create_form", { formId: item });
             } else if (action === "preIndex") {
-                navigation.navigate("Preview", { formId: item });
+                navigate("Preview", { formId: item });
             } else if (action === "copyIndex") {
-                navigation.navigate("Create_form", { formId: item, action: "copy" });
+                navigate("Create_form", { formId: item, action: "copy" });
             } else if (action === "editIndex") {
                 const response = await axiosInstance.post("MatchFormMachine_service.asmx/GetMatchFormMachine", {
                     MachineID: item,
@@ -130,7 +131,7 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
         } catch (error) {
             handleError(error);
         }
-    }, [handleError, queryClient]);
+    }, [handleError, queryClient, navigate]);
 
     const tableData = useMemo(() => {
         return matchForm.map((item) => [
@@ -216,6 +217,7 @@ const MatchFormMachineScreen = React.memo(({ navigation }: any) => {
                 <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
                 </Suspense>
+                {isFetching && <ActivityIndicator />}
             </Card.Content>
 
             {isVisible && (

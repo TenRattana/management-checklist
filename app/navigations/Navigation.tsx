@@ -128,8 +128,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                                 onSettingsPress={handleSettings}
                                 onLogoutPress={handleLogout}
                             />
-                        ),
-                        unmountOnBlur: true
+                        )
                     }}
                     initialRouteName={user.initialRoute || ""}
                     id="nav"

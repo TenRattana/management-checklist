@@ -10,10 +10,11 @@ import { useInfiniteQuery } from 'react-query';
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { fetchExpectedResults, fetchMachines, fetchSearchExpectedResult, fetchSearchMachines } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
+import { navigate } from "@/app/navigations/navigationUtils";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
-const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ navigation }) => {
+const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [debouncedSearchQueryFilter, setDebouncedSearchQueryFilter] = useState<string>("");
@@ -115,7 +116,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
         try {
             if (action === "preIndex") {
                 if (data) {
-                    navigation.navigate("Preview", {
+                    navigate("Preview", {
                         formId: data.FormID,
                         tableId: data.TableID,
                     });
@@ -124,7 +125,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
         } catch (error) {
             handleError(error);
         }
-    }, [handleError, expectedResult]);
+    }, [handleError, expectedResult, navigate]);
 
     const convertToThaiDateTime = (dateString: string) => {
         const date = new Date(dateString);
@@ -216,6 +217,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(({ naviga
                 <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} fetchNextPage={fetchNextPageMG} handlefilter={handlefilter} />
                 </Suspense>
+                {isFetching && <ActivityIndicator />}
             </Card.Content>
         </View>
     );

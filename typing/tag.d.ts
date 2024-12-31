@@ -111,7 +111,7 @@ export interface PreviewProps<T extends PreviewParams | ScanParams> {
 }
 
 export interface FormScreenProps {
-  navigation: NavigationProp<any>;
+  // navigation: NavigationProp<any>;
   route: any;
 }
 
