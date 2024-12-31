@@ -207,6 +207,7 @@ const CheckListOptionScreen = React.memo(() => {
                 <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
                 </Suspense>
+                {isFetching && <ActivityIndicator />}
             </Card.Content>
 
             {isVisible && (

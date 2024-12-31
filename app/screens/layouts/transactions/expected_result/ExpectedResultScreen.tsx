@@ -217,6 +217,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(() => {
                 <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} fetchNextPage={fetchNextPageMG} handlefilter={handlefilter} />
                 </Suspense>
+                {isFetching && <ActivityIndicator />}
             </Card.Content>
         </View>
     );
