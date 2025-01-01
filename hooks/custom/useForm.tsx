@@ -129,6 +129,7 @@ const useForm = (route?: RouteParams) => {
     });
     const [dataLoaded, setDataLoaded] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingForm, setIsLoadingForm] = useState(false);
     const [exp, setExp] = useState(false);
     const [found, setFound] = useState(false);
 
@@ -162,6 +163,7 @@ const useForm = (route?: RouteParams) => {
 
     const fetchForm = useCallback(async (formId: string, mode: boolean = false, action?: string, tableId?: string) => {
         if (!dataLoaded) return;
+        setIsLoadingForm(true)
         try {
             const endpoint = mode ? "Form_service.asmx/ScanForm" : "Form_service.asmx/GetForm";
             const response = await axiosInstance.post(endpoint, { [mode ? "MachineID" : "FormID"]: formId });
@@ -212,6 +214,8 @@ const useForm = (route?: RouteParams) => {
 
         } catch (error) {
             handleError(error);
+        }finally {
+            setIsLoadingForm(false);
         }
     }, [dataLoaded, data.checkListType, data.dataType, handleError, dispatch]);
 
@@ -241,6 +245,7 @@ const useForm = (route?: RouteParams) => {
             found,
             checkList: data.checkList,
             groupCheckListOption: data.groupCheckListOption,
+            isLoadingForm
         }),
         [
             data.dataType,
@@ -250,6 +255,7 @@ const useForm = (route?: RouteParams) => {
             isLoading,
             exp,
             found,
+            isLoadingForm
         ]
     );
 };

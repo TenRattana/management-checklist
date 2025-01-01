@@ -103,7 +103,7 @@ const FormCard = React.memo(
 
 const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) => {
   const { route } = props;
-  const { dataType, found } = useForm(route);
+  const { dataType, found, isLoadingForm } = useForm(route);
 
   const state = useSelector((state: any) => state.form);
   const user = useSelector((state: any) => state.user);
@@ -197,7 +197,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
             incrementCount(false);
             console.log(values);
             console.log(errors);
-            
+
             return (
               <>
                 <FlatList
@@ -258,9 +258,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
         </AccessibleView>
       )}
     </AccessibleView>
-  ) : (
-    <NotFoundScreen />
-  );
+  ) : isLoadingForm ? <Text>Loading Form...</Text> : <NotFoundScreen />
 });
 
 export default InputFormMachine;

@@ -102,7 +102,9 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
         return screens;
     }, [user.IsAuthenticated, user.Screen, renderComponent]);
 
-    const initialRoute = user.initialRoute || (user.Screen.length > 0 ? user.Screen[0].NavigationTo : "");
+    const initialRoute = useMemo(() => {
+        return user.initialRoute || (user.Screen.length > 0 ? user.Screen[0].NavigationTo : "Permission_deny");
+    }, [user]);
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -131,8 +133,8 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                                 onLogoutPress={handleLogout}
                             />
                         ),
-                        freezeOnBlur: true,
-                        unmountOnBlur: true, 
+                        freezeOnBlur: false,
+                        unmountOnBlur: false, 
                     }}
                     initialRouteName={initialRoute}
                     id="nav"
@@ -151,7 +153,6 @@ const Navigation: React.FC = React.memo(() => {
     const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
 
     const renderComponent = useCallback((name: ComponentNames) => {
-
         if (cachedComponents.current[name]) {
             const Component = cachedComponents.current[name];
             return (props: any) => (
@@ -160,26 +161,20 @@ const Navigation: React.FC = React.memo(() => {
                 </Suspense>
             );
         }
-
+    
         if (name in components) {
             const LazyComponent = lazy(components[name as ComponentNames]);
             cachedComponents.current[name] = LazyComponent;
-
+    
             return (props: any) => (
-                <Suspense fallback={
-                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                        <ActivityIndicator size="large" color="#0000ff" />
-                        <Text>Loading Screen...</Text>
-                    </View>
-                }>
+                <Suspense fallback={<Text>Loading Component...</Text>}>
                     <LazyComponent {...props} />
                 </Suspense>
-
             );
         }
-
+    
         return (props: any) => (
-            <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+            <Suspense fallback={<Text>Permission Denied...</Text>}>
                 <PermissionDeny {...props} />
             </Suspense>
         );

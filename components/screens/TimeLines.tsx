@@ -34,9 +34,9 @@ type TimelinesProps = {
 
 const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, currentDate }) => {
     const { theme } = useTheme();
-    const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+    const [dialogVisible, setDialogVisible] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState<any>(null);
-    const masterdataStyles = useMasterdataStyles();
+    const [isLoadingData, setIsLoadingData] = useState(true);
 
     const initialTime = useMemo(() => ({
         hour: getCurrentTime().getHours(),
@@ -56,50 +56,32 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
     }, [timeSchedule, isLoading]);
 
     useEffect(() => {
-        console.log("computedTimeline", computedTimeline);
-
-        setTimelineItems(computedTimeline.timeline);
-    }, [timeSchedule, isLoading]);
+        if (computedTimeline.timeline.length) {
+            setTimelineItems(computedTimeline.timeline);
+            setIsLoadingData(false); // ข้อมูลพร้อมแล้ว
+        }
+    }, [computedTimeline.timeline]);
 
     const eventsByDateS = useMemo(() => {
         if (!timelineItems.length) return {};
-    
+
         const filteredEvents = timelineItems.filter(event => {
             const statusMatches = filterStatus === "all" || event.statustype === filterStatus;
             const typeMatches = filterTitle.includes(event.type as string);
             return statusMatches && typeMatches;
         });
-    
+
         return groupBy(filteredEvents, (event) => {
             if (event.start && typeof event.start === 'string') {
                 return moment(event.start).format('YYYY-MM-DD');
             }
             return 'invalid_date';
         });
-    }, [filterStatus, currentDate, filterTitle, timelineItems]);
-
-    const formatTime = (time: string) => {
-        const date = new Date(time);
-        return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-    };
-
-    const RenderEvent = React.memo(({ item }: { item: Event }) => (
-        <TouchableOpacity onPress={() => handleEventClick(item)}>
-            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>{item.title}</Text>
-            <Text style={masterdataStyles.textFFF}>
-                {formatTime(item.start)} - {formatTime(item.end)}
-            </Text>
-            {item.summary && <Text style={masterdataStyles.textFFF}>{item.summary}</Text>}
-        </TouchableOpacity>
-    ));
+    }, [filterStatus, filterTitle, timelineItems]);
 
     const handleEventClick = useCallback((event: Event) => {
-        if (event) {
-            setSelectedEvent(event);
-            setDialogVisible(true);
-        } else {
-            console.warn('Event is undefined:', event);
-        }
+        setSelectedEvent(event);
+        setDialogVisible(true);
     }, []);
 
     const renderItem = useCallback((timelineProps: TimelineProps, info: TimelineListRenderItemInfo) => {
@@ -109,24 +91,32 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
                     {...timelineProps}
                     styles={{ contentStyle: { backgroundColor: theme.colors.fff } }}
                     onEventPress={handleEventClick}
-                    renderEvent={(event) => <RenderEvent item={event} />}
                 />
             </Suspense>
         );
     }, [theme]);
 
+    if (isLoadingData) {
+        return <ActivityIndicator size="large" color={theme.colors.primary} />;
+    }
+
     return (
         <>
-            <Suspense fallback={<ActivityIndicator size="large" color={theme.colors.primary} />}>
-                <LazyTimelineList
-                    events={eventsByDateS}
-                    renderItem={renderItem}
-                    showNowIndicator
-                    scrollToNow
-                    initialTime={initialTime}
-                />
-            </Suspense>
-
+            {Object.keys(eventsByDateS).length ? (
+                <Suspense fallback={<ActivityIndicator size="large" color={theme.colors.primary} />}>
+                    <LazyTimelineList
+                        events={eventsByDateS}
+                        renderItem={renderItem}
+                        showNowIndicator
+                        scrollToNow
+                        initialTime={initialTime}
+                    />
+                </Suspense>
+            ) : (
+                <Text style={{ textAlign: 'center', color: theme.colors.text }}>
+                    No events found for the selected filters.
+                </Text>
+            )}
 
             {dialogVisible && selectedEvent && (
                 <MemoHome_dialog

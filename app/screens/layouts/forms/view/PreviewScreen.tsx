@@ -24,7 +24,7 @@ const isValidDateFormatCustom = (value: string) => {
 
 const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
     const { route } = props;
-    const { dataType, exp } = useForm(route);
+    const { dataType, exp, isLoadingForm } = useForm(route);
 
     const state = useSelector((state: any) => state.form);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -93,7 +93,7 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
             countRef.current = 1
     };
 
-    return (
+    return isLoadingForm ? <Text>Loading Form...</Text> : (
         <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]}>
             <Stack.Screen
                 options={{
