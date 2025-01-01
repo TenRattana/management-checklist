@@ -2,14 +2,12 @@ import React, { lazy, Suspense, useCallback, useEffect, useMemo, useState } from
 import { ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 import { useTheme } from '@/app/contexts/useTheme';
 import moment from 'moment-timezone';
-import { CalendarUtils, TimelineEventProps, TimelineListRenderItemInfo, TimelineProps } from 'react-native-calendars';
+import { CalendarUtils, TimelineListRenderItemInfo, TimelineProps } from 'react-native-calendars';
 import { getCurrentTime } from '@/config/timezoneUtils';
 import Home_dialog from './Home_dialog';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { useQuery } from 'react-query';
 import { fetchTimeSchedules } from '@/app/services';
-import { GroupMachine } from '@/typing/type';
-import { parseTimeScheduleToTimeline } from '@/app/mocks/parseTimeScheduleToTimeline';
 import { convertSchedule } from '@/app/mocks/convertSchedule';
 import { groupBy } from 'lodash';
 import { TimeLine } from '@/app/mocks/timeline';
@@ -34,16 +32,6 @@ type TimelinesProps = {
     currentDate: any;
 };
 
-type ScheduleType = 'Daily' | 'Weekly' | 'Custom';
-
-type MarkedDates = Record<string, { dots: DOT[] }>;
-
-type DOT = {
-    color: string;
-    selectedDotColor: string;
-    type?: ScheduleType;
-};
-
 const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, currentDate }) => {
     const { theme } = useTheme();
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
@@ -64,9 +52,7 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
 
     const computedTimeline = useMemo(() => {
         if (isLoading || !timeSchedule.length) return { timeline: [], markedDates: {} };
-        const time = parseTimeScheduleToTimeline(timeSchedule);
-
-        return convertSchedule(time);
+        return convertSchedule(timeSchedule);
     }, [timeSchedule, isLoading]);
 
     useEffect(() => {
@@ -75,25 +61,22 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
         setTimelineItems(computedTimeline.timeline);
     }, [timeSchedule, isLoading]);
 
-    const eventsByDate = groupBy(timelineItems, (e) => CalendarUtils.getCalendarDateString(e.start));
-
     const eventsByDateS = useMemo(() => {
-        const filteredEvents = eventsByDate[currentDate]?.filter(event => {
+        if (!timelineItems.length) return {};
+    
+        const filteredEvents = timelineItems.filter(event => {
             const statusMatches = filterStatus === "all" || event.statustype === filterStatus;
             const typeMatches = filterTitle.includes(event.type as string);
             return statusMatches && typeMatches;
-        }) || [];
-
-        const groupedEvents = groupBy(filteredEvents, (event) => {
+        });
+    
+        return groupBy(filteredEvents, (event) => {
             if (event.start && typeof event.start === 'string') {
-                const datePart = moment(event.start).format('YYYY-MM-DD');
-                return datePart;
+                return moment(event.start).format('YYYY-MM-DD');
             }
             return 'invalid_date';
         });
-
-        return groupedEvents;
-    }, [filterStatus, currentDate, filterTitle, eventsByDate]);
+    }, [filterStatus, currentDate, filterTitle, timelineItems]);
 
     const formatTime = (time: string) => {
         const date = new Date(time);

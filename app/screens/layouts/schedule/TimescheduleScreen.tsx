@@ -6,7 +6,7 @@ import { useToast } from "@/app/contexts/useToast";
 import { Customtable, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { GroupMachine, TimeScheduleProps } from '@/typing/type';
+import { TimeScheduleProps } from '@/typing/type';
 import { InfiniteData, useMutation, useQuery, useQueryClient } from 'react-query';
 import { useSelector } from "react-redux";
 import ScheduleDialog from "@/components/screens/Schedule_dialog";
@@ -170,7 +170,7 @@ const TimescheduleScreen: React.FC = React.memo(() => {
         detail: true,
         detailKey: "ScheduleID",
         detailKeyrow: 5,
-        showDetailwithKey: ["MachineGroup", "Type_schedule", "TimeSlots", "TimeWeek", "TimeCustom"],
+        showDetailwithKey: ["MachineGroup", "Type_schedule", "TimelineItems"],
         detailData: timeSchedule,
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction, timeSchedule]);

@@ -72,35 +72,21 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
     }, []);
 
     const menuScreens = useMemo(() => {
-        const screens: JSX.Element[] = [];
-        user.Screen.forEach((screen: Menus) => {
-            if (screen.NavigationTo) {
-                screens.push(
-                    <Drawer.Screen
-                        key={screen.MenuID}
-                        name={screen.NavigationTo}
-                        component={renderComponent(screen.NavigationTo as ComponentNames)}
-                        options={{ title: screen.MenuLabel }}
-                    />
-                );
-            }
-
-            if (screen.ParentMenu && screen.ParentMenu.length > 0) {
-                screen.ParentMenu.forEach((parentScreen: ParentMenu) => {
-                    screens.push(
-                        <Drawer.Screen
-                            key={parentScreen.MenuID}
-                            name={parentScreen.NavigationTo}
-                            component={renderComponent(parentScreen.NavigationTo as ComponentNames)}
-                            options={{ title: screen.MenuLabel }}
-                        />
-                    );
-                });
-            }
+        if (!user.IsAuthenticated || user.Screen.length === 0) return [];
+        return user.Screen.map((screen: Menus) => {
+            if (!screen.NavigationTo) return null;
+            return (
+                <Drawer.Screen
+                    key={screen.MenuID}
+                    name={screen.NavigationTo}
+                    component={renderComponent(screen.NavigationTo as ComponentNames)}
+                    options={{ title: screen.MenuLabel }}
+                />
+            );
         });
+    }, [user.Screen, renderComponent]);
 
-        return screens;
-    }, [user.IsAuthenticated, user.Screen, renderComponent]);
+    const initialRoute = user.initialRoute || (user.Screen.length > 0 ? user.Screen[0].NavigationTo : "");
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -128,9 +114,11 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                                 onSettingsPress={handleSettings}
                                 onLogoutPress={handleLogout}
                             />
-                        )
+                        ),
+                        freezeOnBlur: true,
+                        unmountOnBlur: true, 
                     }}
-                    initialRouteName={user.initialRoute || ""}
+                    initialRouteName={initialRoute}
                     id="nav"
                 >
                     {menuScreens}
@@ -173,7 +161,6 @@ const Navigation: React.FC = React.memo(() => {
 
             );
         }
-        console.warn(`Component ${name} not found. Falling back to PermissionDeny.`);
 
         return (props: any) => (
             <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>

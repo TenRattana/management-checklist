@@ -159,10 +159,9 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
                         }}>
                             <Text style={[masterdataStyles.text, { alignContent: 'center', paddingRight: 15, alignSelf: 'center' }]}>Date :</Text>
                             <Picker
-                                itemStyle={masterdataStyles.pickerItem}
                                 selectedValue={Dates || ""}
                                 onValueChange={(itemValue) => filteredDate(itemValue)}
-                                style={[masterdataStyles.picker, { width: responsive === "small" ? '100%' : 200, borderWidth: 0, borderBottomWidth: 1, top: -2 }]}
+                                style={[masterdataStyles.picker, { width: responsive === "small" ? '100%' : 200, borderWidth: 0, borderBottomWidth: 1, top: 10 }]}
                                 mode="dropdown"
                                 testID="picker-custom"
                                 accessibilityLabel="Picker Accessibility Label"
