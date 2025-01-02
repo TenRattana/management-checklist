@@ -230,7 +230,7 @@ const useMasterdataStyles = () => {
             marginBottom: 20,
         },
         cardTitle: {
-            fontSize: spacing.small,
+            fontSize: spacing.medium,
             fontWeight: 'bold',
             paddingVertical: 15
         },

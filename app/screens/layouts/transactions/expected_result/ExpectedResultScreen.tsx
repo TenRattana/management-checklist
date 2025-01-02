@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from '@/app/contexts/useToast';
-import { Searchbar } from "@/components";
+import { LoadingSpinner, Searchbar } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { ExpectedResult } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
 import { useInfiniteQuery } from 'react-query';
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { fetchExpectedResults, fetchMachines, fetchSearchExpectedResult, fetchSearchMachines } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 import { navigate } from "@/app/navigations/navigationUtils";
@@ -214,10 +214,10 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(() => {
                 />
             </View>
             <Card.Content style={styles.cardcontent}>
-                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                <Suspense fallback={<LoadingSpinner />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} fetchNextPage={fetchNextPageMG} handlefilter={handlefilter} />
                 </Suspense>
-                {isFetching && <ActivityIndicator />}
+                {isFetching && <LoadingSpinner />}
             </Card.Content>
         </View>
     );

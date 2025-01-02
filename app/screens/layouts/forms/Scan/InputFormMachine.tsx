@@ -17,6 +17,7 @@ import { useSelector } from "react-redux";
 import * as Yup from "yup";
 import { Stack } from "expo-router";
 import { navigate } from "@/app/navigations/navigationUtils";
+import Submit from "@/components/common/Submit";
 
 interface FormValues {
   [key: string]: any;
@@ -175,6 +176,17 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
 
   const countRef = useRef(1);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = useCallback(async (values: { [key: string]: any }) => {
+    setIsSubmitting(true);
+    onFormSubmit(values)
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+    }, 2000);
+  }, [])
+
   const incrementCount = (value: boolean) => {
     if (value)
       countRef.current += 1
@@ -189,14 +201,12 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
         <Formik
           initialValues={formValues}
           validationSchema={validationSchema}
-          onSubmit={onFormSubmit}
+          onSubmit={handleSubmit}
           validateOnBlur={false}
           enableReinitialize
         >
           {({ errors, touched, setFieldValue, setTouched, values, dirty, isValid, handleSubmit }) => {
             incrementCount(false);
-            console.log(values);
-            console.log(errors);
 
             return (
               <>
@@ -243,20 +253,21 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
             )
           }}
         </Formik>
-      ) : (
-        <AccessibleView name="form-success" style={masterdataStyles.containerScccess}>
-          <Text style={masterdataStyles.text}>Save success</Text>
-          <TouchableOpacity
-            onPress={() => {
-              setIsSubmitted(false);
-              navigate("ScanQR");
-            }}
-            style={masterdataStyles.button}
-          >
-            <Text style={[masterdataStyles.textBold, masterdataStyles.text, { color: theme.colors.blue }]}>Scan again</Text>
-          </TouchableOpacity>
-        </AccessibleView>
-      )}
+      ) : isSubmitting ? <Submit />
+        : (
+          <AccessibleView name="form-success" style={masterdataStyles.containerScccess}>
+            <Text style={masterdataStyles.text}>Save success</Text>
+            <TouchableOpacity
+              onPress={() => {
+                setIsSubmitted(false);
+                navigate("ScanQR");
+              }}
+              style={masterdataStyles.button}
+            >
+              <Text style={[masterdataStyles.textBold, masterdataStyles.text, { color: theme.colors.blue }]}>Scan again</Text>
+            </TouchableOpacity>
+          </AccessibleView>
+        )}
     </AccessibleView>
   ) : isLoadingForm ? <Text>Loading Form...</Text> : <NotFoundScreen />
 });

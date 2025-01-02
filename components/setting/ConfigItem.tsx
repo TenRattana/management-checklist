@@ -1,11 +1,12 @@
 import React from 'react';
-import { StyleSheet, View, ActivityIndicator } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { IconButton, Text } from 'react-native-paper';
 import { useTheme } from '@/app/contexts/useTheme';
 import { useRes } from '@/app/contexts/useRes';
 import RenderFormik from './RenderFormik';
 import AccessibleView from '../AccessibleView';
 import useMasterdataStyles from '@/styles/common/masterdata';
+import { LoadingSpinner } from '../common';
 
 interface ConfigItemProps {
     label: string;
@@ -29,7 +30,7 @@ const ConfigItem: React.FC<ConfigItemProps> = React.memo(({ label, value, editab
     const masterdataStyles = useMasterdataStyles();
 
     if (!state || !label) {
-        return <ActivityIndicator size="large" />;
+        return <LoadingSpinner />;
     }
 
     const styles = StyleSheet.create({

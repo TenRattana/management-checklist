@@ -1,7 +1,6 @@
 import React, { useState, Suspense } from "react";
-import { AccessibilityInfo, ActivityIndicator } from "react-native";
 import Text from "../Text";
-import { Dialogs } from "../common";
+import { Dialogs, LoadingSpinner } from "../common";
 import { CustomtableDataProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { Easing, FadeInUp, FadeOutDown } from "react-native-reanimated";
@@ -27,7 +26,7 @@ const CustomtableData = React.memo(({ Tablehead, flexArr, actionIndex, displayDa
             <FlatList
                 data={displayData}
                 renderItem={({ item, index }) =>
-                    <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                    <Suspense fallback={<Text style={{ textAlign: 'center', fontStyle: 'italic', height: 58, alignContent: 'center', justifyContent: 'center' }}>Loading...</Text>}>
                         <LazyRenderItem
                             item={item}
                             index={index}

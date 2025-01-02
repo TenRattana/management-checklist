@@ -1,5 +1,4 @@
 import React, { lazy, Suspense, useRef, useCallback, useState, useMemo } from 'react';
-import { ActivityIndicator, View } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import PermissionDeny from '../screens/layouts/PermissionDeny';
 import { useRes } from "@/app/contexts/useRes";
@@ -13,6 +12,7 @@ import CustomMenu from '@/components/navigation/CustomMenu'
 import Setting_dialog from "@/components/screens/Setting_dialog"
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text } from 'react-native-paper';
+import { LoadingSpinner } from '@/components';
 
 const Drawer = createDrawerNavigator();
 const MemoSetting_dialog = React.memo(Setting_dialog)
@@ -134,7 +134,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                             />
                         ),
                         freezeOnBlur: false,
-                        unmountOnBlur: false, 
+                        unmountOnBlur: false,
                     }}
                     initialRouteName={initialRoute}
                     id="nav"
@@ -156,25 +156,25 @@ const Navigation: React.FC = React.memo(() => {
         if (cachedComponents.current[name]) {
             const Component = cachedComponents.current[name];
             return (props: any) => (
-                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                <Suspense fallback={<LoadingSpinner />}>
                     <Component {...props} />
                 </Suspense>
             );
         }
-    
+
         if (name in components) {
             const LazyComponent = lazy(components[name as ComponentNames]);
             cachedComponents.current[name] = LazyComponent;
-    
+
             return (props: any) => (
-                <Suspense fallback={<Text>Loading Component...</Text>}>
+                <Suspense fallback={<LoadingSpinner />}>
                     <LazyComponent {...props} />
                 </Suspense>
             );
         }
-    
+
         return (props: any) => (
-            <Suspense fallback={<Text>Permission Denied...</Text>}>
+            <Suspense fallback={<LoadingSpinner />}>
                 <PermissionDeny {...props} />
             </Suspense>
         );

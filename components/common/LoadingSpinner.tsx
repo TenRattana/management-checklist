@@ -1,8 +1,40 @@
-import React from "react";
-import { ActivityIndicator, MD2Colors } from "react-native-paper";
+import React, { useEffect, useState } from "react";
+import LottieView from "lottie-react-native";
+import { View, StyleSheet } from "react-native";
 
 const LoadingSpinner = () => {
-  return <ActivityIndicator animating={true} color={MD2Colors.red800} />;
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    setIsReady(true);
+  }, []);
+
+  if (!isReady) {
+    return null;
+  }
+
+  return (
+    <View style={styles.container}>
+      <LottieView
+        source={require('@/assets/animations/Loading.json')}
+        autoPlay
+        loop
+        style={styles.lottie}
+      />
+    </View>
+  );
 };
 
-export default React.memo(LoadingSpinner);
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  lottie: {
+    width: 200,
+    height: 200,
+  },
+});
+
+export default LoadingSpinner;

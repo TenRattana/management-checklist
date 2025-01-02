@@ -4,9 +4,8 @@ import useMasterdataStyles from '@/styles/common/masterdata';
 import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity, Platform, Modal, StyleSheet } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { HelperText, IconButton, Portal } from 'react-native-paper';
+import { HelperText, IconButton, Portal, Text } from 'react-native-paper';
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import Text from '../Text';
 
 const Dropdown = React.memo(({
     label,

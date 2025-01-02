@@ -110,7 +110,9 @@ export interface SaveDialogProps extends SetVisible {
 }
 
 export interface MachineDialogProps<V extends Values>
-  extends BaseDialogProps<V> {}
+  extends BaseDialogProps<V> {
+
+  }
 
 export interface GroupMachineDialogProps<V extends Values>
   extends BaseDialogProps<V> {}

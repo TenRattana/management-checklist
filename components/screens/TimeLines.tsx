@@ -1,19 +1,19 @@
 import React, { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 import { useTheme } from '@/app/contexts/useTheme';
 import moment from 'moment-timezone';
-import { CalendarUtils, TimelineListRenderItemInfo, TimelineProps } from 'react-native-calendars';
+import { TimelineListRenderItemInfo, TimelineProps, Timeline } from 'react-native-calendars';
 import { getCurrentTime } from '@/config/timezoneUtils';
 import Home_dialog from './Home_dialog';
-import useMasterdataStyles from '@/styles/common/masterdata';
 import { useQuery } from 'react-query';
 import { fetchTimeSchedules } from '@/app/services';
 import { convertSchedule } from '@/app/mocks/convertSchedule';
 import { groupBy } from 'lodash';
 import { TimeLine } from '@/app/mocks/timeline';
+import { useRes } from '@/app/contexts/useRes';
+import Text from '../Text';
+import { LoadingSpinner } from '../common';
 
 const LazyTimelineList = lazy(() => import('react-native-calendars').then(module => ({ default: module.TimelineList })));
-const LazyTimeline = lazy(() => import('react-native-calendars').then(module => ({ default: module.Timeline })));
 
 const MemoHome_dialog = React.memo(Home_dialog);
 
@@ -29,10 +29,9 @@ type Event = {
 type TimelinesProps = {
     filterStatus: string;
     filterTitle: string[];
-    currentDate: any;
 };
 
-const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, currentDate }) => {
+const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle }) => {
     const { theme } = useTheme();
     const [dialogVisible, setDialogVisible] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState<any>(null);
@@ -58,7 +57,7 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
     useEffect(() => {
         if (computedTimeline.timeline.length) {
             setTimelineItems(computedTimeline.timeline);
-            setIsLoadingData(false); // ข้อมูลพร้อมแล้ว
+            setIsLoadingData(false);
         }
     }, [computedTimeline.timeline]);
 
@@ -86,24 +85,31 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, curren
 
     const renderItem = useCallback((timelineProps: TimelineProps, info: TimelineListRenderItemInfo) => {
         return (
-            <Suspense fallback={<ActivityIndicator size="small" color={theme.colors.primary} />}>
-                <LazyTimeline
-                    {...timelineProps}
-                    styles={{ contentStyle: { backgroundColor: theme.colors.fff } }}
-                    onEventPress={handleEventClick}
-                />
-            </Suspense>
+            <Timeline
+                {...timelineProps}
+                styles={{ contentStyle: { backgroundColor: theme.colors.fff } }}
+                onEventPress={handleEventClick}
+                theme={{
+                    eventTitle: { color: theme.colors.fff },
+                    eventSummary: { color: theme.colors.fff },
+                    eventTimes: { color: theme.colors.fff },
+                    timeLabel: { color: theme.colors.fff },
+                    textSectionTitleColor: theme.colors.fff,
+                    calendarBackground: theme.colors.background,
+                    indicatorColor: theme.colors.primary,
+                }}
+            />
         );
     }, [theme]);
 
     if (isLoadingData) {
-        return <ActivityIndicator size="large" color={theme.colors.primary} />;
+        return <LoadingSpinner />;
     }
 
     return (
         <>
             {Object.keys(eventsByDateS).length ? (
-                <Suspense fallback={<ActivityIndicator size="large" color={theme.colors.primary} />}>
+                <Suspense fallback={<LoadingSpinner />}>
                     <LazyTimelineList
                         events={eventsByDateS}
                         renderItem={renderItem}

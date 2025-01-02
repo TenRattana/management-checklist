@@ -1,11 +1,11 @@
 import React, { lazy, Suspense, useCallback, useState, useMemo } from 'react';
-import { ActivityIndicator, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { CalendarUtils, CalendarProvider, Calendar } from 'react-native-calendars';
 import { getCurrentTime } from '@/config/timezoneUtils';
 import { useTheme } from '@/app/contexts/useTheme';
 import { FlatList } from 'react-native-gesture-handler';
 import useMasterdataStyles from '@/styles/common/masterdata';
-import { Checkbox, Icon } from 'react-native-paper';
+import { ActivityIndicator, Checkbox, Icon } from 'react-native-paper';
 import { useRes } from '@/app/contexts/useRes';
 import { useQuery } from 'react-query';
 import { fetchTimeSchedules } from '@/app/services';
@@ -140,10 +140,10 @@ const HomeScreen = React.memo(() => {
             </View>
           )}
           <View style={{ flex: 1 }}>
-          <TouchableOpacity onPress={toggleSwitch} style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
-                <Icon source={showCalendar ? "chevron-left" : "chevron-right"} size={24} color={theme.colors.primary} />
-                <Text style={masterdataStyles.text}>{showCalendar ? 'Hide Calendar' : 'Show Calendar'}</Text>
-              </TouchableOpacity>
+            <TouchableOpacity onPress={toggleSwitch} style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
+              <Icon source={showCalendar ? "chevron-left" : "chevron-right"} size={24} color={theme.colors.primary} />
+              <Text style={masterdataStyles.text}>{showCalendar ? 'Hide Calendar' : 'Show Calendar'}</Text>
+            </TouchableOpacity>
             <View style={styles.filterContainer}>
               {['all', 'end', 'running', 'wait', 'stop'].map(status => (
                 <TouchableOpacity key={status} onPress={() => setFilterStatus(status)}>
@@ -154,7 +154,7 @@ const HomeScreen = React.memo(() => {
               ))}
             </View>
             <Suspense fallback={<ActivityIndicator size="large" color={theme.colors.primary} />}>
-              <LazyTimelines filterStatus={filterStatus} filterTitle={filterTitle} currentDate={currentDate} />
+              <LazyTimelines filterStatus={filterStatus} filterTitle={filterTitle} />
             </Suspense>
           </View>
         </View>

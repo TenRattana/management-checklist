@@ -1,5 +1,5 @@
 import React, { useEffect, useState, forwardRef, useMemo, useRef } from "react";
-import { View, ViewStyle, FlatList, TouchableOpacity } from "react-native";
+import { View, ViewStyle, FlatList } from "react-native";
 import { Card, Divider } from "react-native-paper";
 import { useRes } from "@/app/contexts/useRes";
 import { useTheme } from "@/app/contexts/useTheme";

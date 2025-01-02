@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
-import { TouchableOpacity, StyleSheet, View, ActivityIndicator } from "react-native";
+import { TouchableOpacity, StyleSheet, View } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
-import { Searchbar, Text } from "@/components";
+import { LoadingSpinner, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { MatchForm } from '@/typing/type'
@@ -214,22 +214,24 @@ const MatchFormMachineScreen = React.memo(() => {
                 </TouchableOpacity>
             </View>
             <Card.Content style={styles.cardcontent}>
-                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                <Suspense fallback={<LoadingSpinner />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
                 </Suspense>
-                {isFetching && <ActivityIndicator />}
+                {isFetching && <LoadingSpinner />}
             </Card.Content>
 
             {isVisible && (
-                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
-                    <LazyMatch_form_machine_dialog
-                        isVisible={isVisible}
-                        setIsVisible={setIsVisible}
-                        isEditing={isEditing}
-                        initialValues={initialValues}
-                        saveData={saveData}
-                    />
-                </Suspense>
+                <View style={{ flex: 1, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' }}>
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <LazyMatch_form_machine_dialog
+                            isVisible={isVisible}
+                            setIsVisible={setIsVisible}
+                            isEditing={isEditing}
+                            initialValues={initialValues}
+                            saveData={saveData}
+                        />
+                    </Suspense>
+                </View>
             )}
         </View>
     );

@@ -44,8 +44,9 @@ export const convertSchedule = (schedule: TimeScheduleProps[]): { timeline: Time
         }
     };
 
-    schedule.forEach((item) => {
-        item.TimelineItems.forEach(({ date, name, time, ScheduleID, status }) => {
+    schedule?.forEach((item) => {
+        item.TimelineItems?.forEach(({ date, name, time, ScheduleID, status }) => {
+
             const now = moment(getCurrentTime());
 
             if (date.startsWith('Weekly')) {

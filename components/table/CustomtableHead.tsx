@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Checkbox, DataTable } from "react-native-paper";
-import Text from "@/components/Text";
+import { Checkbox, DataTable, Text } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useRes } from '@/app/contexts/useRes'
@@ -63,7 +62,7 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
     searchfilter
 }) => {
     const masterdataStyles = useMasterdataStyles();
-    const { fontSize, responsive } = useRes();
+    const { fontSize, responsive, spacing } = useRes();
     const [open, setOpen] = useState(false);
 
     const filterDateOptions = ["Today", "This week", "This month"];
@@ -89,8 +88,6 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
             }
         }
     };
-
-    // console.log(showData);
 
     return (
         <View id="container-datahead">
@@ -149,7 +146,6 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
 
                 <View style={{
                     flexDirection: responsive === "small" ? 'column' : 'row',
-                    marginBottom: 10,
                 }}>
                     {showFilterDate && (
                         <View id="filter" style={{
@@ -159,16 +155,16 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
                         }}>
                             <Text style={[masterdataStyles.text, { alignContent: 'center', paddingRight: 15, alignSelf: 'center' }]}>Date :</Text>
                             <Picker
+                                style={{ width: responsive === "small" ? '100%' : 200, borderWidth: 0, borderBottomWidth: 1, height: 35, alignSelf: 'center' }}
                                 selectedValue={Dates || ""}
                                 onValueChange={(itemValue) => filteredDate(itemValue)}
-                                style={[masterdataStyles.picker, { width: responsive === "small" ? '100%' : 200, borderWidth: 0, borderBottomWidth: 1, top: 10 }]}
                                 mode="dropdown"
                                 testID="picker-custom"
                                 accessibilityLabel="Picker Accessibility Label"
                             >
-                                <Picker.Item label="Select all" value="" />
+                                <Picker.Item label="Select all" value="" style={masterdataStyles.text} fontFamily="Poppins" />
                                 {filterDateOptions.map((option, index) => (
-                                    <Picker.Item key={`date-option-${index}`} label={option} value={option} />
+                                    <Picker.Item key={`date-option-${index}`} label={option} value={option} style={masterdataStyles.text} fontFamily="Poppins" />
                                 ))}
                             </Picker>
                         </View>

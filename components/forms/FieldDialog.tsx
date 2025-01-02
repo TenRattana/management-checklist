@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef, Suspense, lazy } from "react";
-import { ActivityIndicator, Platform, ScrollView, TouchableOpacity, View } from "react-native";
+import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
 import { Portal, Dialog, Switch, Icon, HelperText } from "react-native-paper";
 import { Formik, Field } from "formik";
 import { useTheme } from "@/app/contexts/useTheme";
@@ -15,6 +15,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { saveCheckList, saveCheckListOption, saveGroupCheckListOption } from "@/app/services";
 import { InitialValuesChecklist, InitialValuesCheckListOption, InitialValuesGroupCheckList } from "@/typing/value";
 import { useSelector } from "react-redux";
+import { Inputs, LoadingSpinner } from "../common";
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 
@@ -23,7 +24,6 @@ const LazyGroupCreate_dialog = lazy(() => import("../screens/GroupCreate_dialog"
 const LazyCheckListCreate_dialog = lazy(() => import("../screens/CheckListCreate_dialog"));
 const LazyDropdown = lazy(() => import("@/components/common/Dropdown"));
 const LazyCheckboxs = lazy(() => import("@/components/common/Checkboxs"));
-const LazyInputs = lazy(() => import("@/components/common/Inputs"));
 
 const CustomDialog = React.memo(({ visible, onDismiss, children }: { visible: boolean, onDismiss: any, children: any }) => {
     const { responsive } = useRes();
@@ -337,7 +337,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                     >
                                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                             <View style={{ flex: 1 }}>
-                                                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                                                <Suspense fallback={<LoadingSpinner />}>
                                                     <LazyDropdown
                                                         label='check list'
                                                         open={open.CheckList}
@@ -380,7 +380,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                             </View>
                                         </View>
 
-                                        <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                                        <Suspense fallback={<LoadingSpinner />}>
                                             <LazyDropdown
                                                 label='check list type'
                                                 search={false}
@@ -413,7 +413,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                             <RenderView style={Platform.OS === 'web' ? memoizedAnimatedText : { opacity: 1 }}>
                                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                                     <View style={{ flex: 1 }}>
-                                                        <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                                                        <Suspense fallback={<LoadingSpinner />}>
                                                             <LazyDropdown
                                                                 label="match check list"
                                                                 open={open.MatchChecklist}
@@ -475,7 +475,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
                                         {shouldRender === "text" && (
                                             <RenderView style={Platform.OS === 'web' ? memoizedAnimatedText : { opacity: 1 }}>
-                                                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                                                <Suspense fallback={<LoadingSpinner />}>
                                                     <LazyDropdown
                                                         label='data type'
                                                         search={false}
@@ -508,8 +508,8 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
                                         <Field name="Rowcolumn">
                                             {({ field, form }: any) => (
-                                                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
-                                                    <LazyInputs
+                                                <Suspense fallback={<LoadingSpinner />}>
+                                                    <Inputs
                                                         placeholder="Columns"
                                                         label="Column in row"
                                                         handleChange={(value) => form.setFieldValue(field.name, value)}
@@ -527,18 +527,16 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                             <RenderView style={Platform.OS === 'web' ? memoizedAnimatedDT : { opacity: 1 }}>
                                                 <Field name="DTypeValue">
                                                     {({ field, form }: any) => (
-                                                        <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
-                                                            <LazyInputs
-                                                                placeholder="Digis Value"
-                                                                label="Digit number"
-                                                                handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                                value={String(field.value ?? "")}
-                                                                error={form.touched?.DTypeValue && Boolean(form.errors?.DTypeValue)}
-                                                                errorMessage={form.touched?.DTypeValue ? form.errors?.DTypeValue : ""}
-                                                                testId={`DTypeValue-form`}
-                                                            />
-                                                        </Suspense>
+                                                        <Inputs
+                                                            placeholder="Digis Value"
+                                                            label="Digit number"
+                                                            handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                            handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                            value={String(field.value ?? "")}
+                                                            error={form.touched?.DTypeValue && Boolean(form.errors?.DTypeValue)}
+                                                            errorMessage={form.touched?.DTypeValue ? form.errors?.DTypeValue : ""}
+                                                            testId={`DTypeValue-form`}
+                                                        />
                                                     )}
                                                 </Field >
                                             </RenderView>
@@ -570,7 +568,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                                 <Field name="ImportantList[0].Value">
                                                     {({ field, form }: any) => {
                                                         return (
-                                                            <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                                                            <Suspense fallback={<LoadingSpinner />}>
                                                                 <LazyCheckboxs
                                                                     option={option}
                                                                     handleChange={(value) => {
@@ -610,41 +608,36 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                                     <Field name="ImportantList[0].MinLength">
                                                         {({ field, form }: any) => {
                                                             return (
-                                                                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
-                                                                    <LazyInputs
-                                                                        placeholder="Min Value"
-                                                                        label="Min Value Control"
-                                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                                        handleBlur={() => {
-                                                                            form.setFieldTouched(field.name, true);
-                                                                        }}
-                                                                        value={String(field.value ?? "")}
-                                                                        error={form.touched?.ImportantList?.[0]?.MinLength && Boolean(form.errors?.ImportantList?.[0]?.MinLength)}
-                                                                        errorMessage={form.touched?.ImportantList?.[0]?.MinLength ? form.errors?.ImportantList?.[0]?.MinLength : ""}
-                                                                        testId={`MinLength-form`}
-                                                                    />
-                                                                </Suspense>
-
+                                                                <Inputs
+                                                                    placeholder="Min Value"
+                                                                    label="Min Value Control"
+                                                                    handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                                    handleBlur={() => {
+                                                                        form.setFieldTouched(field.name, true);
+                                                                    }}
+                                                                    value={String(field.value ?? "")}
+                                                                    error={form.touched?.ImportantList?.[0]?.MinLength && Boolean(form.errors?.ImportantList?.[0]?.MinLength)}
+                                                                    errorMessage={form.touched?.ImportantList?.[0]?.MinLength ? form.errors?.ImportantList?.[0]?.MinLength : ""}
+                                                                    testId={`MinLength-form`}
+                                                                />
                                                             )
                                                         }}
                                                     </Field>
 
                                                     <Field name="ImportantList[0].MaxLength">
                                                         {({ field, form }: any) => (
-                                                            <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
-                                                                <LazyInputs
-                                                                    placeholder="Max Value"
-                                                                    label="Max Value Control"
-                                                                    handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                                    handleBlur={() => {
-                                                                        form.setFieldTouched(field.name, true);
-                                                                    }}
-                                                                    value={String(field.value ?? "")}
-                                                                    error={form.touched?.ImportantList?.[0]?.MaxLength && Boolean(form.errors?.ImportantList?.[0]?.MaxLength)}
-                                                                    errorMessage={form.touched?.ImportantList?.[0]?.MaxLength ? form.errors?.ImportantList?.[0]?.MaxLength : ""}
-                                                                    testId={`MaxLength-form`}
-                                                                />
-                                                            </Suspense>
+                                                            <Inputs
+                                                                placeholder="Max Value"
+                                                                label="Max Value Control"
+                                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                                handleBlur={() => {
+                                                                    form.setFieldTouched(field.name, true);
+                                                                }}
+                                                                value={String(field.value ?? "")}
+                                                                error={form.touched?.ImportantList?.[0]?.MaxLength && Boolean(form.errors?.ImportantList?.[0]?.MaxLength)}
+                                                                errorMessage={form.touched?.ImportantList?.[0]?.MaxLength ? form.errors?.ImportantList?.[0]?.MaxLength : ""}
+                                                                testId={`MaxLength-form`}
+                                                            />
                                                         )}
                                                     </Field>
                                                 </>
@@ -699,7 +692,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
             {dialogAdd.CheckList && (
                 <CustomDialog visible={dialogAdd.CheckList} onDismiss={() => handelAdd(false, "CheckList")}>
-                    <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                    <Suspense fallback={<LoadingSpinner />}>
                         <LazyCheckListCreate_dialog
                             setIsVisible={() => {
                                 handelAdd(false, "CheckList");
@@ -715,7 +708,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
             {info.GroupCheckList && (
                 <CustomDialog visible={info.GroupCheckList} onDismiss={() => handelInfo(false, "GroupCheckList")}>
-                    <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                    <Suspense fallback={<LoadingSpinner />}>
                         <LazyInfoGroup_dialog
                             setDialogAdd={() => handelInfo(false, "GroupCheckList")}
                             option={option}
@@ -726,7 +719,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
             {dialogAdd.GroupCheckList && (
                 <CustomDialog visible={dialogAdd.GroupCheckList} onDismiss={() => handelAdd(false, "GroupCheckList")}>
-                    <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                    <Suspense fallback={<LoadingSpinner />}>
                         <LazyGroupCreate_dialog
                             setIsVisible={() => {
                                 handelAdd(false, "GroupCheckList");

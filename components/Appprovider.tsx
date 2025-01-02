@@ -4,8 +4,7 @@ import { Provider as ReduxProvider } from "react-redux";
 import { store } from "@/stores";
 import * as SplashScreen from 'expo-splash-screen';
 import { ThemeProvider, TimezoneProvider } from "@/app/providers";
-import { View, StyleSheet } from "react-native";
-import LottieView from 'lottie-react-native';
+import { LoadingSpinner } from "./common";
 
 const ToastProvider = lazy(() => import('@/app/providers/toastify').then(module => ({ default: module.ToastProvider })));
 const AuthProvider = lazy(() => import('@/app/providers/auth').then(module => ({ default: module.AuthProvider })));
@@ -16,7 +15,7 @@ const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();
 
 const AppProviders = ({ children }: any) => (
-    <Suspense fallback={<LoadingScreen />}>
+    <Suspense fallback={<LoadingSpinner />}>
         <ResponsiveProvider>
             <ThemeProvider>
                 <TimezoneProvider timezone="Asia/Bangkok">
@@ -34,24 +33,5 @@ const AppProviders = ({ children }: any) => (
         </ResponsiveProvider>
     </Suspense>
 );
-
-const LoadingScreen = () => (
-    <View style={styles.container}>
-        <LottieView
-            source={require('@/assets/animations/loading.json')}
-            autoPlay
-            loop
-        />
-    </View>
-);
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-    },
-});
 
 export default AppProviders;

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
-import { TouchableOpacity, StyleSheet, View, ActivityIndicator } from "react-native";
+import { TouchableOpacity, StyleSheet, View } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts/useToast";
-import { Searchbar, Text } from "@/components";
+import { LoadingSpinner, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { FormScreenProps } from "@/typing/tag";
@@ -172,10 +172,10 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ route }) => {
                 </TouchableOpacity>
             </View>
             <Card.Content style={styles.cardcontent}>
-                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                <Suspense fallback={<LoadingSpinner />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
                 </Suspense>
-                {isFetching && <ActivityIndicator />}
+                {isFetching && <LoadingSpinner />}
             </Card.Content>
         </View>
     );
