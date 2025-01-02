@@ -93,7 +93,7 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle }) => {
                     eventTitle: { color: theme.colors.fff },
                     eventSummary: { color: theme.colors.fff },
                     eventTimes: { color: theme.colors.fff },
-                    timeLabel: { color: theme.colors.fff },
+                    timeLabel: { color: theme.colors.error },
                     textSectionTitleColor: theme.colors.fff,
                     calendarBackground: theme.colors.background,
                     indicatorColor: theme.colors.primary,

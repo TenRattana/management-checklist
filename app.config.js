@@ -47,6 +47,7 @@ export default {
         foregroundImage: "./assets/images/Icon-app.png",
         backgroundColor: "#ffffff",
       },
+      resourceClass: "medium",
       package: "com.m_checklist_test",
       permissions: ["CAMERA"],
       targetSdkVersion: 34,
