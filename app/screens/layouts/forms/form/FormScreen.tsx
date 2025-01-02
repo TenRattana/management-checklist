@@ -175,7 +175,6 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ route }) => {
                 <Suspense fallback={<LoadingSpinner />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
                 </Suspense>
-                {isFetching && <LoadingSpinner />}
             </Card.Content>
         </View>
     );

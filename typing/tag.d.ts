@@ -161,6 +161,7 @@ export interface CustomTableProps {
   setFilterDate?:number;
   handlefilter?:(value?:string) => void;
   searchfilter?:string;
+  isFetching?:boolean;
 }
 
 export interface DragfieldProps {

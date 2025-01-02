@@ -20,6 +20,10 @@ const LoadingSpinner = () => {
         autoPlay
         loop
         style={styles.lottie}
+        webStyle={{
+          width: 200,
+          height: 200,
+        }}
       />
     </View>
   );

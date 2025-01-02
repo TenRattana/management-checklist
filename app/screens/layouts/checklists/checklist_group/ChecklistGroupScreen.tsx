@@ -205,7 +205,6 @@ const ChecklistGroupScreen = React.memo(() => {
                 <Suspense fallback={<LoadingSpinner />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
                 </Suspense>
-                {isFetching && <LoadingSpinner />}
             </Card.Content>
 
             {isVisible && (

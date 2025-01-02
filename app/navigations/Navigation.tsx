@@ -102,9 +102,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
         return screens;
     }, [user.IsAuthenticated, user.Screen, renderComponent]);
 
-    const initialRoute = useMemo(() => {
-        return user.initialRoute || (user.Screen.length > 0 ? user.Screen[0].NavigationTo : "Permission_deny");
-    }, [user]);
+    const initialRoute = user.initialRoute || (user.Screen.length > 0 ? user.Screen[0].NavigationTo : "");
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -133,8 +131,8 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                                 onLogoutPress={handleLogout}
                             />
                         ),
-                        freezeOnBlur: false,
-                        unmountOnBlur: false,
+                        freezeOnBlur: true,
+                        unmountOnBlur: true,
                     }}
                     initialRouteName={initialRoute}
                     id="nav"
