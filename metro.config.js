@@ -15,6 +15,8 @@ module.exports = {
         inlineRequires: true,
       },
     }),
+    enableBabelRCLookup: true,
+    sourceMap: true,
   },
   resolver: {
     ...defaultConfig.resolver,

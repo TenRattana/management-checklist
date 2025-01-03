@@ -70,10 +70,16 @@ export default {
       enabled: true,
       checkAutomatically: "ON_LOAD",
       fallbackToCacheTimeout: 0,
+      assetPatternsToBeBundled: [
+        "assets/fonts/*",
+        "assets/images/*",
+        "assets/animations/*",
+        "node_modules/react-native/**/*",
+      ],
     },
     web: {
       bundler: "metro",
-      output: "single",
+      output: "Static",
       favicon: "./assets/images/Icon-app.png",
       splitChunks: true,
       cache: true,
@@ -86,6 +92,7 @@ export default {
     assetBundlePatterns: [
       "assets/fonts/*",
       "assets/images/*",
+      "assets/animations/*",
       "node_modules/react-native/**/*",
     ],
     plugins: [
@@ -126,12 +133,6 @@ export default {
       ...getEnvVars(environment),
       eas: {
         projectId: "6ae04db7-93f3-48cb-976a-e5b6558751df",
-      },
-      updates: {
-        assetPatternsToBeBundled: [
-          "assets/images/**/*.png",
-          "assets/images/**/*.jpg",
-        ],
       },
     },
     experiments: {

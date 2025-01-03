@@ -5,10 +5,13 @@ import { registerRoute } from "workbox-routing";
 import { CacheFirst, StaleWhileRevalidate } from "workbox-strategies";
 import { ExpirationPlugin } from "workbox-expiration";
 
-// แคชไฟล์จาก precaching
-precacheAndRoute(self.__WB_MANIFEST);
+console.log("Precache Manifest:", self.__WB_MANIFEST);
 
-// ใช้ StaleWhileRevalidate สำหรับไฟล์ static เช่น CSS, JS
+precacheAndRoute([
+  ...self.__WB_MANIFEST,
+  "/entry-*.js",  
+]);
+
 registerRoute(
   ({ request }) => ["style", "script"].includes(request.destination),
   new StaleWhileRevalidate({
@@ -16,16 +19,60 @@ registerRoute(
   })
 );
 
-// เพิ่มการจัดการ cache สำหรับ image assets
 registerRoute(
-  ({ request }) => request.destination === "image",
-  new CacheFirst({
-    cacheName: "image-cache",
+  ({ url }) => /assets\/fonts\/.*\.(?:woff|woff2|ttf|otf)$/i.test(url.pathname),
+  new workbox.strategies.CacheFirst({
+    cacheName: 'fonts-cache',
     plugins: [
-      new ExpirationPlugin({
-        maxEntries: 100, // จำกัดจำนวนรายการ
-        maxAgeSeconds: 60 * 60 * 24 * 30, // เก็บไว้ 30 วัน
+      new workbox.expiration.Plugin({
+        maxEntries: 50,
+        maxAgeSeconds: 60 * 60 * 24 * 30,
       }),
     ],
   })
 );
+
+registerRoute(
+  ({ url }) => /assets\/images\/.*\.(?:png|jpg|jpeg|gif|webp|svg|bmp|tiff)$/i.test(url.pathname),
+  new workbox.strategies.StaleWhileRevalidate({
+    cacheName: 'images-cache',
+    plugins: [
+      new workbox.expiration.Plugin({
+        maxEntries: 100,
+        maxAgeSeconds: 60 * 60 * 24 * 30,
+      }),
+    ],
+  })
+);
+
+registerRoute(
+  ({ url }) => /assets\/animations\/.*\.(?:lottie|json)$/i.test(url.pathname), 
+  new workbox.strategies.CacheFirst({
+    cacheName: 'animations-cache',
+    plugins: [
+      new workbox.expiration.Plugin({
+        maxEntries: 50,
+        maxAgeSeconds: 60 * 60 * 24 * 30,
+      }),
+    ],
+  })
+);
+
+registerRoute(
+  ({ url }) => url.pathname.startsWith("/entry-") && url.pathname.endsWith(".js"),
+  new StaleWhileRevalidate({
+    cacheName: "entry-cache",
+  })
+);
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(self.clients.claim());
+});
+
+self.addEventListener("install", (event) => {
+  self.skipWaiting();
+});
+
+self.addEventListener("fetch", (event) => {
+  console.log("Fetching:", event.request.url);
+});
