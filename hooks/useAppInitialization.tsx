@@ -44,4 +44,4 @@ const useAppInitialization = () => {
     return isInitialized;
 };
 
-export default useAppInitialization
+export default useAppInitialization;
