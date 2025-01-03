@@ -18,6 +18,11 @@ const useAppInitialization = () => {
 
                 const images = [
                     require("../assets/images/Icon-app.png"),
+                    require("../assets/images/adaptive-icon.png"),
+                    require("../assets/images/favicon.png"),
+                    require("../assets/images/icon.png"),
+                    require("../assets/images/partial-react-logo.png"),
+                    require("../assets/images/react-logo.png"),
                 ];
                 const cacheImages = images.map(image => Asset.loadAsync(image));
                 await Promise.all(cacheImages);

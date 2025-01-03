@@ -4,7 +4,7 @@ import { CustomLightTheme } from '@/constants/CustomColor';
 import { getCurrentTime } from '@/config/timezoneUtils';
 
 type ScheduleType = 'Daily' | 'Weekly' | 'Custom';
-type MarkedDates = Record<string, { dots: DOT[] }>;
+export type MarkedDates = Record<string, { dots: DOT[] }>;
 
 type DOT = {
     color: string;

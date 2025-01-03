@@ -43,12 +43,13 @@ const subFormSlice = createSlice({
       checkList?: Checklist[] | ({
         label: string;
         value: string;
-    } & Checklist)[],
+      } & Checklist)[],
       groupCheckListOption?: GroupCheckListOption[];
       checkListType: CheckList[];
-      dataType: DataType[]
+      dataType: DataType[],
+      mode: boolean
     }>) => {
-      const { form, subForms, BaseFormState, checkList, checkListType, dataType, groupCheckListOption } = action.payload;
+      const { form, subForms, BaseFormState, checkList, checkListType, dataType, groupCheckListOption, mode } = action.payload;
 
       const updatedForm = {
         FormID: form?.FormID || "",
@@ -71,11 +72,11 @@ const subFormSlice = createSlice({
 
       updatedForm.subForms.forEach(sub => {
         const matchingFields = BaseFormState.filter(form => form.SFormID === sub.SFormID);
-        
+
         sub.Fields = matchingFields.map((field, index) => ({
           ...field,
           DisplayOrder: field.DisplayOrder || index,
-          CListName: field.CListName || checkListMap.get(field.CListID) || "",
+          CListName: mode && sub.Number ? `${index + 1}. ${checkListMap.get(field.CListID) || ""}` : checkListMap.get(field.CListID) || "" || field.CListName,
           GCLOptionName: field.GCLOptionName || field?.GCLOptionID && groupCheckListOptionMap.get(field?.GCLOptionID) || "",
           CTypeName: checkListTypeMap.get(field.CTypeID) || "",
           DTypeName: dataTypeMap.get(field.DTypeID) || ""

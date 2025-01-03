@@ -197,7 +197,8 @@ const useForm = (route?: RouteParams) => {
                         groupCheckListOption: itemsGroupCheckListOption,
                         BaseFormState: fields,
                         checkListType: checkListType,
-                        dataType: data.dataType
+                        dataType: data.dataType,
+                        mode
                     })
                 );
 
@@ -214,7 +215,7 @@ const useForm = (route?: RouteParams) => {
 
         } catch (error) {
             handleError(error);
-        }finally {
+        } finally {
             setIsLoadingForm(false);
         }
     }, [dataLoaded, data.checkListType, data.dataType, handleError, dispatch]);

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Checkbox, DataTable, Text } from "react-native-paper";
+import { Checkbox, DataTable } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useRes } from '@/app/contexts/useRes'
@@ -7,6 +7,7 @@ import { Picker } from "@react-native-picker/picker";
 import { TypeConfig } from "@/typing/type";
 import { Dropdown } from "../common";
 import { DebouncedFunc } from "lodash";
+import Text from "../Text";
 
 type justifyContent = 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly' | undefined;
 

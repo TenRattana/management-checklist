@@ -9,9 +9,9 @@ import { Checkbox, Icon } from 'react-native-paper';
 import { useRes } from '@/app/contexts/useRes';
 import { useQuery } from 'react-query';
 import { fetchTimeSchedules } from '@/app/services';
-import { convertSchedule } from '@/app/mocks/convertSchedule';
-import { MarkedDates } from 'react-native-calendars/src/types';
+import { convertSchedule, MarkedDates } from '@/app/mocks/convertSchedule';
 import { Calendar } from 'react-native-calendars';
+import { TimeLine } from '@/app/mocks/timeline';
 
 type Category = {
   id: string;
@@ -79,16 +79,16 @@ const HomeScreen = React.memo(() => {
   }), [theme.colors.background, spacing, responsive]);
 
   const toggleCheckbox = useCallback((id: string, title: string) => {
-        setCheckedItems((prevState) => {
-          const updatedCheckedState = { ...prevState, [id]: !prevState[id] };
-          const updatedFilterTypes = updatedCheckedState[id]
-            ? [...filterTitle, title.split(' ')[1]]
-            : filterTitle.filter((filter) => filter !== title.split(' ')[1]);
-    
-          setFilterTitle(updatedFilterTypes);
-          return updatedCheckedState;
-        });
-      }, [filterTitle]);
+    setCheckedItems((prevState) => {
+      const updatedCheckedState = { ...prevState, [id]: !prevState[id] };
+      const updatedFilterTypes = updatedCheckedState[id]
+        ? [...filterTitle, title.split(' ')[1]]
+        : filterTitle.filter((filter) => filter !== title.split(' ')[1]);
+
+      setFilterTitle(updatedFilterTypes);
+      return updatedCheckedState;
+    });
+  }, [filterTitle]);
 
   const toggleSwitch = useCallback(() => setShowCalendar((prev) => !prev), []);
 
@@ -98,11 +98,10 @@ const HomeScreen = React.memo(() => {
   });
 
   const [timelineItems, setTimelineItems] = useState<MarkedDates>({});
-
-  const computedTimeline = useMemo(() => {
-    if (isLoading || !timeSchedule.length) return { timeline: [], markedDates: {} };
-    return convertSchedule(timeSchedule);
-  }, [timeSchedule, isLoading]);
+  const [computedTimeline, setComputedTimeline] = useState<{
+    timeline: TimeLine[];
+    markedDates: MarkedDates;
+  }>({ markedDates: {}, timeline: [] });
 
   const markedDatesS = useMemo(() => {
     return {
@@ -112,8 +111,14 @@ const HomeScreen = React.memo(() => {
   }, [currentDate, theme.colors.drag, theme.colors.fff, timelineItems]);
 
   useEffect(() => {
-    if (computedTimeline.markedDates)
+    if (!isLoading && timeSchedule.length)
+      setComputedTimeline(convertSchedule(timeSchedule));
+  }, [timeSchedule, isLoading]);
+
+  useEffect(() => {
+    if (computedTimeline.markedDates !== timelineItems) {
       setTimelineItems(computedTimeline.markedDates);
+    }
   }, [computedTimeline]);
 
   return (
@@ -174,7 +179,7 @@ const HomeScreen = React.memo(() => {
               </View>
 
               <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
-                <LazyTimelines filterStatus={filterStatus} filterTitle={filterTitle}  />
+                <LazyTimelines filterStatus={filterStatus} filterTitle={filterTitle} computedTimeline={computedTimeline} />
               </Suspense>
             </View>
           </View>

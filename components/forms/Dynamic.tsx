@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState, useCallback, useEffect } from "react";
 import { Selects, Radios, Textareas, Inputs, Checkboxs } from "@/components/common";
 import { DynamicFormProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
@@ -23,8 +23,8 @@ const DynamicForm = React.memo(({
 }: DynamicFormProps) => {
   const { CTypeName, CListName, MCListID, GCLOptionID, Required, Important, ImportantList, SFormID } = field;
   const masterdataStyles = useMasterdataStyles();
-  const { theme } = useTheme()
-  const { fontSize } = useRes()
+  const { theme } = useTheme();
+  const { fontSize } = useRes();
   const { groupCheckListOption } = useField();
 
   const [textColor, setTextColor] = useState(theme.colors.onBackground);
@@ -59,12 +59,11 @@ const DynamicForm = React.memo(({
         .map(item => ({
           label: item.CLOptionName,
           value: item.CLOptionID,
-        })) || []
-      ),
+        })) || []),
     [groupCheckListOption, GCLOptionID]
   );
 
-  const renderField = () => {
+  const renderField = useCallback(() => {
     switch (CTypeName) {
       case "Textinput":
         return (
@@ -139,8 +138,7 @@ const DynamicForm = React.memo(({
               const processedValues = Array.isArray(value)
                 ? value.filter((v: string) => v.trim() !== '')
                 : String(value).split(',').filter((v: string) => v.trim() !== '');
-
-              handleChange(MCListID, processedValues)
+              handleChange(MCListID, processedValues);
             }}
             handleBlur={handleBlur}
             value={values}
@@ -151,7 +149,7 @@ const DynamicForm = React.memo(({
       default:
         return null;
     }
-  };
+  }, [CTypeName, CListName, MCListID, values, handleChange, handleBlur, textColor, errorMessages, exp, option]);
 
   const styles = StyleSheet.create({
     text: {
@@ -163,9 +161,12 @@ const DynamicForm = React.memo(({
     }
   });
 
-  const isValidImportantList = values && ImportantList && ImportantList.length > 0 ? ImportantList?.every(
-    (value) => value.Value && value.Value?.includes(values)
-  ) : values && Important ? Important : false;
+
+  const isValidImportantList = useMemo(() => {
+    return values && ImportantList && ImportantList.length > 0 ? ImportantList?.every(
+      (value) => value.Value && value.Value?.includes(values)
+    ) : values && Important ? Important : false;
+  }, [values, Important, ImportantList]);
 
   return (
     <View id="form-layout2">

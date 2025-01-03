@@ -11,7 +11,6 @@ import { initializeLogout } from '../providers';
 import CustomMenu from '@/components/navigation/CustomMenu'
 import Setting_dialog from "@/components/screens/Setting_dialog"
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text } from 'react-native-paper';
 import { LoadingSpinner } from '@/components';
 
 const Drawer = createDrawerNavigator();
@@ -34,7 +33,7 @@ const components: Record<ComponentNames, () => Promise<{ default: React.Componen
     Form: () => import('@/app/screens/layouts/forms/form/FormScreen'),
     Home: () => import('@/app/screens/layouts/HomeScreen'),
     Login: () => import('@/app/auth/LoginScreen'),
-    Managepermissions: () => import('@/app/screens/SAdmin/Managepermissions'),
+    Managepermissions: () => import('@/app/screens/layouts/permission/Managepermissions'),
     Permission_deny: () => import('@/app/screens/NotFoundScreen404'),
     ScanQR: () => import('@/app/screens/layouts/actions/camera/ScanQR'),
     Setting: () => import('@/app/screens/layouts/settings/SettingScreen'),

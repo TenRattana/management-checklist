@@ -2,16 +2,16 @@ import React, { lazy, Suspense, useCallback, useEffect, useMemo, useState } from
 import { useTheme } from '@/app/contexts/useTheme';
 import moment from 'moment-timezone';
 import { TimelineListRenderItemInfo, TimelineProps, Timeline } from 'react-native-calendars';
-import { getCurrentTime } from '@/config/timezoneUtils';
+import { formatTime, getCurrentTime } from '@/config/timezoneUtils';
 import Home_dialog from './Home_dialog';
-import { useQuery } from 'react-query';
-import { fetchTimeSchedules } from '@/app/services';
-import { convertSchedule } from '@/app/mocks/convertSchedule';
 import { groupBy } from 'lodash';
 import { TimeLine } from '@/app/mocks/timeline';
-import { useRes } from '@/app/contexts/useRes';
 import Text from '../Text';
 import { LoadingSpinner } from '../common';
+import { MarkedDates } from '@/app/mocks/convertSchedule';
+import { TouchableOpacity, View } from 'react-native';
+import useMasterdataStyles from '@/styles/common/masterdata';
+import { useRes } from '@/app/contexts/useRes';
 
 const LazyTimelineList = lazy(() => import('react-native-calendars').then(module => ({ default: module.TimelineList })));
 
@@ -29,30 +29,26 @@ type Event = {
 type TimelinesProps = {
     filterStatus: string;
     filterTitle: string[];
+    computedTimeline: {
+        timeline: TimeLine[];
+        markedDates: MarkedDates;
+    }
 };
 
-const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle }) => {
+const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, computedTimeline }) => {
     const { theme } = useTheme();
+    const { spacing } = useRes();
     const [dialogVisible, setDialogVisible] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState<any>(null);
     const [isLoadingData, setIsLoadingData] = useState(true);
+    const masterdataStyles = useMasterdataStyles();
 
     const initialTime = useMemo(() => ({
         hour: getCurrentTime().getHours(),
         minutes: getCurrentTime().getMinutes(),
     }), []);
 
-    const { data: timeSchedule = [], isLoading } = useQuery('timeSchedule', fetchTimeSchedules, {
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
-    });
-
     const [timelineItems, setTimelineItems] = useState<TimeLine[]>([]);
-
-    const computedTimeline = useMemo(() => {
-        if (isLoading || !timeSchedule.length) return { timeline: [], markedDates: {} };
-        return convertSchedule(timeSchedule);
-    }, [timeSchedule, isLoading]);
 
     useEffect(() => {
         if (computedTimeline.timeline.length) {
@@ -78,9 +74,24 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle }) => {
         });
     }, [filterStatus, filterTitle, timelineItems]);
 
+    const RenderEvent = React.memo(({ item }: { item: Event }) => (
+        <TouchableOpacity onPress={() => handleEventClick(item)}>
+            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>{item.title}</Text>
+            <View style={[{ flexDirection: 'row' }]}>
+                <Text style={masterdataStyles.textFFF}>Status : </Text>
+                <Text style={masterdataStyles.textFFF}>{item.statustype}</Text>
+            </View>
+            {item.summary && <Text style={masterdataStyles.textFFF}>{item.summary}</Text>}
+        </TouchableOpacity>
+    ));
+
     const handleEventClick = useCallback((event: Event) => {
-        setSelectedEvent(event);
-        setDialogVisible(true);
+        if (event) {
+            setSelectedEvent(event);
+            setDialogVisible(true);
+        } else {
+            console.warn('Event is undefined:', event);
+        }
     }, []);
 
     const renderItem = useCallback((timelineProps: TimelineProps, info: TimelineListRenderItemInfo) => {
@@ -89,11 +100,12 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle }) => {
                 {...timelineProps}
                 styles={{ contentStyle: { backgroundColor: theme.colors.fff } }}
                 onEventPress={handleEventClick}
+                renderEvent={(event) => <RenderEvent item={event} />}
                 theme={{
                     eventTitle: { color: theme.colors.fff },
                     eventSummary: { color: theme.colors.fff },
                     eventTimes: { color: theme.colors.fff },
-                    timeLabel: { color: theme.colors.error },
+                    timeLabel: { color: theme.colors.error, fontSize: spacing.small, fontWeight: 'bold' },
                     textSectionTitleColor: theme.colors.fff,
                     calendarBackground: theme.colors.background,
                     indicatorColor: theme.colors.primary,

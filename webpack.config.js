@@ -1,13 +1,13 @@
 const createExpoWebpackConfigAsync = require("@expo/webpack-config");
 const TerserPlugin = require("terser-webpack-plugin");
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
+const WorkboxWebpackPlugin = require("workbox-webpack-plugin");
 
 module.exports = async function (env, argv) {
   const config = await createExpoWebpackConfigAsync(env, argv);
 
   if (env.mode === "production") {
     if (argv.platform === "web") {
-      const WorkboxWebpackPlugin = require("workbox-webpack-plugin");
       config.plugins.push(
         new WorkboxWebpackPlugin.InjectManifest({
           swSrc: "./web/service-worker.js",
