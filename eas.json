@@ -5,6 +5,7 @@
   },
   "build": {
     "development": {
+      "gradleVersion": "7.3.3",
       "distribution": "internal",
       "android": {
         "buildType": "apk"
