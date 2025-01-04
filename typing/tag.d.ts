@@ -146,22 +146,22 @@ export interface CustomTableProps {
   showFilter?: boolean;
   showData?: TypeConfig[];
   showColumn?: string;
-  filterColumn?:number;
+  filterColumn?: number;
   detail?: boolean;
   detailKey?: string;
   showDetailwithKey?: string[];
   detailKeyrow?: number;
   detailData?: TypeConfig[];
   ShowTitle?: string;
-  handlePaginationChange?:() => void;
-  isFetchingNextPage?:boolean;
-  hasNextPage?:boolean;
-  fetchNextPage?:() => void;
-  showFilterDate?:boolean;
-  setFilterDate?:number;
-  handlefilter?:(value?:string) => void;
-  searchfilter?:string;
-  isFetching?:boolean;
+  handlePaginationChange?: () => void;
+  isFetchingNextPage?: boolean;
+  hasNextPage?: boolean;
+  fetchNextPage?: () => void;
+  showFilterDate?: boolean;
+  setFilterDate?: number;
+  handlefilter?: (value?: string) => void;
+  searchfilter?: string;
+  isFetching?: boolean;
 }
 
 export interface DragfieldProps {
@@ -170,6 +170,7 @@ export interface DragfieldProps {
   dispatch: any;
   checkListType: checkListTypes[];
   index?: string;
+  Columns?: number;
 }
 
 export interface DragsubformProps {
@@ -237,7 +238,7 @@ export interface CustomtableSmallProps {
   selectedRows?: string[];
   showFilter?: boolean;
   filter?: string | null;
-  handelSetFilter: (value: string) => void;
+  handelSetFilter: DebouncedFunc<(value: string | null) => void>;
   showData?: TypeConfig[];
   showColumn?: string;
   handleDialog: (action?: string, data?: string) => void;
@@ -247,6 +248,19 @@ export interface CustomtableSmallProps {
   detailKeyrow?: number;
   showDetailwithKey?: string[];
   detailData?: TypeConfig[];
+  ShowTitle?: string;
+  handlePaginationChange?: () => void;
+  isFetchingNextPage?: boolean;
+  hasNextPage?: boolean;
+  fetchNextPage?: () => void;
+  showFilterDate?: boolean;
+  setFilterDate?: number;
+  handlefilter?: (value?: string) => void;
+  handleLoadMore?: () => void;
+  searchfilter?: string;
+  isFetching?: boolean;
+  filteredDate: DebouncedFunc<(value: string | null) => void>;
+  Dates?: string | null;
 }
 
 export interface CustomtableDataProps {
@@ -263,6 +277,6 @@ export interface CustomtableDataProps {
   detailKeyrow?: number;
   showDetailwithKey?: string[];
   detailData?: TypeConfig[];
-  handlePaginationChange?:() => void;
-  isFetching?:boolean;
+  handlePaginationChange?: () => void;
+  isFetching?: boolean;
 }

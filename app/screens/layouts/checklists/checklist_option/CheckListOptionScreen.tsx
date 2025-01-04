@@ -45,7 +45,7 @@ const CheckListOptionScreen = React.memo(() => {
         },
         {
             refetchOnWindowFocus: false,
-            refetchOnMount: false,
+            refetchOnMount: true,
             getNextPageParam: (lastPage, allPages) => {
                 return lastPage.length === 50 ? allPages.length : undefined;
             },
@@ -62,15 +62,6 @@ const CheckListOptionScreen = React.memo(() => {
             fetchNextPage();
         }
     }, [hasNextPage, isFetching, fetchNextPage]);
-
-    useEffect(() => {
-        if (debouncedSearchQuery === "") {
-            setCheckListOption([])
-            remove()
-        } else {
-            setCheckListOption([])
-        }
-    }, [debouncedSearchQuery, remove])
 
     const mutation = useMutation(saveCheckListOption, {
         onSuccess: (data) => {

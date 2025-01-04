@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import LottieView from "lottie-react-native";
 import { View, StyleSheet } from "react-native";
+import { ActivityIndicator } from "react-native-paper";
 
 const LoadingSpinner = () => {
   const [isReady, setIsReady] = useState(false);
@@ -15,16 +15,7 @@ const LoadingSpinner = () => {
 
   return (
     <View style={styles.container}>
-      <LottieView
-        source={require('@/assets/animations/Loading.json')}
-        autoPlay
-        loop
-        style={styles.lottie}
-        webStyle={{
-          width: 200,
-          height: 200,
-        }}
-      />
+      <ActivityIndicator size="large" />
     </View>
   );
 };
@@ -32,12 +23,8 @@ const LoadingSpinner = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  lottie: {
-    width: 200,
-    height: 200,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

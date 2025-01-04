@@ -35,7 +35,7 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ route }) => {
         },
         {
             refetchOnWindowFocus: false,
-            refetchOnMount: false,
+            refetchOnMount: true,
             getNextPageParam: (lastPage, allPages) => {
                 return lastPage.length === 50 ? allPages.length : undefined;
             },
@@ -52,15 +52,6 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ route }) => {
             fetchNextPage();
         }
     }, [hasNextPage, isFetching, fetchNextPage]);
-
-    useEffect(() => {
-        if (debouncedSearchQuery === "") {
-            setForm([])
-            remove()
-        } else {
-            setForm([])
-        }
-    }, [debouncedSearchQuery, remove])
 
     useEffect(() => {
         const handler = setTimeout(() => {

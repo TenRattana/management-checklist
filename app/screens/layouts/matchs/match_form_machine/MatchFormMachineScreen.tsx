@@ -44,7 +44,7 @@ const MatchFormMachineScreen = React.memo(() => {
         },
         {
             refetchOnWindowFocus: false,
-            refetchOnMount: false,
+            refetchOnMount: true,
             getNextPageParam: (lastPage, allPages) => {
                 return lastPage.length === 50 ? allPages.length : undefined;
             },
@@ -61,15 +61,6 @@ const MatchFormMachineScreen = React.memo(() => {
             fetchNextPage();
         }
     }, [hasNextPage, isFetching, fetchNextPage]);
-
-    useEffect(() => {
-        if (debouncedSearchQuery === "") {
-            setMatchForm([])
-            remove()
-        } else {
-            setMatchForm([])
-        }
-    }, [debouncedSearchQuery, remove])
 
     const mutation = useMutation(SaveMatchFormMachine, {
         onSuccess: (data) => {

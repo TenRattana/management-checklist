@@ -1,40 +1,87 @@
-import React from 'react';
-import { Searchbar } from 'react-native-paper';
-import useMasterdataStyles from '@/styles/common/masterdata';
-import { useTheme } from '@/app/contexts/useTheme';
-import { useRes } from '@/app/contexts/useRes';
+import React from "react";
+import { Searchbar } from "react-native-paper";
+import { StyleSheet, View, Platform } from "react-native";
+import { useTheme } from "@/app/contexts/useTheme";
+import useMasterdataStyles from "@/styles/common/masterdata";
+import { useRes } from "@/app/contexts/useRes";
 
-interface SeractBarProps {
+interface SearchBarProps {
   value: string;
   onChange: (search: string) => void;
   placeholder: string;
   testId: string;
 }
 
-const SearchBar = ({ value, onChange, placeholder, testId }: SeractBarProps) => {
+const SearchBar = ({ value, onChange, placeholder, testId }: SearchBarProps) => {
   const { theme } = useTheme();
-  const { spacing } = useRes()
-  const masterdataStyles = useMasterdataStyles()
-
-  const isThai = (text: string): boolean => {
-    const thaiCharRange = /[\u0E00-\u0E7F]/;
-    return thaiCharRange.test(text);
-  };
-
-  const fontFamily = isThai(value) ? 'Sarabun' : 'Poppins';
+  const { responsive } = useRes();
+  const masterdataStyles = useMasterdataStyles();
 
   return (
-    <Searchbar
-      placeholder={placeholder}
-      value={value}
-      onChangeText={onChange}
-      style={masterdataStyles.searchbar}
-      inputStyle={[masterdataStyles.textLight, { fontSize: spacing.small, fontWeight: '400', fontFamily }]}
-      iconColor="#007AFF"
-      placeholderTextColor={theme.colors.background}
-      testID={testId}
-      id={testId}
-    />
+    <View
+      style={[
+        { flex: responsive === "small" ? undefined : 1, marginRight: responsive === "small" ? 0 : 10, alignSelf: responsive === "small" ? undefined : "center" },
+      ]}
+    >
+      <View
+        style={[
+          styles.searchbarWrapper,
+          {
+            backgroundColor: theme.colors.surface,
+            ...Platform.select({
+              web: {
+                boxShadow: `${theme.colors.onBackground || "#000"} 0px 2px 4px`,
+              },
+              ios: {
+                shadowColor: theme.colors.onBackground || "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 1,
+                shadowRadius: 4,
+              },
+              android: {
+                elevation: 4,
+              },
+            }),
+          },
+        ]}
+      >
+        <Searchbar
+          placeholder={placeholder}
+          value={value}
+          onChangeText={onChange}
+          style={styles.searchbar}
+          inputStyle={[
+            masterdataStyles.text,
+            { color: theme.colors.text },
+          ]}
+          placeholderTextColor="#B0B0B0"
+          testID={testId}
+        />
+      </View>
+    </View>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  searchbarWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    height: 50,
+  },
+  searchbar: {
+    elevation: 0,
+    backgroundColor: "transparent",
+  },
+  searchIcon: {
+    marginLeft: 5,
+  },
+  clearButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 5,
+  },
+});
+
 export default React.memo(SearchBar);

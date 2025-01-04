@@ -1,22 +1,22 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { FlatList, StyleSheet, TouchableOpacity } from "react-native";
+import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 import AccessibleView from "@/components/AccessibleView";
 import Text from "@/components/Text";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import useCustomtableStyles from "@/styles/customtable";
 import Cellcontent from "./Contents/Cellcontent";
 import Actioncontent from "./Contents/Actioncontent";
-import { Dialogs } from "../common";
+import { Dialogs, Dropdown } from "../common";
 import { HandelPrssProps, CustomtableSmallProps } from "@/typing/tag";
-import { useRes } from "@/app/contexts/useRes";
 import { Picker } from "@react-native-picker/picker";
 import DetailContent from "./Contents/Detailcontent";
 
-const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayData, Tablehead, actionIndex, showMessage, handleDialog, selectedRows, handelSetFilter, filter, showColumn, showData, showFilter, toggleSelect, detail, detailKey, detailData, detailKeyrow, showDetailwithKey }) => {
+const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayData, Tablehead, actionIndex, showMessage, selectedRows, toggleSelect, detail, detailKey, detailData, detailKeyrow, showDetailwithKey,
+    showFilter, filter, handelSetFilter, showData, showColumn, handlePaginationChange, handleDialog, ShowTitle, showFilterDate, filteredDate, Dates, handleLoadMore, isFetchingNextPage, hasNextPage, handlefilter, searchfilter
+}) => {
 
     const masterdataStyles = useMasterdataStyles();
     const customtable = useCustomtableStyles();
-    const { fontSize, responsive } = useRes()
 
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [dialogAction, setDialogAction] = useState<string>("");
@@ -43,15 +43,26 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
         }
     })
 
-    const dropdownOptions = useMemo(() => {
-        const uniqueOptions = new Set(showData?.map(row => row?.[showColumn || 0]));
-        return Array.from(uniqueOptions);
-    }, [showData, showColumn]);
+    const filterDateOptions = ["Today", "This week", "This month"];
+
+    const [open, setOpen] = useState(false);
 
     const findIndex = (row: (string | number | boolean)[]) => {
         return detailData?.findIndex(item => {
             return detailKey && item[detailKey] === (detailKeyrow && row[Number(detailKeyrow)]);
         }) ?? -1;
+    };
+
+    const handleScroll = ({ nativeEvent }: any) => {
+        if (nativeEvent && nativeEvent?.contentSize) {
+            const contentHeight = nativeEvent?.contentSize.height;
+            const layoutHeight = nativeEvent?.layoutMeasurement.height;
+            const offsetY = nativeEvent?.contentOffset.y;
+
+            if (contentHeight - layoutHeight - offsetY <= 0 && hasNextPage && !isFetchingNextPage && handleLoadMore) {
+                handleLoadMore();
+            }
+        }
     };
 
     const renderSmallRes = useCallback((rowData: (string | number | boolean)[], rowIndex: number) => {
@@ -125,13 +136,20 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
         );
     }, [actionIndex, Tablehead, detail, detailKey, detailData]);
 
+    const getItemLayout = (data: any, index: number) => ({
+        length: 159,
+        offset: 159 * index,
+        index,
+    });
+
     return (
         <>
-            <AccessibleView name="Approve" style={{
+            <View id="Approve" style={{
                 flexDirection: 'column', justifyContent: 'space-between',
                 marginHorizontal: '2%',
+                zIndex: 8,
             }}>
-                <AccessibleView name="" style={{ flexDirection: 'column', justifyContent: 'space-evenly' }}>
+                <View style={{ flexDirection: 'column', justifyContent: 'space-evenly' }}>
                     {selectedRows && selectedRows.length > 0 && (
                         <>
                             <TouchableOpacity
@@ -177,27 +195,59 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
                             </TouchableOpacity>
                         </>
                     )}
-                </AccessibleView>
+                </View>
 
-                {showFilter && (
-                    <AccessibleView name="filter" style={{ flexDirection: 'column', justifyContent: 'flex-end', marginVertical: 10 }}>
-                        <Text style={[masterdataStyles.text, { alignContent: 'center', paddingRight: 15 }]}>{Tablehead[1].label}</Text>
-                        <Picker
-                            selectedValue={filter || ""}
-                            onValueChange={(itemValue) => handelSetFilter(itemValue)}
-                            style={[masterdataStyles.picker, { width: '100%', borderWidth: 0, borderBottomWidth: 1 }]}
-                            mode="dropdown"
-                            testID="picker-custom"
-                            accessibilityLabel="Picker Accessibility Label"
-                        >
-                            <Picker.Item label="Select an option" value="" />
-                            {dropdownOptions.map((option, index) => (
-                                <Picker.Item key={index} label={String(option)} value={option} />
-                            ))}
-                        </Picker>
-                    </AccessibleView>
-                )}
-            </AccessibleView>
+                <View style={{
+                    flexDirection: 'column',
+                }}>
+                    {showFilterDate && (
+                        <View id="filter" style={{
+                            flexDirection: 'column',
+                            marginTop: 20,
+                        }}>
+                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingRight: 15 }]}>Date</Text>
+                            <Picker
+                                style={{ width: '100%', borderWidth: 0, borderBottomWidth: 1, height: 35, alignSelf: 'center' }}
+                                selectedValue={Dates || ""}
+                                onValueChange={(itemValue) => filteredDate(itemValue)}
+                                mode="dropdown"
+                                testID="picker-custom"
+                                accessibilityLabel="Picker Accessibility Label"
+                            >
+                                <Picker.Item label="Select all" value="" style={masterdataStyles.text} fontFamily="Poppins" />
+                                {filterDateOptions.map((option, index) => (
+                                    <Picker.Item key={`date-option-${index}`} label={option} value={option} style={masterdataStyles.text} fontFamily="Poppins" />
+                                ))}
+                            </Picker>
+                        </View>
+                    )}
+
+                    {showFilter && (
+                        <View id="filter" style={{
+                            flexDirection: 'column',
+                            marginVertical: 10,
+                            zIndex: 8
+                        }}>
+                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingRight: 15 }]}>{`${ShowTitle || "Title"}`}</Text>
+                            <Dropdown
+                                mode="dialog"
+                                label={ShowTitle || ""}
+                                open={open}
+                                setOpen={(v: boolean) => setOpen(v)}
+                                selectedValue={filter}
+                                items={showData || []}
+                                searchQuery={searchfilter}
+                                setDebouncedSearchQuery={(value) => handlefilter && handlefilter(value)}
+                                setSelectedValue={(stringValue: string | null) => {
+                                    handelSetFilter(stringValue)
+                                }}
+                                handleScroll={handleScroll}
+                                showLefticon={true}
+                            />
+                        </View>
+                    )}
+                </View>
+            </View>
 
             <FlatList
                 data={displayData.length > 0 ? displayData : []}
@@ -210,20 +260,27 @@ const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayD
                 )}
                 contentContainerStyle={{ flexGrow: 1 }}
                 nestedScrollEnabled={true}
-                showsVerticalScrollIndicator={false}
+                showsVerticalScrollIndicator={true}
                 removeClippedSubviews
-                getItemLayout={(data, index) => ({ length: 65, offset: 65 * index, index })}
+                onEndReachedThreshold={0.2}
+                initialNumToRender={30}
+                // windowSize={50}
+                // maxToRenderPerBatch={50}
+                onEndReached={handlePaginationChange}
+                getItemLayout={getItemLayout}
             />
 
-            <Dialogs
-                isVisible={isVisible}
-                title={dialogTitle}
-                setIsVisible={setIsVisible}
-                handleDialog={handleDialog}
-                actions={dialogAction}
-                messages={dialogMessage}
-                data={dialogData}
-            />
+            {isVisible && (
+                <Dialogs
+                    isVisible={isVisible}
+                    title={dialogTitle}
+                    setIsVisible={setIsVisible}
+                    handleDialog={handleDialog}
+                    actions={dialogAction}
+                    messages={dialogMessage}
+                    data={dialogData}
+                />
+            )}
         </>
     )
 })

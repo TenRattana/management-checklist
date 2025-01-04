@@ -34,7 +34,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(() => {
         },
         {
             refetchOnWindowFocus: false,
-            refetchOnMount: false,
+            refetchOnMount: true,
             getNextPageParam: (lastPage, allPages) => {
                 return lastPage.length === 50 ? allPages.length : undefined;
             },
@@ -90,15 +90,6 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(() => {
             setDebouncedSearchQueryFilter(search)
         }
     }, []);
-
-    useEffect(() => {
-        if (debouncedSearchQuery === "") {
-            setExpectedResult([])
-            remove()
-        } else {
-            setExpectedResult([])
-        }
-    }, [debouncedSearchQuery, remove])
 
     useEffect(() => {
         const handler = setTimeout(() => {

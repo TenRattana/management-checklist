@@ -98,6 +98,7 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, c
                     <MemoDragfield
                         data={item.Fields ?? []}
                         SFormID={item.SFormID}
+                        Columns={item.Columns}
                         dispatch={dispatch}
                         checkListType={checkListType}
                     />

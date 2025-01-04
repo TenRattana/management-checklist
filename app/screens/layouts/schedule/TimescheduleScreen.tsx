@@ -48,7 +48,7 @@ const TimescheduleScreen: React.FC = React.memo(() => {
         },
         {
             refetchOnWindowFocus: false,
-            refetchOnMount: false,
+            refetchOnMount: true,
             onSuccess: (NewData: InfiniteData<TimeScheduleProps[]>) => {
                 const newItems = NewData?.pages?.flat() || NewData
                 setTimeSchedule(newItems)
@@ -128,7 +128,6 @@ const TimescheduleScreen: React.FC = React.memo(() => {
     const tableData = useMemo(() => {
         return timeSchedule.map((item) => [
             item.ScheduleName,
-            item.MachineGroup?.map((v) => v.GMachineName).join(', ') || "",
             item.Type_schedule,
             item.Tracking ? "track" : "not track",
             item.IsActive,
@@ -157,19 +156,18 @@ const TimescheduleScreen: React.FC = React.memo(() => {
         Tabledata: tableData,
         Tablehead: [
             { label: "Schedule Name", align: "flex-start" },
-            { label: "Group Machine Name", align: "flex-start" },
             { label: "Type", align: "center" },
             { label: "Tracking", align: "center" },
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
         ],
-        flexArr: [2, 1, 1, 1, 1, 1],
-        actionIndex: [{ editIndex: 5, delIndex: 6 }],
+        flexArr: [2, 1, 1, 1, 1],
+        actionIndex: [{ editIndex: 4, delIndex: 5 }],
         handleAction,
         showMessage: 0,
         detail: true,
         detailKey: "ScheduleID",
-        detailKeyrow: 5,
+        detailKeyrow: 4,
         showDetailwithKey: ["MachineGroup", "Type_schedule", "TimelineItems"],
         detailData: timeSchedule,
         searchQuery: debouncedSearchQuery,

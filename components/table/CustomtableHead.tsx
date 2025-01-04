@@ -156,7 +156,7 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
                         }}>
                             <Text style={[masterdataStyles.text, { alignContent: 'center', paddingRight: 15, alignSelf: 'center' }]}>Date :</Text>
                             <Picker
-                                style={{ width: responsive === "small" ? '100%' : 200, borderWidth: 0, borderBottomWidth: 1, height: 35, alignSelf: 'center' }}
+                                style={{ width: responsive === "small" ? '100%' : 150, borderWidth: 0, borderBottomWidth: 1, height: 35, alignSelf: 'center' }}
                                 selectedValue={Dates || ""}
                                 onValueChange={(itemValue) => filteredDate(itemValue)}
                                 mode="dropdown"

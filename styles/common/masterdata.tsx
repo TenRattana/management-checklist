@@ -26,7 +26,7 @@ const useMasterdataStyles = () => {
             fontStyle: "italic",
         },
         textBold: {
-            fontWeight: "bold",
+            fontWeight: "500",
         },
         textMain: {
             color: theme.colors.onPrimary,
@@ -64,8 +64,7 @@ const useMasterdataStyles = () => {
         },
         buttonCreate: {
             borderRadius: 8,
-            marginLeft: responsive === "small" ? "5%" : 30,
-            minWidth: responsive === "small" ? "90%" : 200,
+            minWidth: responsive === "small" ? "100%" : 200,
             justifyContent: 'center',
             padding: 15,
             alignSelf: 'center',
@@ -91,9 +90,9 @@ const useMasterdataStyles = () => {
             marginVertical: 12,
         },
         containerSearch: {
-            flexDirection: 'row',
+            flexDirection: responsive === "small" ? "column" : "row",
             flexWrap: 'wrap',
-            marginVertical: 10
+            marginHorizontal: 20
         },
         searchbar: {
             width: responsive === "small" ? "90%" : 400,

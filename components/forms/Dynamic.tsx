@@ -173,7 +173,7 @@ const DynamicForm = React.memo(({
       <TouchableOpacity onPress={() => showField && showField(String(MCListID), String(SFormID))}>
         <Text
           variant="bodyMedium"
-          style={[masterdataStyles.text, CTypeName === "Text" ? styles.text : undefined, { color: exp && (messageminOrmax || isValidImportantList) ? theme.colors.error : theme.colors.onBackground }]}>
+          style={[masterdataStyles.text, masterdataStyles.textBold, CTypeName === "Text" ? styles.text : undefined, { color: exp && (messageminOrmax || isValidImportantList) ? theme.colors.error : theme.colors.onBackground }]}>
           {number}{" "}
           {Required && <Text style={{ color: theme.colors.error }}>(*)</Text>}
         </Text>

@@ -46,7 +46,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
         },
         {
             refetchOnWindowFocus: false,
-            refetchOnMount: false,
+            refetchOnMount: true,
             getNextPageParam: (lastPage, allPages) => {
                 return lastPage.length === 50 ? allPages.length : undefined;
             },
@@ -63,15 +63,6 @@ const MatchCheckListOptionScreen = React.memo(() => {
             fetchNextPage();
         }
     }, [hasNextPage, isFetching, fetchNextPage]);
-
-    useEffect(() => {
-        if (debouncedSearchQuery === "") {
-            setMatchCheckListOption([])
-            remove()
-        } else {
-            setMatchCheckListOption([])
-        }
-    }, [debouncedSearchQuery, remove])
 
     const mutation = useMutation(saveMatchCheckListOptions, {
         onSuccess: (data) => {

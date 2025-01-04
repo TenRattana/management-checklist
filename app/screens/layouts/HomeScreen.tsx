@@ -3,7 +3,7 @@ import React, { lazy, Suspense, useCallback, useState, useMemo, useEffect, useRe
 import { CalendarUtils } from 'react-native-calendars';
 import { getCurrentTime } from '@/config/timezoneUtils';
 import { useTheme } from '@/app/contexts/useTheme';
-import { FlatList } from 'react-native-gesture-handler';
+import { FlatList, ScrollView } from 'react-native-gesture-handler';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { Checkbox, Icon } from 'react-native-paper';
 import { useRes } from '@/app/contexts/useRes';
@@ -12,6 +12,7 @@ import { fetchTimeSchedules } from '@/app/services';
 import { convertSchedule, MarkedDates } from '@/app/mocks/convertSchedule';
 import { Calendar } from 'react-native-calendars';
 import { TimeLine } from '@/app/mocks/timeline';
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 type Category = {
   id: string;
@@ -60,7 +61,7 @@ const HomeScreen = React.memo(() => {
 
   const styles = useMemo(() => StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.colors.background },
-    calendarContainer: { padding: 10, width: responsive === 'small' ? '100%' : Platform.OS === "web" ? 400 : 300 },
+    calendarContainer: { padding: 10, width: responsive === 'small' ? '100%' : Platform.OS === "web" ? 400 : 300, },
     filterContainer: { flexDirection: 'row', alignItems: 'center', marginVertical: 10 },
     filterButton: {
       color: theme.colors.blue,
@@ -129,44 +130,69 @@ const HomeScreen = React.memo(() => {
             {showCalendar && (
               <View style={styles.calendarContainer}>
                 <FlatList
-                  data={categories}
-                  keyExtractor={(item) => item.id}
-                  renderItem={({ item, index }) => <RenderCategoryItem item={item} toggleCheckbox={toggleCheckbox} checkedItems={checkedItems} />}
-                  extraData={checkedItems}
-                  ListHeaderComponent={(
-                    <>
-                      <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginTop: 20, marginBottom: 10, paddingLeft: 10 }]}>Calendar List</Text>
-                      <Calendar
-                        onDayPress={(day) => setCurrentDate(day.dateString)}
-                        markingType="multi-dot"
-                        style={{ borderRadius: 10 }}
-                        markedDates={markedDatesS}
-                        theme={{
-                          todayTextColor: theme.colors.primary,
-                          arrowColor: theme.colors.primary,
-                          monthTextColor: theme.colors.primary,
-                          textDayFontSize: spacing.small,
-                          textMonthFontSize: spacing.small,
-                          textDayHeaderFontSize: spacing.small,
-                          textDayFontFamily: 'Poppins',
-                          textMonthFontFamily: 'Poppins',
-                          textDayHeaderFontFamily: 'Poppins',
-                          textDayFontWeight: 'bold',
-                          textMonthFontWeight: '600',
-                          textDayHeaderFontWeight: '500',
-                        }}
-                      />
-                      <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginTop: 20, marginBottom: 10, paddingLeft: 10 }]}>Filter Date Type</Text>
-                    </>
+                  data={[[]]}
+                  renderItem={() => (
+                    <View style={{ flex: 1, flexDirection: responsive === 'small' ? 'row' : 'column' }}>
+                      <View style={{ width: responsive === 'small' ? "70%" : "100%" }}>
+                        {responsive === 'small' && (
+                          <TouchableOpacity onPress={toggleSwitch} style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
+                            <Icon source={showCalendar ? "chevron-left" : "chevron-right"} size={24} color={theme.colors.primary} />
+                            <Text style={masterdataStyles.text}>{showCalendar ? 'Hide Calendar' : 'Show Calendar'}</Text>
+                          </TouchableOpacity>
+                        )}
+                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginTop: 20, marginBottom: 10, paddingLeft: 10 }]}>Calendar List</Text>
+                        <Calendar
+                          onDayPress={(day) => setCurrentDate(day.dateString)}
+                          markingType="multi-dot"
+                          style={{ borderRadius: 10 }}
+                          markedDates={markedDatesS}
+                          theme={{
+                            todayTextColor: theme.colors.primary,
+                            arrowColor: theme.colors.primary,
+                            monthTextColor: theme.colors.primary,
+                            textDayFontSize: spacing.small,
+                            textMonthFontSize: spacing.small,
+                            textDayHeaderFontSize: spacing.small,
+                            textDayFontFamily: 'Poppins',
+                            textMonthFontFamily: 'Poppins',
+                            textDayHeaderFontFamily: 'Poppins',
+                            textDayFontWeight: 'bold',
+                            textMonthFontWeight: '600',
+                            textDayHeaderFontWeight: '500',
+                          }}
+                        />
+                      </View >
+
+                      <View style={{ width: responsive === 'small' ? "30%" : "100%", marginTop: responsive === 'small' ? 44 : 0 }}>
+                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginTop: 20, marginBottom: 10, paddingLeft: 10 }]}>Filter Date Type</Text>
+
+                        <FlatList
+                          data={categories}
+                          keyExtractor={(item) => item.id}
+                          renderItem={({ item, index }) => (
+                            <RenderCategoryItem item={item} toggleCheckbox={toggleCheckbox} checkedItems={checkedItems} />
+                          )}
+                          extraData={checkedItems}
+                        />
+                      </View>
+                    </View>
                   )}
                 />
               </View>
             )}
+
             <View style={{ flex: 1 }}>
-              <TouchableOpacity onPress={toggleSwitch} style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
-                <Icon source={showCalendar ? "chevron-left" : "chevron-right"} size={24} color={theme.colors.primary} />
-                <Text style={masterdataStyles.text}>{showCalendar ? 'Hide Calendar' : 'Show Calendar'}</Text>
-              </TouchableOpacity>
+              {responsive !== 'small' ? (
+                <TouchableOpacity onPress={toggleSwitch} style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
+                  <Icon source={showCalendar ? "chevron-left" : "chevron-right"} size={24} color={theme.colors.primary} />
+                  <Text style={masterdataStyles.text}>{showCalendar ? 'Hide Calendar' : 'Show Calendar'}</Text>
+                </TouchableOpacity>
+              ) : responsive === 'small' && !showCalendar && (
+                <TouchableOpacity onPress={toggleSwitch} style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
+                  <Icon source={showCalendar ? "chevron-left" : "chevron-right"} size={24} color={theme.colors.primary} />
+                  <Text style={masterdataStyles.text}>{showCalendar ? 'Hide Calendar' : 'Show Calendar'}</Text>
+                </TouchableOpacity>
+              )}
 
               <View style={styles.filterContainer}>
                 {['all', 'end', 'running', 'wait', 'stop'].map((status) => (
@@ -178,15 +204,18 @@ const HomeScreen = React.memo(() => {
                 ))}
               </View>
 
-              <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
-                <LazyTimelines filterStatus={filterStatus} filterTitle={filterTitle} computedTimeline={computedTimeline} />
-              </Suspense>
+              <View style={{ flex: 1 }} key={JSON.stringify(responsive)}>
+                <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+                  <LazyTimelines filterStatus={filterStatus} filterTitle={filterTitle} computedTimeline={computedTimeline} />
+                </Suspense>
+              </View>
             </View>
           </View>
         </LazyCalendarProvider>
       </Suspense>
     </View>
   );
+
 });
 
 export default HomeScreen;

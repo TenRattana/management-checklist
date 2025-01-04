@@ -51,8 +51,10 @@
     "expo-secure-store": "~13.0.2",
     "expo-splash-screen": "~0.27.5",
     "expo-status-bar": "~1.12.1",
+    "expo-updates": "~0.25.27",
     "formik": "^2.4.6",
     "jwt-decode": "^4.0.0",
+    "lottie-react": "^2.4.0",
     "lottie-react-native": "^7.1.0",
     "moment-timezone": "^0.5.46",
     "prop-types": "^15.8.1",
@@ -81,8 +83,7 @@
     "redux": "^5.0.1",
     "ts-loader": "^9.5.1",
     "workbox-cli": "^7.3.0",
-    "yup": "^1.4.0",
-    "expo-updates": "~0.25.27"
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",

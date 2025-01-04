@@ -273,7 +273,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route }) => {
                                 {responsive === "small" && (
                                     <TouchableOpacity
                                         onPress={() => closeDrawer()}
-                                        style={[styles.openButtonActive, { marginHorizontal: 16 }]}
+                                        style={[styles.openButtonActive, { marginHorizontal: 16, marginTop: 20 }]}
                                     >
                                         <Icon source={"arrow-left-circle"} size={spacing.large} color={theme.colors.fff} key={"icon-tool"} />
                                         <Text style={[masterdataStyles.text, masterdataStyles.textFFF, { marginLeft: 10, padding: 2 }]}>Close Drawer</Text>
@@ -290,7 +290,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route }) => {
 
                         {drawerContent === 'toolbox' && (
                             <ScrollView
-                                style={{ display: drawerContent === "toolbox" ? 'flex' : 'none', marginTop: 20 }}
+                                style={{ display: drawerContent === "toolbox" ? 'flex' : 'none', marginTop: 20, marginHorizontal: responsive === "small" ? "5%" : 10 }}
                                 showsVerticalScrollIndicator={false}
                             >
                                 {responsive === "small" && (

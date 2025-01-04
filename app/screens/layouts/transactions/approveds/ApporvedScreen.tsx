@@ -2,12 +2,12 @@ import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from
 import { useToast } from '@/app/contexts/useToast';
 import { useRes } from '@/app/contexts/useRes';
 import { LoadingSpinner, Searchbar } from "@/components";
-import { Card } from "react-native-paper";
+import { Card, Text } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { ExpectedResult } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
 import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useSelector } from "react-redux";
 import { fetchApporved, fetchMachines, fetchSearchApporved, fetchSearchMachines, SaveApporved } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
@@ -37,7 +37,7 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(() => {
         },
         {
             refetchOnWindowFocus: false,
-            refetchOnMount: false,
+            refetchOnMount: true,
             getNextPageParam: (lastPage, allPages) => {
                 return lastPage.length === 50 ? allPages.length : undefined;
             },
@@ -60,7 +60,7 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(() => {
         },
         {
             refetchOnWindowFocus: false,
-            refetchOnMount: false,
+            refetchOnMount: true,
             enabled: true,
             getNextPageParam: (lastPage, allPages) => {
                 return lastPage.length === 50 ? allPages.length : undefined;
@@ -94,14 +94,6 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(() => {
         }
     }, []);
 
-    useEffect(() => {
-        if (debouncedSearchQuery === "") {
-            setApproved([])
-            remove()
-        } else {
-            setApproved([])
-        }
-    }, [debouncedSearchQuery, remove])
     const user = useSelector((state: any) => state.user)
 
     useEffect(() => {

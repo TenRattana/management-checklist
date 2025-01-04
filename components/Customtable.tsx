@@ -177,6 +177,16 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
           detailKey={detailKey}
           detailKeyrow={detailKeyrow}
           showDetailwithKey={showDetailwithKey}
+          handlePaginationChange={handlePaginationChange}
+          isFetchingNextPage={isFetchingNextPage}
+          hasNextPage={hasNextPage}
+          fetchNextPage={fetchNextPage}
+          handlefilter={handlefilter}
+          searchfilter={searchfilter}
+          ShowTitle={ShowTitle}
+          showFilterDate={showFilterDate}
+          filteredDate={filteredDate}
+          Dates={Dates}
           key={"CustomtableSmall"}
         />
       ) : (

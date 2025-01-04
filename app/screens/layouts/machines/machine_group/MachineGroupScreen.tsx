@@ -45,7 +45,7 @@ const MachineGroupScreen = React.memo(() => {
         },
         {
             refetchOnWindowFocus: false,
-            refetchOnMount: false,
+            refetchOnMount: true,
             getNextPageParam: (lastPage, allPages) => {
                 return lastPage.length === 50 ? allPages.length : undefined;
             },
@@ -61,15 +61,6 @@ const MachineGroupScreen = React.memo(() => {
             fetchNextPage();
         }
     }, [hasNextPage, isFetching, fetchNextPage]);
-
-    useEffect(() => {
-        if (debouncedSearchQuery === "") {
-            setMachineGroup([]);
-            remove();
-        } else {
-            setMachineGroup([]);
-        }
-    }, [debouncedSearchQuery, remove]);
 
     const mutation = useMutation(saveGroupMachine, {
         onSuccess: (data) => {
