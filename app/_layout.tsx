@@ -5,6 +5,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import useAppInitialization from '@/hooks/useAppInitialization';
 import { LoadingSpinner } from '@/components';
 
+import * as serviceWorkerRegistration from "../web/serviceWorkerRegistration";
+
 const RootNavigation = React.lazy(() => import('./navigations/RootNavigation'))
 const ErrorBoundary = React.lazy(() => import('@/hooks/ErrorBoundary'))
 
@@ -30,3 +32,5 @@ const RootLayout = () => {
 };
 
 export default RootLayout;
+
+serviceWorkerRegistration.register();

@@ -70,12 +70,12 @@ export default {
       enabled: true,
       checkAutomatically: "ON_LOAD",
       fallbackToCacheTimeout: 0,
-      assetPatternsToBeBundled: [
-        "assets/fonts/*",
-        "assets/images/*",
-        "assets/animations/*",
-        "node_modules/react-native/**/*",
-      ],
+      // assetPatternsToBeBundled: [
+      //   "assets/fonts/*",
+      //   "assets/images/*",
+      //   "assets/animations/*",
+      //   "node_modules/react-native/**/*",
+      // ],
     },
     web: {
       bundler: "metro",
@@ -90,9 +90,9 @@ export default {
       },
     },
     assetBundlePatterns: [
-      "assets/fonts/*",
-      "assets/images/*",
-      "assets/animations/*",
+      "fonts/*",
+      "images/*",
+      "animations/*",
       "node_modules/react-native/**/*",
     ],
     plugins: [
