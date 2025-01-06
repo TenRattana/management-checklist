@@ -14,6 +14,10 @@ const useMasterdataStyles = () => {
             color: theme.colors.fff,
             fontSize: spacing.small,
         },
+        text000: {
+            color: theme.colors.black,
+            fontSize: spacing.small,
+        },
         textQR: {
             fontSize: spacing.small - 3,
             color: theme.colors.onBackground,
@@ -47,7 +51,7 @@ const useMasterdataStyles = () => {
             marginVertical: "1%",
             marginHorizontal: "3%",
             padding: 12,
-            borderRadius: 8,
+            borderRadius: 4,
         },
         backMain: {
             backgroundColor: theme.colors.blue,

@@ -70,16 +70,10 @@ export default {
       enabled: true,
       checkAutomatically: "ON_LOAD",
       fallbackToCacheTimeout: 0,
-      // assetPatternsToBeBundled: [
-      //   "assets/fonts/*",
-      //   "assets/images/*",
-      //   "assets/animations/*",
-      //   "node_modules/react-native/**/*",
-      // ],
     },
     web: {
       bundler: "metro",
-      output: "Static",
+      output: "single",
       favicon: "./assets/images/Icon-app.png",
       splitChunks: true,
       cache: true,
@@ -90,11 +84,17 @@ export default {
       },
     },
     assetBundlePatterns: [
-      "fonts/*",
-      "images/*",
-      "animations/*",
-      "node_modules/react-native/**/*",
+      "assets/fonts/*",
+      "assets/images/*",
+      "node_modules/**/assets/**/*",
     ],
+    // assetBundlePatterns: ["assets/fonts/*", "assets/images/*"],
+    // assetBundlePatterns: [
+    //   "assets/fonts/*",
+    //   "assets/images/*",
+    //   "assets/animations/*",
+    //   "node_modules/react-native/**/*",
+    // ],
     plugins: [
       "expo-router",
       [

@@ -1,9 +1,9 @@
 import { ActivityIndicator, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { lazy, Suspense, useCallback, useState, useMemo, useEffect, useRef } from 'react';
+import React, { lazy, Suspense, useCallback, useState, useMemo, useEffect } from 'react';
 import { CalendarUtils } from 'react-native-calendars';
 import { getCurrentTime } from '@/config/timezoneUtils';
 import { useTheme } from '@/app/contexts/useTheme';
-import { FlatList, ScrollView } from 'react-native-gesture-handler';
+import { FlatList } from 'react-native-gesture-handler';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { Checkbox, Icon } from 'react-native-paper';
 import { useRes } from '@/app/contexts/useRes';
@@ -12,7 +12,6 @@ import { fetchTimeSchedules } from '@/app/services';
 import { convertSchedule, MarkedDates } from '@/app/mocks/convertSchedule';
 import { Calendar } from 'react-native-calendars';
 import { TimeLine } from '@/app/mocks/timeline';
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 type Category = {
   id: string;

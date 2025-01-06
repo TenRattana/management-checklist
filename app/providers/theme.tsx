@@ -23,11 +23,13 @@ const CustomLightTheme = {
     yellow: "#c8c400",
     blue: "rgb(20, 148, 255)",
     fff: '#fff',
+    black: '#000',
     drag: '#37AFE1',
     subform: '#6439FF',
     field: '#4F75FF',
     succeass: '#4CAF50',
-    error: '#ff2222'
+    error: '#ff2222',
+    gay: "#e0e0e0"
   },
 };
 
@@ -44,11 +46,13 @@ const CustomDarkTheme = {
     yellow: "#c8c400",
     blue: "rgb(20, 148, 255)",
     fff: '#fff',
+    black: '#000',
     drag: '#37AFE1',
     subform: '#071952',
     field: '#088395',
     succeass: '#4CAF50',
-    error: '#ff2222'
+    error: '#ff2222',
+    gay: "#e0e0e0"
   },
 };
 

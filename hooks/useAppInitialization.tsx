@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useFonts } from 'expo-font';
+import * as Font from "expo-font";
 import { Asset } from "expo-asset";
 import * as SplashScreen from 'expo-splash-screen';
 
@@ -11,9 +11,9 @@ const useAppInitialization = () => {
             await SplashScreen.preventAutoHideAsync();
 
             const loadResourcesAsync = async () => {
-                useFonts({
-                    'Poppins': require("../assets/fonts/Poppins-Regular.ttf"),
-                    'Sarabun': require("../assets/fonts/Sarabun-Regular.ttf"),
+                await Font.loadAsync({
+                    Poppins: require("../assets/fonts/Poppins-Regular.ttf"),
+                    Sarabun: require("../assets/fonts/Sarabun-Regular.ttf"),
                 });
 
                 const images = [
