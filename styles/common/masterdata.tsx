@@ -63,6 +63,8 @@ const useMasterdataStyles = () => {
             backgroundColor: theme.colors.onSecondary,
         },
         containerDialog: {
+            backgroundColor: theme.colors.background,
+            borderRadius: 4,
             width: responsive === "large" ? 800 : '80%',
             alignSelf: "center",
         },
@@ -266,8 +268,9 @@ const useMasterdataStyles = () => {
             justifyContent: 'center',
             alignItems: 'center',
             borderRadius: 8,
-            backgroundColor: theme.colors.gay,
+            backgroundColor: theme.colors.succeass,
             margin: 4,
+            marginTop: 10,
             padding: 10,
         },
         menuItemNav: {

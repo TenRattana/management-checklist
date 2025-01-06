@@ -1,4 +1,4 @@
-import { View } from 'react-native'
+import { Platform, View } from 'react-native'
 import React, { useState } from 'react'
 import { InitialValuesCheckListOption, InitialValuesGroupCheckList } from '@/typing/value'
 import { Dialog, Icon, IconButton, Portal, Switch } from 'react-native-paper'
@@ -45,7 +45,7 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, saveData, saveDataCheckLi
             <View style={{ justifyContent: "space-between", flexDirection: 'row', alignItems: 'center' }}>
                 <View style={{ justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center' }}>
                     <Icon source="information-outline" size={spacing.large} color={theme.colors.green} />
-                    <Text style={[masterdataStyles.title, masterdataStyles.textBold, { paddingLeft: 8 }]}>Create Group Check List Option & Option Detail</Text>
+                    <Text style={[masterdataStyles.text, masterdataStyles.title, masterdataStyles.textBold, { paddingLeft: 8 }]}>Create Group Check List Option & Option Detail</Text>
                 </View>
                 <IconButton icon="close" size={20} iconColor={theme.colors.black} onPress={() => setIsVisible()} />
             </View>
@@ -63,8 +63,12 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, saveData, saveDataCheckLi
             >
                 {({ values, handleSubmit, setFieldValue, isValid, dirty }) => (
                     <>
-                        <View id="form-cgd">
-
+                        <ScrollView
+                            showsVerticalScrollIndicator={false}
+                            style={{ maxHeight: Platform.OS === "web" ? 330 : '58%' }}
+                            keyboardShouldPersistTaps="handled"
+                            nestedScrollEnabled={true}
+                        >
                             <FastField name="groupCheckListOptionName">
                                 {({ field, form }: any) => (
                                     <>
@@ -133,7 +137,7 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, saveData, saveDataCheckLi
                                             setOptions(options.filter((id) => id !== item))
                                         }} key={index}>
                                             <View style={[masterdataStyles.selectedStyle]}>
-                                                <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{itemsCLO.find((v) => v.CLOptionID === item)?.CLOptionName}</Text>
+                                                <Text style={masterdataStyles.textFFF}>{itemsCLO.find((v) => v.CLOptionID === item)?.CLOptionName}</Text>
                                             </View>
                                         </TouchableOpacity>
                                     ))}
@@ -157,9 +161,9 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, saveData, saveDataCheckLi
                                     testID="isActive-cgd"
                                 />
                             </View>
-                        </View>
+                        </ScrollView>
 
-                        <View style={[masterdataStyles.containerAction, { paddingVertical: 10, justifyContent: "flex-end" }]}>
+                        <View style={[masterdataStyles.containerAction, { paddingTop: 10, justifyContent: "flex-end" }]}>
                             <TouchableOpacity
                                 onPress={() => handleSubmit()}
                                 style={[styles.button, { backgroundColor: theme.colors.green, flexDirection: 'row' }]}
@@ -186,19 +190,21 @@ const GroupCreate_dialog = React.memo(({ setIsVisible, saveData, saveDataCheckLi
                 )}
             </Formik>
 
-            <Portal>
-                <Dialog visible={dialog} style={{ zIndex: 5, width: "50%", alignSelf: 'center', borderRadius: 8, padding: 20 }} onDismiss={() => setDialog(false)}>
-                    <MemoCheckListOptionCreate_dialog
-                        setIsVisible={() => {
-                            setDialog(false);
-                        }}
-                        saveData={(value: any) => {
-                            saveDataCheckListOption(value);
-                            setDialog(false);
-                        }}
-                    />
-                </Dialog>
-            </Portal>
+            {dialog && (
+                <Portal>
+                    <Dialog visible={dialog} style={{ zIndex: 5, width: "50%", alignSelf: 'center', borderRadius: 8, paddingVertical: 10, paddingHorizontal: 20, backgroundColor: theme.colors.background }} onDismiss={() => setDialog(false)}>
+                        <MemoCheckListOptionCreate_dialog
+                            setIsVisible={() => {
+                                setDialog(false);
+                            }}
+                            saveData={(value: any) => {
+                                saveDataCheckListOption(value);
+                                setDialog(false);
+                            }}
+                        />
+                    </Dialog>
+                </Portal>
+            )}
 
         </GestureHandlerRootView >
     )

@@ -50,7 +50,7 @@ const InfoGroup_dialog = ({
             <View style={[masterdataStyles.containerAction, { paddingVertical: 10, justifyContent: "flex-end" }]}>
                 <TouchableOpacity
                     onPress={() => setDialogAdd()}
-                    style={[masterdataStyles.backMain, styles.button, { marginLeft: 10, flexDirection: 'row' }]}
+                    style={[styles.button, { backgroundColor: theme.colors.drag, marginLeft: 10, flexDirection: 'row' }]}
                 >
                     <Icon source="close" size={spacing.large} color={theme.colors.fff} />
 

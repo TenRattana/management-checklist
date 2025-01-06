@@ -33,7 +33,6 @@ const CheckListCreate_dialog = React.memo(({ setIsVisible, saveData }: { setIsVi
             flexDirection: 'row'
         },
         button: {
-            flex: 1,
             marginRight: 5,
             flexDirection: "row",
             paddingVertical: 10,
@@ -47,7 +46,7 @@ const CheckListCreate_dialog = React.memo(({ setIsVisible, saveData }: { setIsVi
             <View style={{ justifyContent: "space-between", flexDirection: 'row', alignItems: 'center' }}>
                 <View style={{ justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center' }}>
                     <Icon source="information-outline" size={spacing.large} color={theme.colors.green} />
-                    <Text style={[masterdataStyles.title, masterdataStyles.textBold, { paddingLeft: 8 }]}>Create Check List</Text>
+                    <Text style={[masterdataStyles.text, masterdataStyles.title, masterdataStyles.textBold, { paddingLeft: 8 }]}>Create Check List</Text>
                 </View>
                 <IconButton icon="close" size={20} iconColor={theme.colors.black} onPress={() => setIsVisible()} />
             </View>

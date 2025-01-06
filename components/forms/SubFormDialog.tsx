@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Inputs } from "@/components/common";
-import { Portal, Dialog, Switch } from "react-native-paper";
+import { Portal, Dialog, Switch, Icon, IconButton } from "react-native-paper";
 import { FastField, Formik } from "formik";
 import * as Yup from "yup";
 import useMasterdataStyles from "@/styles/common/masterdata";
@@ -10,6 +10,7 @@ import { BaseSubForm } from "@/typing/form";
 import Text from "@/components/Text";
 import { useRes } from "@/app/contexts/useRes";
 import { useTheme } from "@/app/contexts/useTheme";
+import { styles } from "../screens/Schedule";
 
 const validationSchemaSubForm = Yup.object().shape({
     SFormName: Yup.string().required("The machine group name field is required."),
@@ -26,28 +27,21 @@ const SubFormDialog = React.memo(({
     onDelete,
 }: SubFormDialogProps<BaseSubForm>) => {
     const masterdataStyles = useMasterdataStyles();
-    const { responsive } = useRes()
+    const { responsive, spacing } = useRes()
     const { theme } = useTheme();
 
-    const styles = StyleSheet.create({
-        actionButton: {
-            margin: 5,
-            padding: 10
-        },
-    })
     return (
         <Portal>
-            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={[masterdataStyles.containerDialog, { width: responsive === "large" ? 550 : '60%', }]}>
-                <Dialog.Title
-                    style={[
-                        masterdataStyles.text,
-                        masterdataStyles.textBold,
-                        { paddingLeft: 8 },
-                    ]}
-                >
-                    {isEditing ? "Edit Subform Detail" : "Create Subform Detail"}
-                </Dialog.Title>
+            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={[masterdataStyles.containerDialog, { width: responsive === "large" ? 550 : '60%' }]}>
                 <Dialog.Content>
+                    <View style={{ justifyContent: "space-between", flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={{ justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center' }}>
+                            <Icon source="information-outline" size={spacing.large} color={theme.colors.green} />
+                            <Text style={[masterdataStyles.text, masterdataStyles.title, masterdataStyles.textBold, { paddingLeft: 8 }]}>{isEditing ? "Edit Subform Detail" : "Create Subform Detail"}</Text>
+                        </View>
+                        <IconButton icon="close" size={20} iconColor={theme.colors.black} onPress={() => setIsVisible(false)} />
+                    </View>
+
                     <Text
                         style={[
                             masterdataStyles.text,
@@ -70,70 +64,113 @@ const SubFormDialog = React.memo(({
                             }}
                         >
                             {({ handleSubmit, values, setFieldValue }) => (
-                                <View id="sfd">
-                                    <FastField name="SFormName">
-                                        {({ field, form }: any) => (
-                                            <Inputs
-                                                placeholder="Enter Sub Form Name"
-                                                label="Sub Form Name"
-                                                handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                value={String(field.value ?? "")}
-                                                error={form.touched.SFormName && Boolean(form.errors.SFormName)}
-                                                errorMessage={form.touched.SFormName ? form.errors.SFormName : ""}
-                                                testId={`SFormName-sform`}
-                                            />
-                                        )}
-                                    </FastField >
+                                <>
+                                    <View id="sfd">
+                                        <FastField name="SFormName">
+                                            {({ field, form }: any) => (
+                                                <>
+                                                    <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 20, paddingLeft: 10 }]}>
+                                                        SubForm Name
+                                                    </Text>
 
-                                    <FastField name="Columns">
-                                        {({ field, form }: any) => (
-                                            <Inputs
-                                                placeholder="Enter Columns"
-                                                label="Columns"
-                                                handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                value={String(field.value ?? "")}
-                                                error={form.touched.Columns && Boolean(form.errors.Columns)}
-                                                errorMessage={form.touched.Columns ? form.errors.Columns : ""}
-                                                testId={`Columns-sform`}
-                                            />
-                                        )}
-                                    </FastField >
+                                                    <Inputs
+                                                        mode="outlined"
+                                                        placeholder="Enter Sub Form Name"
+                                                        label="Sub Form Name"
+                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                        handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                        value={String(field.value ?? "")}
+                                                        error={form.touched.SFormName && Boolean(form.errors.SFormName)}
+                                                        errorMessage={form.touched.SFormName ? form.errors.SFormName : ""}
+                                                        testId={`SFormName-sform`}
+                                                    />
+                                                </>
+                                            )}
+                                        </FastField >
 
-                                    <View id="form-active-md" style={masterdataStyles.containerSwitch}>
-                                        <View style={{ flex: 1, flexDirection: 'row' }}>
-                                            <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
-                                                Add number in front checklist: {values.Number ? "Add" : "None"}
-                                            </Text>
-                                            <Switch
-                                                style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                                color={values.Number ? theme.colors.inversePrimary : theme.colors.onPrimaryContainer}
-                                                value={values.Number}
-                                                onValueChange={(v: boolean) => {
-                                                    setFieldValue("Number", v);
-                                                }}
-                                                testID="Number-md"
-                                            />
+                                        <FastField name="Columns">
+                                            {({ field, form }: any) => (
+                                                <>
+                                                    <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 10 }]}>
+                                                        Columns
+                                                    </Text>
+
+                                                    <Inputs
+                                                        mode="outlined"
+                                                        placeholder="Enter Columns"
+                                                        label="Columns"
+                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                        handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                        value={String(field.value ?? "")}
+                                                        error={form.touched.Columns && Boolean(form.errors.Columns)}
+                                                        errorMessage={form.touched.Columns ? form.errors.Columns : ""}
+                                                        testId={`Columns-sform`}
+                                                    />
+                                                </>
+                                            )}
+                                        </FastField >
+
+                                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 5, paddingLeft: 10 }]}>
+                                            Add number in front checklist
+                                        </Text>
+
+                                        <View id="form-active-md" style={masterdataStyles.containerSwitch}>
+                                            <View style={{ flex: 1, flexDirection: 'row' }}>
+                                                <Text style={[masterdataStyles.text, masterdataStyles.textDark, { margin: 10 }]}>
+                                                    {values.Number ? "Add" : "None"}
+                                                </Text>
+                                                <Switch
+                                                    style={{ transform: [{ scale: 1.1 }], top: 2, alignSelf: 'center' }}
+                                                    color={values.Number ? theme.colors.inversePrimary : theme.colors.onPrimaryContainer}
+                                                    value={values.Number}
+                                                    onValueChange={(v: boolean) => {
+                                                        setFieldValue("Number", v);
+                                                    }}
+                                                    testID="Number-md"
+                                                />
+                                            </View>
                                         </View>
                                     </View>
 
-                                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }} id="sfd-action">
-                                        <TouchableOpacity onPress={() => handleSubmit()} style={styles.actionButton}>
-                                            <Text style={masterdataStyles.text}>{isEditing ? "Update SubForm" : "Add SubForm"}</Text>
+                                    <View style={[masterdataStyles.containerAction, { justifyContent: "space-between", paddingTop: 10 }]}>
+                                        <TouchableOpacity
+                                            onPress={() => handleSubmit()}
+                                            style={[styles.button, { backgroundColor: theme.colors.green, flex: 1, marginRight: 5, flexDirection: "row" }]}
+                                        >
+                                            <Icon source="check" size={spacing.large} color={theme.colors.fff} />
+
+                                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
+                                                {isEditing ? "Update" : "Add"}
+                                            </Text>
+                                        </TouchableOpacity>
+
+                                        <TouchableOpacity
+                                            onPress={() => setIsVisible(false)}
+                                            style={[styles.button, masterdataStyles.backMain, { flex: 1, marginLeft: 10, flexDirection: "row" }]}
+                                        >
+                                            <Icon source="close" size={spacing.large} color={theme.colors.fff} />
+
+                                            <Text style={[masterdataStyles.text, masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
+                                                Cancel
+                                            </Text>
                                         </TouchableOpacity>
 
                                         {isEditing && (
-                                            <TouchableOpacity onPress={() => onDelete(values.SFormID)} style={styles.actionButton}>
-                                                <Text style={masterdataStyles.text}>Delete</Text>
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    onDelete(values.SFormID)
+                                                }}
+                                                style={[styles.button, { backgroundColor: theme.colors.error, flexDirection: "row", flex: 1, marginLeft: 100 }]}
+                                            >
+                                                <Icon source="trash-can" size={spacing.large} color={theme.colors.fff} />
+
+                                                <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
+                                                    Delete
+                                                </Text>
                                             </TouchableOpacity>
                                         )}
-
-                                        <TouchableOpacity onPress={() => setIsVisible(false)} style={styles.actionButton}>
-                                            <Text style={masterdataStyles.text}>Cancel</Text>
-                                        </TouchableOpacity>
                                     </View>
-                                </View>
+                                </>
                             )}
                         </Formik>
                     )}

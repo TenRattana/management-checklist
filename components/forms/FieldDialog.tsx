@@ -31,7 +31,7 @@ const CustomDialog = React.memo(({ visible, onDismiss, children }: { visible: bo
 
     return <Dialog
         visible={visible}
-        style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center', padding: 20, borderRadius: 4, backgroundColor: theme.colors.fff }}
+        style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 4, backgroundColor: theme.colors.background }}
         onDismiss={onDismiss}
     >
         {children}
@@ -215,10 +215,10 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
     return (
         <Portal>
-            <Dialog visible={isVisible} onDismiss={handleDismissDialog} style={[masterdataStyles.containerDialog, { width: responsive === "large" ? 650 : '80%', borderRadius: 4, backgroundColor: theme.colors.fff }]}>
+            <Dialog visible={isVisible} onDismiss={handleDismissDialog} style={[masterdataStyles.containerDialog, { width: responsive === "large" ? 650 : '80%', borderRadius: 4, backgroundColor: theme.colors.background }]}>
                 <View style={{ justifyContent: "space-between", flexDirection: 'row', marginHorizontal: 20, alignItems: 'center' }}>
-                    <Text style={[masterdataStyles.title, masterdataStyles.textBold, { paddingLeft: 8 }]}>{editMode ? "Edit check list" : "Create check list"}</Text>
-                    <IconButton icon="close" size={20} iconColor={theme.colors.black} onPress={() => setShowDialogs()} />
+                    <Text style={[masterdataStyles.text, masterdataStyles.title, masterdataStyles.textBold, { paddingLeft: 8 }]}>{editMode ? "Edit check list" : "Create check list"}</Text>
+                    <IconButton icon="close" size={20} iconColor={theme.colors.onBackground} onPress={() => setShowDialogs()} />
                 </View>
 
                 <Text style={[masterdataStyles.text, masterdataStyles.textDark, { paddingLeft: 28, marginBottom: 5 }]}>
@@ -329,386 +329,384 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
                             return (
                                 <>
-                                    <View style={{ margin: 12 }}>
-                                        <ScrollView
-                                            contentContainerStyle={{ paddingBottom: 5, paddingHorizontal: 10 }}
-                                            showsVerticalScrollIndicator={false}
-                                            style={{ maxHeight: Platform.OS === "web" ? 330 : '68%' }}
-                                            keyboardShouldPersistTaps="handled"
-                                            nestedScrollEnabled={true}
-                                        >
-                                            <View style={{ flex: 1 }}>
-                                                <Suspense fallback={<LoadingSpinner />}>
-                                                    <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 5, paddingLeft: 10 }]}>
-                                                        Check List
-                                                    </Text>
-
-                                                    <LazyDropdown
-                                                        label='check list'
-                                                        lefticon="subtitles-outline"
-                                                        open={open.CheckList}
-                                                        searchQuery={debouncedSearchQuery.CheckList}
-                                                        setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, CheckList: v }))}
-                                                        selectedValue={values.CListID}
-                                                        setDebouncedSearchQuery={(value: string) =>
-                                                            handelSetDebouncedSearchQuery("CheckList", value)
-                                                        }
-                                                        items={checkList}
-                                                        setSelectedValue={(stringValue: string | null) => {
-                                                            setFieldTouched("CListID", true);
-                                                            setFieldValue("CListID", stringValue);
-                                                        }}
-                                                        isFetching={isFetchingCL}
-                                                        fetchNextPage={fetchNextPageCL}
-                                                        handleScroll={handleScrollCL}
-                                                    />
-                                                </Suspense>
-
-                                                <HelperText
-                                                    type="error"
-                                                    visible={Boolean(touched.CListID && Boolean(errors.CListID))}
-                                                    style={[{ display: Boolean(touched.CListID && Boolean(errors.CListID)) ? 'flex' : 'none' }, masterdataStyles.errorText]}
-                                                >
-                                                    {touched.CListID ? errors.CListID : ""}
-                                                </HelperText>
-                                            </View>
-
-                                            <TouchableOpacity
-                                                onPress={() => handelAdd(true, "CheckList")}
-                                                style={styles.button}
-                                            >
-                                                <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
-                                                    Add Check List
-                                                </Text>
-                                            </TouchableOpacity>
-
+                                    <ScrollView
+                                        contentContainerStyle={{ paddingBottom: 5, paddingHorizontal: 10 }}
+                                        showsVerticalScrollIndicator={false}
+                                        style={{ maxHeight: Platform.OS === "web" ? 400 : '58%', marginHorizontal: 10 }}
+                                        keyboardShouldPersistTaps="handled"
+                                        nestedScrollEnabled={true}
+                                    >
+                                        <View style={{ flex: 1 }}>
                                             <Suspense fallback={<LoadingSpinner />}>
-                                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 10 }]}>
-                                                    Type Check List
+                                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 30, paddingLeft: 10 }]}>
+                                                    Check List
                                                 </Text>
 
                                                 <LazyDropdown
-                                                    label='check list type'
-                                                    search={false}
-                                                    open={open.CheckListType}
-                                                    setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, CheckListType: v }))}
-                                                    selectedValue={values.CTypeID}
-                                                    items={editMode ? checkListTypes.map((v) => ({
-                                                        label: v.CTypeTitle,
-                                                        value: v.CTypeID,
-                                                        icon: () => <IconButton icon={v.Icon} size={spacing.large} />
-                                                    })) : checkListTypes.filter(v => v.IsActive).map((v) => ({
-                                                        label: v.CTypeTitle,
-                                                        value: v.CTypeID,
-                                                        icon: () => <IconButton icon={v.Icon} size={spacing.large} />
-                                                    }))}
+                                                    label='check list'
+                                                    lefticon="subtitles-outline"
+                                                    open={open.CheckList}
+                                                    searchQuery={debouncedSearchQuery.CheckList}
+                                                    setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, CheckList: v }))}
+                                                    selectedValue={values.CListID}
+                                                    setDebouncedSearchQuery={(value: string) =>
+                                                        handelSetDebouncedSearchQuery("CheckList", value)
+                                                    }
+                                                    items={checkList}
                                                     setSelectedValue={(stringValue: string | null) => {
-                                                        setFieldTouched("CTypeID", true);
-                                                        setFieldValue("CTypeID", stringValue);
+                                                        setFieldTouched("CListID", true);
+                                                        setFieldValue("CListID", stringValue);
                                                     }}
+                                                    isFetching={isFetchingCL}
+                                                    fetchNextPage={fetchNextPageCL}
+                                                    handleScroll={handleScrollCL}
                                                 />
                                             </Suspense>
 
                                             <HelperText
                                                 type="error"
-                                                visible={Boolean(touched.CTypeID && Boolean(errors.CTypeID))}
-                                                style={[{ display: Boolean(touched.CTypeID && Boolean(errors.CTypeID)) ? 'flex' : 'none' }, masterdataStyles.errorText]}
+                                                visible={Boolean(touched.CListID && Boolean(errors.CListID))}
+                                                style={[{ display: Boolean(touched.CListID && Boolean(errors.CListID)) ? 'flex' : 'none' }, masterdataStyles.errorText]}
                                             >
-                                                {touched.CTypeID ? errors.CTypeID : ""}
+                                                {touched.CListID ? errors.CListID : ""}
                                             </HelperText>
+                                        </View>
 
-                                            {shouldRender === "detail" && (
-                                                <RenderView style={Platform.OS === 'web' ? memoizedAnimatedText : { opacity: 1 }}>
-                                                    <View style={{ flex: 1 }}>
-                                                        <Suspense fallback={<LoadingSpinner />}>
-                                                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 5, paddingLeft: 10 }]}>
-                                                                Match Group Check List
-                                                            </Text>
+                                        <TouchableOpacity
+                                            onPress={() => handelAdd(true, "CheckList")}
+                                            style={styles.button}
+                                        >
+                                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
+                                                Add Check List
+                                            </Text>
+                                        </TouchableOpacity>
 
-                                                            <LazyDropdown
-                                                                lefticon="checkbox-multiple-blank-outline"
-                                                                label="match check list"
-                                                                open={open.MatchChecklist}
-                                                                setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, MatchChecklist: v }))}
-                                                                selectedValue={values.GCLOptionID}
-                                                                searchQuery={debouncedSearchQuery.MatchChecklist}
-                                                                setDebouncedSearchQuery={(value: string) =>
-                                                                    handelSetDebouncedSearchQuery("MatchChecklist", value)
-                                                                }
-                                                                items={groupCheckListOption}
-                                                                setSelectedValue={(stringValue: string | null) => {
-                                                                    setFieldTouched('GCLOptionID', true);
-                                                                    setFieldValue('GCLOptionID', stringValue, true);
+                                        <Suspense fallback={<LoadingSpinner />}>
+                                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 10 }]}>
+                                                Type Check List
+                                            </Text>
 
-                                                                    updateImportantList({ Value: undefined });
-                                                                }}
-                                                                isFetching={isFetchingCL}
-                                                                fetchNextPage={fetchNextPageML}
-                                                                handleScroll={handleScrollML}
-                                                            />
-                                                        </Suspense>
+                                            <LazyDropdown
+                                                label='check list type'
+                                                search={false}
+                                                open={open.CheckListType}
+                                                setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, CheckListType: v }))}
+                                                selectedValue={values.CTypeID}
+                                                items={editMode ? checkListTypes.map((v) => ({
+                                                    label: v.CTypeTitle,
+                                                    value: v.CTypeID,
+                                                    icon: () => <IconButton icon={v.Icon} size={spacing.large} />
+                                                })) : checkListTypes.filter(v => v.IsActive).map((v) => ({
+                                                    label: v.CTypeTitle,
+                                                    value: v.CTypeID,
+                                                    icon: () => <IconButton icon={v.Icon} size={spacing.large} />
+                                                }))}
+                                                setSelectedValue={(stringValue: string | null) => {
+                                                    setFieldTouched("CTypeID", true);
+                                                    setFieldValue("CTypeID", stringValue);
+                                                }}
+                                            />
+                                        </Suspense>
 
-                                                        <HelperText
-                                                            type="error"
-                                                            visible={Boolean(touched.GCLOptionID && Boolean(errors.GCLOptionID))}
-                                                            style={[{ display: Boolean(touched.GCLOptionID && Boolean(errors.GCLOptionID)) ? 'flex' : 'none' }, masterdataStyles.errorText]}
-                                                        >
-                                                            {touched.GCLOptionID ? errors.GCLOptionID : ""}
-                                                        </HelperText>
-                                                    </View>
+                                        <HelperText
+                                            type="error"
+                                            visible={Boolean(touched.CTypeID && Boolean(errors.CTypeID))}
+                                            style={[{ display: Boolean(touched.CTypeID && Boolean(errors.CTypeID)) ? 'flex' : 'none' }, masterdataStyles.errorText]}
+                                        >
+                                            {touched.CTypeID ? errors.CTypeID : ""}
+                                        </HelperText>
 
-                                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                                        <TouchableOpacity
-                                                            onPress={() => {
-                                                                handelInfo(true, "GroupCheckList")
-                                                            }}
-                                                            style={[styles.button, { marginLeft: 10, flexDirection: 'row' }]}
-                                                        >
-                                                            <Icon source={"information"} size={spacing.large} color={theme.colors.fff} />
-                                                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 10 }]}>
-                                                                Info
-                                                            </Text>
-                                                        </TouchableOpacity>
-
-                                                        <TouchableOpacity
-                                                            onPress={() => handelAdd(true, "GroupCheckList")}
-                                                            style={styles.button}
-                                                        >
-                                                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
-                                                                Add Group Check List Option
-                                                            </Text>
-                                                        </TouchableOpacity>
-                                                    </View>
-                                                </RenderView>
-                                            )}
-
-                                            {shouldRender === "text" && (
-                                                <RenderView style={Platform.OS === 'web' ? memoizedAnimatedText : { opacity: 1 }}>
+                                        {shouldRender === "detail" && (
+                                            <RenderView style={Platform.OS === 'web' ? memoizedAnimatedText : { opacity: 1 }}>
+                                                <View style={{ flex: 1 }}>
                                                     <Suspense fallback={<LoadingSpinner />}>
                                                         <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 5, paddingLeft: 10 }]}>
-                                                            Data Type
+                                                            Match Group Check List
                                                         </Text>
 
                                                         <LazyDropdown
-                                                            label='data type'
-                                                            search={false}
-                                                            open={open.DataType}
-                                                            setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, DataType: v }))}
-                                                            selectedValue={values.DTypeID}
-                                                            items={editMode ? dataType.map((v => ({
-                                                                label: v.DTypeName,
-                                                                value: v.DTypeID,
-                                                            }))) : dataType.filter(v => v.IsActive).map((v => ({
-                                                                label: v.DTypeName,
-                                                                value: v.DTypeID,
-                                                            })))}
+                                                            lefticon="checkbox-multiple-blank-outline"
+                                                            label="match check list"
+                                                            open={open.MatchChecklist}
+                                                            setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, MatchChecklist: v }))}
+                                                            selectedValue={values.GCLOptionID}
+                                                            searchQuery={debouncedSearchQuery.MatchChecklist}
+                                                            setDebouncedSearchQuery={(value: string) =>
+                                                                handelSetDebouncedSearchQuery("MatchChecklist", value)
+                                                            }
+                                                            items={groupCheckListOption}
                                                             setSelectedValue={(stringValue: string | null) => {
-                                                                setFieldTouched("DTypeID", true);
-                                                                setFieldValue("DTypeID", stringValue);
+                                                                setFieldTouched('GCLOptionID', true);
+                                                                setFieldValue('GCLOptionID', stringValue, true);
+
+                                                                updateImportantList({ Value: undefined });
                                                             }}
+                                                            isFetching={isFetchingCL}
+                                                            fetchNextPage={fetchNextPageML}
+                                                            handleScroll={handleScrollML}
                                                         />
                                                     </Suspense>
 
                                                     <HelperText
                                                         type="error"
-                                                        visible={Boolean(touched.DTypeID && Boolean(errors.DTypeID))}
-                                                        style={[{ display: Boolean(touched.DTypeID && Boolean(errors.DTypeID)) ? 'flex' : 'none' }, masterdataStyles.errorText]}
+                                                        visible={Boolean(touched.GCLOptionID && Boolean(errors.GCLOptionID))}
+                                                        style={[{ display: Boolean(touched.GCLOptionID && Boolean(errors.GCLOptionID)) ? 'flex' : 'none' }, masterdataStyles.errorText]}
                                                     >
-                                                        {touched.DTypeID ? errors.DTypeID : ""}
+                                                        {touched.GCLOptionID ? errors.GCLOptionID : ""}
                                                     </HelperText>
-                                                </RenderView>
-                                            )}
+                                                </View>
 
-                                            <Field name="Rowcolumn">
-                                                {({ field, form }: any) => (
-                                                    <Suspense fallback={<LoadingSpinner />}>
-                                                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 5, paddingLeft: 10 }]}>
-                                                            Columns
+                                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                                    <TouchableOpacity
+                                                        onPress={() => {
+                                                            handelInfo(true, "GroupCheckList")
+                                                        }}
+                                                        style={[styles.button, { marginLeft: 10, flexDirection: 'row' }]}
+                                                    >
+                                                        <Icon source={"information"} size={spacing.large} color={theme.colors.fff} />
+                                                        <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 10 }]}>
+                                                            Info
                                                         </Text>
+                                                    </TouchableOpacity>
 
-                                                        <Inputs
-                                                            mode={"outlined"}
-                                                            placeholder="Columns"
-                                                            label="Column in row"
-                                                            handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                            handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                            value={String(field.value ?? "")}
-                                                            error={form.touched?.Rowcolumn && Boolean(form.errors?.Rowcolumn)}
-                                                            errorMessage={form.touched?.Rowcolumn ? form.errors?.Rowcolumn : ""}
-                                                            testId={`Rowcolumn-form`}
-                                                        />
-                                                    </Suspense>
-                                                )}
-                                            </Field>
+                                                    <TouchableOpacity
+                                                        onPress={() => handelAdd(true, "GroupCheckList")}
+                                                        style={styles.button}
+                                                    >
+                                                        <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
+                                                            Add Group Check List Option
+                                                        </Text>
+                                                    </TouchableOpacity>
+                                                </View>
+                                            </RenderView>
+                                        )}
 
-                                            {shouldRenderDT && (
-                                                <RenderView style={Platform.OS === 'web' ? memoizedAnimatedDT : { opacity: 1 }}>
-                                                    <Field name="DTypeValue">
-                                                        {({ field, form }: any) => (
+                                        {shouldRender === "text" && (
+                                            <RenderView style={Platform.OS === 'web' ? memoizedAnimatedText : { opacity: 1 }}>
+                                                <Suspense fallback={<LoadingSpinner />}>
+                                                    <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 5, paddingLeft: 10 }]}>
+                                                        Data Type
+                                                    </Text>
+
+                                                    <LazyDropdown
+                                                        label='data type'
+                                                        search={false}
+                                                        open={open.DataType}
+                                                        setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, DataType: v }))}
+                                                        selectedValue={values.DTypeID}
+                                                        items={editMode ? dataType.map((v => ({
+                                                            label: v.DTypeName,
+                                                            value: v.DTypeID,
+                                                        }))) : dataType.filter(v => v.IsActive).map((v => ({
+                                                            label: v.DTypeName,
+                                                            value: v.DTypeID,
+                                                        })))}
+                                                        setSelectedValue={(stringValue: string | null) => {
+                                                            setFieldTouched("DTypeID", true);
+                                                            setFieldValue("DTypeID", stringValue);
+                                                        }}
+                                                    />
+                                                </Suspense>
+
+                                                <HelperText
+                                                    type="error"
+                                                    visible={Boolean(touched.DTypeID && Boolean(errors.DTypeID))}
+                                                    style={[{ display: Boolean(touched.DTypeID && Boolean(errors.DTypeID)) ? 'flex' : 'none' }, masterdataStyles.errorText]}
+                                                >
+                                                    {touched.DTypeID ? errors.DTypeID : ""}
+                                                </HelperText>
+                                            </RenderView>
+                                        )}
+
+                                        <Field name="Rowcolumn">
+                                            {({ field, form }: any) => (
+                                                <Suspense fallback={<LoadingSpinner />}>
+                                                    <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 5, paddingLeft: 10 }]}>
+                                                        Columns
+                                                    </Text>
+
+                                                    <Inputs
+                                                        mode={"outlined"}
+                                                        placeholder="Columns"
+                                                        label="Column in row"
+                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                        handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                        value={String(field.value ?? "")}
+                                                        error={form.touched?.Rowcolumn && Boolean(form.errors?.Rowcolumn)}
+                                                        errorMessage={form.touched?.Rowcolumn ? form.errors?.Rowcolumn : ""}
+                                                        testId={`Rowcolumn-form`}
+                                                    />
+                                                </Suspense>
+                                            )}
+                                        </Field>
+
+                                        {shouldRenderDT && (
+                                            <RenderView style={Platform.OS === 'web' ? memoizedAnimatedDT : { opacity: 1 }}>
+                                                <Field name="DTypeValue">
+                                                    {({ field, form }: any) => (
+                                                        <Suspense fallback={<LoadingSpinner />}>
+                                                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 5, paddingLeft: 10 }]}>
+                                                                Number Digit
+                                                            </Text>
+
+                                                            <Inputs
+                                                                mode={"outlined"}
+                                                                placeholder="Digis Value"
+                                                                label="Digit number"
+                                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                                value={String(field.value ?? "")}
+                                                                error={form.touched?.DTypeValue && Boolean(form.errors?.DTypeValue)}
+                                                                errorMessage={form.touched?.DTypeValue ? form.errors?.DTypeValue : ""}
+                                                                testId={`DTypeValue-form`}
+                                                            />
+                                                        </Suspense>
+                                                    )}
+                                                </Field >
+                                            </RenderView>
+                                        )}
+
+                                        {shouldRender !== "label" && (
+                                            <>
+                                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 5, paddingLeft: 10 }]}>
+                                                    Field Require
+                                                </Text>
+
+                                                <View id="form-active-fd" style={masterdataStyles.containerSwitch}>
+                                                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { margin: 10 }]}>
+                                                        {values.Required ? "Yes" : "No"}
+                                                    </Text>
+
+                                                    <Switch
+                                                        style={{ transform: [{ scale: 1.1 }], top: 2 }}
+                                                        value={values.Required}
+                                                        onValueChange={(v: boolean) => {
+                                                            setFieldValue("Required", v);
+                                                        }}
+                                                        id="Required-form"
+                                                    />
+                                                </View>
+                                            </>
+                                        )}
+
+                                        {shouldRenderIT && shouldRender === "detail" && option?.length > 0 && (
+                                            <RenderView style={Platform.OS === 'web' ? memoizedAnimatedIT : { opacity: 1 }}>
+
+                                                <Text style={{ marginTop: 10, marginBottom: 10, paddingLeft: 10, fontSize: spacing.small, color: theme.colors.error }}>
+                                                    {(values.ImportantList || []).some((item) => item.Value) ? "Select value is important!" : "Input value control!"}
+                                                </Text>
+
+                                                <Field name="ImportantList[0].Value">
+                                                    {({ field, form }: any) => {
+                                                        return (
                                                             <Suspense fallback={<LoadingSpinner />}>
-                                                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 5, paddingLeft: 10 }]}>
-                                                                    Number Digit
-                                                                </Text>
+                                                                <LazyCheckboxs
+                                                                    option={option}
+                                                                    handleChange={(value) => {
+                                                                        const processedValues = Array.isArray(value)
+                                                                            ? value.filter((v: string) => v.trim() !== '')
+                                                                            : String(value).split(',').filter((v: string) => v.trim() !== '');
 
-                                                                <Inputs
-                                                                    mode={"outlined"}
-                                                                    placeholder="Digis Value"
-                                                                    label="Digit number"
-                                                                    handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                                    handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                                        form.setFieldValue(field.name, processedValues);
+                                                                        form.setFieldTouched(field.name, true);
+                                                                    }}
                                                                     value={String(field.value ?? "")}
-                                                                    error={form.touched?.DTypeValue && Boolean(form.errors?.DTypeValue)}
-                                                                    errorMessage={form.touched?.DTypeValue ? form.errors?.DTypeValue : ""}
-                                                                    testId={`DTypeValue-form`}
+                                                                    error={form.touched?.ImportantList?.[0]?.Value && Boolean(form.errors?.ImportantList?.[0]?.Value)}
+                                                                    errorMessage={form.touched?.ImportantList?.[0]?.Value ? form.errors?.ImportantList?.[0]?.Value : ""}
+                                                                    handleBlur={() => {
+                                                                        form.setFieldTouched(field.name, true);
+                                                                    }}
+                                                                    testId="Value-Important-form-combined"
                                                                 />
                                                             </Suspense>
-                                                        )}
-                                                    </Field >
-                                                </RenderView>
-                                            )}
+                                                        );
+                                                    }}
+                                                </Field>
 
-                                            {shouldRender !== "label" && (
+                                            </RenderView>
+                                        )}
+
+                                        {shouldRenderIT && shouldRenderDT && (
+                                            <RenderView style={Platform.OS === 'web' ? memoizedAnimatedIT : { opacity: 1 }}>
+                                                <Text
+                                                    style={[
+                                                        { marginTop: 10, marginBottom: 10, paddingLeft: 10, fontSize: spacing.small, color: theme.colors.error }
+                                                    ]}
+                                                >
+                                                    Input value control!
+                                                </Text>
                                                 <>
-                                                    <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 5, paddingLeft: 10 }]}>
-                                                        Field Require
-                                                    </Text>
-
-                                                    <View id="form-active-fd" style={masterdataStyles.containerSwitch}>
-                                                        <Text style={[masterdataStyles.text, masterdataStyles.textDark, { margin: 10 }]}>
-                                                            {values.Required ? "Yes" : "No"}
-                                                        </Text>
-
-                                                        <Switch
-                                                            style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                                            value={values.Required}
-                                                            onValueChange={(v: boolean) => {
-                                                                setFieldValue("Required", v);
-                                                            }}
-                                                            id="Required-form"
-                                                        />
-                                                    </View>
-                                                </>
-                                            )}
-
-                                            {shouldRenderIT && shouldRender === "detail" && option?.length > 0 && (
-                                                <RenderView style={Platform.OS === 'web' ? memoizedAnimatedIT : { opacity: 1 }}>
-
-                                                    <Text style={{ marginTop: 10, marginBottom: 10, paddingLeft: 10, fontSize: spacing.small, color: theme.colors.error }}>
-                                                        {(values.ImportantList || []).some((item) => item.Value) ? "Select value is important!" : "Input value control!"}
-                                                    </Text>
-
-                                                    <Field name="ImportantList[0].Value">
+                                                    <Field name="ImportantList[0].MinLength">
                                                         {({ field, form }: any) => {
                                                             return (
-                                                                <Suspense fallback={<LoadingSpinner />}>
-                                                                    <LazyCheckboxs
-                                                                        option={option}
-                                                                        handleChange={(value) => {
-                                                                            const processedValues = Array.isArray(value)
-                                                                                ? value.filter((v: string) => v.trim() !== '')
-                                                                                : String(value).split(',').filter((v: string) => v.trim() !== '');
-
-                                                                            form.setFieldValue(field.name, processedValues);
-                                                                            form.setFieldTouched(field.name, true);
-                                                                        }}
-                                                                        value={String(field.value ?? "")}
-                                                                        error={form.touched?.ImportantList?.[0]?.Value && Boolean(form.errors?.ImportantList?.[0]?.Value)}
-                                                                        errorMessage={form.touched?.ImportantList?.[0]?.Value ? form.errors?.ImportantList?.[0]?.Value : ""}
-                                                                        handleBlur={() => {
-                                                                            form.setFieldTouched(field.name, true);
-                                                                        }}
-                                                                        testId="Value-Important-form-combined"
-                                                                    />
-                                                                </Suspense>
-                                                            );
-                                                        }}
-                                                    </Field>
-
-                                                </RenderView>
-                                            )}
-
-                                            {shouldRenderIT && shouldRenderDT && (
-                                                <RenderView style={Platform.OS === 'web' ? memoizedAnimatedIT : { opacity: 1 }}>
-                                                    <Text
-                                                        style={[
-                                                            { marginTop: 10, marginBottom: 10, paddingLeft: 10, fontSize: spacing.small, color: theme.colors.error }
-                                                        ]}
-                                                    >
-                                                        Input value control!
-                                                    </Text>
-                                                    <>
-                                                        <Field name="ImportantList[0].MinLength">
-                                                            {({ field, form }: any) => {
-                                                                return (
-                                                                    <Inputs
-                                                                        placeholder="Min Value"
-                                                                        label="Min Value Control"
-                                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                                        handleBlur={() => {
-                                                                            form.setFieldTouched(field.name, true);
-                                                                        }}
-                                                                        value={String(field.value ?? "")}
-                                                                        error={form.touched?.ImportantList?.[0]?.MinLength && Boolean(form.errors?.ImportantList?.[0]?.MinLength)}
-                                                                        errorMessage={form.touched?.ImportantList?.[0]?.MinLength ? form.errors?.ImportantList?.[0]?.MinLength : ""}
-                                                                        testId={`MinLength-form`}
-                                                                    />
-                                                                )
-                                                            }}
-                                                        </Field>
-
-                                                        <Field name="ImportantList[0].MaxLength">
-                                                            {({ field, form }: any) => (
                                                                 <Inputs
-                                                                    placeholder="Max Value"
-                                                                    label="Max Value Control"
+                                                                    placeholder="Min Value"
+                                                                    label="Min Value Control"
                                                                     handleChange={(value) => form.setFieldValue(field.name, value)}
                                                                     handleBlur={() => {
                                                                         form.setFieldTouched(field.name, true);
                                                                     }}
                                                                     value={String(field.value ?? "")}
-                                                                    error={form.touched?.ImportantList?.[0]?.MaxLength && Boolean(form.errors?.ImportantList?.[0]?.MaxLength)}
-                                                                    errorMessage={form.touched?.ImportantList?.[0]?.MaxLength ? form.errors?.ImportantList?.[0]?.MaxLength : ""}
-                                                                    testId={`MaxLength-form`}
+                                                                    error={form.touched?.ImportantList?.[0]?.MinLength && Boolean(form.errors?.ImportantList?.[0]?.MinLength)}
+                                                                    errorMessage={form.touched?.ImportantList?.[0]?.MinLength ? form.errors?.ImportantList?.[0]?.MinLength : ""}
+                                                                    testId={`MinLength-form`}
                                                                 />
-                                                            )}
-                                                        </Field>
-                                                    </>
-                                                </RenderView>
-                                            )}
+                                                            )
+                                                        }}
+                                                    </Field>
 
-                                            {shouldRender !== "label" && (
-                                                <>
-                                                    <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 5, paddingLeft: 10 }]}>
-                                                        Field Important
-                                                    </Text>
-
-                                                    <View id="form-important-fd" style={masterdataStyles.containerSwitch}>
-                                                        <Text style={[masterdataStyles.text, masterdataStyles.textDark, { margin: 10 }]}>
-                                                            {values.Important ? "Yes" : "No"}
-                                                        </Text>
-                                                        <Switch
-                                                            style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                                            value={values.Important}
-                                                            onValueChange={(v: boolean) => {
-                                                                setFieldValue("Important", v);
-                                                            }}
-                                                            id="Important-form"
-                                                        />
-                                                    </View>
+                                                    <Field name="ImportantList[0].MaxLength">
+                                                        {({ field, form }: any) => (
+                                                            <Inputs
+                                                                placeholder="Max Value"
+                                                                label="Max Value Control"
+                                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                                handleBlur={() => {
+                                                                    form.setFieldTouched(field.name, true);
+                                                                }}
+                                                                value={String(field.value ?? "")}
+                                                                error={form.touched?.ImportantList?.[0]?.MaxLength && Boolean(form.errors?.ImportantList?.[0]?.MaxLength)}
+                                                                errorMessage={form.touched?.ImportantList?.[0]?.MaxLength ? form.errors?.ImportantList?.[0]?.MaxLength : ""}
+                                                                testId={`MaxLength-form`}
+                                                            />
+                                                        )}
+                                                    </Field>
                                                 </>
-                                            )}
+                                            </RenderView>
+                                        )}
 
-                                        </ScrollView>
-                                    </View>
+                                        {shouldRender !== "label" && (
+                                            <>
+                                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 5, paddingLeft: 10 }]}>
+                                                    Field Important
+                                                </Text>
 
-                                    <View style={[masterdataStyles.containerAction, { padding: 15, justifyContent: "space-between", backgroundColor: theme.colors.gay }]}>
+                                                <View id="form-important-fd" style={masterdataStyles.containerSwitch}>
+                                                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { margin: 10 }]}>
+                                                        {values.Important ? "Yes" : "No"}
+                                                    </Text>
+                                                    <Switch
+                                                        style={{ transform: [{ scale: 1.1 }], top: 2 }}
+                                                        value={values.Important}
+                                                        onValueChange={(v: boolean) => {
+                                                            setFieldValue("Important", v);
+                                                        }}
+                                                        id="Important-form"
+                                                    />
+                                                </View>
+                                            </>
+                                        )}
+
+                                    </ScrollView>
+
+                                    <View style={[masterdataStyles.containerAction, { padding: 15, justifyContent: "space-between" }]}>
                                         <TouchableOpacity
                                             onPress={() => handleSubmit()}
-                                            style={[masterdataStyles.button, masterdataStyles.backDis, { flex: 1, marginRight: 5, flexDirection: "row" }]}
+                                            style={[masterdataStyles.button, { backgroundColor: theme.colors.green, flex: 1, marginRight: 5, flexDirection: "row" }]}
                                         >
-                                            <Icon source="check" size={spacing.large} color={theme.colors.secondary} />
+                                            <Icon source="check" size={spacing.large} color={theme.colors.fff} />
 
-                                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 15 }]}>
+                                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
                                                 {editMode ? "Update" : "Create"}
                                             </Text>
                                         </TouchableOpacity>
@@ -741,7 +739,6 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                         )}
                                     </View>
                                 </>
-
                             );
                         }}
                     </Formik>
