@@ -697,7 +697,6 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                                 </View>
                                             </>
                                         )}
-
                                     </ScrollView>
 
                                     <View style={[masterdataStyles.containerAction, { padding: 15, justifyContent: "space-between" }]}>

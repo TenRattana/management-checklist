@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { TouchableOpacity, ScrollView, View, StyleSheet } from "react-native";
 import { Inputs, Dropdown } from "@/components/common";
-import { Portal, Switch, Dialog, TextInput, HelperText } from "react-native-paper";
+import { Portal, Switch, Dialog, TextInput, HelperText, Icon, IconButton } from "react-native-paper";
 import { Formik, FastField, Field } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
@@ -26,7 +26,7 @@ const validationSchema = Yup.object().shape({
 const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData }: MachineDialogProps<InitialValuesMachine>) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
-    const { responsive } = useRes()
+    const { responsive, spacing } = useRes()
 
     const [open, setOpen] = useState(false);
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
@@ -85,18 +85,41 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
         }
     };
 
+    const styles = StyleSheet.create({
+        button: {
+            alignSelf: 'flex-end',
+            paddingHorizontal: 20,
+            paddingVertical: 12,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: theme.colors.drag,
+            borderRadius: 4,
+        },
+    })
+
     return (
         <Portal>
             <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={[masterdataStyles.containerDialog, { width: responsive === "large" ? 1000 : "80%" }]} testID="dialog-md">
-                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]} testID="dialog-title-md">
-                    {isEditing ? "Edit" : "Create"}
-                </Dialog.Title>
                 <Dialog.Content>
+                    <View style={{ justifyContent: "space-between", flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={{ justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center' }}>
+                            <Icon source="information-outline" size={spacing.large} color={theme.colors.green} />
+                            <Text style={[masterdataStyles.text, masterdataStyles.title, masterdataStyles.textBold, { paddingLeft: 8 }]}>{isEditing ? "Edit" : "Create"}
+                            </Text>
+                        </View>
+                        <IconButton icon="close" size={20} iconColor={theme.colors.onBackground} onPress={() => setIsVisible(false)} />
+                    </View>
+
                     <Text
-                        style={[masterdataStyles.text, { paddingLeft: 10 }]}
+                        style={[
+                            masterdataStyles.text,
+                            masterdataStyles.textDark,
+                            { marginBottom: 10, paddingLeft: 10 },
+                        ]}
                     >
                         {isEditing ? "Edit the details of the machine." : "Enter the details for the new machine."}
                     </Text>
+
                     {isVisible && (
                         <Formik
                             initialValues={initialValues}
@@ -113,42 +136,48 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
 
                                 return (
                                     <View id="form-md" style={{ flexDirection: 'row' }}>
-                                        <View style={{ flex: values.machineId ? 1 : undefined }}>
-                                            <ScrollView
-                                                contentContainerStyle={{ marginTop: '15%', paddingBottom: 5, paddingHorizontal: 10 }}
-                                                showsVerticalScrollIndicator={false}
-                                            >
-                                                {values.machineId ? (
-                                                    <View style={{ flexGrow: 1, alignItems: 'center' }}>
-                                                        <QRCode
-                                                            value={values.machineId || "No input"}
-                                                            size={180}
-                                                            color="black"
-                                                            backgroundColor="white"
-                                                            logoBorderRadius={5}
-                                                            logoMargin={20}
-                                                        />
-                                                        <Text
-                                                            style={[masterdataStyles.textQR, { marginVertical: 10 }]}
-                                                        >
-                                                            Scan this code for open form.
-                                                        </Text>
-                                                        <TextInput
-                                                            mode="outlined"
-                                                            value={values.machineId}
-                                                            contentStyle={{ borderRadius: 10 }}
-                                                            style={[masterdataStyles.text, { width: '70%', backgroundColor: theme.colors.background }]}
-                                                        />
-                                                    </View>
-                                                ) : false}
-                                            </ScrollView>
-                                        </View>
+                                        {isEditing && (
+                                            <View style={{ flex: values.machineId ? 1 : undefined }}>
+                                                <ScrollView
+                                                    contentContainerStyle={{ marginTop: '15%', paddingBottom: 5, paddingHorizontal: 10 }}
+                                                    showsVerticalScrollIndicator={false}
+                                                >
+                                                    {values.machineId ? (
+                                                        <View style={{ flexGrow: 1, alignItems: 'center' }}>
+                                                            <QRCode
+                                                                value={values.machineId || "No input"}
+                                                                size={180}
+                                                                color="black"
+                                                                backgroundColor="white"
+                                                                logoBorderRadius={5}
+                                                                logoMargin={20}
+                                                            />
+                                                            <Text
+                                                                style={[masterdataStyles.textQR, { marginVertical: 10 }]}
+                                                            >
+                                                                Scan this code for open form.
+                                                            </Text>
+                                                            <TextInput
+                                                                mode="outlined"
+                                                                value={values.machineId}
+                                                                contentStyle={{ borderRadius: 10 }}
+                                                                style={[masterdataStyles.text, { width: '70%', backgroundColor: theme.colors.background }]}
+                                                            />
+                                                        </View>
+                                                    ) : false}
+                                                </ScrollView>
+                                            </View>
+                                        )}
 
                                         <View style={{ flex: 2, flexGrow: 2, maxHeight: hp(Platform.OS === "web" ? '50%' : '70&') }}>
                                             <ScrollView
                                                 contentContainerStyle={{ paddingBottom: 5, paddingHorizontal: 10 }}
                                                 showsVerticalScrollIndicator={false}
                                             >
+                                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 20, paddingLeft: 10 }]}>
+                                                    Group Machine
+                                                </Text>
+
                                                 <Dropdown
                                                     label='group machine'
                                                     open={open}
@@ -176,99 +205,146 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
 
                                                 <Field name="machineName">
                                                     {({ field, form }: any) => (
-                                                        <Inputs
-                                                            placeholder="Enter Machine Name"
-                                                            label="Machine Name"
-                                                            handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                            handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                            value={field.value}
-                                                            error={form.touched.machineName && Boolean(form.errors.machineName)}
-                                                            errorMessage={form.touched.machineName ? form.errors.machineName : ""}
-                                                            testId="machineName-md"
-                                                        />
+                                                        <>
+                                                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
+                                                                Machine Name
+                                                            </Text>
+
+                                                            <Inputs
+                                                                mode="outlined"
+                                                                placeholder="Enter Machine Name"
+                                                                label="Machine Name"
+                                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                                value={field.value}
+                                                                error={form.touched.machineName && Boolean(form.errors.machineName)}
+                                                                errorMessage={form.touched.machineName ? form.errors.machineName : ""}
+                                                                testId="machineName-md"
+                                                            />
+                                                        </>
+
                                                     )}
                                                 </Field>
 
                                                 <Field name="machineCode">
                                                     {({ field, form }: any) => (
-                                                        <Inputs
-                                                            placeholder="Enter machine Code"
-                                                            label="Machine Code"
-                                                            handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                            handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                            value={field.value}
-                                                            error={form.touched.machineCode && Boolean(form.errors.machineCode)}
-                                                            errorMessage={form.touched.machineCode ? form.errors.machineCode : ""}
-                                                            testId="machineCode-md"
-                                                        />
+                                                        <>
+                                                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
+                                                                Machine Code
+                                                            </Text>
+
+                                                            <Inputs
+                                                                mode="outlined"
+                                                                placeholder="Enter machine Code"
+                                                                label="Machine Code"
+                                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                                value={field.value}
+                                                                error={form.touched.machineCode && Boolean(form.errors.machineCode)}
+                                                                errorMessage={form.touched.machineCode ? form.errors.machineCode : ""}
+                                                                testId="machineCode-md"
+                                                            />
+                                                        </>
                                                     )}
                                                 </Field>
 
                                                 <Field name="description">
                                                     {({ field, form }: any) => (
-                                                        <Inputs
-                                                            placeholder="Enter Description"
-                                                            label="Description"
-                                                            handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                            handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                            value={field.value}
-                                                            error={form.touched.description && Boolean(form.errors.description)}
-                                                            errorMessage={form.touched.description ? form.errors.description : ""}
-                                                            testId="description-md"
-                                                        />
+                                                        <>
+                                                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
+                                                                Machine Description
+                                                            </Text>
+
+                                                            <Inputs
+                                                                mode="outlined"
+                                                                placeholder="Enter Description"
+                                                                label="Description"
+                                                                handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                                value={field.value}
+                                                                error={form.touched.description && Boolean(form.errors.description)}
+                                                                errorMessage={form.touched.description ? form.errors.description : ""}
+                                                                testId="description-md"
+                                                            />
+                                                        </>
                                                     )}
                                                 </Field>
 
-                                                <Field name="building">
-                                                    {({ field, form }: any) => (
-                                                        <Inputs
-                                                            placeholder="Enter Building"
-                                                            label="Building"
-                                                            handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                            handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                            value={field.value}
-                                                            error={form.touched.building && Boolean(form.errors.building)}
-                                                            errorMessage={form.touched.building ? form.errors.building : ""}
-                                                            testId="building-md"
-                                                        />
-                                                    )}
-                                                </Field>
+                                                <View style={{ flexDirection: 'row', flex: 1 }}>
+                                                    <View style={{ flexDirection: 'column', flex: 2 }}>
+                                                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
+                                                            Machine Building
+                                                        </Text>
 
-                                                <Field name="floor">
-                                                    {({ field, form }: any) => (
-                                                        <Inputs
-                                                            placeholder="Enter Floor"
-                                                            label="Floor"
-                                                            handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                            handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                            value={field.value}
-                                                            error={form.touched.floor && Boolean(form.errors.floor)}
-                                                            errorMessage={form.touched.floor ? form.errors.floor : ""}
-                                                            testId="floor-md"
-                                                        />
-                                                    )}
-                                                </Field>
+                                                        <Field name="building">
+                                                            {({ field, form }: any) => (
+                                                                <Inputs
+                                                                    mode="outlined"
+                                                                    placeholder="Enter Building"
+                                                                    label="Building"
+                                                                    handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                                    handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                                    value={field.value}
+                                                                    error={form.touched.building && Boolean(form.errors.building)}
+                                                                    errorMessage={form.touched.building ? form.errors.building : ""}
+                                                                    testId="building-md"
+                                                                />
+                                                            )}
+                                                        </Field>
+                                                    </View>
 
-                                                <Field name="area">
-                                                    {({ field, form }: any) => (
-                                                        <Inputs
-                                                            placeholder="Enter Area"
-                                                            label="Area"
-                                                            handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                            handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                            value={field.value}
-                                                            error={form.touched.area && Boolean(form.errors.area)}
-                                                            errorMessage={form.touched.area ? form.errors.area : ""}
-                                                            testId="area-md"
-                                                        />
-                                                    )}
-                                                </Field>
+                                                    <View style={{ flexDirection: 'column', flex: 2 }}>
+                                                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
+                                                            Machine Area
+                                                        </Text>
 
+                                                        <Field name="area">
+                                                            {({ field, form }: any) => (
+                                                                <Inputs
+                                                                    mode="outlined"
+                                                                    placeholder="Enter Area"
+                                                                    label="Area"
+                                                                    handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                                    handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                                    value={field.value}
+                                                                    error={form.touched.area && Boolean(form.errors.area)}
+                                                                    errorMessage={form.touched.area ? form.errors.area : ""}
+                                                                    testId="area-md"
+                                                                />
+                                                            )}
+                                                        </Field>
+                                                    </View>
+
+                                                    <View style={{ flexDirection: 'column', flex: 1 }}>
+                                                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
+                                                            Machine Floor
+                                                        </Text>
+                                                        <Field name="floor">
+                                                            {({ field, form }: any) => (
+                                                                <Inputs
+                                                                    mode="outlined"
+                                                                    placeholder="Enter Floor"
+                                                                    label="Floor"
+                                                                    handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                                    handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                                    value={field.value}
+                                                                    error={form.touched.floor && Boolean(form.errors.floor)}
+                                                                    errorMessage={form.touched.floor ? form.errors.floor : ""}
+                                                                    testId="floor-md"
+                                                                />
+                                                            )}
+                                                        </Field>
+                                                    </View>
+                                                </View>
+
+                                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 10, paddingLeft: 10 }]}>
+                                                    Machine Status
+                                                </Text>
 
                                                 <View id="form-active-md" style={masterdataStyles.containerSwitch}>
                                                     <View style={{ flex: 1, flexDirection: 'row' }}>
                                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
-                                                            Status: {values.isActive ? "Active" : "Inactive"}
+                                                            {values.isActive ? "Active" : "Inactive"}
                                                         </Text>
                                                         <Switch
                                                             style={{ transform: [{ scale: 1.1 }], top: 2 }}
@@ -282,23 +358,29 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                         />
                                                     </View>
                                                 </View>
-
                                             </ScrollView>
-                                            <View id="form-action-md" style={masterdataStyles.containerAction}>
+
+                                            <View style={[masterdataStyles.containerAction, { justifyContent: "flex-end", flexDirection: 'row', paddingTop: 10, paddingRight: 20 }]}>
                                                 <TouchableOpacity
                                                     onPress={() => handleSubmit()}
-                                                    disabled={!isValid || !dirty}
-                                                    style={[
-                                                        masterdataStyles.button,
-                                                        masterdataStyles.backMain,
-                                                        { opacity: isValid && dirty ? 1 : 0.5 }
-                                                    ]}
-                                                    testID="Save-md"
+                                                    style={[styles.button, { backgroundColor: theme.colors.green, marginRight: 5, flexDirection: "row" }]}
                                                 >
-                                                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Save</Text>
+                                                    <Icon source="check" size={spacing.large} color={theme.colors.fff} />
+
+                                                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
+                                                        {isEditing ? "Update" : "Add"}
+                                                    </Text>
                                                 </TouchableOpacity>
-                                                <TouchableOpacity onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-md">
-                                                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Cancel</Text>
+
+                                                <TouchableOpacity
+                                                    onPress={() => setIsVisible(false)}
+                                                    style={[styles.button, masterdataStyles.backMain, { marginLeft: 10, flexDirection: "row" }]}
+                                                >
+                                                    <Icon source="close" size={spacing.large} color={theme.colors.fff} />
+
+                                                    <Text style={[masterdataStyles.text, masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
+                                                        Cancel
+                                                    </Text>
                                                 </TouchableOpacity>
                                             </View>
                                         </View>

@@ -1,13 +1,14 @@
 import React from "react";
-import { TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Inputs } from "@/components/common";
-import { Portal, Switch, Dialog } from "react-native-paper";
+import { Portal, Switch, Dialog, Icon, IconButton } from "react-native-paper";
 import { FastField, Field, Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { ChecklistGroupDialogProps, InitialValuesGroupCheckList } from '@/typing/value'
 import Text from "@/components/Text";
 import { useTheme } from "@/app/contexts/useTheme";
+import { useRes } from "@/app/contexts/useRes";
 
 const validationSchema = Yup.object().shape({
     groupCheckListOptionName: Yup.string().required(
@@ -19,6 +20,19 @@ const validationSchema = Yup.object().shape({
 const Checklist_group_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData }: ChecklistGroupDialogProps<InitialValuesGroupCheckList>) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
+    const { spacing } = useRes()
+
+    const styles = StyleSheet.create({
+        button: {
+            alignSelf: 'flex-end',
+            paddingHorizontal: 20,
+            paddingVertical: 12,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: theme.colors.drag,
+            borderRadius: 4,
+        },
+    })
 
     return (
         <Portal>
@@ -28,10 +42,15 @@ const Checklist_group_dialog = React.memo(({ isVisible, setIsVisible, isEditing,
                 style={masterdataStyles.containerDialog}
                 testID="dialog-cgd"
             >
-                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]} testID="dialog-title-cgd">
-                    {isEditing ? "Edit" : "Create"}
-                </Dialog.Title>
                 <Dialog.Content>
+                    <View style={{ justifyContent: "space-between", flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={{ justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center' }}>
+                            <Icon source="information-outline" size={spacing.large} color={theme.colors.green} />
+                            <Text style={[masterdataStyles.text, masterdataStyles.title, masterdataStyles.textBold, { paddingLeft: 8 }]}>{isEditing ? "Edit" : "Create"}
+                            </Text>
+                        </View>
+                        <IconButton icon="close" size={20} iconColor={theme.colors.onBackground} onPress={() => setIsVisible(false)} />
+                    </View>
 
                     <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginBottom: 10, paddingLeft: 10 }]}>
                         {isEditing
@@ -51,22 +70,33 @@ const Checklist_group_dialog = React.memo(({ isVisible, setIsVisible, isEditing,
 
                                     <Field name="groupCheckListOptionName">
                                         {({ field, form }: any) => (
-                                            <Inputs
-                                                placeholder="Enter Group Check List"
-                                                label="Group Check List Name"
-                                                handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                value={field.value}
-                                                error={form.touched.groupCheckListOptionName && Boolean(form.errors.groupCheckListOptionName)}
-                                                errorMessage={form.touched.groupCheckListOptionName ? form.errors.groupCheckListOptionName : ""}
-                                                testId="groupCheckListOptionName-cgd"
-                                            />
+                                            <>
+                                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 20, paddingLeft: 10 }]}>
+                                                    Group Check List Name
+                                                </Text>
+
+                                                <Inputs
+                                                    mode="outlined"
+                                                    placeholder="Enter Group Check List"
+                                                    label="Group Check List Name"
+                                                    handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                    handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                    value={field.value}
+                                                    error={form.touched.groupCheckListOptionName && Boolean(form.errors.groupCheckListOptionName)}
+                                                    errorMessage={form.touched.groupCheckListOptionName ? form.errors.groupCheckListOptionName : ""}
+                                                    testId="groupCheckListOptionName-cgd"
+                                                />
+                                            </>
                                         )}
                                     </Field >
 
+                                    <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 10, paddingLeft: 10 }]}>
+                                        Group Check List Status
+                                    </Text>
+
                                     <View id="form-active-cgd" style={masterdataStyles.containerSwitch}>
                                         <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginHorizontal: 12 }]}>
-                                            Status: {values.isActive ? "Active" : "Inactive"}
+                                            {values.isActive ? "Active" : "Inactive"}
                                         </Text>
                                         <Switch
                                             style={{ transform: [{ scale: 1.1 }], top: 2 }}
@@ -78,21 +108,27 @@ const Checklist_group_dialog = React.memo(({ isVisible, setIsVisible, isEditing,
                                         />
                                     </View>
 
-                                    <View id="form-action-cgd" style={masterdataStyles.containerAction}>
+                                    <View style={[masterdataStyles.containerAction, { justifyContent: "flex-end", flexDirection: 'row', paddingTop: 10, paddingRight: 20 }]}>
                                         <TouchableOpacity
                                             onPress={() => handleSubmit()}
-                                            disabled={!isValid || !dirty}
-                                            style={[
-                                                masterdataStyles.button,
-                                                masterdataStyles.backMain,
-                                                { opacity: isValid && dirty ? 1 : 0.5 }
-                                            ]}
-                                            testID="Save-cgd"
+                                            style={[styles.button, { backgroundColor: theme.colors.green, marginRight: 5, flexDirection: "row" }]}
                                         >
-                                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Save</Text>
+                                            <Icon source="check" size={spacing.large} color={theme.colors.fff} />
+
+                                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
+                                                {isEditing ? "Update" : "Add"}
+                                            </Text>
                                         </TouchableOpacity>
-                                        <TouchableOpacity onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-cgd">
-                                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Cancel</Text>
+
+                                        <TouchableOpacity
+                                            onPress={() => setIsVisible(false)}
+                                            style={[styles.button, masterdataStyles.backMain, { marginLeft: 10, flexDirection: "row" }]}
+                                        >
+                                            <Icon source="close" size={spacing.large} color={theme.colors.fff} />
+
+                                            <Text style={[masterdataStyles.text, masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
+                                                Cancel
+                                            </Text>
                                         </TouchableOpacity>
                                     </View>
                                 </View>

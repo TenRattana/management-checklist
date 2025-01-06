@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Platform, TouchableOpacity, View } from "react-native";
-import { Portal, Dialog, HelperText } from "react-native-paper";
+import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Portal, Dialog, HelperText, Icon, IconButton } from "react-native-paper";
 import { Field, Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
@@ -9,10 +9,14 @@ import Text from "@/components/Text";
 import Dropdown from "../common/Dropdown";
 import { fetchForms, fetchMachines, fetchSearchFomrs, fetchSearchMachines } from "@/app/services";
 import { useInfiniteQuery, useQueryClient } from "react-query";
+import { useRes } from "@/app/contexts/useRes";
+import { useTheme } from "@/app/contexts/useTheme";
 
 
 const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData }: MatchFormMachineDialogProps<InitialValuesMatchFormMachine>) => {
     const masterdataStyles = useMasterdataStyles()
+    const { theme } = useTheme();
+    const { spacing } = useRes()
 
     const [openMachine, setOpenMachine] = useState(false);
     const [openForm, setOpenForm] = useState(false);
@@ -125,18 +129,37 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
         }
     };
 
+    const styles = StyleSheet.create({
+        button: {
+            alignSelf: 'flex-end',
+            paddingHorizontal: 20,
+            paddingVertical: 12,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: theme.colors.drag,
+            borderRadius: 4,
+        },
+    })
+
     return (
         <Portal>
             <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={masterdataStyles.containerDialog} testID="dialog-mfmd">
-                <Dialog.Title style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 8 }]} testID="dialog-title-mfmd">
-                    {isEditing ? "Edit" : "Create"}
-                </Dialog.Title>
                 <Dialog.Content>
+                    <View style={{ justifyContent: "space-between", flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={{ justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center' }}>
+                            <Icon source="information-outline" size={spacing.large} color={theme.colors.green} />
+                            <Text style={[masterdataStyles.text, masterdataStyles.title, masterdataStyles.textBold, { paddingLeft: 8 }]}>{isEditing ? "Edit" : "Create"}
+                            </Text>
+                        </View>
+                        <IconButton icon="close" size={20} iconColor={theme.colors.onBackground} onPress={() => setIsVisible(false)} />
+                    </View>
+
                     <Text
                         style={[masterdataStyles.text, { paddingLeft: 10 }]}
                     >
                         {isEditing ? "Edit the details of the match form & machine." : "Enter the details for the new match form & machine.."}
                     </Text>
+
                     {isVisible && (
                         <Formik
                             initialValues={initialValues}
@@ -148,7 +171,12 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
 
                                 return (
                                     <View id="machine-mfmd">
+                                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 30, paddingLeft: 10 }]}>
+                                            Machine
+                                        </Text>
+
                                         <Dropdown
+                                            lefticon="desktop-classic"
                                             label='machine'
                                             open={openMachine}
                                             setOpen={(v: boolean) => setOpenMachine(v)}
@@ -174,8 +202,13 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
                                             {touched.machineId ? errors.machineId : ""}
                                         </HelperText>
 
+                                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 10 }]}>
+                                            Form
+                                        </Text>
+
                                         <Dropdown
                                             label='form'
+                                            lefticon="format-line-style"
                                             open={openForm}
                                             setOpen={(v: boolean) => setOpenForm(v)}
                                             selectedValue={values.formId}
@@ -200,21 +233,27 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
                                             {touched.formId ? errors.formId : ""}
                                         </HelperText>
 
-                                        <View id="form-action-mfmd" style={masterdataStyles.containerAction}>
+                                        <View style={[masterdataStyles.containerAction, { justifyContent: "flex-end", flexDirection: 'row', paddingTop: 20, paddingRight: 20 }]}>
                                             <TouchableOpacity
                                                 onPress={() => handleSubmit()}
-                                                disabled={!isValid || !dirty}
-                                                style={[
-                                                    masterdataStyles.button,
-                                                    masterdataStyles.backMain,
-                                                    { opacity: isValid && dirty ? 1 : 0.5 }
-                                                ]}
-                                                testID="Save-mfmd"
+                                                style={[styles.button, { backgroundColor: theme.colors.green, marginRight: 5, flexDirection: "row" }]}
                                             >
-                                                <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Save</Text>
+                                                <Icon source="check" size={spacing.large} color={theme.colors.fff} />
+
+                                                <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
+                                                    {isEditing ? "Update" : "Add"}
+                                                </Text>
                                             </TouchableOpacity>
-                                            <TouchableOpacity onPress={() => setIsVisible(false)} style={[masterdataStyles.button, masterdataStyles.backMain]} testID="Cancel-mfmd">
-                                                <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>Cancel</Text>
+
+                                            <TouchableOpacity
+                                                onPress={() => setIsVisible(false)}
+                                                style={[styles.button, masterdataStyles.backMain, { marginLeft: 10, flexDirection: "row" }]}
+                                            >
+                                                <Icon source="close" size={spacing.large} color={theme.colors.fff} />
+
+                                                <Text style={[masterdataStyles.text, masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
+                                                    Cancel
+                                                </Text>
                                             </TouchableOpacity>
                                         </View>
                                     </View>
