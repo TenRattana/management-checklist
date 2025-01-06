@@ -29,7 +29,7 @@ const CustomLightTheme = {
     field: '#4F75FF',
     succeass: '#4CAF50',
     error: '#ff2222',
-    gay: "#e0e0e0"
+    gay: "#e9e9e9"
   },
 };
 
@@ -52,7 +52,7 @@ const CustomDarkTheme = {
     field: '#088395',
     succeass: '#4CAF50',
     error: '#ff2222',
-    gay: "#e0e0e0"
+    gay: "#e9e9e9"
   },
 };
 

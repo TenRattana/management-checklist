@@ -4,7 +4,7 @@ import useMasterdataStyles from '@/styles/common/masterdata';
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { View, TouchableOpacity, Platform, Modal, StyleSheet } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { HelperText, IconButton, Portal, Text } from 'react-native-paper';
+import { HelperText, Icon, IconButton, Portal, Text } from 'react-native-paper';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 
 const Dropdown = React.memo(({
@@ -117,24 +117,29 @@ const Dropdown = React.memo(({
                                 setOpen={() => setOpen(true)}
                                 placeholder={`Select for a ${label}...`}
                                 loading={isFetching}
-                                renderListItem={({ item }) => (
-                                    <TouchableOpacity
-                                        style={{
-                                            paddingVertical: selectedValue === item.value ? 30 : 15,
-                                            paddingHorizontal: 15,
-                                            borderBottomWidth: 1,
-                                            backgroundColor: selectedValue === item.value ? theme.colors.drag : undefined,
-                                            borderBottomColor: selectedValue === item.value ? theme.colors.onBackground : '#d0d0d0',
-                                            justifyContent: 'center'
-                                        }}
-                                        onPress={() => {
-                                            setSelectedValue(String(item.value));
-                                            setOpen(false);
-                                        }}
-                                    >
-                                        <Text style={masterdataStyles.text}>{item.label}</Text>
-                                    </TouchableOpacity>
-                                )}
+                                renderListItem={({ item }) => {
+                                    return (
+                                        <TouchableOpacity
+                                            style={{
+                                                paddingVertical: selectedValue === item.value ? 10 : 5,
+                                                paddingHorizontal: 15,
+                                                borderBottomWidth: 1,
+                                                backgroundColor: selectedValue === item.value ? theme.colors.drag : undefined,
+                                                borderBottomColor: selectedValue === item.value ? theme.colors.onBackground : '#d0d0d0',
+                                                justifyContent: 'flex-start',
+                                                flexDirection: 'row',
+                                                alignItems: 'center'
+                                            }}
+                                            onPress={() => {
+                                                setSelectedValue(String(item.value));
+                                                setOpen(false);
+                                            }}
+                                        >
+                                            {item?.icon && item.icon()}
+                                            <Text style={[masterdataStyles.text, { marginVertical: item?.icon ? 0 : spacing.large }]}>{item.label}</Text>
+                                        </TouchableOpacity>
+                                    )
+                                }}
                                 ListEmptyComponent={() => <Text>No data found</Text>}
                                 onOpen={fetchNextPage}
                                 onClose={() => setOpen(false)}
@@ -239,13 +244,19 @@ const Dropdown = React.memo(({
                 {mode === "dialog" ? ViewScroll : ViewDialog}
 
                 <TouchableOpacity onPress={() => setOpen(true)} style={styles.triggerButton}>
-                    {!showLefticon && (
-                        <IconButton
-                            style={masterdataStyles.icon}
-                            icon={items.find((v) => v.value === selectedValue)?.icon || lefticon || "check-all"}
-                            size={spacing.large}
-                        />
-                    )}
+                    {
+                        !showLefticon && (
+                            items.find((v) => v.value === selectedValue)?.icon ? (
+                                (items.find((v) => v.value === selectedValue)?.icon as () => JSX.Element)()
+                            ) : (
+                                <IconButton
+                                    style={masterdataStyles.icon}
+                                    icon={lefticon || "check-all"}
+                                    size={spacing.large}
+                                />
+                            )
+                        )
+                    }
 
                     <Text style={[masterdataStyles.text]}>{selectedValue ? `${items.find((v) => v.value === selectedValue)?.label}` : `Select a ${label}`}</Text>
 

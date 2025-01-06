@@ -127,6 +127,9 @@ const useMasterdataStyles = () => {
         },
         icon: {
             marginRight: 5,
+            alignItems: 'center',
+            alignContent: 'center',
+            alignSelf: 'center'
         },
         placeholderStyle: {
             fontSize: spacing.small,
@@ -155,7 +158,7 @@ const useMasterdataStyles = () => {
             alignItems: 'center',
         },
         commonContainer: {
-            marginHorizontal: 12,
+            marginHorizontal: 10,
             marginVertical: 8
         },
         checkboxContainer: {
@@ -263,11 +266,9 @@ const useMasterdataStyles = () => {
             justifyContent: 'center',
             alignItems: 'center',
             borderRadius: 8,
-            backgroundColor: theme.colors.background,
-            marginTop: 8,
-            marginRight: 12,
-            paddingHorizontal: 10,
-            paddingVertical: 10
+            backgroundColor: theme.colors.gay,
+            margin: 4,
+            padding: 10,
         },
         menuItemNav: {
             paddingHorizontal: 15,

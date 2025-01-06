@@ -17,6 +17,15 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
+  button: {
+    alignSelf: 'flex-end',
+    marginRight: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    alignItems: 'center',
+    backgroundColor: theme.colors.drag,
+    borderRadius: 4,
+  },
   addButton: {
     marginVertical: 5,
   },

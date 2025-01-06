@@ -55,11 +55,13 @@ const Inputs: React.FC<InputProps> = React.memo(({
             <TextInput.Icon
               icon="window-close"
               onPress={() => handleChange("")}
+              size={spacing.large}
             />
           ) : secureTextEntry ? (
             <TextInput.Icon
               icon={passwordVisible ? 'eye-off' : 'eye'}
               onPress={togglePasswordVisibility}
+              size={spacing.large}
             />
           ) : undefined
         }
