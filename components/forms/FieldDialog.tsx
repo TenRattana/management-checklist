@@ -490,6 +490,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
                                                     <LazyDropdown
                                                         label='data type'
+                                                        lefticon="checkbox-multiple-marked-outline"
                                                         search={false}
                                                         open={open.DataType}
                                                         setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, DataType: v }))}
