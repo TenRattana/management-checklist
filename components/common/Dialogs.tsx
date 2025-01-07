@@ -50,7 +50,7 @@ const Dialogs: React.FC<DialogsProps> = ({
                     <Dialog.Content style={{ paddingHorizontal: 20, paddingBottom: 20, marginTop: 10 }}>
 
                         <View style={{ justifyContent: "space-between", flexDirection: 'row' }}>
-                            <IconButton icon="information" size={25} iconColor={theme.colors.error} style={{ borderRadius: 50, backgroundColor: 'rgba(249, 140, 140, 0.5)' }} />
+                            <IconButton icon="information" size={25} iconColor={theme.colors.error} mode="contained" />
                             <IconButton icon="close" size={20} iconColor={theme.colors.onBackground} onPress={() => setIsVisible(false)} />
                         </View>
 
@@ -76,7 +76,7 @@ const Dialogs: React.FC<DialogsProps> = ({
                     <View style={[masterdataStyles.containerAction, styles.containerAction]}>
                         <TouchableOpacity
                             onPress={handleOkPress}
-                            style={[masterdataStyles.button, { flex: 1, marginRight: 5, flexDirection: "row" , backgroundColor:theme.colors.gay }]}
+                            style={[masterdataStyles.button, { flex: 1, marginRight: 5, flexDirection: "row", backgroundColor: theme.colors.gay }]}
                         >
                             <Icon source="check" size={spacing.large} color={theme.colors.black} />
 

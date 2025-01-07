@@ -1,13 +1,12 @@
-import React, { useMemo, useState } from "react";
-import { Checkbox, DataTable } from "react-native-paper";
+import React, { useState } from "react";
+import { Checkbox, DataTable, IconButton, Menu } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { FlatList, Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useRes } from '@/app/contexts/useRes'
-import { Picker } from "@react-native-picker/picker";
 import { TypeConfig } from "@/typing/type";
-import { Dropdown } from "../common";
 import { DebouncedFunc } from "lodash";
 import Text from "../Text";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 type justifyContent = 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly' | undefined;
 
@@ -65,17 +64,26 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
     const masterdataStyles = useMasterdataStyles();
     const { fontSize, responsive, spacing } = useRes();
     const [open, setOpen] = useState(false);
+    const [openDate, setOpenDate] = useState(false);
 
-    const filterDateOptions = ["Today", "This week", "This month"];
+    const filterDateOptions = [
+        { label: "Today", value: "Today" },
+        { label: "This week", value: "This week" },
+        { label: "This month", value: "This month" },
+    ];
+
+    const mx = hp(Platform.OS === "web" ? '50%' : '40%');
 
     const styles = StyleSheet.create({
         functionname: {
             textAlign: 'center'
         },
-        cardcontent: {
-            padding: 2,
-            flex: 1
-        }
+        triggerButton: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            borderBottomColor: 'gray',
+            borderBottomWidth: 0.5,
+        },
     });
 
     const handleScroll = ({ nativeEvent }: any) => {
@@ -86,9 +94,18 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
 
             if (contentHeight - layoutHeight - offsetY <= 0 && hasNextPage && !isFetchingNextPage && handleLoadMore) {
                 handleLoadMore();
+                console.log("A");
+
             }
         }
     };
+
+    const renderItem = (item: { label: string, value: any }, field: string) => (
+        <Menu.Item title={item.label} onPress={() => {
+            field === "date" ? filteredDate(item.value) : handelSetFilter(item.value)
+            field === "date" ? setOpenDate(false) : setOpen(false)
+        }} titleStyle={masterdataStyles.text} />
+    );
 
     return (
         <View id="container-datahead">
@@ -147,6 +164,7 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
 
                 <View style={{
                     flexDirection: responsive === "small" ? 'column' : 'row',
+                    marginVertical: 5
                 }}>
                     {showFilterDate && (
                         <View id="filter" style={{
@@ -154,20 +172,28 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
                             flexDirection: responsive === "small" ? 'column' : 'row',
                             marginRight: responsive === "small" ? 0 : 10,
                         }}>
-                            <Text style={[masterdataStyles.text, { alignContent: 'center', paddingRight: 15, alignSelf: 'center' }]}>Date :</Text>
-                            <Picker
-                                style={{ width: responsive === "small" ? '100%' : 150, borderWidth: 0, borderBottomWidth: 1, height: 35, alignSelf: 'center' }}
-                                selectedValue={Dates || ""}
-                                onValueChange={(itemValue) => filteredDate(itemValue)}
-                                mode="dropdown"
-                                testID="picker-custom"
-                                accessibilityLabel="Picker Accessibility Label"
-                            >
-                                <Picker.Item label="Select all" value="" style={masterdataStyles.text} fontFamily="Poppins" />
-                                {filterDateOptions.map((option, index) => (
-                                    <Picker.Item key={`date-option-${index}`} label={option} value={option} style={masterdataStyles.text} fontFamily="Poppins" />
-                                ))}
-                            </Picker>
+                            <View style={{ paddingRight: 10, alignItems: 'center', alignSelf: 'center' }}>
+                                <Menu
+                                    visible={openDate}
+                                    onDismiss={() => setOpenDate(false)}
+                                    anchor={
+                                        <Text style={masterdataStyles.text}>Date :</Text>
+                                    }
+                                >
+                                    <FlatList
+                                        data={filterDateOptions}
+                                        renderItem={({ item }) => renderItem(item, "date")}
+                                        keyExtractor={(item) => item.value}
+                                        style={{ maxHeight: mx }}
+                                        onEndReachedThreshold={0.5}
+                                    />
+                                </Menu>
+                            </View>
+
+                            <TouchableOpacity onPress={() => setOpenDate(true)} style={styles.triggerButton}>
+                                <Text style={[masterdataStyles.text]}>{Dates || "Select all"}</Text>
+                                <IconButton style={[masterdataStyles.icon, { right: 8, flex: 1, alignItems: 'flex-end' }]} icon="chevron-down" size={spacing.large} />
+                            </TouchableOpacity>
                         </View>
                     )}
 
@@ -176,29 +202,37 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
                             flexDirection: responsive === "small" ? 'column' : 'row',
                             justifyContent: 'flex-end',
                             marginLeft: responsive === "small" ? 0 : 10,
-                            top: -5
+                            marginVertical: 5
                         }}>
-                            <Text style={[masterdataStyles.text, { alignContent: 'center', paddingRight: 15, alignSelf: 'center' }]}>{`${ShowTitle || "Title"} :`}</Text>
+                            <View style={{ paddingRight: 10, alignItems: 'center', alignSelf: 'center' }}>
+                                <Menu
+                                    visible={open}
+                                    onDismiss={() => setOpen(false)}
+                                    anchor={
+                                        <Text style={masterdataStyles.text}>{`${ShowTitle || "Title"} :`}</Text>
+                                    }
+                                >
+                                    <FlatList
+                                        data={showData || []}
+                                        renderItem={({ item }) => renderItem(item, "filter")}
+                                        keyExtractor={(item) => item.value}
+                                        onEndReached={handleScroll}
+                                        onScroll={handleScroll}
+                                        style={{ maxHeight: mx }}
+                                        onEndReachedThreshold={0.5}
+                                    />
+                                </Menu>
+                            </View>
 
-                            <Dropdown
-                                label={ShowTitle || ""}
-                                open={open}
-                                setOpen={(v: boolean) => setOpen(v)}
-                                selectedValue={filter}
-                                items={showData || []}
-                                searchQuery={searchfilter}
-                                setDebouncedSearchQuery={(value) => handlefilter && handlefilter(value)}
-                                setSelectedValue={(stringValue: string | null) => {
-                                    handelSetFilter(stringValue)
-                                }}
-                                handleScroll={handleScroll}
-                                showLefticon={true}
-                            />
+                            <TouchableOpacity onPress={() => setOpen(true)} style={styles.triggerButton}>
+                                <Text style={[masterdataStyles.text]}>{filter || "Select all"}</Text>
+                                <IconButton style={[masterdataStyles.icon, { right: 8, flex: 1, alignItems: 'flex-end' }]} icon="chevron-down" size={spacing.large} />
+                            </TouchableOpacity>
                         </View>
                     )}
                 </View>
 
-            </View>
+            </View >
 
             <DataTable>
                 <DataTable.Header>
@@ -230,9 +264,8 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
                     })}
                 </DataTable.Header>
             </DataTable>
-        </View>
+        </View >
     );
 });
-
 
 export default CustomtableHead;

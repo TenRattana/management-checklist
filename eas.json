@@ -1,11 +1,10 @@
 {
   "cli": {
-    "version": ">=3.0.0",
+    "version": ">= 7.8.1",
     "appVersionSource": "remote"
   },
   "build": {
     "development": {
-      "gradleVersion": "7.3.3",
       "distribution": "internal",
       "android": {
         "buildType": "apk"

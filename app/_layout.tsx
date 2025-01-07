@@ -1,9 +1,9 @@
 import React, { Suspense } from 'react';
-import { StatusBar } from 'expo-status-bar';
 import AppProviders from "@/components/Appprovider";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import useAppInitialization from '@/hooks/useAppInitialization';
 import { LoadingSpinner } from '@/components';
+import { StatusBar } from 'react-native';
 
 const RootNavigation = React.lazy(() => import('./navigations/RootNavigation'))
 const ErrorBoundary = React.lazy(() => import('@/hooks/ErrorBoundary'))
@@ -20,7 +20,7 @@ const RootLayout = () => {
             <GestureHandlerRootView>
                 <Suspense fallback={<LoadingSpinner />}>
                     <AppProviders>
-                        <StatusBar hidden={true} />
+                        <StatusBar hidden={true} translucent />
                         <RootNavigation />
                     </AppProviders>
                 </Suspense>

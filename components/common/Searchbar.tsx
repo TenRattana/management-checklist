@@ -71,6 +71,7 @@ const styles = StyleSheet.create({
     height: 50,
   },
   searchbar: {
+    flex: 1,
     elevation: 0,
     backgroundColor: "transparent",
   },

@@ -12,6 +12,9 @@ import CustomMenu from '@/components/navigation/CustomMenu'
 import Setting_dialog from "@/components/screens/Setting_dialog"
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LoadingSpinner } from '@/components';
+import useMasterdataStyles from '@/styles/common/masterdata';
+import { Text } from 'react-native-paper';
+import { View } from 'react-native';
 
 const Drawer = createDrawerNavigator();
 const MemoSetting_dialog = React.memo(Setting_dialog)
@@ -102,6 +105,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
     }, [user.IsAuthenticated, user.Screen, renderComponent]);
 
     const initialRoute = user.initialRoute || (user.Screen.length > 0 ? user.Screen[0].NavigationTo : "");
+    const masterdataStyles = useMasterdataStyles();
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -122,13 +126,16 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                             color: '#333',
                         },
                         headerRight: () => (
-                            <CustomMenu
-                                visible={menuVisible}
-                                onShow={toggleMenu}
-                                onDismiss={closeMenu}
-                                onSettingsPress={handleSettings}
-                                onLogoutPress={handleLogout}
-                            />
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={masterdataStyles.title}>{user.Full_Name}</Text>
+                                <CustomMenu
+                                    visible={menuVisible}
+                                    onShow={toggleMenu}
+                                    onDismiss={closeMenu}
+                                    onSettingsPress={handleSettings}
+                                    onLogoutPress={handleLogout}
+                                />
+                            </View>
                         ),
                         freezeOnBlur: true,
                         unmountOnBlur: true,

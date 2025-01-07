@@ -1,10 +1,10 @@
 import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
-import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
-import { View, TouchableOpacity, Platform, Modal, StyleSheet } from 'react-native';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import { View, TouchableOpacity, Platform, StyleSheet, StatusBar } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { HelperText, Icon, IconButton, Portal, Text } from 'react-native-paper';
+import { HelperText, IconButton, Text, Modal } from 'react-native-paper';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 
 const Dropdown = React.memo(({
@@ -50,14 +50,14 @@ const Dropdown = React.memo(({
     const { theme, darkMode } = useTheme();
     const { spacing } = useRes();
 
-    const mx = hp(Platform.OS === "web" ? '50%' : '40%')
+    const mx = hp(Platform.OS === "web" ? '50%' : '40%');
 
     const handleSearch = (query: string) => {
         setSearchQuery(query);
     };
 
     useEffect(() => {
-        searchQuery && setSearchQuery(searchQuery)
+        searchQuery && setSearchQuery(searchQuery);
     }, [searchQuery]);
 
     useEffect(() => {
@@ -70,193 +70,100 @@ const Dropdown = React.memo(({
         };
     }, [searchQuerys]);
 
-    // const sortedItems = selectedValue
-    //     ? [
-    //         items.find(item => item.value === selectedValue),
-    //         ...items.filter(item => item.value !== selectedValue)
-    //     ]
-    //     : items;
-
     const filteredItems = items.filter(item =>
         searchQuerys === "" ? item : item.label.toLowerCase().includes(searchQuerys.toLowerCase())
     );
 
-    const ViewDialog = useMemo(() => {
-        return (
-            <Portal>
-                <Modal
-                    visible={open}
-                    transparent={true}
-                    onRequestClose={() => setOpen(false)}
-                >
-                    <View style={styles.modalContainer}>
-                        <View style={styles.modalContent}>
-                            <DropDownPicker
-                                multiple={false}
-                                maxHeight={mx}
-                                open={open}
-                                value={selectedValue ? String(selectedValue) : null}
-                                items={filteredItems}
-                                theme={darkMode ? 'DARK' : 'LIGHT'}
-                                searchable={search ?? true}
-                                searchTextInputProps={{
-                                    value: searchQuerys,
-                                    onChangeText: handleSearch,
-                                }}
-                                searchTextInputStyle={{
-                                    fontFamily: 'Poppins', fontSize: spacing.small, borderRadius: 5, padding: 10, borderWidth: 0.01
-                                }}
-                                searchPlaceholder={`Search for a ${label}...`}
-                                style={{ padding: 10, borderRadius: 0 }}
-                                textStyle={{
-                                    fontFamily: 'Poppins', fontSize: spacing.medium, padding: 5,
-                                    marginVertical: 5,
-                                }}
-                                containerStyle={{ flex: 1 }}
-                                setValue={() => { }}
-                                setOpen={() => setOpen(true)}
-                                placeholder={`Select for a ${label}...`}
-                                loading={isFetching}
-                                renderListItem={({ item }) => {
-                                    return (
-                                        <TouchableOpacity
-                                            style={{
-                                                paddingVertical: selectedValue === item.value ? 10 : 5,
-                                                paddingHorizontal: 15,
-                                                borderBottomWidth: 1,
-                                                backgroundColor: selectedValue === item.value ? theme.colors.drag : undefined,
-                                                borderBottomColor: selectedValue === item.value ? theme.colors.onBackground : '#d0d0d0',
-                                                justifyContent: 'flex-start',
-                                                flexDirection: 'row',
-                                                alignItems: 'center'
-                                            }}
-                                            onPress={() => {
-                                                setSelectedValue(String(item.value));
-                                                setOpen(false);
-                                            }}
-                                        >
-                                            {item?.icon && item.icon()}
-                                            <Text style={[masterdataStyles.text, { marginVertical: item?.icon ? 0 : spacing.large }]}>{item.label}</Text>
-                                        </TouchableOpacity>
-                                    )
-                                }}
-                                ListEmptyComponent={() => <Text>No data found</Text>}
-                                onOpen={fetchNextPage}
-                                onClose={() => setOpen(false)}
-                                flatListProps={{
-                                    data: filteredItems,
-                                    keyExtractor: (item) => `${item.value}`,
-                                    onScroll: handleScroll,
-                                    onEndReached: handleScroll,
-                                    onEndReachedThreshold: 0.5,
-                                    initialNumToRender: 10,
-                                    maxToRenderPerBatch: 10,
-                                    windowSize: 5,
-                                    nestedScrollEnabled: true
-                                }}
-                                selectedItemContainerStyle={{
-                                    backgroundColor: "grey"
-                                }}
-                                selectedItemLabelStyle={{
-                                    fontWeight: "bold"
-                                }}
-                                bottomOffset={100}
-                            />
-                        </View>
-                    </View>
-                </Modal>
-            </Portal>
-        )
-    }, [filteredItems, selectedValue, open, fetchNextPage, searchQuerys, theme, darkMode, hp]);
-
-    const ViewScroll = useMemo(() => {
-        return open && (
-            <DropDownPicker
-                multiple={false}
-                maxHeight={mx}
-                open={open}
-                value={selectedValue ? String(selectedValue) : null}
-                items={filteredItems}
-                theme={darkMode ? "DARK" : "LIGHT"}
-                searchable={true}
-                searchTextInputProps={{
-                    value: searchQuerys,
-                    onChangeText: handleSearch,
-                }}
-                searchTextInputStyle={{
-                    fontFamily: 'Poppins',
-                    fontSize: spacing.small,
-                    borderRadius: 5,
-                    padding: 10,
-                    borderWidth: 0.01,
-                }}
-                searchPlaceholder={`Search for a ${label}...`}
-                textStyle={{
-                    fontFamily: 'Poppins',
-                    fontSize: spacing.small,
-                    padding: 5,
-                    marginVertical: 5,
-                }}
-                containerStyle={{ flex: 1 }}
-                setValue={() => { }}
-                setOpen={() => setOpen(true)}
-                placeholder={`Select for a ${label}...`}
-                loading={isFetching}
-                renderListItem={({ item }) => (
-                    <TouchableOpacity
-                        style={{
-                            paddingVertical: selectedValue === item.value ? 30 : 15,
-                            paddingHorizontal: 15,
-                            borderBottomWidth: 1,
-                            backgroundColor: selectedValue === item.value ? theme.colors.drag : undefined,
-                            borderBottomColor: selectedValue === item.value ? theme.colors.onBackground : '#d0d0d0',
-                            justifyContent: 'center',
-                        }}
-                        onPress={() => {
-                            setSelectedValue(String(item.value));
-                            setOpen(false);
-                        }}
-                    >
-                        <Text style={{ fontFamily: 'Poppins', fontSize: spacing.small }}>{item.label}</Text>
-                    </TouchableOpacity>
-                )}
-                ListEmptyComponent={() => <Text>No data found</Text>}
-                onOpen={fetchNextPage}
-                onClose={() => setOpen(false)}
-                flatListProps={{
-                    data: filteredItems,
-                    keyExtractor: (item) => `${item.value}`,
-                    onScroll: handleScroll,
-                    onEndReached: handleScroll,
-                    onEndReachedThreshold: 0.5,
-                    initialNumToRender: 10,
-                    maxToRenderPerBatch: 10,
-                    windowSize: 5,
-                    nestedScrollEnabled: true,
-                }}
-            />
-        );
-    }, [open, filteredItems, isFetching, selectedValue, searchQuerys, fetchNextPage, handleScroll, theme, darkMode]);
-
     return (
         <View id="inputs" style={mode === "dialog" ? { margin: 0 } : masterdataStyles.commonContainer}>
+
             <View style={Platform.OS !== 'android' ? { zIndex: 10 } : {}}>
-                {mode === "dialog" ? ViewScroll : ViewDialog}
+                {open && (
+                    <DropDownPicker
+                        multiple={false}
+                        maxHeight={mx}
+                        open={open}
+                        value={selectedValue ? String(selectedValue) : null}
+                        items={filteredItems}
+                        theme={darkMode ? 'DARK' : 'LIGHT'}
+                        searchable={search ?? true}
+                        searchTextInputProps={{
+                            value: searchQuerys,
+                            onChangeText: handleSearch,
+                        }}
+                        searchTextInputStyle={{
+                            fontFamily: 'Poppins', fontSize: spacing.small, borderRadius: 5, padding: 10, borderWidth: 0.01
+                        }}
+                        searchPlaceholder={`Search for a ${label}...`}
+                        style={{ padding: 10, borderRadius: 0 }}
+                        textStyle={{
+                            fontFamily: 'Poppins', fontSize: spacing.medium, padding: 5,
+                            marginVertical: 5,
+                        }}
+                        containerStyle={{ flex: 1 }}
+                        setValue={() => { }}
+                        setOpen={() => setOpen(true)}
+                        placeholder={`Select for a ${label}...`}
+                        loading={isFetching}
+                        renderListItem={({ item }) => {
+                            return (
+                                <TouchableOpacity
+                                    style={{
+                                        paddingVertical: selectedValue === item.value ? 10 : 5,
+                                        paddingHorizontal: 15,
+                                        borderBottomWidth: 1,
+                                        backgroundColor: selectedValue === item.value ? theme.colors.drag : undefined,
+                                        borderBottomColor: selectedValue === item.value ? theme.colors.onBackground : '#d0d0d0',
+                                        justifyContent: 'flex-start',
+                                        flexDirection: 'row',
+                                        alignItems: 'center'
+                                    }}
+                                    onPress={() => {
+                                        setSelectedValue(String(item.value));
+                                        setOpen(false);
+                                    }}
+                                >
+                                    {item?.icon && item.icon()}
+                                    <Text style={[masterdataStyles.text, { marginVertical: item?.icon ? 0 : spacing.large }]}>{item.label}</Text>
+                                </TouchableOpacity>
+                            )
+                        }}
+                        ListEmptyComponent={() => <Text>No data found</Text>}
+                        onOpen={fetchNextPage}
+                        onClose={() => setOpen(false)}
+                        flatListProps={{
+                            data: filteredItems,
+                            keyExtractor: (item) => `${item.value}`,
+                            onScroll: handleScroll,
+                            onEndReached: handleScroll,
+                            onEndReachedThreshold: 0.5,
+                            initialNumToRender: 10,
+                            maxToRenderPerBatch: 10,
+                            windowSize: 5,
+                            nestedScrollEnabled: true
+                        }}
+                        selectedItemContainerStyle={{
+                            backgroundColor: "grey"
+                        }}
+                        selectedItemLabelStyle={{
+                            fontWeight: "bold"
+                        }}
+                        bottomOffset={100}
+                    />
+                )}
 
                 <TouchableOpacity onPress={() => setOpen(true)} style={styles.triggerButton}>
-                    {
-                        !showLefticon && (
-                            items.find((v) => v.value === selectedValue)?.icon ? (
-                                (items.find((v) => v.value === selectedValue)?.icon as () => JSX.Element)()
-                            ) : (
-                                <IconButton
-                                    style={masterdataStyles.icon}
-                                    icon={lefticon || "check-all"}
-                                    size={spacing.large}
-                                />
-                            )
+                    {!showLefticon && (
+                        items.find((v) => v.value === selectedValue)?.icon ? (
+                            (items.find((v) => v.value === selectedValue)?.icon as () => JSX.Element)()
+                        ) : (
+                            <IconButton
+                                style={masterdataStyles.icon}
+                                icon={lefticon || "check-all"}
+                                size={spacing.large}
+                            />
                         )
-                    }
+                    )}
 
                     <Text style={[masterdataStyles.text]}>{selectedValue ? `${items.find((v) => v.value === selectedValue)?.label}` : `Select a ${label}`}</Text>
 
@@ -298,6 +205,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     modalContent: {
         width: "80%",

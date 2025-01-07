@@ -29,7 +29,7 @@ export default {
     slug: "pmchecklist",
     version: "1.0.0",
     sdkVersion: "51.0.0",
-    orientation: "DEFAULT",
+    orientation: "all",
     icon: "./assets/images/Icon-app.png",
     scheme: "myapp",
     userInterfaceStyle: "automatic",
@@ -55,6 +55,7 @@ export default {
         barStyle: "dark-content",
         backgroundColor: "#00000000",
         translucent: true,
+        hidden: true,
       },
       navigationBar: {
         backgroundColor: "#00000000",
@@ -88,13 +89,6 @@ export default {
       "assets/images/*",
       "node_modules/**/assets/**/*",
     ],
-    // assetBundlePatterns: ["assets/fonts/*", "assets/images/*"],
-    // assetBundlePatterns: [
-    //   "assets/fonts/*",
-    //   "assets/images/*",
-    //   "assets/animations/*",
-    //   "node_modules/react-native/**/*",
-    // ],
     plugins: [
       "expo-router",
       [

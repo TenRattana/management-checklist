@@ -1,9 +1,10 @@
 import React from "react";
-import { View, StyleSheet, Dimensions } from "react-native";
-import { Menu, Divider, IconButton } from "react-native-paper";
+import { View, StyleSheet, Dimensions, TouchableOpacity } from "react-native";
+import { Menu, Divider, IconButton, Avatar } from "react-native-paper";
 import { useRes } from '@/app/contexts/useRes'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useTheme } from "@/app/contexts/useTheme";
+import { useSelector } from "react-redux";
 
 interface CustomMenuProps {
     visible: boolean;
@@ -24,6 +25,7 @@ const CustomMenu: React.FC<CustomMenuProps> = React.memo(({
     const { spacing } = useRes()
     const { width } = Dimensions.get('window');
     const masterdataStyles = useMasterdataStyles()
+    const user = useSelector((state: any) => state.user);
 
     const styles = StyleSheet.create({
         iconButton: {
@@ -44,15 +46,18 @@ const CustomMenu: React.FC<CustomMenuProps> = React.memo(({
         },
     });
 
+    const getInitials = (text: string) => {
+        const words = text.split(" ");
+        const initials = words.map(word => word.charAt(0).toUpperCase());
+        return initials.join("");
+    };
+
     return (
         <View>
-            <IconButton
-                icon="account-circle"
-                size={25}
-                style={styles.iconButton}
-                onPress={onShow}
-                iconColor="#4CAF50"
-            />
+            <TouchableOpacity onPress={onShow} style={{ marginHorizontal: 10 }}>
+                <Avatar.Text size={35} label={getInitials(user.Full_Name)} style={styles.iconButton} />
+            </TouchableOpacity>
+
             <Menu
                 visible={visible}
                 onDismiss={onDismiss}
