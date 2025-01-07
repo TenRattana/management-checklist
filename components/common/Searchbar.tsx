@@ -56,6 +56,7 @@ const SearchBar = ({ value, onChange, placeholder, testId }: SearchBarProps) => 
           ]}
           placeholderTextColor="#B0B0B0"
           testID={testId}
+          id={testId}
         />
       </View>
     </View>

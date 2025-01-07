@@ -2,9 +2,9 @@ import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { View, TouchableOpacity, Platform, StyleSheet, StatusBar } from 'react-native';
+import { View, TouchableOpacity, Platform, StyleSheet, StatusBar, FlatList } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { HelperText, IconButton, Text, Modal } from 'react-native-paper';
+import { HelperText, IconButton, Text, Modal, Menu, Searchbar } from 'react-native-paper';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 
 const Dropdown = React.memo(({
@@ -74,112 +74,109 @@ const Dropdown = React.memo(({
         searchQuerys === "" ? item : item.label.toLowerCase().includes(searchQuerys.toLowerCase())
     );
 
+    const styles = StyleSheet.create({
+        modalContainer: {
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        },
+        modalContent: {
+            width: "80%",
+            padding: 20,
+            top: -250,
+            justifyContent: 'center',
+        },
+        triggerButton: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            borderBottomColor: 'gray',
+            borderBottomWidth: 0.5,
+        },
+        searchbar: {
+            backgroundColor: theme.colors.background,
+            borderRadius: 4
+        },
+        emptyComponent: {
+            padding: 16,
+            alignItems: 'center',
+        },
+    });
+
     return (
         <View id="inputs" style={mode === "dialog" ? { margin: 0 } : masterdataStyles.commonContainer}>
+            <View style={[Platform.OS !== 'android' ? { zIndex: 10 } : {}]}>
+                <Menu
+                    visible={open}
+                    onDismiss={() => setOpen(false)}
+                    style={{ paddingTop: 50 }}
+                    anchor={<>
+                        <TouchableOpacity onPress={() => setOpen(true)} style={styles.triggerButton}>
+                            {!showLefticon && (
+                                items.find((v) => v.value === selectedValue)?.icon ? (
+                                    (items.find((v) => v.value === selectedValue)?.icon as () => JSX.Element)()
+                                ) : (
+                                    <IconButton
+                                        style={masterdataStyles.icon}
+                                        icon={lefticon || "check-all"}
+                                        size={spacing.large}
+                                    />
+                                )
+                            )}
 
-            <View style={Platform.OS !== 'android' ? { zIndex: 10 } : {}}>
-                {open && (
-                    <DropDownPicker
-                        multiple={false}
-                        maxHeight={mx}
-                        open={open}
-                        value={selectedValue ? String(selectedValue) : null}
-                        items={filteredItems}
-                        theme={darkMode ? 'DARK' : 'LIGHT'}
-                        searchable={search ?? true}
-                        searchTextInputProps={{
-                            value: searchQuerys,
-                            onChangeText: handleSearch,
-                        }}
-                        searchTextInputStyle={{
-                            fontFamily: 'Poppins', fontSize: spacing.small, borderRadius: 5, padding: 10, borderWidth: 0.01
-                        }}
-                        searchPlaceholder={`Search for a ${label}...`}
-                        style={{ padding: 10, borderRadius: 0 }}
-                        textStyle={{
-                            fontFamily: 'Poppins', fontSize: spacing.medium, padding: 5,
-                            marginVertical: 5,
-                        }}
-                        containerStyle={{ flex: 1 }}
-                        setValue={() => { }}
-                        setOpen={() => setOpen(true)}
-                        placeholder={`Select for a ${label}...`}
-                        loading={isFetching}
-                        renderListItem={({ item }) => {
-                            return (
-                                <TouchableOpacity
-                                    style={{
-                                        paddingVertical: selectedValue === item.value ? 10 : 5,
-                                        paddingHorizontal: 15,
-                                        borderBottomWidth: 1,
-                                        backgroundColor: selectedValue === item.value ? theme.colors.drag : undefined,
-                                        borderBottomColor: selectedValue === item.value ? theme.colors.onBackground : '#d0d0d0',
-                                        justifyContent: 'flex-start',
-                                        flexDirection: 'row',
-                                        alignItems: 'center'
-                                    }}
+                            <Text style={[masterdataStyles.text]}>{selectedValue ? `${items.find((v) => v.value === selectedValue)?.label}` : `Select a ${label}`}</Text>
+
+                            {!showLefticon && selectedValue ? (
+                                <IconButton
+                                    style={[masterdataStyles.icon, { right: 8, flex: 1, alignItems: 'flex-end' }]}
+                                    icon="window-close"
+                                    size={spacing.large}
                                     onPress={() => {
-                                        setSelectedValue(String(item.value));
-                                        setOpen(false);
+                                        setSelectedValue("");
                                     }}
-                                >
-                                    {item?.icon && item.icon()}
-                                    <Text style={[masterdataStyles.text, { marginVertical: item?.icon ? 0 : spacing.large }]}>{item.label}</Text>
-                                </TouchableOpacity>
-                            )
-                        }}
-                        ListEmptyComponent={() => <Text>No data found</Text>}
-                        onOpen={fetchNextPage}
-                        onClose={() => setOpen(false)}
-                        flatListProps={{
-                            data: filteredItems,
-                            keyExtractor: (item) => `${item.value}`,
-                            onScroll: handleScroll,
-                            onEndReached: handleScroll,
-                            onEndReachedThreshold: 0.5,
-                            initialNumToRender: 10,
-                            maxToRenderPerBatch: 10,
-                            windowSize: 5,
-                            nestedScrollEnabled: true
-                        }}
-                        selectedItemContainerStyle={{
-                            backgroundColor: "grey"
-                        }}
-                        selectedItemLabelStyle={{
-                            fontWeight: "bold"
-                        }}
-                        bottomOffset={100}
-                    />
-                )}
-
-                <TouchableOpacity onPress={() => setOpen(true)} style={styles.triggerButton}>
-                    {!showLefticon && (
-                        items.find((v) => v.value === selectedValue)?.icon ? (
-                            (items.find((v) => v.value === selectedValue)?.icon as () => JSX.Element)()
-                        ) : (
-                            <IconButton
-                                style={masterdataStyles.icon}
-                                icon={lefticon || "check-all"}
-                                size={spacing.large}
+                                />
+                            ) : (
+                                <IconButton style={[masterdataStyles.icon, { right: 8, flex: 1, alignItems: 'flex-end' }]} icon="chevron-down" size={spacing.large} />
+                            )}
+                        </TouchableOpacity>
+                    </>}
+                >
+                    <FlatList
+                        data={filteredItems}
+                        renderItem={({ item }) => (
+                            <Menu.Item
+                                title={item.label}
+                                onPress={() => {
+                                    setSelectedValue(item.value);
+                                    setSearchQuery('');
+                                    setOpen(false);
+                                }}
+                                titleStyle={masterdataStyles.text}
                             />
-                        )
-                    )}
-
-                    <Text style={[masterdataStyles.text]}>{selectedValue ? `${items.find((v) => v.value === selectedValue)?.label}` : `Select a ${label}`}</Text>
-
-                    {!showLefticon && selectedValue ? (
-                        <IconButton
-                            style={[masterdataStyles.icon, { right: 8, flex: 1, alignItems: 'flex-end' }]}
-                            icon="window-close"
-                            size={spacing.large}
-                            onPress={() => {
-                                setSelectedValue("");
-                            }}
-                        />
-                    ) : (
-                        <IconButton style={[masterdataStyles.icon, { right: 8, flex: 1, alignItems: 'flex-end' }]} icon="chevron-down" size={spacing.large} />
-                    )}
-                </TouchableOpacity>
+                        )}
+                        ListHeaderComponent={() => search && (
+                            <Searchbar
+                                placeholder={searchQuery || `Search ${label}`}
+                                value={searchQuery ?? ""}
+                                onChangeText={setSearchQuery}
+                                style={styles.searchbar}
+                                inputStyle={masterdataStyles.text}
+                                autoFocus
+                            />
+                        )}
+                        keyExtractor={(item) => `${item.value}`}
+                        style={{ maxHeight: mx }}
+                        ListEmptyComponent={() => (
+                            <View style={styles.emptyComponent}>
+                                <Text style={masterdataStyles.text}>No options available</Text>
+                            </View>
+                        )}
+                        onEndReached={handleScroll}
+                        onScroll={handleScroll}
+                        onEndReachedThreshold={0.5}
+                        nestedScrollEnabled
+                    />
+                </Menu>
             </View>
 
             <HelperText
@@ -198,27 +195,6 @@ const Dropdown = React.memo(({
         prevProps.open === nextProps.open &&
         prevProps.searchQuery === nextProps.searchQuery
     );
-});
-
-const styles = StyleSheet.create({
-    modalContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalContent: {
-        width: "80%",
-        padding: 20,
-        top: -250,
-        justifyContent: 'center',
-    },
-    triggerButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderBottomColor: 'gray',
-        borderBottomWidth: 0.5,
-    },
 });
 
 export default Dropdown;

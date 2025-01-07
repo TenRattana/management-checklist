@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { Checkbox, DataTable, IconButton, Menu } from "react-native-paper";
+import { Checkbox, DataTable } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { FlatList, Platform, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useRes } from '@/app/contexts/useRes'
 import { TypeConfig } from "@/typing/type";
 import { DebouncedFunc } from "lodash";
 import Text from "../Text";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { useTheme } from "@/app/contexts/useTheme";
+import PickerDropdown from "../common/PickerDropdown";
 
 type justifyContent = 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly' | undefined;
 
@@ -63,10 +65,12 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
 }) => {
     const masterdataStyles = useMasterdataStyles();
     const { fontSize, responsive, spacing } = useRes();
+    const { theme } = useTheme();
     const [open, setOpen] = useState(false);
     const [openDate, setOpenDate] = useState(false);
 
     const filterDateOptions = [
+        { label: "Select all", value: "" },
         { label: "Today", value: "Today" },
         { label: "This week", value: "This week" },
         { label: "This month", value: "This month" },
@@ -94,18 +98,9 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
 
             if (contentHeight - layoutHeight - offsetY <= 0 && hasNextPage && !isFetchingNextPage && handleLoadMore) {
                 handleLoadMore();
-                console.log("A");
-
             }
         }
     };
-
-    const renderItem = (item: { label: string, value: any }, field: string) => (
-        <Menu.Item title={item.label} onPress={() => {
-            field === "date" ? filteredDate(item.value) : handelSetFilter(item.value)
-            field === "date" ? setOpenDate(false) : setOpen(false)
-        }} titleStyle={masterdataStyles.text} />
-    );
 
     return (
         <View id="container-datahead">
@@ -167,68 +162,29 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
                     marginVertical: 5
                 }}>
                     {showFilterDate && (
-                        <View id="filter" style={{
-                            justifyContent: 'flex-end',
-                            flexDirection: responsive === "small" ? 'column' : 'row',
-                            marginRight: responsive === "small" ? 0 : 10,
-                        }}>
-                            <View style={{ paddingRight: 10, alignItems: 'center', alignSelf: 'center' }}>
-                                <Menu
-                                    visible={openDate}
-                                    onDismiss={() => setOpenDate(false)}
-                                    anchor={
-                                        <Text style={masterdataStyles.text}>Date :</Text>
-                                    }
-                                >
-                                    <FlatList
-                                        data={filterDateOptions}
-                                        renderItem={({ item }) => renderItem(item, "date")}
-                                        keyExtractor={(item) => item.value}
-                                        style={{ maxHeight: mx }}
-                                        onEndReachedThreshold={0.5}
-                                    />
-                                </Menu>
-                            </View>
-
-                            <TouchableOpacity onPress={() => setOpenDate(true)} style={styles.triggerButton}>
-                                <Text style={[masterdataStyles.text]}>{Dates || "Select all"}</Text>
-                                <IconButton style={[masterdataStyles.icon, { right: 8, flex: 1, alignItems: 'flex-end' }]} icon="chevron-down" size={spacing.large} />
-                            </TouchableOpacity>
-                        </View>
+                        <PickerDropdown
+                            label="Date"
+                            handelSetFilter={(value: string) => filteredDate(value)}
+                            open={openDate}
+                            setOpen={(v: boolean) => setOpenDate(v)}
+                            value={Dates}
+                            values={filterDateOptions}
+                            key={`picker-date`}
+                        />
                     )}
 
                     {showFilter && (
-                        <View id="filter" style={{
-                            flexDirection: responsive === "small" ? 'column' : 'row',
-                            justifyContent: 'flex-end',
-                            marginLeft: responsive === "small" ? 0 : 10,
-                            marginVertical: 5
-                        }}>
-                            <View style={{ paddingRight: 10, alignItems: 'center', alignSelf: 'center' }}>
-                                <Menu
-                                    visible={open}
-                                    onDismiss={() => setOpen(false)}
-                                    anchor={
-                                        <Text style={masterdataStyles.text}>{`${ShowTitle || "Title"} :`}</Text>
-                                    }
-                                >
-                                    <FlatList
-                                        data={showData || []}
-                                        renderItem={({ item }) => renderItem(item, "filter")}
-                                        keyExtractor={(item) => item.value}
-                                        onEndReached={handleScroll}
-                                        onScroll={handleScroll}
-                                        style={{ maxHeight: mx }}
-                                        onEndReachedThreshold={0.5}
-                                    />
-                                </Menu>
-                            </View>
-
-                            <TouchableOpacity onPress={() => setOpen(true)} style={styles.triggerButton}>
-                                <Text style={[masterdataStyles.text]}>{filter || "Select all"}</Text>
-                                <IconButton style={[masterdataStyles.icon, { right: 8, flex: 1, alignItems: 'flex-end' }]} icon="chevron-down" size={spacing.large} />
-                            </TouchableOpacity>
-                        </View>
+                        <PickerDropdown
+                            label={`${ShowTitle || "Title"}`}
+                            handelSetFilter={(value: string) => handelSetFilter(value)}
+                            open={open}
+                            setOpen={(v: boolean) => setOpen(v)}
+                            value={filter}
+                            values={showData || []}
+                            search
+                            handleScroll={handleScroll}
+                            key={`picker-data`}
+                        />
                     )}
                 </View>
 

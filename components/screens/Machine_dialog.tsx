@@ -181,6 +181,7 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                 <Dropdown
                                                     label='group machine'
                                                     open={open}
+                                                    search
                                                     setOpen={(v: boolean) => setOpen(v)}
                                                     selectedValue={values.machineGroupId}
                                                     searchQuery={debouncedSearchQuery}

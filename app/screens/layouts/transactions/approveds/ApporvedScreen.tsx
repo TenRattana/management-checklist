@@ -51,7 +51,7 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(() => {
 
     const [machines, setMachine] = useState<{ label: string, value: string | null }[]>([{ label: "Show all", value: "" }]);
 
-    const { data: machine, fetchNextPage: fetchNextPageMG, hasNextPage: hasNextPageMG, isLoading, isFetchingNextPage } = useInfiniteQuery(
+    const { data: machine, isFetching: isFetchingMG, fetchNextPage: fetchNextPageMG, hasNextPage: hasNextPageMG } = useInfiniteQuery(
         ['machine', debouncedSearchQueryFilter],
         ({ pageParam = 0 }) => {
             return debouncedSearchQueryFilter
@@ -198,9 +198,9 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(() => {
         filterColumn: 1,
         setFilterDate: 4,
         hasNextPage: hasNextPageMG,
-        isFetchingNextPage: isFetchingNextPage,
+        isFetchingNextPage: hasNextPageMG,
         searchfilter: debouncedSearchQueryFilter
-    }), [tableData, debouncedSearchQuery, handleAction, machines, debouncedSearchQueryFilter, hasNextPageMG, isFetchingNextPage, setRow, selectedRows]);
+    }), [tableData, debouncedSearchQuery, handleAction, machines, debouncedSearchQueryFilter, hasNextPageMG, hasNextPageMG, setRow, selectedRows]);
 
     const styles = StyleSheet.create({
         container: {
