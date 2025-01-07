@@ -273,7 +273,7 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                 <View style={{ flexDirection: 'row', flex: 1 }}>
                                                     <View style={{ flexDirection: 'column', flex: 2 }}>
                                                         <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
-                                                            Machine Building
+                                                            Building
                                                         </Text>
 
                                                         <Field name="building">
@@ -295,7 +295,7 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
 
                                                     <View style={{ flexDirection: 'column', flex: 2 }}>
                                                         <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
-                                                            Machine Area
+                                                            Area
                                                         </Text>
 
                                                         <Field name="area">
@@ -317,7 +317,7 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
 
                                                     <View style={{ flexDirection: 'column', flex: 1 }}>
                                                         <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
-                                                            Machine Floor
+                                                            Floor
                                                         </Text>
                                                         <Field name="floor">
                                                             {({ field, form }: any) => (

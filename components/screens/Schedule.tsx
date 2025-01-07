@@ -23,6 +23,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     alignItems: 'center',
+    justifyContent: "center",
     backgroundColor: theme.colors.drag,
     borderRadius: 4,
   },
