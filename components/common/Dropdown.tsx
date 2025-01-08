@@ -1,9 +1,9 @@
 import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, TouchableOpacity, Platform, StyleSheet, FlatList } from 'react-native';
-import { HelperText, IconButton, Text, Menu, Searchbar, TextInput } from 'react-native-paper';
+import { HelperText, IconButton, Text, Menu, TextInput } from 'react-native-paper';
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 const Dropdown = React.memo(({
@@ -13,7 +13,7 @@ const Dropdown = React.memo(({
     isFetching,
     items,
     open,
-    search,
+    search = true,
     setOpen,
     selectedValue,
     setSelectedValue,
@@ -48,6 +48,8 @@ const Dropdown = React.memo(({
     const masterdataStyles = useMasterdataStyles();
     const { theme, darkMode } = useTheme();
     const { spacing } = useRes();
+    const [menuPosition, setMenuPosition] = useState<'top' | 'bottom'>('bottom');
+    const viewRef = useRef<View>(null);
 
     const mx = hp(Platform.OS === "web" ? '40%' : '40%');
 
@@ -56,7 +58,7 @@ const Dropdown = React.memo(({
     };
 
     useEffect(() => {
-        searchQuery && setSearchQuery(searchQuery);
+        searchQuery !== "" && searchQuery && setSearchQuery(searchQuery)
     }, [searchQuery]);
 
     useEffect(() => {
@@ -84,14 +86,15 @@ const Dropdown = React.memo(({
             backgroundColor: theme.colors.background,
             borderRadius: 4,
             flex: 1,
-            bottom: 4,
+            paddingHorizontal: 0,
+            top: menuPosition === "top" ? -12 : 12,
         },
         emptyComponent: {
             padding: 16,
             alignItems: 'center',
         },
         menuStyle: {
-            paddingTop: 50,
+            paddingTop: search ? 0 : 50,
             width: menuWidth,
         },
     });
@@ -99,7 +102,74 @@ const Dropdown = React.memo(({
     const onLayout = (event: any) => {
         const { width } = event.nativeEvent.layout;
         setMenuWidth(width);
+
+        const screenHeight = hp('95%');
+        const menuHeight = mx;
+
+        if (viewRef.current) {
+            viewRef.current.measure((x, y, width, height, pageX, pageY) => {
+                console.log('ตำแหน่งของ View:', { x, y, width, height, pageX, pageY });
+
+                if ((pageY + menuHeight + 56) > screenHeight) {
+                    setMenuPosition('bottom');
+                } else {
+                    setMenuPosition('top');
+                }
+            });
+        }
     };
+
+    const Search = useMemo(() => search && open && (
+        <TextInput
+            placeholder={searchQuerys || `Search ${label}`}
+            value={searchQuerys ?? ""}
+            onChangeText={setSearchQuery}
+            style={styles.searchbar}
+            contentStyle={masterdataStyles.text}
+            left={<TextInput.Icon icon="magnify" size={spacing.large} style={{ left: -6 }} />}
+            right={<TextInput.Icon icon="close" size={spacing.large} onPress={() => setSearchQuery("")} style={{ right: -6 }} />}
+            id="search"
+            autoFocus
+        />
+    ), [searchQuerys, search, open]);
+
+    const FlatData = useMemo(() =>
+        <FlatList
+            data={filteredItems}
+            renderItem={({ item }) => (
+                <Menu.Item
+                    title={item.label}
+                    onPress={() => {
+                        setSelectedValue(item.value);
+                        setOpen(false);
+                    }}
+                    titleStyle={masterdataStyles.text}
+                    style={{
+                        paddingVertical: selectedValue === item.value ? 10 : 5,
+                        paddingHorizontal: 15,
+                        borderBottomWidth: 1,
+                        backgroundColor: selectedValue === item.value ? theme.colors.drag : undefined,
+                        borderBottomColor: selectedValue === item.value ? theme.colors.onBackground : '#d0d0d0',
+                        justifyContent: 'flex-start',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        maxWidth: menuWidth
+                    }}
+                />
+            )}
+            contentContainerStyle={{ flex: 1 }}
+            keyExtractor={(item) => `${item.value}`}
+            style={{ maxHeight: mx, maxWidth: menuWidth }}
+            ListEmptyComponent={() => (
+                <View style={styles.emptyComponent}>
+                    <Text style={masterdataStyles.text}>No options available</Text>
+                </View>
+            )}
+            onEndReached={handleScroll}
+            onScroll={handleScroll}
+            onEndReachedThreshold={0.5}
+            nestedScrollEnabled
+        />, [filteredItems]);
 
     return (
         <View id="inputs" style={mode === "dialog" ? { margin: 0 } : masterdataStyles.commonContainer}>
@@ -108,23 +178,8 @@ const Dropdown = React.memo(({
                 onDismiss={() => setOpen(false)}
                 style={styles.menuStyle}
                 anchor={
-                    <View onLayout={onLayout}>
-                        {search && open ? (
-                            <TextInput
-                                placeholder={searchQuerys || `Search ${label}`}
-                                value={searchQuerys ?? ""}
-                                onChangeText={setSearchQuery}
-                                style={styles.searchbar}
-                                contentStyle={masterdataStyles.text}
-                                left={<TextInput.Icon icon="magnify" size={spacing.large}
-                                    style={{
-                                        left: -6
-                                    }}
-                                />}
-                                id='search'
-                                autoFocus
-                            />
-                        ) : <TouchableOpacity style={styles.triggerButton} onPress={() => setOpen(true)}>
+                    <View onLayout={onLayout} ref={viewRef}>
+                        <TouchableOpacity style={styles.triggerButton} onPress={() => setOpen(true)}>
                             {!showLefticon && (
                                 items.find((v) => v.value === selectedValue)?.icon ? (
                                     (items.find((v) => v.value === selectedValue)?.icon as () => JSX.Element)()
@@ -137,7 +192,9 @@ const Dropdown = React.memo(({
                                 )
                             )}
 
-                            <Text style={[masterdataStyles.text, { flex: 1 }]}>{selectedValue ? `${items.find((v) => v.value === selectedValue)?.label}` : `Select a ${label}`}</Text>
+                            <Text style={[masterdataStyles.text, { flex: 1 }]}>
+                                {selectedValue ? `${items.find((v) => v.value === selectedValue)?.label}` : `Select a ${label}`}
+                            </Text>
 
                             {!showLefticon && selectedValue ? (
                                 <IconButton
@@ -149,10 +206,13 @@ const Dropdown = React.memo(({
                                     }}
                                 />
                             ) : (
-                                <IconButton style={[masterdataStyles.icon, { right: 8, alignItems: 'flex-end' }]} icon="chevron-down" size={spacing.large} />
+                                <IconButton
+                                    style={[masterdataStyles.icon, { right: 8, alignItems: 'flex-end' }]}
+                                    icon="chevron-down"
+                                    size={spacing.large}
+                                />
                             )}
                         </TouchableOpacity>
-                        }
                     </View>
                 }
                 contentStyle={{
@@ -160,34 +220,15 @@ const Dropdown = React.memo(({
                     backgroundColor: theme.colors.background
                 }}
             >
-                <FlatList
-                    data={filteredItems}
-                    renderItem={({ item }) => (
-                        <Menu.Item
-                            title={item.label}
-                            onPress={() => {
-                                setSelectedValue(item.value);
-                                setSearchQuery('');
-                                setOpen(false);
-                            }}
-                            titleStyle={masterdataStyles.text}
-                            style={{ paddingHorizontal: 10 }}
-                        />
-                    )}
-                    contentContainerStyle={{ flex: 1 }}
-                    keyExtractor={(item) => `${item.value}`}
-                    style={{ maxHeight: mx }}
-                    ListEmptyComponent={() => (
-                        <View style={styles.emptyComponent}>
-                            <Text style={masterdataStyles.text}>No options available</Text>
-                        </View>
-                    )}
-                    onEndReached={handleScroll}
-                    onScroll={handleScroll}
-                    onEndReachedThreshold={0.5}
-                    nestedScrollEnabled
-                />
-            </Menu>
+                {menuPosition === "top" ? <>
+                    {Search}
+                    {FlatData}
+                </> : <>
+                    {FlatData}
+                    {Search}
+                </>
+                }
+            </Menu >
 
             <HelperText
                 type="error"
@@ -196,7 +237,7 @@ const Dropdown = React.memo(({
             >
                 {errorMessage}
             </HelperText>
-        </View>
+        </View >
     );
 }, (prevProps, nextProps) => {
     return (

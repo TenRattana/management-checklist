@@ -1,12 +1,10 @@
 import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
-import React, { useEffect, useState } from 'react';
-import { View, TouchableOpacity, Platform, Modal, StyleSheet } from 'react-native';
-import DropDownPicker from 'react-native-dropdown-picker';
-import { HelperText, IconButton, Portal } from 'react-native-paper';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { View, TouchableOpacity, Platform, StyleSheet, FlatList } from 'react-native';
+import { HelperText, IconButton, Text, Menu, TextInput } from 'react-native-paper';
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import Text from '../Text';
 
 const DropdownMulti = React.memo(({
     label,
@@ -15,22 +13,23 @@ const DropdownMulti = React.memo(({
     isFetching,
     items,
     open,
-    search,
+    search = true,
     setOpen,
     selectedValue,
-    searchQuery,
     setSelectedValue,
     setDebouncedSearchQuery,
     error,
+    searchQuery,
     errorMessage,
-    lefticon
+    lefticon,
+    showLefticon,
+    mode,
 }: {
     search?: boolean;
     label: string;
     open: boolean;
     setOpen: (v: boolean) => void;
     selectedValue: any;
-    searchQuery?: string;
     items: { label: string; value: string, icon?: () => JSX.Element }[];
     setSelectedValue: (value: string | string[] | null) => void;
     isFetching?: boolean;
@@ -38,16 +37,22 @@ const DropdownMulti = React.memo(({
     handleScroll?: ({ nativeEvent }: any) => void;
     setDebouncedSearchQuery?: (value: string) => void;
     error?: boolean;
+    searchQuery?: string;
     errorMessage?: string;
-    lefticon?: string
+    lefticon?: string;
+    showLefticon?: boolean;
+    mode?: string;
 }) => {
-    DropDownPicker.setListMode("FLATLIST");
     const isSelected = new Set(selectedValue);
-
     const [searchQuerys, setSearchQuery] = useState('');
+    const [menuWidth, setMenuWidth] = useState(0);
     const masterdataStyles = useMasterdataStyles();
+    const { theme, darkMode } = useTheme();
     const { spacing } = useRes();
-    const { theme, darkMode } = useTheme()
+    const [menuPosition, setMenuPosition] = useState<'top' | 'bottom'>('bottom');
+    const viewRef = useRef<View>(null);
+
+    const mx = hp(Platform.OS === "web" ? '40%' : '40%');
 
     const handleSearch = (query: string) => {
         setSearchQuery(query);
@@ -73,111 +78,162 @@ const DropdownMulti = React.memo(({
         searchQuerys === "" ? item : item.label.toLowerCase().includes(searchQuerys.toLowerCase())
     );
 
-    return (
-        <View id="inputs" style={masterdataStyles.commonContainer}>
-            <View style={Platform.OS !== 'android' ? { zIndex: 10 } : {}}>
+    const styles = StyleSheet.create({
+        triggerButton: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            borderBottomColor: 'gray',
+            borderBottomWidth: 0.5,
+        },
+        searchbar: {
+            backgroundColor: theme.colors.background,
+            borderRadius: 4,
+            paddingHorizontal: 0,
+            flex: 1,
+            top: menuPosition === "top" ? -12 : 12,
+        },
+        emptyComponent: {
+            padding: 16,
+            alignItems: 'center',
+        },
+        menuStyle: {
+            paddingTop: search ? 0 : 50,
+            width: menuWidth,
+        },
+    });
 
-                <Portal>
-                    <Modal
-                        visible={open}
-                        transparent={true}
-                        onRequestClose={() => setOpen(false)}
-                    >
-                        <View style={styles.modalContainer}>
-                            <View style={styles.modalContent}>
-                                <DropDownPicker
-                                    multiple={true}
-                                    maxHeight={hp(Platform.OS === "web" ? '50%' : '70&')}
-                                    open={open}
-                                    value={selectedValue}
-                                    items={filteredItems}
-                                    theme={darkMode ? 'DARK' : 'LIGHT'}
-                                    containerStyle={{ flex: 1 }}
-                                    setValue={() => { }}
-                                    setOpen={() => setOpen(true)}
-                                    placeholder={`Select for a ${label}...`}
-                                    loading={isFetching}
-                                    searchable={search ?? true}
-                                    searchTextInputProps={{
-                                        value: searchQuerys,
-                                        onChangeText: handleSearch,
-                                    }}
-                                    searchTextInputStyle={{ fontFamily: 'Poppins', fontSize: spacing.small, borderRadius: 5, padding: 10, borderWidth: 0.01 }}
-                                    searchPlaceholder={`Search for a ${label}...`}
+    const onLayout = (event: any) => {
+        const { width } = event.nativeEvent.layout;
+        setMenuWidth(width);
 
-                                    style={{ padding: 10, borderRadius: 0 }}
-                                    textStyle={{
-                                        fontFamily: 'Poppins', fontSize: spacing.medium, padding: 5,
-                                        marginVertical: 5,
-                                    }}
+        const screenHeight = hp('95%');
+        const menuHeight = mx;
 
-                                    renderListItem={({ item }) => (
-                                        <TouchableOpacity
-                                            style={{
-                                                paddingVertical: isSelected.has(item.value) ? 20 : 15,
-                                                paddingHorizontal: 15,
-                                                borderBottomWidth: 1,
-                                                backgroundColor: isSelected.has(item.value) ? theme.colors.drag : undefined,
-                                                borderBottomColor: isSelected.has(item.value) ? theme.colors.onBackground : '#d0d0d0',
-                                                justifyContent: 'center'
-                                            }}
-                                            onPress={() => {
-                                                if (isSelected.has(item.value)) {
-                                                    setSelectedValue(selectedValue.filter((val: string) => val !== item.value));
-                                                } else {
-                                                    setSelectedValue([...selectedValue, item.value]);
-                                                }
-                                            }}
-                                        >
-                                            <Text style={masterdataStyles.text}>{item.label}</Text>
-                                        </TouchableOpacity>
-                                    )}
-                                    ListEmptyComponent={() => <Text>No data found</Text>}
-                                    onOpen={fetchNextPage}
-                                    onClose={() => setOpen(false)}
-                                    flatListProps={{
-                                        data: filteredItems,
-                                        keyExtractor: (item) => `${item.value}`,
-                                        onScroll: handleScroll,
-                                        onEndReached: handleScroll,
-                                        onEndReachedThreshold: 0.5,
-                                        initialNumToRender: 10,
-                                        maxToRenderPerBatch: 10,
-                                        windowSize: 5,
-                                        nestedScrollEnabled: true
-                                    }}
-                                    bottomOffset={100}
-                                />
-                            </View>
-                        </View>
-                    </Modal>
-                </Portal>
+        if (viewRef.current) {
+            viewRef.current.measure((x, y, width, height, pageX, pageY) => {
+                if ((pageY + menuHeight + 56) > screenHeight) {
+                    setMenuPosition('bottom');
+                } else {
+                    setMenuPosition('top');
+                }
+            });
+        }
+    };
 
-                <TouchableOpacity onPress={() => setOpen(true)} style={styles.triggerButton}>
-                    <IconButton
-                        style={masterdataStyles.icon}
-                        icon={lefticon || "check-all"}
-                        size={spacing.large}
-                    />
-                    <Text style={[masterdataStyles.text]}>
-                        {selectedItems
-                            ? `${selectedItems.length} ${label} selected`
-                            : `Select a ${label}`
+    const Search = useMemo(() => search && open && (
+        <TextInput
+            placeholder={searchQuerys || `Search ${label}`}
+            value={searchQuerys ?? ""}
+            onChangeText={setSearchQuery}
+            style={styles.searchbar}
+            contentStyle={masterdataStyles.text}
+            left={<TextInput.Icon icon="magnify" size={spacing.large} style={{ left: -6 }} />}
+            right={<TextInput.Icon icon="close" size={spacing.large} onPress={() => setSearchQuery("")} style={{ right: -6 }} />}
+            id="search"
+            autoFocus
+        />
+    ), [searchQuerys, search, open]);
+
+    const FlatData = useMemo(() =>
+        <FlatList
+            data={filteredItems}
+            renderItem={({ item }) => (
+                <Menu.Item
+                    title={item.label}
+                    onPress={() => {
+                        if (isSelected.has(item.value)) {
+                            setSelectedValue(selectedValue.filter((val: string) => val !== item.value));
+                        } else {
+                            setSelectedValue([...selectedValue, item.value]);
                         }
-                    </Text>
+                    }}
+                    titleStyle={masterdataStyles.text}
+                    style={{
+                        paddingVertical: isSelected.has(item.value) ? 20 : 15,
+                        paddingHorizontal: 15,
+                        borderBottomWidth: 1,
+                        backgroundColor: isSelected.has(item.value) ? theme.colors.drag : undefined,
+                        borderBottomColor: isSelected.has(item.value) ? theme.colors.onBackground : '#d0d0d0',
+                        justifyContent: 'center',
+                        maxWidth: menuWidth
+                    }}
+                />
+            )}
+            contentContainerStyle={{ flex: 1 }}
+            keyExtractor={(item) => `${item.value}`}
+            style={{ maxHeight: mx, maxWidth: menuWidth }}
+            ListEmptyComponent={() => (
+                <View style={styles.emptyComponent}>
+                    <Text style={masterdataStyles.text}>No options available</Text>
+                </View>
+            )}
+            onEndReached={handleScroll}
+            onScroll={handleScroll}
+            onEndReachedThreshold={0.5}
+            nestedScrollEnabled
+        />, [filteredItems]);
 
-                    {selectedValue.length > 0 ? (
-                        <IconButton
-                            style={[masterdataStyles.icon, { right: 8, flex: 1, alignItems: 'flex-end' }]}
-                            icon="window-close"
-                            size={spacing.large}
-                            onPress={() => setSelectedValue([])}
-                        />
-                    ) : (
-                        <IconButton style={[masterdataStyles.icon, { right: 8, flex: 1, alignItems: 'flex-end' }]} icon="chevron-down" size={spacing.large} />
-                    )}
-                </TouchableOpacity>
-            </View>
+    return (
+        <View id="inputs" style={mode === "dialog" ? { margin: 0 } : masterdataStyles.commonContainer}>
+            <Menu
+                visible={open}
+                onDismiss={() => setOpen(false)}
+                style={styles.menuStyle}
+                anchor={
+                    <View onLayout={onLayout} ref={viewRef}>
+                        <TouchableOpacity style={styles.triggerButton} onPress={() => setOpen(true)}>
+                            {!showLefticon && (
+                                items.find((v) => v.value === selectedValue)?.icon ? (
+                                    (items.find((v) => v.value === selectedValue)?.icon as () => JSX.Element)()
+                                ) : (
+                                    <IconButton
+                                        style={masterdataStyles.icon}
+                                        icon={lefticon || "check-all"}
+                                        size={spacing.large}
+                                    />
+                                )
+                            )}
+
+                            <Text style={[masterdataStyles.text, { flex: 1 }]}>
+                                {selectedItems
+                                    ? `${selectedItems.length} ${label} selected`
+                                    : `Select a ${label}`
+                                }
+                            </Text>
+
+                            {!showLefticon && selectedValue.length > 0 ? (
+                                <IconButton
+                                    style={[masterdataStyles.icon, { right: 8, alignItems: 'flex-end' }]}
+                                    icon="window-close"
+                                    size={spacing.large}
+                                    onPress={() => {
+                                        setSelectedValue([]);
+                                    }}
+                                />
+                            ) : (
+                                <IconButton
+                                    style={[masterdataStyles.icon, { right: 8, alignItems: 'flex-end' }]}
+                                    icon="chevron-down"
+                                    size={spacing.large}
+                                />
+                            )}
+                        </TouchableOpacity>
+                    </View>
+                }
+                contentStyle={{
+                    maxWidth: menuWidth,
+                    backgroundColor: theme.colors.background
+                }}
+            >
+                {menuPosition === "top" ? <>
+                    {Search}
+                    {FlatData}
+                </> : <>
+                    {FlatData}
+                    {Search}
+                </>
+                }
+            </Menu >
 
             <HelperText
                 type="error"
@@ -186,7 +242,7 @@ const DropdownMulti = React.memo(({
             >
                 {errorMessage}
             </HelperText>
-        </View>
+        </View >
     );
 }, (prevProps, nextProps) => {
     return (
@@ -195,27 +251,6 @@ const DropdownMulti = React.memo(({
         prevProps.open === nextProps.open &&
         prevProps.searchQuery === nextProps.searchQuery
     );
-})
-
-const styles = StyleSheet.create({
-    modalContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    modalContent: {
-        width: 800,
-        height: 50,
-        padding: 20,
-        top: -250,
-        justifyContent: 'center',
-    },
-    triggerButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderBottomColor: 'gray',
-        borderBottomWidth: 0.5,
-    },
 });
 
 export default DropdownMulti;
