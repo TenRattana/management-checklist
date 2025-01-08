@@ -95,8 +95,6 @@ export default {
         "expo-build-properties",
         {
           android: {
-            minSdkVersion: 21,
-            targetSdkVersion: 34,
             usesCleartextTraffic: true,
           },
         },
