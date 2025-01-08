@@ -24,12 +24,12 @@ const environment = process.env.EXPO_PUBLIC_API_URL || "development";
 
 export default {
   expo: {
-    name: "PMCheck List",
+    name: "PMCheck List", 
     platforms: ["ios", "android", "web"],
     slug: "pmchecklist",
     version: "1.0.0",
     sdkVersion: "51.0.0",
-    orientation: "all",
+    orientation: "sensor",
     icon: "./assets/images/Icon-app.png",
     scheme: "myapp",
     userInterfaceStyle: "automatic",
@@ -95,6 +95,8 @@ export default {
         "expo-build-properties",
         {
           android: {
+            minSdkVersion: 21,
+            targetSdkVersion: 34,
             usesCleartextTraffic: true,
           },
         },
@@ -126,7 +128,7 @@ export default {
     extra: {
       ...getEnvVars(environment),
       eas: {
-        projectId: "6ae04db7-93f3-48cb-976a-e5b6558751df",
+        projectId: "bc86b091-c7d5-4991-bc17-90a632b8c05e",
       },
     },
     experiments: {
