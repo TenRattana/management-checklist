@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Checkbox, DataTable } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
@@ -90,7 +90,7 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
         },
     });
 
-    const handleScroll = ({ nativeEvent }: any) => {
+    const handleScroll = useCallback(({ nativeEvent }: any) => {
         if (nativeEvent && nativeEvent?.contentSize) {
             const contentHeight = nativeEvent?.contentSize.height;
             const layoutHeight = nativeEvent?.layoutMeasurement.height;
@@ -100,7 +100,7 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
                 handleLoadMore();
             }
         }
-    };
+    }, []);
 
     return (
         <View id="container-datahead">
