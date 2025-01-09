@@ -1,10 +1,10 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import { useRes } from "@/app/contexts/useRes";
 import { useTheme } from "@/app/contexts/useTheme";
 
 const useMasterdataStyles = () => {
     const { responsive, spacing, fontSize } = useRes();
-    const { theme } = useTheme();
+    const { theme , darkMode } = useTheme();
 
     return StyleSheet.create({
         scrollView: {
@@ -232,10 +232,26 @@ const useMasterdataStyles = () => {
             flexWrap: "wrap",
         },
         card: {
+            // backgroundColor: !!darkMode ? theme.colors.background : undefined,
             paddingVertical: 5,
-            borderRadius: 8,
-            elevation: 2,
+            borderRadius: 2,
             marginBottom: 20,
+            borderLeftWidth: 3,
+            borderColor: theme.colors.yellow,
+            ...Platform.select({
+                web: {
+                    boxShadow: `${theme.colors.onBackground || "#000"} 0px 2px 4px`,
+                },
+                ios: {
+                    shadowColor: theme.colors.onBackground || "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 1,
+                    shadowRadius: 4,
+                },
+                android: {
+                    elevation: 4,
+                },
+            }),
         },
         cardTitle: {
             fontSize: spacing.medium,

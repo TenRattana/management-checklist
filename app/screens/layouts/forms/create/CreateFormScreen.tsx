@@ -36,9 +36,11 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route }) => {
     const { responsive, fontSize, spacing } = useRes();
     const { handleError } = useToast();
     const { width } = useWindowDimensions();
-    const DRAWER_WIDTH = responsive === "small" ? width : fontSize === "large" ? 430 : 370;
+    const DRAWER_WIDTH = responsive === "small" ? width : fontSize === "large" ? 380 : 340;
     const [dialogVisible, setDialogVisible] = useState<{ sub: boolean, field: boolean }>({ sub: false, field: false });
 
+    console.log("CreateFormScreen");
+    
     const translateX = useSharedValue(-DRAWER_WIDTH);
     const mainTranslateX = useSharedValue(0);
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -290,7 +292,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route }) => {
 
                         {drawerContent === 'toolbox' && (
                             <ScrollView
-                                style={{ display: drawerContent === "toolbox" ? 'flex' : 'none', marginTop: 20, marginHorizontal: responsive === "small" ? "5%" : 10 }}
+                                style={{ display: drawerContent === "toolbox" ? 'flex' : 'none', marginTop: 20, marginHorizontal: responsive === "small" ? "5%" : 5 }}
                                 showsVerticalScrollIndicator={false}
                             >
                                 {responsive === "small" && (

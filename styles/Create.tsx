@@ -6,7 +6,7 @@ import { StyleSheet } from "react-native";
 const Create = (width: number, drawerOpen: boolean) => {
     const { responsive, fontSize } = useRes();
     const { theme } = useTheme();
-    const DRAWER_WIDTH = responsive === "small" ? width : fontSize === "large" ? 430 : 370;
+    const DRAWER_WIDTH = responsive === "small" ? width : fontSize === "large" ? 380 : 340;
 
     return StyleSheet.create({
         container: {

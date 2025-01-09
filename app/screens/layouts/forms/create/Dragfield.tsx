@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import {
     deleteField,
     setDragField
@@ -9,12 +9,58 @@ import { IconButton } from "react-native-paper";
 import { NestableDraggableFlatList, NestableScrollContainer, RenderItemParams, ScaleDecorator, ShadowDecorator } from "react-native-draggable-flatlist";
 import { spacing } from "@/constants/Spacing";
 import useCreateformStyle from "@/styles/createform";
-import { BaseFormState, RowItemProps } from '@/typing/form'
+import { BaseFormState, BaseSubForm } from '@/typing/form'
 import { DragfieldProps } from "@/typing/tag";
 import { useTheme } from "@/app/contexts/useTheme";
 import Text from '@/components/Text'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { CheckList } from "@/typing/type";
+
+interface RowItemProps<V extends BaseFormState | BaseSubForm> {
+    item: V;
+    drag: () => void;
+    getIndex: () => number | undefined;
+    isActive: boolean;
+    setIsEditing: any;
+    setDialogVisible: any
+    handleField: any
+    checkListType: any[]
+}
+
+const RowItem = React.memo(({ item, drag, isActive, setIsEditing, setDialogVisible, handleField, checkListType }: RowItemProps<BaseFormState>) => {
+    const { theme } = useTheme()
+    const createformStyles = useCreateformStyle();
+    const masterdataStyles = useMasterdataStyles()
+
+    return (
+        <TouchableOpacity
+            onPress={() => {
+                setIsEditing(true);
+                setDialogVisible(true);
+                handleField(item);
+            }}
+            onLongPress={drag}
+            disabled={isActive}
+            style={[createformStyles.fieldContainer, isActive && createformStyles.active]}
+            testID={`dg-FD-${item.SFormID}`}
+        >
+            <IconButton
+                icon={checkListType.find((v: CheckList) => v.CTypeID === item.CTypeID)?.Icon ?? "camera"}
+                style={createformStyles.icon}
+                iconColor={theme.colors.onBackground}
+                size={spacing.large}
+                animated
+            />
+            <Text
+                style={[masterdataStyles.text, { textAlign: "left", flex: 1, paddingLeft: 5 }]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+            >
+                {item.CListName}
+            </Text>
+        </TouchableOpacity>
+    );
+});
 
 const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatch, checkListType }) => {
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
@@ -28,9 +74,9 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
     const createformStyles = useCreateformStyle();
     const masterdataStyles = useMasterdataStyles()
 
-    const handleDropField = (data: Omit<BaseFormState, 'DisplayOrder'>[]) => {
+    const handleDropField = useCallback((data: Omit<BaseFormState, 'DisplayOrder'>[]) => {
         dispatch(setDragField({ data }));
-    };
+    }, [dispatch]);
 
     const handleDialogToggle = useCallback(() => {
         setIsEditing(false);
@@ -63,60 +109,24 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
             });
     };
 
-    const RowItem = React.memo(({ item, drag, isActive }: RowItemProps<BaseFormState>) => {
-        return (
-            <TouchableOpacity
-                onPress={() => {
-                    setIsEditing(true);
-                    setDialogVisible(true);
-                    handleField(item);
-                }}
-                onLongPress={drag}
-                disabled={isActive}
-                style={[createformStyles.fieldContainer, isActive && createformStyles.active]}
-                testID={`dg-FD-${item.SFormID}`}
-            >
-                <IconButton
-                    icon={checkListType.find((v: CheckList) => v.CTypeID === item.CTypeID)?.Icon ?? "camera"}
-                    style={createformStyles.icon}
-                    iconColor={theme.colors.fff}
-                    size={spacing.large}
-                    animated
-                />
-                <Text
-                    style={[createformStyles.fieldText, { textAlign: "left", flex: 1, paddingLeft: 5 }]}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                >
-                    {item.CListName}
-                </Text>
-                <IconButton
-                    icon="chevron-right"
-                    iconColor={theme.colors.fff}
-                    size={spacing.large}
-                    style={createformStyles.icon}
-                    animated
-                />
-            </TouchableOpacity>
-        );
-    });
-
     const renderField = useCallback((params: RenderItemParams<BaseFormState>) => {
         return (
             <ShadowDecorator>
                 <ScaleDecorator activeScale={0.90}>
-                    <RowItem {...params} />
+                    <RowItem {...params} checkListType={checkListType} handleField={handleField} setDialogVisible={setDialogVisible} setIsEditing={setIsEditing} />
                 </ScaleDecorator>
             </ShadowDecorator>
         );
     }, []);
 
     const MemoFieldDialog = React.memo(FieldDialog)
+
     return (
         <NestableScrollContainer>
             <NestableDraggableFlatList
                 data={data}
                 renderItem={renderField}
+                extraData={data}
                 keyExtractor={(item, index) => `FD-${item.SFormID}-${index}`}
                 onDragEnd={({ data }) => handleDropField(data)}
                 getItemLayout={(data, index) => ({ length: 60, offset: 60 * index, index })}
@@ -128,10 +138,10 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
                     handleDialogToggle();
                     handleField();
                 }}
-                style={[createformStyles.fieldContainer, { justifyContent: "center", opacity: 0.8 }]}
+                style={createformStyles.fieldContainer}
             >
-                <IconButton icon="plus" iconColor={theme.colors.fff} size={spacing.large} style={createformStyles.icon} animated />
-                <Text style={[masterdataStyles.textFFF, { marginLeft: 8, paddingVertical: 10 }]}>Add Field</Text>
+                <IconButton icon="plus" iconColor={theme.colors.onBackground} size={spacing.large} style={createformStyles.icon} animated />
+                <Text style={[masterdataStyles.text, { marginLeft: 8, paddingVertical: 10 }]}>Add Field</Text>
             </TouchableOpacity>
 
             {dialogVisible && (

@@ -70,6 +70,7 @@ export interface BaseFormState {
 export interface RowItemProps<V extends BaseFormState | BaseSubForm> {
   item: V;
   drag: () => void;
+  getIndex: () => number | undefined;
   isActive: boolean;
 }
 export type FormConfig = BaseForm | BaseSubForm | BaseFormState;

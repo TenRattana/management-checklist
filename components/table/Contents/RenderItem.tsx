@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { DataTable } from "react-native-paper";
 import useCustomtableStyles from "@/styles/customtable";
 import Cellcontent from "./Cellcontent";
@@ -74,12 +74,22 @@ const RenderItem = React.memo(({ item, index, Tablehead, flexArr, actionIndex, s
         });
     }, []);
 
+    const styles = StyleSheet.create({
+        container:{ flex: 1, paddingBottom: 3 },
+        containerRow: {
+            backgroundColor: theme.colors.background,
+            borderRadius: 4,
+            borderLeftWidth: 4,
+            borderColor: item[Number(Tablehead.findIndex(v => v.label === "Status"))] || false ? theme.colors.succeass : theme.colors.error
+        }
+    })
+
     return (
-        <Animated.View key={`row-${index}`} style={{ flex: 1 }}>
+        <Animated.View key={`row-${index}`} style={styles.container}>
             <DataTable.Row
                 onPress={() => detail && runOnJS(toggleDetailVisibility)(findIndex(item))}
                 disabled={!detail}
-                style={{ backgroundColor: theme.colors.background }}
+                style={styles.containerRow}
             >
                 {item.map((cell, cellIndex) => {
                     const Align = Tablehead[cellIndex]?.align as justifyContent;
