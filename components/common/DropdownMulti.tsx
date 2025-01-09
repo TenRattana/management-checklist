@@ -194,6 +194,59 @@ const DropdownMulti = React.memo(({
                     anchor={
                         <View onLayout={onLayout} ref={viewRef}>
                             <TouchableOpacity style={styles.triggerButton} onPress={() => setOpen(true)}>
+                                {open && search ? (<></>) : <>
+                                    {!showLefticon && (
+                                        items.find((v) => v.value === selectedValue)?.icon ? (
+                                            (items.find((v) => v.value === selectedValue)?.icon as () => JSX.Element)()
+                                        ) : (
+                                            <IconButton
+                                                style={masterdataStyles.icon}
+                                                icon={lefticon || "check-all"}
+                                                size={spacing.large}
+                                            />
+                                        )
+                                    )}
+
+                                    <Text style={[masterdataStyles.text, { flex: 1 }]}>
+                                        {selectedItems
+                                            ? `${selectedItems.length} ${label} selected`
+                                            : `Select a ${label}`
+                                        }
+                                    </Text>
+
+                                    {!showLefticon && selectedValue.length > 0 ? (
+                                        <IconButton
+                                            style={[masterdataStyles.icon, { right: 8, alignItems: 'flex-end' }]}
+                                            icon="window-close"
+                                            size={spacing.large}
+                                            onPress={() => {
+                                                setSelectedValue([]);
+                                            }}
+                                        />
+                                    ) : (
+                                        <IconButton
+                                            style={[masterdataStyles.icon, { right: 8, alignItems: 'flex-end' }]}
+                                            icon="chevron-down"
+                                            size={spacing.large}
+                                        />
+                                    )}
+                                </>}
+                            </TouchableOpacity>
+                        </View>
+                    }
+                    contentStyle={{
+                        maxWidth: menuWidth,
+                        backgroundColor: theme.colors.background
+                    }}
+                >
+                    {Search}
+                    {FlatData}
+                </Menu >
+            ) : (
+                <>
+                    <View onLayout={onLayout} ref={viewRef}>
+                        <TouchableOpacity style={styles.triggerButton} onPress={() => setOpen(true)}>
+                            {open && search ? (<></>) : <>
                                 {!showLefticon && (
                                     items.find((v) => v.value === selectedValue)?.icon ? (
                                         (items.find((v) => v.value === selectedValue)?.icon as () => JSX.Element)()
@@ -229,56 +282,7 @@ const DropdownMulti = React.memo(({
                                         size={spacing.large}
                                     />
                                 )}
-                            </TouchableOpacity>
-                        </View>
-                    }
-                    contentStyle={{
-                        maxWidth: menuWidth,
-                        backgroundColor: theme.colors.background
-                    }}
-                >
-                    {Search}
-                    {FlatData}
-                </Menu >
-            ) : (
-                <>
-                    <View onLayout={onLayout} ref={viewRef}>
-                        <TouchableOpacity style={styles.triggerButton} onPress={() => setOpen(true)}>
-                            {!showLefticon && (
-                                items.find((v) => v.value === selectedValue)?.icon ? (
-                                    (items.find((v) => v.value === selectedValue)?.icon as () => JSX.Element)()
-                                ) : (
-                                    <IconButton
-                                        style={masterdataStyles.icon}
-                                        icon={lefticon || "check-all"}
-                                        size={spacing.large}
-                                    />
-                                )
-                            )}
-
-                            <Text style={[masterdataStyles.text, { flex: 1 }]}>
-                                {selectedItems
-                                    ? `${selectedItems.length} ${label} selected`
-                                    : `Select a ${label}`
-                                }
-                            </Text>
-
-                            {!showLefticon && selectedValue.length > 0 ? (
-                                <IconButton
-                                    style={[masterdataStyles.icon, { right: 8, alignItems: 'flex-end' }]}
-                                    icon="window-close"
-                                    size={spacing.large}
-                                    onPress={() => {
-                                        setSelectedValue([]);
-                                    }}
-                                />
-                            ) : (
-                                <IconButton
-                                    style={[masterdataStyles.icon, { right: 8, alignItems: 'flex-end' }]}
-                                    icon="chevron-down"
-                                    size={spacing.large}
-                                />
-                            )}
+                            </>}
                         </TouchableOpacity>
                     </View>
                     {open && (
