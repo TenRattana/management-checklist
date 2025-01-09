@@ -12,6 +12,7 @@ import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
 import { useSelector } from "react-redux";
 import { fetchMachines, fetchSearchMachines, saveMachine } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
+import { useFocusEffect } from "expo-router";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 const LazyMachine_dialog = lazy(() => import("@/components/screens/Machine_dialog"));
@@ -43,8 +44,17 @@ const MachineGroupScreen = React.memo(() => {
     const queryClient = useQueryClient();
     const [machines, setMachine] = useState<Machine[]>([]);
 
+    useFocusEffect(
+        useCallback(() => {
+            return () => {
+                remove()
+                setMachine([])
+            };
+        }, [])
+    );
+
     const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
-        ['machine', debouncedSearchQuery],
+        ['machines', debouncedSearchQuery],
         ({ pageParam = 0 }) => {
             return debouncedSearchQuery
                 ? fetchSearchMachines(debouncedSearchQuery)

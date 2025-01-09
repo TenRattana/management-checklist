@@ -98,6 +98,7 @@ const RenderItem = React.memo(({ item, index, Tablehead, flexArr, actionIndex, s
                                     rowIndex: index,
                                     row: item,
                                     Canedit: item[Number(actionItem["disables"])] || false,
+                                    Candel: item[Number(actionItem["delete"])] || false,
                                     handlePress,
                                     selectedRows,
                                     toggleSelect,
@@ -128,17 +129,17 @@ const RenderItem = React.memo(({ item, index, Tablehead, flexArr, actionIndex, s
                                             </View>
                                         );
                                     }
-                                }) : (
-                                    <CellcontentMemo
+                                })
+                                    : <CellcontentMemo
                                         key={`cellcontent-${index}-${cellIndex}`}
                                         cell={cell}
                                         cellIndex={cellIndex}
                                         row={item}
                                         rowIndex={index}
                                         Canedit={item[Number(actionItem["disables"])]}
+                                        Candel={item[Number(actionItem["delete"])]}
                                         handlePress={handlePress}
                                     />
-                                )
                             })}
                         </DataTable.Cell>
                     )

@@ -12,6 +12,7 @@ import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
 import { useSelector } from "react-redux";
 import { fetchCheckListOption, fetchSearchCheckListOption, saveCheckListOption } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
+import { useFocusEffect } from "expo-router";
 
 const LazyChecklist_group_dialog = lazy(() => import("@/components/screens/Checklist_option_dialog"));
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
@@ -55,6 +56,15 @@ const CheckListOptionScreen = React.memo(() => {
                 setCheckListOption(newItems);
             },
         }
+    );
+
+    useFocusEffect(
+        useCallback(() => {
+            return () => {
+                remove()
+                setCheckListOption([])
+            };
+        }, [])
     );
 
     const handlePaginationChange = useCallback(() => {

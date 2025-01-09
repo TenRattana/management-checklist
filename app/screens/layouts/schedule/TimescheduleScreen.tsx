@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import ScheduleDialog from "@/components/screens/Schedule_dialog";
 import { fetchSearchTimeSchedules, fetchTimeSchedules, saveTimeSchedule } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
+import { useFocusEffect } from "expo-router";
 
 const TimescheduleScreen: React.FC = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -56,14 +57,14 @@ const TimescheduleScreen: React.FC = React.memo(() => {
         }
     );
 
-    useEffect(() => {
-        if (debouncedSearchQuery === "") {
-            setTimeSchedule([])
-            remove()
-        } else {
-            setTimeSchedule([])
-        }
-    }, [debouncedSearchQuery, remove])
+    useFocusEffect(
+        useCallback(() => {
+            return () => {
+                remove()
+                setTimeSchedule([])
+            };
+        }, [])
+    );
 
     const mutation = useMutation(saveTimeSchedule, {
         onSuccess: (data) => {

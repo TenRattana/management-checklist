@@ -11,7 +11,7 @@ interface CellcontentProps extends CellProps {
     handlePress: (props: HandelPrssProps) => void
 }
 
-const Cellcontent = React.memo(({ cell, cellIndex, row, rowIndex, Canedit, handlePress }: CellcontentProps) => {
+const Cellcontent = React.memo(({ cell, cellIndex, row, rowIndex, Canedit, Candel, handlePress }: CellcontentProps) => {
     const { theme } = useTheme();
     const { spacing } = useRes();
     const masterdataStyles = useMasterdataStyles();
@@ -22,7 +22,7 @@ const Cellcontent = React.memo(({ cell, cellIndex, row, rowIndex, Canedit, handl
                 action: "activeIndex",
                 data: String(row[cellIndex + 1]),
                 message: row,
-                visible: Boolean(!Canedit),
+                visible: Boolean(!(Canedit)),
                 Change: "Change Status"
             }
             )} key={`cell-content-${cellIndex}`}>

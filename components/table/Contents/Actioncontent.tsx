@@ -12,7 +12,7 @@ interface ActioncontentProps extends ActionProps {
     toggleSelect?: (value: string) => void;
 }
 
-const Actioncontent = React.memo(({ data, action, row, rowIndex, Canedit, handlePress, selectedRows, toggleSelect }: ActioncontentProps) => {
+const Actioncontent = React.memo(({ data, action, row, rowIndex, Canedit, Candel, handlePress, selectedRows, toggleSelect }: ActioncontentProps) => {
 
     const { responsive, spacing } = useRes();
     const { theme } = useTheme();
@@ -24,13 +24,13 @@ const Actioncontent = React.memo(({ data, action, row, rowIndex, Canedit, handle
             icon = <IconButton icon="pencil-box" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.blue} />
             break;
         case "delOnlyIndex":
-            icon = <IconButton icon="trash-can" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.error} disabled={Boolean(Canedit)} />
+            icon = <IconButton icon="trash-can" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.error} disabled={Boolean((Candel ?? Canedit))} />
             break;
         case "editIndex":
             icon = <IconButton icon="pencil-box" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.blue} />;
             break;
         case "delIndex":
-            icon = <IconButton icon="trash-can" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.error} disabled={Boolean(Canedit)} />;
+            icon = <IconButton icon="trash-can" size={(responsive === "small" ? spacing.large : spacing.large) + 5} iconColor={theme.colors.error} disabled={Boolean((Candel ?? Canedit))} />;
             break;
         case "changeIndex":
             icon = <IconButton icon="tooltip-edit" size={(responsive === "small" ? spacing.large : spacing.large)} iconColor={theme.colors.yellow} />
@@ -56,7 +56,7 @@ const Actioncontent = React.memo(({ data, action, row, rowIndex, Canedit, handle
             action: action,
             data: data,
             message: row,
-            visible: Boolean(!Canedit),
+            visible: Boolean(!(Candel ?? Canedit)),
         }
         )} key={`action-${action}`} style={customtable.eventCell}>
             {icon}

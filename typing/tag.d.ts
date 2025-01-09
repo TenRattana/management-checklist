@@ -212,6 +212,7 @@ export interface ActionProps {
   row: (string | number | boolean)[];
   rowIndex: number;
   Canedit: string | number | boolean | undefined;
+  Candel: string | number | boolean | undefined;
 }
 
 export interface CellProps {
@@ -220,6 +221,7 @@ export interface CellProps {
   row: (string | number | boolean)[];
   rowIndex: number;
   Canedit: string | number | boolean | undefined;
+  Candel: string | number | boolean | undefined;
 }
 
 export interface HandelPrssProps {

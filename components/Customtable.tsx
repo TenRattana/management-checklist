@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { useRes } from "@/app/contexts/useRes";
-import CustomtableHead from "./table/CustomtableHead";
-import CustomtableSmall from "./table/CustomtableSmall";
+import CustomtableHead from "./table/Contents/RenderItemHead";
+import CustomtableSmall from "./table/CustomtableDataSmall";
 import CustomtableData from "./table/CustomtableData";
 import { CustomTableProps } from '@/typing/tag';
 import { View } from "react-native";

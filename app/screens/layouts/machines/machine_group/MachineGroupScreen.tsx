@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux';
 import { fetchMachineGroups, fetchSearchMachineGroups, saveGroupMachine } from "@/app/services";
 import axiosInstance from "@/config/axios";
 import { useTheme } from "@/app/contexts/useTheme";
+import { useFocusEffect } from "expo-router";
 
 const LazyMachine_group_dialog = lazy(() => import("@/components/screens/Machine_group_dialog"));
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
@@ -54,6 +55,15 @@ const MachineGroupScreen = React.memo(() => {
                 setMachineGroup(newItems);
             },
         }
+    );
+
+    useFocusEffect(
+        useCallback(() => {
+            return () => {
+                remove()
+                setMachineGroup([])
+            };
+        }, [])
     );
 
     const handlePaginationChange = useCallback(() => {
@@ -121,6 +131,7 @@ const MachineGroupScreen = React.memo(() => {
     const tableData = useMemo(() => {
         return machineGroup.map(item => [
             item.Disables,
+            item.Deletes,
             item.GMachineName,
             item.Description,
             item.IsActive,
@@ -144,14 +155,15 @@ const MachineGroupScreen = React.memo(() => {
         Tabledata: tableData,
         Tablehead: [
             { label: "", align: "flex-start" },
+            { label: "", align: "flex-start" },
             { label: "Group Machine Name", align: "flex-start" },
             { label: "Description", align: "flex-start" },
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
         ],
-        flexArr: [0, 3, 3, 1, 1, 1],
-        actionIndex: [{ disables: 0, editIndex: 4, delIndex: 5 }],
-        showMessage: 1,
+        flexArr: [0, 0, 3, 3, 1, 1, 1],
+        actionIndex: [{ disables: 0, delete: 1, editIndex: 5, delIndex: 6 }],
+        showMessage: 2,
         handleAction,
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);

@@ -12,6 +12,7 @@ import { fetchForms, fetchSearchFomrs } from "@/app/services";
 import { useRes } from "@/app/contexts/useRes";
 import { useTheme } from "@/app/contexts/useTheme";
 import { navigate } from "@/app/navigations/navigationUtils";
+import { useFocusEffect } from "expo-router";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
@@ -45,6 +46,15 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ route }) => {
                 setForm(newItems);
             },
         }
+    );
+
+    useFocusEffect(
+        useCallback(() => {
+            return () => {
+                remove()
+                setForm([])
+            };
+        }, [])
     );
 
     const handlePaginationChange = useCallback(() => {

@@ -12,6 +12,7 @@ import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
 import { useSelector } from "react-redux";
 import { fetchMatchCheckListOptions, fetchSearchMatchCheckListOptions, saveMatchCheckListOptions } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
+import { useFocusEffect } from "expo-router";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 const LazyMatch_CheckList_Option_dialog = lazy(() => import("@/components/screens/Match_checklist_option_dialog"));
@@ -56,6 +57,15 @@ const MatchCheckListOptionScreen = React.memo(() => {
                 setMatchCheckListOption(newItems);
             },
         }
+    );
+
+    useFocusEffect(
+        useCallback(() => {
+            return () => {
+                remove()
+                setMatchCheckListOption([])
+            };
+        }, [])
     );
 
     const handlePaginationChange = useCallback(() => {
@@ -128,6 +138,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
     const tableData = useMemo(() => {
         return matchCheckListOption.map((item) => [
             item.Disables,
+            item.Deletes,
             item.GCLOptionName || "",
             item.CLOptionName || "",
             item.IsActive,
@@ -151,20 +162,15 @@ const MatchCheckListOptionScreen = React.memo(() => {
         Tabledata: tableData,
         Tablehead: [
             { label: "", align: "flex-start" },
+            { label: "", align: "flex-start" },
             { label: "Group Name", align: "flex-start" },
             { label: "Option Name", align: "flex-start" },
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
         ],
-        flexArr: [0, 3, 3, 1, 1],
-        actionIndex: [
-            {
-                disables: 0,
-                editIndex: 4,
-                delIndex: 5,
-            },
-        ],
-        showMessage: 1,
+        flexArr: [0, 0, 3, 3, 1, 1],
+        actionIndex: [{ disables: 0, delete: 1, editIndex: 5, delIndex: 6 }],
+        showMessage: 2,
         handleAction,
         searchQuery: debouncedSearchQuery,
     }), [tableData, debouncedSearchQuery, handleAction]);

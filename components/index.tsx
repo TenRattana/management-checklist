@@ -6,5 +6,5 @@ export { default as Text } from "./Text";
 export { default as CustomDropdownSingle } from "./CustomDropdownSingle";
 export { default as CustomDropdownMultiple } from "./CustomDropdownMultiple";
 export { default as Customtable } from "./Customtable";
-export { default as CustomtableHead } from "./table/CustomtableHead";
-export { default as CustomtableSmall } from "./table/CustomtableSmall";
+export { default as CustomtableHead } from "./table/Contents/RenderItemHead";
+export { default as CustomtableSmall } from "./table/CustomtableDataSmall";

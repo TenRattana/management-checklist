@@ -13,6 +13,7 @@ import { useSelector } from "react-redux";
 import { fetchMatchFormMchines, fetchSearchMatchFormMchine, SaveMatchFormMachine } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 import { navigate } from "@/app/navigations/navigationUtils";
+import { useFocusEffect } from "expo-router";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 const LazyMatch_form_machine_dialog = lazy(() => import("@/components/screens/Match_form_machine_dialog"));
@@ -54,6 +55,15 @@ const MatchFormMachineScreen = React.memo(() => {
                 setMatchForm(newItems);
             },
         }
+    );
+
+    useFocusEffect(
+        useCallback(() => {
+            return () => {
+                remove()
+                setMatchForm([])
+            };
+        }, [])
     );
 
     const handlePaginationChange = useCallback(() => {

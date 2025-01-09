@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import { fetchApporved, fetchMachines, fetchSearchApporved, fetchSearchMachines, SaveApporved } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 import { navigate } from "@/app/navigations/navigationUtils";
+import { useFocusEffect } from "expo-router";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
@@ -80,6 +81,15 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(() => {
                 });
             },
         }
+    );
+
+    useFocusEffect(
+        useCallback(() => {
+            return () => {
+                remove()
+                setApproved([])
+            };
+        }, [])
     );
 
     const handlePaginationChange = useCallback(() => {

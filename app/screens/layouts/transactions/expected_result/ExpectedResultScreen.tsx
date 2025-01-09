@@ -11,6 +11,7 @@ import { StyleSheet, View } from "react-native";
 import { fetchExpectedResults, fetchMachines, fetchSearchExpectedResult, fetchSearchMachines } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 import { navigate } from "@/app/navigations/navigationUtils";
+import { useFocusEffect } from "expo-router";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
@@ -76,6 +77,15 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(() => {
                 });
             },
         }
+    );
+
+    useFocusEffect(
+        useCallback(() => {
+            return () => {
+                remove()
+                setExpectedResult([])
+            };
+        }, [])
     );
 
     const handlePaginationChange = useCallback(() => {

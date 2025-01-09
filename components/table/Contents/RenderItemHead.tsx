@@ -5,10 +5,10 @@ import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useRes } from '@/app/contexts/useRes'
 import { TypeConfig } from "@/typing/type";
 import { DebouncedFunc } from "lodash";
-import Text from "../Text";
+import Text from "../../Text";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { useTheme } from "@/app/contexts/useTheme";
-import PickerDropdown from "../common/PickerDropdown";
+import PickerDropdown from "../../common/PickerDropdown";
 
 type justifyContent = 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly' | undefined;
 

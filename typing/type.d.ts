@@ -7,6 +7,7 @@ export interface GroupMachine {
   Description: string;
   IsActive: boolean;
   Disables: boolean;
+  Deletes:boolean;
 }
 
 export interface Machine {
@@ -124,6 +125,7 @@ export interface MatchCheckListOption {
   IsActive: boolean;
   GCLOptionName: string;
   Disables: boolean;
+  Deletes:boolean;
 }
 
 export interface ExpectedResult {
