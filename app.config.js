@@ -24,7 +24,7 @@ const environment = process.env.EXPO_PUBLIC_API_URL || "development";
 
 export default {
   expo: {
-    name: "PMCheck List", 
+    name: "PMCheck List",
     platforms: ["ios", "android", "web"],
     slug: "pmchecklist",
     version: "1.0.0",
@@ -47,9 +47,11 @@ export default {
         foregroundImage: "./assets/images/Icon-app.png",
         backgroundColor: "#ffffff",
       },
+      softwareKeyboardLayoutMode: "resize",
       resourceClass: "medium",
       package: "com.m_checklist_test",
       permissions: ["CAMERA"],
+      hermes: true,
       targetSdkVersion: 34,
       statusBar: {
         barStyle: "dark-content",

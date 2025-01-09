@@ -15,14 +15,13 @@ import { useMutation, useQueryClient } from "react-query";
 import { saveCheckList, saveCheckListOption, saveGroupCheckListOption } from "@/app/services";
 import { InitialValuesChecklist, InitialValuesCheckListOption, InitialValuesGroupCheckList } from "@/typing/value";
 import { useSelector } from "react-redux";
-import { Inputs, LoadingSpinner } from "../common";
+import { Dropdown, Inputs, LoadingSpinner } from "../common";
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 
 const LazyInfoGroup_dialog = lazy(() => import("../screens/InfoGroup_dialog"));
 const LazyGroupCreate_dialog = lazy(() => import("../screens/GroupCreate_dialog"));
 const LazyCheckListCreate_dialog = lazy(() => import("../screens/CheckListCreate_dialog"));
-const LazyDropdown = lazy(() => import("@/components/common/Dropdown"));
 const LazyCheckboxs = lazy(() => import("@/components/common/Checkboxs"));
 
 const CustomDialog = React.memo(({ visible, onDismiss, children }: { visible: boolean, onDismiss: any, children: any }) => {
@@ -337,31 +336,29 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                         nestedScrollEnabled={true}
                                     >
                                         <View style={{ flex: 1 }}>
-                                            <Suspense fallback={<LoadingSpinner />}>
-                                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 30, paddingLeft: 10 }]}>
-                                                    Check List
-                                                </Text>
+                                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 30, paddingLeft: 10 }]}>
+                                                Check List
+                                            </Text>
 
-                                                <LazyDropdown
-                                                    label='check list'
-                                                    lefticon="subtitles-outline"
-                                                    open={open.CheckList}
-                                                    searchQuery={debouncedSearchQuery.CheckList}
-                                                    setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, CheckList: v }))}
-                                                    selectedValue={values.CListID}
-                                                    setDebouncedSearchQuery={(value: string) =>
-                                                        handelSetDebouncedSearchQuery("CheckList", value)
-                                                    }
-                                                    items={checkList}
-                                                    setSelectedValue={(stringValue: string | null) => {
-                                                        setFieldTouched("CListID", true);
-                                                        setFieldValue("CListID", stringValue);
-                                                    }}
-                                                    isFetching={isFetchingCL}
-                                                    fetchNextPage={fetchNextPageCL}
-                                                    handleScroll={handleScrollCL}
-                                                />
-                                            </Suspense>
+                                            <Dropdown
+                                                label='check list'
+                                                lefticon="subtitles-outline"
+                                                open={open.CheckList}
+                                                searchQuery={debouncedSearchQuery.CheckList}
+                                                setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, CheckList: v }))}
+                                                selectedValue={values.CListID}
+                                                setDebouncedSearchQuery={(value: string) =>
+                                                    handelSetDebouncedSearchQuery("CheckList", value)
+                                                }
+                                                items={checkList}
+                                                setSelectedValue={(stringValue: string | null) => {
+                                                    setFieldTouched("CListID", true);
+                                                    setFieldValue("CListID", stringValue);
+                                                }}
+                                                isFetching={isFetchingCL}
+                                                fetchNextPage={fetchNextPageCL}
+                                                handleScroll={handleScrollCL}
+                                            />
 
                                             <HelperText
                                                 type="error"
@@ -381,32 +378,30 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                             </Text>
                                         </TouchableOpacity>
 
-                                        <Suspense fallback={<LoadingSpinner />}>
-                                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 10 }]}>
-                                                Type Check List
-                                            </Text>
+                                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 10 }]}>
+                                            Type Check List
+                                        </Text>
 
-                                            <LazyDropdown
-                                                label='check list type'
-                                                search={false}
-                                                open={open.CheckListType}
-                                                setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, CheckListType: v }))}
-                                                selectedValue={values.CTypeID}
-                                                items={editMode ? checkListTypes.map((v) => ({
-                                                    label: v.CTypeTitle,
-                                                    value: v.CTypeID,
-                                                    icon: () => <IconButton icon={v.Icon} size={spacing.large} />
-                                                })) : checkListTypes.filter(v => v.IsActive).map((v) => ({
-                                                    label: v.CTypeTitle,
-                                                    value: v.CTypeID,
-                                                    icon: () => <IconButton icon={v.Icon} size={spacing.large} />
-                                                }))}
-                                                setSelectedValue={(stringValue: string | null) => {
-                                                    setFieldTouched("CTypeID", true);
-                                                    setFieldValue("CTypeID", stringValue);
-                                                }}
-                                            />
-                                        </Suspense>
+                                        <Dropdown
+                                            label='check list type'
+                                            search={false}
+                                            open={open.CheckListType}
+                                            setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, CheckListType: v }))}
+                                            selectedValue={values.CTypeID}
+                                            items={editMode ? checkListTypes.map((v) => ({
+                                                label: v.CTypeTitle,
+                                                value: v.CTypeID,
+                                                icon: () => <IconButton icon={v.Icon} size={spacing.large} />
+                                            })) : checkListTypes.filter(v => v.IsActive).map((v) => ({
+                                                label: v.CTypeTitle,
+                                                value: v.CTypeID,
+                                                icon: () => <IconButton icon={v.Icon} size={spacing.large} />
+                                            }))}
+                                            setSelectedValue={(stringValue: string | null) => {
+                                                setFieldTouched("CTypeID", true);
+                                                setFieldValue("CTypeID", stringValue);
+                                            }}
+                                        />
 
                                         <HelperText
                                             type="error"
@@ -419,33 +414,31 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                         {shouldRender === "detail" && (
                                             <RenderView style={Platform.OS === 'web' ? memoizedAnimatedText : { opacity: 1 }}>
                                                 <View style={{ flex: 1 }}>
-                                                    <Suspense fallback={<LoadingSpinner />}>
-                                                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 5, paddingLeft: 10 }]}>
-                                                            Match Group Check List
-                                                        </Text>
+                                                    <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 5, paddingLeft: 10 }]}>
+                                                        Match Group Check List
+                                                    </Text>
 
-                                                        <LazyDropdown
-                                                            lefticon="checkbox-multiple-blank-outline"
-                                                            label="match check list"
-                                                            open={open.MatchChecklist}
-                                                            setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, MatchChecklist: v }))}
-                                                            selectedValue={values.GCLOptionID}
-                                                            searchQuery={debouncedSearchQuery.MatchChecklist}
-                                                            setDebouncedSearchQuery={(value: string) =>
-                                                                handelSetDebouncedSearchQuery("MatchChecklist", value)
-                                                            }
-                                                            items={groupCheckListOption}
-                                                            setSelectedValue={(stringValue: string | null) => {
-                                                                setFieldTouched('GCLOptionID', true);
-                                                                setFieldValue('GCLOptionID', stringValue, true);
+                                                    <Dropdown
+                                                        lefticon="checkbox-multiple-blank-outline"
+                                                        label="match check list"
+                                                        open={open.MatchChecklist}
+                                                        setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, MatchChecklist: v }))}
+                                                        selectedValue={values.GCLOptionID}
+                                                        searchQuery={debouncedSearchQuery.MatchChecklist}
+                                                        setDebouncedSearchQuery={(value: string) =>
+                                                            handelSetDebouncedSearchQuery("MatchChecklist", value)
+                                                        }
+                                                        items={groupCheckListOption}
+                                                        setSelectedValue={(stringValue: string | null) => {
+                                                            setFieldTouched('GCLOptionID', true);
+                                                            setFieldValue('GCLOptionID', stringValue, true);
 
-                                                                updateImportantList({ Value: undefined });
-                                                            }}
-                                                            isFetching={isFetchingCL}
-                                                            fetchNextPage={fetchNextPageML}
-                                                            handleScroll={handleScrollML}
-                                                        />
-                                                    </Suspense>
+                                                            updateImportantList({ Value: undefined });
+                                                        }}
+                                                        isFetching={isFetchingCL}
+                                                        fetchNextPage={fetchNextPageML}
+                                                        handleScroll={handleScrollML}
+                                                    />
 
                                                     <HelperText
                                                         type="error"
@@ -483,31 +476,29 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
                                         {shouldRender === "text" && (
                                             <RenderView style={Platform.OS === 'web' ? memoizedAnimatedText : { opacity: 1 }}>
-                                                <Suspense fallback={<LoadingSpinner />}>
-                                                    <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 5, paddingLeft: 10 }]}>
-                                                        Data Type
-                                                    </Text>
+                                                <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 5, paddingLeft: 10 }]}>
+                                                    Data Type
+                                                </Text>
 
-                                                    <LazyDropdown
-                                                        label='data type'
-                                                        lefticon="checkbox-multiple-marked-outline"
-                                                        search={false}
-                                                        open={open.DataType}
-                                                        setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, DataType: v }))}
-                                                        selectedValue={values.DTypeID}
-                                                        items={editMode ? dataType.map((v => ({
-                                                            label: v.DTypeName,
-                                                            value: v.DTypeID,
-                                                        }))) : dataType.filter(v => v.IsActive).map((v => ({
-                                                            label: v.DTypeName,
-                                                            value: v.DTypeID,
-                                                        })))}
-                                                        setSelectedValue={(stringValue: string | null) => {
-                                                            setFieldTouched("DTypeID", true);
-                                                            setFieldValue("DTypeID", stringValue);
-                                                        }}
-                                                    />
-                                                </Suspense>
+                                                <Dropdown
+                                                    label='data type'
+                                                    lefticon="checkbox-multiple-marked-outline"
+                                                    search={false}
+                                                    open={open.DataType}
+                                                    setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, DataType: v }))}
+                                                    selectedValue={values.DTypeID}
+                                                    items={editMode ? dataType.map((v => ({
+                                                        label: v.DTypeName,
+                                                        value: v.DTypeID,
+                                                    }))) : dataType.filter(v => v.IsActive).map((v => ({
+                                                        label: v.DTypeName,
+                                                        value: v.DTypeID,
+                                                    })))}
+                                                    setSelectedValue={(stringValue: string | null) => {
+                                                        setFieldTouched("DTypeID", true);
+                                                        setFieldValue("DTypeID", stringValue);
+                                                    }}
+                                                />
 
                                                 <HelperText
                                                     type="error"
@@ -545,7 +536,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                             <RenderView style={Platform.OS === 'web' ? memoizedAnimatedDT : { opacity: 1 }}>
                                                 <Field name="DTypeValue">
                                                     {({ field, form }: any) => (
-                                                        <Suspense fallback={<LoadingSpinner />}>
+                                                        <>
                                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 5, paddingLeft: 10 }]}>
                                                                 Number Digit
                                                             </Text>
@@ -561,7 +552,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                                                 errorMessage={form.touched?.DTypeValue ? form.errors?.DTypeValue : ""}
                                                                 testId={`DTypeValue-form`}
                                                             />
-                                                        </Suspense>
+                                                        </>
                                                     )}
                                                 </Field >
                                             </RenderView>
