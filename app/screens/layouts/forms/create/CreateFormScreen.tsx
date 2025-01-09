@@ -207,7 +207,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route }) => {
             setCurrentSub(data)
             handleDialogToggle("sub", true)
         }
-    }, [state])
+    }, [state.subForms])
 
     const handelSaveSubForm = useCallback((values: BaseSubForm, mode: string) => {
         const payload = { subForm: values };

@@ -31,6 +31,8 @@ FadeIn.duration(300).easing(Easing.ease);
 FadeOut.duration(300).easing(Easing.ease);
 
 const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, checkListType }) => {
+    console.log("Dragsubform");
+    
     const [initialDialog, setInitialDialog] = useState(false);
     const [initialSubForm, setInitialSubForm] = useState<BaseSubForm>({
         SFormID: "",
