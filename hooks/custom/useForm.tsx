@@ -121,7 +121,17 @@ const createSubFormsAndFields = async (
         }
     }
 
-    return { subForms, fields, itemsCheckList, itemsGroupCheckListOption };
+    const ep = {
+        UserID: expectedResult.UserID,
+        UserName: expectedResult.UserName,
+        ApporvedID: expectedResult.ApporvedID,
+        ApporvedName: expectedResult.ApporvedName,
+        Status: expectedResult.Status,
+        CreateDate: expectedResult.CreateDate,
+        ApporvedTime: expectedResult.ApporvedTime
+    }
+
+    return { subForms, fields, itemsCheckList, itemsGroupCheckListOption, ep };
 };
 
 const useForm = (route?: RouteParams) => {
@@ -184,7 +194,7 @@ const useForm = (route?: RouteParams) => {
             }
 
             if (response.data?.data?.[0]) {
-                const { subForms, fields, itemsCheckList, itemsGroupCheckListOption } = await createSubFormsAndFields(
+                const { subForms, fields, itemsCheckList, itemsGroupCheckListOption, ep } = await createSubFormsAndFields(
                     response.data?.data?.[0],
                     fetchedExpectedResult,
                 );
@@ -197,6 +207,7 @@ const useForm = (route?: RouteParams) => {
                 dispatch(
                     setFormData({
                         form: action === "copy" ? {} : response.data?.data[0],
+                        fetchedExpectedResult: ep,
                         subForms,
                         checkList: itemsCheckList,
                         groupCheckListOption: itemsGroupCheckListOption,

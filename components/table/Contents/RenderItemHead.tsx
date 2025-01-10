@@ -65,7 +65,6 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
 }) => {
     const masterdataStyles = useMasterdataStyles();
     const { fontSize, responsive, spacing } = useRes();
-    const { theme } = useTheme();
     const [open, setOpen] = useState(false);
     const [openDate, setOpenDate] = useState(false);
 
@@ -75,8 +74,6 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
         { label: "This week", value: "This week" },
         { label: "This month", value: "This month" },
     ];
-
-    const mx = hp(Platform.OS === "web" ? '50%' : '40%');
 
     const styles = StyleSheet.create({
         functionname: {
@@ -155,9 +152,10 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
                     )}
                 </View>
 
+                {/* {showFilterDate || showFilter && ( */}
                 <View style={{
                     flexDirection: responsive === "small" ? 'column' : 'row',
-                    marginVertical: 5
+                    // marginVertical: 2
                 }}>
                     {showFilterDate && (
                         <PickerDropdown
@@ -185,7 +183,7 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
                         />
                     )}
                 </View>
-
+                {/* )} */}
             </View >
 
             <DataTable>

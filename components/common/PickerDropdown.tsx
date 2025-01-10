@@ -16,7 +16,8 @@ const PickerDropdown = React.memo(({
     handleScroll,
     label,
     search,
-    style
+    style,
+    border = true
 }: {
     open: boolean;
     setOpen: (v: boolean) => void;
@@ -26,7 +27,8 @@ const PickerDropdown = React.memo(({
     handleScroll?: ({ nativeEvent }: any) => void;
     label: string;
     search?: boolean;
-    style?: ViewStyle
+    style?: ViewStyle;
+    border?: boolean
 }) => {
     const maxHeight = hp(Platform.OS === 'web' ? '50%' : '40%');
     const masterdataStyles = useMasterdataStyles();
@@ -52,8 +54,8 @@ const PickerDropdown = React.memo(({
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
-            borderBottomColor: 'gray',
-            borderBottomWidth: 0.5,
+            borderBottomColor: border ? 'gray' : undefined,
+            borderBottomWidth: border ? 0.5 : 0,
             padding: 5,
         },
         searchbar: {
@@ -75,7 +77,7 @@ const PickerDropdown = React.memo(({
 
     return (
         <View style={styles.container}>
-            <Text style={[masterdataStyles.text, { alignSelf: 'center', paddingRight: 15 }]}>{`${label} : `}</Text>
+            {label && (<Text style={[masterdataStyles.text, { alignSelf: 'center', paddingRight: 15 }]}>{`${label} : `}</Text>)}
 
             <Menu
                 visible={open}

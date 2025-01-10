@@ -1,17 +1,24 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, Switch, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
-import { AccessibleView, Text } from '@/components';
+import { Text } from '@/components';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
 import { Divider } from 'react-native-paper';
+import PickerDropdown from '@/components/common/PickerDropdown';
+
+const fontSizes = [
+  { label: "Small", value: "small" },
+  { label: "Medium", value: "medium" },
+  { label: "Large", value: "large" },
+]
 
 const SettingsScreen = React.memo(() => {
   const { darkMode, setDarkMode, theme } = useTheme();
   const { spacing, fontSize, setFontSize } = useRes();
-
+  const [open, setOpen] = useState(false)
   const masterdataStyles = useMasterdataStyles();
 
   useEffect(() => {
@@ -40,36 +47,37 @@ const SettingsScreen = React.memo(() => {
   const styles = StyleSheet.create({
     divider: {
       backgroundColor: '#ddd',
-      marginBottom: 10,
+      // marginBottom: 10,
     },
     containerPicker: {
       alignSelf: 'center',
     },
     picker: {
-      fontSize: spacing.small,
-      color: theme.colors.onBackground,
+      // fontSize: spacing.small,
+      // color: theme.colors.onBackground,
       backgroundColor: theme.colors.background,
       borderWidth: 0,
-      padding: 10,
+      // padding: 10,
       borderRadius: 8,
-      flex: 1
+      // flex: 1
     },
     switchContainer: {
       alignSelf: 'center',
       alignItems: 'center'
     },
     userInfoRow: {
-      paddingVertical: fontSize === "large" ? 10 : fontSize === "medium" ? 5 : 2,
+      // paddingVertical: fontSize === "large" ? 10 : fontSize === "medium" ? 5 : 2,
     },
     switch: {
       transform: [{ scale: fontSize === "large" ? 1.5 : fontSize === "medium" ? 1 : 0.9 }],
     },
   });
 
-  const MySwitch = useMemo(() => {
-    return (
-      <AccessibleView name="container-switch" style={styles.switchContainer}>
-        <View style={styles.userInfoRow}>
+  return (
+    <View id="setting" style={[masterdataStyles.container]}>
+      <View id="setting-mode" style={[masterdataStyles.settingItem, { paddingVertical: 0 }]}>
+        <Text style={[masterdataStyles.text, { alignSelf: 'center', alignItems: 'center' }]}>Dark Mode</Text>
+        <View>
           <Switch
             onValueChange={toggleSwitch}
             value={darkMode}
@@ -78,44 +86,26 @@ const SettingsScreen = React.memo(() => {
             style={styles.switch}
           />
         </View>
-      </AccessibleView>
-    );
-  }, [darkMode]);
-
-  const PickerFont = useMemo(() => {
-    return (
-      <AccessibleView name="Picker" style={styles.containerPicker}>
-        <View style={styles.userInfoRow}>
-          <Picker
-            selectedValue={fontSize}
-            style={styles.picker}
-            onValueChange={handleFontSizeChange}
-            id="picker-font"
-          >
-            <Picker.Item label="Small" value="small" />
-            <Picker.Item label="Medium" value="medium" />
-            <Picker.Item label="Large" value="large" />
-          </Picker>
-        </View>
-      </AccessibleView>
-    );
-  }, [fontSize, handleFontSizeChange]);
-
-  return (
-    <AccessibleView name="setting" style={[masterdataStyles.container]}>
-      <AccessibleView name="setting-mode" style={[masterdataStyles.settingItem]}>
-        <Text style={[masterdataStyles.text, { alignSelf: 'center', alignItems: 'center' }]}>Dark Mode</Text>
-        {MySwitch}
-      </AccessibleView>
-      <Divider style={styles.divider} />
-
-      <View id="setting-font" style={[masterdataStyles.settingItem]}>
-        <Text style={[masterdataStyles.text, { alignSelf: 'center', alignItems: 'center' }]}>Font Size</Text>
-        {PickerFont}
       </View>
-
       <Divider style={styles.divider} />
-    </AccessibleView>
+
+      <View id="setting-font" style={[masterdataStyles.settingItem, { paddingVertical: 2 }]}>
+        <Text style={[masterdataStyles.text, { alignSelf: 'center', alignItems: 'center' }]}>Font Size</Text>
+        <View>
+          <PickerDropdown
+            label=""
+            border={false}
+            handelSetFilter={(value: string) => handleFontSizeChange(value)}
+            open={open}
+            setOpen={(v: boolean) => setOpen(v)}
+            value={fontSize}
+            values={fontSizes}
+            key={`picker-date`}
+          />
+        </View>
+      </View>
+      <Divider style={styles.divider} />
+    </View>
   );
 });
 

@@ -60,7 +60,7 @@ const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisib
 
     const styles = StyleSheet.create({
         dialog: {
-            width: responsive === "large" ? 800 : fontSize === "medium" ? '75%' : '90%',
+            width: responsive === "large" ? (fontSize === "large" ? 1000 : 800) : responsive === "medium" ? (fontSize === "large" ? 850 : 700) : "80%",
             justifyContent: 'center',
             alignSelf: 'center',
             alignContent: 'center',

@@ -99,7 +99,7 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
 
     return (
         <Portal>
-            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={[masterdataStyles.containerDialog, { width: responsive === "large" ? 1000 : "80%" }]} testID="dialog-md">
+            <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={[masterdataStyles.containerDialog, { width: isEditing ? 700 : masterdataStyles.containerDialog.width }]} testID="dialog-md">
                 <Dialog.Content>
                     <View style={{ justifyContent: "space-between", flexDirection: 'row', alignItems: 'center' }}>
                         <View style={{ justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center' }}>

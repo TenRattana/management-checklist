@@ -4,7 +4,7 @@ import { useTheme } from "@/app/contexts/useTheme";
 
 const useMasterdataStyles = () => {
     const { responsive, spacing, fontSize } = useRes();
-    const { theme , darkMode } = useTheme();
+    const { theme, darkMode } = useTheme();
 
     return StyleSheet.create({
         scrollView: {
@@ -65,7 +65,7 @@ const useMasterdataStyles = () => {
         containerDialog: {
             backgroundColor: theme.colors.background,
             borderRadius: 4,
-            width: responsive === "large" ? 800 : '80%',
+            width: responsive === "large" ? 600 : responsive === "medium" ? 600 : '80%',
             alignSelf: "center",
         },
         buttonCreate: {
@@ -74,7 +74,6 @@ const useMasterdataStyles = () => {
             justifyContent: 'center',
             padding: 15,
             alignSelf: 'center',
-            marginVertical: 10
         },
         containerSwitch: {
             flexDirection: "row",

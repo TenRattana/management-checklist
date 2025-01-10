@@ -24,8 +24,8 @@ const isValidDateFormatCustom = (value: string) => {
 
 const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
     const { route } = props;
-    const { dataType, exp, isLoadingForm } = useForm(route);
-
+    const { dataType, exp, isLoadingForm, found } = useForm(route);
+    const [load, setLoad] = useState(true)
     const state = useSelector((state: any) => state.form);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -93,7 +93,24 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
             countRef.current = 1
     };
 
-    return isLoadingForm ? <Text>Loading Form...</Text> : (
+    useEffect(() => {
+        if (!isLoadingForm && found && state.UserID) {
+            setLoad(false)
+        }
+    }, [isLoadingForm, found, state.UserID])
+
+    const convertToThaiDateTime = (dateString: string) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear() + 543;
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+
+        return `${day}/${month}/${year} เวลา ${hours}:${minutes}`;
+    };
+
+    return !load ? (
         <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]}>
             <Stack.Screen
                 options={{
@@ -204,18 +221,51 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
                     </Formik>
                 ))}
                 ListHeaderComponent={() => (
-                    <>
-                        <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
-                        <Divider />
-                        <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
-                    </>
+                    <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
+                        <View style={{ alignSelf: 'center', flex: 1 }}>
+                            <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
+                            <Divider />
+                            <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
+                        </View>
+                        {state.CreateDate && (
+                            <View style={{ marginLeft: 30 }}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                                    <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>Submit Time : </Text>
+                                    <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{convertToThaiDateTime(state?.CreateDate) || "Time Submit"}</Text>
+                                </View>
+                                {state.ApporvedTime && (
+                                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                                        <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>Apporved Time : </Text>
+                                        <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{convertToThaiDateTime(state?.ApporvedTime) || "Time Submit"}</Text>
+                                    </View>
+                                )}
+                            </View>
+                        )}
+                    </View>
+                )}
+                ListFooterComponent={() => exp && (
+                    <View style={{ flexDirection: 'row', marginLeft: 10, marginVertical: 10 }}>
+                        <View style={{ marginRight: 30 }}>
+                            <Text style={[masterdataStyles.description, { color: theme.colors.onBackground }]}>Inspector</Text>
+                            <Divider />
+                            <Text style={[masterdataStyles.title, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state?.UserName || "User Submit"}</Text>
+                        </View>
+
+                        {state?.ApporvedName && (
+                            <View>
+                                <Text style={[masterdataStyles.description, { color: theme.colors.onBackground }]}>Acknowledged</Text>
+                                <Divider />
+                                <Text style={[masterdataStyles.title, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state?.ApporvedName || "User Apporved"}</Text>
+                            </View>
+                        )}
+                    </View>
                 )}
                 keyExtractor={(_, index) => `index-preview-${index}`}
                 contentContainerStyle={{ paddingBottom: 20 }}
                 showsVerticalScrollIndicator={false}
             />
         </AccessibleView>
-    );
+    ) : (<Text>Loading ...</Text>)
 }));
 
 export default PreviewScreen;

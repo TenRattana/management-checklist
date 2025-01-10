@@ -41,8 +41,6 @@ const subFormSlice = createSlice({
 
       state.subForms = state.subForms.map((existingSub) => {
         if (existingSub.SFormID === subForm.SFormID) {
-          console.log(existingSub);
-
           return {
             ...existingSub,
             Open: !(subForm.Open ?? false),
@@ -62,9 +60,10 @@ const subFormSlice = createSlice({
       groupCheckListOption?: GroupCheckListOption[];
       checkListType: CheckList[];
       dataType: DataType[],
-      mode: boolean
+      mode: boolean,
+      fetchedExpectedResult: any
     }>) => {
-      const { form, subForms, BaseFormState, checkList, checkListType, dataType, groupCheckListOption, mode } = action.payload;
+      const { form, subForms, BaseFormState, checkList, checkListType, dataType, groupCheckListOption, mode, fetchedExpectedResult } = action.payload;
 
       const updatedForm = {
         FormID: form?.FormID || "",
@@ -78,7 +77,13 @@ const subFormSlice = createSlice({
           DisplayOrder: sub.DisplayOrder || index,
           Number: sub.Number || false,
           Open: false
-        }))
+        })),
+        UserID: fetchedExpectedResult?.UserID,
+        UserName: fetchedExpectedResult?.UserName,
+        ApporvedID: fetchedExpectedResult?.ApporvedID,
+        ApporvedName: fetchedExpectedResult?.ApporvedName,
+        Status: fetchedExpectedResult?.Status,
+        CreateDate: fetchedExpectedResult?.CreateDate
       };
 
       const checkListMap = new Map(checkList?.map(item => [item.CListID, item.CListName]));

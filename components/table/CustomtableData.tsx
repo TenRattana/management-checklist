@@ -46,7 +46,7 @@ const CustomtableData = React.memo(({ Tablehead, flexArr, actionIndex, displayDa
                         />
                     </Suspense>
                 }
-                keyExtractor={(item, index) => `${index}`}
+                keyExtractor={(item, index) => `${index}-${item}`}
                 ListEmptyComponent={() => (
                     <Text style={[masterdataStyles.text, { textAlign: 'center', fontStyle: 'italic' }]}>
                         No data found...
@@ -58,7 +58,7 @@ const CustomtableData = React.memo(({ Tablehead, flexArr, actionIndex, displayDa
                 removeClippedSubviews
                 onEndReachedThreshold={0.2}
                 initialNumToRender={30}
-                // windowSize={50}
+                windowSize={10}
                 // maxToRenderPerBatch={50}
                 onEndReached={handlePaginationChange}
                 getItemLayout={getItemLayout}

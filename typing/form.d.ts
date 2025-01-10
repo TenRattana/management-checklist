@@ -6,6 +6,11 @@ export interface BaseForm {
   Description: string;
   MachineID: string;
   MachineName?: string;
+  UserID?: string;
+  UserName?: string;
+  ApporvedID?: string;
+  ApporvedName?: string;
+  Status?: boolean;
 }
 
 export interface Form extends BaseForm {
@@ -29,7 +34,7 @@ export interface BaseSubForm {
   DisplayOrder?: number;
   MachineID: string;
   Fields: BaseFormState[];
-  Open?:boolean
+  Open?: boolean;
 }
 
 export interface SubForm extends BaseSubForm {
