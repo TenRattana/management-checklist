@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { DataTable } from "react-native-paper";
 import useCustomtableStyles from "@/styles/customtable";
 import Cellcontent from "./Cellcontent";
@@ -75,12 +75,14 @@ const RenderItem = React.memo(({ item, index, Tablehead, flexArr, actionIndex, s
     }, []);
 
     const styles = StyleSheet.create({
-        container:{ flex: 1, paddingBottom: 3 },
+        container: { flex: 1, paddingBottom: 3 },
         containerRow: {
             backgroundColor: theme.colors.background,
             borderRadius: 4,
             borderLeftWidth: 4,
-            borderColor: item[Number(Tablehead.findIndex(v => v.label === "Status"))] || false ? theme.colors.succeass : theme.colors.error
+            borderColor: item[Number(Tablehead.findIndex(v => v.label === "Status"))] || false ? theme.colors.succeass : theme.colors.error,
+            borderBottomWidth: Platform.OS === "web" ? 1 : 0,
+            elevation: 1
         }
     })
 

@@ -5,7 +5,7 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 export const fetchMenu = createAsyncThunk(
     "user/fetchMenu",
     async (data: string) => {
-        const response = await axiosInstance.post('Menu_service.asmx/GetMenusALL', { GUserID: data });
+        const response = await axiosInstance.post('Menu_service.asmx/GetMenus', { GUserID: data });
         return response.data.data ?? [];
     }
 );

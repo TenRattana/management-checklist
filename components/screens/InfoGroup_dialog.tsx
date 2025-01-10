@@ -2,7 +2,7 @@ import { useRes } from "@/app/contexts/useRes";
 import { useTheme } from "@/app/contexts/useTheme";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import React from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet, TouchableOpacity, ScrollView, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Dialog, Icon, IconButton, List, Text } from "react-native-paper";
 
@@ -30,8 +30,8 @@ const InfoGroup_dialog = ({
                 <IconButton icon="close" size={20} iconColor={theme.colors.black} onPress={() => setDialogAdd()} />
             </View>
 
-            <View style={styles.dialog}>
-                <View style={{ marginHorizontal: 10 }}>
+            <View style={[styles.dialog, { maxHeight: Platform.OS === "web" ? 400 : '68%' }]}>
+                <ScrollView style={{ marginHorizontal: 10 }}>
                     {option?.length > 0 ? (
                         option?.map((op, index) => (
                             <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignContent: 'center', alignItems: 'center' }} key={index}>
@@ -47,10 +47,10 @@ const InfoGroup_dialog = ({
                     ) : (
                         <Text style={masterdataStyles.text}>No options available</Text>
                     )}
-                </View>
+                </ScrollView>
             </View>
 
-            <View style={[masterdataStyles.containerAction, { paddingVertical: 10, justifyContent: "flex-end" }]}>
+            <View style={[masterdataStyles.containerAction, { justifyContent: "flex-end" }]}>
                 <TouchableOpacity
                     onPress={() => setDialogAdd()}
                     style={[styles.button, { backgroundColor: theme.colors.drag, marginLeft: 10, flexDirection: 'row' }]}
