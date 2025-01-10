@@ -268,7 +268,10 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                         label: item.CLOptionName,
                                         value: item.CLOptionID,
                                         IsActive: item.IsActive
-                                    })) || []);
+                                    })).sort((a, b) => {
+                                        if (a.IsActive === b.IsActive) return 0
+                                        return a.IsActive ? -1 : 1
+                                    }) || []);
 
                                     if (JSON.stringify(newOptions) !== JSON.stringify(option)) {
                                         setOption(newOptions);
