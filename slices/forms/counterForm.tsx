@@ -83,7 +83,8 @@ const subFormSlice = createSlice({
         ApporvedID: fetchedExpectedResult?.ApporvedID,
         ApporvedName: fetchedExpectedResult?.ApporvedName,
         Status: fetchedExpectedResult?.Status,
-        CreateDate: fetchedExpectedResult?.CreateDate
+        CreateDate: fetchedExpectedResult?.CreateDate,
+        ApporvedTime: fetchedExpectedResult?.ApporvedTime
       };
 
       const checkListMap = new Map(checkList?.map(item => [item.CListID, item.CListName]));
