@@ -39,7 +39,7 @@ const CustomDialog = React.memo(({ visible, onDismiss, children }: { visible: bo
 
 const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode, setShowDialogs }: FieldDialogProps) => {
     const masterdataStyles = useMasterdataStyles();
-    const [option, setOption] = useState<{ label: string; value: string; }[]>([]);
+    const [option, setOption] = useState<{ label: string; value: string; IsActive?: boolean }[]>([]);
     const [shouldRender, setShouldRender] = useState<string>('');
     const [shouldRenderDT, setShouldRenderDT] = useState<boolean>(false);
 
@@ -267,6 +267,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                     const newOptions = filteredItems.flatMap(option => option.CheckListOptions?.map(item => ({
                                         label: item.CLOptionName,
                                         value: item.CLOptionID,
+                                        IsActive: item.IsActive
                                     })) || []);
 
                                     if (JSON.stringify(newOptions) !== JSON.stringify(option)) {

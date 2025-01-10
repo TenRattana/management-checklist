@@ -85,8 +85,6 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
         triggerButton: {
             flexDirection: 'row',
             alignItems: 'center',
-            borderBottomColor: 'gray',
-            borderBottomWidth: 0.5,
         },
     });
 

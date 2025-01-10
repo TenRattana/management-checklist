@@ -13,6 +13,7 @@ const InfoGroup_dialog = ({
     setDialogAdd: () => void, option: {
         label: string;
         value: string;
+        IsActive?: boolean
     }[]
 }) => {
     const masterdataStyles = useMasterdataStyles();
@@ -33,13 +34,15 @@ const InfoGroup_dialog = ({
                 <View style={{ marginHorizontal: 10 }}>
                     {option?.length > 0 ? (
                         option?.map((op, index) => (
-                            <List.Item
-                                key={index}
-                                title={op.label}
-                                style={styles.optionItem}
-                                descriptionStyle={{ fontSize: spacing.small }}
-                                titleStyle={{ fontSize: spacing.small }}
-                            />
+                            <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignContent: 'center', alignItems: 'center' }} key={index}>
+                                <Icon source="circle" size={spacing.medium} color={op.IsActive ? theme.colors.succeass : theme.colors.error} />
+                                <List.Item
+                                    title={op.label}
+                                    style={styles.optionItem}
+                                    descriptionStyle={{ fontSize: spacing.small }}
+                                    titleStyle={{ fontSize: spacing.small }}
+                                />
+                            </View>
                         ))
                     ) : (
                         <Text style={masterdataStyles.text}>No options available</Text>

@@ -1,13 +1,12 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import {
     deleteField,
     setDragField
 } from "@/slices";
 import FieldDialog from "@/components/forms/FieldDialog";
-import { IconButton } from "react-native-paper";
+import { Icon, IconButton } from "react-native-paper";
 import { NestableDraggableFlatList, NestableScrollContainer, RenderItemParams, ScaleDecorator, ShadowDecorator } from "react-native-draggable-flatlist";
-import { spacing } from "@/constants/Spacing";
 import useCreateformStyle from "@/styles/createform";
 import { BaseFormState, BaseSubForm } from '@/typing/form'
 import { DragfieldProps } from "@/typing/tag";
@@ -15,6 +14,9 @@ import { useTheme } from "@/app/contexts/useTheme";
 import Text from '@/components/Text'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { CheckList } from "@/typing/type";
+import { useRes } from "@/app/contexts/useRes";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/stores";
 
 interface RowItemProps<V extends BaseFormState | BaseSubForm> {
     item: V;
@@ -29,48 +31,64 @@ interface RowItemProps<V extends BaseFormState | BaseSubForm> {
 
 const RowItem = React.memo(({ item, drag, isActive, setIsEditing, setDialogVisible, handleField, checkListType }: RowItemProps<BaseFormState>) => {
     const { theme } = useTheme()
+    const { spacing } = useRes()
     const createformStyles = useCreateformStyle();
     const masterdataStyles = useMasterdataStyles()
 
     return (
-        <TouchableOpacity
-            onPress={() => {
-                setIsEditing(true);
-                setDialogVisible(true);
-                handleField(item);
-            }}
-            onLongPress={drag}
-            disabled={isActive}
-            style={[createformStyles.fieldContainer, isActive && createformStyles.active]}
-            testID={`dg-FD-${item.SFormID}`}
-        >
-            <IconButton
-                icon={checkListType.find((v: CheckList) => v.CTypeID === item.CTypeID)?.Icon ?? "camera"}
-                style={createformStyles.icon}
-                iconColor={theme.colors.onBackground}
-                size={spacing.large}
-                animated
-            />
-            <Text
-                style={[masterdataStyles.text, { textAlign: "left", flex: 1, paddingLeft: 5 }]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-            >
-                {item.CListName}
-            </Text>
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', marginLeft: 20 }}>
+            <View style={{ alignSelf: 'center' }}>
+                <Icon
+                    source={"subdirectory-arrow-right"}
+                    color={theme.colors.onBackground}
+                    size={spacing.medium}
+                />
+            </View>
+
+            <View style={{ alignSelf: 'center', flexDirection: 'row' }}>
+                <TouchableOpacity
+                    onPress={() => {
+                        setIsEditing(true);
+                        setDialogVisible(true);
+                        handleField(item);
+                    }}
+                    onLongPress={drag}
+                    disabled={isActive}
+                    style={[createformStyles.fieldContainer, isActive && createformStyles.active]}
+                    testID={`dg-FD-${item.SFormID}`}
+                >
+                    <IconButton
+                        icon={checkListType.find((v: CheckList) => v.CTypeID === item.CTypeID)?.Icon ?? "camera"}
+                        style={createformStyles.icon}
+                        iconColor={theme.colors.onBackground}
+                        size={spacing.large}
+                        animated
+                    />
+                    <Text
+                        style={[masterdataStyles.text, { textAlign: "left", flex: 1, paddingLeft: 5 }]}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                    >
+                        {item.CListName}
+                    </Text>
+                </TouchableOpacity>
+            </View>
+        </View>
     );
 });
 
-const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatch, checkListType }) => {
+const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, checkLists }) => {
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const [currentField, setCurrentField] = useState<BaseFormState>({
         MCListID: "", CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: SFormID,
         Required: false, Important: false, ImportantList: [], EResult: "", CListName: "", DTypeValue: undefined,
     });
+    const dispatch = useDispatch<AppDispatch>();
 
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const { theme } = useTheme()
+    const { spacing } = useRes()
+
     const createformStyles = useCreateformStyle();
     const masterdataStyles = useMasterdataStyles()
 
@@ -113,7 +131,7 @@ const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, dispatc
         return (
             <ShadowDecorator>
                 <ScaleDecorator activeScale={0.90}>
-                    <RowItem {...params} checkListType={checkListType} handleField={handleField} setDialogVisible={setDialogVisible} setIsEditing={setIsEditing} />
+                    <RowItem {...params} checkListType={checkLists} handleField={handleField} setDialogVisible={setDialogVisible} setIsEditing={setIsEditing} />
                 </ScaleDecorator>
             </ShadowDecorator>
         );

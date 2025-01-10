@@ -36,6 +36,21 @@ const subFormSlice = createSlice({
   name: "form",
   initialState,
   reducers: {
+    setOpen: (state, action: PayloadAction<{ subForm: BaseSubForm }>) => {
+      const { subForm } = action.payload;
+
+      state.subForms = state.subForms.map((existingSub) => {
+        if (existingSub.SFormID === subForm.SFormID) {
+          console.log(existingSub);
+
+          return {
+            ...existingSub,
+            Open: !(subForm.Open ?? false),
+          };
+        }
+        return existingSub;
+      });
+    },
     setFormData: (state, action: PayloadAction<{
       form?: BaseForm,
       subForms: BaseSubForm[],
@@ -62,6 +77,7 @@ const subFormSlice = createSlice({
           Columns: sub.Columns,
           DisplayOrder: sub.DisplayOrder || index,
           Number: sub.Number || false,
+          Open: false
         }))
       };
 
@@ -316,7 +332,8 @@ export const {
   deleteField,
   reset,
   defaultDataForm,
-  setGroupCheckListinForm
+  setGroupCheckListinForm,
+  setOpen
 } = subFormSlice.actions;
 
 export default subFormSlice.reducer;

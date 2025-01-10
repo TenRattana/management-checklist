@@ -36,11 +36,9 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route }) => {
     const { responsive, fontSize, spacing } = useRes();
     const { handleError } = useToast();
     const { width } = useWindowDimensions();
-    const DRAWER_WIDTH = responsive === "small" ? width : fontSize === "large" ? 380 : 340;
+    const DRAWER_WIDTH = responsive === "small" ? width : fontSize === "large" ? 350 : 320;
     const [dialogVisible, setDialogVisible] = useState<{ sub: boolean, field: boolean }>({ sub: false, field: false });
 
-    console.log("CreateFormScreen");
-    
     const translateX = useSharedValue(-DRAWER_WIDTH);
     const mainTranslateX = useSharedValue(0);
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -50,7 +48,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route }) => {
     const { isLoading, checkList, groupCheckListOption, checkListType, dataType } = useForm(route);
     const styles = Create(width, drawerOpen)
 
-    const checkListTypes = useMemo(
+    const checkLists = useMemo(
         () =>
             checkListType
                 .filter(group => group.CheckList)
@@ -66,19 +64,19 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route }) => {
         Description: false,
     });
 
-    const openDrawer = (content: any) => {
+    const openDrawer = useCallback((content: any) => {
         setDrawerContent(content);
         translateX.value = withTiming(0, { duration: 300 });
         mainTranslateX.value = withTiming(DRAWER_WIDTH, { duration: 300 });
         setDrawerOpen(true);
-    };
+    }, []);
 
-    const closeDrawer = () => {
+    const closeDrawer = useCallback(() => {
         translateX.value = withTiming(-DRAWER_WIDTH, { duration: 300 });
         mainTranslateX.value = withTiming(0, { duration: 300 });
         setDrawerOpen(false);
         setDrawerContent(null);
-    };
+    }, []);
 
     const drawerStyle = useAnimatedStyle(() => ({
         transform: [{ translateX: translateX.value }],
@@ -283,16 +281,14 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route }) => {
                                 )}
 
                                 <MemoDragsubform
-                                    state={state}
-                                    dispatch={dispatch}
-                                    checkListType={checkListTypes}
+                                    checkLists={checkLists}
                                 />
                             </>
                         )}
 
                         {drawerContent === 'toolbox' && (
                             <ScrollView
-                                style={{ display: drawerContent === "toolbox" ? 'flex' : 'none', marginTop: 20, marginHorizontal: responsive === "small" ? "5%" : 5 }}
+                                style={{ display: drawerContent === "toolbox" ? 'flex' : 'none', marginTop: 20, marginHorizontal: responsive === "small" ? "5%" : 2 }}
                                 showsVerticalScrollIndicator={false}
                             >
                                 {responsive === "small" && (

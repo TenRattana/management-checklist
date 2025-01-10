@@ -71,7 +71,7 @@ const createSubFormsAndFields = async (
                         MaxLength: itemOption?.ImportantList[0]?.MaxLength,
                         Value
                     }]
-                    :[{
+                    : [{
                         MCListID: itemOption.MCListID,
                         Value: [],
                         MinLength: undefined,

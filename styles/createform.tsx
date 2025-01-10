@@ -38,8 +38,6 @@ const useCreateformStyle = () => {
             justifyContent: 'center',
         },
         fieldContainer: {
-            marginHorizontal: 10,
-            marginLeft: 20,
             paddingHorizontal: 5,
             // height: 60,
             // marginVertical: 5,

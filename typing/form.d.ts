@@ -29,6 +29,7 @@ export interface BaseSubForm {
   DisplayOrder?: number;
   MachineID: string;
   Fields: BaseFormState[];
+  Open?:boolean
 }
 
 export interface SubForm extends BaseSubForm {

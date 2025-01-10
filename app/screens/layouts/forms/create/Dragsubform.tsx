@@ -1,12 +1,13 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import {
     setDragSubForm,
     addSubForm,
     updateSubForm,
     deleteSubForm,
+    setOpen,
 } from "@/slices";
-import { AccessibleView, Text } from "@/components";
+import { Text } from "@/components";
 import SubFormDialog from "@/components/forms/SubFormDialog";
 import useCreateformStyle from "@/styles/createform";
 import {
@@ -17,7 +18,6 @@ import {
     ShadowDecorator,
 } from "react-native-draggable-flatlist";
 import { IconButton } from "react-native-paper";
-import { spacing } from "@/constants/Spacing";
 import Dragfield from "./Dragfield";
 import { BaseSubForm, RowItemProps } from "@/typing/form";
 import { DragsubformProps } from "@/typing/tag";
@@ -26,13 +26,16 @@ import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Animated, { Easing, FadeIn, FadeOut } from "react-native-reanimated";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "@/stores";
 
 FadeIn.duration(300).easing(Easing.ease);
 FadeOut.duration(300).easing(Easing.ease);
 
-const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, checkListType }) => {
-    console.log("Dragsubform");
-    
+const Dragsubform: React.FC<DragsubformProps> = React.memo(({ checkLists }) => {
+    const state = useSelector((state: any) => state.form);
+    const dispatch = useDispatch<AppDispatch>();
+
     const [initialDialog, setInitialDialog] = useState(false);
     const [initialSubForm, setInitialSubForm] = useState<BaseSubForm>({
         SFormID: "",
@@ -43,10 +46,9 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, c
         Fields: [],
     });
     const [editMode, setEditMode] = useState(false);
-    const [open, setOpen] = useState<Record<number, boolean>>({});
 
     const masterdataStyles = useMasterdataStyles();
-    const { fontSize } = useRes();
+    const { fontSize, spacing } = useRes();
     const { theme } = useTheme();
     const createform = useCreateformStyle();
     const { handleError } = useToast();
@@ -129,28 +131,23 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ state, dispatch, c
                         {item.SFormName}
                     </Text>
                     <IconButton
-                        icon={open[Number(getIndex())] ? "chevron-up" : "chevron-down"}
+                        icon={item.Open ? "chevron-up" : "chevron-down"}
                         iconColor={theme.colors.onBackground}
                         size={spacing.large}
                         style={createform.icon}
-                        onPress={() =>
-                            setOpen((prev) => ({
-                                ...prev,
-                                [Number(getIndex())]: !prev[Number(getIndex())],
-                            }))
-                        }
+                        onPress={() => dispatch(setOpen({ subForm: item }))}
                         animated
                     />
                 </TouchableOpacity>
 
-                {open[Number(getIndex())] && (
+                {item.Open && (
                     <Animated.View entering={FadeIn} exiting={FadeOut}>
                         <Dragfield
                             data={item.Fields ?? []}
                             SFormID={item.SFormID}
                             Columns={item.Columns}
                             dispatch={dispatch}
-                            checkListType={checkListType}
+                            checkLists={checkLists}
                         />
                     </Animated.View>
                 )}
