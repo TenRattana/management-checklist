@@ -139,6 +139,7 @@ export interface ExpectedResult {
   FormID: string;
   FormName: string;
   CreateDate: string;
+  ApporvedTime?:string;
 }
 export interface Users {
   User;

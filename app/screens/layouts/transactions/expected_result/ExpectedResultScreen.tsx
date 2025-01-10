@@ -145,6 +145,7 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(() => {
             item.UserName || "-",
             item.ApporvedName || "-",
             convertToThaiDateTime(item.CreateDate),
+            item.ApporvedTime ? convertToThaiDateTime(item.ApporvedTime) : "-",
             item.TableID,
         ]);
     }, [expectedResult, debouncedSearchQuery]);
@@ -157,12 +158,13 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(() => {
             { label: "User", align: "flex-start" },
             { label: "Acknowledged", align: "flex-start" },
             { label: "Time Submit", align: "flex-start" },
+            { label: "Time Apporved", align: "flex-start" },
             { label: "Preview", align: "center" },
         ],
-        flexArr: [2, 3, 2, 2, 2, 1],
+        flexArr: [2, 3, 2, 2, 2, 2, 1],
         actionIndex: [
             {
-                preIndex: 5,
+                preIndex: 6,
             },
         ],
         handleAction,
