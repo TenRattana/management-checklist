@@ -95,7 +95,7 @@ const RenderItem = React.memo(({ item, index, Tablehead, flexArr, actionIndex, s
             >
                 {item.map((cell, cellIndex) => {
                     const Align = Tablehead[cellIndex]?.align as justifyContent;
-                    const justifyContent = { justifyContent: Align };
+                    const justifyContent = { justifyContent: cell === "-" ? "center" : Align };
 
                     return (
                         <DataTable.Cell
