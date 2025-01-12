@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import { Button, Dialog, Portal, Menu, Switch, HelperText } from 'react-native-paper';
 import { DropdownMulti, Inputs } from '../common';
-import { TimeScheduleProps } from '@/typing/type';
+import { GroupMachine, TimeScheduleProps } from '@/typing/type';
 import { useToast } from '@/app/contexts/useToast';
 import { FastField, Field, Formik } from 'formik';
 import * as Yup from 'yup'
@@ -116,7 +116,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
     const [open, setOpen] = useState<{ Machine: boolean, Schedule: boolean }>({ Machine: false, Schedule: false })
 
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<{ Machine: string, Schedule: string }>({ Machine: '', Schedule: '' });
-    const [machineGroups, setItemsMachine] = useState<any[]>([]);
+    const [items, setItems] = useState<{ label: string; value: string }[]>([]);
 
     const { data, isFetching, fetchNextPage, hasNextPage, refetch } = useInfiniteQuery(
         ['machineGroups', debouncedSearchQuery.Machine],
@@ -138,7 +138,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                     value: item.GMachineID || '',
                 }));
 
-                setItemsMachine((prevItems) => {
+                setItems((prevItems) => {
                     const newItemsSet = new Set(prevItems.map((item: any) => item.value));
                     const mergedItems = prevItems.concat(
                         newItems.filter((item) => !newItemsSet.has(item.value))
@@ -160,14 +160,19 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
             onSuccess: (newData) => {
                 const newItems = newData.pages.flat();
 
-                const newItemsMG = newItems.flatMap((item) => (item.MachineGroup?.map((v) => ({
-                    label: v.GMachineName || 'Unknown',
-                    value: v.GMachineID || '',
-                }))));
+                const filteredItems = newItems.flatMap((item) => item.MachineGroup);
 
-                setItemsMachine((prevItems) => {
+                const newItemsMG = filteredItems.map((item) => ({
+                    label: item?.GMachineName || 'Unknown',
+                    value: item?.GMachineID || '',
+                })) || [];
+
+                setItems((prevItems) => {
                     const newItemsSet = new Set(prevItems.map((item: any) => item.value));
-                    return [...prevItems, ...newItemsMG.filter((item) => !newItemsSet.has(item))];
+                    const mergedItems = prevItems.concat(
+                        newItemsMG.filter((item) => !newItemsSet.has(item.value))
+                    );
+                    return mergedItems;
                 });
             },
         }
@@ -260,30 +265,35 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                                             setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, Machine: v }))}
                                             searchQuery={debouncedSearchQuery.Machine}
                                             setDebouncedSearchQuery={(v: string) => setDebouncedSearchQuery((prev) => ({ ...prev, Machine: v }))}
-                                            items={machineGroups}
+                                            items={items}
                                             isFetching={isFetching}
                                             fetchNextPage={fetchNextPage}
                                             handleScroll={handleScroll}
                                             selectedValue={values.MachineGroup}
                                             setSelectedValue={(value: string | string[] | null) => handelChange("MachineGroup", value)}
-                                            error={Boolean(touched.MachineGroup && errors.MachineGroup)}
-                                            errorMessage={String(errors.MachineGroup || "")}
                                         />
 
-                                        <ScrollView showsVerticalScrollIndicator={false} style={{ flexGrow: 0 }}>
-                                            <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 8 }}>
+                                        <HelperText
+                                            type="error"
+                                            visible={Boolean(touched.MachineGroup && errors.MachineGroup)}
+                                            style={[{ display: Boolean(touched.MachineGroup && errors.MachineGroup) ? 'flex' : 'none' }, masterdataStyles.errorText]}
+                                        >
+                                            {errors.MachineGroup || ""}
+                                        </HelperText>
+
+                                        <ScrollView showsVerticalScrollIndicator={false} style={{ flexGrow: 0, marginVertical: 5 }}>
+                                            <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 10 }}>
                                                 {values.MachineGroup && Array.isArray(values.MachineGroup) && values.MachineGroup.length > 0 && values.MachineGroup?.map((item, index) => (
                                                     <TouchableOpacity onPress={() => {
                                                         setFieldValue("MachineGroup", values.MachineGroup && Array.isArray(values.MachineGroup) && values.MachineGroup.filter((id) => id !== item))
                                                     }} key={index}>
                                                         <View id="container-renderSelect" style={masterdataStyles.selectedStyle}>
-                                                            <Text style={[masterdataStyles.text, masterdataStyles.textDark]}>{machineGroups.find((v) => v.value === item)?.label}</Text>
+                                                            <Text style={masterdataStyles.textFFF}>{items.find((v) => v.value === String(item))?.label}</Text>
                                                         </View>
                                                     </TouchableOpacity>
                                                 ))}
                                             </View>
                                         </ScrollView>
-
 
                                         <View style={[styles.timeIntervalMenu, { marginBottom: 0 }]}>
                                             <View id="form-active-point-md" style={[masterdataStyles.containerSwitch]}>
