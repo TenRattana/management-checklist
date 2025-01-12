@@ -206,6 +206,10 @@ const Daily_dialog = React.memo(({ values, setFieldValue, spacing, showError, sh
                             renderRightActions(dragX, index)
                         }
                     >
+                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
+                            {`Detail ${index + 1}`}
+                        </Text>
+                        
                         <View key={`container-${index}`} style={styles.containerTime}>
                             {renderTimeSelection('start', index, timeSlot, hours)}
 

@@ -50,7 +50,7 @@ const Week_dialog = React.memo(({ theme, spacing, responsive, showError, showSuc
     }, []);
 
     const MemoInfoSchedule_dialog = React.memo(InfoSchedule_dialog)
-    
+
     return (
         <>
             <View style={styles.timeIntervalMenu}>
@@ -81,38 +81,44 @@ const Week_dialog = React.memo(({ theme, spacing, responsive, showError, showSuc
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
-                {Object.keys(values).map((day) => (
-                    <View key={day} style={styles.containerWeek}>
-                        <View style={styles.containerBoxWeek}>
-                            <Text style={[masterdataStyles.textFFF, { textAlign: 'center', padding: 10 }]}>
-                                {day}
-                            </Text>
+                {Object.keys(values).map((day, index) => (
+                    <>
+                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
+                            {`Detail day ${index + 1}`}
+                        </Text>
+
+                        <View key={day} style={styles.containerWeek}>
+                            <View style={styles.containerBoxWeek}>
+                                <Text style={[masterdataStyles.textFFF, { textAlign: 'center', padding: 10 }]}>
+                                    {day}
+                                </Text>
+                            </View>
+
+                            <TouchableOpacity
+                                style={[masterdataStyles.button, styles.containerIconWeek]}
+                                onPress={() => setInfoDay(day, 0)}
+                            >
+                                <Icon
+                                    source="information-outline"
+                                    color={theme.colors.blue}
+                                    size={spacing.large}
+                                />
+                                <Text style={[masterdataStyles.text, { paddingLeft: 10 }]}>Info</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                onPress={() => removeDay(day)}
+                                style={[masterdataStyles.button, styles.containerIconWeek]}
+                            >
+                                <Icon
+                                    source="window-close"
+                                    color={theme.colors.error}
+                                    size={spacing.large}
+                                />
+                                <Text style={[masterdataStyles.text, { paddingLeft: 10 }]}>Delete</Text>
+                            </TouchableOpacity>
                         </View>
-
-                        <TouchableOpacity
-                            style={[masterdataStyles.button, styles.containerIconWeek]}
-                            onPress={() => setInfoDay(day, 0)}
-                        >
-                            <Icon
-                                source="information-outline"
-                                color={theme.colors.blue}
-                                size={spacing.large}
-                            />
-                            <Text style={[masterdataStyles.text, { paddingLeft: 10 }]}>Info</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            onPress={() => removeDay(day)}
-                            style={[masterdataStyles.button, styles.containerIconWeek]}
-                        >
-                            <Icon
-                                source="window-close"
-                                color={theme.colors.error}
-                                size={spacing.large}
-                            />
-                            <Text style={[masterdataStyles.text, { paddingLeft: 10 }]}>Delete</Text>
-                        </TouchableOpacity>
-                    </View>
+                    </>
                 ))}
             </ScrollView>
 

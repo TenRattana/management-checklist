@@ -13,7 +13,7 @@ export const styles = StyleSheet.create({
     borderRadius: 8
   },
   containerTime: {
-    marginVertical: 10,
+    marginVertical: 3,
     flexDirection: "row",
     justifyContent: "space-between",
   },

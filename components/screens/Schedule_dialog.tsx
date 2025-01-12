@@ -7,7 +7,7 @@ import { Button, Dialog, Portal, Menu, Switch, HelperText } from 'react-native-p
 import { DropdownMulti, Inputs } from '../common';
 import { TimeScheduleProps } from '@/typing/type';
 import { useToast } from '@/app/contexts/useToast';
-import { FastField, Formik } from 'formik';
+import { FastField, Field, Formik } from 'formik';
 import * as Yup from 'yup'
 import Daily_dialog from './Daily_dialog';
 import Week_dialog from './Week_dialog';
@@ -202,7 +202,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                 <Formik
                     initialValues={initialValues}
                     validationSchema={validationSchema}
-                    validateOnChange={true}
+                    validateOnBlur={false}
                     onSubmit={(values, formikHelpers) => {
                         saveData(values);
                         formikHelpers.resetForm();
@@ -226,22 +226,33 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                                     maxHeight: height / 1.7,
                                 }}>
                                     <View style={{ flexBasis: '46%', marginHorizontal: '2%' }}>
-                                        <Text style={[masterdataStyles.text, { marginHorizontal: 24, marginVertical: 10 }]}>{isEditing ? "Update TimeSchedule detail" : "Create TimeSchedule detail"}</Text>
+                                        <Text style={[masterdataStyles.text, { marginLeft: 10, marginTop: 10 }]}>{isEditing ? "Update TimeSchedule detail" : "Create TimeSchedule detail"}</Text>
 
-                                        <FastField name="ScheduleName">
+                                        <Field name="ScheduleName">
                                             {({ field, form }: any) => (
-                                                <Inputs
-                                                    placeholder="Enter Schedule Name"
-                                                    label="Schedule Name"
-                                                    handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                    handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                    value={field.value ??= ""}
-                                                    error={form.touched.ScheduleName && Boolean(form.errors.ScheduleName)}
-                                                    errorMessage={form.touched.ScheduleName ? form.errors.ScheduleName : ""}
-                                                    testId="schedule-s"
-                                                />
+                                                <>
+                                                    <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 10, paddingLeft: 10 }]}>
+                                                        Schedule Name
+                                                    </Text>
+
+                                                    <Inputs
+                                                        mode='outlined'
+                                                        placeholder="Enter Schedule Name"
+                                                        label="Schedule Name"
+                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                        handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                        value={field.value ??= ""}
+                                                        error={form.touched.ScheduleName && Boolean(form.errors.ScheduleName)}
+                                                        errorMessage={form.touched.ScheduleName ? form.errors.ScheduleName : ""}
+                                                        testId="schedule-s"
+                                                    />
+                                                </>
                                             )}
-                                        </FastField>
+                                        </Field>
+
+                                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
+                                            Group Machine
+                                        </Text>
 
                                         <DropdownMulti
                                             label='machine group'
@@ -310,6 +321,10 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                                     </View>
 
                                     <View style={{ flexBasis: '46%', marginHorizontal: '2%', flex: 1, marginTop: responsive === "small" ? 100 : 0 }}>
+                                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
+                                            Type Schedule
+                                        </Text>
+
                                         <View style={styles.timeIntervalMenu}>
                                             <Menu
                                                 visible={showTimeIntervalMenu.Custom}

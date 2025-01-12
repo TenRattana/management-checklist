@@ -231,6 +231,10 @@ const Custom_schedule_dialog = React.memo(({ showError, showSuccess, spacing, se
                             renderRightActions(dragX, index)
                         }
                     >
+                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
+                            {`Detail ${index + 1}`}
+                        </Text>
+
                         <View key={`container-${index}`} style={styles.containerTime}>
                             {renderTimePicker('start', index, custom)}
 
