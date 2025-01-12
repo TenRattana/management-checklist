@@ -1,15 +1,11 @@
-import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-} from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
 import { Card } from 'react-native-paper';
 import { useQuery } from 'react-query';
-import { AccessibleView } from '@/components';
 import axiosInstance from '@/config/axios';
 import useMasterdataStyles from '@/styles/common/masterdata';
+import { Customtable, LoadingSpinner } from '@/components';
+import { useTheme } from '@/app/contexts/useTheme';
 
 interface Log {
   start: string | null;
@@ -25,7 +21,7 @@ interface TimeTrack {
   ScheduleID: string;
   ScheduleName: string;
   GroupMachines: GMachine[];
-  Track: Log[];
+  Track: Log[] | null;
 }
 
 const fetchTimeTrack = async (): Promise<TimeTrack[]> => {
@@ -33,141 +29,127 @@ const fetchTimeTrack = async (): Promise<TimeTrack[]> => {
   return response.data.data ?? [];
 };
 
-const Render = React.memo(({ group }: { group: TimeTrack }) => {
-  return (
-    <FlatList
-      data={group.Track}
-      keyExtractor={(item, index) => `${index}-start-end`}
-      renderItem={({ item: track }) => (
-        <View style={styles.logRow}>
-          <Text style={styles.logText}>{track.start || '-'}</Text>
-          <Text style={styles.logText}>{track.stop || '-'}</Text>
-          <Text
-            style={[
-              styles.logText,
-              { color: track.start && track.stop ? 'green' : 'red' },
-            ]}
-          >
-            {track.start && track.stop ? 'Finished' : 'In Progress'}
-          </Text>
-        </View>
-      )}
-      ListEmptyComponent={() => (
-        <View style={styles.emptyState}>
-          <Text style={styles.emptyText}>No data available</Text>
-        </View>
-      )}
-      ListHeaderComponent={() => (
-        <View>
-          <Text style={styles.groupName}>{group.ScheduleName}</Text>
-          <Text style={styles.groupSubtitle}>Tracking: {group.Track?.length}</Text>
-          <View style={styles.logHeader}>
-            <Text style={styles.logHeaderText}>Start</Text>
-            <Text style={styles.logHeaderText}>Stop</Text>
-            <Text style={styles.logHeaderText}>Status</Text>
-          </View>
-        </View>
-      )}
-      nestedScrollEnabled={false}
-    />
-  );
-});
-
-const TimescheduleTrack = () => {
+const TimescheduleTrack = React.memo(() => {
+  const [selectedTrack, setSelectedTrack] = useState<string | null>(null);
   const masterdataStyles = useMasterdataStyles();
+  const { theme } = useTheme()
 
-  const { data: timeTrack = [] } = useQuery<TimeTrack[], Error>(
+  const { data: timeTrack = [], isLoading } = useQuery<TimeTrack[], Error>(
     'timeTrack',
-    fetchTimeTrack,
+    fetchTimeTrack
   );
+
+  const handleTrackSelect = (ScheduleID: string) => {
+    setSelectedTrack(ScheduleID);
+  };
+
+  const convertToThaiDateTime = (dateString: string | null) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear() + 543;
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${day}/${month}/${year} เวลา ${hours}:${minutes}`;
+  };
+
+  const styles = StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      flex: 1,
+      backgroundColor: theme.colors.background,
+      height: '100%',
+    },
+    leftPanel: {
+      width: '30%',
+      backgroundColor: theme.colors.background,
+      padding: 15,
+      borderRightWidth: 1,
+      borderRightColor: '#D0D0D0',
+      height: '100%',
+    },
+    header: {
+      fontSize: 22,
+      textAlign: 'center',
+      color: '#333',
+      marginTop: 15,
+    },
+    card: {
+      marginBottom: 20,
+      backgroundColor: theme.colors.background,
+      borderRadius: 10,
+      elevation: 4,
+      padding: 15,
+    },
+    timeTrackItem: {
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: '#D0D0D0',
+    },
+    timeTrackName: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: '#333',
+    },
+  });
+
+  const tableData = useMemo(() => {
+    const selectedSchedule = timeTrack.find((item) => item.ScheduleID === selectedTrack);
+
+    if (!selectedSchedule) {
+      return [];
+    }
+
+    return selectedSchedule.Track?.map((log, index) => [
+      `Detail ${index + 1}`,
+      selectedSchedule.ScheduleName,
+      convertToThaiDateTime(log.start),
+      convertToThaiDateTime(log.stop),
+    ]) || [];
+  }, [timeTrack, selectedTrack]);
+
+  const customtableProps = useMemo(() => ({
+    Tabledata: tableData,
+    Tablehead: [
+      { label: "", align: "flex-start" },
+      { label: "Schedule Name", align: "flex-start" },
+      { label: "Start", align: "flex-start" },
+      { label: "End", align: "flex-start" },
+    ],
+    flexArr: [1, 2, 2, 2],
+    actionIndex: [{}],
+    showMessage: 1,
+    searchQuery: " ",
+  }), [tableData]);
 
   return (
-    <AccessibleView name="container-timetrack" style={styles.container}>
-      <Card.Title
-        title="Time Tracking"
-        titleStyle={[masterdataStyles.textBold, styles.header]}
-      />
+    <View style={styles.container}>
+      <View style={styles.leftPanel}>
+        <Card.Title
+          title="Time Tracking"
+          titleStyle={[masterdataStyles.textBold, styles.header]}
+        />
 
-      <FlatList
-        data={timeTrack}
-        keyExtractor={(item) => `${item.ScheduleID}-key`}
-        renderItem={({ item: group }) => (
-          <View key={group.ScheduleID} style={styles.groupCard}>
-            <Render group={group} />
-          </View>
-        )}
-      />
-    </AccessibleView>
+        <FlatList
+          data={timeTrack}
+          keyExtractor={(item) => item.ScheduleID}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => handleTrackSelect(item.ScheduleID)}>
+              <View style={styles.timeTrackItem}>
+                <Text style={styles.timeTrackName}>{item.ScheduleName}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+
+      <View style={{ flex: 1, marginHorizontal: 24 }}>
+        {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+      </View>
+    </View>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f9f9f9',
-    padding: 10,
-  },
-  header: {
-    fontSize: 18,
-    marginVertical: 10,
-    textAlign: 'center',
-    color: '#333',
-  },
-  groupCard: {
-    marginBottom: 15,
-    padding: 15,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    elevation: 3,
-  },
-  groupName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#444',
-  },
-  groupSubtitle: {
-    color: '#666',
-    marginVertical: 5,
-    fontSize: 14,
-  },
-  logHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    paddingVertical: 5,
-    marginTop: 10,
-  },
-  logHeaderText: {
-    fontWeight: 'bold',
-    fontSize: 14,
-    color: '#444',
-    width: '33%',
-    textAlign: 'center',
-  },
-  logRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 5,
-    paddingVertical: 5,
-    backgroundColor: '#f7f7f7',
-    borderRadius: 5,
-  },
-  logText: {
-    fontSize: 13,
-    width: '33%',
-    textAlign: 'center',
-    color: '#555',
-  },
-  emptyState: {
-    alignSelf: 'center',
-    paddingVertical: 20,
-  },
-  emptyText: {
-    fontStyle: 'italic',
-    color: '#aaa',
-    textAlign: 'center',
-  },
 });
 
 export default TimescheduleTrack;
