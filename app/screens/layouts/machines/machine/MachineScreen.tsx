@@ -155,7 +155,7 @@ const MachineGroupScreen = React.memo(() => {
             item.GMachineName || "",
             item.MachineName,
             item.Description,
-            item.FormID ? "U" : "N",
+            item.FormID ? "Used" : "Null",
             item.IsActive,
             item.MachineID,
         ]);
