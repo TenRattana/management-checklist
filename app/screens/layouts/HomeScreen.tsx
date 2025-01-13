@@ -44,8 +44,8 @@ const RenderCategoryItem = React.memo(({ item, toggleCheckbox, checkedItems }: {
 
 const HomeScreen = React.memo(() => {
   const [currentDate, setCurrentDate] = useState(CalendarUtils.getCalendarDateString(getCurrentTime().setDate(getCurrentTime().getDate() + 0)));
-  const { theme } = useTheme();
-  const { spacing, responsive } = useRes();
+  const { theme, darkMode } = useTheme();
+  const { spacing, responsive, fontSize } = useRes();
 
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({
     '1': true,
@@ -203,7 +203,7 @@ const HomeScreen = React.memo(() => {
                 ))}
               </View>
 
-              <View style={{ flex: 1 }} key={JSON.stringify(responsive)}>
+              <View style={{ flex: 1 }} key={JSON.stringify({ responsive, darkMode, fontSize })}>
                 <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
                   <LazyTimelines filterStatus={filterStatus} filterTitle={filterTitle} computedTimeline={computedTimeline} />
                 </Suspense>

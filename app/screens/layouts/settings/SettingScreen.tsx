@@ -57,7 +57,7 @@ const SettingsScreen = React.memo(() => {
       // color: theme.colors.onBackground,
       backgroundColor: theme.colors.background,
       borderWidth: 0,
-      // padding: 10,
+      padding: 10,
       borderRadius: 8,
       // flex: 1
     },
@@ -66,7 +66,7 @@ const SettingsScreen = React.memo(() => {
       alignItems: 'center'
     },
     userInfoRow: {
-      // paddingVertical: fontSize === "large" ? 10 : fontSize === "medium" ? 5 : 2,
+      paddingVertical: fontSize === "large" ? 10 : fontSize === "medium" ? 5 : 2,
     },
     switch: {
       transform: [{ scale: fontSize === "large" ? 1.5 : fontSize === "medium" ? 1 : 0.9 }],
@@ -75,9 +75,9 @@ const SettingsScreen = React.memo(() => {
 
   return (
     <View id="setting" style={[masterdataStyles.container]}>
-      <View id="setting-mode" style={[masterdataStyles.settingItem, { paddingVertical: 0 }]}>
+      <View id="setting-mode" style={[masterdataStyles.settingItem, { paddingVertical: 10 }]}>
         <Text style={[masterdataStyles.text, { alignSelf: 'center', alignItems: 'center' }]}>Dark Mode</Text>
-        <View>
+        <View style={{ paddingRight: 20 }}>
           <Switch
             onValueChange={toggleSwitch}
             value={darkMode}
@@ -91,7 +91,7 @@ const SettingsScreen = React.memo(() => {
 
       <View id="setting-font" style={[masterdataStyles.settingItem, { paddingVertical: 2 }]}>
         <Text style={[masterdataStyles.text, { alignSelf: 'center', alignItems: 'center' }]}>Font Size</Text>
-        <View>
+        <View style={{ paddingLeft: 10 }}>
           <PickerDropdown
             label=""
             border={false}
