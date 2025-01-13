@@ -59,7 +59,7 @@ const RenderItemSmall = React.memo(({ item, index, Tablehead, actionIndex, detai
                             rowIndex: index,
                             row: item,
                             Canedit: item[Number(actionItem["disables"])] || false,
-                            Candel: item[Number(actionItem["delete"])] || false,
+                            Candel: item[Number(actionItem["delete"])],
                             handlePress,
                             selectedRows,
                             toggleSelect,
