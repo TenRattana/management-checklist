@@ -94,10 +94,11 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
     };
 
     useEffect(() => {
-        if (!isLoadingForm && found && state.UserID) {
-            setLoad(false)
+        if (!isLoadingForm && found) {
+            state.UserID && setLoad(false) 
+            !exp && setLoad(false)
         }
-    }, [isLoadingForm, found, state.UserID])
+    }, [isLoadingForm, found, state.UserID,exp])
 
     const convertToThaiDateTime = (dateString: string) => {
         const date = new Date(dateString);
