@@ -37,17 +37,14 @@ const LoginScreen: React.FC = React.memo(() => {
       alignContent: 'center',
       justifyContent: 'center',
       height: '100%',
-      backgroundColor: theme.colors.onBackground
     }
   })
 
   return (
     <View id="login-container" style={[masterdataStyles.container, styles.container]}>
-      <Card style={[masterdataStyles.containerDialog, { alignSelf: 'center' }]}>
-        <Card.Title
-          title={`Login`}
-          titleStyle={[masterdataStyles.textBold, { fontSize: spacing.small, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
-        />
+      <Card style={[masterdataStyles.containerDialog, { alignSelf: 'center', padding: 20 }]}>
+        <Text style={[masterdataStyles.text, masterdataStyles.title, masterdataStyles.textBold, { paddingLeft: 8 }]}>Login</Text>
+
         <Card.Content style={{ padding: 2, paddingVertical: 10 }}>
 
           <Formik
