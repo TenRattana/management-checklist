@@ -19,6 +19,7 @@ interface Toast {
   id: string;
   message: string;
   status: "success" | "error";
+  progressAnim: Animated.Value;
 }
 
 export const ToastContext = createContext<ToastContextProps | undefined>(undefined);
@@ -30,7 +31,15 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
 
   const addToast = useCallback((message: string, status: "success" | "error") => {
     const id = Math.random().toString(36).substring(7);
-    setToasts((prev) => [...prev, { id, message, status }]);
+    const progressAnim = new Animated.Value(1);
+
+    Animated.timing(progressAnim, {
+      toValue: 0,
+      duration: 5000,
+      useNativeDriver: false,
+    }).start();
+
+    setToasts((prev) => [...prev, { id, message, status, progressAnim }]);
 
     const timeoutId = setTimeout(() => {
       setToasts((prev) => prev.filter((toast) => toast.id !== id));
@@ -57,7 +66,6 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
         errorMsg = error.response?.data?.errors ?? [
           "Something went wrong!",
         ];
-
       } else if (error instanceof Error) {
         errorMsg = [error.message, "An unexpected issue occurred."];
       } else {
@@ -87,7 +95,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
                 {
                   top: index * 15,
                   backgroundColor: toast.status === "error" ? theme.colors.error : theme.colors.succeass,
-                }
+                },
               ]}
             >
               <View style={{ flexBasis: '90%', flexDirection: 'row' }}>
@@ -98,9 +106,24 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
                   style={styles.icon}
                 />
                 <View style={styles.messageContainer}>
-                  <Text style={{ fontSize: spacing.small, color: theme.colors.fff }}>{toast.message}</Text>
+                  <Text style={{ fontSize: spacing.small, color: theme.colors.fff }}>
+                    {toast.message}
+                  </Text>
                 </View>
               </View>
+
+              <Animated.View
+                style={[
+                  styles.progressBar,
+                  {
+                    width: toast.progressAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ["0%", "100%"],
+                    }),
+                  },
+                ]}
+              />
+
               <TouchableOpacity
                 onPress={() =>
                   setToasts((prev) => prev.filter((item) => item.id !== toast.id))
@@ -110,7 +133,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
                 <MaterialIcons name="close" size={spacing.large} color="white" />
               </TouchableOpacity>
             </Animated.View>
-          )
+          );
         })}
       </View>
     </ToastContext.Provider>
@@ -139,12 +162,21 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginVertical: 5,
     maxWidth: 350,
+    overflow: 'hidden',
   },
   icon: {
     marginRight: 8,
   },
   messageContainer: {
     maxWidth: 250,
+    padding: 5,
     paddingRight: 8,
+  },
+  progressBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    height: 3,
+    backgroundColor: 'white',
   },
 });
