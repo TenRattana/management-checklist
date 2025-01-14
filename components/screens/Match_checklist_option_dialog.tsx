@@ -12,6 +12,8 @@ import { fetchCheckListOption, fetchGroupCheckListOption, fetchSearchCheckListOp
 import { useInfiniteQuery, useQueryClient } from "react-query";
 import { Dropdown, DropdownMulti } from "../common";
 import { useRes } from "@/app/contexts/useRes";
+import HeaderDialog from "./HeaderDialog";
+import { useSelector } from "react-redux";
 
 const validationSchema = Yup.object().shape({
     groupCheckListOptionId: Yup.string().required("This group check list field is required"),
@@ -29,6 +31,7 @@ const Match_checklist_option = React.memo(({
     const masterdataStyles = useMasterdataStyles();
     const { theme } = useTheme();
     const { spacing } = useRes()
+    const state = useSelector((state: any) => state.prefix);
 
     const [open, setOpen] = useState(false);
     const [openCO, setOpenCO] = useState(false);
@@ -135,24 +138,24 @@ const Match_checklist_option = React.memo(({
             backgroundColor: theme.colors.drag,
             borderRadius: 4,
         },
+        buttonSubmit: {
+            backgroundColor: theme.colors.green,
+            marginRight: 5,
+            flexDirection: "row"
+        },
+        containerAction: {
+            justifyContent: "flex-end",
+            flexDirection: 'row',
+            paddingTop: 10,
+            paddingRight: 20
+        }
     })
 
     return (
         <Portal>
             <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={masterdataStyles.containerDialog}>
                 <Dialog.Content>
-                    <View style={{ justifyContent: "space-between", flexDirection: 'row', alignItems: 'center' }}>
-                        <View style={{ justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center' }}>
-                            <Icon source="information-outline" size={spacing.large} color={theme.colors.green} />
-                            <Text style={[masterdataStyles.text, masterdataStyles.title, masterdataStyles.textBold, { paddingLeft: 8 }]}>{isEditing ? "Edit" : "Create"}
-                            </Text>
-                        </View>
-                        <IconButton icon="close" size={20} iconColor={theme.colors.onBackground} onPress={() => setIsVisible(false)} />
-                    </View>
-
-                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginBottom: 10 }]}>
-                        {isEditing ? "Edit the details of the match check list option & group check list option." : "Enter the details for the match check list option & group check list option."}
-                    </Text>
+                    <HeaderDialog isEditing setIsVisible={() => setIsVisible(false)} display={state.MatchCheckListOption} />
 
                     <Formik
                         initialValues={initialValues}
@@ -190,11 +193,11 @@ const Match_checklist_option = React.memo(({
                             return (
                                 <View id="form-mcod">
                                     <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 20, paddingLeft: 10 }]}>
-                                        Group Check List Type
+                                        {state.GroupCheckList}
                                     </Text>
 
                                     <Dropdown
-                                        label='Group Check List Type'
+                                        label={state.GroupCheckList}
                                         open={open}
                                         setOpen={setOpen}
                                         setDebouncedSearchQuery={setDebouncedSearchQuery}
@@ -216,11 +219,11 @@ const Match_checklist_option = React.memo(({
                                     </HelperText>
 
                                     <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 5, paddingLeft: 10 }]}>
-                                        Group Check List Type
+                                        {state.CheckListOption}
                                     </Text>
 
                                     <DropdownMulti
-                                        label='Check List Type'
+                                        label={state.CheckListOption}
                                         open={openCO}
                                         setOpen={setOpenCO}
                                         searchQuery={debouncedSearchQueryCO}
@@ -256,7 +259,7 @@ const Match_checklist_option = React.memo(({
                                     </ScrollView>
 
                                     <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 10, paddingLeft: 10 }]}>
-                                        Match Check List Group & Option Status
+                                        {`${state.MatchCheckListOption} Status`}
                                     </Text>
 
                                     <View id="form-active-mcod" style={masterdataStyles.containerSwitch}>
@@ -275,10 +278,10 @@ const Match_checklist_option = React.memo(({
                                         />
                                     </View>
 
-                                    <View style={[masterdataStyles.containerAction, { justifyContent: "flex-end", flexDirection: 'row', paddingTop: 10, paddingRight: 20 }]}>
+                                    <View style={[masterdataStyles.containerAction, styles.containerAction]}>
                                         <TouchableOpacity
                                             onPress={() => handleSubmit()}
-                                            style={[styles.button, { backgroundColor: theme.colors.green, marginRight: 5, flexDirection: "row" }]}
+                                            style={[styles.button, styles.buttonSubmit]}
                                         >
                                             <Icon source="check" size={spacing.large} color={theme.colors.fff} />
 

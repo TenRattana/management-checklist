@@ -97,7 +97,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
     };
 
     const data = {
-      Prefix: prefix.ExpectedResult,
+      Prefix: prefix.PF_ExpectedResult,
       FormData: JSON.stringify(updatedSubForms),
       UserInfo: JSON.stringify(userData),
     };

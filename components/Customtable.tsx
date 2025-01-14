@@ -9,7 +9,7 @@ import { debounce, throttle } from "lodash";
 
 const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, actionIndex, searchQuery, showMessage, selectedRows, setRow,
   showFilter, showData, showColumn, detail, detailData, detailKey, detailKeyrow, showDetailwithKey, ShowTitle, handlePaginationChange, isFetchingNextPage, hasNextPage, fetchNextPage,
-  showFilterDate, setFilterDate, searchfilter, handlefilter, filterColumn }: CustomTableProps) => {
+  showFilterDate, setFilterDate, searchfilter, handlefilter, filterColumn, isFetching }: CustomTableProps) => {
 
   const [displayData, setDisplayData] = useState<(string | number | boolean)[][]>([]);
   const [filter, setFilter] = useState<string | null>(null);
@@ -222,6 +222,7 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
             actionIndex={actionIndex}
             displayData={displayData}
             flexArr={flexArr}
+            isFetching={isFetching}
             handleDialog={handleDialog}
             selectedRows={selectedRows}
             toggleSelect={toggleSelect}

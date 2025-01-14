@@ -94,7 +94,7 @@ const ChecklistGroupScreen = React.memo(() => {
 
     const saveData = useCallback(async (values: InitialValuesGroupCheckList) => {
         const data = {
-            Prefix: state.GroupCheckList ?? "",
+            Prefix: state.PF_GroupCheckList ?? "",
             GCLOptionID: values.groupCheckListOptionId,
             GCLOptionName: values.groupCheckListOptionName,
             IsActive: values.isActive,
@@ -155,7 +155,7 @@ const ChecklistGroupScreen = React.memo(() => {
         Tabledata: tableData,
         Tablehead: [
             { label: "", align: "flex-start" },
-            { label: "Group Option Name", align: "flex-start" },
+            { label: state.GroupCheckList, align: "flex-start" },
             { label: "Status", align: "center" },
             { label: "", align: "center" },
         ],
@@ -164,7 +164,8 @@ const ChecklistGroupScreen = React.memo(() => {
         handleAction,
         showMessage: 1,
         searchQuery: debouncedSearchQuery,
-    }), [tableData, debouncedSearchQuery, handleAction]);
+        isFetching: isFetching
+    }), [tableData, debouncedSearchQuery, handleAction, state.GroupCheckList, isFetching]);
 
     const styles = StyleSheet.create({
         container: {
@@ -188,18 +189,18 @@ const ChecklistGroupScreen = React.memo(() => {
     return (
         <View id="container-groupchecklist" style={styles.container}>
             <Card.Title
-                title="Create Group Option"
+                title={`List ${state.GroupCheckList}` || "List"}
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
             <View id="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
-                    placeholder="Search Group CheckList..."
+                    placeholder={`Search ${state.GroupCheckList}...`}
                     value={searchQuery}
                     onChange={setSearchQuery}
                     testId="search-groupchecklist"
                 />
                 <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Group Option</Text>
+                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.GroupCheckList}`}</Text>
                 </TouchableOpacity>
             </View>
             <Card.Content style={styles.cardcontent}>

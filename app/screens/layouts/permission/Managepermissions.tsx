@@ -99,7 +99,7 @@ const Managepermissions = React.memo(() => {
 
   const saveData = useCallback(async (values: InitialValuesManagepermission) => {
     const data = {
-      Prefix: state.UsersPermission ?? "",
+      Prefix: state.PF_UsersPermission ?? "",
       UserID: values.UserID,
       UserName: values.UserName,
       GUserID: values.GUserID,
@@ -180,7 +180,7 @@ const Managepermissions = React.memo(() => {
   return (
     <AccessibleView name="container-checklist" style={{ flex: 1 }}>
       <Card.Title
-        title="List User"
+        title={`List ${state.UsersPermission}` || "List"}
         titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
       />
       <AccessibleView name="match-form-machine" style={masterdataStyles.containerSearch}>

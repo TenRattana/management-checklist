@@ -5,13 +5,14 @@ import { CustomtableDataProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { Easing, FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { FlatList } from "react-native-gesture-handler";
+import { View } from "react-native";
 
 FadeInUp.duration(300).easing(Easing.ease);
 FadeOutDown.duration(300).easing(Easing.ease);
 
 const LazyRenderItem = React.lazy(() => import('./Contents/RenderItem'));
 
-const CustomtableData = React.memo(({ Tablehead, flexArr, actionIndex, displayData, handleDialog, showMessage, selectedRows, toggleSelect, detail, detailKey, detailData, detailKeyrow, showDetailwithKey, handlePaginationChange }: CustomtableDataProps) => {
+const CustomtableData = React.memo(({ Tablehead, flexArr, actionIndex, displayData, handleDialog, showMessage, selectedRows, toggleSelect, detail, detailKey, detailData, detailKeyrow, showDetailwithKey, handlePaginationChange, isFetching }: CustomtableDataProps) => {
     const masterdataStyles = useMasterdataStyles();
     const [dialogState, setDialogState] = useState({ isVisible: false, action: "", message: "", title: "", data: "" });
 
@@ -49,9 +50,10 @@ const CustomtableData = React.memo(({ Tablehead, flexArr, actionIndex, displayDa
                 keyExtractor={(item, index) => `${index}-${item}`}
                 ListEmptyComponent={() => (
                     <Text style={[masterdataStyles.text, { textAlign: 'center', fontStyle: 'italic' }]}>
-                        No data found...
+                        {isFetching ? "Loading ..." : "No data found..."}
                     </Text>
                 )}
+                ListFooterComponent={() => displayData.length > 0 && isFetching && <View style={{ padding: 20 }}><LoadingSpinner /></View>}
                 contentContainerStyle={{ flexGrow: 1 }}
                 nestedScrollEnabled={true}
                 showsVerticalScrollIndicator={true}

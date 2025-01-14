@@ -54,7 +54,7 @@ const Configuration: React.FC<ConfigurationProps> = React.memo(({ prefix, handle
             </AccessibleView>
 
             <AccessibleView name="setting-mode" style={[masterdataStyles.configPrefix]}>
-                <Text style={[masterdataStyles.settingText, masterdataStyles.textBold]}>Fix Prefixes</Text>
+                <Text style={[masterdataStyles.settingText, masterdataStyles.textBold]}>Display & Prefixes</Text>
                 {['GroupMachine', 'Machine', 'CheckList', 'GroupCheckList', 'CheckListOption', 'MatchCheckListOption', 'MatchFormMachine', 'Form', 'SubForm', 'ExpectedResult', 'UsersPermission', "TimeSchedule"].map((item) => (
                     <React.Fragment key={item}>
                         <MemoConfigItem
@@ -63,6 +63,14 @@ const Configuration: React.FC<ConfigurationProps> = React.memo(({ prefix, handle
                             value={state[item]}
                             editable={edit[item]}
                             onEdit={(v: boolean) => handelEdit(item, v)}
+                            handleSubmit={handleSubmit}
+                        />
+                        <MemoConfigItem
+                            state={state}
+                            label={`PF_${item}`}
+                            value={state[`PF_${item}`]}
+                            editable={edit[`PF_${item}`]}
+                            onEdit={(v: boolean) => handelEdit(`PF_${item}`, v)}
                             handleSubmit={handleSubmit}
                         />
                         <Divider style={styles.divider} />

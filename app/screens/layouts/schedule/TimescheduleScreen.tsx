@@ -87,7 +87,7 @@ const TimescheduleScreen: React.FC = React.memo(() => {
 
     const saveData = useCallback(async (values: TimeScheduleProps) => {
         const data = {
-            Prefix: state.TimeSchedule ?? "",
+            Prefix: state.PF_TimeSchedule ?? "",
             Schedule: JSON.stringify(values)
         };
         mutation.mutate(data);
@@ -198,7 +198,7 @@ const TimescheduleScreen: React.FC = React.memo(() => {
     return (
         <View id="container-schedule" style={styles.container}>
             <Card.Title
-                title="List Time Schedule"
+                title={state.TimeSchedule || "List Time Schedule"}
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
             <View id="container-search" style={masterdataStyles.containerSearch}>
@@ -209,7 +209,7 @@ const TimescheduleScreen: React.FC = React.memo(() => {
                     testId="search-schedule"
                 />
                 <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Add New Schedule</Text>
+                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.TimeSchedule}`}</Text>
                 </TouchableOpacity>
             </View>
             <Card.Content style={styles.cardcontent}>

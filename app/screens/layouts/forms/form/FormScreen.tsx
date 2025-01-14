@@ -13,12 +13,14 @@ import { useRes } from "@/app/contexts/useRes";
 import { useTheme } from "@/app/contexts/useTheme";
 import { navigate } from "@/app/navigations/navigationUtils";
 import { useFocusEffect } from "expo-router";
+import { useSelector } from "react-redux";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
 const FormScreen: React.FC<FormScreenProps> = React.memo(({ route }) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
+    const state = useSelector((state: any) => state.prefix);
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
@@ -105,6 +107,7 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ route }) => {
     const tableData = useMemo(() => {
         return form.map((item) => [
             item.Disables,
+            item.Deletes,
             item.FormName,
             item.Description,
             item.FormState ?? "-",
@@ -120,21 +123,23 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ route }) => {
         Tabledata: tableData,
         Tablehead: [
             { label: "", align: "flex-start" },
-            { label: "Form Name", align: "flex-start" },
-            { label: "Form Description", align: "flex-start" },
-            { label: "Form Status", align: "center" },
+            { label: "", align: "flex-start" },
+            { label: `${state.Form} Name`, align: "flex-start" },
+            { label: `${state.Form} Description`, align: "flex-start" },
+            { label: `${state.Form} Status`, align: "center" },
             { label: "Status", align: "center" },
             { label: "Change", align: "center" },
             { label: "Copy", align: "center" },
             { label: "View", align: "center" },
             { label: "Delete", align: "center" },
         ],
-        flexArr: [0, 2, 2, 1, 1, 1, 1, 1, 1],
-        actionIndex: [{ disables: 0, changeIndex: 5, copyIndex: 6, preIndex: 7, delOnlyIndex: 8 }],
+        flexArr: [0, 0, 2, 2, 1, 1, 1, 1, 1, 1],
+        actionIndex: [{ disables: 0, delete: 1, changeIndex: 6, copyIndex: 7, preIndex: 8, delOnlyIndex: 9 }],
         showMessage: 1,
         handleAction,
         searchQuery: debouncedSearchQuery,
-    }), [tableData, searchQuery, handleAction, debouncedSearchQuery]);
+        isFetching: isFetching
+    }), [tableData, searchQuery, handleAction, debouncedSearchQuery, state.Form, isFetching]);
 
     const styles = StyleSheet.create({
         container: {
@@ -158,7 +163,7 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ route }) => {
     return (
         <View id="container-form" style={styles.container}>
             <Card.Title
-                title="Forms"
+                title={`List ${state.Form}` || "List"}
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
             <View id="container-search" style={masterdataStyles.containerSearch}>
@@ -169,7 +174,7 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ route }) => {
                     testId="search-form"
                 />
                 <TouchableOpacity onPress={handleNewForm} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>New Form</Text>
+                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.Form}`}</Text>
                 </TouchableOpacity>
             </View>
             <Card.Content style={styles.cardcontent}>

@@ -93,7 +93,7 @@ const MatchFormMachineScreen = React.memo(() => {
 
     const saveData = useCallback(async (values: InitialValuesMatchFormMachine, status: boolean) => {
         const data = {
-            Prefix: state.MatchFormMachine ?? "",
+            Prefix: state.PF_MatchFormMachine ?? "",
             MachineID: values.machineId,
             FormID: values.formId,
             Mode: status ? "edit" : "add"
@@ -156,8 +156,8 @@ const MatchFormMachineScreen = React.memo(() => {
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: [
-            { label: "Machine Name", align: "flex-start" },
-            { label: "Form Name", align: "flex-start" },
+            { label: state.Machine, align: "flex-start" },
+            { label: state.Form, align: "flex-start" },
             { label: "Change", align: "center" },
             { label: "Copy", align: "center" },
             { label: "Preview", align: "center" },
@@ -176,7 +176,8 @@ const MatchFormMachineScreen = React.memo(() => {
         handleAction,
         showMessage: [0, 1],
         searchQuery: debouncedSearchQuery,
-    }), [tableData, debouncedSearchQuery, handleAction]);
+        isFetching: isFetching
+    }), [tableData, debouncedSearchQuery, handleAction, isFetching, state.Machine, state.Form]);
 
     const styles = StyleSheet.create({
         container: {
@@ -200,7 +201,7 @@ const MatchFormMachineScreen = React.memo(() => {
     return (
         <View id="container-checklist" style={styles.container}>
             <Card.Title
-                title="Create Match Machine & Form"
+                title={`List ${state.MatchFormMachine}` || "List"}
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
             <View id="container-search" style={masterdataStyles.containerSearch}>
@@ -211,7 +212,7 @@ const MatchFormMachineScreen = React.memo(() => {
                     testId="search-match-form-machine"
                 />
                 <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Match Machine & Form</Text>
+                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.MatchFormMachine}`}</Text>
                 </TouchableOpacity>
             </View>
             <Card.Content style={styles.cardcontent}>

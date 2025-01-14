@@ -101,7 +101,7 @@ const MachineGroupScreen = React.memo(() => {
 
     const saveData = useCallback(async (values: InitialValuesMachine) => {
         const data = {
-            Prefix: state.Machine ?? "",
+            Prefix: state.PF_Machine ?? "",
             MachineID: values.machineId,
             GMachineID: values.machineGroupId ?? "",
             MachineCode: values.machineCode,
@@ -152,6 +152,7 @@ const MachineGroupScreen = React.memo(() => {
     const tableData = useMemo(() => {
         return machines.map((item) => [
             item.Disables,
+            item.Deletes,
             item.GMachineName || "",
             item.MachineName,
             item.Description,
@@ -183,19 +184,21 @@ const MachineGroupScreen = React.memo(() => {
         Tabledata: tableData,
         Tablehead: [
             { label: "", align: "flex-start" },
-            { label: "Group Machine Name", align: "flex-start" },
-            { label: "Machine Name", align: "flex-start" },
+            { label: "", align: "flex-start" },
+            { label: state.GroupMachine, align: "flex-start" },
+            { label: state.Machine, align: "flex-start" },
             { label: "Description", align: "flex-start" },
             { label: "Used Form", align: "center" },
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
         ],
-        flexArr: [0, 2, 2, 2, 1, 1, 1],
-        actionIndex: [{ disables: 0, editIndex: 6, delIndex: 7 }],
+        flexArr: [0, 0, 2, 2, 2, 1, 1, 1],
+        actionIndex: [{ disables: 0, delete: 1, editIndex: 7, delIndex: 8 }],
         handleAction,
         showMessage: 2,
         searchQuery: debouncedSearchQuery,
-    }), [tableData, debouncedSearchQuery, handleAction]);
+        isFetching: isFetching
+    }), [tableData, debouncedSearchQuery, handleAction, state.GroupMachine, state.Machine, isFetching]);
 
     const styles = StyleSheet.create({
         container: {
@@ -219,18 +222,18 @@ const MachineGroupScreen = React.memo(() => {
     return (
         <View id="container-machine" style={styles.container}>
             <Card.Title
-                title="Create Machine"
+                title={`List ${state.Machine}` || "List"}
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
             <View id="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
-                    placeholder="Search Machine..."
+                    placeholder={`Search ${state.Machine}...`}
                     value={searchQuery}
                     onChange={setSearchQuery}
                     testId="search-machine"
                 />
                 <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Machine</Text>
+                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.Machine}`}</Text>
                 </TouchableOpacity>
             </View>
             <Card.Content style={styles.cardcontent}>

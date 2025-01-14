@@ -14,7 +14,7 @@ import { fetchCheckList, fetchSearchCheckList, saveCheckList } from "@/app/servi
 import { useTheme } from "@/app/contexts/useTheme";
 import { useFocusEffect } from "expo-router";
 
-const LzyChecklist_dialog = lazy(() => import("@/components/screens/Checklist_dialog"));
+const LazyChecklist_dialog = lazy(() => import("@/components/screens/Checklist_dialog"));
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
 const CheckListScreen = React.memo(() => {
@@ -91,7 +91,7 @@ const CheckListScreen = React.memo(() => {
 
     const saveData = useCallback(async (values: InitialValuesChecklist) => {
         const data = {
-            Prefix: state.CheckList ?? "",
+            Prefix: state.PF_CheckList ?? "",
             CListID: values.checkListId ?? "",
             CListName: values.checkListName,
             IsActive: values.isActive,
@@ -149,7 +149,7 @@ const CheckListScreen = React.memo(() => {
         Tabledata: tableData,
         Tablehead: [
             { label: "", align: "flex-start" },
-            { label: "Check List Name", align: "flex-start" },
+            { label: state.CheckList, align: "flex-start" },
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
         ],
@@ -158,7 +158,8 @@ const CheckListScreen = React.memo(() => {
         handleAction,
         showMessage: 1,
         searchQuery: debouncedSearchQuery,
-    }), [tableData, debouncedSearchQuery, handleAction]);
+        isFetching: isFetching
+    }), [tableData, debouncedSearchQuery, handleAction, state.CheckList, isFetching]);
 
     const styles = StyleSheet.create({
         container: {
@@ -182,18 +183,18 @@ const CheckListScreen = React.memo(() => {
     return (
         <View id="container-checklist" style={styles.container}>
             <Card.Title
-                title="Create Check List"
+                title={`List ${state.CheckList}` || "List"}
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
             <View id="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
-                    placeholder="Search Checklist..."
+                    placeholder={`Search ${state.CheckList}...`}
                     value={searchQuery}
                     onChange={setSearchQuery}
                     testId="search-checklist"
                 />
                 <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Check List</Text>
+                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.CheckList}`}</Text>
                 </TouchableOpacity>
             </View>
             <Card.Content style={styles.cardcontent}>
@@ -205,7 +206,7 @@ const CheckListScreen = React.memo(() => {
             {isVisible && (
                 <View style={{ flex: 1, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' }}>
                     <Suspense fallback={<LoadingSpinner />}>
-                        <LzyChecklist_dialog
+                        <LazyChecklist_dialog
                             isVisible={isVisible}
                             setIsVisible={setIsVisible}
                             isEditing={isEditing}

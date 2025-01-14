@@ -95,7 +95,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
 
     const saveData = useCallback(async (values: InitialValuesMatchCheckListOption) => {
         const data = {
-            Prefix: state.MatchCheckListOption ?? "",
+            Prefix: state.PF_MatchCheckListOption ?? "",
             MCLOptionID: values.matchCheckListOptionId,
             GCLOptionID: values.groupCheckListOptionId,
             CLOptionID: JSON.stringify(values.checkListOptionId),
@@ -163,8 +163,8 @@ const MatchCheckListOptionScreen = React.memo(() => {
         Tablehead: [
             { label: "", align: "flex-start" },
             { label: "", align: "flex-start" },
-            { label: "Group Name", align: "flex-start" },
-            { label: "Option Name", align: "flex-start" },
+            { label: state.GroupCheckList, align: "flex-start" },
+            { label: state.CheckListOption, align: "flex-start" },
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
         ],
@@ -173,7 +173,8 @@ const MatchCheckListOptionScreen = React.memo(() => {
         showMessage: 2,
         handleAction,
         searchQuery: debouncedSearchQuery,
-    }), [tableData, debouncedSearchQuery, handleAction]);
+        isFetching: isFetching
+    }), [tableData, debouncedSearchQuery, handleAction, state.GroupCheckList, state.CheckListOption, isFetching]);
 
     const styles = StyleSheet.create({
         container: {
@@ -197,7 +198,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
     return (
         <View id="container-matchchecklist" style={styles.container}>
             <Card.Title
-                title="Create Match Group & Option"
+                title={`List ${state.MatchCheckListOption}` || "List"}
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
             <View id="container-search" style={masterdataStyles.containerSearch}>
@@ -208,7 +209,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
                     testId="search-match-checklist"
                 />
                 <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Match Group & Option</Text>
+                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.MatchCheckListOption}`}</Text>
                 </TouchableOpacity>
             </View>
             <Card.Content style={styles.cardcontent}>

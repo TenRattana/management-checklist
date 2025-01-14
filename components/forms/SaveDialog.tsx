@@ -29,8 +29,8 @@ const SaveDialog = React.memo(({
         }
 
         const data = {
-            PrefixForm: prefix.Form,
-            PrefixSForm: prefix.SubForm,
+            PrefixForm: prefix.PF_Form,
+            PrefixSForm: prefix.PF_SubForm,
             SubFormData: JSON.stringify(state.subForms),
             FormData: JSON.stringify(form),
         };

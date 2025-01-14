@@ -23,6 +23,7 @@ export interface Machine {
   Area: string | null;
   IsActive: boolean;
   Disables: boolean;
+  Deletes:boolean;
 }
 
 export interface TimeDetail {
@@ -106,6 +107,7 @@ export interface Form {
   FormState?: string;
   Description: string;
   Disables: boolean;
+  Deletes:boolean;
 }
 
 export interface MatchForm {
@@ -163,6 +165,20 @@ export interface GroupUsers {
 }
 
 export interface Prefixs {
+  PF_GroupMachine: string;
+  PF_Machine: string;
+  PF_CheckList: string;
+  PF_GroupCheckList: string;
+  PF_CheckListOption: string;
+  PF_MatchCheckListOption: string;
+  PF_MatchFormMachine: string;
+  PF_Form: string;
+  PF_SubForm: string;
+  PF_ExpectedResult: string;
+  PF_UsersPermission: string;
+  PF_TimeSchedule: string;
+}
+export interface AppSetting {
   AppID: string;
   GroupMachine: string;
   Machine: string;
@@ -177,8 +193,7 @@ export interface Prefixs {
   UsersPermission: string;
   TimeSchedule: string;
 }
-
-export interface AppProps extends Prefixs {
+export interface AppProps extends Prefixs , AppSetting {
   AppName: string;
 }
 

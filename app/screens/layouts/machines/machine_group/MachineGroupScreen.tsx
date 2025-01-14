@@ -93,7 +93,7 @@ const MachineGroupScreen = React.memo(() => {
 
     const saveData = useCallback(async (values: InitialValuesGroupMachine) => {
         const data = {
-            Prefix: state.GroupMachine ?? "",
+            Prefix: state.PF_GroupMachine ?? "",
             GMachineID: values.machineGroupId ?? "",
             GMachineName: values.machineGroupName,
             Description: values.description,
@@ -156,7 +156,7 @@ const MachineGroupScreen = React.memo(() => {
         Tablehead: [
             { label: "", align: "flex-start" },
             { label: "", align: "flex-start" },
-            { label: "Group Machine Name", align: "flex-start" },
+            { label: state.GroupMachine, align: "flex-start" },
             { label: "Description", align: "flex-start" },
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
@@ -166,7 +166,8 @@ const MachineGroupScreen = React.memo(() => {
         showMessage: 2,
         handleAction,
         searchQuery: debouncedSearchQuery,
-    }), [tableData, debouncedSearchQuery, handleAction]);
+        isFetching: isFetching
+    }), [tableData, debouncedSearchQuery, handleAction, state.GroupMachine, isFetching]);
 
     const styles = StyleSheet.create({
         container: {
@@ -190,18 +191,18 @@ const MachineGroupScreen = React.memo(() => {
     return (
         <View id="container-groupmachine" style={styles.container}>
             <Card.Title
-                title="Create Group Machine"
+                title={`List ${state.GroupMachine}` || "List"}
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
             <View id="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
-                    placeholder="Search Machine Group..."
+                    placeholder={`Search ${state.GroupMachine}...`}
                     value={searchQuery}
                     onChange={setSearchQuery}
                     testId="search-machine-group"
                 />
                 <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Group Machine</Text>
+                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.GroupMachine}`}</Text>
                 </TouchableOpacity>
             </View>
 

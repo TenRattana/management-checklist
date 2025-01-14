@@ -20,6 +20,19 @@ import {
     setPrefixMatchFormMachine,
     setPrefixUsersPermission,
     setPrefixTimeSchedule,
+
+    setGroupMachine,
+    setCheckList,
+    setCheckListOption,
+    setExpectedResult,
+    setForm,
+    setSubForm,
+    setGroupCheckList,
+    setMachine,
+    setMatchCheckListOption,
+    setMatchFormMachine,
+    setUsersPermission,
+    setTimeSchedule,
     setAppName
 } from "@/slices";
 import { useMutation, useQueryClient } from 'react-query';
@@ -134,6 +147,19 @@ const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisib
         Form: false,
         SubForm: false,
         ExpectedResult: false,
+        TimeSchedule: false,
+
+        PF_GroupMachine: false,
+        PF_Machine: false,
+        PF_CheckList: false,
+        PF_GroupCheckList: false,
+        PF_CheckListOption: false,
+        PF_MatchCheckListOption: false,
+        PF_MatchFormMachine: false,
+        PF_Form: false,
+        PF_SubForm: false,
+        PF_ExpectedResult: false,
+        PF_TimeSchedule: false,
     });
 
     const handleSubmit = useCallback((field: string, values: { [x: string]: any; }) => {
@@ -141,41 +167,79 @@ const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisib
             case 'AppName':
                 dispatch(setAppName({ AppName: values[field] }));
                 break;
+            case 'PF_GroupMachine':
+                dispatch(setPrefixGroupMachine({ PF_GroupMachine: values[field] }));
+                break;
+            case 'PF_CheckList':
+                dispatch(setPrefixCheckList({ PF_CheckList: values[field] }));
+                break;
+            case 'PF_CheckListOption':
+                dispatch(setPrefixCheckListOption({ PF_CheckListOption: values[field] }));
+                break;
+            case 'PF_ExpectedResult':
+                dispatch(setPrefixExpectedResult({ PF_ExpectedResult: values[field] }));
+                break;
+            case 'PF_Form':
+                dispatch(setPrefixForm({ PF_Form: values[field] }));
+                break;
+            case 'PF_SubForm':
+                dispatch(setPrefixSubForm({ PF_SubForm: values[field] }));
+                break;
+            case 'PF_GroupCheckList':
+                dispatch(setPrefixGroupCheckList({ PF_GroupCheckList: values[field] }));
+                break;
+            case 'PF_Machine':
+                dispatch(setPrefixMachine({ PF_Machine: values[field] }));
+                break;
+            case 'PF_MatchCheckListOption':
+                dispatch(setPrefixMatchCheckListOption({ PF_MatchCheckListOption: values[field] }));
+                break;
+            case 'PF_MatchFormMachine':
+                dispatch(setPrefixMatchFormMachine({ PF_MatchFormMachine: values[field] }));
+                break;
+            case 'PF_UsersPermission':
+                dispatch(setPrefixUsersPermission({ PF_UsersPermission: values[field] }));
+                break;
+            case 'PF_TimeSchedule':
+                dispatch(setPrefixTimeSchedule({ PF_TimeSchedule: values[field] }))
+                break;
+
             case 'GroupMachine':
-                dispatch(setPrefixGroupMachine({ GroupMachine: values[field] }));
+                dispatch(setGroupMachine({ GroupMachine: values[field] }));
                 break;
             case 'CheckList':
-                dispatch(setPrefixCheckList({ CheckList: values[field] }));
+                dispatch(setCheckList({ CheckList: values[field] }));
                 break;
             case 'CheckListOption':
-                dispatch(setPrefixCheckListOption({ CheckListOption: values[field] }));
+                dispatch(setCheckListOption({ CheckListOption: values[field] }));
                 break;
             case 'ExpectedResult':
-                dispatch(setPrefixExpectedResult({ ExpectedResult: values[field] }));
+                dispatch(setExpectedResult({ ExpectedResult: values[field] }));
                 break;
             case 'Form':
-                dispatch(setPrefixForm({ Form: values[field] }));
+                dispatch(setForm({ Form: values[field] }));
                 break;
             case 'SubForm':
-                dispatch(setPrefixSubForm({ SubForm: values[field] }));
+                dispatch(setSubForm({ SubForm: values[field] }));
                 break;
             case 'GroupCheckList':
-                dispatch(setPrefixGroupCheckList({ GroupCheckList: values[field] }));
+                dispatch(setGroupCheckList({ GroupCheckList: values[field] }));
                 break;
             case 'Machine':
-                dispatch(setPrefixMachine({ Machine: values[field] }));
+                dispatch(setMachine({ Machine: values[field] }));
                 break;
             case 'MatchCheckListOption':
-                dispatch(setPrefixMatchCheckListOption({ MatchCheckListOption: values[field] }));
+                dispatch(setMatchCheckListOption({ MatchCheckListOption: values[field] }));
                 break;
             case 'MatchFormMachine':
-                dispatch(setPrefixMatchFormMachine({ MatchFormMachine: values[field] }));
+                dispatch(setMatchFormMachine({ MatchFormMachine: values[field] }));
                 break;
             case 'UsersPermission':
-                dispatch(setPrefixUsersPermission({ UsersPermission: values[field] }));
+                dispatch(setUsersPermission({ UsersPermission: values[field] }));
                 break;
             case 'TimeSchedule':
-                dispatch(setPrefixTimeSchedule({ TimeSchedule: values[field] }))
+                dispatch(setTimeSchedule({ TimeSchedule: values[field] }))
+                break;
             default:
                 break;
         }

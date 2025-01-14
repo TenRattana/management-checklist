@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TouchableOpacity, ScrollView, View, StyleSheet } from "react-native";
 import { Inputs, Dropdown } from "@/components/common";
-import { Portal, Switch, Dialog, TextInput, HelperText, Icon, IconButton } from "react-native-paper";
-import { Formik, FastField, Field } from "formik";
+import { Portal, Switch, Dialog, TextInput, HelperText, Icon } from "react-native-paper";
+import { Formik, Field } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { MachineDialogProps, InitialValuesMachine } from '@/typing/value'
@@ -14,6 +14,8 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { Platform } from "react-native";
 import { useInfiniteQuery, useQueryClient } from "react-query";
 import { fetchMachineGroups, fetchSearchMachineGroups } from "@/app/services";
+import HeaderDialog from "./HeaderDialog";
+import { useSelector } from "react-redux";
 
 const validationSchema = Yup.object().shape({
     machineGroupId: Yup.string().required("The group machine field is required."),
@@ -27,6 +29,7 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
     const { responsive, spacing } = useRes()
+    const state = useSelector((state: any) => state.prefix);
 
     const [open, setOpen] = useState(false);
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
@@ -95,30 +98,24 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
             backgroundColor: theme.colors.drag,
             borderRadius: 4,
         },
+        buttonSubmit: {
+            backgroundColor: theme.colors.green,
+            marginRight: 5,
+            flexDirection: "row"
+        },
+        containerAction: {
+            justifyContent: "flex-end",
+            flexDirection: 'row',
+            paddingTop: 10,
+            paddingRight: 20
+        }
     })
 
     return (
         <Portal>
             <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={[masterdataStyles.containerDialog, { width: isEditing ? 850 : masterdataStyles.containerDialog.width }]} testID="dialog-md">
                 <Dialog.Content>
-                    <View style={{ justifyContent: "space-between", flexDirection: 'row', alignItems: 'center' }}>
-                        <View style={{ justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center' }}>
-                            <Icon source="information-outline" size={spacing.large} color={theme.colors.green} />
-                            <Text style={[masterdataStyles.text, masterdataStyles.title, masterdataStyles.textBold, { paddingLeft: 8 }]}>{isEditing ? "Edit" : "Create"}
-                            </Text>
-                        </View>
-                        <IconButton icon="close" size={20} iconColor={theme.colors.onBackground} onPress={() => setIsVisible(false)} />
-                    </View>
-
-                    <Text
-                        style={[
-                            masterdataStyles.text,
-                            masterdataStyles.textDark,
-                            { marginBottom: 10, paddingLeft: 10 },
-                        ]}
-                    >
-                        {isEditing ? "Edit the details of the machine." : "Enter the details for the new machine."}
-                    </Text>
+                    <HeaderDialog isEditing setIsVisible={() => setIsVisible(false)} display={state.Machine} />
 
                     {isVisible && (
                         <Formik
@@ -129,17 +126,12 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                         >
                             {({ values, handleSubmit, setFieldValue, dirty, isValid, touched, errors, setFieldTouched }) => {
 
-                                const handelChange = (field: string, value: any) => {
-                                    setFieldValue(field, value)
-                                    setFieldTouched(field, true)
-                                }
-
                                 return (
                                     <View id="form-md" style={{ flexDirection: 'row' }}>
                                         {isEditing && (
-                                            <View style={{ flex: values.machineId ? 1 : undefined }}>
+                                            <View style={{ flex: values.machineId ? 1 : undefined, alignSelf: 'center' }}>
                                                 <ScrollView
-                                                    contentContainerStyle={{ marginTop: '15%', paddingBottom: 5, paddingHorizontal: 10 }}
+                                                    contentContainerStyle={{ paddingBottom: 5, paddingHorizontal: 10 }}
                                                     showsVerticalScrollIndicator={false}
                                                 >
                                                     {values.machineId ? (
@@ -148,7 +140,7 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                                 value={values.machineId || "No input"}
                                                                 size={180}
                                                                 color="black"
-                                                                backgroundColor="white"
+                                                                backgroundColor={theme.colors.background}
                                                                 logoBorderRadius={5}
                                                                 logoMargin={20}
                                                             />
@@ -175,11 +167,11 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                 showsVerticalScrollIndicator={false}
                                             >
                                                 <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 20, paddingLeft: 10 }]}>
-                                                    Group Machine
+                                                    {state.GroupMachine}
                                                 </Text>
 
                                                 <Dropdown
-                                                    label='group machine'
+                                                    label={`${state.GroupMachine}`}
                                                     open={open}
                                                     search
                                                     setOpen={(v: boolean) => setOpen(v)}
@@ -208,13 +200,13 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                     {({ field, form }: any) => (
                                                         <>
                                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
-                                                                Machine Name
+                                                                {`${state.Machine} Name`}
                                                             </Text>
 
                                                             <Inputs
                                                                 mode="outlined"
-                                                                placeholder="Enter Machine Name"
-                                                                label="Machine Name"
+                                                                placeholder={`Enter ${state.Machine} Name`}
+                                                                label={state.Machine}
                                                                 handleChange={(value) => form.setFieldValue(field.name, value)}
                                                                 handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
                                                                 value={field.value}
@@ -231,13 +223,13 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                     {({ field, form }: any) => (
                                                         <>
                                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
-                                                                Machine Code
+                                                                {`${state.Machine} Code`}
                                                             </Text>
 
                                                             <Inputs
                                                                 mode="outlined"
-                                                                placeholder="Enter machine Code"
-                                                                label="Machine Code"
+                                                                placeholder={`Enter ${state.Machine} Code`}
+                                                                label={`${state.Machine} Code`}
                                                                 handleChange={(value) => form.setFieldValue(field.name, value)}
                                                                 handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
                                                                 value={field.value}
@@ -253,12 +245,12 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                     {({ field, form }: any) => (
                                                         <>
                                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
-                                                                Machine Description
+                                                                {`${state.Machine} Description`}
                                                             </Text>
 
                                                             <Inputs
                                                                 mode="outlined"
-                                                                placeholder="Enter Description"
+                                                                placeholder={`Enter ${state.Machine} Description`}
                                                                 label="Description"
                                                                 handleChange={(value) => form.setFieldValue(field.name, value)}
                                                                 handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
@@ -339,7 +331,7 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                 </View>
 
                                                 <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 10, paddingLeft: 10 }]}>
-                                                    Machine Status
+                                                    {`${state.Machine} Status`}
                                                 </Text>
 
                                                 <View id="form-active-md" style={masterdataStyles.containerSwitch}>
@@ -361,10 +353,10 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                 </View>
                                             </ScrollView>
 
-                                            <View style={[masterdataStyles.containerAction, { justifyContent: "flex-end", flexDirection: 'row', paddingTop: 10, paddingRight: 20 }]}>
+                                            <View style={[masterdataStyles.containerAction, styles.containerAction]}>
                                                 <TouchableOpacity
                                                     onPress={() => handleSubmit()}
-                                                    style={[styles.button, { backgroundColor: theme.colors.green, marginRight: 5, flexDirection: "row" }]}
+                                                    style={[styles.button, styles.buttonSubmit]}
                                                 >
                                                     <Icon source="check" size={spacing.large} color={theme.colors.fff} />
 

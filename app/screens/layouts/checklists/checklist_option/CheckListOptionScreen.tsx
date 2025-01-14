@@ -94,7 +94,7 @@ const CheckListOptionScreen = React.memo(() => {
 
     const saveData = useCallback(async (values: InitialValuesCheckListOption) => {
         const data = {
-            Prefix: state.CheckListOption ?? "",
+            Prefix: state.PF_CheckListOption ?? "",
             CLOptionID: values.checkListOptionId,
             CLOptionName: values.checkListOptionName,
             IsActive: values.isActive,
@@ -157,7 +157,7 @@ const CheckListOptionScreen = React.memo(() => {
         Tabledata: tableData,
         Tablehead: [
             { label: "", align: "flex-start" },
-            { label: "Check List Option Name", align: "flex-start" },
+            { label: state.CheckListOption, align: "flex-start" },
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
         ],
@@ -166,7 +166,8 @@ const CheckListOptionScreen = React.memo(() => {
         showMessage: 1,
         handleAction,
         searchQuery: debouncedSearchQuery,
-    }), [tableData, debouncedSearchQuery, handleAction]);
+        isFetching: isFetching
+    }), [tableData, debouncedSearchQuery, handleAction, state.CheckListOption, isFetching]);
 
     const styles = StyleSheet.create({
         container: {
@@ -190,7 +191,7 @@ const CheckListOptionScreen = React.memo(() => {
     return (
         <View id="container-checklistoption" style={styles.container}>
             <Card.Title
-                title="Create Option"
+                title={state.CheckListOption || "Create Option"}
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
             <View id="container-search" style={masterdataStyles.containerSearch}>
@@ -201,7 +202,7 @@ const CheckListOptionScreen = React.memo(() => {
                     testId="search-checklist-option"
                 />
                 <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>Create Option</Text>
+                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.CheckListOption}`}</Text>
                 </TouchableOpacity>
             </View>
             <Card.Content style={styles.cardcontent}>

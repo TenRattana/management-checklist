@@ -1,14 +1,16 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Inputs } from "@/components/common";
-import { Portal, Switch, Dialog, Icon, IconButton } from "react-native-paper";
-import { FastField, Field, Formik } from "formik";
+import { Portal, Switch, Dialog, Icon } from "react-native-paper";
+import { Field, Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { InitialValuesCheckListOption, CheckListOptionProps } from '@/typing/value'
 import Text from "@/components/Text";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
+import HeaderDialog from "./HeaderDialog";
+import { useSelector } from "react-redux";
 
 const validationSchema = Yup.object().shape({
     checkListOptionName: Yup.string().required(
@@ -21,6 +23,7 @@ const Checklist_option_dialog = React.memo(({ isVisible, setIsVisible, isEditing
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
     const { spacing } = useRes()
+    const state = useSelector((state: any) => state.prefix);
 
     const styles = StyleSheet.create({
         button: {
@@ -32,6 +35,17 @@ const Checklist_option_dialog = React.memo(({ isVisible, setIsVisible, isEditing
             backgroundColor: theme.colors.drag,
             borderRadius: 4,
         },
+        buttonSubmit: {
+            backgroundColor: theme.colors.green,
+            marginRight: 5,
+            flexDirection: "row"
+        },
+        containerAction: {
+            justifyContent: "flex-end",
+            flexDirection: 'row',
+            paddingTop: 10,
+            paddingRight: 20
+        }
     })
 
     return (
@@ -43,21 +57,7 @@ const Checklist_option_dialog = React.memo(({ isVisible, setIsVisible, isEditing
                 testID="dialog-cod"
             >
                 <Dialog.Content>
-
-                    <View style={{ justifyContent: "space-between", flexDirection: 'row', alignItems: 'center' }}>
-                        <View style={{ justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center' }}>
-                            <Icon source="information-outline" size={spacing.large} color={theme.colors.green} />
-                            <Text style={[masterdataStyles.text, masterdataStyles.title, masterdataStyles.textBold, { paddingLeft: 8 }]}>{isEditing ? "Edit" : "Create"}
-                            </Text>
-                        </View>
-                        <IconButton icon="close" size={20} iconColor={theme.colors.onBackground} onPress={() => setIsVisible(false)} />
-                    </View>
-
-                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginBottom: 10, paddingLeft: 10 }]}>
-                        {isEditing
-                            ? "Edit the details of the check list option."
-                            : "Enter the details for the new check list option."}
-                    </Text>
+                    <HeaderDialog isEditing setIsVisible={() => setIsVisible(false)} display={state.CheckListOption} />
 
                     {isVisible && (
                         <Formik
@@ -73,13 +73,13 @@ const Checklist_option_dialog = React.memo(({ isVisible, setIsVisible, isEditing
                                         {({ field, form }: any) => (
                                             <>
                                                 <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 20, paddingLeft: 10 }]}>
-                                                    Check List Opttion Name
+                                                    {`${state.CheckListOption} Name`}
                                                 </Text>
 
                                                 <Inputs
                                                     mode="outlined"
-                                                    placeholder="Enter Check List Option"
-                                                    label="Check List Option"
+                                                    placeholder={`Enter ${state.CheckListOption} Option`}
+                                                    label={state.CheckListOption}
                                                     handleChange={(value) => form.setFieldValue(field.name, value)}
                                                     handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
                                                     value={field.value}
@@ -92,7 +92,7 @@ const Checklist_option_dialog = React.memo(({ isVisible, setIsVisible, isEditing
                                     </Field >
 
                                     <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 10, paddingLeft: 10 }]}>
-                                        Check List Option Status
+                                        {`${state.CheckListOption} Status`}
                                     </Text>
 
                                     <View id="form-active-cod" style={masterdataStyles.containerSwitch}>
@@ -111,10 +111,10 @@ const Checklist_option_dialog = React.memo(({ isVisible, setIsVisible, isEditing
                                         />
                                     </View>
 
-                                    <View style={[masterdataStyles.containerAction, { justifyContent: "flex-end", flexDirection: 'row', paddingTop: 10, paddingRight: 20 }]}>
+                                    <View style={[masterdataStyles.containerAction, styles.containerAction]}>
                                         <TouchableOpacity
                                             onPress={() => handleSubmit()}
-                                            style={[styles.button, { backgroundColor: theme.colors.green, marginRight: 5, flexDirection: "row" }]}
+                                            style={[styles.button, styles.buttonSubmit]}
                                         >
                                             <Icon source="check" size={spacing.large} color={theme.colors.fff} />
 

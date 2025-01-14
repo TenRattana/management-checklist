@@ -89,7 +89,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
     const saveDataCheckListOption = useCallback(async (values: InitialValuesCheckListOption) => {
         const data = {
-            Prefix: state.CheckListOption ?? "",
+            Prefix: state.PF_CheckListOption ?? "",
             CLOptionID: values.checkListOptionId,
             CLOptionName: values.checkListOptionName,
             IsActive: values.isActive,
@@ -101,7 +101,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
     const saveDataCheckList = useCallback((values: InitialValuesChecklist) => {
         mutation.mutate({
-            Prefix: state.CheckList ?? "",
+            Prefix: state.PF_CheckList ?? "",
             CListID: "",
             CListName: values.checkListName,
             IsActive: values.isActive,
@@ -113,8 +113,8 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
     const saveDataGroupCheckList = useCallback((values: InitialValuesGroupCheckList, options: string[]) => {
         mutationG.mutate({
-            Prefix: state.GroupCheckList ?? "",
-            PrefixMatch: state.MatchCheckListOption ?? "",
+            Prefix: state.PF_GroupCheckList ?? "",
+            PrefixMatch: state.PF_MatchCheckListOption ?? "",
             GCLOptionID: values.groupCheckListOptionId,
             GCLOptionName: values.groupCheckListOptionName,
             IsActive: values.isActive,
@@ -345,7 +345,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                             </Text>
 
                                             <Dropdown
-                                                label='check list'
+                                                label={`Select ${state.CheckList}`}
                                                 lefticon="subtitles-outline"
                                                 open={open.CheckList}
                                                 searchQuery={debouncedSearchQuery.CheckList}
@@ -387,7 +387,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                         </Text>
 
                                         <Dropdown
-                                            label='check list type'
+                                            label='Select CheckList type'
                                             search={false}
                                             open={open.CheckListType}
                                             setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, CheckListType: v }))}
@@ -424,7 +424,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
                                                     <Dropdown
                                                         lefticon="checkbox-multiple-blank-outline"
-                                                        label="match check list"
+                                                        label={`Select ${state.MatchCheckListOption}`}
                                                         open={open.MatchChecklist}
                                                         setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, MatchChecklist: v }))}
                                                         selectedValue={values.GCLOptionID}
@@ -485,7 +485,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
                                                 </Text>
 
                                                 <Dropdown
-                                                    label='data type'
+                                                    label='Select Data type'
                                                     lefticon="checkbox-multiple-marked-outline"
                                                     search={false}
                                                     open={open.DataType}

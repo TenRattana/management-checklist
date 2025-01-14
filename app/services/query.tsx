@@ -80,7 +80,20 @@ export const fetchSearchMachines = async (
     }
 }
 
-export const saveMachine = async (data: Machine): Promise<{ message: string }> => {
+export const saveMachine = async (data: {
+    Prefix: any;
+    MachineID: string;
+    GMachineID: string;
+    MachineCode: string | null;
+    Building: string | null;
+    Floor: string | null;
+    Area: string | null;
+    MachineName: string;
+    Description: string;
+    IsActive: boolean;
+    Disables: boolean;
+    FormID: string | null;
+}): Promise<{ message: string }> => {
     const response = await axiosInstance.post("Machine_service.asmx/SaveMachine", data);
     return response.data;
 };

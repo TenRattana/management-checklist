@@ -20,6 +20,7 @@ const RenderFormik: React.FC<RennderFormikPorps> = React.memo(({ field, state, h
     const { spacing } = useRes();
     const { theme } = useTheme();
     const masterdataStyles = useMasterdataStyles();
+    console.log(field, state,);
 
     return (
         <Formik

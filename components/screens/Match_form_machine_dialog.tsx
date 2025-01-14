@@ -11,12 +11,15 @@ import { fetchForms, fetchMachines, fetchSearchFomrs, fetchSearchMachines } from
 import { useInfiniteQuery, useQueryClient } from "react-query";
 import { useRes } from "@/app/contexts/useRes";
 import { useTheme } from "@/app/contexts/useTheme";
+import HeaderDialog from "./HeaderDialog";
+import { useSelector } from "react-redux";
 
 
 const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData }: MatchFormMachineDialogProps<InitialValuesMatchFormMachine>) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme();
     const { spacing } = useRes()
+    const state = useSelector((state: any) => state.prefix);
 
     const [openMachine, setOpenMachine] = useState(false);
     const [openForm, setOpenForm] = useState(false);
@@ -139,26 +142,24 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
             backgroundColor: theme.colors.drag,
             borderRadius: 4,
         },
+        buttonSubmit: {
+            backgroundColor: theme.colors.green,
+            marginRight: 5,
+            flexDirection: "row"
+        },
+        containerAction: {
+            justifyContent: "flex-end",
+            flexDirection: 'row',
+            paddingTop: 10,
+            paddingRight: 20
+        }
     })
 
     return (
         <Portal>
             <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={masterdataStyles.containerDialog} testID="dialog-mfmd">
                 <Dialog.Content>
-                    <View style={{ justifyContent: "space-between", flexDirection: 'row', alignItems: 'center' }}>
-                        <View style={{ justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center' }}>
-                            <Icon source="information-outline" size={spacing.large} color={theme.colors.green} />
-                            <Text style={[masterdataStyles.text, masterdataStyles.title, masterdataStyles.textBold, { paddingLeft: 8 }]}>{isEditing ? "Edit" : "Create"}
-                            </Text>
-                        </View>
-                        <IconButton icon="close" size={20} iconColor={theme.colors.onBackground} onPress={() => setIsVisible(false)} />
-                    </View>
-
-                    <Text
-                        style={[masterdataStyles.text, { paddingLeft: 10 }]}
-                    >
-                        {isEditing ? "Edit the details of the match form & machine." : "Enter the details for the new match form & machine.."}
-                    </Text>
+                    <HeaderDialog isEditing setIsVisible={() => setIsVisible(false)} display={state.MatchFormMachine} />
 
                     {isVisible && (
                         <Formik
@@ -172,12 +173,12 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
                                 return (
                                     <View id="machine-mfmd">
                                         <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 30, paddingLeft: 10 }]}>
-                                            Machine
+                                            {state.Machine}
                                         </Text>
 
                                         <Dropdown
                                             lefticon="desktop-classic"
-                                            label='machine'
+                                            label={state.Machine}
                                             open={openMachine}
                                             setOpen={(v: boolean) => setOpenMachine(v)}
                                             selectedValue={values.machineId}
@@ -203,11 +204,11 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
                                         </HelperText>
 
                                         <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingLeft: 10 }]}>
-                                            Form
+                                            {state.Form}
                                         </Text>
 
                                         <Dropdown
-                                            label='form'
+                                            label={state.Form}
                                             lefticon="format-line-style"
                                             open={openForm}
                                             setOpen={(v: boolean) => setOpenForm(v)}
@@ -233,10 +234,10 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
                                             {touched.formId ? errors.formId : ""}
                                         </HelperText>
 
-                                        <View style={[masterdataStyles.containerAction, { justifyContent: "flex-end", flexDirection: 'row', paddingTop: 20, paddingRight: 20 }]}>
+                                        <View style={[masterdataStyles.containerAction, styles.containerAction]}>
                                             <TouchableOpacity
                                                 onPress={() => handleSubmit()}
-                                                style={[styles.button, { backgroundColor: theme.colors.green, marginRight: 5, flexDirection: "row" }]}
+                                                style={[styles.button, styles.buttonSubmit]}
                                             >
                                                 <Icon source="check" size={spacing.large} color={theme.colors.fff} />
 
