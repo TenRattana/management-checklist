@@ -1,9 +1,10 @@
 import React, { createContext, ReactNode, useCallback, useMemo, useState } from "react";
-import { View, Text, StyleSheet, Platform, TouchableOpacity, Animated } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { View, Text, StyleSheet, Platform, Animated } from "react-native";
 import { useRes } from "@/app/contexts/useRes";
 import { useTheme } from "@/app/contexts/useTheme";
 import axios from "axios";
+import useMasterdataStyles from "@/styles/common/masterdata";
+import { IconButton } from "react-native-paper";
 
 export interface ToastContextProps {
   showSuccess: (message: string | string[]) => void;
@@ -28,6 +29,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
   const { theme } = useTheme();
   const { spacing } = useRes();
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const masterdataStyles = useMasterdataStyles();
 
   const addToast = useCallback((message: string, status: "success" | "error") => {
     const id = Math.random().toString(36).substring(7);
@@ -93,22 +95,62 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
               style={[
                 styles.toastContainer,
                 {
-                  top: index * 15,
-                  backgroundColor: toast.status === "error" ? theme.colors.error : theme.colors.succeass,
+                  backgroundColor: theme.colors.background,
+                  top: index * 10,
+                  ...Platform.select({
+                    web: {
+                      boxShadow: `${theme.colors.onBackground || "#000"} 0px 2px 4px`,
+                    },
+                    ios: {
+                      shadowColor: theme.colors.onBackground || "#000",
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 1,
+                      shadowRadius: 4,
+                    },
+                    android: {
+                      elevation: 4,
+                    },
+                  }),
                 },
               ]}
             >
-              <View style={{ flexBasis: '90%', flexDirection: 'row' }}>
-                <MaterialIcons
-                  name={toast.status === "error" ? "error" : "check-circle"}
-                  size={spacing.large}
-                  color="white"
-                  style={styles.icon}
-                />
-                <View style={styles.messageContainer}>
-                  <Text style={{ fontSize: spacing.small, color: theme.colors.fff }}>
-                    {toast.message}
-                  </Text>
+              <View style={{
+                padding: 5,
+                flexBasis: '90%',
+                flexDirection: 'row',
+                justifyContent: 'space-between'
+              }}>
+                <View style={{
+                  borderColor: toast.status === "error" ? theme.colors.error : theme.colors.succeass,
+                  borderRadius: 10,
+                  borderLeftWidth: 4,
+                }}>
+
+                </View>
+                <View style={{ paddingHorizontal: 10, alignSelf: 'center', minWidth: 200 }}>
+                  <View style={{ flexDirection: 'row', paddingVertical: 5 }}>
+                    <Text style={[masterdataStyles.title, { color: toast.status === "error" ? theme.colors.error : theme.colors.succeass }]}>
+                      {toast.status}
+                    </Text>
+                  </View>
+
+                  <View style={styles.messageContainer}>
+                    <Text style={masterdataStyles.text}>
+                      {toast.message}
+                    </Text>
+                  </View>
+                </View>
+
+                <View>
+                  <IconButton
+                    icon={"close"}
+                    size={spacing.large}
+                    iconColor={theme.colors.onBackground}
+                    style={{ top: -5 }}
+                    onPress={() =>
+                      setToasts((prev) => prev.filter((item) => item.id !== toast.id))
+                    }
+                  />
                 </View>
               </View>
 
@@ -116,6 +158,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
                 style={[
                   styles.progressBar,
                   {
+                    backgroundColor: toast.status === "error" ? theme.colors.error : theme.colors.succeass,
                     width: toast.progressAnim.interpolate({
                       inputRange: [0, 1],
                       outputRange: ["0%", "100%"],
@@ -123,20 +166,11 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
                   },
                 ]}
               />
-
-              <TouchableOpacity
-                onPress={() =>
-                  setToasts((prev) => prev.filter((item) => item.id !== toast.id))
-                }
-                style={{ flexBasis: '10%' }}
-              >
-                <MaterialIcons name="close" size={spacing.large} color="white" />
-              </TouchableOpacity>
             </Animated.View>
           );
         })}
       </View>
-    </ToastContext.Provider>
+    </ToastContext.Provider >
   );
 };
 
@@ -158,8 +192,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: "row",
     alignItems: "center",
-    padding: 15,
-    borderRadius: 8,
+    padding: 5,
+    paddingLeft: 20,
+    borderRadius: 3,
     marginVertical: 5,
     maxWidth: 350,
     overflow: 'hidden',
@@ -177,6 +212,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     height: 3,
-    backgroundColor: 'white',
+    marginTop: 5
   },
 });
