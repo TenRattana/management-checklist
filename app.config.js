@@ -29,7 +29,7 @@ export default {
     slug: "pmchecklist",
     version: "1.0.0",
     sdkVersion: "51.0.0",
-    orientation: "sensor",
+    orientation: "landscape",
     icon: "./assets/images/Icon-app.png",
     scheme: "myapp",
     userInterfaceStyle: "automatic",

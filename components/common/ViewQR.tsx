@@ -6,6 +6,7 @@ import useMasterdataStyles from '@/styles/common/masterdata';
 import { useTheme } from '@/app/contexts/useTheme';
 import { Dialog, IconButton, Portal } from 'react-native-paper';
 import { useRes } from '@/app/contexts/useRes';
+import { spacing } from '@/constants/Spacing';
 
 const ViewQR = ({ value, open, setOpen, display }: { value: string, open: boolean, setOpen: (v: boolean) => void, display: string }) => {
     const masterdataStyles = useMasterdataStyles()
@@ -64,14 +65,15 @@ const ViewQR = ({ value, open, setOpen, display }: { value: string, open: boolea
     const styles = StyleSheet.create({
         container: {
             zIndex: 3,
-            width: responsive === "large" ? 500 : "60%",
+            width: responsive === "large" ? 800 : "60%",
             alignSelf: 'center',
             paddingHorizontal: 20,
-            paddingVertical: 30,
+            paddingVertical: 50,
             borderRadius: 4,
             backgroundColor: theme.colors.background,
             alignContent: 'center',
             alignItems: 'center',
+            shadowColor: undefined
         }
     });
 
@@ -80,14 +82,14 @@ const ViewQR = ({ value, open, setOpen, display }: { value: string, open: boolea
             <Dialog visible={open} onDismiss={() => setOpen(false)} style={styles.container}>
                 <QRCode
                     value={value || "value"}
-                    size={300}
+                    size={350}
                     color="black"
                     backgroundColor={theme.colors.background}
                     logoBorderRadius={5}
                     logoMargin={20}
                     getRef={(c) => { qrRef.current = c }}
                 />
-                <Text style={[masterdataStyles.text, { marginVertical: 20 }]}>
+                <Text style={[{ marginVertical: 40, fontSize: spacing.medium }]}>
                     {`Scan this code for open form ${display}.`}
                 </Text>
 

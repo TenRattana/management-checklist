@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo, useRef } from "react";
 import axiosInstance from "@/config/axios";
-import { Card, Divider } from "react-native-paper";
-import { FlatList, TouchableOpacity } from "react-native";
+import { Card, Divider, IconButton } from "react-native-paper";
+import { FlatList, TouchableOpacity, View } from "react-native";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useToast } from "@/app/contexts/useToast";
 import { BaseSubForm, BaseFormState } from '@/typing/form';
@@ -18,6 +18,7 @@ import { navigate } from "@/app/navigations/navigationUtils";
 import Submit from "@/components/common/Submit";
 import Formfield from "./Formfield";
 import { useRes } from "@/app/contexts/useRes";
+// import * as ScreenOrientation from 'expo-screen-orientation';
 
 interface FormValues {
   [key: string]: any;
@@ -37,6 +38,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
   const prefix = useSelector((state: any) => state.prefix);
 
   const [isSubmitted, setIsSubmitted] = useState(false);
+
   const [formValues, setFormValues] = useState<FormValues>({});
 
   const validationSchema = useMemo(() => {
@@ -80,7 +82,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
   const masterdataStyles = useMasterdataStyles();
   const { showSuccess, handleError } = useToast();
   const { theme } = useTheme();
-  const { responsive } = useRes();
+  const { responsive, spacing } = useRes();
 
   const onFormSubmit = useCallback(async (values: { [key: string]: any }) => {
     const updatedSubForms = state.subForms.map((subForm: BaseSubForm) => ({
@@ -128,6 +130,18 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
     return <Text>Loading Form...</Text>;
   }
 
+  // const [orientation, setOrientation] = useState('portrait');
+
+  // const toggleOrientation = async () => {
+  //   if (orientation === 'portrait') {
+  //     await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+  //     setOrientation('landscape');
+  //   } else {
+  //     await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+  //     setOrientation('portrait');
+  //   }
+  // };
+
   return found ? (
     <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]} key={responsive}>
       <Stack.Screen options={{ headerTitle: `${state.MachineName || "Machine Name"}` }} />
@@ -172,6 +186,21 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
                     <Divider />
                     <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
                   </>
+                  // <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  //   <View style={{ flex: 1 }}>
+                  //     <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
+                  //     <Divider />
+                  //     <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
+                  //   </View>
+                  //   <View>
+                  //     <IconButton
+                  //       icon={"screen-rotation"}
+                  //       size={spacing.large}
+                  //       iconColor={theme.colors.onBackground}
+                  //       onPress={() => { }}
+                  //     />
+                  //   </View>
+                  // </View>
                 )}
                 ListFooterComponent={() => (
                   <AccessibleView name="form-action-scan" style={[masterdataStyles.containerAction]}>
