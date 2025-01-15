@@ -5,7 +5,9 @@ import { CustomtableDataProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { Easing, FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { FlatList } from "react-native-gesture-handler";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import ShimmerPlaceholder, { createShimmerPlaceholder } from 'react-native-shimmer-placeholder';
+import { LinearGradient } from 'expo-linear-gradient';
 
 FadeInUp.duration(300).easing(Easing.ease);
 FadeOutDown.duration(300).easing(Easing.ease);
@@ -15,6 +17,7 @@ const LazyRenderItem = React.lazy(() => import('./Contents/RenderItem'));
 const CustomtableData = React.memo(({ Tablehead, flexArr, actionIndex, displayData, handleDialog, showMessage, selectedRows, toggleSelect, detail, detailKey, detailData, detailKeyrow, showDetailwithKey, handlePaginationChange, isFetching }: CustomtableDataProps) => {
     const masterdataStyles = useMasterdataStyles();
     const [dialogState, setDialogState] = useState({ isVisible: false, action: "", message: "", title: "", data: "" });
+    const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
     const getItemLayout = (data: any, index: number) => ({
         length: 55,
@@ -22,12 +25,32 @@ const CustomtableData = React.memo(({ Tablehead, flexArr, actionIndex, displayDa
         index,
     });
 
+    const styles = StyleSheet.create({
+        shimmerBox: {
+            alignSelf: 'center',
+            height: 10,
+            backgroundColor: '#dcdcdc',
+            borderRadius: 10
+        },
+    });
+
     return (
         <>
-            <FlatList
-                data={displayData}
-                renderItem={({ item, index }) =>
-                    <Suspense fallback={<Text style={{ textAlign: 'center', fontStyle: 'italic', height: 58, alignContent: 'center', justifyContent: 'center' }}>Loading...</Text>}>
+            <Suspense fallback={
+                <View style={{ flexDirection: 'row', height: 55 }}>
+                    {flexArr.map((flex, idx) => (
+                        <View key={idx}>
+                            <ShimmerPlaceholder
+                                key={idx}
+                                style={[styles.shimmerBox, { flex: flex }]}
+                            />
+                        </View>
+                    ))}
+                </View>
+            }>
+                <FlatList
+                    data={displayData}
+                    renderItem={({ item, index }) =>
                         <LazyRenderItem
                             item={item}
                             index={index}
@@ -45,26 +68,27 @@ const CustomtableData = React.memo(({ Tablehead, flexArr, actionIndex, displayDa
                             toggleSelect={toggleSelect}
                             key={index}
                         />
-                    </Suspense>
-                }
-                keyExtractor={(item, index) => `${index}-${item}`}
-                ListEmptyComponent={() => (
-                    <Text style={[masterdataStyles.text, { textAlign: 'center', fontStyle: 'italic' }]}>
-                        {isFetching ? "Loading ..." : "No data found..."}
-                    </Text>
-                )}
-                ListFooterComponent={() => displayData.length > 0 && isFetching && <View style={{ padding: 20 }}><LoadingSpinner /></View>}
-                contentContainerStyle={{ flexGrow: 1 }}
-                nestedScrollEnabled={true}
-                showsVerticalScrollIndicator={true}
-                removeClippedSubviews
-                onEndReachedThreshold={0.2}
-                initialNumToRender={30}
-                windowSize={10}
-                // maxToRenderPerBatch={50}
-                onEndReached={handlePaginationChange}
-                getItemLayout={getItemLayout}
-            />
+                    }
+                    keyExtractor={(item, index) => `${index}-${item}`}
+                    ListEmptyComponent={() => (
+                        <Text style={[masterdataStyles.text, { textAlign: 'center', fontStyle: 'italic' }]}>
+                            {isFetching ? "Loading ..." : "No data found..."}
+                        </Text>
+                    )}
+                    ListFooterComponent={() => displayData.length > 0 && isFetching && <View style={{ padding: 20 }}><LoadingSpinner /></View>}
+                    contentContainerStyle={{ flexGrow: 1 }}
+                    nestedScrollEnabled={true}
+                    showsVerticalScrollIndicator={true}
+                    removeClippedSubviews
+                    onEndReachedThreshold={0.2}
+                    initialNumToRender={30}
+                    windowSize={10}
+                    // maxToRenderPerBatch={50}
+                    onEndReached={handlePaginationChange}
+                    getItemLayout={getItemLayout}
+                />
+            </Suspense>
+
 
             {dialogState.isVisible && (
                 <Dialogs
