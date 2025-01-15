@@ -37,8 +37,6 @@ const prefixSlice = createSlice({
     reducers: {
         setApp: (state, action: PayloadAction<{ App: AppProps }>) => {
             const { App } = action.payload
-            console.log(App);
-
             state.AppID = App.AppID
             state.AppName = App.AppName
             state.GroupMachine = App.GroupMachine
