@@ -27,11 +27,9 @@ const SearchBar = ({ value, onChange, placeholder, testId }: SearchBarProps) => 
         style={[
           styles.searchbarWrapper,
           {
+            borderWidth: 1,
             backgroundColor: theme.colors.surface,
             ...Platform.select({
-              web: {
-                boxShadow: `${theme.colors.onBackground || "#000"} 0px 2px 4px`,
-              },
               ios: {
                 shadowColor: theme.colors.onBackground || "#000",
                 shadowOffset: { width: 0, height: 2 },
@@ -67,7 +65,7 @@ const styles = StyleSheet.create({
   searchbarWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 8,
+    borderRadius: 4,
     paddingHorizontal: 10,
     height: 50,
   },

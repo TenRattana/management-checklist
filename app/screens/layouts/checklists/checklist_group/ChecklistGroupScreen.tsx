@@ -134,6 +134,7 @@ const ChecklistGroupScreen = React.memo(() => {
     const tableData = useMemo(() => {
         return groupCheckListOption.map((item) => [
             item.Disables,
+            item.Deletes,
             item.GCLOptionName,
             item.IsActive,
             item.GCLOptionID,
@@ -155,12 +156,13 @@ const ChecklistGroupScreen = React.memo(() => {
         Tabledata: tableData,
         Tablehead: [
             { label: "", align: "flex-start" },
+            { label: "", align: "flex-start" },
             { label: state.GroupCheckList, align: "flex-start" },
             { label: "Status", align: "center" },
             { label: "", align: "center" },
         ],
-        flexArr: [0, 6, 1, 1],
-        actionIndex: [{ disables: 0, editIndex: 3, delIndex: 4 }],
+        flexArr: [0, 0, 6, 1, 1],
+        actionIndex: [{ disables: 0, delete: 1, editIndex: 4, delIndex: 5 }],
         handleAction,
         showMessage: 1,
         searchQuery: debouncedSearchQuery,

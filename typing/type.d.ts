@@ -98,6 +98,7 @@ export interface GroupCheckListOption {
   IsActive: boolean;
   CheckListOptions?: CheckListOption[];
   Disables: boolean;
+  Deletes:boolean;
 }
 
 export interface Form {

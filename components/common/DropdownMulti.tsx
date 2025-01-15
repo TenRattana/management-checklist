@@ -3,9 +3,10 @@ import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, TouchableOpacity, Platform, StyleSheet, Keyboard } from 'react-native';
-import { HelperText, IconButton, Text, Menu, TextInput, Modal, Portal } from 'react-native-paper';
+import { HelperText, IconButton, Menu, TextInput, Modal, Portal } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import Text from '../Text';
 
 const DropdownMulti = React.memo(({
     label,
