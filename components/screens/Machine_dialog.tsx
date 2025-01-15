@@ -16,6 +16,7 @@ import { useInfiniteQuery, useQueryClient } from "react-query";
 import { fetchMachineGroups, fetchSearchMachineGroups } from "@/app/services";
 import HeaderDialog from "./HeaderDialog";
 import { useSelector } from "react-redux";
+import ViewQR from "../common/ViewQR";
 
 const validationSchema = Yup.object().shape({
     machineGroupId: Yup.string().required("The group machine field is required."),
@@ -111,56 +112,73 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
         }
     })
 
+    const [openQR, setOpenQR] = useState(false);
+
     return (
         <Portal>
             <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)} style={[masterdataStyles.containerDialog, { width: isEditing ? 850 : masterdataStyles.containerDialog.width }]} testID="dialog-md">
                 <Dialog.Content>
                     <HeaderDialog isEditing setIsVisible={() => setIsVisible(false)} display={state.Machine} />
 
-                    {isVisible && (
-                        <Formik
-                            initialValues={initialValues}
-                            validationSchema={validationSchema}
-                            validateOnBlur={false}
-                            onSubmit={(values: InitialValuesMachine) => saveData(values)}
-                        >
-                            {({ values, handleSubmit, setFieldValue, dirty, isValid, touched, errors, setFieldTouched }) => {
+                    <View style={{ flexDirection: 'row' }}>
+                        {isEditing && (
+                            <View style={{ flex: initialValues.machineId ? 1 : undefined, alignSelf: 'center' }}>
+                                <ScrollView
+                                    contentContainerStyle={{ paddingBottom: 5, paddingHorizontal: 10 }}
+                                    showsVerticalScrollIndicator={false}
+                                >
+                                    {initialValues.machineId ? (
+                                        <View style={{ flexGrow: 1, alignItems: 'center' }}>
+                                            <QRCode
+                                                value={initialValues.machineId || 'No input'}
+                                                size={180}
+                                                color="black"
+                                                backgroundColor={theme.colors.background}
+                                                logoBorderRadius={5}
+                                                logoMargin={20}
+                                            />
+                                            <Text
+                                                style={[masterdataStyles.textQR, { marginVertical: 10 }]}
+                                            >
+                                                Scan this code for open form.
+                                            </Text>
+                                            <TextInput
+                                                mode="outlined"
+                                                disabled
+                                                value={initialValues.machineId}
+                                                contentStyle={{ borderRadius: 10 }}
+                                                style={[masterdataStyles.text, { width: '70%', backgroundColor: theme.colors.background }]}
+                                                right={<TextInput.Icon
+                                                    icon={"printer-search"}
+                                                    size={spacing.large}
+                                                    color={theme.colors.onBackground}
+                                                    onPress={() => setOpenQR(true)}
+                                                />}
+                                            />
+                                        </View>
+                                    ) : false}
+                                </ScrollView>
 
-                                return (
-                                    <View id="form-md" style={{ flexDirection: 'row' }}>
-                                        {isEditing && (
-                                            <View style={{ flex: values.machineId ? 1 : undefined, alignSelf: 'center' }}>
-                                                <ScrollView
-                                                    contentContainerStyle={{ paddingBottom: 5, paddingHorizontal: 10 }}
-                                                    showsVerticalScrollIndicator={false}
-                                                >
-                                                    {values.machineId ? (
-                                                        <View style={{ flexGrow: 1, alignItems: 'center' }}>
-                                                            <QRCode
-                                                                value={values.machineId || "No input"}
-                                                                size={180}
-                                                                color="black"
-                                                                backgroundColor={theme.colors.background}
-                                                                logoBorderRadius={5}
-                                                                logoMargin={20}
-                                                            />
-                                                            <Text
-                                                                style={[masterdataStyles.textQR, { marginVertical: 10 }]}
-                                                            >
-                                                                Scan this code for open form.
-                                                            </Text>
-                                                            <TextInput
-                                                                mode="outlined"
-                                                                value={values.machineId}
-                                                                contentStyle={{ borderRadius: 10 }}
-                                                                style={[masterdataStyles.text, { width: '70%', backgroundColor: theme.colors.background }]}
-                                                            />
-                                                        </View>
-                                                    ) : false}
-                                                </ScrollView>
-                                            </View>
-                                        )}
+                                {openQR && (
+                                    <ViewQR
+                                        value={initialValues.machineId}
+                                        open={openQR}
+                                        setOpen={(v: boolean) => setOpenQR(false)}
+                                        display={initialValues.machineName}
+                                    />
+                                )}
+                            </View>
+                        )}
+                        {isVisible && (
+                            <Formik
+                                initialValues={initialValues}
+                                validationSchema={validationSchema}
+                                validateOnBlur={false}
+                                onSubmit={(values: InitialValuesMachine) => saveData(values)}
+                            >
+                                {({ values, handleSubmit, setFieldValue, dirty, isValid, touched, errors, setFieldTouched }) => {
 
+                                    return (
                                         <View style={{ flex: 2, flexGrow: 2, maxHeight: hp(Platform.OS === "web" ? '50%' : '70&') }}>
                                             <ScrollView
                                                 contentContainerStyle={{ paddingBottom: 5, paddingHorizontal: 10 }}
@@ -377,11 +395,11 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                 </TouchableOpacity>
                                             </View>
                                         </View>
-                                    </View>
-                                )
-                            }}
-                        </Formik>
-                    )}
+                                    )
+                                }}
+                            </Formik>
+                        )}
+                    </View>
                 </Dialog.Content>
             </Dialog>
         </Portal>

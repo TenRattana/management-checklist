@@ -93,7 +93,8 @@
     "workbox-routing": "^7.3.0",
     "workbox-strategies": "^7.3.0",
     "yup": "^1.4.0",
-    "expo-linear-gradient": "~13.0.2"
+    "expo-linear-gradient": "~13.0.2",
+    "expo-print": "~13.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",

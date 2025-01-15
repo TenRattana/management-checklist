@@ -17,6 +17,7 @@ import { Stack } from "expo-router";
 import { navigate } from "@/app/navigations/navigationUtils";
 import Submit from "@/components/common/Submit";
 import Formfield from "./Formfield";
+import { useRes } from "@/app/contexts/useRes";
 
 interface FormValues {
   [key: string]: any;
@@ -79,6 +80,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
   const masterdataStyles = useMasterdataStyles();
   const { showSuccess, handleError } = useToast();
   const { theme } = useTheme();
+  const { responsive } = useRes();
 
   const onFormSubmit = useCallback(async (values: { [key: string]: any }) => {
     const updatedSubForms = state.subForms.map((subForm: BaseSubForm) => ({
@@ -127,7 +129,7 @@ const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) 
   }
 
   return found ? (
-    <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]}>
+    <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]} key={responsive}>
       <Stack.Screen options={{ headerTitle: `${state.MachineName || "Machine Name"}` }} />
 
       {!isSubmitted ? (
