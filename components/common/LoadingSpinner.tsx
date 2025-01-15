@@ -1,49 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import ShimmerPlaceHolder, { createShimmerPlaceholder } from 'react-native-shimmer-placeholder';
-import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet } from "react-native";
+import { ActivityIndicator } from "react-native-paper";
 
-const LoadingPage = () => {
-  const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
-  const [isFetched, setIsFetched] = useState(false);
+const LoadingSpinner = () => {
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => {
-      setIsFetched(true);
-    }, 3000);
+    setIsReady(true);
   }, []);
 
+  if (!isReady) {
+    return null;
+  }
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <ShimmerPlaceholder
-        style={styles.shimmerBox}
-        visible={isFetched}
-      />
-      <ShimmerPlaceHolder visible={isFetched}>
-        <Text style={styles.text}>
-          Wow, awesome here.
-        </Text>
-      </ShimmerPlaceHolder>
-    </ScrollView>
+    <View style={styles.container}>
+      <ActivityIndicator size="large" />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
-  shimmerBox: {
-    height: 100,
-    backgroundColor: '#dcdcdc',
-    marginBottom: 20,
-    borderRadius: 8,
-  },
-  text: {
-    fontSize: 18,
-    color: '#333',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
-export default LoadingPage;
+export default LoadingSpinner;
