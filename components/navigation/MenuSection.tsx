@@ -6,6 +6,8 @@ import { useRes } from '@/app/contexts/useRes';
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { DrawerNavigationHelpers } from '@react-navigation/drawer/lib/typescript/src/types';
 import { TouchableOpacity } from 'react-native';
+import { navigate } from '@/app/navigations/navigationUtils';
+import { ComponentNames } from '@/typing/type';
 
 interface MenuSectionProps {
     title: string;
@@ -64,7 +66,7 @@ const MenuSection = React.memo(({ title, isOpen, onToggle, items, navigation }: 
                     return (
                         <TouchableOpacity
                             key={`item-${item.label}-nav-${item.navigateTo}`}
-                            onPress={() => navigation.navigate(item.navigateTo)}
+                            onPress={() => navigate(item.navigateTo as ComponentNames)}
                             style={masterdataStyles.subMenuItem}>
                             <Text style={masterdataStyles.subMenuText}>{item.label ?? ""}</Text>
                         </TouchableOpacity>

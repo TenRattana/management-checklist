@@ -164,7 +164,7 @@ const ChecklistGroupScreen = React.memo(() => {
         flexArr: [0, 0, 6, 1, 1],
         actionIndex: [{ disables: 0, delete: 1, editIndex: 4, delIndex: 5 }],
         handleAction,
-        showMessage: 1,
+        showMessage: 2,
         searchQuery: debouncedSearchQuery,
         isFetching: isFetching
     }), [tableData, debouncedSearchQuery, handleAction, state.GroupCheckList, isFetching]);

@@ -5,23 +5,25 @@ import { Text } from '@/components';
 import MenuSection from './MenuSection';
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useSelector } from 'react-redux';
-import { Menus, ParentMenu } from '@/typing/type';
+import { ComponentNames, Menus, ParentMenu } from '@/typing/type';
 import { DrawerNavigationHelpers } from '@react-navigation/drawer/lib/typescript/src/types';
+import { navigate, navigationRef } from '@/app/navigations/navigationUtils';
 
 interface RenderTouchableOpacityProps {
     label: string;
-    navigateTo: string;
+    navigateTo: ComponentNames;
     navigations: DrawerNavigationHelpers;
 }
 
 const RenderTouchableOpacity = React.memo((props: RenderTouchableOpacityProps) => {
     const masterdataStyles = useMasterdataStyles();
     const { label, navigateTo, navigations } = props
+    const cureent = navigationRef.current?.getCurrentRoute()
 
     return (
         <TouchableOpacity
-            key={`item-${label}-nav-${navigateTo}`}
-            onPress={() => navigations.navigate(navigateTo)}
+            key={`item-${label}-nav-${navigateTo}-${cureent}`}
+            onPress={() => navigate(navigateTo)}
             style={masterdataStyles.menuItemNav}
         >
             <Text style={masterdataStyles.menuText}>{label}</Text>
@@ -65,7 +67,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = React.memo((p
                             />
                         );
                     } else {
-                        return <RenderTouchableOpacity key={`item-${screen.MenuLabel}-nav-${screen.NavigationTo}`} label={screen.MenuLabel} navigateTo={screen.NavigationTo} navigations={navigation} />;
+                        return <RenderTouchableOpacity key={`item-${screen.MenuLabel}-nav-${screen.NavigationTo}`} label={screen.MenuLabel} navigateTo={screen.NavigationTo as ComponentNames} navigations={navigation} />;
                     }
                 }
             })}

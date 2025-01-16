@@ -112,6 +112,7 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ checkLists }) => {
                     disabled={isActive}
                     style={[
                         createform.subFormContainer,
+                        { backgroundColor: item.Open ? "#e9e9e9" : undefined },
                         isActive ? createform.active : null,
                     ]}
                     testID={`dg-SF-${item.SFormID}`}
@@ -195,7 +196,7 @@ const Dragsubform: React.FC<DragsubformProps> = React.memo(({ checkLists }) => {
     return (
         <>
             <View style={styles.container}>
-                <Text style={[masterdataStyles.text, styles.cardtext]}>All Cards</Text>
+                <Text style={[masterdataStyles.cardTitle]}>All Cards</Text>
                 <IconButton
                     icon="folder-plus-outline"
                     iconColor={theme.colors.onBackground}

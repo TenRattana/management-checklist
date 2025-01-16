@@ -77,7 +77,7 @@ const PickerDropdown = React.memo(({
 
     return (
         <View style={styles.container}>
-            {label && (<Text style={[masterdataStyles.text, { alignSelf: 'center', paddingRight: 15 }]}>{`${label} : `}</Text>)}
+            {label ? (<Text style={[masterdataStyles.text, { alignSelf: 'center', paddingRight: 15 }]}>{`${label} : `}</Text>) : false}
 
             <Menu
                 visible={open}
@@ -94,7 +94,7 @@ const PickerDropdown = React.memo(({
                     data={filteredValues}
                     renderItem={({ item }) => (
                         <Menu.Item
-                            title={item.label}
+                            title={item.label ?? ""}
                             onPress={() => {
                                 handelSetFilter(item.value);
                                 setSearchQuery('');

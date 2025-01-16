@@ -195,7 +195,7 @@ const MachineGroupScreen = React.memo(() => {
         flexArr: [0, 0, 2, 2, 2, 1, 1, 1],
         actionIndex: [{ disables: 0, delete: 1, editIndex: 7, delIndex: 8 }],
         handleAction,
-        showMessage: 2,
+        showMessage: 3,
         searchQuery: debouncedSearchQuery,
         isFetching: isFetching
     }), [tableData, debouncedSearchQuery, handleAction, state.GroupMachine, state.Machine, isFetching]);

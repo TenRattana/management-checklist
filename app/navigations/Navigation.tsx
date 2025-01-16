@@ -10,7 +10,6 @@ import { AppDispatch } from '@/stores';
 import { initializeLogout } from '../providers';
 import CustomMenu from '@/components/navigation/CustomMenu'
 import Setting_dialog from "@/components/screens/Setting_dialog"
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { LoadingSpinner } from '@/components';
 import { Text } from 'react-native-paper';
 import { View } from 'react-native';
