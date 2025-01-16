@@ -12,6 +12,7 @@ import { fetchTimeSchedules } from '@/app/services';
 import { convertSchedule, MarkedDates } from '@/app/mocks/convertSchedule';
 import { Calendar } from 'react-native-calendars';
 import { TimeLine } from '@/app/mocks/timeline';
+import Animated, { SlideInLeft, SlideOutLeft } from 'react-native-reanimated';
 
 type Category = {
   id: string;
@@ -126,57 +127,59 @@ const HomeScreen = React.memo(() => {
         <LazyCalendarProvider date={currentDate} onDateChanged={setCurrentDate} showTodayButton>
           <View style={{ flex: 1, flexDirection: responsive === 'small' ? 'column' : 'row' }}>
             {showCalendar && (
-              <View style={styles.calendarContainer}>
-                <FlatList
-                  data={[[]]}
-                  renderItem={() => (
-                    <View style={{ flex: 1, flexDirection: responsive === 'small' ? 'row' : 'column' }}>
-                      <View style={{ width: responsive === 'small' ? "70%" : "100%" }}>
-                        {responsive === 'small' && (
-                          <TouchableOpacity onPress={toggleSwitch} style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
-                            <Icon source={showCalendar ? "chevron-left" : "chevron-right"} size={24} color={theme.colors.primary} />
-                            <Text style={masterdataStyles.text}>{showCalendar ? 'Hide Calendar' : 'Show Calendar'}</Text>
-                          </TouchableOpacity>
-                        )}
-                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginTop: 20, marginBottom: 10, paddingLeft: 10 }]}>Calendar List</Text>
-                        <Calendar
-                          onDayPress={(day) => setCurrentDate(day.dateString)}
-                          markingType="multi-dot"
-                          style={{ borderRadius: 10 }}
-                          markedDates={markedDatesS}
-                          theme={{
-                            todayTextColor: theme.colors.primary,
-                            arrowColor: theme.colors.primary,
-                            monthTextColor: theme.colors.primary,
-                            textDayFontSize: spacing.small,
-                            textMonthFontSize: spacing.small,
-                            textDayHeaderFontSize: spacing.small,
-                            textDayFontFamily: 'Poppins',
-                            textMonthFontFamily: 'Poppins',
-                            textDayHeaderFontFamily: 'Poppins',
-                            textDayFontWeight: 'bold',
-                            textMonthFontWeight: '600',
-                            textDayHeaderFontWeight: '500',
-                          }}
-                        />
-                      </View >
-
-                      <View style={{ width: responsive === 'small' ? "30%" : "100%", marginTop: responsive === 'small' ? 44 : 0 }}>
-                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginTop: 20, marginBottom: 10, paddingLeft: 10 }]}>Filter Date Type</Text>
-
-                        <FlatList
-                          data={categories}
-                          keyExtractor={(item) => item.id}
-                          renderItem={({ item, index }) => (
-                            <RenderCategoryItem item={item} toggleCheckbox={toggleCheckbox} checkedItems={checkedItems} />
+              <Animated.View entering={SlideInLeft} exiting={SlideOutLeft} >
+                <View style={styles.calendarContainer}>
+                  <FlatList
+                    data={[[]]}
+                    renderItem={() => (
+                      <View style={{ flex: 1, flexDirection: responsive === 'small' ? 'row' : 'column' }}>
+                        <View style={{ width: responsive === 'small' ? "70%" : "100%" }}>
+                          {responsive === 'small' && (
+                            <TouchableOpacity onPress={toggleSwitch} style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
+                              <Icon source={showCalendar ? "chevron-left" : "chevron-right"} size={24} color={theme.colors.primary} />
+                              <Text style={masterdataStyles.text}>{showCalendar ? 'Hide Calendar' : 'Show Calendar'}</Text>
+                            </TouchableOpacity>
                           )}
-                          extraData={checkedItems}
-                        />
+                          <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginTop: 20, marginBottom: 10, paddingLeft: 10 }]}>Calendar List</Text>
+                          <Calendar
+                            onDayPress={(day) => setCurrentDate(day.dateString)}
+                            markingType="multi-dot"
+                            style={{ borderRadius: 10 }}
+                            markedDates={markedDatesS}
+                            theme={{
+                              todayTextColor: theme.colors.primary,
+                              arrowColor: theme.colors.primary,
+                              monthTextColor: theme.colors.primary,
+                              textDayFontSize: spacing.small,
+                              textMonthFontSize: spacing.small,
+                              textDayHeaderFontSize: spacing.small,
+                              textDayFontFamily: 'Poppins',
+                              textMonthFontFamily: 'Poppins',
+                              textDayHeaderFontFamily: 'Poppins',
+                              textDayFontWeight: 'bold',
+                              textMonthFontWeight: '600',
+                              textDayHeaderFontWeight: '500',
+                            }}
+                          />
+                        </View >
+
+                        <View style={{ width: responsive === 'small' ? "30%" : "100%", marginTop: responsive === 'small' ? 44 : 0 }}>
+                          <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginTop: 20, marginBottom: 10, paddingLeft: 10 }]}>Filter Date Type</Text>
+
+                          <FlatList
+                            data={categories}
+                            keyExtractor={(item) => item.id}
+                            renderItem={({ item, index }) => (
+                              <RenderCategoryItem item={item} toggleCheckbox={toggleCheckbox} checkedItems={checkedItems} />
+                            )}
+                            extraData={checkedItems}
+                          />
+                        </View>
                       </View>
-                    </View>
-                  )}
-                />
-              </View>
+                    )}
+                  />
+                </View>
+              </Animated.View>
             )}
 
             <View style={{ flex: 1 }}>
