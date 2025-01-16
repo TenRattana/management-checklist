@@ -146,7 +146,12 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ route }) => {
             flex: 1,
             margin: 10,
             padding: 10,
-            borderRadius: 8,
+            paddingBottom: 0,
+            marginBottom: 0,
+            borderTopLeftRadius: 8,
+            borderTopRightRadius: 8,
+            borderBottomLeftRadius: 0,
+            borderBottomRightRadius: 0,
             backgroundColor: theme.colors.background
         },
         header: {
