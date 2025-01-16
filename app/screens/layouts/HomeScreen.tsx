@@ -65,7 +65,12 @@ const HomeScreen = React.memo(() => {
       flex: 1,
       margin: 10,
       padding: 10,
-      borderRadius: 8,
+      paddingBottom: 0,
+      marginBottom: 0,
+      borderTopLeftRadius: 8,
+      borderTopRightRadius: 8,
+      borderBottomLeftRadius: 0,
+      borderBottomRightRadius: 0,
       backgroundColor: theme.colors.background
     },
     calendarContainer: { padding: 10, width: responsive === 'small' ? '100%' : Platform.OS === "web" ? 400 : 300, },
@@ -178,7 +183,7 @@ const HomeScreen = React.memo(() => {
                               textDayHeaderFontWeight: '500',
                             }}
                           />
-                        </View >
+                        </View>
 
                         <View style={{ width: responsive === 'small' ? "30%" : "100%", marginTop: responsive === 'small' ? 44 : 0 }}>
                           <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginTop: 10, marginBottom: 10, paddingLeft: 10 }]}>Filter Schedule Type</Text>
@@ -206,7 +211,7 @@ const HomeScreen = React.memo(() => {
                   <Text style={masterdataStyles.text}>{showCalendar ? 'Hide Calendar' : 'Show Calendar'}</Text>
                 </TouchableOpacity>
               ) : responsive === 'small' && !showCalendar && (
-                <TouchableOpacity onPress={toggleSwitch} style={{ flexDirection: 'row', alignItems: 'center'}}>
+                <TouchableOpacity onPress={toggleSwitch} style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Icon source={showCalendar ? "chevron-left" : "chevron-right"} size={24} color={theme.colors.primary} />
                   <Text style={masterdataStyles.text}>{showCalendar ? 'Hide Calendar' : 'Show Calendar'}</Text>
                 </TouchableOpacity>
@@ -224,7 +229,7 @@ const HomeScreen = React.memo(() => {
 
               <View style={{ flex: 1 }} key={JSON.stringify({ responsive, darkMode, fontSize })}>
                 <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
-                  <LazyTimelines filterStatus={filterStatus} filterTitle={filterTitle} computedTimeline={computedTimeline} />
+                  <LazyTimelines filterStatus={filterStatus} filterTitle={filterTitle} computedTimeline={computedTimeline}/>
                 </Suspense>
               </View>
             </View>
@@ -233,7 +238,6 @@ const HomeScreen = React.memo(() => {
       </Suspense>
     </View>
   );
-
 });
 
 export default HomeScreen;
