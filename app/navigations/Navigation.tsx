@@ -106,7 +106,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
     const initialRoute = user.initialRoute || (user.Screen.length > 0 ? user.Screen[0].NavigationTo : "");
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <>
             {user.Screen.length > 0 && (
                 <Drawer.Navigator
                     drawerContent={(props) => <CustomDrawerContent {...props} />}
@@ -149,7 +149,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                 </Drawer.Navigator>
             )}
             <MemoSetting_dialog isVisible={menuSetting} setVisible={() => setMenuSetting(false)} />
-        </SafeAreaView>
+        </>
     );
 });
 

@@ -1,93 +1,124 @@
-import { StyleSheet, Text } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
-import * as Print from 'expo-print';
-import QRCode from 'react-native-qrcode-svg';
-import useMasterdataStyles from '@/styles/common/masterdata';
-import { useTheme } from '@/app/contexts/useTheme';
-import { Dialog, IconButton, Portal } from 'react-native-paper';
-import { useRes } from '@/app/contexts/useRes';
-import { spacing } from '@/constants/Spacing';
+import { StyleSheet, Text, Platform } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import * as Print from "expo-print";
+import QRCode from "react-native-qrcode-svg";
+import { useTheme } from "@/app/contexts/useTheme";
+import { useRes } from "@/app/contexts/useRes";
+import { Dialog, IconButton, Portal } from "react-native-paper";
+import { spacing } from "@/constants/Spacing";
+import useMasterdataStyles from "@/styles/common/masterdata";
 
-const ViewQR = ({ value, open, setOpen, display }: { value: string, open: boolean, setOpen: (v: boolean) => void, display: string }) => {
-    const masterdataStyles = useMasterdataStyles()
-    const { theme } = useTheme()
-    const { responsive } = useRes()
+const ViewQR = ({
+    value,
+    open,
+    setOpen,
+    display,
+}: {
+    value: string;
+    open: boolean;
+    setOpen: (v: boolean) => void;
+    display: string;
+}) => {
+    const masterdataStyles = useMasterdataStyles();
+    const { theme } = useTheme();
+    const [base64Code, setBase64Code] = useState<string>("");
+    const [isReadyToPrint, setIsReadyToPrint] = useState<boolean>(false);
 
-    const [qrData, setQrData] = useState('');
-    const qrRef = useRef<any>(null);
-
-    useEffect(() => {
-        if (qrRef.current && open) {
-            qrRef.current.toDataURL(callback);
+    const handlePrint = useCallback(async () => {
+        if (!base64Code) {
+            console.log("QR Code data is still loading...");
+            return;
         }
-    }, [open, value]);
 
-    const callback = (dataURL: any) => {
-        setQrData(dataURL);
-    };
-
-    const handlePrint = async () => {
-        const htmlContent = `
-        <html>
+        const printHtmlContent = `
+       <html>
             <head>
                 <style>
+                    * {
+                        margin: 0;
+                        padding:0;
+                    }
                     body {
                         font-family: Arial, sans-serif;
-                        padding: 10px;
-                    }
-                    h1 {
-                        font-size: 24px;
+                        text-align: center;
+                        justify-content: center; 
+                        align-items: center; 
+                        min-height: 100vh; 
                     }
                     h4 {
-                        font-size: 18px;
+                        padding-top:5px;
+                        padding-bottom:5px;
                     }
                     img {
-                        width: 100%;
-                        padding: 10px;
+                        padding-top:5px;
+                        padding-bottom:5px;
+                        max-width: 300px; 
+                        height: auto; 
+                    }
+                    h5 {
+                        padding-top: 5px;
                     }
                 </style>
             </head>
             <body>
-                <h1>QR Code for Machine ID</h1>
-                <h4>Machine Name : ${display}</h4>
-                <img src="${qrData}" alt="QR Code" />
+                <h4>${`QR Code : ${display}.`}</h4>
+                <img src="data:image/png;base64,${base64Code}" alt="QR Code" />
+                <h5>Scan this code for open form.</h5>
             </body>
         </html>
-    `;
+        `;
 
-        try {
-            await Print.printAsync({ html: htmlContent });
-        } catch (error) {
-            console.error("Error printing the HTML:", error);
+        if (Platform.OS === "web") {
+            const printWindow = window.open("", "", "width=1980,height=1090");
+            printWindow.document.write(printHtmlContent);
+            printWindow.document.close();
+            printWindow.print();
+        } else {
+            try {
+                const printResult = await Print.printToFileAsync({
+                    html: printHtmlContent,
+                });
+                if (printResult && printResult.uri) {
+                    await Print.printAsync({ uri: printResult.uri });
+                } else {
+                    console.error("Failed to create PDF, URI is undefined.");
+                }
+            } catch (error) {
+                console.error("Error creating or printing PDF:", error);
+            }
         }
-    };
+    }, [base64Code]);
 
-    const styles = StyleSheet.create({
-        container: {
-            zIndex: 3,
-            width: responsive === "large" ? 800 : "60%",
-            alignSelf: 'center',
-            paddingHorizontal: 20,
-            paddingVertical: 50,
-            borderRadius: 4,
-            backgroundColor: theme.colors.background,
-            alignContent: 'center',
-            alignItems: 'center',
-            shadowColor: undefined
+    useEffect(() => {
+        if (base64Code) {
+            setIsReadyToPrint(true);
         }
-    });
+    }, [base64Code]);
 
     return (
         <Portal>
-            <Dialog visible={open} onDismiss={() => setOpen(false)} style={styles.container}>
+            <Dialog
+                visible={open}
+                onDismiss={() => setOpen(false)}
+                style={[
+                    masterdataStyles.containerDialog,
+                    { alignItems: "center", alignSelf: "center", paddingTop: 20 },
+                ]}
+            >
                 <QRCode
                     value={value || "value"}
-                    size={350}
+                    size={300}
                     color="black"
                     backgroundColor={theme.colors.background}
                     logoBorderRadius={5}
                     logoMargin={20}
-                    getRef={(c) => { qrRef.current = c }}
+                    getRef={(ref) => {
+                        if (ref && !base64Code) {
+                            ref.toDataURL((base64: string) => {
+                                setBase64Code(base64);
+                            });
+                        }
+                    }}
                 />
                 <Text style={[{ marginVertical: 40, fontSize: spacing.medium }]}>
                     {`Scan this code for open form ${display}.`}
@@ -97,11 +128,12 @@ const ViewQR = ({ value, open, setOpen, display }: { value: string, open: boolea
                     icon="printer"
                     iconColor={theme.colors.onBackground}
                     onPress={handlePrint}
-                    style={{ position: 'absolute', right: 0, bottom: -5 }}
+                    style={{ position: "absolute", right: 0, bottom: -5 }}
+                    disabled={!isReadyToPrint}
                 />
             </Dialog>
         </Portal>
     );
-}
+};
 
 export default ViewQR;

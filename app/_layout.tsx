@@ -20,7 +20,7 @@ const RootLayout = () => {
             <GestureHandlerRootView>
                 <Suspense fallback={<LoadingSpinner />}>
                     <AppProviders>
-                        <StatusBar hidden={true} translucent />
+                        <StatusBar hidden={false} translucent />
                         <RootNavigation />
                     </AppProviders>
                 </Suspense>

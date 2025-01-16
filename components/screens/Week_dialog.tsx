@@ -82,7 +82,7 @@ const Week_dialog = React.memo(({ theme, spacing, responsive, showError, showSuc
 
             <ScrollView showsVerticalScrollIndicator={false}>
                 {Object.keys(values).map((day, index) => (
-                    <>
+                    <View key={index}>
                         <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
                             {`Detail day ${index + 1}`}
                         </Text>
@@ -118,7 +118,7 @@ const Week_dialog = React.memo(({ theme, spacing, responsive, showError, showSuc
                                 <Text style={[masterdataStyles.text, { paddingLeft: 10 }]}>Delete</Text>
                             </TouchableOpacity>
                         </View>
-                    </>
+                    </View>
                 ))}
             </ScrollView>
 

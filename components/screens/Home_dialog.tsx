@@ -54,7 +54,7 @@ const Home_dialog = React.memo(({ dialogVisible, hideDialog, selectedEvent }: Ho
 
     return (
         <Portal>
-            <Dialog visible={dialogVisible} onDismiss={hideDialog} style={[masterdataStyles.containerDialog, { backgroundColor: theme.colors.background, display: dialogVisible ? 'flex' : 'none', flex: 1, maxHeight: hp(Platform.OS === "web" ? '50%' : '70&') }]}>
+            <Dialog visible={dialogVisible} onDismiss={hideDialog} style={[masterdataStyles.containerDialog, { backgroundColor: theme.colors.background, width: 850, display: dialogVisible ? 'flex' : 'none', flex: 1, maxHeight: hp(Platform.OS === "web" ? '50%' : '70&') }]}>
                 <Dialog.Title>{selectedEvent?.title} - Schedule</Dialog.Title>
                 <View style={{ flex: 1, marginHorizontal: 24 }}>
                     {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}

@@ -178,25 +178,35 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(() => {
         onError: handleError,
     });
 
+    const Edit = user.Permissions.includes("edit_apporved")
+
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
-        Tablehead: [
+        Tablehead: Edit ? [
             { label: "selected", align: "center" },
             { label: "Machine Name", align: "flex-start" },
             { label: "Form Name", align: "flex-start" },
             { label: "User", align: "flex-start" },
             { label: "Time Submit", align: "flex-start" },
             { label: "Preview", align: "center" },
+        ] : [
+            { label: "Machine Name", align: "flex-start" },
+            { label: "Form Name", align: "flex-start" },
+            { label: "User", align: "flex-start" },
+            { label: "Time Submit", align: "flex-start" },
+            { label: "Preview", align: "center" },
         ],
-        flexArr: [1, 2, 3, 2, 3, 1],
-        actionIndex: [
+        flexArr: Edit ? [1, 2, 3, 2, 3, 1] : [2, 3, 2, 3, 1],
+        actionIndex: Edit ? [
             {
                 selectIndex: 0,
                 preIndex: 5,
             },
-        ],
+        ] : [{
+            preIndex: 4,
+        }],
         handleAction,
-        showMessage: [1, 2],
+        showMessage: Edit ? [1, 2] : [0, 1],
         searchQuery: debouncedSearchQuery,
         selectedRows,
         setRow,

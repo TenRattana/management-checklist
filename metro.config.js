@@ -8,7 +8,9 @@ module.exports = {
   watchFolders: ["./app", "./components"],
   transformer: {
     ...defaultConfig.transformer,
-    babelTransformerPath: require.resolve("react-native-svg-transformer"),
+    babelTransformerPath: require.resolve(
+      "react-native-qrcode-svg/textEncodingTransformation"
+    ),
     getTransformOptions: async () => ({
       transform: {
         experimentalImportSupport: false,

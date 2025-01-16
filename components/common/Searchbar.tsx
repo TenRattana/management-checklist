@@ -27,6 +27,7 @@ const SearchBar = ({ value, onChange, placeholder, testId }: SearchBarProps) => 
         style={[
           styles.searchbarWrapper,
           {
+            marginBottom: responsive === "small" ? 5 : undefined,
             borderWidth: 1,
             backgroundColor: theme.colors.surface,
             ...Platform.select({
@@ -68,7 +69,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     paddingHorizontal: 10,
     height: 50,
-    marginBottom: 5
   },
   searchbar: {
     flex: 1,

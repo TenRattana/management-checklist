@@ -66,7 +66,6 @@ const HomeScreen = React.memo(() => {
       color: theme.colors.blue,
       fontSize: spacing.small,
       marginHorizontal: 10,
-      marginTop: 10,
     },
     filterButtonActive: {
       color: theme.colors.field,
