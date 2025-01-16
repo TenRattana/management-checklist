@@ -181,7 +181,7 @@ const HomeScreen = React.memo(() => {
                         </View >
 
                         <View style={{ width: responsive === 'small' ? "30%" : "100%", marginTop: responsive === 'small' ? 44 : 0 }}>
-                          <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginTop: 20, marginBottom: 10, paddingLeft: 10 }]}>Filter Schedule Type</Text>
+                          <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginTop: 10, marginBottom: 10, paddingLeft: 10 }]}>Filter Schedule Type</Text>
 
                           <FlatList
                             data={categories}
@@ -201,12 +201,12 @@ const HomeScreen = React.memo(() => {
 
             <View style={{ flex: 1 }}>
               {responsive !== 'small' ? (
-                <TouchableOpacity onPress={toggleSwitch} style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
+                <TouchableOpacity onPress={toggleSwitch} style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Icon source={showCalendar ? "chevron-left" : "chevron-right"} size={24} color={theme.colors.primary} />
                   <Text style={masterdataStyles.text}>{showCalendar ? 'Hide Calendar' : 'Show Calendar'}</Text>
                 </TouchableOpacity>
               ) : responsive === 'small' && !showCalendar && (
-                <TouchableOpacity onPress={toggleSwitch} style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
+                <TouchableOpacity onPress={toggleSwitch} style={{ flexDirection: 'row', alignItems: 'center'}}>
                   <Icon source={showCalendar ? "chevron-left" : "chevron-right"} size={24} color={theme.colors.primary} />
                   <Text style={masterdataStyles.text}>{showCalendar ? 'Hide Calendar' : 'Show Calendar'}</Text>
                 </TouchableOpacity>
