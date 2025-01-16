@@ -157,7 +157,7 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
   }, 300), []);
 
   return (
-    <View id="customtable" style={{ flex: 1 }}>
+    <View id="customtable" style={{ flex: 1, marginTop: 10 }}>
       {responsive === "small" ? (
         <CustomtableSmall
           displayData={displayData}

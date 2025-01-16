@@ -3,7 +3,7 @@ import { TouchableOpacity, StyleSheet, View } from "react-native";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
 import { LoadingSpinner, Searchbar, Text } from "@/components";
-import { Card } from "react-native-paper";
+import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { GroupMachine } from '@/typing/type';
 import { InitialValuesGroupMachine } from '@/typing/value';
@@ -172,6 +172,9 @@ const MachineGroupScreen = React.memo(() => {
     const styles = StyleSheet.create({
         container: {
             flex: 1,
+            margin: 10,
+            padding: 10,
+            borderRadius: 8,
             backgroundColor: theme.colors.background
         },
         header: {
@@ -194,6 +197,8 @@ const MachineGroupScreen = React.memo(() => {
                 title={`List ${state.GroupMachine}` || "List"}
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
+            <Divider style={{ marginHorizontal: 15, marginBottom: 10 }} />
+
             <View id="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
                     placeholder={`Search ${state.GroupMachine}...`}

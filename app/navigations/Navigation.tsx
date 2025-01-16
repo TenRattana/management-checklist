@@ -1,5 +1,4 @@
 import React, { lazy, Suspense, useRef, useCallback, useState, useMemo } from 'react';
-import { createDrawerNavigator } from '@react-navigation/drawer';
 import PermissionDeny from '../screens/layouts/PermissionDeny';
 import { useRes } from "@/app/contexts/useRes";
 import CustomDrawerContent from '@/components/navigation/CustomDrawer';
@@ -11,11 +10,17 @@ import { initializeLogout } from '../providers';
 import CustomMenu from '@/components/navigation/CustomMenu'
 import Setting_dialog from "@/components/screens/Setting_dialog"
 import { LoadingSpinner } from '@/components';
-import { Text } from 'react-native-paper';
-import { View } from 'react-native';
+import { IconButton, Text } from 'react-native-paper';
+import { Platform, View } from 'react-native';
+import { useToast } from '../contexts/useToast';
+import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { createDrawerNavigator, DrawerNavigationProp } from '@react-navigation/drawer';
+import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 
 const Drawer = createDrawerNavigator();
 const MemoSetting_dialog = React.memo(Setting_dialog)
+
+export const navigationRef = React.createRef<NavigationContainerRef<{}> & { openDrawer: () => void; closeDrawer: () => void }>();
 
 const components: Record<ComponentNames, () => Promise<{ default: React.ComponentType<any> }>> = {
     InputFormMachine: () => import('@/app/screens/layouts/forms/Scan/InputFormMachine'),
@@ -43,12 +48,13 @@ const components: Record<ComponentNames, () => Promise<{ default: React.Componen
 };
 
 const DrawerNav = React.memo(({ renderComponent, user }: any) => {
-
-    const { theme } = useTheme();
-    const { fontSize } = useRes();
+    const { theme, darkMode } = useTheme();
+    const { showSuccess } = useToast();
+    const { fontSize, spacing, responsive } = useRes();
     const state = useSelector((state: any) => state.prefix);
     const drawerWidth = fontSize === "small" ? 300 : fontSize === "medium" ? 350 : 400;
     const dispatch = useDispatch<AppDispatch>();
+    const [isDrawerVisible, setDrawerVisible] = useState(true);
 
     const [menuVisible, setMenuVisible] = useState(false);
     const [menuSetting, setMenuSetting] = useState(false);
@@ -61,6 +67,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
     const handleLogout = useCallback(() => {
         dispatch(initializeLogout());
         setMenuVisible(false);
+        showSuccess("Logout Success")
     }, [dispatch]);
 
     const toggleMenu = useCallback(() => {
@@ -104,49 +111,110 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
 
     const initialRoute = user.initialRoute || (user.Screen.length > 0 ? user.Screen[0].NavigationTo : "");
 
-    return (
+    const toggleDrawer = () => {
+        if (navigationRef.current) {
+            navigationRef.current.dispatch(DrawerActions.toggleDrawer());
+        }
+        setDrawerVisible(!isDrawerVisible)
+    };
+
+    return user.Screen.length > 0 && (
         <>
-            {user.Screen.length > 0 && (
-                <Drawer.Navigator
-                    drawerContent={(props) => <CustomDrawerContent {...props} />}
-                    screenOptions={{
-                        drawerHideStatusBarOnOpen: false,
-                        drawerStatusBarAnimation: 'none',
-                        drawerStyle: {
-                            backgroundColor: theme.colors.background,
-                            width: drawerWidth,
+            {Platform.OS === "web" && responsive === "large" && (
+                <View style={{
+                    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 55,
+                    backgroundColor: theme.colors.blueNav,
+                    borderColor: "rgb(216, 216, 216)",
+                    borderTopWidth: 1, borderBottomWidth: 1,
+                    ...Platform.select({
+                        web: {
+                            boxShadow: `${theme.colors.onBackground || "#000"} 0px 2px 4px`,
                         },
-                        headerTitle: state.AppName || "",
-                        headerTitleStyle: {
+                        ios: {
+                            shadowColor: theme.colors.onBackground || "#000",
+                            shadowOffset: { width: 0, height: 2 },
+                            shadowOpacity: 1,
+                            shadowRadius: 4,
+                        },
+                        android: {
+                            elevation: 4,
+                        },
+                    }),
+                }} key={JSON.stringify(darkMode)}>
+                    <View style={{ flexDirection: 'row', alignSelf: 'center', alignItems: 'center' }}>
+                        <IconButton icon="menu" iconColor={theme.colors.fff} size={25}
+                            onPress={() => toggleDrawer()}
+                        />
+                        <Text style={{
+                            paddingLeft: 5,
                             fontSize: 14,
                             fontWeight: 'bold',
-                            color: '#333',
-                        },
-                        headerRight: () => (
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <Text style={{
-                                    fontSize: 14,
-                                    fontWeight: 'bold',
-                                    color: '#333',
-                                }}>{user.Full_Name}</Text>
-                                <CustomMenu
-                                    visible={menuVisible}
-                                    onShow={toggleMenu}
-                                    onDismiss={closeMenu}
-                                    onSettingsPress={handleSettings}
-                                    onLogoutPress={handleLogout}
-                                />
-                            </View>
-                        ),
-                        freezeOnBlur: true,
-                        unmountOnBlur: true,
-                    }}
-                    initialRouteName={initialRoute}
-                    id="nav"
-                >
-                    {menuScreens}
-                </Drawer.Navigator>
+                            color: theme.colors.fff,
+                        }}>{state.AppName || ''}</Text>
+                    </View>
+
+                    <View style={{ flexDirection: 'row', alignSelf: 'center', alignItems: 'center' }}>
+                        <Text style={{
+                            fontSize: 14,
+                            fontWeight: 'bold',
+                            color: theme.colors.fff,
+                        }}>{user.Full_Name}</Text>
+                        <CustomMenu
+                            visible={menuVisible}
+                            onShow={toggleMenu}
+                            onDismiss={closeMenu}
+                            onSettingsPress={handleSettings}
+                            onLogoutPress={handleLogout}
+                        />
+                    </View>
+                </View>
             )}
+            <Drawer.Navigator
+                drawerContent={(props) => <CustomDrawerContent {...props} />}
+                screenOptions={{
+                    headerShown: Platform.OS !== 'web' || responsive !== "large",
+                    drawerStatusBarAnimation: 'none',
+                    drawerStyle: {
+                        backgroundColor: theme.colors.background,
+                        width: drawerWidth,
+                        display: Platform.OS === 'web' && responsive === "large" && isDrawerVisible ? 'flex' : Platform.OS !== 'web' || responsive !== "large" ? 'flex' : 'none'
+                    },
+                    drawerType: Platform.OS === 'web' && responsive === "large" ? 'permanent' : 'front',
+                    headerTitle: state.AppName || '',
+                    headerTitleStyle: {
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                        color: theme.colors.fff,
+                    },
+                    headerStyle: {
+                        backgroundColor: theme.colors.blueNav
+                    },
+                    headerTintColor: theme.colors.fff,
+                    headerRight: () => (
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Text style={{
+                                fontSize: 14,
+                                fontWeight: 'bold',
+                                color: theme.colors.fff,
+                            }}>{user.Full_Name}</Text>
+                            <CustomMenu
+                                visible={menuVisible}
+                                onShow={toggleMenu}
+                                onDismiss={closeMenu}
+                                onSettingsPress={handleSettings}
+                                onLogoutPress={handleLogout}
+                            />
+                        </View>
+                    ),
+                    freezeOnBlur: true,
+                    unmountOnBlur: true,
+                }}
+                initialRouteName={initialRoute}
+                id="nav"
+            >
+                {menuScreens}
+            </Drawer.Navigator>
+
             <MemoSetting_dialog isVisible={menuSetting} setVisible={() => setMenuSetting(false)} />
         </>
     );
@@ -190,6 +258,7 @@ const Navigation: React.FC = React.memo(() => {
             renderComponent={renderComponent}
             user={user}
         />
+
     );
 });
 

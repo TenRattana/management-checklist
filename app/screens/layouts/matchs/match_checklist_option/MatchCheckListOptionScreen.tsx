@@ -4,7 +4,7 @@ import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
 import { LoadingSpinner, Searchbar, Text } from "@/components";
-import { Card } from "react-native-paper";
+import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { MatchCheckListOption } from '@/typing/type'
 import { InitialValuesMatchCheckListOption } from '@/typing/value'
@@ -179,6 +179,9 @@ const MatchCheckListOptionScreen = React.memo(() => {
     const styles = StyleSheet.create({
         container: {
             flex: 1,
+            margin: 10,
+            padding: 10,
+            borderRadius: 8,
             backgroundColor: theme.colors.background
         },
         header: {
@@ -201,6 +204,8 @@ const MatchCheckListOptionScreen = React.memo(() => {
                 title={`List ${state.MatchCheckListOption}` || "List"}
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
+            <Divider style={{ marginHorizontal: 15, marginBottom: 10 }} />
+
             <View id="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
                     placeholder="Search Match Checklist Machine..."

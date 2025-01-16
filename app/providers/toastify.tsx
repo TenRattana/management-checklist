@@ -177,13 +177,13 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
 const styles = StyleSheet.create({
   toastStackWeb: {
     position: "absolute",
-    top: '10%',
+    top: '7%',
     right: '2%',
     zIndex: 9999,
   },
   toastStackMobile: {
     position: "absolute",
-    top: '10%',
+    top: '7%',
     flex: 1,
     alignSelf: 'center',
     zIndex: 9999,

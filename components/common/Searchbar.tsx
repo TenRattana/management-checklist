@@ -20,7 +20,7 @@ const SearchBar = ({ value, onChange, placeholder, testId }: SearchBarProps) => 
   return (
     <View
       style={[
-        { flex: responsive === "small" ? undefined : 1, marginRight: responsive === "small" ? 0 : 10, alignSelf: responsive === "small" ? undefined : "center" },
+        { marginRight: responsive === "small" ? 0 : 10, alignSelf: responsive === "small" ? undefined : "center" },
       ]}
     >
       <View
@@ -68,11 +68,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 4,
     paddingHorizontal: 10,
-    height: 50,
   },
   searchbar: {
-    flex: 1,
-    elevation: 0,
+    minWidth: 300,
+    minHeight: 0,
     backgroundColor: "transparent",
   },
   searchIcon: {

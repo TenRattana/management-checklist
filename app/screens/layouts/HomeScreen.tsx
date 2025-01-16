@@ -1,11 +1,11 @@
-import { ActivityIndicator, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import React, { lazy, Suspense, useCallback, useState, useMemo, useEffect } from 'react';
 import { CalendarUtils } from 'react-native-calendars';
 import { getCurrentTime } from '@/config/timezoneUtils';
 import { useTheme } from '@/app/contexts/useTheme';
 import { FlatList } from 'react-native-gesture-handler';
 import useMasterdataStyles from '@/styles/common/masterdata';
-import { Checkbox, Icon } from 'react-native-paper';
+import { Card, Checkbox, Divider, Icon } from 'react-native-paper';
 import { useRes } from '@/app/contexts/useRes';
 import { useQuery } from 'react-query';
 import { fetchTimeSchedules } from '@/app/services';
@@ -13,6 +13,7 @@ import { convertSchedule, MarkedDates } from '@/app/mocks/convertSchedule';
 import { Calendar } from 'react-native-calendars';
 import { TimeLine } from '@/app/mocks/timeline';
 import Animated, { SlideInLeft, SlideOutLeft } from 'react-native-reanimated';
+import { Text } from '@/components';
 
 type Category = {
   id: string;
@@ -60,21 +61,32 @@ const HomeScreen = React.memo(() => {
   const [filterStatus, setFilterStatus] = useState('running');
 
   const styles = useMemo(() => StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.colors.background },
+    container: {
+      flex: 1,
+      margin: 10,
+      padding: 10,
+      borderRadius: 8,
+      backgroundColor: theme.colors.background
+    },
     calendarContainer: { padding: 10, width: responsive === 'small' ? '100%' : Platform.OS === "web" ? 400 : 300, },
     filterContainer: { flexDirection: 'row', alignItems: 'center', marginVertical: 10 },
     filterButton: {
-      color: theme.colors.blue,
+      color: theme.colors.text,
       fontSize: spacing.small,
       marginHorizontal: 10,
     },
     filterButtonActive: {
-      color: theme.colors.field,
+      color: theme.colors.text,
       fontSize: spacing.medium,
       borderBottomWidth: 1,
       borderBottomColor: theme.colors.drag,
       marginHorizontal: 10,
       marginTop: 10,
+    },
+    header: {
+      fontSize: spacing.large,
+      marginTop: spacing.small,
+      paddingVertical: fontSize === "large" ? 7 : 5
     },
   }), [theme.colors.background, spacing, responsive]);
 
@@ -123,9 +135,14 @@ const HomeScreen = React.memo(() => {
 
   return (
     <View style={styles.container}>
+      <Card.Title
+        title="Schedule"
+        titleStyle={[masterdataStyles.textBold, styles.header]}
+      />
+      <Divider style={{ marginHorizontal: 15, marginBottom: 10 }} />
       <Suspense fallback={<ActivityIndicator size="large" color={theme.colors.primary} />}>
         <LazyCalendarProvider date={currentDate} onDateChanged={setCurrentDate} showTodayButton>
-          <View style={{ flex: 1, flexDirection: responsive === 'small' ? 'column' : 'row' }}>
+          <View style={{ flex: 1, flexDirection: responsive === 'small' ? 'column' : 'row', padding: 10 }}>
             {showCalendar && (
               <Animated.View entering={SlideInLeft} exiting={SlideOutLeft} >
                 <View style={styles.calendarContainer}>

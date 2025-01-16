@@ -1,10 +1,11 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import AuthStack from './AuthStack';
 import { useSelector } from 'react-redux';
 import { navigationRef } from './navigationUtils';
 import { LoadingSpinner } from '@/components';
 import Navigation from './Navigation';
+import { LoginScreen } from '../screens';
+import { View } from 'react-native';
 
 const RootNavigation = () => {
     const isLoggedIn = useSelector((state: any) => state.user.IsAuthenticated);
@@ -15,7 +16,7 @@ const RootNavigation = () => {
             {isLoggedIn ? (
                 loadgin > 0 ? <Navigation /> : <LoadingSpinner />
             ) : (
-                <AuthStack />
+                <LoginScreen />
             )}
         </NavigationContainer>
     );

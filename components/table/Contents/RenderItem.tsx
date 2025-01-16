@@ -37,7 +37,7 @@ const RenderItem = React.memo(({ item, index, Tablehead, flexArr, actionIndex, s
         }>>
     }
 ) => {
-    const { theme } = useTheme();
+    const { theme, darkMode } = useTheme();
     const customtable = useCustomtableStyles();
 
     const [visibleDetails, setVisibleDetails] = useState<Set<number>>(new Set());
@@ -75,11 +75,11 @@ const RenderItem = React.memo(({ item, index, Tablehead, flexArr, actionIndex, s
     }, []);
 
     const styles = StyleSheet.create({
-        container: { flex: 1, paddingBottom: 3 },
+        container: { flex: 1 },
         containerRow: {
-            backgroundColor: theme.colors.background,
-            borderRadius: 4,
-            borderLeftWidth: 4,
+            backgroundColor: index % 2 === 0 ? !darkMode ? '#f4f4f4' : '#15205a' : theme.colors.background,
+            // borderRadius: 4,
+            // borderLeftWidth: 4,
             borderColor: item[Number(Tablehead.findIndex(v => v.label === "Status"))] || false ? theme.colors.succeass : theme.colors.error,
             borderBottomWidth: Platform.OS === "web" ? 1 : 0,
             elevation: 1

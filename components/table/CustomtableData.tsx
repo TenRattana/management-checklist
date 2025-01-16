@@ -64,8 +64,7 @@ const CustomtableData = React.memo(({ Tablehead, flexArr, actionIndex, displayDa
                 )}
                 ListFooterComponent={() => displayData.length > 0 && isFetching && <View style={{ padding: 20 }}><LoadingSpinner /></View>}
                 contentContainerStyle={{ flexGrow: 1 }}
-                nestedScrollEnabled={true}
-                showsVerticalScrollIndicator={true}
+                showsVerticalScrollIndicator={false}
                 removeClippedSubviews
                 onEndReachedThreshold={0.2}
                 initialNumToRender={30}

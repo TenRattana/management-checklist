@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from
 import { useToast } from '@/app/contexts/useToast';
 import { useRes } from '@/app/contexts/useRes';
 import { LoadingSpinner, Searchbar } from "@/components";
-import { Card, Text } from "react-native-paper";
+import { Card, Divider, Text } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { ExpectedResult } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
@@ -225,6 +225,9 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(() => {
     const styles = StyleSheet.create({
         container: {
             flex: 1,
+            margin: 10,
+            padding: 10,
+            borderRadius: 8,
             backgroundColor: theme.colors.background
         },
         header: {
@@ -247,6 +250,8 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(() => {
                 title="List Acknowledged"
                 titleStyle={[masterdataStyles.textBold, styles.header]}
             />
+            <Divider style={{ marginHorizontal: 15, marginBottom: 10 }} />
+
             <View id="container-search" style={masterdataStyles.containerSearch}>
                 <Searchbar
                     placeholder="Search Acknowledged..."
