@@ -164,7 +164,7 @@ const HomeScreen = React.memo(() => {
                         </View >
 
                         <View style={{ width: responsive === 'small' ? "30%" : "100%", marginTop: responsive === 'small' ? 44 : 0 }}>
-                          <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginTop: 20, marginBottom: 10, paddingLeft: 10 }]}>Filter Date Type</Text>
+                          <Text style={[masterdataStyles.text, masterdataStyles.textBold, { marginTop: 20, marginBottom: 10, paddingLeft: 10 }]}>Filter Schedule Type</Text>
 
                           <FlatList
                             data={categories}
