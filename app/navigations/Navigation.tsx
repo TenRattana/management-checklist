@@ -154,11 +154,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                     </View>
 
                     <View style={{ flexDirection: 'row', alignSelf: 'center', alignItems: 'center' }}>
-                        <Text style={{
-                            fontSize: 14,
-                            fontWeight: 'bold',
-                            color: theme.colors.fff,
-                        }}>{user.Full_Name}</Text>
+                        <Text style={{ fontSize: 14, fontWeight: 'bold', color: theme.colors.fff }}>{user.Full_Name}</Text>
                         <CustomMenu
                             visible={menuVisible}
                             onShow={toggleMenu}
