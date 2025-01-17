@@ -253,7 +253,7 @@ const HomeScreen = React.memo(() => {
               </Animated.View>
             )}
 
-            <View style={{ flex: 1, borderLeftWidth: 1, borderColor: "rgb(216,216,216)", paddingLeft: 5 }}>
+            <View style={{ flex: 1, borderLeftWidth: showCalendar ? 1 : 0, borderColor: "rgb(216,216,216)", paddingLeft: 5 }}>
               {responsive !== "small" ? (
                 <TouchableOpacity onPress={toggleSwitch} style={{ flexDirection: "row", alignItems: "center" }} >
                   <Icon
