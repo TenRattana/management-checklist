@@ -45,6 +45,7 @@ const components: Record<ComponentNames, () => Promise<{ default: React.Componen
     Setting: () => import('@/app/screens/layouts/settings/SettingScreen'),
     Time: () => import('@/app/screens/layouts/schedule/TimescheduleScreen'),
     TimeTrack: () => import('@/app/screens/layouts/schedule/TimescheduleTrack'),
+    Camera: () => import('@/app/screens/layouts/test/Camera'),
 };
 
 const DrawerNav = React.memo(({ renderComponent, user }: any) => {

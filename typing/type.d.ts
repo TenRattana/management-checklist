@@ -259,7 +259,8 @@ export type ComponentNames =
   | "Match_form_machine"
   | "Managepermissions"
   | "Time"
-  | "TimeTrack";
+  | "TimeTrack"
+  | "Camera";
 
 export type ComponentNameNoLazy =
   | "Create_form"

@@ -41,6 +41,7 @@ export default {
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.mchecklisttest",
+      requireFullScreen: true,
     },
     android: {
       adaptiveIcon: {
@@ -122,6 +123,20 @@ export default {
           cameraPermission: "Allow PMChecklist to access your camera",
           microphonePermission: "Allow PMChecklist to access your microphone",
           recordAudioAndroid: true,
+        },
+      ],
+      [
+        "expo-media-library",
+        {
+          photosPermission: "Allow $(PRODUCT_NAME) to access your photos.",
+          savePhotosPermission: "Allow $(PRODUCT_NAME) to save photos.",
+          isAccessMediaLocationEnabled: true,
+        },
+      ],
+      [
+        "expo-screen-orientation",
+        {
+          initialOrientation: "landscape",
         },
       ],
     ],
