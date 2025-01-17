@@ -77,12 +77,11 @@ const RenderItem = React.memo(({ item, index, Tablehead, flexArr, actionIndex, s
     const styles = StyleSheet.create({
         container: { flex: 1 },
         containerRow: {
-            backgroundColor: index % 2 === 0 ? !darkMode ? '#f4f4f4' : '#15205a' : theme.colors.background,
-            // borderRadius: 4,
-            // borderLeftWidth: 4,
+            backgroundColor: index % 2 === 0 ? !darkMode ? 'rgba(239, 239, 239, 0.32)' : 'rgba(0, 0, 20, 0.75)' : theme.colors.background,
             borderColor: item[Number(Tablehead.findIndex(v => v.label === "Status"))] || false ? theme.colors.succeass : theme.colors.error,
             borderBottomWidth: Platform.OS === "web" ? 1 : 0,
-            elevation: 1
+            elevation: 1,
+            paddingHorizontal: 25
         }
     })
 

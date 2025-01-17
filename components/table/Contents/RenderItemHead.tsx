@@ -187,7 +187,7 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
             </View >
 
             <DataTable>
-                <DataTable.Header>
+                <DataTable.Header style={{ paddingHorizontal: 25 }}>
                     {Tablehead.map((header, index) => {
                         const Align: justifyContent = Tablehead[index]?.align as justifyContent;
                         const justifyContent = { justifyContent: Align };

@@ -24,7 +24,7 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ route }) => {
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
-    const { spacing } = useRes();
+    const { spacing, fontSize } = useRes();
     const { theme } = useTheme();
     const queryClient = useQueryClient();
     const [form, setForm] = useState<Form[]>([])
@@ -142,58 +142,68 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ route }) => {
     }), [tableData, searchQuery, handleAction, debouncedSearchQuery, state.Form, isFetching]);
 
     const styles = StyleSheet.create({
-        container:
-            Platform.OS === "web"
-                ? {
-                    flex: 1,
-                    margin: 10,
-                    padding: 10,
-                    paddingBottom: 0,
-                    marginBottom: 0,
-                    borderTopLeftRadius: 8,
-                    borderTopRightRadius: 8,
-                    borderBottomLeftRadius: 0,
-                    borderBottomRightRadius: 0,
-                    backgroundColor: theme.colors.background,
-                }
-                : {
-                    flex: 1,
-                    backgroundColor: theme.colors.background,
-                },
+        container: {
+            flex: 1,
+            backgroundColor: theme.colors.background,
+            padding: 10,
+            paddingHorizontal: 20
+        },
         header: {
-            fontSize: spacing.medium,
-            marginTop: 10,
-            paddingVertical: 8,
+            fontSize: spacing.large,
+            paddingVertical: fontSize === "large" ? 7 : 5,
+            fontWeight: 'bold'
         },
         functionname: {
-            textAlign: 'center',
+            textAlign: 'center'
         },
         cardcontent: {
-            padding: 2,
+            marginTop: 10,
+            paddingVertical: 10,
+            paddingHorizontal: 0,
             flex: 1,
+            borderRadius: 10,
+            backgroundColor: theme.colors.background,
+            ...Platform.select({
+                ios: {
+                    shadowColor: theme.colors.onBackground,
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 6,
+                },
+                android: {
+                    elevation: 6,
+                },
+                web: {
+                    boxShadow: '2px 5px 10px rgba(0, 0, 0, 0.24)',
+                },
+            }),
         },
     });
 
     return (
         <View id="container-form" style={styles.container}>
-            <Card.Title
-                title={`List ${state.Form}` || "List"}
-                titleStyle={[masterdataStyles.textBold, styles.header]}
-            />
-            <Divider style={{ marginHorizontal: 15, marginBottom: 10 }} />
-
             <View id="container-search" style={masterdataStyles.containerSearch}>
-                <Searchbar
-                    placeholder="Search Form..."
-                    value={searchQuery}
-                    onChange={setSearchQuery}
-                    testId="search-form"
-                />
-                <TouchableOpacity onPress={handleNewForm} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.Form}`}</Text>
-                </TouchableOpacity>
+                <Text style={[masterdataStyles.textBold, styles.header]}>{`List ${state.Form}` || "List"}</Text>
             </View>
+
             <Card.Content style={styles.cardcontent}>
+                <View style={{ paddingHorizontal: 20, paddingVertical: 5, flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <TouchableOpacity onPress={handleNewForm} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                        <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.Form}`}</Text>
+                    </TouchableOpacity>
+
+                    <View style={{ alignContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                        <Searchbar
+                            placeholder="Search Form..."
+                            value={searchQuery}
+                            onChange={setSearchQuery}
+                            testId="search-form"
+                        />
+
+                        <Text style={[masterdataStyles.title, masterdataStyles.textBold]}>{state.Form}</Text>
+                    </View>
+                </View>
+
                 <Suspense fallback={<LoadingSpinner />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
                 </Suspense>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from '@/app/contexts/useToast';
-import { LoadingSpinner, Searchbar } from "@/components";
+import { LoadingSpinner, Searchbar, Text } from "@/components";
 import { Card, Divider } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { ExpectedResult } from "@/typing/type";
@@ -20,11 +20,11 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(() => {
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [debouncedSearchQueryFilter, setDebouncedSearchQueryFilter] = useState<string>("");
 
-    const masterdataStyles = useMasterdataStyles();
     const { handleError } = useToast();
     const { spacing, fontSize } = useRes();
     const { theme } = useTheme();
     const [expectedResult, setExpectedResult] = useState<ExpectedResult[]>([])
+    const masterdataStyles = useMasterdataStyles();
 
     const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
         ['expectedResult', debouncedSearchQuery],
@@ -183,55 +183,62 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(() => {
     }), [tableData, debouncedSearchQuery, handleAction, machines, debouncedSearchQueryFilter, hasNextPageMG, isFetchingMG]);
 
     const styles = StyleSheet.create({
-        container:
-            Platform.OS === "web"
-                ? {
-                    flex: 1,
-                    margin: 10,
-                    padding: 10,
-                    paddingBottom: 0,
-                    marginBottom: 0,
-                    borderTopLeftRadius: 8,
-                    borderTopRightRadius: 8,
-                    borderBottomLeftRadius: 0,
-                    borderBottomRightRadius: 0,
-                    backgroundColor: theme.colors.background,
-                }
-                : {
-                    flex: 1,
-                    backgroundColor: theme.colors.background,
-                },
+        container: {
+            flex: 1,
+            backgroundColor: theme.colors.background,
+            padding: 10,
+            paddingHorizontal: 20
+        },
         header: {
             fontSize: spacing.large,
-            marginTop: spacing.small,
-            paddingVertical: fontSize === "large" ? 7 : 5
-        },
-        functionname: {
-            textAlign: 'center'
+            paddingVertical: fontSize === "large" ? 7 : 5,
+            fontWeight: 'bold'
         },
         cardcontent: {
-            padding: 2,
-            flex: 1
-        }
-    })
+            marginTop: 10,
+            paddingVertical: 10,
+            paddingHorizontal: 0,
+            flex: 1,
+            borderRadius: 10,
+            backgroundColor: theme.colors.background,
+            ...Platform.select({
+                ios: {
+                    shadowColor: theme.colors.onBackground,
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 6,
+                },
+                android: {
+                    elevation: 6,
+                },
+                web: {
+                    boxShadow: '2px 5px 10px rgba(0, 0, 0, 0.24)',
+                },
+            }),
+        },
+    });
 
     return (
         <View id="container-checklist" style={styles.container}>
-            <Card.Title
-                title="ExpectedResult"
-                titleStyle={[masterdataStyles.textBold, styles.header]}
-            />
-            <Divider style={{ marginHorizontal: 15, marginBottom: 10 }} />
-
             <View id="container-search" style={masterdataStyles.containerSearch}>
-                <Searchbar
-                    placeholder="Search ExpectedResult..."
-                    value={searchQuery}
-                    onChange={setSearchQuery}
-                    testId="search-er"
-                />
+                <Text style={[masterdataStyles.textBold, styles.header]}>List ExpectedResult</Text>
             </View>
+
             <Card.Content style={styles.cardcontent}>
+                <View style={{ paddingHorizontal: 20, paddingVertical: 5, flexDirection: 'row', justifyContent: 'space-between' }}>
+
+                    <View style={{ alignContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                        <Searchbar
+                            placeholder="Search ExpectedResult..."
+                            value={searchQuery}
+                            onChange={setSearchQuery}
+                            testId="search-er"
+                        />
+
+                        <Text style={[masterdataStyles.title, masterdataStyles.textBold]}>ExpectedResult</Text>
+                    </View>
+                </View>
+
                 <Suspense fallback={<LoadingSpinner />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} fetchNextPage={fetchNextPageMG} handlefilter={handlefilter} />
                 </Suspense>

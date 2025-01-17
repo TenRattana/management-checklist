@@ -69,10 +69,10 @@ const useMasterdataStyles = () => {
             alignSelf: "center",
         },
         buttonCreate: {
-            borderRadius: 8,
+            borderRadius: 10,
             minWidth: responsive === "small" ? "100%" : 200,
             justifyContent: 'center',
-            padding: 15,
+            padding: 10,
             alignSelf: 'center',
         },
         containerSwitch: {
@@ -97,7 +97,8 @@ const useMasterdataStyles = () => {
         containerSearch: {
             flexDirection: responsive === "small" ? "column" : "row",
             flexWrap: 'wrap',
-            marginHorizontal: 20
+            marginHorizontal: 20,
+            justifyContent: 'space-between'
         },
         searchbar: {
             width: responsive === "small" ? "90%" : 400,
@@ -289,7 +290,7 @@ const useMasterdataStyles = () => {
             padding: 10,
         },
         menuItemNav: {
-            paddingHorizontal: 15,
+            paddingHorizontal: 10,
             paddingVertical: 10,
             minHeight: fontSize === "small" ? 50 : fontSize === "medium" ? 60 : 75,
             flexDirection: 'row',
@@ -302,7 +303,7 @@ const useMasterdataStyles = () => {
             color: theme.colors.onBackground
         },
         subMenuItem: {
-            paddingLeft: 40,
+            paddingLeft: 80,
             minHeight: fontSize === "small" ? 50 : fontSize === "medium" ? 60 : 75,
             paddingVertical: 10,
             flexDirection: 'row',

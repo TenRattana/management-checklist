@@ -177,58 +177,68 @@ const MatchCheckListOptionScreen = React.memo(() => {
     }), [tableData, debouncedSearchQuery, handleAction, state.GroupCheckList, state.CheckListOption, isFetching]);
 
     const styles = StyleSheet.create({
-        container:
-            Platform.OS === "web"
-                ? {
-                    flex: 1,
-                    margin: 10,
-                    padding: 10,
-                    paddingBottom: 0,
-                    marginBottom: 0,
-                    borderTopLeftRadius: 8,
-                    borderTopRightRadius: 8,
-                    borderBottomLeftRadius: 0,
-                    borderBottomRightRadius: 0,
-                    backgroundColor: theme.colors.background,
-                }
-                : {
-                    flex: 1,
-                    backgroundColor: theme.colors.background,
-                },
+        container: {
+            flex: 1,
+            backgroundColor: theme.colors.background,
+            padding: 10,
+            paddingHorizontal: 20
+        },
         header: {
             fontSize: spacing.large,
-            marginTop: spacing.small,
-            paddingVertical: fontSize === "large" ? 7 : 5
+            paddingVertical: fontSize === "large" ? 7 : 5,
+            fontWeight: 'bold'
         },
         functionname: {
             textAlign: 'center'
         },
         cardcontent: {
-            padding: 2,
-            flex: 1
-        }
-    })
+            marginTop: 10,
+            paddingVertical: 10,
+            paddingHorizontal: 0,
+            flex: 1,
+            borderRadius: 10,
+            backgroundColor: theme.colors.background,
+            ...Platform.select({
+                ios: {
+                    shadowColor: theme.colors.onBackground,
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 6,
+                },
+                android: {
+                    elevation: 6,
+                },
+                web: {
+                    boxShadow: '2px 5px 10px rgba(0, 0, 0, 0.24)',
+                },
+            }),
+        },
+    });
 
     return (
         <View id="container-matchchecklist" style={styles.container}>
-            <Card.Title
-                title={`List ${state.MatchCheckListOption}` || "List"}
-                titleStyle={[masterdataStyles.textBold, styles.header]}
-            />
-            <Divider style={{ marginHorizontal: 15, marginBottom: 10 }} />
-
             <View id="container-search" style={masterdataStyles.containerSearch}>
-                <Searchbar
-                    placeholder="Search Match Checklist Machine..."
-                    value={searchQuery}
-                    onChange={setSearchQuery}
-                    testId="search-match-checklist"
-                />
-                <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.MatchCheckListOption}`}</Text>
-                </TouchableOpacity>
+                <Text style={[masterdataStyles.textBold, styles.header]}>{`List ${state.MatchCheckListOption}` || "List"}</Text>
             </View>
+
             <Card.Content style={styles.cardcontent}>
+                <View style={{ paddingHorizontal: 20, paddingVertical: 5, flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                        <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.MatchCheckListOption}`}</Text>
+                    </TouchableOpacity>
+
+                    <View style={{ alignContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                        <Searchbar
+                            placeholder={`Search ${state.MatchCheckListOption}...`}
+                            value={searchQuery}
+                            onChange={setSearchQuery}
+                            testId="search-match-checklist"
+                        />
+
+                        <Text style={[masterdataStyles.title, masterdataStyles.textBold]}>{state.MatchCheckListOption}</Text>
+                    </View>
+                </View>
+
                 <Suspense fallback={<LoadingSpinner />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
                 </Suspense>

@@ -20,7 +20,11 @@ const SearchBar = ({ value, onChange, placeholder, testId }: SearchBarProps) => 
   return (
     <View
       style={[
-        { marginRight: responsive === "small" ? 0 : 10, alignSelf: responsive === "small" ? undefined : "center" },
+        {
+          marginRight: responsive === "small" ? 0 : 10,
+          alignSelf: responsive === "small" ? undefined : "center",
+          marginLeft: 20
+        },
       ]}
     >
       <View
@@ -29,16 +33,17 @@ const SearchBar = ({ value, onChange, placeholder, testId }: SearchBarProps) => 
           {
             marginBottom: responsive === "small" ? 5 : undefined,
             borderWidth: 1,
+            borderRadius: 12,
             backgroundColor: theme.colors.surface,
             ...Platform.select({
               ios: {
                 shadowColor: theme.colors.onBackground || "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 1,
-                shadowRadius: 4,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
               },
               android: {
-                elevation: 4,
+                elevation: 6,
               },
             }),
           },
@@ -51,11 +56,19 @@ const SearchBar = ({ value, onChange, placeholder, testId }: SearchBarProps) => 
           style={styles.searchbar}
           inputStyle={[
             masterdataStyles.text,
-            { color: theme.colors.text },
+            {
+              alignSelf: 'center',
+              color: theme.colors.text,
+              fontSize: 14,
+              paddingHorizontal: 5,
+            },
           ]}
           placeholderTextColor="#B0B0B0"
           testID={testId}
           id={testId}
+          iconColor={theme.colors.primary}
+          clearIcon="close"
+          clearButtonMode="while-editing"
         />
       </View>
     </View>
@@ -66,13 +79,14 @@ const styles = StyleSheet.create({
   searchbarWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 4,
-    paddingHorizontal: 10,
+    borderRadius: 10,
   },
   searchbar: {
-    minWidth: 300,
-    minHeight: 0,
+    minWidth: 500,
+    borderRadius: 10,
+    height: 35,
     backgroundColor: "transparent",
+    paddingVertical: 0,
   },
   searchIcon: {
     marginLeft: 5,

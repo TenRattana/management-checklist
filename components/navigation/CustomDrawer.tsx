@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
 import { Text } from '@/components';
 import MenuSection from './MenuSection';
@@ -8,6 +8,8 @@ import { useSelector } from 'react-redux';
 import { ComponentNames, Menus, ParentMenu } from '@/typing/type';
 import { DrawerNavigationHelpers } from '@react-navigation/drawer/lib/typescript/src/types';
 import { navigate, navigationRef } from '@/app/navigations/navigationUtils';
+import { Icon } from 'react-native-paper';
+import { useTheme } from '@/app/contexts/useTheme';
 
 interface RenderTouchableOpacityProps {
     label: string;
@@ -18,16 +20,20 @@ interface RenderTouchableOpacityProps {
 const RenderTouchableOpacity = React.memo((props: RenderTouchableOpacityProps) => {
     const masterdataStyles = useMasterdataStyles();
     const { label, navigateTo, navigations } = props
-    const cureent = navigationRef.current?.getCurrentRoute()
+    const cureent = navigationRef.current?.getCurrentRoute();
+    const { theme } = useTheme();
 
     return (
-        <TouchableOpacity
-            key={`item-${label}-nav-${navigateTo}-${cureent}`}
-            onPress={() => navigate(navigateTo)}
-            style={masterdataStyles.menuItemNav}
-        >
-            <Text style={masterdataStyles.menuText}>{label}</Text>
-        </TouchableOpacity>
+        <View style={{ paddingLeft: 25, alignItems: 'center', flexDirection: 'row' }}>
+            <Icon source="baby-face-outline" size={20} color={theme.colors.onBackground} />
+            <TouchableOpacity
+                key={`item-${label}-nav-${navigateTo}-${cureent}`}
+                onPress={() => navigate(navigateTo)}
+                style={masterdataStyles.menuItemNav}
+            >
+                <Text style={masterdataStyles.menuText}>{label}</Text>
+            </TouchableOpacity>
+        </View>
     );
 });
 
