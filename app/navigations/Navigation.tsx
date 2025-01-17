@@ -122,7 +122,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
         <>
             {Platform.OS === "web" && responsive === "large" && (
                 <View style={{
-                    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 55,
+                    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 60,
                     backgroundColor: theme.colors.blueNav,
                     borderColor: "rgb(216, 216, 216)",
                     borderTopWidth: 1, borderBottomWidth: 1,
