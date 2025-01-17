@@ -7,7 +7,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { ExpectedResult } from "@/typing/type";
 import { ExpectedResultProps } from "@/typing/tag";
 import { useInfiniteQuery } from 'react-query';
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { fetchExpectedResults, fetchMachines, fetchSearchExpectedResult, fetchSearchMachines } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 import { navigate } from "@/app/navigations/navigationUtils";
@@ -183,18 +183,24 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(() => {
     }), [tableData, debouncedSearchQuery, handleAction, machines, debouncedSearchQueryFilter, hasNextPageMG, isFetchingMG]);
 
     const styles = StyleSheet.create({
-        container: {
-            flex: 1,
-            margin: 10,
-            padding: 10,
-            paddingBottom: 0,
-            marginBottom: 0,
-            borderTopLeftRadius: 8,
-            borderTopRightRadius: 8,
-            borderBottomLeftRadius: 0,
-            borderBottomRightRadius: 0,
-            backgroundColor: theme.colors.background
-        },
+        container:
+            Platform.OS === "web"
+                ? {
+                    flex: 1,
+                    margin: 10,
+                    padding: 10,
+                    paddingBottom: 0,
+                    marginBottom: 0,
+                    borderTopLeftRadius: 8,
+                    borderTopRightRadius: 8,
+                    borderBottomLeftRadius: 0,
+                    borderBottomRightRadius: 0,
+                    backgroundColor: theme.colors.background,
+                }
+                : {
+                    flex: 1,
+                    backgroundColor: theme.colors.background,
+                },
         header: {
             fontSize: spacing.large,
             marginTop: spacing.small,

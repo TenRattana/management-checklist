@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
-import { TouchableOpacity, StyleSheet, View } from "react-native";
+import { TouchableOpacity, StyleSheet, View, Platform } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts/useToast";
 import { LoadingSpinner, Searchbar, Text } from "@/components";
@@ -142,18 +142,24 @@ const FormScreen: React.FC<FormScreenProps> = React.memo(({ route }) => {
     }), [tableData, searchQuery, handleAction, debouncedSearchQuery, state.Form, isFetching]);
 
     const styles = StyleSheet.create({
-        container: {
-            flex: 1,
-            margin: 10,
-            padding: 10,
-            paddingBottom: 0,
-            marginBottom: 0,
-            borderTopLeftRadius: 8,
-            borderTopRightRadius: 8,
-            borderBottomLeftRadius: 0,
-            borderBottomRightRadius: 0,
-            backgroundColor: theme.colors.background
-        },
+        container:
+            Platform.OS === "web"
+                ? {
+                    flex: 1,
+                    margin: 10,
+                    padding: 10,
+                    paddingBottom: 0,
+                    marginBottom: 0,
+                    borderTopLeftRadius: 8,
+                    borderTopRightRadius: 8,
+                    borderBottomLeftRadius: 0,
+                    borderBottomRightRadius: 0,
+                    backgroundColor: theme.colors.background,
+                }
+                : {
+                    flex: 1,
+                    backgroundColor: theme.colors.background,
+                },
         header: {
             fontSize: spacing.medium,
             marginTop: 10,

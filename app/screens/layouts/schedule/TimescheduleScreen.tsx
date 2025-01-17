@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
@@ -175,18 +175,24 @@ const TimescheduleScreen: React.FC = React.memo(() => {
     }), [tableData, debouncedSearchQuery, handleAction, timeSchedule]);
 
     const styles = StyleSheet.create({
-        container: {
-            flex: 1,
-            margin: 10,
-            padding: 10,
-            paddingBottom: 0,
-            marginBottom: 0,
-            borderTopLeftRadius: 8,
-            borderTopRightRadius: 8,
-            borderBottomLeftRadius: 0,
-            borderBottomRightRadius: 0,
-            backgroundColor: theme.colors.background
-        },
+        container:
+            Platform.OS === "web"
+                ? {
+                    flex: 1,
+                    margin: 10,
+                    padding: 10,
+                    paddingBottom: 0,
+                    marginBottom: 0,
+                    borderTopLeftRadius: 8,
+                    borderTopRightRadius: 8,
+                    borderBottomLeftRadius: 0,
+                    borderBottomRightRadius: 0,
+                    backgroundColor: theme.colors.background,
+                }
+                : {
+                    flex: 1,
+                    backgroundColor: theme.colors.background,
+                },
         header: {
             fontSize: spacing.large,
             marginTop: spacing.small,

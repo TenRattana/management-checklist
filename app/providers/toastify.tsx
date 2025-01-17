@@ -114,17 +114,8 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
                 },
               ]}
             >
-              <View style={{
-                padding: 5,
-                flexBasis: '90%',
-                flexDirection: 'row',
-                justifyContent: 'space-between'
-              }}>
-                <View style={{
-                  borderColor: toast.status === "error" ? theme.colors.error : theme.colors.succeass,
-                  borderRadius: 10,
-                  borderLeftWidth: 4,
-                }}>
+              <View style={{ padding: 5, flexBasis: '90%', flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={{ borderColor: toast.status === "error" ? theme.colors.error : theme.colors.succeass, borderRadius: 10, borderLeftWidth: 4 }}>
 
                 </View>
                 <View style={{ paddingHorizontal: 10, alignSelf: 'center', minWidth: 200 }}>

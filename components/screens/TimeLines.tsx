@@ -12,10 +12,10 @@ import Home_dialog from './Home_dialog';
 import { groupBy } from 'lodash';
 import { Timeline, TimelineListRenderItemInfo, TimelineProps } from 'react-native-calendars';
 import Text from '../Text';
+import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 
 const LazyTimelineList = lazy(() => import('react-native-calendars').then(module => ({ default: module.TimelineList })));
 
-// Memoized Home Dialog
 const MemoHome_dialog = React.memo(Home_dialog);
 
 type Event = {
@@ -44,10 +44,13 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, comput
     const [isLoadingData, setIsLoadingData] = useState(true);
     const masterdataStyles = useMasterdataStyles();
 
-    const initialTime = useMemo(() => ({
-        hour: getCurrentTime().getHours(),
-        minutes: getCurrentTime().getMinutes(),
-    }), []);
+    const initialTime = useMemo(() => {
+        const now = getCurrentTime();
+        return {
+            hour: now.getHours(),
+            minutes: now.getMinutes(),
+        };
+    }, []);
 
     const [timelineItems, setTimelineItems] = useState<TimeLine[]>([]);
 
@@ -98,14 +101,7 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, comput
         return (
             <Timeline
                 {...timelineProps}
-                styles={{
-                    contentStyle: {
-                        backgroundColor: theme.colors.fff,
-                        maxWidth: 300,
-                        alignItems: 'center',
-                        width: '100%', 
-                    },
-                }}
+                availableWidth={wp('95%')}
                 onEventPress={handleEventClick}
                 renderEvent={(event) => <RenderEvent item={event} />}
                 theme={{
@@ -116,9 +112,6 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, comput
                     textSectionTitleColor: theme.colors.fff,
                     calendarBackground: theme.colors.background,
                     indicatorColor: theme.colors.primary,
-                    contentStyle: {
-                        maxWidth: 300, 
-                    },
                 }}
             />
         );
@@ -130,25 +123,25 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, comput
 
     return (
         <>
-            <View style={{ flex: 1, padding: 5 }}>
-                <View style={styles.scrollContainer}>
-                    {Object.keys(eventsByDateS).length ? (
-                        <Suspense fallback={<LoadingSpinner />}>
-                            <LazyTimelineList
-                                events={eventsByDateS}
-                                renderItem={renderItem}
-                                showNowIndicator
-                                scrollToNow
-                                initialTime={initialTime}
-                            />
-                        </Suspense>
-                    ): (
-                        <Text style={{ textAlign: 'center', color: theme.colors.text }}>
-                            No events found for the selected filters.
-                        </Text>
-                    )}
-                </View>
-            </View>
+            {Object.keys(eventsByDateS).length ? (
+                <Suspense fallback={<LoadingSpinner />}>
+                    <LazyTimelineList
+                        events={eventsByDateS}
+                        renderItem={renderItem}
+                        showNowIndicator
+                        scrollToNow
+                        initialTime={initialTime}
+                        timelineProps={{
+                            overlapEventsSpacing: 4,
+                            rightEdgeSpacing: 10,
+                        }}
+                    />
+                </Suspense>
+            ) : (
+                <Text style={{ textAlign: 'center', color: theme.colors.text }}>
+                    No events found for the selected filters.
+                </Text>
+            )}
 
             {dialogVisible && selectedEvent && (
                 <MemoHome_dialog
@@ -161,68 +154,6 @@ const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, comput
         </>
     );
 };
-
-const styles = StyleSheet.create({
-    timelineContainer: {
-        position: 'absolute',
-        left: 0,
-        top: 0,
-        bottom: 0,
-        width: 60,
-        backgroundColor: 'rgba(0, 0, 0, 0.05)',
-        zIndex: 1,
-        paddingTop: 30, 
-    },
-    timelineRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        height: 60,
-        paddingHorizontal: 10,
-    },
-    hourMarker: {
-        width: 60,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    hourText: {
-        fontSize: 12,
-        color: 'gray',
-    },
-    timelineLine: {
-        width: 2,
-        flex: 1,
-        backgroundColor: 'lightgray',
-    },
-    currentHourLine: {
-        backgroundColor: 'red', 
-    },
-    eventItem: {
-        marginBottom: 10,
-        padding: 10,
-        backgroundColor: 'white',
-        borderRadius: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
-        elevation: 2,
-        width: 300, // Set width of each event to 300
-    },
-    scrollContainer: {
-        marginLeft: 60, 
-        padding: 10,
-        flexDirection: 'row',
-        flexWrap: 'wrap',  
-        maxWidth: '100%', // Ensure the container doesn't exceed screen width
-        justifyContent: 'flex-start', // Align content to the left
-    },
-    row: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        marginBottom: 15,
-        flexWrap: 'wrap',  
-    },
-});
 
 export default Timelines;
 
