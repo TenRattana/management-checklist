@@ -13,13 +13,13 @@ import { RenderTouchableOpacityProps } from '@/typing/Navigate';
 
 const RenderTouchableOpacity = React.memo((props: RenderTouchableOpacityProps) => {
     const masterdataStyles = useMasterdataStyles();
-    const { label, navigateTo, navigations } = props
+    const { label, navigateTo, navigations, Icons } = props
     const cureent = navigationRef.current?.getCurrentRoute();
     const { theme } = useTheme();
 
     return (
         <View style={{ paddingLeft: 25, alignItems: 'center', flexDirection: 'row' }}>
-            <Icon source="baby-face-outline" size={20} color={theme.colors.onBackground} />
+            <Icon source={Icons ? Icons : "baby-face-outline"} size={20} color={theme.colors.onBackground} />
             <TouchableOpacity
                 key={`item-${label}-nav-${navigateTo}-${cureent}`}
                 onPress={() => navigate(navigateTo)}
@@ -62,12 +62,13 @@ const CustomDrawerContent = React.memo((props: DrawerContentComponentProps) => {
                                 items={screen.ParentMenu.map((parent: ParentMenu) => ({
                                     label: parent.MenuLabel,
                                     navigateTo: parent.NavigationTo,
+                                    Icon: parent.Icon
                                 }))}
                                 navigation={navigation}
                             />
                         );
                     } else {
-                        return <RenderTouchableOpacity key={`item-${screen.MenuLabel}-nav-${screen.NavigationTo}`} label={screen.MenuLabel} navigateTo={screen.NavigationTo as ComponentNames} navigations={navigation} />;
+                        return <RenderTouchableOpacity key={`item-${screen.MenuLabel}-nav-${screen.NavigationTo}`} label={screen.MenuLabel} navigateTo={screen.NavigationTo as ComponentNames} navigations={navigation} Icons={screen.Icon} />;
                     }
                 }
             })}

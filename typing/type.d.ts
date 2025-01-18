@@ -82,6 +82,7 @@ export interface ParentMenu {
   Path: string | null;
   NavigationTo: string;
   OrderNo: number | null;
+  Icon:string;
   IsActive: boolean;
 }
 export interface Menus {
@@ -93,6 +94,7 @@ export interface Menus {
   Path: string | null;
   NavigationTo: string;
   OrderNo: number | null;
+  Icon:string;
   IsActive: boolean;
   ParentMenu: ParentMenu[];
 }

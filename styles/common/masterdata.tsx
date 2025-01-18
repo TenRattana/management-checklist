@@ -299,15 +299,14 @@ const useMasterdataStyles = () => {
         },
         menuText: {
             fontSize: spacing.small,
-            padding: 10,
+            padding: 5,
             color: theme.colors.onBackground
         },
         subMenuItem: {
-            paddingLeft: 80,
+            paddingLeft: 50,
             minHeight: fontSize === "small" ? 50 : fontSize === "medium" ? 60 : 75,
             paddingVertical: 10,
             flexDirection: 'row',
-            justifyContent: 'space-between',
             alignItems: 'center',
         },
         subMenuText: {

@@ -68,7 +68,9 @@ const MenuSection = React.memo(({ title, isOpen, onToggle, items, navigation }: 
                             key={`item-${item.label}-nav-${item.navigateTo}`}
                             onPress={() => navigate(item.navigateTo as ComponentNames)}
                             style={masterdataStyles.subMenuItem}>
-                            <Text style={masterdataStyles.subMenuText}>{item.label ?? ""}</Text>
+                            <Icon source={item.Icon ? item.Icon : "baby-face-outline"} size={20} color={theme.colors.onBackground} />
+
+                            <Text style={[masterdataStyles.subMenuText, { paddingLeft: 15 }]}>{item.label ?? ""}</Text>
                         </TouchableOpacity>
                     )
                 })}

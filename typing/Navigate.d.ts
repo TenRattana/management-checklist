@@ -5,6 +5,7 @@ export interface RenderTouchableOpacityProps {
     label: string;
     navigateTo: ComponentNames;
     navigations: DrawerNavigationHelpers;
+    Icons: string;
 }
 
 export interface CustomMenuProps {
@@ -19,6 +20,6 @@ export interface MenuSectionProps {
     title: string;
     isOpen: boolean;
     onToggle: () => void;
-    items: { label: string; navigateTo: string }[];
+    items: { label: string; navigateTo: string; Icon:string;}[];
     navigation: DrawerNavigationHelpers;
 }
