@@ -3,14 +3,14 @@ import { FlatList } from "react-native";
 import Text from "@/components/Text";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { Dialogs } from "../common";
-import { CustomtableSmallProps } from "@/typing/tag";
 import RenderItemSmallHead from "./Contents/RenderItemSmallHead";
+import { CustomtableSmallProps } from "@/typing/screens/CustomTable";
 
 const LazyRenderItemSmall = React.lazy(() => import('./Contents/RenderItemSmall'));
 
-const CustomtableSmall: React.FC<CustomtableSmallProps> = React.memo(({ displayData, Tablehead, actionIndex, showMessage, selectedRows, toggleSelect, detail, detailKey, detailData, detailKeyrow, showDetailwithKey,
+const CustomtableSmall = React.memo(({ displayData, Tablehead, actionIndex, showMessage, selectedRows, toggleSelect, detail, detailKey, detailData, detailKeyrow, showDetailwithKey,
     showFilter, filter, handelSetFilter, showData, showColumn, handlePaginationChange, handleDialog, ShowTitle, showFilterDate, filteredDate, Dates, handleLoadMore, isFetchingNextPage, hasNextPage, handlefilter, searchfilter
-}) => {
+}: CustomtableSmallProps) => {
 
     const masterdataStyles = useMasterdataStyles();
     const [dialogState, setDialogState] = useState({ isVisible: false, action: "", message: "", title: "", data: "" });

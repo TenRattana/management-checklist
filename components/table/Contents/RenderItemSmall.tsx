@@ -6,22 +6,12 @@ import useCustomtableStyles from '@/styles/customtable';
 import DetailContent from './Detailcontent';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { HandelPrssProps } from '@/typing/tag';
+import { RenderItemSmallProps } from '@/typing/screens/CustomTable';
 
 const CellcontentMemo = React.memo(Cellcontent);
 const ActionContentMemo = React.memo(Actioncontent);
 
-const RenderItemSmall = React.memo(({ item, index, Tablehead, actionIndex, detail, detailKey, detailData, detailKeyrow, selectedRows, toggleSelect, setDialogState, showMessage, showDetailwithKey }: {
-    item: (string | number | boolean)[], index: number, Tablehead: { label?: string; align?: string; }[], actionIndex: { [key: string]: string | number; }[],
-    detail: boolean | undefined, detailKey: string | undefined, detailData: any[] | undefined, detailKeyrow: number | undefined, showMessage: number, showDetailwithKey: string[] | undefined,
-    selectedRows: string[] | undefined, toggleSelect: (value: string) => void,
-    setDialogState: React.Dispatch<React.SetStateAction<{
-        isVisible: boolean;
-        action: string;
-        message: string;
-        title: string;
-        data: string;
-    }>>
-}) => {
+const RenderItemSmall = React.memo(({ item, index, Tablehead, actionIndex, detail, detailKey, detailData, detailKeyrow, selectedRows, toggleSelect, setDialogState, showMessage, showDetailwithKey }: RenderItemSmallProps) => {
     const customtable = useCustomtableStyles();
     const masterdataStyles = useMasterdataStyles();
 
@@ -49,9 +39,9 @@ const RenderItemSmall = React.memo(({ item, index, Tablehead, actionIndex, detai
 
     return (
         <View id={`container-${index}`} style={[customtable.cardRow, { alignItems: 'flex-start', paddingBottom: 10 }]}>
-            {Tablehead.map((header, colIndex) => header.label !== "" && (
-                <View id={`header-${index}-${colIndex}`} key={`cell-${index}-${colIndex}`} style={{ flex: 1, marginVertical: 5, flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={masterdataStyles.text}>{header.label} : </Text>
+            {Tablehead.map((header, colIndex) => (
+                <View id={`header-${index}-${colIndex}`} key={`cell-${index}-${colIndex}`} style={header.label !== "" && { flex: 1, marginVertical: 5, flexDirection: 'row', alignItems: 'center' }}>
+                    {header.label !== "" && (<Text style={masterdataStyles.text}>{header.label} : </Text>)}
                     {actionIndex.map((actionItem, index) => {
 
                         const actionProps = {
@@ -73,7 +63,7 @@ const RenderItemSmall = React.memo(({ item, index, Tablehead, actionIndex, detai
                                     <View
                                         id={`action-${index}-${key}-${index}`}
                                         key={`action-${index}-${index}-${key}`}
-                                        style={customtable.eventColumn}
+                                        style={[customtable.eventColumn, { marginVertical: 10 }]}
                                     >
                                         <ActionContentMemo {...actionProps} action={'editIndex'} />
                                         <ActionContentMemo {...actionProps} action={'delIndex'} />

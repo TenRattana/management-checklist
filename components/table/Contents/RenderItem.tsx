@@ -8,6 +8,7 @@ import Actioncontent from "./Actioncontent";
 import { useTheme } from "@/app/contexts/useTheme";
 import DetailContent from "./Detailcontent";
 import Animated, { Easing, FadeInUp, FadeOutDown, runOnJS } from "react-native-reanimated";
+import { RenderItemProps } from "@/typing/screens/CustomTable";
 
 type justifyContent =
     | "flex-start"
@@ -24,19 +25,7 @@ FadeOutDown.duration(300).easing(Easing.ease);
 const CellcontentMemo = React.memo(Cellcontent);
 const ActionContentMemo = React.memo(Actioncontent);
 
-const RenderItem = React.memo(({ item, index, Tablehead, flexArr, actionIndex, showMessage, selectedRows, toggleSelect, detail, detailKey, detailData, detailKeyrow, showDetailwithKey, setDialogState }:
-    {
-        item: (string | number | boolean)[], index: number, Tablehead: { label?: string; align?: string; }[], flexArr: number[], actionIndex: { [key: string]: string | number; }[], showMessage: number, selectedRows: string[] | undefined,
-        toggleSelect: (value: string) => void, detail: boolean | undefined, detailKey: string | undefined, detailData: any[] | undefined, detailKeyrow: number | undefined, showDetailwithKey: string[] | undefined,
-        setDialogState: React.Dispatch<React.SetStateAction<{
-            isVisible: boolean;
-            action: string;
-            message: string;
-            title: string;
-            data: string;
-        }>>
-    }
-) => {
+const RenderItem = React.memo(({ item, index, Tablehead, flexArr, actionIndex, showMessage, selectedRows, toggleSelect, detail, detailKey, detailData, detailKeyrow, showDetailwithKey, setDialogState }: RenderItemProps) => {
     const { theme, darkMode } = useTheme();
     const customtable = useCustomtableStyles();
 

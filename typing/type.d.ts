@@ -1,31 +1,5 @@
 import * as React from "react";
 
-// Domain-Specific Interfaces
-export interface GroupMachine {
-  GMachineID: string;
-  GMachineName: string;
-  Description: string;
-  IsActive: boolean;
-  Disables: boolean;
-  Deletes:boolean;
-}
-
-export interface Machine {
-  GMachineID: string;
-  MachineID: string;
-  GMachineName?: string;
-  FormID: string | null;
-  MachineCode: string | null;
-  MachineName: string;
-  Description: string;
-  Building: string | null;
-  Floor: string | null;
-  Area: string | null;
-  IsActive: boolean;
-  Disables: boolean;
-  Deletes:boolean;
-}
-
 export interface TimeDetail {
   TDetailID: string;
   StartTime: string;
@@ -38,111 +12,15 @@ export interface TimeSchedule {
   Machine?: { MachineID: string; MachineName: string }[];
   TimeDetail?: TimeDetail[];
 }
-export interface TimeScheduleProps {
-  ScheduleID: string;
-  ScheduleName: string;
-  MachineGroup?: GroupMachine[];
-  Type_schedule: string;
-  Tracking: boolean;
-  IsActive: boolean;
-  Custom: boolean;
-  TimeSlots?: Day[];
-  TimeCustom?: Day[];
-  TimeWeek?: { [key: string]: Day[] };
-}
-
 export interface Day {
   start: string | null;
   end: string | null;
 }
-export interface CheckList {
-  CTypeID: string;
-  CTypeName: string;
-  CTypeTitle: string;
-  Icon: string;
-  IsActive: boolean;
-  Disables: boolean;
-}
-
-export interface CheckListType {
-  GTypeID: string;
-  GTypeName: string;
-  IsActive: boolean;
-  CheckList?: CheckList[];
-}
-
-export interface CheckListOption {
-  CLOptionName: string;
-  IsActive: boolean;
-  CLOptionID: string;
-  Disables: boolean;
-}
-
 export interface DataType {
   DTypeID: string;
   DTypeName: string;
   Icon: string;
   IsActive: boolean;
-}
-
-export interface Checklist {
-  CListID: string;
-  CListName: string;
-  IsActive: boolean;
-  Disables: boolean;
-}
-
-export interface GroupCheckListOption {
-  GCLOptionID: string;
-  GCLOptionName: string;
-  IsActive: boolean;
-  CheckListOptions?: CheckListOption[];
-  Disables: boolean;
-  Deletes:boolean;
-}
-
-export interface Form {
-  FormID: string;
-  FormName: string;
-  IsActive: boolean;
-  FormState?: string;
-  Description: string;
-  Disables: boolean;
-  Deletes:boolean;
-}
-
-export interface MatchForm {
-  MachineID: string;
-  FormID: string;
-  MachineName: string;
-  FormName: string;
-  IsActive: boolean;
-}
-
-export interface MatchCheckListOption {
-  MCLOptionID: string;
-  GCLOptionID: string;
-  CheckListOptions: Array<{ CLOptionID: string }>;
-  GCLOptionName?:string;
-  CLOptionName?:string;
-  IsActive: boolean;
-  GCLOptionName: string;
-  Disables: boolean;
-  Deletes:boolean;
-}
-
-export interface ExpectedResult {
-  TableID: string;
-  MachineID: string;
-  MachineName: string;
-  UserID: string;
-  UserName ?: string;
-  ApporvedID: string;
-  ApporvedName?: string;
-  FormID: string;
-  FormName: string;
-  CreateDate: string;
-  ApporvedTime?:string;
 }
 export interface Users {
   User;
@@ -154,11 +32,9 @@ export interface UsersPermission {
   GUserID: string;
   IsActive: boolean;
 }
-
 export interface Userset {
   UserName: string;
 }
-
 export interface GroupUsers {
   GUserID: string;
   GUserName: string;
@@ -197,7 +73,6 @@ export interface AppSetting {
 export interface AppProps extends Prefixs , AppSetting {
   AppName: string;
 }
-
 export interface ParentMenu {
   MenuID: number;
   MenuPermission: string;

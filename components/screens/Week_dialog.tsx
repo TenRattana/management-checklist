@@ -4,19 +4,9 @@ import { Button, Menu, Icon } from 'react-native-paper';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { styles } from './Schedule';
 import InfoSchedule_dialog from './InfoSchedule_dialog';
-import { Day } from '@/typing/type';
+import { WeekProps } from '@/typing/screens/TimeSchedule';
 
 const Week = ["MonDay", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-interface WeekProps {
-    theme: any;
-    spacing: any;
-    responsive: any;
-    showError: (message: string | string[]) => void;
-    showSuccess: (message: string | string[]) => void;
-    values: { [key: string]: Day[] };
-    setFieldValue: (value: any) => void;
-}
 
 const Week_dialog = React.memo(({ theme, spacing, responsive, showError, showSuccess, values, setFieldValue }: WeekProps) => {
     const [showTimeIntervalMenu, setShowTimeIntervalMenu] = useState<{ custom: boolean, time: boolean, week: boolean }>({ custom: false, time: false, week: false });

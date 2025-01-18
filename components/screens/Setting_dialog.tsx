@@ -42,6 +42,7 @@ import { useToast } from '@/app/contexts/useToast';
 import SettingsScreen from '@/app/screens/layouts/settings/SettingScreen';
 import ConfigulationScreen from '@/app/screens/layouts/settings/Configulation';
 import Auther from '@/app/screens/layouts/settings/Auther';
+import { SettingProps } from '@/typing/screens/Setting';
 
 const { height } = Dimensions.get('window');
 
@@ -50,12 +51,7 @@ const saveAppconfig = async (data: AppProps): Promise<{ message: string }> => {
     return response.data;
 };
 
-interface SettingProps {
-    isVisible: boolean;
-    setVisible: () => void;
-}
-
-const Setting_dialog: React.FC<SettingProps> = React.memo(({ isVisible, setVisible }) => {
+const Setting_dialog = React.memo(({ isVisible, setVisible }: SettingProps) => {
     const [activeMenu, setActiveMenu] = useState<string>("user");
     const { fontSize, spacing, responsive } = useRes();
     const { theme } = useTheme();

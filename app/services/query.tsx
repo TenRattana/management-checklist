@@ -1,10 +1,18 @@
 import axiosInstance from "@/config/axios";
-import { Form, MatchForm } from "@/typing/type";
-import { Checklist, CheckListOption, CheckListType, DataType, ExpectedResult, GroupCheckListOption, GroupMachine, Machine, MatchCheckListOption, TimeScheduleMachine } from "@/typing/type";
-import { TimeScheduleProps } from "../mocks/timeline";
+import { DataType, GroupUsers, TimeScheduleMachine, Users, UsersPermission } from "@/typing/type";
+import { Machine } from "@/typing/screens/Machine";
+import { GroupMachine } from "@/typing/screens/GroupMachine";
+import { GroupCheckListOption } from "@/typing/screens/GroupCheckList";
+import { CheckListOption } from "@/typing/screens/CheckListOption";
+import { MatchCheckListOption } from "@/typing/screens/MatchCheckListOption";
+import { MatchForm } from "@/typing/screens/MatchFormMachine";
+import { Form } from "@/typing/screens/Form";
+import { ExpectedResult } from "@/typing/screens/ExpectedResult";
+import { CheckList, GroupCheckListType } from "@/typing/screens/CheckList";
+import { TimeScemaScheduleProps } from "@/typing/screens/TimeSchedule";
 
 // Check List Type
-export const fetchCheckListType = async (): Promise<CheckListType[]> => {
+export const fetchCheckListType = async (): Promise<GroupCheckListType[]> => {
     const response = await axiosInstance.post("CheckListType_service.asmx/GetCheckListTypes")
     return response.data.data ?? [];
 };
@@ -16,7 +24,7 @@ export const fetchDataType = async (): Promise<DataType[]> => {
 };
 
 // Time Schedule
-export const fetchTimeSchedules = async (): Promise<TimeScheduleProps[]> => {
+export const fetchTimeSchedules = async (): Promise<TimeScemaScheduleProps[]> => {
     try {
         const response = await axiosInstance.post("TimeSchedule_service.asmx/GetSchedules");
         return response.data.data ?? [];
@@ -28,7 +36,7 @@ export const fetchTimeSchedules = async (): Promise<TimeScheduleProps[]> => {
 
 export const fetchSearchTimeSchedules = async (
     debouncedSearchQuery: string
-): Promise<TimeScheduleProps[]> => {
+): Promise<TimeScemaScheduleProps[]> => {
     try {
         const response = await axiosInstance.post("TimeSchedule_service.asmx/SearchTimeSchedule", {
             Messages: debouncedSearchQuery
@@ -144,7 +152,7 @@ export const saveGroupMachine = async (data: {
 export const fetchCheckList = async (
     currentPage: number,
     pageSize: number,
-): Promise<Checklist[]> => {
+): Promise<CheckList[]> => {
     try {
         const response = await axiosInstance.post("CheckList_service.asmx/GetCheckLists", {
             page: currentPage,
@@ -159,7 +167,7 @@ export const fetchCheckList = async (
 
 export const fetchSearchCheckList = async (
     debouncedSearchQuery: string
-): Promise<Checklist[]> => {
+): Promise<CheckList[]> => {
     try {
         const response = await axiosInstance.post("CheckList_service.asmx/SearchCheckLists", {
             Messages: debouncedSearchQuery
@@ -481,5 +489,26 @@ export const SaveMatchFormMachine = async (data: {
     Mode: string;
 }): Promise<{ message: string }> => {
     const response = await axiosInstance.post("MatchFormMachine_service.asmx/SaveMatchFormMachine", data);
+    return response.data;
+};
+
+// User manager
+export const fetchUsers = async (): Promise<Users[]> => {
+    const response = await axiosInstance.post("User_service.asmx/GetUsers");
+    return response.data.data ?? [];
+};
+
+export const fetchGroupUser = async (): Promise<GroupUsers[]> => {
+    const response = await axiosInstance.post('GroupUser_service.asmx/GetGroupUsers');
+    return response.data.data ?? [];
+};
+
+export const fetchUserPermission = async (): Promise<UsersPermission[]> => {
+    const response = await axiosInstance.post("User_service.asmx/GetUsersPermission");
+    return response.data.data ?? [];
+};
+
+export const saveUserPermission = async (data: { Prefix: any; UserID: string | undefined; UserName: string; GUserID: string; IsActive: boolean; }): Promise<{ message: string }> => {
+    const response = await axiosInstance.post("User_service.asmx/SaveUser", data);
     return response.data;
 };

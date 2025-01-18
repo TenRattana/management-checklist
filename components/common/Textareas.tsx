@@ -5,19 +5,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
 import { View } from "react-native";
 
-const Textareas: React.FC<TextareasProps> = React.memo(({
-    placeholder,
-    label,
-    error,
-    errorMessage = "",
-    value,
-    handleChange,
-    handleBlur,
-    mode,
-    hint,
-    testId,
-    exp
-}) => {
+const Textareas = React.memo(({ placeholder, label, error, errorMessage = "", value, handleChange, handleBlur, mode, hint, testId, exp }: TextareasProps) => {
     const masterdataStyles = useMasterdataStyles()
 
     const formattedLabel = useMemo(() => {

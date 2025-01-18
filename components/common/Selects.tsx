@@ -7,18 +7,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
 import { View } from "react-native";
 
-const Selects: React.FC<SelectsProps> = React.memo(({
-  hint,
-  option,
-  value,
-  handleChange,
-  handleBlur,
-  label,
-  error,
-  errorMessage,
-  testId,
-  exp
-}) => {
+const Selects = React.memo(({ hint, option, value, handleChange, handleBlur, label, error, errorMessage, testId, exp }: SelectsProps) => {
   if (!option || option.length === 0) {
     return null;
   }

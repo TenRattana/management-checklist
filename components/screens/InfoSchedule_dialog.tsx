@@ -5,19 +5,7 @@ import Daily_dialog from './Daily_dialog';
 import { styles } from './Schedule';
 import { FastField, Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
-
-interface InfoScheduleProps {
-    visible: boolean;
-    setVisible: (v: boolean) => void;
-    setFieldValue: (value: any) => void;
-    theme: any;
-    spacing: any;
-    responsive: any;
-    showError: (message: string | string[]) => void;
-    showSuccess: (message: string | string[]) => void;
-    values: { start: string | null, end: string | null }[];
-    selectedDay: string;
-}
+import { InfoScheduleProps } from '@/typing/screens/TimeSchedule';
 
 const isValidDateFormatSlots = (value: string) => {
     const dateRegex = /^(\d{2}):(\d{2})$/;
@@ -26,18 +14,7 @@ const isValidDateFormatSlots = (value: string) => {
 
 const { height } = Dimensions.get('window');
 
-const InfoScheduleDialog = React.memo(({
-    visible,
-    setVisible,
-    setFieldValue,
-    theme,
-    spacing,
-    responsive,
-    showError,
-    showSuccess,
-    values,
-    selectedDay
-}: InfoScheduleProps) => {
+const InfoScheduleDialog = React.memo(({ visible, setVisible, setFieldValue, theme, spacing, responsive, showError, showSuccess, values, selectedDay }: InfoScheduleProps) => {
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const validationSchema = Yup.object().shape({

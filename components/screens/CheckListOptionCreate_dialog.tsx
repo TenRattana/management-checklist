@@ -1,16 +1,16 @@
 import { View } from 'react-native'
 import React, { useState } from 'react'
-import { InitialValuesCheckListOption } from '@/typing/value'
 import { Icon, IconButton, Switch } from 'react-native-paper'
 import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler'
 import useMasterdataStyles from '@/styles/common/masterdata'
-import { FastField, Field, Formik } from 'formik'
+import { Field, Formik } from 'formik'
 import * as Yup from 'yup'
 import { Inputs } from '../common'
 import { useTheme } from '@/app/contexts/useTheme'
 import Text from '../Text'
 import { styles } from './Schedule'
 import { useRes } from '@/app/contexts/useRes'
+import { InitialValuesCheckListOption } from '@/typing/screens/CheckListOption'
 
 const validationSchema = Yup.object().shape({
     checkListOptionName: Yup.string().required(

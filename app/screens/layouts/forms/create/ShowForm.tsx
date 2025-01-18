@@ -9,10 +9,7 @@ import { Formik, FieldProps, Field } from "formik";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { DataType } from "@/typing/type";
 import { useSelector } from "react-redux";
-
-interface FormValues {
-    [key: string]: any;
-}
+import { FormValues } from "@/typing/screens/CreateForm";
 
 const Preview = React.memo(forwardRef<any, any>((props, ref) => {
     const { validationSchema, dataType, isLoading, showField } = props;

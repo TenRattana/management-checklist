@@ -6,16 +6,7 @@ import { View, StyleSheet, TouchableOpacity, ScrollView, Platform } from "react-
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Dialog, Icon, IconButton, List, Text } from "react-native-paper";
 
-const InfoGroup_dialog = ({
-    setDialogAdd,
-    option,
-}: {
-    setDialogAdd: () => void, option: {
-        label: string;
-        value: string;
-        IsActive?: boolean
-    }[]
-}) => {
+const InfoGroup_dialog = ({ setDialogAdd, option, }: { setDialogAdd: () => void, option: { label: string; value: string; IsActive?: boolean }[] }) => {
     const masterdataStyles = useMasterdataStyles();
     const { spacing } = useRes()
     const { theme } = useTheme()

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Platform, View } from 'react-native';
-import { HelperText, Button, Text } from 'react-native-paper';
+import { Button, Text } from 'react-native-paper';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import DatePicker from 'react-datepicker';
 import "@/styles/Datapicker.css";
@@ -9,8 +9,9 @@ import { useTheme } from '@/app/contexts/useTheme';
 import { convertToDate, convertToThaiDateTime } from '../screens/Schedule';
 import { getCurrentTime } from '@/config/timezoneUtils';
 import { runOnJS } from 'react-native-reanimated';
+import { TimeProps } from '@/typing/tag';
 
-const Time: React.FC<any> = ({ placeholder, label, error, errorMessage, value, handleChange, handleBlur, hint }) => {
+const Time = ({ value, handleChange, hint }: TimeProps) => {
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const { theme } = useTheme();
     const masterdataStyles = useMasterdataStyles();

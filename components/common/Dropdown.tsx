@@ -7,44 +7,9 @@ import { HelperText, IconButton, Menu, TextInput, Modal, Portal } from 'react-na
 import Animated from 'react-native-reanimated';
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Text from '../Text';
+import { DropdownProps } from '@/typing/tag';
 
-const Dropdown = React.memo(({
-    label,
-    fetchNextPage,
-    handleScroll,
-    isFetching,
-    items,
-    open,
-    search = true,
-    setOpen,
-    selectedValue,
-    setSelectedValue,
-    setDebouncedSearchQuery,
-    error,
-    searchQuery,
-    errorMessage,
-    lefticon,
-    showLefticon,
-    mode,
-}: {
-    search?: boolean;
-    label: string;
-    open: boolean;
-    setOpen: (v: boolean) => void;
-    selectedValue: any;
-    items: { label: string; value: string, icon?: () => JSX.Element }[];
-    setSelectedValue: (value: string | null) => void;
-    isFetching?: boolean;
-    fetchNextPage?: () => void;
-    handleScroll?: ({ nativeEvent }: any) => void;
-    setDebouncedSearchQuery?: (value: string) => void;
-    error?: boolean;
-    searchQuery?: string;
-    errorMessage?: string;
-    lefticon?: string;
-    showLefticon?: boolean;
-    mode?: string;
-}) => {
+const Dropdown = React.memo(({ label, fetchNextPage, handleScroll, isFetching, items, open, search = true, setOpen, selectedValue, setSelectedValue, setDebouncedSearchQuery, error, searchQuery, errorMessage, lefticon, showLefticon, mode, }: DropdownProps) => {
     const [searchQuerys, setSearchQuery] = useState('');
     const [menuWidth, setMenuWidth] = useState(0);
     const masterdataStyles = useMasterdataStyles();

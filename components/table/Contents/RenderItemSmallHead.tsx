@@ -3,12 +3,9 @@ import React, { useState } from 'react'
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { Dropdown } from '@/components/common';
 import { Picker } from '@react-native-picker/picker';
-import { DebouncedFunc } from 'lodash';
+import { RenderItemHeadSmallProps } from '@/typing/screens/CustomTable';
 
-const RenderItemSmallHead = React.memo(({ selectedRows, handleDialog, showFilterDate, Dates, filteredDate, showFilter, ShowTitle, filter, handlefilter, searchfilter, handleLoadMore, hasNextPage, isFetchingNextPage, showData, handelSetFilter }: {
-    selectedRows?: string[], handleDialog: (action?: string, data?: string) => void, showFilterDate?: boolean, Dates?: string | null, filteredDate: DebouncedFunc<(value: string | null) => void>, showFilter?: boolean, ShowTitle?: string,
-    filter?: string | null, handlefilter?: (value?: string) => void, searchfilter?: string, handleLoadMore?: (() => void), hasNextPage?: boolean, isFetchingNextPage?: boolean, showData?: any[], handelSetFilter: DebouncedFunc<(value: string | null) => void>
-}) => {
+const RenderItemSmallHead = React.memo(({ selectedRows, handleDialog, showFilterDate, Dates, filteredDate, showFilter, ShowTitle, filter, handlefilter, searchfilter, handleLoadMore, hasNextPage, isFetchingNextPage, showData, handelSetFilter }: RenderItemHeadSmallProps) => {
     const masterdataStyles = useMasterdataStyles();
 
     const filterDateOptions = ["Today", "This week", "This month"];

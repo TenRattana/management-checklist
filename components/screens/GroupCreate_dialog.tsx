@@ -1,6 +1,5 @@
 import { Platform, View } from 'react-native'
 import React, { useState } from 'react'
-import { InitialValuesCheckListOption, InitialValuesGroupCheckList } from '@/typing/value'
 import { Dialog, Icon, IconButton, Portal, Switch } from 'react-native-paper'
 import { GestureHandlerRootView, ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 import useMasterdataStyles from '@/styles/common/masterdata'
@@ -12,6 +11,8 @@ import { styles } from './Schedule'
 import Text from '../Text'
 import { useRes } from '@/app/contexts/useRes'
 import CheckListOptionCreate_dialog from './CheckListOptionCreate_dialog'
+import { InitialValuesGroupCheckList } from '@/typing/screens/GroupCheckList'
+import { InitialValuesCheckListOption } from '@/typing/screens/CheckListOption'
 
 const validationSchema = Yup.object().shape({
     groupCheckListOptionName: Yup.string().required(

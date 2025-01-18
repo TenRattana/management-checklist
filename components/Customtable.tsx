@@ -3,9 +3,9 @@ import { useRes } from "@/app/contexts/useRes";
 import CustomtableHead from "./table/Contents/RenderItemHead";
 import CustomtableSmall from "./table/CustomtableDataSmall";
 import CustomtableData from "./table/CustomtableData";
-import { CustomTableProps } from '@/typing/tag';
 import { View } from "react-native";
 import { debounce, throttle } from "lodash";
+import { CustomTableProps } from "@/typing/screens/CustomTable";
 
 const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, actionIndex, searchQuery, showMessage, selectedRows, setRow,
   showFilter, showData, showColumn, detail, detailData, detailKey, detailKeyrow, showDetailwithKey, ShowTitle, handlePaginationChange, isFetchingNextPage, hasNextPage, fetchNextPage,

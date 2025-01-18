@@ -6,30 +6,9 @@ import useMasterdataStyles from '@/styles/common/masterdata';
 import { useRes } from '@/app/contexts/useRes';
 import { FlatList } from 'react-native-gesture-handler';
 import { useTheme } from '@/app/contexts/useTheme';
+import { PickerDropdownProps } from '@/typing/tag';
 
-const PickerDropdown = React.memo(({
-    open,
-    setOpen,
-    values,
-    value,
-    handelSetFilter,
-    handleScroll,
-    label,
-    search,
-    style,
-    border = true
-}: {
-    open: boolean;
-    setOpen: (v: boolean) => void;
-    values: { label: string; value: any }[];
-    value: any;
-    handelSetFilter: (v: any) => void;
-    handleScroll?: ({ nativeEvent }: any) => void;
-    label: string;
-    search?: boolean;
-    style?: ViewStyle;
-    border?: boolean
-}) => {
+const PickerDropdown = React.memo(({ open, setOpen, values, value, handelSetFilter, handleScroll, label, search, style, border = true }: PickerDropdownProps) => {
     const maxHeight = hp(Platform.OS === 'web' ? '50%' : '40%');
     const masterdataStyles = useMasterdataStyles();
     const { spacing } = useRes();

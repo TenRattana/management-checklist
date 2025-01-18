@@ -4,11 +4,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import React, { useCallback } from "react";
 import { View, StyleSheet } from "react-native";
 import Text from "@/components/Text";
-
-type DetailContentProps = {
-    detailData: any[];
-    showDetailwithKey?: string[];
-};
+import { DetailContentProps } from "@/typing/screens/CustomTable";
 
 const DetailContent = React.memo(({ detailData, showDetailwithKey }: DetailContentProps) => {
     const { spacing } = useRes();

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import {
     setDragSubForm,
@@ -20,7 +20,6 @@ import {
 import { IconButton } from "react-native-paper";
 import Dragfield from "./Dragfield";
 import { BaseSubForm, RowItemProps } from "@/typing/form";
-import { DragsubformProps } from "@/typing/tag";
 import { useToast } from "@/app/contexts/useToast";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
@@ -28,11 +27,12 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import Animated, { Easing, FadeIn, FadeOut } from "react-native-reanimated";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/stores";
+import { DragsubformProps } from "@/typing/screens/CreateForm";
 
 FadeIn.duration(300).easing(Easing.ease);
 FadeOut.duration(300).easing(Easing.ease);
 
-const Dragsubform: React.FC<DragsubformProps> = React.memo(({ checkLists }) => {
+const Dragsubform = React.memo(({ checkLists }: DragsubformProps) => {
     const state = useSelector((state: any) => state.form);
     const dispatch = useDispatch<AppDispatch>();
 

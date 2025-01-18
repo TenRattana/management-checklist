@@ -6,20 +6,7 @@ import { CustomDropdownSingleProps } from '@/typing/tag'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts/useRes";
 
-const CustomDropdownSingle = ({
-    labels,
-    values,
-    title,
-    data,
-    value,
-    handleBlur,
-    handleChange,
-    lefticon,
-    iconRight,
-    testId,
-    error,
-    errorMessage,
-}: CustomDropdownSingleProps) => {
+const CustomDropdownSingle = ({ labels, values, title, data, value, handleBlur, handleChange, lefticon, iconRight, testId, error, errorMessage, }: CustomDropdownSingleProps) => {
     const [options, setOptions] = useState<{ label?: string; value?: string; icon?: () => JSX.Element }[]>([]);
     const masterdataStyles = useMasterdataStyles();
     const { spacing } = useRes();

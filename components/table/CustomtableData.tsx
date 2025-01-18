@@ -1,13 +1,13 @@
 import React, { useState, Suspense } from "react";
 import Text from "../Text";
 import { Dialogs, LoadingSpinner } from "../common";
-import { CustomtableDataProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { Easing, FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { FlatList } from "react-native-gesture-handler";
 import { StyleSheet, View } from "react-native";
 import ShimmerPlaceholder, { createShimmerPlaceholder } from 'react-native-shimmer-placeholder';
 import { LinearGradient } from 'expo-linear-gradient';
+import { CustomtableDataProps } from "@/typing/screens/CustomTable";
 
 FadeInUp.duration(300).easing(Easing.ease);
 FadeOutDown.duration(300).easing(Easing.ease);

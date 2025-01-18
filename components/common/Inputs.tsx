@@ -7,21 +7,7 @@ import Text from "@/components/Text";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
 
-const Inputs: React.FC<InputProps> = React.memo(({
-  placeholder,
-  label,
-  error,
-  errorMessage,
-  value,
-  handleChange,
-  handleBlur,
-  hint,
-  mode,
-  testId,
-  textColor,
-  secureTextEntry,
-  exp
-}) => {
+const Inputs = React.memo(({ placeholder, label, error, errorMessage, value, handleChange, handleBlur, hint, mode, testId, textColor, secureTextEntry, exp }: InputProps) => {
   const masterdataStyles = useMasterdataStyles();
   const [passwordVisible, setPasswordVisible] = useState(false);
 

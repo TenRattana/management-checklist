@@ -5,7 +5,6 @@ import { Portal, Switch, Dialog, TextInput, HelperText, Icon } from "react-nativ
 import { Formik, Field } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { MachineDialogProps, InitialValuesMachine } from '@/typing/value'
 import Text from "@/components/Text";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
@@ -17,6 +16,7 @@ import { fetchMachineGroups, fetchSearchMachineGroups } from "@/app/services";
 import HeaderDialog from "./HeaderDialog";
 import { useSelector } from "react-redux";
 import ViewQR from "../common/ViewQR";
+import { InitialValuesMachine, MachineDialogProps } from "@/typing/screens/Machine";
 
 const validationSchema = Yup.object().shape({
     machineGroupId: Yup.string().required("The group machine field is required."),
@@ -29,7 +29,7 @@ const validationSchema = Yup.object().shape({
 const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData }: MachineDialogProps<InitialValuesMachine>) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
-    const { responsive, spacing } = useRes()
+    const { spacing } = useRes()
     const state = useSelector((state: any) => state.prefix);
 
     const [open, setOpen] = useState(false);
@@ -137,9 +137,7 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
                                                 logoBorderRadius={5}
                                                 logoMargin={20}
                                             />
-                                            <Text
-                                                style={[masterdataStyles.textQR, { marginVertical: 10 }]}
-                                            >
+                                            <Text style={[masterdataStyles.textQR, { marginVertical: 10 }]}>
                                                 Scan this code for open form.
                                             </Text>
                                             <TextInput

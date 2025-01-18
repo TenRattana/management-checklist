@@ -6,16 +6,10 @@ import MenuSection from './MenuSection';
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useSelector } from 'react-redux';
 import { ComponentNames, Menus, ParentMenu } from '@/typing/type';
-import { DrawerNavigationHelpers } from '@react-navigation/drawer/lib/typescript/src/types';
 import { navigate, navigationRef } from '@/app/navigations/navigationUtils';
 import { Icon } from 'react-native-paper';
 import { useTheme } from '@/app/contexts/useTheme';
-
-interface RenderTouchableOpacityProps {
-    label: string;
-    navigateTo: ComponentNames;
-    navigations: DrawerNavigationHelpers;
-}
+import { RenderTouchableOpacityProps } from '@/typing/Navigate';
 
 const RenderTouchableOpacity = React.memo((props: RenderTouchableOpacityProps) => {
     const masterdataStyles = useMasterdataStyles();
@@ -37,7 +31,7 @@ const RenderTouchableOpacity = React.memo((props: RenderTouchableOpacityProps) =
     );
 });
 
-const CustomDrawerContent: React.FC<DrawerContentComponentProps> = React.memo((props) => {
+const CustomDrawerContent = React.memo((props: DrawerContentComponentProps) => {
     const { navigation } = props;
 
     const user = useSelector((state: any) => state.user);

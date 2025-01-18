@@ -11,17 +11,11 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
-
-interface CreateForm {
-    label: string;
-    value: string;
-    editable: boolean;
-    onEdit: (v: boolean) => void;
-}
+import { CreateForm } from "@/typing/screens/CreateForm";
 
 const MemoizedIconButton = React.memo(IconButton);
 
-const ConfigItemForm: React.FC<CreateForm> = React.memo(({ label, value, editable, onEdit }) => {
+const ConfigItemForm = React.memo(({ label, value, editable, onEdit }: CreateForm) => {
     const { theme } = useTheme();
     const { spacing } = useRes();
     const masterdataStyles = useMasterdataStyles();

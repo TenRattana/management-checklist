@@ -7,15 +7,7 @@ import { DialogsProps } from "@/typing/tag";
 import { useRes } from "@/app/contexts/useRes";
 import { useTheme } from "@/app/contexts/useTheme";
 
-const Dialogs: React.FC<DialogsProps> = ({
-    isVisible,
-    setIsVisible,
-    actions,
-    title = "",
-    messages = "",
-    handleDialog,
-    data,
-}) => {
+const Dialogs = ({ isVisible, setIsVisible, actions, title = "", messages = "", handleDialog, data, }: DialogsProps) => {
     const masterdataStyles = useMasterdataStyles();
     const { fontSize, responsive, spacing } = useRes()
     const { theme } = useTheme()

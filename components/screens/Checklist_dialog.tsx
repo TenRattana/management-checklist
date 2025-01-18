@@ -5,12 +5,12 @@ import { Portal, Switch, Dialog, Icon } from "react-native-paper";
 import { Field, Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { CheckListDialogProps, InitialValuesChecklist } from '@/typing/value'
 import Text from "@/components/Text";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
 import HeaderDialog from "./HeaderDialog";
 import { useSelector } from "react-redux";
+import { CheckListDialogProps, InitialValuesChecklist } from "@/typing/screens/CheckList";
 
 const validationSchema = Yup.object().shape({
     checkListName: Yup.string().required("Check list name is required."),

@@ -3,8 +3,8 @@ import { useState } from 'react';
 import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useToast } from '@/app/contexts/useToast';
 import React from 'react';
-import { ScanQRProps } from '@/typing/tag';
 import { navigate } from '@/app/navigations/navigationUtils';
+import { ScanQRProps } from '@/typing/screens/Scan';
 
 const ScanQR: React.FC<ScanQRProps> = React.memo(() => {
     const [facing, setFacing] = useState<CameraType>('back');

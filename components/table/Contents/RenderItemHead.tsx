@@ -1,68 +1,16 @@
 import React, { useCallback, useState } from "react";
 import { Checkbox, DataTable } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useRes } from '@/app/contexts/useRes'
-import { TypeConfig } from "@/typing/type";
-import { DebouncedFunc } from "lodash";
 import Text from "../../Text";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { useTheme } from "@/app/contexts/useTheme";
 import PickerDropdown from "../../common/PickerDropdown";
+import { RenderItemHeadProps } from "@/typing/screens/CustomTable";
 
 type justifyContent = 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly' | undefined;
 
-interface CustomTableHeadProps {
-    Tablehead: { label?: string; align?: string }[];
-    flexArr: number[];
-    handleSort: (index: number) => void;
-    sortColumn: number | null;
-    sortDirection: "ascending" | "descending" | undefined;
-    selectedRows?: string[];
-    toggleSelectAll?: () => void;
-    displayData: (string | number | boolean)[][];
-    showFilter?: boolean;
-    filter?: string | null;
-    handelSetFilter: DebouncedFunc<(value: string | null) => void>
-    showData?: TypeConfig[];
-    showColumn?: string;
-    handleDialog: (action?: string, data?: string) => void;
-    ShowTitle?: string;
-    showFilterDate?: boolean;
-    filteredDate: DebouncedFunc<(value: string | null) => void>
-    Dates?: string | null;
-    handleLoadMore?: () => void;
-    isFetchingNextPage?: boolean;
-    hasNextPage?: boolean;
-    handlefilter?: (value?: string) => void;
-    searchfilter?: string;
-}
-
-const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
-    Tablehead,
-    flexArr,
-    handleSort,
-    sortColumn,
-    sortDirection,
-    selectedRows,
-    toggleSelectAll,
-    displayData,
-    showFilter,
-    filter,
-    handelSetFilter,
-    showData,
-    showColumn,
-    handleDialog,
-    ShowTitle,
-    showFilterDate,
-    filteredDate,
-    Dates,
-    handleLoadMore,
-    isFetchingNextPage,
-    hasNextPage,
-    handlefilter,
-    searchfilter
-}) => {
+const CustomtableHead = React.memo(({ Tablehead, flexArr, handleSort, sortColumn, sortDirection, selectedRows, toggleSelectAll, displayData, showFilter, filter, handelSetFilter, showData, showColumn,
+    handleDialog, ShowTitle, showFilterDate, filteredDate, Dates, handleLoadMore, isFetchingNextPage, hasNextPage, handlefilter, searchfilter }: RenderItemHeadProps) => {
     const masterdataStyles = useMasterdataStyles();
     const { fontSize, responsive, spacing } = useRes();
     const [open, setOpen] = useState(false);
@@ -152,10 +100,8 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
                     )}
                 </View>
 
-                {/* {showFilterDate || showFilter && ( */}
                 <View style={{
                     flexDirection: responsive === "small" ? 'column' : 'row',
-                    // marginVertical: 2
                 }}>
                     {showFilterDate && (
                         <PickerDropdown
@@ -183,7 +129,6 @@ const CustomtableHead: React.FC<CustomTableHeadProps> = React.memo(({
                         />
                     )}
                 </View>
-                {/* )} */}
             </View >
 
             <DataTable>

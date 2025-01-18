@@ -6,23 +6,7 @@ import axiosInstance from '@/config/axios';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { Customtable, LoadingSpinner } from '@/components';
 import { useTheme } from '@/app/contexts/useTheme';
-
-interface Log {
-  start: string | null;
-  stop: string | null;
-}
-
-interface GMachine {
-  GMachineID: string;
-  GMachineName: string;
-}
-
-interface TimeTrack {
-  ScheduleID: string;
-  ScheduleName: string;
-  GroupMachines: GMachine[];
-  Track: Log[] | null;
-}
+import { TimeTrack } from '@/typing/screens/TimeTrack';
 
 const fetchTimeTrack = async (): Promise<TimeTrack[]> => {
   const response = await axiosInstance.post("TimeSchedule_service.asmx/GetScheduleTracks");
@@ -36,7 +20,10 @@ const TimescheduleTrack = React.memo(() => {
 
   const { data: timeTrack = [], isLoading } = useQuery<TimeTrack[], Error>(
     'timeTrack',
-    fetchTimeTrack
+    fetchTimeTrack, {
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
+  }
   );
 
   const handleTrackSelect = (ScheduleID: string) => {

@@ -4,18 +4,35 @@ import { StyleSheet, View, Platform } from "react-native";
 import { useTheme } from "@/app/contexts/useTheme";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts/useRes";
-
-interface SearchBarProps {
-  value: string;
-  onChange: (search: string) => void;
-  placeholder: string;
-  testId: string;
-}
+import { SearchBarProps } from "@/typing/tag";
 
 const SearchBar = ({ value, onChange, placeholder, testId }: SearchBarProps) => {
-  const { theme } = useTheme();
+  const { theme, darkMode } = useTheme();
   const { responsive } = useRes();
   const masterdataStyles = useMasterdataStyles();
+
+  const styles = StyleSheet.create({
+    searchbarWrapper: {
+      flexDirection: "row",
+      alignItems: "center",
+      borderRadius: 10,
+    },
+    searchbar: {
+      minWidth: 400,
+      borderRadius: 10,
+      height: 35,
+      backgroundColor: "transparent",
+      paddingVertical: 0,
+    },
+    searchIcon: {
+      marginLeft: 5,
+    },
+    clearButton: {
+      justifyContent: "center",
+      alignItems: "center",
+      marginRight: 5,
+    },
+  });
 
   return (
     <View
@@ -23,7 +40,6 @@ const SearchBar = ({ value, onChange, placeholder, testId }: SearchBarProps) => 
         {
           marginRight: responsive === "small" ? 0 : 10,
           alignSelf: responsive === "small" ? undefined : "center",
-          marginLeft: 20
         },
       ]}
     >
@@ -33,6 +49,7 @@ const SearchBar = ({ value, onChange, placeholder, testId }: SearchBarProps) => 
           {
             marginBottom: responsive === "small" ? 5 : undefined,
             borderWidth: 1,
+            borderColor: !darkMode ? "rgb(216,216,216)" : "rgb(0, 0, 20)",
             borderRadius: 12,
             backgroundColor: theme.colors.surface,
             ...Platform.select({
@@ -66,7 +83,7 @@ const SearchBar = ({ value, onChange, placeholder, testId }: SearchBarProps) => 
           placeholderTextColor="#B0B0B0"
           testID={testId}
           id={testId}
-          iconColor={theme.colors.primary}
+          iconColor={theme.colors.onBackground}
           clearIcon="close"
           clearButtonMode="while-editing"
         />
@@ -74,28 +91,5 @@ const SearchBar = ({ value, onChange, placeholder, testId }: SearchBarProps) => 
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  searchbarWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 10,
-  },
-  searchbar: {
-    minWidth: 500,
-    borderRadius: 10,
-    height: 35,
-    backgroundColor: "transparent",
-    paddingVertical: 0,
-  },
-  searchIcon: {
-    marginLeft: 5,
-  },
-  clearButton: {
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 5,
-  },
-});
 
 export default React.memo(SearchBar);

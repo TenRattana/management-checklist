@@ -12,10 +12,7 @@ import { useSelector } from "react-redux";
 import useForm from "@/hooks/custom/useForm";
 import * as Yup from 'yup';
 import { Stack } from "expo-router";
-
-interface FormValues {
-    [key: string]: any;
-}
+import { FormValues } from "@/typing/screens/CreateForm";
 
 const isValidDateFormatCustom = (value: string) => {
     const dateRegex = /^(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2})$/;
@@ -95,10 +92,10 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
 
     useEffect(() => {
         if (!isLoadingForm && found) {
-            state.UserID && setLoad(false) 
+            state.UserID && setLoad(false)
             !exp && setLoad(false)
         }
-    }, [isLoadingForm, found, state.UserID,exp])
+    }, [isLoadingForm, found, state.UserID, exp])
 
     const convertToThaiDateTime = (dateString: string) => {
         const date = new Date(dateString);

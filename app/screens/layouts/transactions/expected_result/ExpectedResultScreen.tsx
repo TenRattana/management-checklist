@@ -2,26 +2,27 @@ import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from '@/app/contexts/useToast';
 import { LoadingSpinner, Searchbar, Text } from "@/components";
-import { Card, Divider } from "react-native-paper";
+import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { ExpectedResult } from "@/typing/type";
-import { ExpectedResultProps } from "@/typing/tag";
 import { useInfiniteQuery } from 'react-query';
 import { Platform, StyleSheet, View } from "react-native";
 import { fetchExpectedResults, fetchMachines, fetchSearchExpectedResult, fetchSearchMachines } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 import { navigate } from "@/app/navigations/navigationUtils";
 import { useFocusEffect } from "expo-router";
+import { useSelector } from "react-redux";
+import { ExpectedResult } from "@/typing/screens/ExpectedResult";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
-const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(() => {
+const ExpectedResultScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [debouncedSearchQueryFilter, setDebouncedSearchQueryFilter] = useState<string>("");
+    const state = useSelector((state: any) => state.prefix);
 
     const { handleError } = useToast();
-    const { spacing, fontSize } = useRes();
+    const { spacing, fontSize, responsive } = useRes();
     const { theme } = useTheme();
     const [expectedResult, setExpectedResult] = useState<ExpectedResult[]>([])
     const masterdataStyles = useMasterdataStyles();
@@ -216,26 +217,31 @@ const ExpectedResultScreen: React.FC<ExpectedResultProps> = React.memo(() => {
                 },
             }),
         },
+        containerSearch: {
+            paddingHorizontal: 20,
+            paddingVertical: 5,
+            flexDirection: responsive === "small" ? "column" : 'row',
+        },
+        contentSearch: {
+            flexDirection: responsive === "small" ? "column" : 'row',
+        },
     });
 
     return (
         <View id="container-checklist" style={styles.container}>
             <View id="container-search" style={masterdataStyles.containerSearch}>
-                <Text style={[masterdataStyles.textBold, styles.header]}>List ExpectedResult</Text>
+                <Text style={[masterdataStyles.textBold, styles.header]}>{state.ExpectedResult || "List"}</Text>
             </View>
 
             <Card.Content style={styles.cardcontent}>
-                <View style={{ paddingHorizontal: 20, paddingVertical: 5, flexDirection: 'row', justifyContent: 'space-between' }}>
-
-                    <View style={{ alignContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                <View style={styles.containerSearch}>
+                    <View style={styles.contentSearch}>
                         <Searchbar
                             placeholder="Search ExpectedResult..."
                             value={searchQuery}
                             onChange={setSearchQuery}
                             testId="search-er"
                         />
-
-                        <Text style={[masterdataStyles.title, masterdataStyles.textBold]}>ExpectedResult</Text>
                     </View>
                 </View>
 

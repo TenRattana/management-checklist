@@ -1,10 +1,8 @@
 import React, { useEffect, useMemo, useState, useCallback, lazy, Suspense } from 'react';
 import { useTheme } from '@/app/contexts/useTheme';
 import moment from 'moment-timezone';
-import { FlatList, TouchableOpacity, View, Text as RNText, StyleSheet, ScrollView } from 'react-native';
-import { TimeLine } from '@/app/mocks/timeline';
+import { TouchableOpacity, View, Text as RNText, StyleSheet, ScrollView } from 'react-native';
 import { LoadingSpinner } from '../common';
-import { MarkedDates } from '@/app/mocks/convertSchedule';
 import { useRes } from '@/app/contexts/useRes';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { getCurrentTime } from '@/config/timezoneUtils';
@@ -13,30 +11,13 @@ import { groupBy } from 'lodash';
 import { Timeline, TimelineListRenderItemInfo, TimelineProps } from 'react-native-calendars';
 import Text from '../Text';
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { Event, TimeLine, TimelinesProps } from '@/typing/screens/TimeSchedule';
 
 const LazyTimelineList = lazy(() => import('react-native-calendars').then(module => ({ default: module.TimelineList })));
 
 const MemoHome_dialog = React.memo(Home_dialog);
 
-type Event = {
-    title: string;
-    start: string;
-    end: string;
-    summary?: string;
-    statustype?: string;
-    type?: string;
-};
-
-type TimelinesProps = {
-    filterStatus: string;
-    filterTitle: string[];
-    computedTimeline: {
-        timeline: TimeLine[];
-        markedDates: MarkedDates;
-    };
-};
-
-const Timelines: React.FC<TimelinesProps> = ({ filterStatus, filterTitle, computedTimeline }) => {
+const Timelines = ({ filterStatus, filterTitle, computedTimeline }: TimelinesProps) => {
     const { theme } = useTheme();
     const { spacing } = useRes();
     const [dialogVisible, setDialogVisible] = useState(false);

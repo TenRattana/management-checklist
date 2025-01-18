@@ -9,11 +9,7 @@ import Text from "@/components/Text";
 import { useSelector } from "react-redux";
 import { navigate } from "@/app/navigations/navigationUtils";
 
-const SaveDialog = React.memo(({
-    state,
-    isVisible,
-    setIsVisible,
-}: SaveDialogProps) => {
+const SaveDialog = React.memo(({ state, isVisible, setIsVisible }: SaveDialogProps) => {
     const prefix = useSelector((state: any) => state.prefix);
     const { handleError, showSuccess } = useToast();
     const masterdataStyles = useMasterdataStyles();

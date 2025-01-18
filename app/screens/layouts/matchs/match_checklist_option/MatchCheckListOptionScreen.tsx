@@ -4,15 +4,14 @@ import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
 import { LoadingSpinner, Searchbar, Text } from "@/components";
-import { Card, Divider } from "react-native-paper";
+import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { MatchCheckListOption } from '@/typing/type'
-import { InitialValuesMatchCheckListOption } from '@/typing/value'
 import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
 import { useSelector } from "react-redux";
 import { fetchMatchCheckListOptions, fetchSearchMatchCheckListOptions, saveMatchCheckListOptions } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useFocusEffect } from "expo-router";
+import { InitialValuesMatchCheckListOption, MatchCheckListOption } from "@/typing/screens/MatchCheckListOption";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 const LazyMatch_CheckList_Option_dialog = lazy(() => import("@/components/screens/Match_checklist_option_dialog"));
@@ -33,7 +32,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
     const masterdataStyles = useMasterdataStyles();
     const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
-    const { spacing, fontSize } = useRes();
+    const { spacing, fontSize, responsive } = useRes();
     const { theme } = useTheme();
     const queryClient = useQueryClient();
     const [matchCheckListOption, setMatchCheckListOption] = useState<MatchCheckListOption[]>([])
@@ -213,6 +212,24 @@ const MatchCheckListOptionScreen = React.memo(() => {
                 },
             }),
         },
+        containerSearch: {
+            paddingHorizontal: 20,
+            paddingVertical: 5,
+            flexDirection: responsive === "small" ? "column" : 'row',
+        },
+        contentSearch: {
+            flexDirection: responsive === "small" ? "column" : 'row',
+        },
+        containerTable: {
+            flex: 1,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            justifyContent: 'center',
+            alignItems: 'center'
+        }
     });
 
     return (
@@ -222,21 +239,19 @@ const MatchCheckListOptionScreen = React.memo(() => {
             </View>
 
             <Card.Content style={styles.cardcontent}>
-                <View style={{ paddingHorizontal: 20, paddingVertical: 5, flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                        <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.MatchCheckListOption}`}</Text>
-                    </TouchableOpacity>
-
-                    <View style={{ alignContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                <View style={styles.containerSearch}>
+                    <View style={styles.contentSearch}>
                         <Searchbar
                             placeholder={`Search ${state.MatchCheckListOption}...`}
                             value={searchQuery}
                             onChange={setSearchQuery}
                             testId="search-match-checklist"
                         />
-
-                        <Text style={[masterdataStyles.title, masterdataStyles.textBold]}>{state.MatchCheckListOption}</Text>
                     </View>
+
+                    <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                        <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.MatchCheckListOption}`}</Text>
+                    </TouchableOpacity>
                 </View>
 
                 <Suspense fallback={<LoadingSpinner />}>
@@ -245,7 +260,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
             </Card.Content>
 
             {isVisible && (
-                <View style={{ flex: 1, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' }}>
+                <View style={styles.containerTable}>
                     <Suspense fallback={<LoadingSpinner />}>
                         <LazyMatch_CheckList_Option_dialog
                             isVisible={isVisible}

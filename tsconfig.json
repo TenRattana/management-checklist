@@ -22,6 +22,7 @@
     "hooks/**/*",
     "styles/**/*",
     "typing/*.d.ts",
+    "typing/**/*.d.ts",
     "config/axios.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"

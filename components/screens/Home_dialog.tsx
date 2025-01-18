@@ -6,15 +6,10 @@ import { useQuery } from 'react-query';
 import { LoadingSpinner } from '../common';
 import { Customtable } from '..';
 import { useTheme } from '@/app/contexts/useTheme';
-import { Platform, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { fetchTimeMachines } from '@/app/services';
-
-interface Home_dialogProps {
-    dialogVisible: boolean;
-    hideDialog: () => void;
-    selectedEvent: any;
-}
+import { Home_dialogProps } from '@/typing/screens/HomeScreen';
 
 const Home_dialog = React.memo(({ dialogVisible, hideDialog, selectedEvent }: Home_dialogProps) => {
     const masterdataStyles = useMasterdataStyles()
@@ -52,9 +47,19 @@ const Home_dialog = React.memo(({ dialogVisible, hideDialog, selectedEvent }: Ho
         searchQuery: " ",
     }), [tableData]);
 
+    const styles = StyleSheet.create({
+        container: {
+            backgroundColor: theme.colors.background,
+            width: 850,
+            display: dialogVisible ? 'flex' : 'none',
+            flex: 1,
+            maxHeight: hp(Platform.OS === "web" ? '50%' : '70&')
+        }
+    })
+
     return (
         <Portal>
-            <Dialog visible={dialogVisible} onDismiss={hideDialog} style={[masterdataStyles.containerDialog, { backgroundColor: theme.colors.background, width: 850, display: dialogVisible ? 'flex' : 'none', flex: 1, maxHeight: hp(Platform.OS === "web" ? '50%' : '70&') }]}>
+            <Dialog visible={dialogVisible} onDismiss={hideDialog} style={[masterdataStyles.containerDialog, styles.container]}>
                 <Dialog.Title>{selectedEvent?.title} - Schedule</Dialog.Title>
                 <View style={{ flex: 1, marginHorizontal: 24 }}>
                     {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}

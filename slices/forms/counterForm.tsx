@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { BaseSubForm, BaseFormState, Form, BaseForm } from '@/typing/form'
-import { CheckList, Checklist, DataType, GroupCheckListOption } from '@/typing/type'
+import { DataType } from '@/typing/type'
+import { GroupCheckListOption } from "@/typing/screens/GroupCheckList";
+import { CheckList, CheckListType } from "@/typing/screens/CheckList";
 
 
 const initialState: Form = {
@@ -53,12 +55,12 @@ const subFormSlice = createSlice({
       form?: BaseForm,
       subForms: BaseSubForm[],
       BaseFormState: BaseFormState[],
-      checkList?: Checklist[] | ({
+      checkList?: CheckList[] | ({
         label: string;
         value: string;
-      } & Checklist)[],
+      } & CheckList)[],
       groupCheckListOption?: GroupCheckListOption[];
-      checkListType: CheckList[];
+      checkListType: CheckListType[];
       dataType: DataType[],
       mode: boolean,
       fetchedExpectedResult: any
@@ -122,7 +124,7 @@ const subFormSlice = createSlice({
       itemCLL: ({
         label: string;
         value: string;
-      } & Checklist)[]
+      } & CheckList)[]
     }>) => {
       const { itemsMLL, itemCLL } = action.payload;
       state.itemsMLL = itemsMLL || [];
@@ -204,8 +206,8 @@ const subFormSlice = createSlice({
     },
     addField: (state, action: PayloadAction<{
       BaseFormState: BaseFormState;
-      checkList: Checklist[];
-      checkListType: CheckList[];
+      checkList: CheckList[];
+      checkListType: CheckListType[];
       dataType: DataType[];
     }>) => {
       const { BaseFormState, checkList, checkListType, dataType } = action.payload;
@@ -240,8 +242,8 @@ const subFormSlice = createSlice({
     },
     updateField: (state, action: PayloadAction<{
       BaseFormState: BaseFormState;
-      checkList: Checklist[];
-      checkListType: CheckList[];
+      checkList: CheckList[];
+      checkListType: CheckListType[];
       dataType: DataType[];
     }>) => {
       const { BaseFormState, checkList, checkListType, dataType } = action.payload;

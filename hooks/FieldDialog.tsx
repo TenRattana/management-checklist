@@ -6,8 +6,9 @@ import { AppDispatch } from "@/stores";
 import { addField, updateField } from "@/slices";
 import * as Yup from "yup";
 import { fetchCheckList, fetchCheckListType, fetchDataType, fetchSearchCheckList, fetchSearchGroupCheckListOption, fetchGroupCheckListOption, fetchSearchCheckListOption, fetchCheckListOption } from "@/app/services";
-import { Checklist, CheckList, GroupCheckListOption } from "@/typing/type";
 import { BaseFormState } from "@/typing/form";
+import { GroupCheckListOption } from "@/typing/screens/GroupCheckList";
+import { CheckList, CheckListType } from "@/typing/screens/CheckList";
 
 const useField = (editMode?: boolean, formState?: BaseFormState) => {
     const dispatch = useDispatch<AppDispatch>();
@@ -16,7 +17,7 @@ const useField = (editMode?: boolean, formState?: BaseFormState) => {
     const itemMLL = useSelector((state: any) => state.form);
 
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<{ CheckList: string, MatchChecklist: string }>({ CheckList: '', MatchChecklist: '' });
-    const [itemsCL, setItemsCL] = useState<({ label: string; value: string } & Checklist)[]>([]);
+    const [itemsCL, setItemsCL] = useState<({ label: string; value: string } & CheckList)[]>([]);
     const [itemsML, setItemsML] = useState<({ label: string; value: string } & GroupCheckListOption)[]>([]);
 
     useEffect(() => {
@@ -167,7 +168,7 @@ const useField = (editMode?: boolean, formState?: BaseFormState) => {
             checkListType
                 .filter(group => group.CheckList)
                 .flatMap(group => group.CheckList)
-                .filter((checkList): checkList is CheckList => checkList !== undefined),
+                .filter((checkList): checkList is CheckListType => checkList !== undefined),
         [checkListType]
     );
 

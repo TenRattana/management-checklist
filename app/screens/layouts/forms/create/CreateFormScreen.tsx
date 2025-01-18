@@ -1,16 +1,15 @@
 import React, { useState, useCallback, useRef, useMemo } from "react";
-import { useWindowDimensions, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useWindowDimensions, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
-import { DialogProps, Divider, Icon } from "react-native-paper";
+import { Divider, Icon } from "react-native-paper";
 import useCreateformStyle from "@/styles/createform";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import useForm from "@/hooks/custom/useForm";
 import { ConfigItemForm, FieldDialog, SaveDialog, SubFormDialog, Text } from "@/components";
 import Dragsubform from "./Dragsubform";
 import Preview from "@/app/screens/layouts/forms/create/ShowForm";
-import { CreateFormProps } from "@/typing/tag";
 import { BaseFormState, BaseSubForm } from "@/typing/form";
-import { CheckList, Checklist, CheckListType, DataType, GroupCheckListOption } from "@/typing/type";
+import { DataType } from "@/typing/type";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
 import { addSubForm, defaultDataForm, deleteField, deleteSubForm, updateSubForm } from "@/slices";
@@ -26,13 +25,15 @@ import Animated, {
 } from 'react-native-reanimated';
 import Create from "@/styles/Create";
 import { useToast } from "@/app/contexts/useToast";
+import { CreateFormProps } from "@/typing/screens/CreateForm";
+import { CheckListType, GroupCheckListType } from "@/typing/screens/CheckList";
 
 const isValidDateFormatCustom = (value: string) => {
     const dateRegex = /^(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2})$/;
     return dateRegex.test(value);
 };
 
-const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route }) => {
+const CreateFormScreen = React.memo(({ route }: CreateFormProps) => {
     const { responsive, fontSize, spacing } = useRes();
     const { handleError } = useToast();
     const { width } = useWindowDimensions();
@@ -53,7 +54,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route }) => {
             checkListType
                 .filter(group => group.CheckList)
                 .flatMap(group => group.CheckList)
-                .filter((checkList): checkList is CheckList => checkList !== undefined),
+                .filter((checkList): checkList is CheckListType => checkList !== undefined),
         [checkListType]
     );
 
@@ -125,7 +126,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route }) => {
 
     const childRef = useRef<any>();
 
-    const handleDrop = useCallback((item: CheckList, absoluteX: number, absoluteY: number) => {
+    const handleDrop = useCallback((item: CheckListType, absoluteX: number, absoluteY: number) => {
         const cardIndex = childRef.current.checkCardPosition(absoluteX, absoluteY);
         const selectedChecklist = checkList?.[0];
         const selectedDataType = dataType.find((v: DataType) => item.CTypeTitle === "Number Answer" ? v.DTypeName === "Number" : item.CTypeTitle === "Time/Date" ? v.DTypeName === "Date" : v.DTypeName === "String") || dataType?.[0];
@@ -321,7 +322,7 @@ const CreateFormScreen: React.FC<CreateFormProps> = React.memo(({ route }) => {
 
                                 <View style={styles.groupContainer}>
 
-                                    {checkListType && checkListType.length > 0 ? checkListType.map((item: CheckListType, index) => (
+                                    {checkListType && checkListType.length > 0 ? checkListType.map((item: GroupCheckListType, index) => (
                                         item.IsActive && (
                                             <View key={index}>
                                                 <View style={styles.fieldContainer}>

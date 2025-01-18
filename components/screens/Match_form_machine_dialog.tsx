@@ -1,10 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
-import { Portal, Dialog, HelperText, Icon, IconButton } from "react-native-paper";
-import { Field, Formik } from "formik";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Portal, Dialog, HelperText, Icon } from "react-native-paper";
+import { Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { MatchFormMachineDialogProps, InitialValuesMatchFormMachine } from '@/typing/value'
 import Text from "@/components/Text";
 import Dropdown from "../common/Dropdown";
 import { fetchForms, fetchMachines, fetchSearchFomrs, fetchSearchMachines } from "@/app/services";
@@ -13,7 +12,7 @@ import { useRes } from "@/app/contexts/useRes";
 import { useTheme } from "@/app/contexts/useTheme";
 import HeaderDialog from "./HeaderDialog";
 import { useSelector } from "react-redux";
-
+import { InitialValuesMatchFormMachine, MatchFormMachineDialogProps } from "@/typing/screens/MatchFormMachine";
 
 const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData }: MatchFormMachineDialogProps<InitialValuesMatchFormMachine>) => {
     const masterdataStyles = useMasterdataStyles()

@@ -1,6 +1,5 @@
 import { StyleSheet, View } from 'react-native'
 import React, { useState } from 'react'
-import { InitialValuesChecklist } from '@/typing/value'
 import { Icon, IconButton, Switch } from 'react-native-paper'
 import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler'
 import useMasterdataStyles from '@/styles/common/masterdata'
@@ -10,6 +9,7 @@ import { Inputs } from '../common'
 import { useTheme } from '@/app/contexts/useTheme'
 import Text from '../Text'
 import { useRes } from '@/app/contexts/useRes'
+import { InitialValuesChecklist } from '@/typing/screens/CheckList'
 
 const validationSchema = Yup.object().shape({
     checkListName: Yup.string().required("Check list name is required."),

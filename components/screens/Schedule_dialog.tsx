@@ -5,7 +5,6 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import { Button, Dialog, Portal, Menu, Switch, HelperText } from 'react-native-paper';
 import { DropdownMulti, Inputs } from '../common';
-import { GroupMachine, TimeScheduleProps } from '@/typing/type';
 import { useToast } from '@/app/contexts/useToast';
 import { FastField, Field, Formik } from 'formik';
 import * as Yup from 'yup'
@@ -17,6 +16,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { Easing, FadeInLeft, FadeInRight, FadeOutLeft, FadeOutRight } from 'react-native-reanimated';
 import { useInfiniteQuery, useQueryClient } from 'react-query';
 import { fetchMachineGroups, fetchSearchMachineGroups, fetchSearchTimeSchedules } from '@/app/services';
+import { ScheduleDialogProps } from '@/typing/screens/TimeSchedule';
 
 const { height } = Dimensions.get('window');
 
@@ -28,13 +28,7 @@ const isValidDateFormatSlots = (value: string) => {
     const dateRegex = /^(\d{2}):(\d{2})$/;
     return dateRegex.test(value);
 };
-interface ScheduleDialogProps {
-    isVisible: boolean;
-    setIsVisible: (value: boolean) => void;
-    saveData: (values: any) => void;
-    initialValues: TimeScheduleProps;
-    isEditing: boolean;
-}
+
 FadeInLeft.duration(300).easing(Easing.ease);
 FadeOutLeft.duration(300).easing(Easing.ease);
 

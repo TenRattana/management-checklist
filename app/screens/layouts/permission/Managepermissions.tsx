@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { TouchableOpacity } from "react-native";
+import React, { useState, useEffect, useCallback, useMemo, Suspense, lazy } from "react";
+import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts/useToast";
 import { useRes } from "@/app/contexts/useRes";
-import { Customtable, LoadingSpinner, AccessibleView, Searchbar, Text } from "@/components";
+import { LoadingSpinner, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Managepermisstion_dialog from "@/components/screens/Managepermisstion_dialog";
@@ -11,26 +11,10 @@ import { Users, GroupUsers, UsersPermission } from '@/typing/type'
 import { InitialValuesManagepermission } from '@/typing/value'
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
+import { fetchGroupUser, fetchUserPermission, fetchUsers, saveUserPermission } from "@/app/services";
+import { useTheme } from "@/app/contexts/useTheme";
 
-const fetchUsers = async (): Promise<Users[]> => {
-  const response = await axiosInstance.post("User_service.asmx/GetUsers");
-  return response.data.data ?? [];
-};
-
-const fetchGroupUser = async (): Promise<GroupUsers[]> => {
-  const response = await axiosInstance.post('GroupUser_service.asmx/GetGroupUsers');
-  return response.data.data ?? [];
-};
-
-const fetchUserPermission = async (): Promise<UsersPermission[]> => {
-  const response = await axiosInstance.post("User_service.asmx/GetUsersPermission");
-  return response.data.data ?? [];
-};
-
-const saveUserPermission = async (data: { Prefix: any; UserID: string | undefined; UserName: string; GUserID: string; IsActive: boolean; }): Promise<{ message: string }> => {
-  const response = await axiosInstance.post("User_service.asmx/SaveUser", data);
-  return response.data;
-};
+const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
 const Managepermissions = React.memo(() => {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -48,6 +32,7 @@ const Managepermissions = React.memo(() => {
   const state = useSelector((state: any) => state.prefix);
   const { showSuccess, handleError } = useToast();
   const { spacing, fontSize } = useRes();
+  const { theme } = useTheme();
   const queryClient = useQueryClient();
 
   const { data: userPermission = [], isLoading } = useQuery<UsersPermission[], Error>(
@@ -177,37 +162,104 @@ const Managepermissions = React.memo(() => {
 
   const MemoManagepermisstion_dialog = React.memo(Managepermisstion_dialog)
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+      padding: 10,
+      paddingHorizontal: 20
+    },
+    header: {
+      fontSize: spacing.large,
+      paddingVertical: fontSize === "large" ? 7 : 5,
+      fontWeight: 'bold'
+    },
+    functionname: {
+      textAlign: 'center'
+    },
+    cardcontent: {
+      marginTop: 10,
+      paddingVertical: 10,
+      paddingHorizontal: 0,
+      flex: 1,
+      borderRadius: 10,
+      backgroundColor: theme.colors.background,
+      ...Platform.select({
+        ios: {
+          shadowColor: theme.colors.onBackground,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.1,
+          shadowRadius: 6,
+        },
+        android: {
+          elevation: 6,
+        },
+        web: {
+          boxShadow: '2px 5px 10px rgba(0, 0, 0, 0.24)',
+        },
+      }),
+    },
+    containerSearch: {
+      paddingHorizontal: 20,
+      paddingVertical: 5,
+      flexDirection: 'row'
+    },
+    contentSearch: {
+      alignContent: 'center',
+      alignItems: 'center',
+      flexDirection: 'row'
+    },
+    containerTable: {
+      flex: 1,
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      justifyContent: 'center',
+      alignItems: 'center'
+    }
+  });
+
   return (
-    <AccessibleView name="container-checklist" style={{ flex: 1 }}>
-      <Card.Title
-        title={`List ${state.UsersPermission}` || "List"}
-        titleStyle={[masterdataStyles.textBold, { fontSize: spacing.large, marginTop: spacing.small, paddingVertical: fontSize === "large" ? 7 : 5 }]}
-      />
-      <AccessibleView name="match-form-machine" style={masterdataStyles.containerSearch}>
-        <Searchbar
-          placeholder="Search User..."
-          value={searchQuery}
-          onChange={setSearchQuery}
-          testId="search-user"
-        />
-        <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-          <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { textAlign: 'center' }]}>Add Permission</Text>
-        </TouchableOpacity>
-      </AccessibleView>
-      <Card.Content style={{ padding: 2, flex: 1 }}>
-        {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+    <View id="container-managerpermission" style={styles.container}>
+      <View id="container-search" style={masterdataStyles.containerSearch}>
+        <Text style={[masterdataStyles.textBold, styles.header]}>{`List ${state.UsersPermission}` || "List"}</Text>
+      </View>
+
+      <Card.Content style={styles.cardcontent}>
+        <View style={styles.containerSearch}>
+          <View style={styles.contentSearch}>
+            <Searchbar
+              placeholder={`Search ${state.UsersPermission}...`}
+              value={searchQuery}
+              onChange={setSearchQuery}
+              testId="search-user"
+            />
+          </View>
+
+          <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.UsersPermission}`}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Suspense fallback={<LoadingSpinner />}>
+          <LazyCustomtable {...customtableProps} />
+        </Suspense>
       </Card.Content>
 
-      <MemoManagepermisstion_dialog
-        isVisible={isVisible}
-        setIsVisible={setIsVisible}
-        isEditing={isEditing}
-        initialValues={initialValues}
-        saveData={saveData}
-        users={user}
-        groupUser={groupUser}
-      />
-    </AccessibleView>
+      {isVisible && (
+        <MemoManagepermisstion_dialog
+          isVisible={isVisible}
+          setIsVisible={setIsVisible}
+          isEditing={isEditing}
+          initialValues={initialValues}
+          saveData={saveData}
+          users={user}
+          groupUser={groupUser}
+        />
+      )}
+    </View>
   );
 });
 

@@ -5,63 +5,9 @@ import { FormConfig } from "./form";
 export interface Active {
   isActive: boolean;
 }
-
 export interface Detail {
   description: string;
 }
-
-export interface InitialValuesMachine extends Detail, Active {
-  machineGroupId?: string;
-  machineGroupName?: string;
-  machineId: string;
-  machineCode: string | null;
-  formId: string | null;
-  building: string | null;
-  floor: string | null;
-  area: string | null;
-  machineName: string;
-  disables: boolean;
-}
-
-export interface InitialValuesGroupMachine extends Detail, Active {
-  machineGroupId: string;
-  machineGroupName: string;
-  disables: boolean;
-}
-
-export interface InitialValuesChecklist extends Active {
-  checkListId: string;
-  checkListName: string;
-  disables: boolean;
-}
-
-export interface InitialValuesCheckListOption extends Active {
-  checkListOptionId: string;
-  checkListOptionName: string;
-  disables: boolean;
-}
-
-export interface InitialValuesGroupCheckList extends Active {
-  groupCheckListOptionId: string;
-  groupCheckListOptionName: string;
-  disables: boolean;
-}
-
-export interface InitialValuesMatchFormMachine {
-  machineId: string;
-  formId: string;
-  formName?: string;
-  machineName?: string;
-}
-
-export interface InitialValuesMatchCheckListOption extends Active {
-  matchCheckListOptionId: string;
-  checkListOptionId: string[];
-  groupCheckListOptionId: string;
-  groupCheckListOptionName?: string;
-  disables: boolean;
-}
-
 export interface InitialValuesManagepermission {
   UserID?: string;
   UserName: string;
@@ -100,42 +46,14 @@ export interface BaseDialogProps<V> extends SetVisible, SetInitial<V> {
   saveData: SaveDataFunction<V>;
 }
 
-export interface SubFormDialogProps<V extends FormConfig>
-  extends BaseDialogProps<V> {
+export interface SubFormDialogProps<V extends FormConfig> extends BaseDialogProps<V> {
   onDelete: OnDelete<string>;
 }
 
 export interface SaveDialogProps extends SetVisible {
   state: any;
 }
-
-export interface MachineDialogProps<V extends Values>
-  extends BaseDialogProps<V> {
-
-  }
-
-export interface GroupMachineDialogProps<V extends Values>
-  extends BaseDialogProps<V> {}
-
-export interface CheckListDialogProps<V extends Values>
-  extends BaseDialogProps<V> {}
-
-export interface CheckListOptionProps<V extends Values>
-  extends BaseDialogProps<V> {}
-
-export interface ChecklistGroupDialogProps<V extends Values>
-  extends BaseDialogProps<V> {}
-
-export interface ManagepermissionDialogProps<
-  V extends Values,
-  D1 extends TypeConfig,
-  D2 extends TypeConfig
-> extends BaseDialogProps<V> {
+export interface ManagepermissionDialogProps<V extends Values,D1 extends TypeConfig,D2 extends TypeConfig> extends BaseDialogProps<V> {
   users: D1[];
   groupUser: D2[];
 }
-export interface MatchFormMachineDialogProps<V extends Values>
-  extends BaseDialogProps<V> {}
-
-export interface MatchChecklistOptionProps<V extends Values>
-  extends BaseDialogProps<V> {}

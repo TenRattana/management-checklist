@@ -5,16 +5,7 @@ import { CheckboxsProps } from "@/typing/tag";
 import Text from "@/components/Text";
 import useMasterdataStyles from "@/styles/common/masterdata";
 
-const Checkboxs: React.FC<CheckboxsProps> = React.memo(({
-  option,
-  value,
-  handleChange,
-  hint,
-  error,
-  errorMessage,
-  testId,
-  exp
-}) => {
+const Checkboxs = React.memo(({ option, value, handleChange, hint, error, errorMessage, testId, exp }: CheckboxsProps) => {
   const [checkedOptions, setCheckedOptions] = useState<string[]>([]);
   const masterdataStyles = useMasterdataStyles();
 

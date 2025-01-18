@@ -19,7 +19,6 @@ import {
 import * as Yup from "yup";
 import { FormikErrors } from "formik";
 
-export type CreateFormParams = { formId: string };
 export type PreviewParams = { formId: string; action?: string };
 export type ScanParams = { machineId: string };
 
@@ -55,6 +54,78 @@ export interface DialogsProps {
   data?: string;
 }
 
+export interface DropdownProps {
+    search?: boolean;
+    label: string;
+    open: boolean;
+    setOpen: (v: boolean) => void;
+    selectedValue: any;
+    items: { label: string; value: string, icon?: () => JSX.Element }[];
+    setSelectedValue: (value: string | null) => void;
+    isFetching?: boolean;
+    fetchNextPage?: () => void;
+    handleScroll?: ({ nativeEvent }: any) => void;
+    setDebouncedSearchQuery?: (value: string) => void;
+    error?: boolean;
+    searchQuery?: string;
+    errorMessage?: string;
+    lefticon?: string;
+    showLefticon?: boolean;
+    mode?: string;
+}
+
+export interface DropdownMultiProps {
+    search?: boolean;
+    label: string;
+    open: boolean;
+    setOpen: (v: boolean) => void;
+    selectedValue: any;
+    items: { label: string; value: string, icon?: () => JSX.Element }[];
+    setSelectedValue: (value: string | string[] | null) => void;
+    isFetching?: boolean;
+    fetchNextPage?: () => void;
+    handleScroll?: ({ nativeEvent }: any) => void;
+    setDebouncedSearchQuery?: (value: string) => void;
+    error?: boolean;
+    searchQuery?: string;
+    errorMessage?: string;
+    lefticon?: string;
+    showLefticon?: boolean;
+    mode?: string;
+}
+
+export interface PickerDropdownProps {
+    open: boolean;
+    setOpen: (v: boolean) => void;
+    values: { label: string; value: any }[];
+    value: any;
+    handelSetFilter: (v: any) => void;
+    handleScroll?: ({ nativeEvent }: any) => void;
+    label: string;
+    search?: boolean;
+    style?: ViewStyle;
+    border?: boolean
+}
+
+export interface SearchBarProps {
+  value: string;
+  onChange: (search: string) => void;
+  placeholder: string;
+  testId: string;
+}
+
+export interface TimeProps {
+    value: any;
+    handleChange: (v: string) => void;
+    hint: string;
+}
+
+export interface ViewQRProps {
+    value: string;
+    open: boolean;
+    setOpen: (v: boolean) => void;
+    display: string;
+}
 export interface InputProps extends Event, DefaultProps {
   placeholder?: string;
   mode?: "outlined" | "flat";
@@ -111,18 +182,6 @@ export interface PreviewProps<T extends PreviewParams | ScanParams> {
   // SFRefs:{ [key: string]: any };
 }
 
-export interface FormScreenProps {
-  // navigation: NavigationProp<any>;
-  route: any;
-}
-
-export interface CreateFormProps {
-  navigation: NavigationProp<any>;
-  route: Route<CreateFormParams>;
-}
-
-// Miscellaneous Props
-
 export interface CustomDropdownMultiProps extends Event, DefaultProps {
   labels: string;
   values: string;
@@ -132,63 +191,6 @@ export interface CustomDropdownMultiProps extends Event, DefaultProps {
   iconRight?: React.ReactNode;
   handleBlur: () => void;
   position?: "auto" | "bottom" | "top";
-}
-
-export interface CustomTableProps {
-  Tabledata: (string | number | boolean)[][];
-  Tablehead: { label?: string; align?: string }[];
-  flexArr: number[];
-  handleAction?: (action?: string, data?: string) => void;
-  actionIndex: { [key: string]: number }[];
-  searchQuery: string;
-  showMessage: number | Array;
-  selectedRows?: string[];
-  setRow?: (value: string[]) => void;
-  showFilter?: boolean;
-  showData?: TypeConfig[];
-  showColumn?: string;
-  filterColumn?: number;
-  detail?: boolean;
-  detailKey?: string;
-  showDetailwithKey?: string[];
-  detailKeyrow?: number;
-  detailData?: TypeConfig[];
-  ShowTitle?: string;
-  handlePaginationChange?: () => void;
-  isFetchingNextPage?: boolean;
-  hasNextPage?: boolean;
-  fetchNextPage?: () => void;
-  showFilterDate?: boolean;
-  setFilterDate?: number;
-  handlefilter?: (value?: string) => void;
-  searchfilter?: string;
-  isFetching?: boolean;
-}
-
-export interface DragfieldProps {
-  data: BaseFormState[];
-  SFormID: string;
-  dispatch: any;
-  checkLists: CheckList[];
-  index?: string;
-  Columns?: number;
-}
-
-export interface DragsubformProps {
-  checkLists: CheckList[];
-  index?: string;
-}
-// validationSchema: Yup.ObjectSchema<{[x: string]: any;},Yup.AnyObject,{[x: string]: any;},"" >;
-
-// Admin and QR Props
-export interface AdminProps {}
-export interface ExpectedResultProps {
-  navigation: any;
-}
-export interface ScanQRProps {
-  navigation: {
-    navigate: (screen: string, params?: object) => void;
-  };
 }
 
 export interface HomeScreenProps {
@@ -230,54 +232,6 @@ export interface HandelPrssProps {
   visible?: boolean;
   Change?: string;
 }
-export interface CustomtableSmallProps {
-  displayData: (string | number | boolean)[][];
-  Tablehead: { label?: string; align?: string }[];
-  actionIndex: { [key: string]: number }[];
-  showMessage: number | any;
-  handleDialog: (action?: string, data?: string) => void;
-  selectedRows?: string[];
-  showFilter?: boolean;
-  filter?: string | null;
-  handelSetFilter: DebouncedFunc<(value: string | null) => void>;
-  showData?: TypeConfig[];
-  showColumn?: string;
-  handleDialog: (action?: string, data?: string) => void;
-  toggleSelect: (value: string) => void;
-  detail?: boolean;
-  detailKey?: string;
-  detailKeyrow?: number;
-  showDetailwithKey?: string[];
-  detailData?: TypeConfig[];
-  ShowTitle?: string;
-  handlePaginationChange?: () => void;
-  isFetchingNextPage?: boolean;
-  hasNextPage?: boolean;
-  fetchNextPage?: () => void;
-  showFilterDate?: boolean;
-  setFilterDate?: number;
-  handlefilter?: (value?: string) => void;
-  handleLoadMore?: () => void;
-  searchfilter?: string;
-  isFetching?: boolean;
-  filteredDate: DebouncedFunc<(value: string | null) => void>;
-  Dates?: string | null;
-}
 
-export interface CustomtableDataProps {
-  actionIndex: { [key: string]: number | string }[];
-  flexArr: number[];
-  Tablehead: { label?: string; align?: string }[];
-  displayData: (string | number | boolean)[][];
-  handleDialog: (action?: string, data?: string) => void;
-  showMessage: number;
-  selectedRows?: string[];
-  toggleSelect: (value: string) => void;
-  detail?: boolean;
-  detailKey?: string;
-  detailKeyrow?: number;
-  showDetailwithKey?: string[];
-  detailData?: TypeConfig[];
-  handlePaginationChange?: () => void;
-  isFetching?: boolean;
-}
+
+

@@ -2,17 +2,16 @@ import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from
 import { TouchableOpacity, StyleSheet, View, Platform } from "react-native";
 import axiosInstance from "@/config/axios";
 import { LoadingSpinner, Searchbar, Text } from "@/components";
-import { Card, Divider } from "react-native-paper";
+import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useToast } from '@/app/contexts/useToast';
 import { useRes } from '@/app/contexts/useRes';
-import { Checklist } from '@/typing/type';
-import { InitialValuesChecklist } from '@/typing/value';
 import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
 import { useSelector } from "react-redux";
 import { fetchCheckList, fetchSearchCheckList, saveCheckList } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useFocusEffect } from "expo-router";
+import { CheckList, InitialValuesChecklist } from "@/typing/screens/CheckList";
 
 const LazyChecklist_dialog = lazy(() => import("@/components/screens/Checklist_dialog"));
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
@@ -32,10 +31,10 @@ const CheckListScreen = React.memo(() => {
     const masterdataStyles = useMasterdataStyles();
     const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
-    const { spacing, fontSize } = useRes();
+    const { spacing, fontSize, responsive } = useRes();
     const { theme } = useTheme();
     const queryClient = useQueryClient();
-    const [checkList, setCheckList] = useState<Checklist[]>([])
+    const [checkList, setCheckList] = useState<CheckList[]>([])
 
     const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
         ['checkList', debouncedSearchQuery],
@@ -198,6 +197,24 @@ const CheckListScreen = React.memo(() => {
                 },
             }),
         },
+        containerSearch: {
+            paddingHorizontal: 20,
+            paddingVertical: 5,
+            flexDirection: responsive === "small" ? "column" : 'row',
+        },
+        contentSearch: {
+            flexDirection: responsive === "small" ? "column" : 'row',
+        },
+        containerTable: {
+            flex: 1,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            justifyContent: 'center',
+            alignItems: 'center'
+        }
     });
 
     return (
@@ -207,21 +224,19 @@ const CheckListScreen = React.memo(() => {
             </View>
 
             <Card.Content style={styles.cardcontent}>
-                <View style={{ paddingHorizontal: 20, paddingVertical: 5, flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                        <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.CheckList}`}</Text>
-                    </TouchableOpacity>
-
-                    <View style={{ alignContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                <View style={styles.containerSearch}>
+                    <View style={styles.contentSearch}>
                         <Searchbar
                             placeholder={`Search ${state.CheckList}...`}
                             value={searchQuery}
                             onChange={setSearchQuery}
                             testId="search-checklist"
                         />
-
-                        <Text style={[masterdataStyles.title, masterdataStyles.textBold]}>{state.CheckList}</Text>
                     </View>
+
+                    <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                        <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.CheckList}`}</Text>
+                    </TouchableOpacity>
                 </View>
 
                 <Suspense fallback={<LoadingSpinner />}>
@@ -230,7 +245,7 @@ const CheckListScreen = React.memo(() => {
             </Card.Content>
 
             {isVisible && (
-                <View style={{ flex: 1, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' }}>
+                <View style={styles.containerTable}>
                     <Suspense fallback={<LoadingSpinner />}>
                         <LazyChecklist_dialog
                             isVisible={isVisible}

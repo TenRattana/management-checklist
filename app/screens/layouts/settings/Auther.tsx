@@ -8,7 +8,6 @@ import { Divider } from 'react-native-paper';
 
 const Auther = React.memo((user: any) => {
     const state = user.user
-
     const { theme } = useTheme();
     const { fontSize } = useRes();
 

@@ -1,22 +1,21 @@
 import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { useToast } from '@/app/contexts/useToast';
 import { useRes } from '@/app/contexts/useRes';
-import { LoadingSpinner, Searchbar } from "@/components";
-import { Card, Divider, Text } from "react-native-paper";
+import { LoadingSpinner, Searchbar, Text } from "@/components";
+import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { ExpectedResult } from "@/typing/type";
-import { ExpectedResultProps } from "@/typing/tag";
 import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
-import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { useSelector } from "react-redux";
 import { fetchApporved, fetchMachines, fetchSearchApporved, fetchSearchMachines, SaveApporved } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 import { navigate } from "@/app/navigations/navigationUtils";
 import { useFocusEffect } from "expo-router";
+import { ExpectedResult } from "@/typing/screens/ExpectedResult";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
-const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(() => {
+const ApprovedScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [debouncedSearchQueryFilter, setDebouncedSearchQueryFilter] = useState<string>("");
@@ -24,7 +23,7 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(() => {
 
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
-    const { spacing, fontSize } = useRes();
+    const { spacing, fontSize, responsive } = useRes();
     const { theme } = useTheme();
     const queryClient = useQueryClient();
     const [approved, setApproved] = useState<ExpectedResult[]>([])
@@ -256,6 +255,14 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(() => {
                 },
             }),
         },
+        containerSearch: {
+            paddingHorizontal: 20,
+            paddingVertical: 5,
+            flexDirection: responsive === "small" ? "column" : 'row',
+        },
+        contentSearch: {
+            flexDirection: responsive === "small" ? "column" : 'row',
+        },
     });
 
     return (
@@ -265,17 +272,14 @@ const ApprovedScreen: React.FC<ExpectedResultProps> = React.memo(() => {
             </View>
 
             <Card.Content style={styles.cardcontent}>
-                <View style={{ paddingHorizontal: 20, paddingVertical: 5, flexDirection: 'row', justifyContent: 'space-between' }}>
-
-                    <View style={{ alignContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                <View style={styles.containerSearch}>
+                    <View style={styles.contentSearch}>
                         <Searchbar
                             placeholder="Search Acknowledged..."
                             value={searchQuery}
                             onChange={setSearchQuery}
                             testId="search-ac"
                         />
-
-                        <Text style={[masterdataStyles.title, masterdataStyles.textBold]}>Acknowledged</Text>
                     </View>
                 </View>
 

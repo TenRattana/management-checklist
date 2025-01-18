@@ -4,16 +4,9 @@ import { Checkbox, IconButton } from 'react-native-paper';
 import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
 import useCustomtableStyles from '@/styles/customtable';
-import { ActionProps, HandelPrssProps } from "@/typing/tag";
-
-interface ActioncontentProps extends ActionProps {
-    handlePress: (props: HandelPrssProps) => void
-    selectedRows?: string[];
-    toggleSelect?: (value: string) => void;
-}
+import { ActioncontentProps } from '@/typing/screens/CustomTable';
 
 const Actioncontent = React.memo(({ data, action, row, rowIndex, Canedit, Candel, handlePress, selectedRows, toggleSelect }: ActioncontentProps) => {
-
     const { responsive, spacing } = useRes();
     const { theme } = useTheme();
     const customtable = useCustomtableStyles();

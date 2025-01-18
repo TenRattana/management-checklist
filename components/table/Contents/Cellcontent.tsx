@@ -5,11 +5,7 @@ import { IconButton } from 'react-native-paper';
 import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
-import { CellProps, HandelPrssProps } from "@/typing/tag";
-
-interface CellcontentProps extends CellProps {
-    handlePress: (props: HandelPrssProps) => void
-}
+import { CellcontentProps } from '@/typing/screens/CustomTable';
 
 const Cellcontent = React.memo(({ cell, cellIndex, row, rowIndex, Canedit, Candel, handlePress }: CellcontentProps) => {
     const { theme } = useTheme();

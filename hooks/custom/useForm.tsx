@@ -5,7 +5,9 @@ import { setFormData, reset, setGroupCheckListinForm } from "@/slices";
 import { useToast } from "@/app/contexts/useToast";
 import { useFocusEffect } from "@react-navigation/native";
 import { BaseFormState, FormData, SubForm } from "@/typing/form";
-import { CheckList, Checklist, CheckListType, DataType, GroupCheckListOption } from "@/typing/type";
+import { DataType } from "@/typing/type";
+import { GroupCheckListOption } from "@/typing/screens/GroupCheckList";
+import { CheckList, CheckListType, GroupCheckListType } from "@/typing/screens/CheckList";
 
 interface RouteParams {
     params?: {
@@ -16,8 +18,8 @@ interface RouteParams {
     };
 }
 interface FormDataState {
-    checkList: Checklist[];
-    checkListType: CheckListType[],
+    checkList: CheckList[];
+    checkListType: GroupCheckListType[],
     groupCheckListOption: GroupCheckListOption[];
     dataType: DataType[];
 }
@@ -28,7 +30,7 @@ const createSubFormsAndFields = async (
 ) => {
     const subForms: SubForm[] = [];
     const fields: BaseFormState[] = [];
-    const itemsCheckList: ({ label: string; value: string } & Checklist)[] = [];
+    const itemsCheckList: ({ label: string; value: string } & CheckList)[] = [];
     const itemsGroupCheckListOption: ({ label: string; value: string } & GroupCheckListOption)[] = [];
 
     formData.SubForm?.forEach((subFormItem) => {
@@ -96,14 +98,14 @@ const createSubFormsAndFields = async (
     if (DataInfo.length > 0) {
         try {
             const results = await Promise.all(DataInfo);
-            const newItems = results[0]?.data?.data?.map((item: Checklist) => ({
+            const newItems = results[0]?.data?.data?.map((item: CheckList) => ({
                 ...item,
                 label: item.CListName || 'Unknown',
                 value: item.CListID || '',
             })) || [];
 
             const existingValues = new Set(itemsCheckList.map(item => item.value));
-            const uniqueItems = newItems.filter((item: { label: string, value: string } & Checklist) => !existingValues.has(item.value));
+            const uniqueItems = newItems.filter((item: { label: string, value: string } & CheckList) => !existingValues.has(item.value));
             itemsCheckList.push(...uniqueItems);
 
             const newItemsM = results[1]?.data?.data?.map((item: GroupCheckListOption) => ({
@@ -202,7 +204,7 @@ const useForm = (route?: RouteParams) => {
                 const checkListType = data.checkListType
                     .filter(group => group.CheckList !== null)
                     .flatMap(group => group.CheckList)
-                    .filter((checkList): checkList is CheckList => checkList !== undefined);
+                    .filter((checkList): checkList is CheckListType => checkList !== undefined);
 
                 dispatch(
                     setFormData({

@@ -5,17 +5,7 @@ import { RadiosProps } from "@/typing/tag";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
 
-const Radios: React.FC<RadiosProps> = React.memo(({
-  option,
-  value,
-  handleChange,
-  hint,
-  label,
-  error,
-  errorMessage,
-  testId,
-  exp
-}) => {
+const Radios = React.memo(({ option, value, handleChange, hint, label, error, errorMessage, testId, exp }: RadiosProps) => {
   const masterdataStyles = useMasterdataStyles()
 
   if (!option || option.length === 0) {

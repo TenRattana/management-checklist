@@ -6,17 +6,17 @@ import { useToast } from "@/app/contexts/useToast";
 import { LoadingSpinner, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { TimeScheduleProps } from '@/typing/type';
 import { InfiniteData, useMutation, useQuery, useQueryClient } from 'react-query';
 import { useSelector } from "react-redux";
 import ScheduleDialog from "@/components/screens/Schedule_dialog";
 import { fetchSearchTimeSchedules, fetchTimeSchedules, saveTimeSchedule } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useFocusEffect } from "expo-router";
+import { TimeScheduleProps } from "@/typing/screens/TimeSchedule";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
-const TimescheduleScreen: React.FC = React.memo(() => {
+const TimescheduleScreen = React.memo(() => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -38,7 +38,7 @@ const TimescheduleScreen: React.FC = React.memo(() => {
     const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
     const { theme } = useTheme()
-    const { spacing, fontSize } = useRes();
+    const { spacing, fontSize, responsive } = useRes();
     const queryClient = useQueryClient();
     const [timeSchedule, setTimeSchedule] = useState<TimeScheduleProps[]>([])
 
@@ -213,6 +213,24 @@ const TimescheduleScreen: React.FC = React.memo(() => {
                 },
             }),
         },
+        containerSearch: {
+            paddingHorizontal: 20,
+            paddingVertical: 5,
+            flexDirection: responsive === "small" ? "column" : 'row',
+        },
+        contentSearch: {
+            flexDirection: responsive === "small" ? "column" : 'row',
+        },
+        containerTable: {
+            flex: 1,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            justifyContent: 'center',
+            alignItems: 'center'
+        }
     });
     const MemoScheduleDialog = React.memo(ScheduleDialog)
 
@@ -223,21 +241,19 @@ const TimescheduleScreen: React.FC = React.memo(() => {
             </View>
 
             <Card.Content style={styles.cardcontent}>
-                <View style={{ paddingHorizontal: 20, paddingVertical: 5, flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                        <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.TimeSchedule}`}</Text>
-                    </TouchableOpacity>
-
-                    <View style={{ alignContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                <View style={styles.containerSearch}>
+                    <View style={styles.contentSearch}>
                         <Searchbar
                             placeholder={`Search ${state.TimeSchedule}...`}
                             value={searchQuery}
                             onChange={setSearchQuery}
                             testId="search-schedule"
                         />
-
-                        <Text style={[masterdataStyles.title, masterdataStyles.textBold]}>{state.TimeSchedule}</Text>
                     </View>
+
+                    <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                        <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.TimeSchedule}`}</Text>
+                    </TouchableOpacity>
                 </View>
 
                 <Suspense fallback={<LoadingSpinner />}>

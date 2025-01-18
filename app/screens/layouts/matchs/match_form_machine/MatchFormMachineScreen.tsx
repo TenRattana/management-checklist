@@ -4,16 +4,15 @@ import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
 import { LoadingSpinner, Searchbar, Text } from "@/components";
-import { Card, Divider } from "react-native-paper";
+import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { MatchForm } from '@/typing/type'
-import { InitialValuesMatchFormMachine } from '@/typing/value'
 import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
 import { useSelector } from "react-redux";
 import { fetchMatchFormMchines, fetchSearchMatchFormMchine, SaveMatchFormMachine } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 import { navigate } from "@/app/navigations/navigationUtils";
 import { useFocusEffect } from "expo-router";
+import { InitialValuesMatchFormMachine, MatchForm } from "@/typing/screens/MatchFormMachine";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 const LazyMatch_form_machine_dialog = lazy(() => import("@/components/screens/Match_form_machine_dialog"));
@@ -31,7 +30,7 @@ const MatchFormMachineScreen = React.memo(() => {
     const masterdataStyles = useMasterdataStyles();
     const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
-    const { spacing, fontSize } = useRes();
+    const { spacing, fontSize, responsive } = useRes();
     const { theme } = useTheme();
     const queryClient = useQueryClient();
     const [matchForm, setMatchForm] = useState<MatchForm[]>([])
@@ -216,6 +215,24 @@ const MatchFormMachineScreen = React.memo(() => {
                 },
             }),
         },
+        containerSearch: {
+            paddingHorizontal: 20,
+            paddingVertical: 5,
+            flexDirection: responsive === "small" ? "column" : 'row',
+        },
+        contentSearch: {
+            flexDirection: responsive === "small" ? "column" : 'row',
+        },
+        containerTable: {
+            flex: 1,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            justifyContent: 'center',
+            alignItems: 'center'
+        }
     });
 
     return (
@@ -225,21 +242,19 @@ const MatchFormMachineScreen = React.memo(() => {
             </View>
 
             <Card.Content style={styles.cardcontent}>
-                <View style={{ paddingHorizontal: 20, paddingVertical: 5, flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                        <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.MatchFormMachine}`}</Text>
-                    </TouchableOpacity>
-
-                    <View style={{ alignContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                <View style={styles.containerSearch}>
+                    <View style={styles.contentSearch}>
                         <Searchbar
                             placeholder={`Search ${state.MatchFormMachine}...`}
                             value={searchQuery}
                             onChange={setSearchQuery}
                             testId="search-match-form-machine"
                         />
-
-                        <Text style={[masterdataStyles.title, masterdataStyles.textBold]}>{state.MatchFormMachine}</Text>
                     </View>
+
+                    <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                        <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.MatchFormMachine}`}</Text>
+                    </TouchableOpacity>
                 </View>
 
                 <Suspense fallback={<LoadingSpinner />}>
@@ -248,7 +263,7 @@ const MatchFormMachineScreen = React.memo(() => {
             </Card.Content>
 
             {isVisible && (
-                <View style={{ flex: 1, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' }}>
+                <View style={styles.containerTable}>
                     <Suspense fallback={<LoadingSpinner />}>
                         <LazyMatch_form_machine_dialog
                             isVisible={isVisible}

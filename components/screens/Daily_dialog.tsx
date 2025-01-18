@@ -5,9 +5,9 @@ import { Button, Menu, IconButton, HelperText } from 'react-native-paper';
 import Animated, { Easing, Extrapolate, FadeInRight, FadeOutRight, interpolate, SharedValue } from 'react-native-reanimated';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { styles } from './Schedule';
-import { FormikTouched } from 'formik';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Day } from '@/typing/type';
+import { DailyProps } from '@/typing/screens/TimeSchedule';
 
 const hours = Array.from({ length: 24 }, (_, i) =>
     i.toString().padStart(2, '0') + ':00'
@@ -15,20 +15,8 @@ const hours = Array.from({ length: 24 }, (_, i) =>
 
 const Hours = [1, 2, 3, 4, 6, 12]
 
-interface DailyProps {
-    values: Day[];
-    setFieldValue: (value: any) => void;
-    theme: any;
-    spacing: any;
-    responsive: any;
-    showError: (message: string | string[]) => void;
-    showSuccess: (message: string | string[]) => void;
-    touched: boolean | FormikTouched<{
-        start: string | null;
-        end: string | null;
-    }>[] | undefined;
-    errors?: any
-}
+FadeInRight.duration(300).easing(Easing.ease);
+FadeOutRight.duration(300).easing(Easing.ease);
 
 const Daily_dialog = React.memo(({ values, setFieldValue, spacing, showError, showSuccess, touched, errors }: DailyProps) => {
     const [showStartMenu, setShowStartMenu] = useState(-1);
@@ -36,8 +24,6 @@ const Daily_dialog = React.memo(({ values, setFieldValue, spacing, showError, sh
     const [showTimeIntervalMenu, setShowTimeIntervalMenu] = useState<{ custom: boolean, time: boolean, week: boolean }>({ custom: false, time: false, week: false });
     const masterdataStyles = useMasterdataStyles();
 
-    FadeInRight.duration(300).easing(Easing.ease);
-    FadeOutRight.duration(300).easing(Easing.ease);
 
     const handleSelectTime = React.useCallback((type: 'start' | 'end', index: number, value: string) => {
         setFieldValue(values.map((slot, i) => i === index ? { ...slot, [type]: value } : slot));
@@ -209,7 +195,7 @@ const Daily_dialog = React.memo(({ values, setFieldValue, spacing, showError, sh
                         <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
                             {`Detail ${index + 1}`}
                         </Text>
-                        
+
                         <View key={`container-${index}`} style={styles.containerTime}>
                             {renderTimeSelection('start', index, timeSlot, hours)}
 

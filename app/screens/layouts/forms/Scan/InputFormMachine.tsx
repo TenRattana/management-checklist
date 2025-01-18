@@ -17,16 +17,14 @@ import { Stack } from "expo-router";
 import { navigate } from "@/app/navigations/navigationUtils";
 import Formfield from "./Formfield";
 import { useRes } from "@/app/contexts/useRes";
-interface FormValues {
-  [key: string]: any;
-}
+import { FormValues } from "@/typing/screens/CreateForm";
 
 const isValidDateFormatCustom = (value: string) => {
   const dateRegex = /^(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2})$/;
   return dateRegex.test(value);
 };
 
-const InputFormMachine: React.FC<PreviewProps<ScanParams>> = React.memo((props) => {
+const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
   const { route } = props;
   const { dataType, found, isLoadingForm } = useForm(route);
 

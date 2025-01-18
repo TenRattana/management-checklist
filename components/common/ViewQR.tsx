@@ -1,24 +1,14 @@
-import { StyleSheet, Text, Platform } from "react-native";
+import { Text, Platform } from "react-native";
 import React, { useState, useEffect, useCallback } from "react";
 import * as Print from "expo-print";
 import QRCode from "react-native-qrcode-svg";
 import { useTheme } from "@/app/contexts/useTheme";
-import { useRes } from "@/app/contexts/useRes";
 import { Dialog, IconButton, Portal } from "react-native-paper";
 import { spacing } from "@/constants/Spacing";
 import useMasterdataStyles from "@/styles/common/masterdata";
+import { ViewQRProps } from "@/typing/tag";
 
-const ViewQR = ({
-    value,
-    open,
-    setOpen,
-    display,
-}: {
-    value: string;
-    open: boolean;
-    setOpen: (v: boolean) => void;
-    display: string;
-}) => {
+const ViewQR = ({ value, open, setOpen, display }: ViewQRProps) => {
     const masterdataStyles = useMasterdataStyles();
     const { theme } = useTheme();
     const [base64Code, setBase64Code] = useState<string>("");
@@ -26,7 +16,6 @@ const ViewQR = ({
 
     const handlePrint = useCallback(async () => {
         if (!base64Code) {
-            console.log("QR Code data is still loading...");
             return;
         }
 
@@ -69,7 +58,7 @@ const ViewQR = ({
         `;
 
         if (Platform.OS === "web") {
-            const printWindow = window.open("", "", "width=1980,height=1090");
+            const printWindow: any = window.open("", "", "width=1980,height=1090");
             printWindow.document.write(printHtmlContent);
             printWindow.document.close();
             printWindow.print();

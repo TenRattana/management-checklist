@@ -5,12 +5,12 @@ import { Portal, Switch, Dialog, Icon } from "react-native-paper";
 import { Field, Formik } from "formik";
 import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { GroupMachineDialogProps, InitialValuesGroupMachine } from '@/typing/value'
 import Text from "@/components/Text";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
 import HeaderDialog from "./HeaderDialog";
 import { useSelector } from "react-redux";
+import { GroupMachineDialogProps, InitialValuesGroupMachine } from "@/typing/screens/GroupMachine";
 
 const validationSchema = Yup.object().shape({
     machineGroupName: Yup.string().required("The group machine name field is required."),

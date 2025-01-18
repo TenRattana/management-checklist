@@ -1,7 +1,7 @@
-import { TimeLine, TimelineItem, TimeScheduleProps } from './timeline';
 import moment from 'moment-timezone';
 import { CustomLightTheme } from '@/constants/CustomColor';
 import { getCurrentTime } from '@/config/timezoneUtils';
+import { TimeLine, TimeScemaScheduleProps } from '@/typing/screens/TimeSchedule';
 
 type ScheduleType = 'Daily' | 'Weekly' | 'Custom';
 export type MarkedDates = Record<string, { dots: DOT[] }>;
@@ -12,7 +12,7 @@ type DOT = {
     type?: ScheduleType;
 };
 
-export const convertSchedule = (schedule: TimeScheduleProps[]): { timeline: TimeLine[]; markedDates: MarkedDates } => {
+export const convertSchedule = (schedule: TimeScemaScheduleProps[]): { timeline: TimeLine[]; markedDates: MarkedDates } => {
     const today = moment();
     const startOfYear = today.clone().startOf('week');
     const endOfYear = today.clone().endOf('week');

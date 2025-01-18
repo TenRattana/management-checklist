@@ -10,18 +10,7 @@ import { getCurrentTime } from '@/config/timezoneUtils';
 import DatePicker from 'react-datepicker';
 import "@/styles/Datapicker.css"
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-
-interface Custom_scheduleProps {
-    theme: any;
-    spacing: any;
-    responsive: any;
-    showError: (message: string | string[]) => void;
-    showSuccess: (message: string | string[]) => void;
-    setFieldValue: (value: any) => void;
-    values: { start: string | null, end: string | null }[];
-    touched: boolean | undefined;
-    errors?: any
-}
+import { Custom_scheduleProps } from '@/typing/screens/TimeSchedule';
 
 const Custom_schedule_dialog = React.memo(({ showError, showSuccess, spacing, setFieldValue, values, theme, touched, errors }: Custom_scheduleProps) => {
     const masterdataStyles = useMasterdataStyles();

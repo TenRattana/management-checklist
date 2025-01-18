@@ -8,15 +8,9 @@ import { useTheme } from '@/app/contexts/useTheme';
 import { Inputs } from '../common';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import Text from '../Text';
+import { RennderFormikPorps } from '@/typing/screens/Setting';
 
-interface RennderFormikPorps {
-    field: string;
-    state: any;
-    handleSubmit: (field: string, values: { [x: number]: any }) => void;
-    onEdit: (v: boolean) => void;
-}
-
-const RenderFormik: React.FC<RennderFormikPorps> = React.memo(({ field, state, handleSubmit, onEdit }) => {
+const RenderFormik = React.memo(({ field, state, handleSubmit, onEdit }: RennderFormikPorps) => {
     const { spacing } = useRes();
     const { theme } = useTheme();
     const masterdataStyles = useMasterdataStyles();

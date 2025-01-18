@@ -11,16 +11,11 @@ import { useQuery } from 'react-query';
 import { fetchTimeSchedules } from '@/app/services';
 import { convertSchedule, MarkedDates } from '@/app/mocks/convertSchedule';
 import { Calendar } from 'react-native-calendars';
-import { TimeLine } from '@/app/mocks/timeline';
 import Animated, { SlideInLeft, SlideOutLeft } from 'react-native-reanimated';
 import { Text } from '@/components';
 import { Theme } from 'react-native-calendars/src/types';
-
-type Category = {
-  id: string;
-  title: string;
-  color: string;
-};
+import { Category, RanderCategory } from '@/typing/screens/HomeScreen';
+import { TimeLine } from '@/typing/screens/TimeSchedule';
 
 const categories: Category[] = [
   { id: '1', title: 'Schedule Daily', color: '#27ae60' },
@@ -31,7 +26,7 @@ const categories: Category[] = [
 const LazyCalendarProvider = lazy(() => import('react-native-calendars').then(module => ({ default: module.CalendarProvider })));
 const LazyTimelines = lazy(() => import('@/components/screens/TimeLines'));
 
-const RenderCategoryItem = React.memo(({ item, toggleCheckbox, checkedItems }: { item: Category; toggleCheckbox: any, checkedItems: Record<string, boolean> }) => {
+const RenderCategoryItem = React.memo(({ item, toggleCheckbox, checkedItems }: RanderCategory) => {
   const masterdataStyles = useMasterdataStyles();
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
@@ -77,7 +72,7 @@ const HomeScreen = React.memo(() => {
 
   const { data: timeSchedule = [], isLoading } = useQuery('timeSchedule', fetchTimeSchedules, {
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    refetchOnMount: true,
   });
 
   const [timelineItems, setTimelineItems] = useState<MarkedDates>({});
@@ -213,7 +208,7 @@ const HomeScreen = React.memo(() => {
                           {responsive === "small" && (
                             <TouchableOpacity onPress={toggleSwitch} style={{ flexDirection: "row", alignItems: "center", marginVertical: 10 }} >
                               <Icon source={showCalendar ? "chevron-left" : "chevron-right"} size={24} color={theme.colors.primary} />
-                              <Text style={masterdataStyles.text}>  {showCalendar ? "Hide Calendar" : "Show Calendar"}  </Text>
+                              <Text style={masterdataStyles.text}>{showCalendar ? "Hide Calendar" : "Show Calendar"}</Text>
                             </TouchableOpacity>
                           )}
                           <Text style={[masterdataStyles.text, masterdataStyles.textBold, styles.textCalender]}>
@@ -265,23 +260,17 @@ const HomeScreen = React.memo(() => {
                     {showCalendar ? "Hide Calendar" : "Show Calendar"}
                   </Text>
                 </TouchableOpacity>
-              ) : (
-                responsive === "small" &&
-                !showCalendar && (
-                  <TouchableOpacity
-                    onPress={toggleSwitch}
-                    style={{ flexDirection: "row", alignItems: "center" }}
-                  >
-                    <Icon
-                      source={showCalendar ? "chevron-left" : "chevron-right"}
-                      size={24}
-                      color={theme.colors.primary}
-                    />
-                    <Text style={masterdataStyles.text}>
-                      {showCalendar ? "Hide Calendar" : "Show Calendar"}
-                    </Text>
-                  </TouchableOpacity>
-                )
+              ) : responsive === "small" && !showCalendar && (
+                <TouchableOpacity onPress={toggleSwitch} style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Icon
+                    source={showCalendar ? "chevron-left" : "chevron-right"}
+                    size={24}
+                    color={theme.colors.primary}
+                  />
+                  <Text style={masterdataStyles.text}>
+                    {showCalendar ? "Hide Calendar" : "Show Calendar"}
+                  </Text>
+                </TouchableOpacity>
               )}
 
               <View style={styles.filterContainer}>

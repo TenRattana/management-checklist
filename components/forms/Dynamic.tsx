@@ -9,18 +9,7 @@ import { Text } from "react-native-paper";
 import useField from "@/hooks/FieldDialog";
 import Time from "../common/Time";
 
-const DynamicForm = React.memo(({
-  field,
-  values,
-  handleChange,
-  handleBlur,
-  error,
-  errorMessages,
-  type,
-  exp,
-  showField,
-  number
-}: DynamicFormProps) => {
+const DynamicForm = React.memo(({ field, values, handleChange, handleBlur, error, errorMessages, type, exp, showField, number }: DynamicFormProps) => {
   const { CTypeName, CListName, MCListID, GCLOptionID, Required, Important, ImportantList, SFormID } = field;
   const masterdataStyles = useMasterdataStyles();
   const { theme } = useTheme();
@@ -74,7 +63,7 @@ const DynamicForm = React.memo(({
             value={values}
             handleChange={(v) => handleChange(MCListID, v)}
             handleBlur={handleBlur}
-            testId={`input-${MCListID}`}
+            testId={`input-${CListName}`}
             textColor={textColor}
             exp={exp}
           />
@@ -83,12 +72,8 @@ const DynamicForm = React.memo(({
         return (
           <Time
             hint={error ? errorMessages?.[MCListID] as string : ""}
-            label={CListName}
             value={values}
             handleChange={(v: any) => handleChange(MCListID, v)}
-            handleBlur={handleBlur}
-            testId={`time-${MCListID}`}
-            exp={exp}
           />
         );
       case "Textarea":
@@ -100,7 +85,7 @@ const DynamicForm = React.memo(({
             value={values}
             handleChange={(v) => handleChange(MCListID, v)}
             handleBlur={handleBlur}
-            testId={`inputarea-${MCListID}`}
+            testId={`inputarea-${CListName}`}
             textColor={textColor}
             exp={exp}
           />
@@ -113,7 +98,7 @@ const DynamicForm = React.memo(({
             handleChange={(v) => handleChange(MCListID, v)}
             handleBlur={handleBlur}
             value={values}
-            testId={`radio-${MCListID}`}
+            testId={`radio-${CListName}`}
             exp={exp}
           />
         );
@@ -125,7 +110,7 @@ const DynamicForm = React.memo(({
             handleChange={(v) => handleChange(MCListID, v)}
             handleBlur={handleBlur}
             value={values}
-            testId={`dropdown-${MCListID}`}
+            testId={`dropdown-${CListName}`}
             exp={exp}
           />
         );
@@ -142,7 +127,7 @@ const DynamicForm = React.memo(({
             }}
             handleBlur={handleBlur}
             value={values}
-            testId={`checkbox-${MCListID}`}
+            testId={`checkbox-${CListName}`}
             exp={exp}
           />
         );

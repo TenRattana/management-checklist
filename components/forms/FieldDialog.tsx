@@ -13,9 +13,11 @@ import { styles } from "../screens/Schedule";
 import useField from "@/hooks/FieldDialog";
 import { useMutation, useQueryClient } from "react-query";
 import { saveCheckList, saveCheckListOption, saveGroupCheckListOption } from "@/app/services";
-import { InitialValuesChecklist, InitialValuesCheckListOption, InitialValuesGroupCheckList } from "@/typing/value";
 import { useSelector } from "react-redux";
 import { Dropdown, Inputs, LoadingSpinner } from "../common";
+import { InitialValuesChecklist } from "@/typing/screens/CheckList";
+import { InitialValuesGroupCheckList } from "@/typing/screens/GroupCheckList";
+import { InitialValuesCheckListOption } from "@/typing/screens/CheckListOption";
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 

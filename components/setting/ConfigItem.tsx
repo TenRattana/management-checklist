@@ -7,15 +7,7 @@ import RenderFormik from './RenderFormik';
 import AccessibleView from '../AccessibleView';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { LoadingSpinner } from '../common';
-
-interface ConfigItemProps {
-    label: string;
-    value: string;
-    editable: boolean;
-    onEdit: (v: boolean) => void;
-    state: any;
-    handleSubmit: (field: string, values: { [x: number]: any }) => void;
-}
+import { ConfigItemProps } from '@/typing/screens/Setting';
 
 const MemoRenderFormik = React.memo(RenderFormik, (prevProps, nextProps) => {
     return (
@@ -24,7 +16,7 @@ const MemoRenderFormik = React.memo(RenderFormik, (prevProps, nextProps) => {
     );
 });
 
-const ConfigItem: React.FC<ConfigItemProps> = React.memo(({ label, value, editable, onEdit, state, handleSubmit }) => {
+const ConfigItem = React.memo(({ label, value, editable, onEdit, state, handleSubmit }: ConfigItemProps) => {
     const { theme } = useTheme();
     const { spacing, fontSize } = useRes();
     const masterdataStyles = useMasterdataStyles();

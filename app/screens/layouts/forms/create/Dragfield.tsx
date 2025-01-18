@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { useState, useCallback } from "react";
+import { TouchableOpacity, View } from "react-native";
 import {
     deleteField,
     setDragField
@@ -8,26 +8,15 @@ import FieldDialog from "@/components/forms/FieldDialog";
 import { Icon, IconButton } from "react-native-paper";
 import { NestableDraggableFlatList, NestableScrollContainer, RenderItemParams, ScaleDecorator, ShadowDecorator } from "react-native-draggable-flatlist";
 import useCreateformStyle from "@/styles/createform";
-import { BaseFormState, BaseSubForm } from '@/typing/form'
-import { DragfieldProps } from "@/typing/tag";
+import { BaseFormState } from '@/typing/form'
 import { useTheme } from "@/app/contexts/useTheme";
 import Text from '@/components/Text'
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { CheckList } from "@/typing/type";
 import { useRes } from "@/app/contexts/useRes";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/stores";
-
-interface RowItemProps<V extends BaseFormState | BaseSubForm> {
-    item: V;
-    drag: () => void;
-    getIndex: () => number | undefined;
-    isActive: boolean;
-    setIsEditing: any;
-    setDialogVisible: any
-    handleField: any
-    checkListType: any[]
-}
+import { CheckListType } from "@/typing/screens/CheckList";
+import { DragfieldProps, RowItemProps } from "@/typing/screens/CreateForm";
 
 const RowItem = React.memo(({ item, drag, isActive, setIsEditing, setDialogVisible, handleField, checkListType }: RowItemProps<BaseFormState>) => {
     const { theme } = useTheme()
@@ -58,7 +47,7 @@ const RowItem = React.memo(({ item, drag, isActive, setIsEditing, setDialogVisib
                     testID={`dg-FD-${item.SFormID}`}
                 >
                     <IconButton
-                        icon={checkListType.find((v: CheckList) => v.CTypeID === item.CTypeID)?.Icon ?? "camera"}
+                        icon={checkListType.find((v: CheckListType) => v.CTypeID === item.CTypeID)?.Icon ?? "camera"}
                         style={createformStyles.icon}
                         iconColor={theme.colors.onBackground}
                         size={spacing.large}
@@ -77,7 +66,7 @@ const RowItem = React.memo(({ item, drag, isActive, setIsEditing, setDialogVisib
     );
 });
 
-const Dragfield: React.FC<DragfieldProps> = React.memo(({ data, SFormID, checkLists }) => {
+const Dragfield = React.memo(({ data, SFormID, checkLists }: DragfieldProps) => {
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const [currentField, setCurrentField] = useState<BaseFormState>({
         MCListID: "", CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: SFormID,

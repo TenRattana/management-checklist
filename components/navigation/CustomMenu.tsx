@@ -1,26 +1,13 @@
 import React from "react";
 import { View, StyleSheet, Dimensions, TouchableOpacity } from "react-native";
-import { Menu, Divider, IconButton, Avatar } from "react-native-paper";
+import { Menu, Divider, Avatar } from "react-native-paper";
 import { useRes } from '@/app/contexts/useRes'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useSelector } from "react-redux";
+import { CustomMenuProps } from "@/typing/Navigate";
 
-interface CustomMenuProps {
-    visible: boolean;
-    onDismiss: () => void;
-    onSettingsPress: () => void;
-    onLogoutPress: () => void;
-    onShow: () => void;
-}
-
-const CustomMenu: React.FC<CustomMenuProps> = React.memo(({
-    visible,
-    onDismiss,
-    onSettingsPress,
-    onLogoutPress,
-    onShow,
-}) => {
+const CustomMenu = React.memo(({ visible, onDismiss, onSettingsPress, onLogoutPress, onShow, }: CustomMenuProps) => {
     const { theme } = useTheme();
     const { spacing } = useRes()
     const { width } = Dimensions.get('window');

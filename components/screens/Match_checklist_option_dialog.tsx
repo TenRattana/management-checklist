@@ -1,11 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Formik } from "formik";
 import * as Yup from 'yup';
-import { Portal, Switch, Dialog, HelperText, Icon, IconButton } from "react-native-paper";
+import { Portal, Switch, Dialog, HelperText, Icon } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { CheckListOption, GroupCheckListOption } from '@/typing/type';
-import { InitialValuesMatchCheckListOption, MatchChecklistOptionProps } from '@/typing/value';
 import Text from "@/components/Text";
 import { useTheme } from "@/app/contexts/useTheme";
 import { fetchCheckListOption, fetchGroupCheckListOption, fetchSearchCheckListOption, fetchSearchGroupCheckListOption } from "@/app/services";
@@ -14,6 +12,8 @@ import { Dropdown, DropdownMulti } from "../common";
 import { useRes } from "@/app/contexts/useRes";
 import HeaderDialog from "./HeaderDialog";
 import { useSelector } from "react-redux";
+import { CheckListOption } from "@/typing/screens/CheckListOption";
+import { InitialValuesMatchCheckListOption, MatchChecklistOptionProps } from "@/typing/screens/MatchCheckListOption";
 
 const validationSchema = Yup.object().shape({
     groupCheckListOptionId: Yup.string().required("This group check list field is required"),
@@ -21,13 +21,7 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The active field is required."),
 });
 
-const Match_checklist_option = React.memo(({
-    isVisible,
-    setIsVisible,
-    isEditing,
-    initialValues,
-    saveData,
-}: MatchChecklistOptionProps<InitialValuesMatchCheckListOption>) => {
+const Match_checklist_option = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData }: MatchChecklistOptionProps<InitialValuesMatchCheckListOption>) => {
     const masterdataStyles = useMasterdataStyles();
     const { theme } = useTheme();
     const { spacing } = useRes()

@@ -3,16 +3,15 @@ import { TouchableOpacity, StyleSheet, View, Platform } from "react-native";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
 import { LoadingSpinner, Searchbar, Text } from "@/components";
-import { Card, Divider } from "react-native-paper";
+import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { GroupMachine } from '@/typing/type';
-import { InitialValuesGroupMachine } from '@/typing/value';
 import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
 import { fetchMachineGroups, fetchSearchMachineGroups, saveGroupMachine } from "@/app/services";
 import axiosInstance from "@/config/axios";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useFocusEffect } from "expo-router";
+import { GroupMachine, InitialValuesGroupMachine } from "@/typing/screens/GroupMachine";
 
 const LazyMachine_group_dialog = lazy(() => import("@/components/screens/Machine_group_dialog"));
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
@@ -32,7 +31,7 @@ const MachineGroupScreen = React.memo(() => {
     const masterdataStyles = useMasterdataStyles();
     const state = useSelector((state: any) => state.prefix);
     const { showSuccess, handleError } = useToast();
-    const { spacing, fontSize } = useRes();
+    const { spacing, fontSize, responsive } = useRes();
     const { theme } = useTheme();
     const queryClient = useQueryClient();
     const [machineGroup, setMachineGroup] = useState<GroupMachine[]>([]);
@@ -206,6 +205,24 @@ const MachineGroupScreen = React.memo(() => {
                 },
             }),
         },
+        containerSearch: {
+            paddingHorizontal: 20,
+            paddingVertical: 5,
+            flexDirection: responsive === "small" ? "column" : 'row',
+        },
+        contentSearch: {
+            flexDirection: responsive === "small" ? "column" : 'row',
+        },
+        containerTable: {
+            flex: 1,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            justifyContent: 'center',
+            alignItems: 'center'
+        }
     });
 
     return (
@@ -215,21 +232,19 @@ const MachineGroupScreen = React.memo(() => {
             </View>
 
             <Card.Content style={styles.cardcontent}>
-                <View style={{ paddingHorizontal: 20, paddingVertical: 5, flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                        <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.GroupMachine}`}</Text>
-                    </TouchableOpacity>
-
-                    <View style={{ alignContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                <View style={styles.containerSearch}>
+                    <View style={styles.contentSearch}>
                         <Searchbar
                             placeholder={`Search ${state.GroupMachine}...`}
                             value={searchQuery}
                             onChange={setSearchQuery}
                             testId="search-machine-group"
                         />
-
-                        <Text style={[masterdataStyles.title, masterdataStyles.textBold]}>{state.GroupMachine}</Text>
                     </View>
+
+                    <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                        <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.GroupMachine}`}</Text>
+                    </TouchableOpacity>
                 </View>
 
                 <Suspense fallback={<LoadingSpinner />}>
@@ -238,7 +253,7 @@ const MachineGroupScreen = React.memo(() => {
             </Card.Content>
 
             {isVisible && (
-                <View style={{ flex: 1, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' }}>
+                <View style={styles.containerTable}>
                     <Suspense fallback={<LoadingSpinner />}>
                         <LazyMachine_group_dialog
                             isVisible={isVisible}

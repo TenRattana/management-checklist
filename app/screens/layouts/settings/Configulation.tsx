@@ -3,17 +3,10 @@ import { StyleSheet } from 'react-native';
 import { AccessibleView, ConfigItem, Text } from '@/components';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { Divider } from 'react-native-paper';
+import { ConfigurationProps } from '@/typing/screens/Setting';
 
-interface ConfigurationProps {
-    prefix: any;
-    handleSubmit: (field: string, values: { [key: string]: any }) => void;
-    edit: { [key: string]: boolean };
-    handelEdit: (field: string, value: boolean) => void;
-}
-
-const Configuration: React.FC<ConfigurationProps> = React.memo(({ prefix, handleSubmit, edit, handelEdit }) => {
+const Configuration = React.memo(({ prefix, handleSubmit, edit, handelEdit }: ConfigurationProps) => {
     const state = prefix;
-
     const masterdataStyles = useMasterdataStyles();
 
     const styles = StyleSheet.create({

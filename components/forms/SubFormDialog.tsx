@@ -18,14 +18,7 @@ const validationSchemaSubForm = Yup.object().shape({
     Number: Yup.boolean().typeError('The number field must be a true or false').required("The number field is required.")
 });
 
-const SubFormDialog = React.memo(({
-    isVisible,
-    setIsVisible,
-    isEditing,
-    initialValues,
-    saveData,
-    onDelete,
-}: SubFormDialogProps<BaseSubForm>) => {
+const SubFormDialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData, onDelete, }: SubFormDialogProps<BaseSubForm>) => {
     const masterdataStyles = useMasterdataStyles();
     const { responsive, spacing } = useRes()
     const { theme } = useTheme();

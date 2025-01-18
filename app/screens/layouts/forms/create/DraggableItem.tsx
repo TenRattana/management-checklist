@@ -7,12 +7,10 @@ import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
 import useCreateformStyle from "@/styles/createform";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { CheckList } from "@/typing/type";
+import { CheckListType } from "@/typing/screens/CheckList";
+import { DragItem } from "@/typing/screens/CreateForm";
 
-const DraggableItem: React.FC<{
-    item: CheckList;
-    onDrop: (item: CheckList, absoluteX: number, absoluteY: number) => void;
-}> = React.memo(({ item, onDrop }) => {
+const DraggableItem = React.memo(({ item, onDrop }: DragItem) => {
     const itemTranslateX = useSharedValue(0);
     const itemTranslateY = useSharedValue(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -100,7 +98,7 @@ const DraggableItem: React.FC<{
     );
 });
 
-const FieldForm: React.FC<{ data: CheckList[], onDrop: (item: CheckList, absoluteX: number, absoluteY: number) => void; }> = ({ data, onDrop }) => {
+const FieldForm: React.FC<{ data: CheckListType[], onDrop: (item: CheckListType, absoluteX: number, absoluteY: number) => void; }> = ({ data, onDrop }) => {
     const styles = StyleSheet.create({
         container: {
             flexDirection: 'row',
@@ -110,7 +108,7 @@ const FieldForm: React.FC<{ data: CheckList[], onDrop: (item: CheckList, absolut
 
     return (
         <View style={styles.container}>
-            {data?.map((item: CheckList, index: number) => (
+            {data?.map((item: CheckListType, index: number) => (
                 item && item.IsActive && (
                     <View style={{ width: '50%' }} key={index}>
                         <DraggableItem item={item} onDrop={onDrop} />

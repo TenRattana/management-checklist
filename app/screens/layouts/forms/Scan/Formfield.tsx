@@ -1,20 +1,12 @@
 import { View, ViewStyle } from 'react-native';
 import React, { useCallback, useMemo } from 'react';
-import { BaseFormState, BaseSubForm } from '@/typing/form';
+import { BaseFormState } from '@/typing/form';
 import { useRes } from '@/app/contexts/useRes';
-import { DataType } from '@/typing/type';
-import { FieldProps, FormikErrors, FormikTouched, FastField } from 'formik';
+import { FieldProps, FastField } from 'formik';
 import { Dynamic } from '@/components';
+import { FiledScan } from '@/typing/screens/Scan';
 
-interface FormValues {
-    [key: string]: any;
-}
-
-const Formfield = React.memo(({ item, field, dataType, setFieldValue, setTouched, touched, values, errors }:
-    {
-        item: BaseSubForm, field: BaseFormState[], dataType: DataType[], setFieldValue: (field: string, value: any, shouldValidate?: boolean) => Promise<void | FormikErrors<FormValues>>, setTouched: (touched: FormikTouched<FormValues>, shouldValidate?: boolean) => Promise<void | FormikErrors<FormValues>>,
-        touched: FormikTouched<FormValues>, values: FormValues, errors: FormikErrors<FormValues>
-    }) => {
+const Formfield = React.memo(({ item, field, dataType, setFieldValue, setTouched, touched, values, errors }: FiledScan) => {
     const { responsive } = useRes();
 
     const getType = useMemo(() => (field: BaseFormState) => {
