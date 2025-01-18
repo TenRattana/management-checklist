@@ -126,11 +126,11 @@ const createSubFormsAndFields = async (
     const ep = {
         UserID: expectedResult.UserID,
         UserName: expectedResult.UserName,
-        ApporvedID: expectedResult.ApporvedID,
-        ApporvedName: expectedResult.ApporvedName,
+        ApprovedID: expectedResult.ApprovedID,
+        ApprovedName: expectedResult.ApprovedName,
         Status: expectedResult.Status,
         CreateDate: expectedResult.CreateDate,
-        ApporvedTime: expectedResult.ApporvedTime
+        ApprovedTime: expectedResult.ApprovedTime
     }
 
     return { subForms, fields, itemsCheckList, itemsGroupCheckListOption, ep };

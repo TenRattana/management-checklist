@@ -231,10 +231,10 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
                                     <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>Submit Time : </Text>
                                     <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{convertToThaiDateTime(state?.CreateDate) || "Time Submit"}</Text>
                                 </View>
-                                {state.ApporvedTime && (
+                                {state.ApprovedTime && (
                                     <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                                        <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>Apporved Time : </Text>
-                                        <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{convertToThaiDateTime(state?.ApporvedTime) || "Time Submit"}</Text>
+                                        <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>Approved Time : </Text>
+                                        <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{convertToThaiDateTime(state?.ApprovedTime) || "Time Submit"}</Text>
                                     </View>
                                 )}
                             </View>
@@ -249,11 +249,11 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
                             <Text style={[masterdataStyles.title, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state?.UserName || "User Submit"}</Text>
                         </View>
 
-                        {state?.ApporvedName && (
+                        {state?.ApprovedName && (
                             <View>
                                 <Text style={[masterdataStyles.description, { color: theme.colors.onBackground }]}>Acknowledged</Text>
                                 <Divider />
-                                <Text style={[masterdataStyles.title, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state?.ApporvedName || "User Apporved"}</Text>
+                                <Text style={[masterdataStyles.title, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state?.ApprovedName || "User Approved"}</Text>
                             </View>
                         )}
                     </View>

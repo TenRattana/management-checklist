@@ -144,9 +144,9 @@ const ExpectedResultScreen = React.memo(() => {
             item.MachineName,
             item.FormName,
             item.UserName || "-",
-            item.ApporvedName || "-",
+            item.ApprovedName || "-",
             convertToThaiDateTime(item.CreateDate),
-            item.ApporvedTime ? convertToThaiDateTime(item.ApporvedTime) : "-",
+            item.ApprovedTime ? convertToThaiDateTime(item.ApprovedTime) : "-",
             item.TableID,
         ]);
     }, [expectedResult, debouncedSearchQuery]);
@@ -159,7 +159,7 @@ const ExpectedResultScreen = React.memo(() => {
             { label: "User", align: "flex-start" },
             { label: "Acknowledged", align: "flex-start" },
             { label: "Time Submit", align: "flex-start" },
-            { label: "Time Apporved", align: "flex-start" },
+            { label: "Time Approved", align: "flex-start" },
             { label: "Preview", align: "center" },
         ],
         flexArr: [2, 3, 2, 2, 2, 2, 1],

@@ -119,7 +119,7 @@ export type ComponentNames =
   | "Preview"
   | "Create_form"
   | "Home"
-  | "Apporved"
+  | "Approved"
   | "Machine_group"
   | "Machine"
   | "Checklist"
@@ -141,7 +141,7 @@ export type ComponentNames =
 export type ComponentNameNoLazy =
   | "Create_form"
   | "Home"
-  | "Apporved"
+  | "Approved"
   | "Machine_group"
   | "Machine"
   | "Checklist"

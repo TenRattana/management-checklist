@@ -409,13 +409,13 @@ export const fetchSearchExpectedResult = async (
     }
 }
 
-// Apporved
-export const fetchApporved = async (
+// Approved
+export const fetchApproved = async (
     currentPage: number,
     pageSize: number,
 ): Promise<ExpectedResult[]> => {
     try {
-        const response = await axiosInstance.post("ExpectedResult_service.asmx/GetApporveds", {
+        const response = await axiosInstance.post("ExpectedResult_service.asmx/GetApproveds", {
             page: currentPage,
             pageSize: pageSize,
         });
@@ -426,11 +426,11 @@ export const fetchApporved = async (
     }
 };
 
-export const fetchSearchApporved = async (
+export const fetchSearchApproved = async (
     debouncedSearchQuery: string
 ): Promise<ExpectedResult[]> => {
     try {
-        const response = await axiosInstance.post("ExpectedResult_service.asmx/SearchApporveds", {
+        const response = await axiosInstance.post("ExpectedResult_service.asmx/SearchApproveds", {
             Messages: debouncedSearchQuery
         });
         return response.data.data ?? [];
@@ -440,14 +440,14 @@ export const fetchSearchApporved = async (
     }
 }
 
-export const SaveApporved = async (data: {
+export const SaveApproved = async (data: {
     TableID: string[], UserData: {
         UserID: any;
         UserName: any;
         GUserID: any;
     }
 }): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("ExpectedResult_service.asmx/SaveApporved", { TableID: JSON.stringify(data.TableID), UserInfo: JSON.stringify(data.UserData) });
+    const response = await axiosInstance.post("ExpectedResult_service.asmx/SaveApproved", { TableID: JSON.stringify(data.TableID), UserInfo: JSON.stringify(data.UserData) });
     return response.data;
 };
 

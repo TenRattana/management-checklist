@@ -44,7 +44,7 @@ const RenderItemSmallHead = React.memo(({ selectedRows, handleDialog, showFilter
                 {selectedRows && selectedRows.length > 0 && (
                     <>
                         <TouchableOpacity
-                            onPress={() => handleDialog("Apporved",)}
+                            onPress={() => handleDialog("Approved",)}
                             style={[
                                 masterdataStyles.backMain,
                                 masterdataStyles.buttonCreate,

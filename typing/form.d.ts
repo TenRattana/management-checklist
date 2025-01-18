@@ -8,8 +8,8 @@ export interface BaseForm {
   MachineName?: string;
   UserID?: string;
   UserName?: string;
-  ApporvedID?: string;
-  ApporvedName?: string;
+  ApprovedID?: string;
+  ApprovedName?: string;
   Status?: boolean;
 }
 

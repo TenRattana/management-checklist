@@ -5,12 +5,12 @@ export interface ExpectedResult {
   MachineName: string;
   UserID: string;
   UserName ?: string;
-  ApporvedID: string;
-  ApporvedName?: string;
+  ApprovedID: string;
+  ApprovedName?: string;
   FormID: string;
   FormName: string;
   CreateDate: string;
-  ApporvedTime?:string;
+  ApprovedTime?:string;
 }
 
 export interface ExpectedResultProps {

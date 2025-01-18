@@ -82,11 +82,11 @@ const subFormSlice = createSlice({
         })),
         UserID: fetchedExpectedResult?.UserID,
         UserName: fetchedExpectedResult?.UserName,
-        ApporvedID: fetchedExpectedResult?.ApporvedID,
-        ApporvedName: fetchedExpectedResult?.ApporvedName,
+        ApprovedID: fetchedExpectedResult?.ApprovedID,
+        ApprovedName: fetchedExpectedResult?.ApprovedName,
         Status: fetchedExpectedResult?.Status,
         CreateDate: fetchedExpectedResult?.CreateDate,
-        ApporvedTime: fetchedExpectedResult?.ApporvedTime
+        ApprovedTime: fetchedExpectedResult?.ApprovedTime
       };
 
       const checkListMap = new Map(checkList?.map(item => [item.CListID, item.CListName]));

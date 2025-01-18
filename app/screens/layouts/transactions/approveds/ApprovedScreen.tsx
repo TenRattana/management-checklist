@@ -7,7 +7,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 import { Platform, StyleSheet, View } from "react-native";
 import { useSelector } from "react-redux";
-import { fetchApporved, fetchMachines, fetchSearchApporved, fetchSearchMachines, SaveApporved } from "@/app/services";
+import { fetchApproved, fetchMachines, fetchSearchApproved, fetchSearchMachines, SaveApproved } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 import { navigate } from "@/app/navigations/navigationUtils";
 import { useFocusEffect } from "expo-router";
@@ -32,8 +32,8 @@ const ApprovedScreen = React.memo(() => {
         ['approved', debouncedSearchQuery],
         ({ pageParam = 0 }) => {
             return debouncedSearchQuery
-                ? fetchSearchApporved(debouncedSearchQuery)
-                : fetchApporved(pageParam, 50);
+                ? fetchSearchApproved(debouncedSearchQuery)
+                : fetchApproved(pageParam, 50);
         },
         {
             refetchOnWindowFocus: false,
@@ -126,7 +126,7 @@ const ApprovedScreen = React.memo(() => {
                         tableId: data.TableID,
                     });
                 }
-            } else if (action === "Apporved") {
+            } else if (action === "Approved") {
                 const UserData = {
                     UserID: user.UserID,
                     UserName: user.Full_Name,
@@ -158,26 +158,32 @@ const ApprovedScreen = React.memo(() => {
         setSelectedRows(value)
     }, [selectedRows])
 
+    const Edit = user.Permissions.includes("edit_approved")
+
     const tableData = useMemo(() => {
-        return approved.map((item) => [
+        return approved.map((item) => Edit ? [
             item.TableID,
             item.MachineName,
             item.FormName,
             item.UserName || "-",
             convertToThaiDateTime(item.CreateDate),
             item.TableID,
+        ] : [
+            item.MachineName,
+            item.FormName,
+            item.UserName || "-",
+            convertToThaiDateTime(item.CreateDate),
+            item.TableID,
         ]);
-    }, [approved, debouncedSearchQuery]);
+    }, [Edit, approved, debouncedSearchQuery]);
 
-    const mutation = useMutation(SaveApporved, {
+    const mutation = useMutation(SaveApproved, {
         onSuccess: (data) => {
             showSuccess(data.message);
             queryClient.invalidateQueries('approved');
         },
         onError: handleError,
     });
-
-    const Edit = user.Permissions.includes("edit_apporved")
 
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,

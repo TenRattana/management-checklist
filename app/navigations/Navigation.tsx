@@ -25,7 +25,7 @@ export const navigationRef = React.createRef<NavigationContainerRef<{}> & { open
 const components: Record<ComponentNames, () => Promise<{ default: React.ComponentType<any> }>> = {
     InputFormMachine: () => import('@/app/screens/layouts/forms/Scan/InputFormMachine'),
     Preview: () => import('@/app/screens/layouts/forms/view/PreviewScreen'),
-    Apporved: () => import('@/app/screens/layouts/transactions/approveds/ApporvedScreen'),
+    Approved: () => import('@/app/screens/layouts/transactions/approveds/ApprovedScreen'),
     Checklist: () => import('@/app/screens/layouts/checklists/checklist/CheckListScreen'),
     Checklist_group: () => import('@/app/screens/layouts/checklists/checklist_group/ChecklistGroupScreen'),
     Checklist_option: () => import('@/app/screens/layouts/checklists/checklist_option/CheckListOptionScreen'),

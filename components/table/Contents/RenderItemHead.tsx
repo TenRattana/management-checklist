@@ -56,7 +56,7 @@ const CustomtableHead = React.memo(({ Tablehead, flexArr, handleSort, sortColumn
                     {selectedRows && selectedRows.length > 0 && (
                         <>
                             <TouchableOpacity
-                                onPress={() => handleDialog("Apporved")}
+                                onPress={() => handleDialog("Approved")}
                                 style={[
                                     masterdataStyles.backMain,
                                     masterdataStyles.buttonCreate,
