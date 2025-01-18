@@ -24,7 +24,7 @@ const ApprovedScreen = React.memo(() => {
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize, responsive } = useRes();
-    const { theme } = useTheme();
+    const { theme, darkMode } = useTheme();
     const queryClient = useQueryClient();
     const [approved, setApproved] = useState<ExpectedResult[]>([])
 
@@ -237,7 +237,8 @@ const ApprovedScreen = React.memo(() => {
         header: {
             fontSize: spacing.large,
             paddingVertical: fontSize === "large" ? 7 : 5,
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            color: theme.colors.onBackground
         },
         cardcontent: {
             marginTop: 10,
@@ -257,7 +258,7 @@ const ApprovedScreen = React.memo(() => {
                     elevation: 6,
                 },
                 web: {
-                    boxShadow: '2px 5px 10px rgba(0, 0, 0, 0.24)',
+                    boxShadow: `2px 5px 10px ${!darkMode ? 'rgba(0, 0, 0, 0.24)' : 'rgba(193, 214, 255, 0.56)'}`,
                 },
             }),
         },

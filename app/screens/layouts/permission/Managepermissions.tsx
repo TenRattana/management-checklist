@@ -32,7 +32,7 @@ const Managepermissions = React.memo(() => {
   const state = useSelector((state: any) => state.prefix);
   const { showSuccess, handleError } = useToast();
   const { spacing, fontSize } = useRes();
-  const { theme } = useTheme();
+  const { theme, darkMode } = useTheme();
   const queryClient = useQueryClient();
 
   const { data: userPermission = [], isLoading } = useQuery<UsersPermission[], Error>(
@@ -172,7 +172,8 @@ const Managepermissions = React.memo(() => {
     header: {
       fontSize: spacing.large,
       paddingVertical: fontSize === "large" ? 7 : 5,
-      fontWeight: 'bold'
+      fontWeight: 'bold',
+      color: theme.colors.onBackground
     },
     functionname: {
       textAlign: 'center'
@@ -195,7 +196,7 @@ const Managepermissions = React.memo(() => {
           elevation: 6,
         },
         web: {
-          boxShadow: '2px 5px 10px rgba(0, 0, 0, 0.24)',
+          boxShadow: `2px 5px 10px ${!darkMode ? 'rgba(0, 0, 0, 0.24)' : 'rgba(193, 214, 255, 0.56)'}`,
         },
       }),
     },

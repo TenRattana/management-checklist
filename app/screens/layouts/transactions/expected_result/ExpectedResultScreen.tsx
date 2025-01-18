@@ -23,7 +23,7 @@ const ExpectedResultScreen = React.memo(() => {
 
     const { handleError } = useToast();
     const { spacing, fontSize, responsive } = useRes();
-    const { theme } = useTheme();
+    const { theme, darkMode } = useTheme();
     const [expectedResult, setExpectedResult] = useState<ExpectedResult[]>([])
     const masterdataStyles = useMasterdataStyles();
 
@@ -193,7 +193,8 @@ const ExpectedResultScreen = React.memo(() => {
         header: {
             fontSize: spacing.large,
             paddingVertical: fontSize === "large" ? 7 : 5,
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            color: theme.colors.onBackground
         },
         cardcontent: {
             marginTop: 10,
@@ -213,7 +214,7 @@ const ExpectedResultScreen = React.memo(() => {
                     elevation: 6,
                 },
                 web: {
-                    boxShadow: '2px 5px 10px rgba(0, 0, 0, 0.24)',
+                    boxShadow: `2px 5px 10px ${!darkMode ? 'rgba(0, 0, 0, 0.24)' : 'rgba(193, 214, 255, 0.56)'}`,
                 },
             }),
         },
