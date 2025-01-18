@@ -303,12 +303,12 @@ const useMasterdataStyles = () => {
             color: theme.colors.onBackground
         },
         subMenuItem: {
-            paddingLeft: 50,
+            paddingLeft: 40,
             minHeight: fontSize === "small" ? 50 : fontSize === "medium" ? 60 : 75,
             paddingVertical: 10,
             flexDirection: 'row',
             alignItems: 'center',
-            marginHorizontal: 10,
+            marginHorizontal: 20,
             borderRadius: 10,
         },
         subMenuText: {

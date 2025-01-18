@@ -19,10 +19,10 @@ const RenderTouchableOpacity = (props: RenderTouchableOpacityProps) => {
 
     const styles = StyleSheet.create({
         container: {
-            marginHorizontal: 10,
+            marginHorizontal: 20,
             marginVertical: 2,
             borderRadius: 10,
-            paddingLeft: 15,
+            paddingLeft: 10,
             alignItems: 'center',
             flexDirection: 'row',
             backgroundColor: current?.name === navigateTo ? !darkMode ? 'rgba(14, 17, 224, 0.16)' : 'rgba(11, 14, 212, 0.71)' : undefined
