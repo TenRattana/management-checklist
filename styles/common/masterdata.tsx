@@ -291,11 +291,11 @@ const useMasterdataStyles = () => {
         },
         menuItemNav: {
             paddingHorizontal: 10,
-            paddingVertical: 10,
             minHeight: fontSize === "small" ? 50 : fontSize === "medium" ? 60 : 75,
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
+            flex: 1,
         },
         menuText: {
             fontSize: spacing.small,
@@ -308,6 +308,8 @@ const useMasterdataStyles = () => {
             paddingVertical: 10,
             flexDirection: 'row',
             alignItems: 'center',
+            marginHorizontal: 10,
+            borderRadius: 10,
         },
         subMenuText: {
             fontSize: spacing.small,

@@ -122,39 +122,58 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
         <>
             {Platform.OS === "web" && responsive === "large" && (
                 <View style={{
-                    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 60,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    height: 60,
                     backgroundColor: theme.colors.blueNav,
                     borderColor: "rgb(216, 216, 216)",
-                    borderTopWidth: 1, borderBottomWidth: 1,
+                    borderTopWidth: 1,
+                    borderBottomWidth: 1,
+                    borderRadius: 4,
+                    paddingHorizontal: 15,
                     ...Platform.select({
                         web: {
-                            boxShadow: `${theme.colors.onBackground || "#000"} 0px 2px 4px`,
+                            boxShadow: `${theme.colors.onBackground || "#000"} 0px 4px 8px`,
                         },
                         ios: {
                             shadowColor: theme.colors.onBackground || "#000",
-                            shadowOffset: { width: 0, height: 2 },
-                            shadowOpacity: 1,
-                            shadowRadius: 4,
+                            shadowOffset: { width: 0, height: 3 },
+                            shadowOpacity: 0.2,
+                            shadowRadius: 8,
                         },
                         android: {
-                            elevation: 4,
+                            elevation: 6,
                         },
                     }),
                 }} key={JSON.stringify(darkMode)}>
-                    <View style={{ flexDirection: 'row', alignSelf: 'center', alignItems: 'center' }}>
-                        <IconButton icon="menu" iconColor={theme.colors.fff} size={25}
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <IconButton
+                            icon="menu"
+                            iconColor={theme.colors.fff}
+                            size={25}
                             onPress={() => toggleDrawer()}
+                            style={{ marginRight: 10 }}
                         />
                         <Text style={{
-                            paddingLeft: 5,
-                            fontSize: 14,
+                            fontSize: 13,
                             fontWeight: 'bold',
                             color: theme.colors.fff,
-                        }}>{state.AppName || ''}</Text>
+                            letterSpacing: 0.5,
+                        }}>
+                            {state.AppName || ''}
+                        </Text>
                     </View>
 
-                    <View style={{ flexDirection: 'row', alignSelf: 'center', alignItems: 'center' }}>
-                        <Text style={{ fontSize: 14, fontWeight: 'bold', color: theme.colors.fff }}>{user.Full_Name}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Text style={{
+                            fontSize: 13,
+                            fontWeight: 'bold',
+                            color: theme.colors.fff,
+                            marginRight: 15,
+                        }}>
+                            {user.Full_Name}
+                        </Text>
                         <CustomMenu
                             visible={menuVisible}
                             onShow={toggleMenu}
@@ -165,6 +184,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                     </View>
                 </View>
             )}
+
             <Drawer.Navigator
                 drawerContent={(props) => <CustomDrawerContent {...props} />}
                 screenOptions={{

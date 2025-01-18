@@ -4,8 +4,8 @@ import { Icon, IconButton } from 'react-native-paper';
 import Text from '@/components/Text';
 import { useRes } from '@/app/contexts/useRes';
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { TouchableOpacity, View } from 'react-native';
-import { navigate } from '@/app/navigations/navigationUtils';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { navigate, navigationRef } from '@/app/navigations/navigationUtils';
 import { ComponentNames } from '@/typing/type';
 import { useTheme } from '@/app/contexts/useTheme';
 import { MenuSectionProps } from '@/typing/Navigate';
@@ -17,7 +17,7 @@ const MenuSection = React.memo(({ title, isOpen, onToggle, items, navigation }: 
     const opacity = useSharedValue(0);
     const totalHeight = items.length * itemHeight;
     const masterdataStyles = useMasterdataStyles();
-    const { theme } = useTheme();
+    const { theme, darkMode } = useTheme();
 
     const animatedStyle = useAnimatedStyle(() => ({
         height: height.value,
@@ -49,9 +49,23 @@ const MenuSection = React.memo(({ title, isOpen, onToggle, items, navigation }: 
         };
     }, [isOpen, totalHeight]);
 
+    const current = navigationRef.current?.getCurrentRoute();
+
+    const styles = StyleSheet.create({
+        container: {
+            marginHorizontal: 10,
+            marginVertical: 2,
+            borderRadius: 10,
+            paddingLeft: 15,
+            alignItems: 'center',
+            flexDirection: 'row',
+            // backgroundColor: current?.name === title ? !darkMode ? 'rgba(14, 17, 224, 0.16)' : 'rgba(11, 14, 212, 0.71)' : undefined
+        },
+    })
+
     return (
         <>
-            <View style={{ paddingLeft: 25, alignItems: 'center', flexDirection: 'row' }}>
+            <View style={styles.container}>
                 <Icon source="baby-face-outline" size={20} color={theme.colors.onBackground} />
                 <View style={{ flexDirection: 'column', flex: 1 }}>
                     <TouchableOpacity onPress={onToggle} style={masterdataStyles.menuItemNav}>
@@ -67,7 +81,9 @@ const MenuSection = React.memo(({ title, isOpen, onToggle, items, navigation }: 
                         <TouchableOpacity
                             key={`item-${item.label}-nav-${item.navigateTo}`}
                             onPress={() => navigate(item.navigateTo as ComponentNames)}
-                            style={masterdataStyles.subMenuItem}>
+                            style={[masterdataStyles.subMenuItem, {
+                                backgroundColor: current?.name === item.navigateTo ? !darkMode ? 'rgba(35, 39, 237, 0.16)' : 'rgba(22, 25, 226, 0.81)' : undefined
+                            }]}>
                             <Icon source={item.Icon ? item.Icon : "baby-face-outline"} size={20} color={theme.colors.onBackground} />
 
                             <Text style={[masterdataStyles.subMenuText, { paddingLeft: 15 }]}>{item.label ?? ""}</Text>
