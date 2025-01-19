@@ -31,7 +31,7 @@ const RenderTouchableOpacity = (props: RenderTouchableOpacityProps) => {
 
     return (
         <View style={styles.container}>
-            <Icon source={Icons ? Icons : "baby-face-outline"} size={20} color={theme.colors.onBackground} />
+            {Icons && <Icon source={Icons ? Icons : "baby-face-outline"} size={20} color={theme.colors.onBackground} />}
             <TouchableOpacity
                 key={`item-${label}-nav-${navigateTo}-${current}`}
                 onPress={() => navigate(navigateTo)}

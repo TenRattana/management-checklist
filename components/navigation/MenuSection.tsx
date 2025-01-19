@@ -66,7 +66,6 @@ const MenuSection = React.memo(({ title, isOpen, onToggle, items, navigation }: 
     return (
         <>
             <View style={styles.container}>
-                <Icon source="baby-face-outline" size={20} color={theme.colors.onBackground} />
                 <View style={{ flexDirection: 'column', flex: 1 }}>
                     <TouchableOpacity onPress={onToggle} style={masterdataStyles.menuItemNav}>
                         <Text style={masterdataStyles.menuText}>{title ?? ""}</Text>
@@ -84,7 +83,7 @@ const MenuSection = React.memo(({ title, isOpen, onToggle, items, navigation }: 
                             style={[masterdataStyles.subMenuItem, {
                                 backgroundColor: current?.name === item.navigateTo ? !darkMode ? 'rgba(35, 39, 237, 0.16)' : 'rgba(22, 25, 226, 0.81)' : undefined
                             }]}>
-                            <Icon source={item.Icon ? item.Icon : "baby-face-outline"} size={20} color={theme.colors.onBackground} />
+                            {item.Icon && <Icon source={item.Icon ? item.Icon : "baby-face-outline"} size={20} color={theme.colors.onBackground} />}
 
                             <Text style={[masterdataStyles.subMenuText, { paddingLeft: 15 }]}>{item.label ?? ""}</Text>
                         </TouchableOpacity>
