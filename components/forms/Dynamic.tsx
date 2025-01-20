@@ -8,6 +8,7 @@ import { useRes } from "@/app/contexts/useRes";
 import { Text } from "react-native-paper";
 import useField from "@/hooks/FieldDialog";
 import Time from "../common/Time";
+import RatingGrid from "../common/RatingGrid";
 
 const DynamicForm = React.memo(({ field, values, handleChange, handleBlur, error, errorMessages, type, exp, showField, number }: DynamicFormProps) => {
   const { CTypeName, CListName, MCListID, GCLOptionID, Required, Important, ImportantList, SFormID } = field;
@@ -130,6 +131,10 @@ const DynamicForm = React.memo(({ field, values, handleChange, handleBlur, error
             testId={`checkbox-${CListName}`}
             exp={exp}
           />
+        );
+      case "GridRadio":
+        return (
+          <RatingGrid Layout="row" GridLable={70} GridRadio={30} />
         );
       default:
         return null;
