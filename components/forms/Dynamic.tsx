@@ -63,7 +63,7 @@ const DynamicForm = React.memo(({ field, values, handleChange, handleBlur, error
             value={values}
             handleChange={(v) => handleChange(MCListID, v)}
             handleBlur={handleBlur}
-            testId={`input-${CListName}`}
+            testId={`input-${CListName}-${SFormID}-${MCListID}`}
             textColor={textColor}
             exp={exp}
           />
@@ -85,7 +85,7 @@ const DynamicForm = React.memo(({ field, values, handleChange, handleBlur, error
             value={values}
             handleChange={(v) => handleChange(MCListID, v)}
             handleBlur={handleBlur}
-            testId={`inputarea-${CListName}`}
+            testId={`inputarea-${CListName}-${SFormID}-${MCListID}`}
             textColor={textColor}
             exp={exp}
           />
@@ -98,7 +98,7 @@ const DynamicForm = React.memo(({ field, values, handleChange, handleBlur, error
             handleChange={(v) => handleChange(MCListID, v)}
             handleBlur={handleBlur}
             value={values}
-            testId={`radio-${CListName}`}
+            testId={`radio-${CListName}-${SFormID}-${MCListID}`}
             exp={exp}
           />
         );
@@ -110,7 +110,7 @@ const DynamicForm = React.memo(({ field, values, handleChange, handleBlur, error
             handleChange={(v) => handleChange(MCListID, v)}
             handleBlur={handleBlur}
             value={values}
-            testId={`dropdown-${CListName}`}
+            testId={`dropdown-${CListName}-${SFormID}-${MCListID}`}
             exp={exp}
           />
         );
@@ -127,7 +127,7 @@ const DynamicForm = React.memo(({ field, values, handleChange, handleBlur, error
             }}
             handleBlur={handleBlur}
             value={values}
-            testId={`checkbox-${CListName}`}
+            testId={`checkbox-${CListName}-${SFormID}-${MCListID}`}
             exp={exp}
           />
         );
