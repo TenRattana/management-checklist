@@ -148,9 +148,13 @@ const DynamicForm = React.memo(({ field, values, handleChange, handleBlur, error
 
 
   const isValidImportantList = useMemo(() => {
-    return values && ImportantList && ImportantList.length > 0 ? ImportantList?.every(
+    return values && ImportantList && Important && ImportantList.length > 0 ? ImportantList?.every(
       (value) => value.Value && value.Value?.includes(values)
-    ) : values && Important ? Important : false;
+    ) : false;
+  }, [values, Important, ImportantList]);
+
+  const TextValid = useMemo(() => {
+    return values && ImportantList && Important && ImportantList.length > 0 && ["Textinput", "Textarea"].includes(String(CTypeName)) && type !== "Number";
   }, [values, Important, ImportantList]);
 
   return (
@@ -158,7 +162,7 @@ const DynamicForm = React.memo(({ field, values, handleChange, handleBlur, error
       <TouchableOpacity onPress={() => showField && showField(String(MCListID), String(SFormID))}>
         <Text
           variant="bodyMedium"
-          style={[masterdataStyles.text, masterdataStyles.textBold, CTypeName === "Text" ? styles.text : undefined, { color: exp && (messageminOrmax || isValidImportantList) ? theme.colors.error : theme.colors.onBackground }]}>
+          style={[masterdataStyles.text, masterdataStyles.textBold, CTypeName === "Text" ? styles.text : undefined, { color: exp && (messageminOrmax || isValidImportantList || TextValid) ? theme.colors.error : theme.colors.onBackground }]}>
           {number}{" "}
           {Required && <Text style={{ color: theme.colors.error }}>(*)</Text>}
         </Text>
