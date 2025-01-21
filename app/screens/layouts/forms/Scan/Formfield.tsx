@@ -2,7 +2,7 @@ import { View, ViewStyle } from 'react-native';
 import React, { useCallback, useMemo } from 'react';
 import { BaseFormState } from '@/typing/form';
 import { useRes } from '@/app/contexts/useRes';
-import { FieldProps, FastField } from 'formik';
+import { FieldProps, FastField, Field } from 'formik';
 import { Dynamic } from '@/components';
 import { FiledScan } from '@/typing/screens/Scan';
 
@@ -41,7 +41,7 @@ const Formfield = React.memo(({ item, field, dataType, setFieldValue, setTouched
         };
 
         return (
-            <FastField name={field.MCListID} key={`field-${fieldIndex}-${item.Columns}`}>
+            <Field name={field.MCListID} key={`field-${fieldIndex}-${item.Columns}`}>
                 {({ field: fastFieldProps }: FieldProps) => {
                     return (
                         <View id="container-layout2" style={containerStyle} key={`dynamic-${fieldIndex}-${item.Columns}`}>
@@ -58,7 +58,7 @@ const Formfield = React.memo(({ item, field, dataType, setFieldValue, setTouched
                         </View>
                     );
                 }}
-            </FastField>
+            </Field>
         );
     })
 });

@@ -222,8 +222,8 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                             />
                         </View>
                     ),
-                    // freezeOnBlur: Platform.OS !== "web" ? true : undefined,
-                    // unmountOnBlur: Platform.OS !== "web" ? true : undefined,
+                    freezeOnBlur: true,
+                    unmountOnBlur: true,
                 }}
                 initialRouteName={initialRoute}
                 id="nav"
