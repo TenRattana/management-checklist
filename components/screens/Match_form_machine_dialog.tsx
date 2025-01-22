@@ -178,6 +178,7 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
                                         <Dropdown
                                             lefticon="desktop-classic"
                                             label={state.Machine}
+                                            disable={isEditing}
                                             open={openMachine}
                                             setOpen={(v: boolean) => setOpenMachine(v)}
                                             selectedValue={values.machineId}

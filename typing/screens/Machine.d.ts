@@ -29,4 +29,5 @@ export interface InitialValuesMachine extends Detail, Active {
   area: string | null;
   machineName: string;
   disables: boolean;
+  delete:boolean;
 }

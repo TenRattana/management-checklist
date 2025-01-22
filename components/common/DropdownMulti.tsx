@@ -9,7 +9,7 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Text from '../Text';
 import { DropdownMultiProps } from '@/typing/tag';
 
-const DropdownMulti = React.memo(({ label, fetchNextPage, handleScroll, isFetching, items, open, search = true, setOpen, selectedValue, setSelectedValue, setDebouncedSearchQuery, error, searchQuery, errorMessage, lefticon, showLefticon, mode, }: DropdownMultiProps) => {
+const DropdownMulti = React.memo(({ label, fetchNextPage, handleScroll, isFetching, items, open, search = true, setOpen, selectedValue, setSelectedValue, setDebouncedSearchQuery, error, searchQuery, errorMessage, lefticon, showLefticon, mode, disable }: DropdownMultiProps) => {
     const isSelected = new Set(selectedValue);
     const [searchQuerys, setSearchQuery] = useState('');
     const [menuWidth, setMenuWidth] = useState(0);
@@ -63,6 +63,7 @@ const DropdownMulti = React.memo(({ label, fetchNextPage, handleScroll, isFetchi
             alignItems: 'center',
             borderBottomColor: 'gray',
             borderBottomWidth: 0.5,
+            opacity: disable ? 0.8 : 1
         },
         searchbar: {
             backgroundColor: theme.colors.background,
@@ -122,6 +123,7 @@ const DropdownMulti = React.memo(({ label, fetchNextPage, handleScroll, isFetchi
                                 setSelectedValue([...selectedValue, item.value]);
                             }
                         }}
+                        disabled={disable}
                         titleStyle={masterdataStyles.text}
                         style={{
                             paddingVertical: isSelected.has(item.value) ? 10 : 5,
@@ -159,7 +161,7 @@ const DropdownMulti = React.memo(({ label, fetchNextPage, handleScroll, isFetchi
                     style={styles.menuStyle}
                     anchor={
                         <View onLayout={onLayout} ref={viewRef}>
-                            <TouchableOpacity style={styles.triggerButton} onPress={() => setOpen(true)}>
+                            <TouchableOpacity style={styles.triggerButton} onPress={() => setOpen(true)} disabled={disable}>
                                 {open && search ? (<></>) : <>
                                     {!showLefticon && (
                                         items.find((v) => v.value === selectedValue)?.icon ? (
@@ -183,7 +185,8 @@ const DropdownMulti = React.memo(({ label, fetchNextPage, handleScroll, isFetchi
                                     {!showLefticon && selectedValue.length > 0 ? (
                                         <IconButton
                                             style={[masterdataStyles.icon, { right: 8, alignItems: 'flex-end' }]}
-                                            icon="window-close"
+                                            icon={disable ? "lock" : "window-close"}
+                                            iconColor={disable ? theme.colors.error : theme.colors.onBackground}
                                             size={spacing.large}
                                             onPress={() => {
                                                 setSelectedValue([]);
@@ -211,7 +214,7 @@ const DropdownMulti = React.memo(({ label, fetchNextPage, handleScroll, isFetchi
             ) : (
                 <>
                     <View onLayout={onLayout} ref={viewRef}>
-                        <TouchableOpacity style={styles.triggerButton} onPress={() => setOpen(true)}>
+                        <TouchableOpacity style={styles.triggerButton} onPress={() => setOpen(true)} disabled={disable}>
                             {open && search ? (<></>) : <>
                                 {!showLefticon && (
                                     items.find((v) => v.value === selectedValue)?.icon ? (
@@ -235,7 +238,8 @@ const DropdownMulti = React.memo(({ label, fetchNextPage, handleScroll, isFetchi
                                 {!showLefticon && selectedValue.length > 0 ? (
                                     <IconButton
                                         style={[masterdataStyles.icon, { right: 8, alignItems: 'flex-end' }]}
-                                        icon="window-close"
+                                        icon={disable ? "lock" : "window-close"}
+                                        iconColor={disable ? theme.colors.error : theme.colors.onBackground}
                                         size={spacing.large}
                                         onPress={() => {
                                             setSelectedValue([]);

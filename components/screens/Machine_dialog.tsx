@@ -188,6 +188,7 @@ const Machine_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initial
 
                                                 <Dropdown
                                                     label={`${state.GroupMachine}`}
+                                                    disable={isEditing && values.delete}
                                                     open={open}
                                                     search
                                                     setOpen={(v: boolean) => setOpen(v)}

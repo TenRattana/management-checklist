@@ -136,7 +136,7 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
         ],
         flexArr: [0, 0, 2, 2, 3, 1, 1, 1, 1, 1, 1],
         actionIndex: [{ disables: 0, delete: 1, changeIndex: 7, copyIndex: 8, preIndex: 9, delOnlyIndex: 10 }],
-        showMessage: 2,
+        showMessage: [2, 3],
         handleAction,
         searchQuery: debouncedSearchQuery,
         isFetching: isFetching

@@ -192,6 +192,7 @@ const Match_checklist_option = React.memo(({ isVisible, setIsVisible, isEditing,
 
                                     <Dropdown
                                         label={state.GroupCheckList}
+                                        disable={isEditing && (values.disables || values.delete)}
                                         open={open}
                                         setOpen={setOpen}
                                         setDebouncedSearchQuery={setDebouncedSearchQuery}
@@ -220,6 +221,7 @@ const Match_checklist_option = React.memo(({ isVisible, setIsVisible, isEditing,
                                         label={state.CheckListOption}
                                         open={openCO}
                                         setOpen={setOpenCO}
+                                        disable={isEditing && (values.disables || values.delete)}
                                         searchQuery={debouncedSearchQueryCO}
                                         setDebouncedSearchQuery={setDebouncedSearchQueryCO}
                                         items={itemsCO}
@@ -243,7 +245,7 @@ const Match_checklist_option = React.memo(({ isVisible, setIsVisible, isEditing,
                                             {values.checkListOptionId && Array.isArray(values.checkListOptionId) && values.checkListOptionId.length > 0 && values.checkListOptionId?.map((item, index) => (
                                                 <TouchableOpacity onPress={() => {
                                                     setFieldValue("checkListOptionId", values.checkListOptionId && Array.isArray(values.checkListOptionId) && values.checkListOptionId.filter((id) => id !== item))
-                                                }} key={index}>
+                                                }} key={index} disabled={isEditing && (values.disables || values.delete)}>
                                                     <View id="container-renderSelect" style={masterdataStyles.selectedStyle}>
                                                         <Text style={masterdataStyles.textFFF}>{itemsCO.find((v) => v.value === item)?.label}</Text>
                                                     </View>

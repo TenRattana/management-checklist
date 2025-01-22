@@ -8,6 +8,7 @@ export interface ExpectedResult {
   ApprovedID: string;
   ApprovedName?: string;
   FormID: string;
+  FormNumber: string;
   FormName: string;
   CreateDate: string;
   ApprovedTime?:string;

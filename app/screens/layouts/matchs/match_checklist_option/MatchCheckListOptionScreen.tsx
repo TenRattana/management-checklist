@@ -26,7 +26,8 @@ const MatchCheckListOptionScreen = React.memo(() => {
         checkListOptionId: [],
         groupCheckListOptionId: "",
         isActive: true,
-        disables: false
+        disables: false,
+        delete: false
     });
 
     const masterdataStyles = useMasterdataStyles();
@@ -120,6 +121,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
                     checkListOptionId: option,
                     isActive: Boolean(matchCheckListOption.IsActive),
                     disables: Boolean(matchCheckListOption.Disables),
+                    delete: Boolean(matchCheckListOption.Deletes),
                 });
                 setIsEditing(true);
                 setIsVisible(true);
@@ -151,7 +153,8 @@ const MatchCheckListOptionScreen = React.memo(() => {
             checkListOptionId: [],
             groupCheckListOptionId: "",
             isActive: true,
-            disables: false
+            disables: false,
+            delete: false
         });
         setIsEditing(false);
         setIsVisible(true);

@@ -147,7 +147,7 @@ const RenderItem = React.memo(({ item, index, Tablehead, flexArr, actionIndex, s
             </DataTable.Row>
 
             {visibleDetails.has(findIndex(item)) && (
-                <View id="containerdetail" style={{ padding: 10 }}>
+                <View id="containerdetail" style={{ padding: 10, paddingLeft: 40 }}>
                     <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
                         <DetailContent
                             detailData={detailData?.[findIndex(item)] || []}

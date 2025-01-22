@@ -32,7 +32,8 @@ const MachineGroupScreen = React.memo(() => {
         machineName: "",
         description: "",
         isActive: true,
-        disables: false
+        disables: false,
+        delete: false
     });
 
     const masterdataStyles = useMasterdataStyles();
@@ -134,6 +135,7 @@ const MachineGroupScreen = React.memo(() => {
                     description: machineData.Description ?? "",
                     isActive: Boolean(machineData.IsActive),
                     disables: Boolean(machineData.Disables),
+                    delete: Boolean(machineData.Deletes),
                 });
                 setIsEditing(true);
                 setIsVisible(true);
@@ -173,7 +175,8 @@ const MachineGroupScreen = React.memo(() => {
             machineName: "",
             description: "",
             isActive: true,
-            disables: false
+            disables: false,
+            delete: false
         });
         setIsEditing(false);
         setIsVisible(true);
