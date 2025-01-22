@@ -92,7 +92,7 @@ export const saveMachine = async (data: {
     Prefix: any;
     MachineID: string;
     GMachineID: string;
-    MachineCode: string | null;
+    MachineCode: string;
     Building: string | null;
     Floor: string | null;
     Area: string | null;

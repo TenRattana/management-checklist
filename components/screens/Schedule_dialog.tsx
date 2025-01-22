@@ -3,7 +3,7 @@ import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
-import { Button, Dialog, Portal, Menu, Switch, HelperText } from 'react-native-paper';
+import { Button, Dialog, Portal, Menu, Switch, HelperText, Icon } from 'react-native-paper';
 import { DropdownMulti, Inputs } from '../common';
 import { useToast } from '@/app/contexts/useToast';
 import { FastField, Field, Formik } from 'formik';
@@ -17,6 +17,8 @@ import Animated, { Easing, FadeInLeft, FadeInRight, FadeOutLeft, FadeOutRight } 
 import { useInfiniteQuery, useQueryClient } from 'react-query';
 import { fetchMachineGroups, fetchSearchMachineGroups, fetchSearchTimeSchedules } from '@/app/services';
 import { ScheduleDialogProps } from '@/typing/screens/TimeSchedule';
+import HeaderDialog from './HeaderDialog';
+import { useSelector } from 'react-redux';
 
 const { height } = Dimensions.get('window');
 
@@ -41,6 +43,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
     const { showError, showSuccess } = useToast()
     const [showTimeIntervalMenu, setShowTimeIntervalMenu] = useState<{ Custom: boolean, time: boolean, week: boolean }>({ Custom: false, time: false, week: false });
     const masterdataStyles = useMasterdataStyles();
+    const state = useSelector((state: any) => state.prefix);
 
     const validationSchema = Yup.object().shape({
         ScheduleName: Yup.string().required('Schedule name field is required.'),
@@ -218,241 +221,250 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
 
                         return (
                             <Dialog visible={isVisible} style={[masterdataStyles.containerDialog, { width: responsive === "large" ? 1000 : "80%" }]}>
-                                <Dialog.Title style={{ marginLeft: 30 }}>{isEditing ? "Edit Schedule" : "Add Schedule"}</Dialog.Title>
+                                <Dialog.Content style={{ paddingHorizontal: 20 }}>
+                                    <HeaderDialog isEditing setIsVisible={() => setIsVisible(false)} display={state.TimeSchedule} />
 
-                                <View style={{
-                                    flexDirection: responsive === "small" ? 'column' : 'row',
-                                    maxHeight: height / 1.7,
-                                }}>
-                                    <View style={{ flexBasis: '46%', marginHorizontal: '2%' }}>
-                                        <Text style={[masterdataStyles.text, { marginLeft: 10, marginTop: 10 }]}>{isEditing ? "Update TimeSchedule detail" : "Create TimeSchedule detail"}</Text>
-
-                                        <Field name="ScheduleName">
-                                            {({ field, form }: any) => (
-                                                <>
-                                                    <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 10, paddingLeft: 10 }]}>
-                                                        Schedule Name
-                                                    </Text>
-
-                                                    <Inputs
-                                                        mode='outlined'
-                                                        placeholder="Enter Schedule Name"
-                                                        label="Schedule Name"
-                                                        handleChange={(value) => form.setFieldValue(field.name, value)}
-                                                        handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
-                                                        value={field.value ??= ""}
-                                                        error={form.touched.ScheduleName && Boolean(form.errors.ScheduleName)}
-                                                        errorMessage={form.touched.ScheduleName ? form.errors.ScheduleName : ""}
-                                                        testId="schedule-s"
-                                                    />
-                                                </>
-                                            )}
-                                        </Field>
-
-                                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
-                                            Group Machine
-                                        </Text>
-
-                                        <DropdownMulti
-                                            label='machine group'
-                                            open={open.Machine}
-                                            setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, Machine: v }))}
-                                            searchQuery={debouncedSearchQuery.Machine}
-                                            setDebouncedSearchQuery={(v: string) => setDebouncedSearchQuery((prev) => ({ ...prev, Machine: v }))}
-                                            items={items}
-                                            isFetching={isFetching}
-                                            fetchNextPage={fetchNextPage}
-                                            handleScroll={handleScroll}
-                                            selectedValue={values.MachineGroup}
-                                            setSelectedValue={(value: string | string[] | null) => handelChange("MachineGroup", value)}
-                                        />
-
-                                        <HelperText
-                                            type="error"
-                                            visible={Boolean(touched.MachineGroup && errors.MachineGroup)}
-                                            style={[{ display: Boolean(touched.MachineGroup && errors.MachineGroup) ? 'flex' : 'none' }, masterdataStyles.errorText]}
-                                        >
-                                            {errors.MachineGroup || ""}
-                                        </HelperText>
-
-                                        <ScrollView showsVerticalScrollIndicator={false} style={{ flexGrow: 0, marginVertical: 5 }}>
-                                            <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 10 }}>
-                                                {values.MachineGroup && Array.isArray(values.MachineGroup) && values.MachineGroup.length > 0 && values.MachineGroup?.map((item, index) => (
-                                                    <TouchableOpacity onPress={() => {
-                                                        setFieldValue("MachineGroup", values.MachineGroup && Array.isArray(values.MachineGroup) && values.MachineGroup.filter((id) => id !== item))
-                                                    }} key={index}>
-                                                        <View id="container-renderSelect" style={masterdataStyles.selectedStyle}>
-                                                            <Text style={masterdataStyles.textFFF}>{items.find((v) => v.value === String(item))?.label}</Text>
+                                    <View style={{
+                                        flexDirection: responsive === "small" ? 'column' : 'row',
+                                        maxHeight: height / 1.7,
+                                    }}>
+                                        <View style={{ flexBasis: '46%' }}>
+                                            <Field name="ScheduleName">
+                                                {({ field, form }: any) => (
+                                                    <>
+                                                        <View style={{ flexDirection: 'row', paddingTop: 10, paddingLeft: 10 }}>
+                                                            <Icon source="calendar-month" size={50} color={theme.colors.onBackground} />
+                                                            <View>
+                                                                <Text style={[masterdataStyles.title, { marginTop: 5 }]}>{isEditing ? "Edit Schedule" : "Add Schedule"}</Text>
+                                                                <Text style={[masterdataStyles.text, { paddingLeft: 5, marginTop: 5 }]}>{isEditing ? "Update TimeSchedule detail" : "Create TimeSchedule detail"}</Text>
+                                                            </View>
                                                         </View>
-                                                    </TouchableOpacity>
-                                                ))}
-                                            </View>
-                                        </ScrollView>
 
-                                        <View style={[styles.timeIntervalMenu, { marginBottom: 0 }]}>
-                                            <View id="form-active-point-md" style={[masterdataStyles.containerSwitch]}>
-                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginRight: 12 }]}>
-                                                        Point time schedule when stop : {values.Tracking ? "Tracking time" : "Not tracking"}
-                                                    </Text>
-                                                    <Switch
-                                                        style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                                        color={values.Tracking ? theme.colors.inversePrimary : theme.colors.onPrimaryContainer}
-                                                        value={values.Tracking}
-                                                        onValueChange={(v: boolean) => { setFieldValue('Tracking', v) }}
-                                                        testID="point-md"
-                                                    />
-                                                </View>
-                                            </View>
-                                        </View>
 
-                                        <View style={[styles.timeIntervalMenu, { marginBottom: 0 }]}>
-                                            <View id="form-active-active-md" style={[masterdataStyles.containerSwitch]}>
-                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                    <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginRight: 12 }]}>
-                                                        Status : {values.IsActive ? "Active" : "In active"}
-                                                    </Text>
-                                                    <Switch
-                                                        style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                                        color={values.IsActive ? theme.colors.inversePrimary : theme.colors.onPrimaryContainer}
-                                                        value={values.IsActive}
-                                                        onValueChange={(v: boolean) => { setFieldValue('IsActive', v) }}
-                                                        testID="active-md"
-                                                    />
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </View>
+                                                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingTop: 10, paddingLeft: 10 }]}>
+                                                            Schedule Name
+                                                        </Text>
 
-                                    <View style={{ flexBasis: '46%', marginHorizontal: '2%', flex: 1, marginTop: responsive === "small" ? 100 : 0 }}>
-                                        <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
-                                            Type Schedule
-                                        </Text>
+                                                        <Inputs
+                                                            mode='outlined'
+                                                            placeholder="Enter Schedule Name"
+                                                            label="Schedule Name"
+                                                            handleChange={(value) => form.setFieldValue(field.name, value)}
+                                                            handleBlur={() => form.setTouched({ ...form.touched, [field.name]: true })}
+                                                            value={field.value ??= ""}
+                                                            error={form.touched.ScheduleName && Boolean(form.errors.ScheduleName)}
+                                                            errorMessage={form.touched.ScheduleName ? form.errors.ScheduleName : ""}
+                                                            testId="schedule-s"
+                                                        />
+                                                    </>
+                                                )}
+                                            </Field>
 
-                                        <View style={styles.timeIntervalMenu}>
-                                            <Menu
-                                                visible={showTimeIntervalMenu.Custom}
-                                                onDismiss={() => {
-                                                    setShowTimeIntervalMenu((prev) => ({ ...prev, Custom: !showTimeIntervalMenu.Custom }))
-                                                    setFieldTouched('Type_schedule', true)
-                                                }}
-                                                style={{ marginTop: 50 }}
-                                                anchor={<Button
-                                                    mode="outlined"
-                                                    style={styles.timeButton}
-                                                    onPress={() => setShowTimeIntervalMenu((prev) => ({ ...prev, Custom: true }))}
-                                                >
-                                                    <Text style={masterdataStyles.timeText}>{values.Type_schedule ? `Selected ${values.Type_schedule}` : 'Select Reange Schedule'}</Text>
-                                                </Button>}
+                                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
+                                                Group Machine
+                                            </Text>
+
+                                            <DropdownMulti
+                                                label='machine group'
+                                                open={open.Machine}
+                                                setOpen={(v: boolean) => setOpen((prev) => ({ ...prev, Machine: v }))}
+                                                searchQuery={debouncedSearchQuery.Machine}
+                                                setDebouncedSearchQuery={(v: string) => setDebouncedSearchQuery((prev) => ({ ...prev, Machine: v }))}
+                                                items={items}
+                                                isFetching={isFetching}
+                                                fetchNextPage={fetchNextPage}
+                                                handleScroll={handleScroll}
+                                                selectedValue={values.MachineGroup}
+                                                setSelectedValue={(value: string | string[] | null) => handelChange("MachineGroup", value)}
+                                            />
+
+                                            <HelperText
+                                                type="error"
+                                                visible={Boolean(touched.MachineGroup && errors.MachineGroup)}
+                                                style={[{ display: Boolean(touched.MachineGroup && errors.MachineGroup) ? 'flex' : 'none' }, masterdataStyles.errorText]}
                                             >
-                                                {["Weekly", "Daily", "Custom"].map((interval, index) => (
-                                                    <Menu.Item
-                                                        style={styles.menuItem}
-                                                        key={index}
-                                                        onPress={() => {
-                                                            setFieldValue('Type_schedule', interval)
-                                                            setShowTimeIntervalMenu((prev) => ({ ...prev, Custom: false }))
-                                                        }}
-                                                        title={`${interval}`}
-                                                    />
-                                                ))}
-                                            </Menu>
+                                                {errors.MachineGroup || ""}
+                                            </HelperText>
+
+                                            <ScrollView showsVerticalScrollIndicator={false} style={{ flexGrow: 0, marginVertical: 5 }}>
+                                                <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 10 }}>
+                                                    {values.MachineGroup && Array.isArray(values.MachineGroup) && values.MachineGroup.length > 0 && values.MachineGroup?.map((item, index) => (
+                                                        <TouchableOpacity onPress={() => {
+                                                            setFieldValue("MachineGroup", values.MachineGroup && Array.isArray(values.MachineGroup) && values.MachineGroup.filter((id) => id !== item))
+                                                        }} key={index}>
+                                                            <View id="container-renderSelect" style={masterdataStyles.selectedStyle}>
+                                                                <Text style={masterdataStyles.textFFF}>{items.find((v) => v.value === String(item))?.label}</Text>
+                                                            </View>
+                                                        </TouchableOpacity>
+                                                    ))}
+                                                </View>
+                                            </ScrollView>
+
+                                            <View style={[styles.timeIntervalMenu, { marginBottom: 0 }]}>
+                                                <View id="form-active-point-md" style={[masterdataStyles.containerSwitch]}>
+                                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                        <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginRight: 12 }]}>
+                                                            Point time schedule when stop : {values.Tracking ? "Tracking time" : "Not tracking"}
+                                                        </Text>
+                                                        <Switch
+                                                            style={{ transform: [{ scale: 1.1 }], top: 2 }}
+                                                            color={values.Tracking ? theme.colors.inversePrimary : theme.colors.onPrimaryContainer}
+                                                            value={values.Tracking}
+                                                            onValueChange={(v: boolean) => { setFieldValue('Tracking', v) }}
+                                                            testID="point-md"
+                                                        />
+                                                    </View>
+                                                </View>
+                                            </View>
+
+                                            <View style={[styles.timeIntervalMenu, { marginBottom: 0 }]}>
+                                                <View id="form-active-active-md" style={[masterdataStyles.containerSwitch]}>
+                                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                        <Text style={[masterdataStyles.text, masterdataStyles.textDark, { marginRight: 12 }]}>
+                                                            Status : {values.IsActive ? "Active" : "In active"}
+                                                        </Text>
+                                                        <Switch
+                                                            style={{ transform: [{ scale: 1.1 }], top: 2 }}
+                                                            color={values.IsActive ? theme.colors.inversePrimary : theme.colors.onPrimaryContainer}
+                                                            value={values.IsActive}
+                                                            onValueChange={(v: boolean) => { setFieldValue('IsActive', v) }}
+                                                            testID="active-md"
+                                                        />
+                                                    </View>
+                                                </View>
+                                            </View>
                                         </View>
 
-                                        <HelperText type="error" visible={touched.Type_schedule && Boolean(errors.Type_schedule)} style={[{ display: touched.Type_schedule && Boolean(errors.Type_schedule) ? 'flex' : 'none' }, masterdataStyles.errorText]}>
-                                            {errors.Type_schedule}
-                                        </HelperText>
+                                        <View style={{ flexBasis: '46%', marginHorizontal: '2%', flex: 1, marginTop: responsive === "small" ? 100 : 0 }}>
+                                            <Text style={[masterdataStyles.text, masterdataStyles.textBold, { paddingVertical: 3, paddingLeft: 10 }]}>
+                                                Type Schedule
+                                            </Text>
 
-                                        <ScrollView showsVerticalScrollIndicator={false} style={{ display: values.Type_schedule ? 'flex' : 'none' }}>
-                                            <Animated.View entering={FadeInRight} exiting={FadeOutRight} style={{ display: values.Type_schedule === "Daily" ? 'flex' : 'none' }} >
-                                                <FastField name="TimeSlots" key={JSON.stringify({ Type_schedule: values.Type_schedule, TimeSlots: values.TimeSlots })}>
-                                                    {({ field, form }: any) => (
-                                                        <Daily_dialog
-                                                            values={values?.TimeSlots || []}
-                                                            setFieldValue={(value: [{ start: string | null, end: string | null }]) => {
-                                                                form.setFieldValue(field.name, value);
-
-                                                                setTimeout(() => {
-                                                                    form.setFieldTouched(field.name, true);
-                                                                }, 0)
+                                            <View style={styles.timeIntervalMenu}>
+                                                <Menu
+                                                    visible={showTimeIntervalMenu.Custom}
+                                                    onDismiss={() => {
+                                                        setShowTimeIntervalMenu((prev) => ({ ...prev, Custom: !showTimeIntervalMenu.Custom }))
+                                                        setFieldTouched('Type_schedule', true)
+                                                    }}
+                                                    style={{ marginTop: 50 }}
+                                                    anchor={<Button
+                                                        mode="outlined"
+                                                        style={styles.timeButton}
+                                                        onPress={() => setShowTimeIntervalMenu((prev) => ({ ...prev, Custom: true }))}
+                                                    >
+                                                        <Text style={masterdataStyles.timeText}>{values.Type_schedule ? `Selected ${values.Type_schedule}` : 'Select Reange Schedule'}</Text>
+                                                    </Button>}
+                                                >
+                                                    {["Weekly", "Daily", "Custom"].map((interval, index) => (
+                                                        <Menu.Item
+                                                            style={styles.menuItem}
+                                                            key={index}
+                                                            onPress={() => {
+                                                                setFieldValue('Type_schedule', interval)
+                                                                setShowTimeIntervalMenu((prev) => ({ ...prev, Custom: false }))
                                                             }}
-                                                            key={`daily-dialog`}
-                                                            responsive={responsive}
-                                                            showError={showError}
-                                                            showSuccess={showSuccess}
-                                                            touched={touched?.TimeSlots}
-                                                            errors={errors.TimeSlots}
-                                                            spacing={spacing}
-                                                            theme={theme}
+                                                            title={`${interval}`}
                                                         />
-                                                    )}
-                                                </FastField>
-                                            </Animated.View>
+                                                    ))}
+                                                </Menu>
+                                            </View>
 
-                                            <Animated.View entering={FadeInLeft} exiting={FadeOutLeft} style={{ display: values.Type_schedule === "Custom" ? 'flex' : 'none' }}>
-                                                <FastField name="TimeCustom" key={JSON.stringify({ Type_schedule: values.Type_schedule, Custom: values.Custom, TimeCustom: values.TimeCustom })}>
-                                                    {({ field, form }: any) => (
-                                                        <Custom_schedule_dialog
-                                                            responsive={responsive}
-                                                            values={values.TimeCustom || []}
-                                                            setFieldValue={(value: [{ start: string | null, end: string | null }]) => {
-                                                                form.setFieldValue(field.name, value);
+                                            <HelperText type="error" visible={touched.Type_schedule && Boolean(errors.Type_schedule)} style={[{ display: touched.Type_schedule && Boolean(errors.Type_schedule) ? 'flex' : 'none' }, masterdataStyles.errorText]}>
+                                                {errors.Type_schedule}
+                                            </HelperText>
 
-                                                                setTimeout(() => {
-                                                                    form.setFieldTouched(field.name, true);
-                                                                }, 0)
-                                                            }}
-                                                            showError={showError}
-                                                            showSuccess={showSuccess}
-                                                            spacing={spacing}
-                                                            theme={theme}
-                                                            touched={touched.TimeCustom}
-                                                            errors={errors.TimeCustom}
-                                                            key={"Custom_schedule"}
-                                                        />
-                                                    )}
-                                                </FastField>
-                                            </Animated.View>
+                                            <ScrollView showsVerticalScrollIndicator={false} style={{ display: values.Type_schedule ? 'flex' : 'none' }}>
+                                                <Animated.View entering={FadeInRight} exiting={FadeOutRight} style={{ display: values.Type_schedule === "Daily" ? 'flex' : 'none' }} >
+                                                    <FastField name="TimeSlots" key={JSON.stringify({ Type_schedule: values.Type_schedule, TimeSlots: values.TimeSlots })}>
+                                                        {({ field, form }: any) => (
+                                                            <Daily_dialog
+                                                                values={values?.TimeSlots || []}
+                                                                setFieldValue={(value: [{ start: string | null, end: string | null }]) => {
+                                                                    form.setFieldValue(field.name, value);
 
-                                            <Animated.View entering={FadeInLeft} exiting={FadeOutLeft} style={{ display: values.Type_schedule === "Weekly" ? 'flex' : 'none' }}>
-                                                <FastField name="TimeWeek" key={JSON.stringify({ Type_schedule: values.Type_schedule, Custom: values.Custom, timeWeek: true })}>
-                                                    {({ field, form }: any) => (
-                                                        <Week_dialog
-                                                            setFieldValue={(value: [{ start: string | null, end: string | null }]) => {
-                                                                form.setFieldValue(field.name, value);
+                                                                    setTimeout(() => {
+                                                                        form.setFieldTouched(field.name, true);
+                                                                    }, 0)
+                                                                }}
+                                                                key={`daily-dialog`}
+                                                                responsive={responsive}
+                                                                showError={showError}
+                                                                showSuccess={showSuccess}
+                                                                touched={touched?.TimeSlots}
+                                                                errors={errors.TimeSlots}
+                                                                spacing={spacing}
+                                                                theme={theme}
+                                                            />
+                                                        )}
+                                                    </FastField>
+                                                </Animated.View>
 
-                                                                setTimeout(() => {
-                                                                    form.setFieldTouched(field.name, true);
-                                                                }, 0)
-                                                            }}
-                                                            responsive={responsive}
-                                                            showError={showError}
-                                                            showSuccess={showSuccess}
-                                                            values={values.TimeWeek || {}}
-                                                            spacing={spacing}
-                                                            theme={theme}
-                                                            key={`week-dialog`}
-                                                        />
-                                                    )}
-                                                </FastField>
-                                            </Animated.View>
-                                        </ScrollView>
+                                                <Animated.View entering={FadeInLeft} exiting={FadeOutLeft} style={{ display: values.Type_schedule === "Custom" ? 'flex' : 'none' }}>
+                                                    <FastField name="TimeCustom" key={JSON.stringify({ Type_schedule: values.Type_schedule, Custom: values.Custom, TimeCustom: values.TimeCustom })}>
+                                                        {({ field, form }: any) => (
+                                                            <Custom_schedule_dialog
+                                                                responsive={responsive}
+                                                                values={values.TimeCustom || []}
+                                                                setFieldValue={(value: [{ start: string | null, end: string | null }]) => {
+                                                                    form.setFieldValue(field.name, value);
 
+                                                                    setTimeout(() => {
+                                                                        form.setFieldTouched(field.name, true);
+                                                                    }, 0)
+                                                                }}
+                                                                showError={showError}
+                                                                showSuccess={showSuccess}
+                                                                spacing={spacing}
+                                                                theme={theme}
+                                                                touched={touched.TimeCustom}
+                                                                errors={errors.TimeCustom}
+                                                                key={"Custom_schedule"}
+                                                            />
+                                                        )}
+                                                    </FastField>
+                                                </Animated.View>
+
+                                                <Animated.View entering={FadeInLeft} exiting={FadeOutLeft} style={{ display: values.Type_schedule === "Weekly" ? 'flex' : 'none' }}>
+                                                    <FastField name="TimeWeek" key={JSON.stringify({ Type_schedule: values.Type_schedule, Custom: values.Custom, timeWeek: true })}>
+                                                        {({ field, form }: any) => (
+                                                            <Week_dialog
+                                                                setFieldValue={(value: [{ start: string | null, end: string | null }]) => {
+                                                                    form.setFieldValue(field.name, value);
+
+                                                                    setTimeout(() => {
+                                                                        form.setFieldTouched(field.name, true);
+                                                                    }, 0)
+                                                                }}
+                                                                responsive={responsive}
+                                                                showError={showError}
+                                                                showSuccess={showSuccess}
+                                                                values={values.TimeWeek || {}}
+                                                                spacing={spacing}
+                                                                theme={theme}
+                                                                key={`week-dialog`}
+                                                            />
+                                                        )}
+                                                    </FastField>
+                                                </Animated.View>
+                                            </ScrollView>
+
+                                        </View>
                                     </View>
-                                </View>
-                                <View style={{ paddingBottom: 10, justifyContent: 'flex-end', flexDirection: 'row', paddingHorizontal: 24 }}>
-                                    <Button onPress={() => {
-                                        setIsVisible(false);
-                                        resetForm()
-                                    }}>Cancel</Button>
-                                    <Button
-                                        disabled={!isValid || !dirty}
-                                        onPress={() => {
-                                            handleSubmit();
+                                    <View style={{ paddingBottom: 10, justifyContent: 'flex-end', flexDirection: 'row', paddingHorizontal: 24 }}>
+                                        <Button onPress={() => {
+                                            setIsVisible(false);
+                                            resetForm()
+                                        }}>Cancel</Button>
+                                        <Button
+                                            disabled={!isValid || !dirty}
+                                            onPress={() => {
+                                                handleSubmit();
 
-                                        }}>Save</Button>
-                                </View>
+                                            }}>Save</Button>
+                                    </View>
 
+                                </Dialog.Content>
                             </Dialog>
                         )
                     }}

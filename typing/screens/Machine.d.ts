@@ -22,7 +22,7 @@ export interface InitialValuesMachine extends Detail, Active {
   machineGroupId?: string;
   machineGroupName?: string;
   machineId: string;
-  machineCode: string | null;
+  machineCode: string;
   formId: string | null;
   building: string | null;
   floor: string | null;
