@@ -238,21 +238,7 @@ const useMasterdataStyles = () => {
             borderRadius: 2,
             marginBottom: 20,
             borderLeftWidth: 3,
-            borderColor: theme.colors.yellow,
-            ...Platform.select({
-                ios: {
-                    shadowColor: theme.colors.onBackground,
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 6,
-                },
-                android: {
-                    elevation: 6,
-                },
-                web: {
-                    boxShadow: `2px 5px 10px ${!darkMode ? 'rgba(0, 0, 0, 0.24)' : 'rgba(193, 214, 255, 0.56)'}`,
-                },
-            }),
+            borderColor: theme.colors.yellow
         },
         cardTitle: {
             fontSize: spacing.medium,

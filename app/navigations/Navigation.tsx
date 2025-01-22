@@ -238,6 +238,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
 
 const Navigation: React.FC = React.memo(() => {
     const user = useSelector((state: any) => state.user);
+    const { theme, darkMode } = useTheme();
 
     const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
 
@@ -256,9 +257,11 @@ const Navigation: React.FC = React.memo(() => {
             cachedComponents.current[name] = LazyComponent;
 
             return (props: any) => (
-                <Suspense fallback={<LoadingSpinner />}>
-                    <LazyComponent {...props} />
-                </Suspense>
+                <View style={{ backgroundColor: 'rgba(1, 0, 47, 0.41)'}}>
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <LazyComponent {...props} />
+                    </Suspense>
+                </View>
             );
         }
 
@@ -269,12 +272,12 @@ const Navigation: React.FC = React.memo(() => {
         );
     }, []);
 
+
     return (
         <DrawerNav
             renderComponent={renderComponent}
             user={user}
         />
-
     );
 });
 

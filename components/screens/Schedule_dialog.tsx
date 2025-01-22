@@ -2,7 +2,7 @@ import { useRes } from '@/app/contexts/useRes';
 import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, Dimensions, TouchableOpacity, Platform } from 'react-native';
 import { Button, Dialog, Portal, Menu, Switch, HelperText, Icon } from 'react-native-paper';
 import { DropdownMulti, Inputs } from '../common';
 import { useToast } from '@/app/contexts/useToast';
@@ -286,7 +286,7 @@ const ScheduleDialog = React.memo(({ isVisible, setIsVisible, saveData, initialV
                                                 {errors.MachineGroup || ""}
                                             </HelperText>
 
-                                            <ScrollView showsVerticalScrollIndicator={false} style={{ flexGrow: 0, marginVertical: 5 }}>
+                                            <ScrollView showsVerticalScrollIndicator={false} style={{ flexGrow: Platform.OS === "web" ? 0 : 1, marginVertical: 5 }}>
                                                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 10 }}>
                                                     {values.MachineGroup && Array.isArray(values.MachineGroup) && values.MachineGroup.length > 0 && values.MachineGroup?.map((item, index) => (
                                                         <TouchableOpacity onPress={() => {
