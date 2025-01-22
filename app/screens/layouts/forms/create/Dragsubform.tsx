@@ -196,7 +196,7 @@ const Dragsubform = React.memo(({ checkLists }: DragsubformProps) => {
     return (
         <>
             <View style={styles.container}>
-                <Text style={[masterdataStyles.cardTitle]}>All Cards</Text>
+                <Text style={[masterdataStyles.text, masterdataStyles.cardTitle]}>All Cards</Text>
                 <IconButton
                     icon="folder-plus-outline"
                     iconColor={theme.colors.onBackground}

@@ -50,11 +50,9 @@ const CustomtableData = React.memo(({ Tablehead, flexArr, actionIndex, displayDa
                 }
                 keyExtractor={(item, index) => `${index}-${item}`}
                 ListEmptyComponent={() => isFetching ? (
-                    <View style={{ height: 55, flexDirection: 'row' }}>
+                    <View style={{ height: 55, flexDirection: 'row', }}>
                         {flexArr.map((flex, idx) => (
-                            <View key={idx} style={{ flex: flex, marginTop: 10 }}>
-                                <ShimmerPlaceholder key={idx} />
-                            </View>
+                            <ShimmerPlaceholder key={idx} style={{ flex: flex, marginHorizontal: idx === 1 || idx === 0 ? 0 : 5, alignSelf: 'center', borderRadius: 10 }} />
                         ))}
                     </View>
                 ) : (

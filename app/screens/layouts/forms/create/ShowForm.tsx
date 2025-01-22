@@ -1,10 +1,10 @@
 import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef, useCallback } from "react";
-import { View, ViewStyle, FlatList, TouchableOpacity } from "react-native";
-import { Card, Divider } from "react-native-paper";
+import { View, ViewStyle, FlatList, TouchableOpacity, Platform } from "react-native";
+import { Card, Divider, Icon } from "react-native-paper";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
 import { BaseFormState, BaseSubForm } from '@/typing/form';
-import { AccessibleView, Dynamic, Text } from "@/components";
+import { Dynamic, Text } from "@/components";
 import { Formik, FieldProps, Field } from "formik";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { DataType } from "@/typing/type";
@@ -17,9 +17,9 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
 
     const masterdataStyles = useMasterdataStyles();
     const cardRef = useRef<View>(null);
-    const { responsive } = useRes();
+    const { responsive, spacing } = useRes();
     const [formValues, setFormValues] = useState<FormValues>({});
-    const { theme } = useTheme();
+    const { theme, darkMode } = useTheme();
     const cardRefs = useRef<(View | null)[]>([]);
     const cardPositions = useRef<{ x: number; y: number; width: number; height: number }[]>([]);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -94,7 +94,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
     };
 
     return (
-        <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]}>
+        <View id="container-form-scan" style={[masterdataStyles.container, { paddingTop: 30, paddingLeft: 10 }]}>
             <FlatList
                 data={[{}]}
                 renderItem={() =>
@@ -121,11 +121,10 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                                                 <Card.Title
                                                     title={subForm.SFormName}
                                                     titleStyle={masterdataStyles.cardTitle}
-
                                                 />
                                             </TouchableOpacity>
 
-                                            <Card.Content style={[masterdataStyles.subFormContainer, { marginHorizontal: 20 }]}>
+                                            <Card.Content style={masterdataStyles.subFormContainer}>
                                                 {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
                                                     const columns = subForm.Columns ?? 1;
                                                     const ChheckList = subForm.Number ? `${countRef.current}. ${field.CListName}` : field.CListName;
@@ -218,7 +217,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                 contentContainerStyle={{ paddingBottom: 20 }}
                 showsVerticalScrollIndicator={false}
             />
-        </AccessibleView>
+        </View>
     );
 }));
 

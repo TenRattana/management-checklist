@@ -66,16 +66,14 @@ const useCreateformStyle = () => {
             color: theme.colors.onBackground
         },
         saveButton: {
-            paddingHorizontal: 10,
-            height: 60,
+            padding: 10,
             marginVertical: 3,
+            marginHorizontal: 20,
             backgroundColor: theme.colors.blue,
             borderRadius: 8,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: 16,
-            margin: 16,
         },
         saveText: {
             color: theme.colors.background,

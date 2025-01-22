@@ -216,7 +216,7 @@ const FieldDialog = React.memo(({ isVisible, formState, onDeleteField, editMode,
 
     return (
         <Portal>
-            <Dialog visible={isVisible} onDismiss={handleDismissDialog} style={[masterdataStyles.containerDialog, { width: responsive === "large" ? 650 : '80%', borderRadius: 4, backgroundColor: theme.colors.background }]}>
+            <Dialog visible={isVisible} onDismiss={handleDismissDialog} style={[masterdataStyles.containerDialog]}>
                 <View style={{ justifyContent: "space-between", flexDirection: 'row', marginHorizontal: 20, alignItems: 'center' }}>
                     <Text style={[masterdataStyles.text, masterdataStyles.title, masterdataStyles.textBold, { paddingLeft: 8 }]}>{editMode ? "Edit check list" : "Create check list"}</Text>
                     <IconButton icon="close" size={20} iconColor={theme.colors.onBackground} onPress={() => setShowDialogs()} />

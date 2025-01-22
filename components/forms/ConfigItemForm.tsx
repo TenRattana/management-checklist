@@ -25,7 +25,7 @@ const ConfigItemForm = React.memo(({ label, value, editable, onEdit }: CreateFor
     }, [onEdit]);
 
     return (
-        <AccessibleView name="" style={styles.container}>
+        <View style={styles.container}>
             {editable ? (
                 <RenderFormik field={label} setEdit={onEdit} />
             ) : (
@@ -50,7 +50,7 @@ const ConfigItemForm = React.memo(({ label, value, editable, onEdit }: CreateFor
                     />
                 </View>
             )}
-        </AccessibleView>
+        </View>
     );
 });
 
@@ -135,10 +135,9 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        marginVertical: 8,
         marginHorizontal: 5,
+        marginVertical: 5,
         paddingHorizontal: 12,
-        backgroundColor: "#f9f9f9",
         borderRadius: 8,
     },
     textRow: {

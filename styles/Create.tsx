@@ -24,7 +24,7 @@ const Create = (width: number, drawerOpen: boolean) => {
         buttonContainer: {
             flexDirection: 'row',
             position: 'absolute',
-            top: 20,
+            top: 10,
             left: 20,
             zIndex: 6
         },
@@ -39,7 +39,7 @@ const Create = (width: number, drawerOpen: boolean) => {
         openButtonActive: {
             backgroundColor: theme.colors.error,
             alignItems: 'center',
-            marginTop: 10,
+            marginTop: 5,
             flexDirection: 'row',
             padding: 10,
             borderRadius: 5,
@@ -53,7 +53,7 @@ const Create = (width: number, drawerOpen: boolean) => {
             width: DRAWER_WIDTH,
         },
         groupContainer: {
-            marginVertical: 20,
+            marginVertical: 10,
             paddingBottom: 10,
         },
         groupTitle: {
@@ -68,7 +68,6 @@ const Create = (width: number, drawerOpen: boolean) => {
             justifyContent: 'flex-start',
         },
         fieldContainer: {
-            marginHorizontal: 10,
             flex: 1,
         },
         iconButton: {
