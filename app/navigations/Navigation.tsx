@@ -257,11 +257,9 @@ const Navigation: React.FC = React.memo(() => {
             cachedComponents.current[name] = LazyComponent;
 
             return (props: any) => (
-                <View style={{ backgroundColor: 'rgba(1, 0, 47, 0.41)'}}>
-                    <Suspense fallback={<LoadingSpinner />}>
-                        <LazyComponent {...props} />
-                    </Suspense>
-                </View>
+                <Suspense fallback={<LoadingSpinner />}>
+                    <LazyComponent {...props} />
+                </Suspense>
             );
         }
 
