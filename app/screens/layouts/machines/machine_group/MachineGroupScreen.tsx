@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from
 import { TouchableOpacity, StyleSheet, View, Platform } from "react-native";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
-import { LoadingSpinner, Searchbar, Text } from "@/components";
+import { LoadingSpinner, LoadingSpinnerTable, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
@@ -62,7 +62,7 @@ const MachineGroupScreen = React.memo(() => {
                 remove()
                 setMachineGroup([])
             };
-        }, [])
+        }, [remove])
     );
 
     const handlePaginationChange = useCallback(() => {
@@ -248,7 +248,7 @@ const MachineGroupScreen = React.memo(() => {
                     </TouchableOpacity>
                 </View>
 
-                <Suspense fallback={<LoadingSpinner />}>
+                <Suspense fallback={<LoadingSpinnerTable />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
                 </Suspense>
             </Card.Content>

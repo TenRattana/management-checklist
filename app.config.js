@@ -128,7 +128,7 @@ export default {
     extra: {
       ...getEnvVars(environment),
       eas: {
-        projectId: "bc86b091-c7d5-4991-bc17-90a632b8c05e",
+        projectId: "0b443236-1652-4627-81dd-7530cec88504",
       },
     },
     experiments: {

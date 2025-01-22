@@ -18,6 +18,8 @@ import { navigate } from "@/app/navigations/navigationUtils";
 import Formfield from "./Formfield";
 import { useRes } from "@/app/contexts/useRes";
 import { FormValues } from "@/typing/screens/CreateForm";
+import ShimmerPlaceholder, { createShimmerPlaceholder } from 'react-native-shimmer-placeholder';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const isValidDateFormatCustom = (value: string) => {
   const dateRegex = /^(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2})$/;
@@ -27,6 +29,7 @@ const isValidDateFormatCustom = (value: string) => {
 const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
   const { route } = props;
   const { dataType, found, isLoadingForm } = useForm(route);
+  const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
   const state = useSelector((state: any) => state.form);
   const user = useSelector((state: any) => state.user);
@@ -124,10 +127,19 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
   }, [onFormSubmit]);
 
   if (isLoadingForm || !found) {
-    return <Text>Loading Form...</Text>;
+    return (
+      <View style={{ flex: 1, marginTop: 5, marginHorizontal: 10 }}>
+        <ShimmerPlaceholder style={{ margin: 5, width: 300, borderRadius: 10 }} width={300} />
+        <ShimmerPlaceholder style={{ margin: 5, width: 600, borderRadius: 10 }} width={600} />
+
+        <ShimmerPlaceholder style={{ marginTop: 20, marginHorizontal: 5, height: 500, width: '100%', borderRadius: 10 }} width={800} />
+
+        <ShimmerPlaceholder style={{ alignSelf: 'center', marginTop: 20, marginHorizontal: 5, height: 50, width: 300, borderRadius: 10 }} width={300} />
+      </View>
+    )
   }
 
-  return found ? (
+  return found ? state.FormID ? (
     <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]} key={responsive}>
       <Stack.Screen options={{ headerTitle: `${state.MachineName || "Machine Name"}` }} />
 
@@ -216,7 +228,18 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
         </AccessibleView>
       )}
     </AccessibleView>
-  ) : <NotFoundScreen />
+  ) : <AccessibleView name="form-success" style={masterdataStyles.containerScccess}>
+    <Text style={masterdataStyles.text}>Not Found!</Text>
+    <TouchableOpacity
+      onPress={() => {
+        setIsSubmitted(false);
+        navigate("ScanQR");
+      }}
+      style={masterdataStyles.button}
+    >
+      <Text style={[masterdataStyles.textBold, masterdataStyles.text, { color: theme.colors.blue }]}>Scan again</Text>
+    </TouchableOpacity>
+  </AccessibleView> : <NotFoundScreen />
 });
 
 export default InputFormMachine;

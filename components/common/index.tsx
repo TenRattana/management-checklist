@@ -2,6 +2,7 @@ export { default as Checkboxs } from "./Checkboxs";
 export { default as Dialogs } from "./Dialogs";
 export { default as Inputs } from "./Inputs";
 export { default as LoadingSpinner } from "./LoadingSpinner";
+export { default as LoadingSpinnerTable } from "./LoadingSpinnerTable";
 export { default as Radios } from "./Radios";
 export { default as Searchbar } from "./Searchbar";
 export { default as Selects } from "./Selects";

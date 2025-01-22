@@ -3,7 +3,7 @@ import { Button, Dialog, Portal } from 'react-native-paper'
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { TimeScheduleMachine } from '@/typing/type';
 import { useQuery } from 'react-query';
-import { LoadingSpinner } from '../common';
+import { LoadingSpinner, LoadingSpinnerTable } from '../common';
 import { Customtable } from '..';
 import { useTheme } from '@/app/contexts/useTheme';
 import { Platform, StyleSheet, View } from 'react-native';
@@ -62,7 +62,7 @@ const Home_dialog = React.memo(({ dialogVisible, hideDialog, selectedEvent }: Ho
             <Dialog visible={dialogVisible} onDismiss={hideDialog} style={[masterdataStyles.containerDialog, styles.container]}>
                 <Dialog.Title>{selectedEvent?.title} - Schedule</Dialog.Title>
                 <View style={{ flex: 1, marginHorizontal: 24 }}>
-                    {isLoading ? <LoadingSpinner /> : <Customtable {...customtableProps} />}
+                    {isLoading ? <LoadingSpinnerTable /> : <Customtable {...customtableProps} />}
                 </View>
                 <View style={{ paddingBottom: 10, justifyContent: 'flex-end', flexDirection: 'row', paddingHorizontal: 24 }}>
                     <Button onPress={() => {

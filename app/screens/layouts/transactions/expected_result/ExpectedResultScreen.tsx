@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from '@/app/contexts/useToast';
-import { LoadingSpinner, Searchbar, Text } from "@/components";
+import { LoadingSpinner, LoadingSpinnerTable, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useInfiniteQuery } from 'react-query';
@@ -86,7 +86,7 @@ const ExpectedResultScreen = React.memo(() => {
                 remove()
                 setExpectedResult([])
             };
-        }, [])
+        }, [remove])
     );
 
     const handlePaginationChange = useCallback(() => {
@@ -251,7 +251,7 @@ const ExpectedResultScreen = React.memo(() => {
                     </View>
                 </View>
 
-                <Suspense fallback={<LoadingSpinner />}>
+                <Suspense fallback={<LoadingSpinnerTable />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} fetchNextPage={fetchNextPageMG} handlefilter={handlefilter} />
                 </Suspense>
             </Card.Content>

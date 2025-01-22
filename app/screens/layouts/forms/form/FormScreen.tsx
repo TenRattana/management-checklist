@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from
 import { TouchableOpacity, StyleSheet, View, Platform } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts/useToast";
-import { LoadingSpinner, Searchbar, Text } from "@/components";
+import { LoadingSpinner, LoadingSpinnerTable, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useInfiniteQuery, useQueryClient } from 'react-query';
@@ -55,7 +55,7 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
                 remove()
                 setForm([])
             };
-        }, [])
+        }, [remove])
     );
 
     const handlePaginationChange = useCallback(() => {
@@ -222,7 +222,7 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
                     </TouchableOpacity>
                 </View>
 
-                <Suspense fallback={<LoadingSpinner />}>
+                <Suspense fallback={<LoadingSpinnerTable />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
                 </Suspense>
             </Card.Content>
