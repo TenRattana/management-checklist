@@ -207,6 +207,11 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                         <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
                     </>
                 )}
+                ListFooterComponent={() =>
+                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                        <Text style={[masterdataStyles.description, { color: theme.colors.onBackground }]}>{state.FormNumber || "// F"}</Text>
+                    </View>
+                }
                 keyExtractor={(_, index) => `index-preview-${index}`}
                 onScroll={handleScroll}
                 scrollEventThrottle={-30}

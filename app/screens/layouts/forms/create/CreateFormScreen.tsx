@@ -303,7 +303,7 @@ const CreateFormScreen = React.memo(({ route }: CreateFormProps) => {
                                 )}
 
                                 <View id="container-formname" style={{ marginHorizontal: 10, marginTop: responsive === "small" ? 5 : 5 }}>
-                                    {['FormName', 'Description'].map((item) => (
+                                    {['FormName', 'Description', 'FormNumber'].map((item) => (
                                         <MemoConfigItemForm
                                             key={item}
                                             label={item}

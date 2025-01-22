@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { IconButton } from "react-native-paper";
 import AccessibleView from "@/components/AccessibleView";
 import Inputs from "@/components/common/Inputs";
-import { updateFormName, updateFormDescription } from "@/slices";
+import { updateFormName, updateFormDescription, updateFormNumber } from "@/slices";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useRes } from "@/app/contexts/useRes";
 import { FastField, Formik } from "formik";
@@ -74,6 +74,9 @@ const RenderFormik: React.FC<{ field: string; setEdit: (v: boolean) => void }> =
                         case "Description":
                             dispatch(updateFormDescription({ form: values[field] }));
                             break;
+                        case "FormNumber":
+                            dispatch(updateFormNumber({ form: values[field] }));
+                            break;
                         default:
                             break;
                     }
@@ -134,7 +137,6 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         marginVertical: 8,
         marginHorizontal: 5,
-        paddingVertical: 10,
         paddingHorizontal: 12,
         backgroundColor: "#f9f9f9",
         borderRadius: 8,

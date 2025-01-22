@@ -27,7 +27,6 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const validationSchema = useMemo(() => {
-
         const shape: Record<string, any> = {};
         state.subForms.forEach((subForm: BaseSubForm) => {
             subForm.Fields.forEach((field: BaseFormState) => {
@@ -241,23 +240,31 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
                         )}
                     </View>
                 )}
-                ListFooterComponent={() => exp && (
-                    <View style={{ flexDirection: 'row', marginLeft: 10, marginVertical: 10 }}>
-                        <View style={{ marginRight: 30 }}>
-                            <Text style={[masterdataStyles.description, { color: theme.colors.onBackground }]}>Inspector</Text>
-                            <Divider />
-                            <Text style={[masterdataStyles.title, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state?.UserName || "User Submit"}</Text>
+                ListFooterComponent={() =>
+                    <>
+                        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                            <Text style={[masterdataStyles.description, { color: theme.colors.onBackground }]}>{state.FormNumber || "// F"}</Text>
                         </View>
 
-                        {state?.ApprovedName && (
-                            <View>
-                                <Text style={[masterdataStyles.description, { color: theme.colors.onBackground }]}>Acknowledged</Text>
-                                <Divider />
-                                <Text style={[masterdataStyles.title, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state?.ApprovedName || "User Approved"}</Text>
+                        {exp && (
+                            <View style={{ flexDirection: 'row', marginLeft: 10, marginVertical: 10 }}>
+                                <View style={{ marginRight: 30 }}>
+                                    <Text style={[masterdataStyles.description, { color: theme.colors.onBackground }]}>Inspector</Text>
+                                    <Divider />
+                                    <Text style={[masterdataStyles.title, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state?.UserName || "User Submit"}</Text>
+                                </View>
+
+                                {state?.ApprovedName && (
+                                    <View>
+                                        <Text style={[masterdataStyles.description, { color: theme.colors.onBackground }]}>Acknowledged</Text>
+                                        <Divider />
+                                        <Text style={[masterdataStyles.title, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state?.ApprovedName || "User Approved"}</Text>
+                                    </View>
+                                )}
                             </View>
                         )}
-                    </View>
-                )}
+                    </>
+                }
                 keyExtractor={(_, index) => `index-preview-${index}`}
                 contentContainerStyle={{ paddingBottom: 20 }}
                 showsVerticalScrollIndicator={false}

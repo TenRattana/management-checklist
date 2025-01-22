@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from "react";
 import axiosInstance from "@/config/axios";
 import { Card, Divider } from "react-native-paper";
-import { FlatList, TouchableOpacity } from "react-native";
+import { FlatList, TouchableOpacity, View } from "react-native";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useToast } from "@/app/contexts/useToast";
 import { BaseSubForm, BaseFormState } from '@/typing/form';
@@ -166,26 +166,34 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
                 }}
                 keyExtractor={(item) => `index-preview-${item.SFormID}`}
                 ListHeaderComponent={() => (
-                  <>
-                    <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
-                    <Divider />
-                    <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
-                  </>
+                  <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
+                    <View style={{ alignSelf: 'center', flex: 1 }}>
+                      <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
+                      <Divider />
+                      <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
+                    </View>
+                  </View>
                 )}
                 ListFooterComponent={() => (
-                  <AccessibleView name="form-action-scan" style={[masterdataStyles.containerAction]}>
-                    <TouchableOpacity
-                      onPress={() => handleSubmit()}
-                      style={[
-                        masterdataStyles.button,
-                        masterdataStyles.backMain,
-                        { opacity: isValid && dirty ? 1 : 0.5 },
-                      ]}
-                      disabled={!dirty || !isValid}
-                    >
-                      <Text style={[masterdataStyles.textBold, masterdataStyles.textFFF]}>Submit Form</Text>
-                    </TouchableOpacity>
-                  </AccessibleView>
+                  <>
+                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                      <Text style={[masterdataStyles.description, { color: theme.colors.onBackground }]}>{state.FormNumber || "// F"}</Text>
+                    </View>
+
+                    <AccessibleView name="form-action-scan" style={[masterdataStyles.containerAction]}>
+                      <TouchableOpacity
+                        onPress={() => handleSubmit()}
+                        style={[
+                          masterdataStyles.button,
+                          masterdataStyles.backMain,
+                          { opacity: isValid && dirty ? 1 : 0.5 },
+                        ]}
+                        disabled={!dirty || !isValid}
+                      >
+                        <Text style={[masterdataStyles.textBold, masterdataStyles.textFFF]}>Submit Form</Text>
+                      </TouchableOpacity>
+                    </AccessibleView>
+                  </>
                 )}
                 contentContainerStyle={{ paddingBottom: 20 }}
                 removeClippedSubviews={true}
