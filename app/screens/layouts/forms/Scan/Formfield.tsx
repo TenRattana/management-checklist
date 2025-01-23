@@ -1,4 +1,4 @@
-import { View, ViewStyle } from 'react-native';
+import { FlatList, View, ViewStyle } from 'react-native';
 import React, { useCallback, useMemo } from 'react';
 import { BaseFormState } from '@/typing/form';
 import { useRes } from '@/app/contexts/useRes';
@@ -8,6 +8,8 @@ import { FiledScan } from '@/typing/screens/Scan';
 
 const Formfield = React.memo(({ item, field, dataType, setFieldValue, setTouched, touched, values, errors }: FiledScan) => {
     const { responsive } = useRes();
+
+    console.log("Formfield");
 
     const getType = useMemo(() => (field: BaseFormState) => {
         return dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName;
@@ -40,8 +42,10 @@ const Formfield = React.memo(({ item, field, dataType, setFieldValue, setTouched
             padding: 5,
         };
 
+        console.log("field");
+
         return (
-            <Field name={field.MCListID} key={`field-${fieldIndex}-${item.Columns}`}>
+            <FastField name={field.MCListID} key={`field-${fieldIndex}-${item.Columns}`}>
                 {({ field: fastFieldProps }: FieldProps) => {
                     return (
                         <View id="container-layout2" style={containerStyle} key={`dynamic-${fieldIndex}-${item.Columns}`}>
@@ -58,7 +62,7 @@ const Formfield = React.memo(({ item, field, dataType, setFieldValue, setTouched
                         </View>
                     );
                 }}
-            </Field>
+            </FastField>
         );
     })
 });
