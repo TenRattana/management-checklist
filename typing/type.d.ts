@@ -35,10 +35,18 @@ export interface UsersPermission {
 export interface Userset {
   UserName: string;
 }
+
+export interface GroupPermisson {
+  PermissionID:number;
+  PermissionStatus:boolean;
+  PermissionName:string;
+  IsActive:boolean;
+}
 export interface GroupUsers {
   GUserID: string;
   GUserName: string;
   IsActive: boolean;
+  Permissons: GroupPermisson[]
 }
 
 export interface Prefixs {

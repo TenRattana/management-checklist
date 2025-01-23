@@ -76,7 +76,7 @@ export default {
     },
     web: {
       bundler: "metro",
-      output: "/PMChecklist_PD/",
+      output: "single",
       favicon: "./assets/images/Icon-app.png",
       splitChunks: true,
       cache: true,

@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo, Suspense, lazy } from "react";
+import React, { useState, useEffect, useCallback, useMemo, Suspense, lazy, useRef } from "react";
 import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts/useToast";
 import { useRes } from "@/app/contexts/useRes";
 import { LoadingSpinner, Searchbar, Text } from "@/components";
-import { Card } from "react-native-paper";
+import { Card, Dialog, Portal } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Managepermisstion_dialog from "@/components/screens/Managepermisstion_dialog";
 import { Users, GroupUsers, UsersPermission } from '@/typing/type'
@@ -15,6 +15,19 @@ import { fetchGroupUser, fetchUserPermission, fetchUsers, saveUserPermission } f
 import { useTheme } from "@/app/contexts/useTheme";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
+const LazyInfoGroupPermisson_dialog = lazy(() => import("@/components/screens/InfoGroupPermisson_dialog"));
+
+const CustomDialog = React.memo(({ visible, children }: { visible: boolean, children: any }) => {
+  const { responsive } = useRes();
+  const { theme } = useTheme();
+
+  return <Dialog
+    visible={visible}
+    style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 4, backgroundColor: theme.colors.background }}
+  >
+    {children}
+  </Dialog>
+});
 
 const Managepermissions = React.memo(() => {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -39,7 +52,10 @@ const Managepermissions = React.memo(() => {
     'userPermission',
     fetchUserPermission,
     {
-      refetchOnWindowFocus: true,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      staleTime: 1000 * 60 * 5,
+      cacheTime: 1000 * 60 * 10
     }
   );
 
@@ -140,6 +156,10 @@ const Managepermissions = React.memo(() => {
     setIsVisible(true);
   }, [setInitialValues, setIsEditing, setIsVisible]);
 
+  const handelEditPermisson = useCallback(() => {
+    setInfoPermisson(true);
+  }, []);
+
   const customtableProps = useMemo(() => ({
     Tabledata: tableData,
     Tablehead: [
@@ -222,6 +242,9 @@ const Managepermissions = React.memo(() => {
     }
   });
 
+  const [infoPermisson, setInfoPermisson] = useState(false)
+  const ref = useRef("")
+
   return (
     <View id="container-managerpermission" style={styles.container}>
       <View id="container-search" style={masterdataStyles.containerSearch}>
@@ -242,6 +265,10 @@ const Managepermissions = React.memo(() => {
           <TouchableOpacity onPress={handleNewData} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
             <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.UsersPermission}`}</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity onPress={handelEditPermisson} style={{ marginHorizontal: 10, position: 'absolute', right: 30 }}>
+            <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textError]}>{`Edit Permisson`}</Text>
+          </TouchableOpacity>
         </View>
 
         <Suspense fallback={<LoadingSpinner />}>
@@ -259,6 +286,19 @@ const Managepermissions = React.memo(() => {
           users={user}
           groupUser={groupUser}
         />
+      )}
+
+      {infoPermisson && (
+        <Portal>
+          <CustomDialog visible={infoPermisson}>
+            <Suspense fallback={<LoadingSpinner />}>
+              <LazyInfoGroupPermisson_dialog
+                setDialogAdd={() => setInfoPermisson(false)}
+                groupUsers={groupUser}
+              />
+            </Suspense>
+          </CustomDialog>
+        </Portal>
       )}
     </View>
   );
