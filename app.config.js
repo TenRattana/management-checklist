@@ -85,6 +85,7 @@ export default {
         html: "./public/index.html",
         development: false,
       },
+      url: "/PMChecklist",
     },
     assetBundlePatterns: [
       "assets/fonts/*",
