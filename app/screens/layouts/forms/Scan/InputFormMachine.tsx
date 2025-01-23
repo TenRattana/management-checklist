@@ -26,10 +26,27 @@ const isValidDateFormatCustom = (value: string) => {
   return dateRegex.test(value);
 };
 
+const MemoizedFormfield = React.memo(({ dataType, item, field, values, setFieldValue, setTouched, errors, touched }: any) => {
+  return (
+    <Formfield
+      dataType={dataType}
+      item={item}
+      field={field}
+      values={values}
+      setFieldValue={setFieldValue}
+      setTouched={setTouched}
+      errors={errors}
+      touched={touched}
+    />
+  );
+});
+
 const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
   const { route } = props;
   const { dataType, found, isLoadingForm } = useForm(route);
   const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
+
+  console.log("InputFormMachine");
 
   const state = useSelector((state: any) => state.form);
   const user = useSelector((state: any) => state.user);
@@ -155,13 +172,14 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
             return (
               <FlatList
                 data={state.subForms}
-                renderItem={({ item }) => {
+                extraData={state.subForms}
+                renderItem={({ item, index }) => {
                   return (
-                    <Card style={masterdataStyles.card} key={item.SFormID}>
+                    <Card style={masterdataStyles.card} key={index}>
                       <Card.Title title={item.SFormName} titleStyle={masterdataStyles.cardTitle} />
                       <Card.Content style={[masterdataStyles.subFormContainer]}>
                         {item.Fields && item.Fields.length > 0 && (
-                          <Formfield
+                          <MemoizedFormfield
                             dataType={dataType}
                             item={item}
                             field={item.Fields}
@@ -176,7 +194,7 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
                     </Card>
                   );
                 }}
-                keyExtractor={(item) => `index-preview-${item.SFormID}`}
+                keyExtractor={(item, index) => `${index}-${item}`}
                 ListHeaderComponent={() => (
                   <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
                     <View style={{ alignSelf: 'center', flex: 1 }}>
