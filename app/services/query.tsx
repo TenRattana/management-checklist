@@ -512,3 +512,19 @@ export const saveUserPermission = async (data: { Prefix: any; UserID: string | u
     const response = await axiosInstance.post("User_service.asmx/SaveUser", data);
     return response.data;
 };
+
+// Group Permission
+export const fetchGroupPermissons = async (): Promise<GroupUsers[]> => {
+    const response = await axiosInstance.post('GroupUser_service.asmx/GetGroupUsers');
+    return response.data.data ?? [];
+};
+
+export const fetchPermissons = async (): Promise<GroupUsers[]> => {
+    const response = await axiosInstance.post('GroupUser_service.asmx/GetGroupUsers');
+    return response.data.data ?? [];
+};
+
+export const fetchGroupUserPermissons = async (): Promise<GroupUsers[]> => {
+    const response = await axiosInstance.post('GroupUser_service.asmx/GetGroupUsers');
+    return response.data.data ?? [];
+};
