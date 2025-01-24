@@ -67,6 +67,19 @@ const DetailContent = React.memo(({ detailData, showDetailwithKey }: DetailConte
         },
     })
 
+    const datePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
+
+    const convertToThaiDateTime = (dateString: string) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear() + 543;
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+
+        return `${day}/${month}/${year} เวลา ${hours}:${minutes}`;
+    };
+
     const renderValue = useCallback((value: any) => {
         if (Array.isArray(value)) {
             return (
@@ -94,7 +107,7 @@ const DetailContent = React.memo(({ detailData, showDetailwithKey }: DetailConte
         } else if (typeof value === "boolean" && value !== null) {
             return <Text style={masterdataStyles.text}>{value ? "Active" : "Is Active"}</Text>;
         } else {
-            return <Text style={masterdataStyles.text}>{String(value)}</Text>;
+            return <Text style={masterdataStyles.text}>{String(datePattern.test(value) ? convertToThaiDateTime(value) : value)}</Text>;
         }
     }, []);
 

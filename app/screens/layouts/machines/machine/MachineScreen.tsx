@@ -3,7 +3,7 @@ import { TouchableOpacity, StyleSheet, View, Platform } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
-import { LoadingSpinner, Searchbar, Text } from "@/components";
+import { LoadingSpinner, LoadingSpinnerTable, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useMutation, useQueryClient, useInfiniteQuery } from 'react-query';
@@ -32,7 +32,8 @@ const MachineGroupScreen = React.memo(() => {
         machineName: "",
         description: "",
         isActive: true,
-        disables: false
+        disables: false,
+        delete: false
     });
 
     const masterdataStyles = useMasterdataStyles();
@@ -42,15 +43,6 @@ const MachineGroupScreen = React.memo(() => {
     const { theme, darkMode } = useTheme();
     const queryClient = useQueryClient();
     const [machines, setMachine] = useState<Machine[]>([]);
-
-    useFocusEffect(
-        useCallback(() => {
-            return () => {
-                remove()
-                setMachine([])
-            };
-        }, [])
-    );
 
     const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
         ['machines', debouncedSearchQuery],
@@ -71,6 +63,15 @@ const MachineGroupScreen = React.memo(() => {
                 setMachine(newItems);
             },
         }
+    );
+
+    useFocusEffect(
+        useCallback(() => {
+            return () => {
+                remove()
+                setMachine([])
+            };
+        }, [remove])
     );
 
     const handlePaginationChange = useCallback(() => {
@@ -134,6 +135,7 @@ const MachineGroupScreen = React.memo(() => {
                     description: machineData.Description ?? "",
                     isActive: Boolean(machineData.IsActive),
                     disables: Boolean(machineData.Disables),
+                    delete: Boolean(machineData.Deletes),
                 });
                 setIsEditing(true);
                 setIsVisible(true);
@@ -173,7 +175,8 @@ const MachineGroupScreen = React.memo(() => {
             machineName: "",
             description: "",
             isActive: true,
-            disables: false
+            disables: false,
+            delete: false
         });
         setIsEditing(false);
         setIsVisible(true);
@@ -279,7 +282,7 @@ const MachineGroupScreen = React.memo(() => {
                     </TouchableOpacity>
                 </View>
 
-                <Suspense fallback={<LoadingSpinner />}>
+                <Suspense fallback={<LoadingSpinnerTable />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
                 </Suspense>
             </Card.Content>

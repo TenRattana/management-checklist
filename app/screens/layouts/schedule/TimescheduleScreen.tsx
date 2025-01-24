@@ -3,7 +3,7 @@ import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from "@/app/contexts/useToast";
-import { LoadingSpinner, Searchbar, Text } from "@/components";
+import { LoadingSpinner, LoadingSpinnerTable, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { InfiniteData, useMutation, useQuery, useQueryClient } from 'react-query';
@@ -65,7 +65,7 @@ const TimescheduleScreen = React.memo(() => {
                 remove()
                 setTimeSchedule([])
             };
-        }, [])
+        }, [remove])
     );
 
     const mutation = useMutation(saveTimeSchedule, {
@@ -257,7 +257,7 @@ const TimescheduleScreen = React.memo(() => {
                     </TouchableOpacity>
                 </View>
 
-                <Suspense fallback={<LoadingSpinner />}>
+                <Suspense fallback={<LoadingSpinnerTable />}>
                     <LazyCustomtable {...CustomtableProps} />
                 </Suspense>
             </Card.Content>

@@ -24,6 +24,7 @@ const environment = process.env.EXPO_PUBLIC_API_URL || "development";
 
 export default {
   expo: {
+    // homepage: "/PMChecklist_PD/",
     name: "PMCheck List",
     platforms: ["ios", "android", "web"],
     slug: "pmchecklist",
@@ -85,6 +86,7 @@ export default {
         html: "./public/index.html",
         development: false,
       },
+      url: "/PMChecklist",
     },
     assetBundlePatterns: [
       "assets/fonts/*",
@@ -128,11 +130,12 @@ export default {
     extra: {
       ...getEnvVars(environment),
       eas: {
-        projectId: "bc86b091-c7d5-4991-bc17-90a632b8c05e",
+        projectId: "0b443236-1652-4627-81dd-7530cec88504",
       },
     },
     experiments: {
       typedRoutes: true,
+      // baseUrl: "/PMChecklist_PD",
     },
     jsEngine: "hermes",
   },

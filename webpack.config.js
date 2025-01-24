@@ -85,8 +85,8 @@ module.exports = async function (env, argv) {
   config.output = {
     ...config.output,
     filename: "[name].js",
-    path: __dirname + "/dist", 
-    clean: true, 
+    path: __dirname + "/dist",
+    clean: true,
   };
 
   return config;

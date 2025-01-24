@@ -40,7 +40,7 @@ const CustomDarkTheme = {
     ...MD3DarkTheme.colors,
     primary: '#bb86fc',
     accent: '#03dac4',
-    background: '#000',
+    background: 'rgba(3, 0, 43, 1)',
     surface: '#121212',
     text: '#ffffff',
     green: "#ffb11e",

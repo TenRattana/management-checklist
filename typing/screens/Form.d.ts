@@ -1,6 +1,7 @@
 
 export interface Form {
   FormID: string;
+  FormNumber:string;
   FormName: string;
   IsActive: boolean;
   FormState?: string;

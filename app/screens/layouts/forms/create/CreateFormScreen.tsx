@@ -255,7 +255,7 @@ const CreateFormScreen = React.memo(({ route }: CreateFormProps) => {
                         </TouchableOpacity>
                     </View>
 
-                    <View id="container-preview" style={[createform.containerL2, { marginTop: 80, marginHorizontal: 10 }]}>
+                    <View id="container-preview" style={[createform.containerL2, { marginTop: 40, marginHorizontal: 10 }]}>
                         <Preview
                             route={route}
                             ref={childRef}
@@ -289,9 +289,15 @@ const CreateFormScreen = React.memo(({ route }: CreateFormProps) => {
 
                         {drawerContent === 'toolbox' && (
                             <ScrollView
-                                style={{ display: drawerContent === "toolbox" ? 'flex' : 'none', marginTop: 20, marginHorizontal: responsive === "small" ? "5%" : 2 }}
+                                style={{ display: drawerContent === "toolbox" ? 'flex' : 'none', marginTop: 10, marginHorizontal: responsive === "small" ? "5%" : 0 }}
                                 showsVerticalScrollIndicator={false}
                             >
+                                <View style={{ paddingHorizontal: 5 }}>
+                                    <Text style={[masterdataStyles.menuText, masterdataStyles.title, { paddingLeft: 20 }]}>Detail Form</Text>
+                                </View>
+
+                                <Divider style={{ marginHorizontal: 20, }} />
+
                                 {responsive === "small" && (
                                     <TouchableOpacity
                                         onPress={() => closeDrawer()}
@@ -302,8 +308,8 @@ const CreateFormScreen = React.memo(({ route }: CreateFormProps) => {
                                     </TouchableOpacity>
                                 )}
 
-                                <View id="container-formname" style={{ marginHorizontal: 10, marginTop: responsive === "small" ? 5 : 5 }}>
-                                    {['FormName', 'Description'].map((item) => (
+                                <View id="container-formname" style={{ marginHorizontal: 10, marginTop: 5 }}>
+                                    {['FormName', 'Description', 'FormNumber'].map((item) => (
                                         <MemoConfigItemForm
                                             key={item}
                                             label={item}
@@ -320,15 +326,14 @@ const CreateFormScreen = React.memo(({ route }: CreateFormProps) => {
                                     <Text style={masterdataStyles.textFFF}>Save Form</Text>
                                 </TouchableOpacity>
 
-                                <View style={styles.groupContainer}>
-
+                                <View style={[styles.groupContainer, { paddingVertical: 10 }]}>
                                     {checkListType && checkListType.length > 0 ? checkListType.map((item: GroupCheckListType, index) => (
                                         item.IsActive && (
                                             <View key={index}>
                                                 <View style={styles.fieldContainer}>
-                                                    <Text style={[masterdataStyles.text, { marginTop: 10 }]}>{item.GTypeName}</Text>
+                                                    <Text style={[masterdataStyles.text, { paddingLeft: 20 }]}>{item.GTypeName}</Text>
 
-                                                    <Divider bold style={[{ marginVertical: 10, height: 1, backgroundColor: theme.colors.onBackground }]} />
+                                                    <Divider bold style={[{ marginVertical: 10, marginHorizontal: 20 }]} />
 
                                                     <MemoDraggableItem data={item?.CheckList || []} key={`drag-${index}`} onDrop={handleDrop} />
                                                 </View>

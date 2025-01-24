@@ -230,28 +230,15 @@ const useMasterdataStyles = () => {
             marginBottom: 16,
             flexDirection: "row",
             flexWrap: "wrap",
+
         },
         card: {
-            // backgroundColor: !!darkMode ? theme.colors.background : undefined,
+            backgroundColor: !darkMode ? 'rgba(193, 214, 255, 0.06)' : 'rgba(50, 50, 100, 0.3)',
             paddingVertical: 5,
             borderRadius: 2,
             marginBottom: 20,
             borderLeftWidth: 3,
-            borderColor: theme.colors.yellow,
-            ...Platform.select({
-                web: {
-                    boxShadow: `${theme.colors.onBackground || "#000"} 0px 2px 4px`,
-                },
-                ios: {
-                    shadowColor: theme.colors.onBackground || "#000",
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 1,
-                    shadowRadius: 4,
-                },
-                android: {
-                    elevation: 4,
-                },
-            }),
+            borderColor: theme.colors.yellow
         },
         cardTitle: {
             fontSize: spacing.medium,
@@ -322,7 +309,6 @@ const useMasterdataStyles = () => {
             alignItems: 'flex-start',
         },
         settingText: {
-            fontWeight: '500',
             paddingVertical: 10,
             fontSize: spacing.small,
         },

@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from "react";
 import axiosInstance from "@/config/axios";
 import { Card, Divider } from "react-native-paper";
-import { FlatList, TouchableOpacity } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useToast } from "@/app/contexts/useToast";
 import { BaseSubForm, BaseFormState } from '@/typing/form';
@@ -18,15 +18,35 @@ import { navigate } from "@/app/navigations/navigationUtils";
 import Formfield from "./Formfield";
 import { useRes } from "@/app/contexts/useRes";
 import { FormValues } from "@/typing/screens/CreateForm";
+import ShimmerPlaceholder, { createShimmerPlaceholder } from 'react-native-shimmer-placeholder';
+import { LinearGradient } from 'expo-linear-gradient';
+import { FlatList } from "react-native-gesture-handler";
 
 const isValidDateFormatCustom = (value: string) => {
   const dateRegex = /^(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2})$/;
   return dateRegex.test(value);
 };
 
+const MemoizedFormfield = React.memo(({ dataType, item, field, values, setFieldValue, setFieldTouched, errors, touched }: any) => {
+  return (
+    <Formfield
+      dataType={dataType}
+      item={item}
+      field={field}
+      values={values}
+      setFieldValue={setFieldValue}
+      setFieldTouched={setFieldTouched}
+      errors={errors}
+      touched={touched}
+    />
+  );
+});
+
+
 const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
   const { route } = props;
   const { dataType, found, isLoadingForm } = useForm(route);
+  const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
   const state = useSelector((state: any) => state.form);
   const user = useSelector((state: any) => state.user);
@@ -124,11 +144,20 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
   }, [onFormSubmit]);
 
   if (isLoadingForm || !found) {
-    return <Text>Loading Form...</Text>;
+    return (
+      <View style={{ flex: 1, marginTop: 5, marginHorizontal: 10 }}>
+        <ShimmerPlaceholder style={{ margin: 5, width: 300, borderRadius: 10 }} width={300} />
+        <ShimmerPlaceholder style={{ margin: 5, width: 600, borderRadius: 10 }} width={600} />
+
+        <ShimmerPlaceholder style={{ marginTop: 20, marginHorizontal: 5, height: 500, width: '100%', borderRadius: 10 }} width={800} />
+
+        <ShimmerPlaceholder style={{ alignSelf: 'center', marginTop: 20, marginHorizontal: 5, height: 50, width: 300, borderRadius: 10 }} width={300} />
+      </View>
+    )
   }
 
-  return found ? (
-    <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]} key={responsive}>
+  return found ? state.FormID ? (
+    <View id="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]} key={responsive}>
       <Stack.Screen options={{ headerTitle: `${state.MachineName || "Machine Name"}` }} />
 
       {!isSubmitted ? (
@@ -138,24 +167,25 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
           validateOnBlur={false}
           onSubmit={handleSubmit}
         >
-          {({ errors, touched, setFieldValue, setTouched, values, dirty, isValid, handleSubmit }) => {
+          {({ errors, touched, setFieldValue, setFieldTouched, values, dirty, isValid, handleSubmit }) => {
 
             return (
               <FlatList
                 data={state.subForms}
-                renderItem={({ item }) => {
+                extraData={state.subForms}
+                renderItem={({ item, index }) => {
                   return (
-                    <Card style={masterdataStyles.card} key={item.SFormID}>
+                    <Card style={masterdataStyles.card} key={index}>
                       <Card.Title title={item.SFormName} titleStyle={masterdataStyles.cardTitle} />
                       <Card.Content style={[masterdataStyles.subFormContainer]}>
                         {item.Fields && item.Fields.length > 0 && (
-                          <Formfield
+                          <MemoizedFormfield
                             dataType={dataType}
                             item={item}
                             field={item.Fields}
                             values={values}
                             setFieldValue={setFieldValue}
-                            setTouched={setTouched}
+                            setFieldTouched={setFieldTouched}
                             errors={errors}
                             touched={touched}
                           />
@@ -164,28 +194,36 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
                     </Card>
                   );
                 }}
-                keyExtractor={(item) => `index-preview-${item.SFormID}`}
+                keyExtractor={(item, index) => `${index}-${item}`}
                 ListHeaderComponent={() => (
-                  <>
-                    <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
-                    <Divider />
-                    <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
-                  </>
+                  <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
+                    <View style={{ alignSelf: 'center', flex: 1 }}>
+                      <Text style={[masterdataStyles.title, { color: theme.colors.onBackground }]}>{state.FormName || "Form Name"}</Text>
+                      <Divider />
+                      <Text style={[masterdataStyles.description, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state.Description || "Form Description"}</Text>
+                    </View>
+                  </View>
                 )}
                 ListFooterComponent={() => (
-                  <AccessibleView name="form-action-scan" style={[masterdataStyles.containerAction]}>
-                    <TouchableOpacity
-                      onPress={() => handleSubmit()}
-                      style={[
-                        masterdataStyles.button,
-                        masterdataStyles.backMain,
-                        { opacity: isValid && dirty ? 1 : 0.5 },
-                      ]}
-                      disabled={!dirty || !isValid}
-                    >
-                      <Text style={[masterdataStyles.textBold, masterdataStyles.textFFF]}>Submit Form</Text>
-                    </TouchableOpacity>
-                  </AccessibleView>
+                  <>
+                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                      <Text style={[masterdataStyles.description, { color: theme.colors.onBackground }]}>{state.FormNumber || "// F"}</Text>
+                    </View>
+
+                    <View id="form-action-scan" style={[masterdataStyles.containerAction]}>
+                      <TouchableOpacity
+                        onPress={() => handleSubmit()}
+                        style={[
+                          masterdataStyles.button,
+                          masterdataStyles.backMain,
+                          { opacity: isValid && dirty ? 1 : 0.5 },
+                        ]}
+                        disabled={!dirty || !isValid}
+                      >
+                        <Text style={[masterdataStyles.textBold, masterdataStyles.textFFF]}>Submit Form</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </>
                 )}
                 contentContainerStyle={{ paddingBottom: 20 }}
                 removeClippedSubviews={true}
@@ -207,8 +245,19 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
           </TouchableOpacity>
         </AccessibleView>
       )}
-    </AccessibleView>
-  ) : <NotFoundScreen />
+    </View>
+  ) : <AccessibleView name="form-success" style={masterdataStyles.containerScccess}>
+    <Text style={masterdataStyles.text}>Not Found!</Text>
+    <TouchableOpacity
+      onPress={() => {
+        setIsSubmitted(false);
+        navigate("ScanQR");
+      }}
+      style={masterdataStyles.button}
+    >
+      <Text style={[masterdataStyles.textBold, masterdataStyles.text, { color: theme.colors.blue }]}>Scan again</Text>
+    </TouchableOpacity>
+  </AccessibleView> : <NotFoundScreen />
 });
 
 export default InputFormMachine;

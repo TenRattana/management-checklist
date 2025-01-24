@@ -13,6 +13,8 @@ import useForm from "@/hooks/custom/useForm";
 import * as Yup from 'yup';
 import { Stack } from "expo-router";
 import { FormValues } from "@/typing/screens/CreateForm";
+import ShimmerPlaceholder, { createShimmerPlaceholder } from 'react-native-shimmer-placeholder';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const isValidDateFormatCustom = (value: string) => {
     const dateRegex = /^(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2})$/;
@@ -25,9 +27,9 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
     const [load, setLoad] = useState(true)
     const state = useSelector((state: any) => state.form);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
     const validationSchema = useMemo(() => {
-
         const shape: Record<string, any> = {};
         state.subForms.forEach((subForm: BaseSubForm) => {
             subForm.Fields.forEach((field: BaseFormState) => {
@@ -241,29 +243,46 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
                         )}
                     </View>
                 )}
-                ListFooterComponent={() => exp && (
-                    <View style={{ flexDirection: 'row', marginLeft: 10, marginVertical: 10 }}>
-                        <View style={{ marginRight: 30 }}>
-                            <Text style={[masterdataStyles.description, { color: theme.colors.onBackground }]}>Inspector</Text>
-                            <Divider />
-                            <Text style={[masterdataStyles.title, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state?.UserName || "User Submit"}</Text>
+                ListFooterComponent={() =>
+                    <>
+                        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                            <Text style={[masterdataStyles.description, { color: theme.colors.onBackground }]}>{state.FormNumber || "// F"}</Text>
                         </View>
 
-                        {state?.ApprovedName && (
-                            <View>
-                                <Text style={[masterdataStyles.description, { color: theme.colors.onBackground }]}>Acknowledged</Text>
-                                <Divider />
-                                <Text style={[masterdataStyles.title, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state?.ApprovedName || "User Approved"}</Text>
+                        {exp && (
+                            <View style={{ flexDirection: 'row', marginLeft: 10, marginVertical: 10 }}>
+                                <View style={{ marginRight: 30 }}>
+                                    <Text style={[masterdataStyles.description, { color: theme.colors.onBackground }]}>Inspector</Text>
+                                    <Divider />
+                                    <Text style={[masterdataStyles.title, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state?.UserName || "User Submit"}</Text>
+                                </View>
+
+                                {state?.ApprovedName && (
+                                    <View>
+                                        <Text style={[masterdataStyles.description, { color: theme.colors.onBackground }]}>Acknowledged</Text>
+                                        <Divider />
+                                        <Text style={[masterdataStyles.title, { paddingVertical: 10, color: theme.colors.onBackground }]}>{state?.ApprovedName || "User Approved"}</Text>
+                                    </View>
+                                )}
                             </View>
                         )}
-                    </View>
-                )}
+                    </>
+                }
                 keyExtractor={(_, index) => `index-preview-${index}`}
                 contentContainerStyle={{ paddingBottom: 20 }}
                 showsVerticalScrollIndicator={false}
             />
         </AccessibleView>
-    ) : (<Text>Loading ...</Text>)
+    ) : (
+        <View style={{ flex: 1, marginTop: 5, marginHorizontal: 10 }}>
+            <ShimmerPlaceholder style={{ margin: 5, width: 300, borderRadius: 10 }} width={300} />
+            <ShimmerPlaceholder style={{ margin: 5, width: 600, borderRadius: 10 }} width={600} />
+
+            <ShimmerPlaceholder style={{ marginTop: 20, marginHorizontal: 5, height: 500, width: '100%', borderRadius: 10 }} width={800} />
+
+            <ShimmerPlaceholder style={{ alignSelf: 'center', marginTop: 20, marginHorizontal: 5, height: 50, width: 300, borderRadius: 10 }} width={300} />
+        </View>
+    )
 }));
 
 export default PreviewScreen;

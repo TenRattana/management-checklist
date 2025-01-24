@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from '@/app/contexts/useToast';
-import { LoadingSpinner, Searchbar, Text } from "@/components";
+import { LoadingSpinner, LoadingSpinnerTable, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useInfiniteQuery } from 'react-query';
@@ -86,7 +86,7 @@ const ExpectedResultScreen = React.memo(() => {
                 remove()
                 setExpectedResult([])
             };
-        }, [])
+        }, [remove])
     );
 
     const handlePaginationChange = useCallback(() => {
@@ -142,11 +142,11 @@ const ExpectedResultScreen = React.memo(() => {
     const tableData = useMemo(() => {
         return expectedResult.map((item) => [
             item.MachineName,
+            item.FormNumber,
             item.FormName,
             item.UserName || "-",
-            item.ApprovedName || "-",
+            item.ApprovedName ? "✔️" : "-",
             convertToThaiDateTime(item.CreateDate),
-            item.ApprovedTime ? convertToThaiDateTime(item.ApprovedTime) : "-",
             item.TableID,
         ]);
     }, [expectedResult, debouncedSearchQuery]);
@@ -155,28 +155,33 @@ const ExpectedResultScreen = React.memo(() => {
         Tabledata: tableData,
         Tablehead: [
             { label: "Machine Name", align: "flex-start" },
+            { label: "Form Number", align: "flex-start" },
             { label: "Form Name", align: "flex-start" },
             { label: "User", align: "flex-start" },
-            { label: "Acknowledged", align: "flex-start" },
+            { label: "Approve", align: "center" },
             { label: "Time Submit", align: "flex-start" },
-            { label: "Time Approved", align: "flex-start" },
             { label: "Preview", align: "center" },
         ],
-        flexArr: [2, 3, 2, 2, 2, 2, 1],
+        flexArr: [2, 2, 3, 2, 1, 2, 1],
         actionIndex: [
             {
                 preIndex: 6,
             },
         ],
         handleAction,
-        showMessage: [0, 1],
+        showMessage: [0, 2],
+        detail: true,
+        detailKey: "TableID",
+        detailKeyrow: 6,
+        showDetailwithKey: ["MachineName", "FormNumber", "FormName", "UserName", "ApprovedName", "CreateDate", "ApprovedTime"],
+        detailData: expectedResult,
         showFilterDate: true,
         showFilter: true,
         ShowTitle: "Machine",
         showData: machines,
         showColumn: "MachineName",
         filterColumn: 0,
-        setFilterDate: 4,
+        setFilterDate: 5,
         searchQuery: debouncedSearchQuery,
         hasNextPage: hasNextPageMG,
         isFetchingNextPage: isFetchingMG,
@@ -246,7 +251,7 @@ const ExpectedResultScreen = React.memo(() => {
                     </View>
                 </View>
 
-                <Suspense fallback={<LoadingSpinner />}>
+                <Suspense fallback={<LoadingSpinnerTable />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} fetchNextPage={fetchNextPageMG} handlefilter={handlefilter} />
                 </Suspense>
             </Card.Content>

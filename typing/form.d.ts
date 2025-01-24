@@ -3,6 +3,7 @@ import * as React from "react";
 export interface BaseForm {
   FormID: string;
   FormName: string;
+  FormNumber:string;
   Description: string;
   MachineID: string;
   MachineName?: string;

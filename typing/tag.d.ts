@@ -72,6 +72,7 @@ export interface DropdownProps {
     lefticon?: string;
     showLefticon?: boolean;
     mode?: string;
+    disable?:boolean;
 }
 
 export interface DropdownMultiProps {
@@ -92,6 +93,7 @@ export interface DropdownMultiProps {
     lefticon?: string;
     showLefticon?: boolean;
     mode?: string;
+    disable?:boolean
 }
 
 export interface PickerDropdownProps {

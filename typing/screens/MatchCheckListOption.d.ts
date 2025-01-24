@@ -20,4 +20,5 @@ export interface InitialValuesMatchCheckListOption extends Active {
   groupCheckListOptionId: string;
   groupCheckListOptionName?: string;
   disables: boolean;
+  delete:boolean;
 }

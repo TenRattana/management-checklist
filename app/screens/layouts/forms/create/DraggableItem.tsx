@@ -102,7 +102,8 @@ const FieldForm: React.FC<{ data: CheckListType[], onDrop: (item: CheckListType,
     const styles = StyleSheet.create({
         container: {
             flexDirection: 'row',
-            flexWrap: 'wrap'
+            flexWrap: 'wrap',
+            marginHorizontal: 10
         },
     });
 

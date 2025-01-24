@@ -20,6 +20,7 @@ const SaveDialog = React.memo(({ state, isVisible, setIsVisible }: SaveDialogPro
         const form = {
             FormID: state.FormID || "",
             FormName: state.FormName || "",
+            FormNumber: state.FormNumber || "",
             Description: state.Description || "",
             MachineID: state.MachineID || "",
         }

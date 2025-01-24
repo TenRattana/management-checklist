@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo, Suspense, lazy } from "react";
 import { TouchableOpacity, StyleSheet, View, Platform } from "react-native";
 import axiosInstance from "@/config/axios";
-import { LoadingSpinner, Searchbar, Text } from "@/components";
-import { Card } from "react-native-paper";
+import { LoadingSpinner, LoadingSpinnerTable, Searchbar, Text } from "@/components";
+import { ActivityIndicator, Card, Portal } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useToast } from '@/app/contexts/useToast';
 import { useRes } from '@/app/contexts/useRes';
@@ -63,7 +63,7 @@ const CheckListOptionScreen = React.memo(() => {
                 remove()
                 setCheckListOption([])
             };
-        }, [])
+        }, [remove])
     );
 
     const handlePaginationChange = useCallback(() => {
@@ -248,7 +248,7 @@ const CheckListOptionScreen = React.memo(() => {
                     </TouchableOpacity>
                 </View>
 
-                <Suspense fallback={<LoadingSpinner />}>
+                <Suspense fallback={<LoadingSpinnerTable />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
                 </Suspense>
             </Card.Content>

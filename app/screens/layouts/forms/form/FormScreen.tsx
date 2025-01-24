@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from
 import { TouchableOpacity, StyleSheet, View, Platform } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts/useToast";
-import { LoadingSpinner, Searchbar, Text } from "@/components";
+import { LoadingSpinner, LoadingSpinnerTable, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useInfiniteQuery, useQueryClient } from 'react-query';
@@ -55,7 +55,7 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
                 remove()
                 setForm([])
             };
-        }, [])
+        }, [remove])
     );
 
     const handlePaginationChange = useCallback(() => {
@@ -79,6 +79,9 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
             queryClient.invalidateQueries('form');
         }
     }, [route.params]);
+
+    const user = useSelector((state: any) => state.user)
+    const Edit = user.Permissions.includes("create_form")
 
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
@@ -104,9 +107,16 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
     }, [navigate]);
 
     const tableData = useMemo(() => {
-        return form.map((item) => [
+        return form.map((item) => !Edit ? [
+            item.FormNumber ?? "-",
+            item.FormName,
+            item.Description,
+            item.FormState ?? "-",
+            item.FormID,
+        ] : [
             item.Disables,
             item.Deletes,
+            item.FormNumber ?? "-",
             item.FormName,
             item.Description,
             item.FormState ?? "-",
@@ -120,10 +130,17 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
 
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
-        Tablehead: [
+        Tablehead: !Edit ? [
+            { label: `${state.Form} Name`, align: "flex-start" },
+            { label: `${state.Form} Number`, align: "flex-start" },
+            { label: `${state.Form} Description`, align: "flex-start" },
+            { label: `${state.Form} Status`, align: "center" },
+            { label: "View", align: "center" },
+        ] : [
             { label: "", align: "flex-start" },
             { label: "", align: "flex-start" },
             { label: `${state.Form} Name`, align: "flex-start" },
+            { label: `${state.Form} Number`, align: "flex-start" },
             { label: `${state.Form} Description`, align: "flex-start" },
             { label: `${state.Form} Status`, align: "center" },
             { label: "Status", align: "center" },
@@ -132,9 +149,9 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
             { label: "View", align: "center" },
             { label: "Delete", align: "center" },
         ],
-        flexArr: [0, 0, 2, 2, 1, 1, 1, 1, 1, 1],
-        actionIndex: [{ disables: 0, delete: 1, changeIndex: 6, copyIndex: 7, preIndex: 8, delOnlyIndex: 9 }],
-        showMessage: 1,
+        flexArr: !Edit ? [2, 2, 3, 1, 1] : [0, 0, 2, 2, 3, 1, 1, 1, 1, 1, 1],
+        actionIndex: !Edit ? [{ preIndex: 4 }] : [{ disables: 0, delete: 1, changeIndex: 7, copyIndex: 8, preIndex: 9, delOnlyIndex: 10 }],
+        showMessage: [2, 3],
         handleAction,
         searchQuery: debouncedSearchQuery,
         isFetching: isFetching
@@ -215,12 +232,14 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
                         />
                     </View>
 
-                    <TouchableOpacity onPress={handleNewForm} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                        <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.Form}`}</Text>
-                    </TouchableOpacity>
+                    {Edit && (
+                        <TouchableOpacity onPress={handleNewForm} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.Form}`}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
-                <Suspense fallback={<LoadingSpinner />}>
+                <Suspense fallback={<LoadingSpinnerTable />}>
                     <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} />
                 </Suspense>
             </Card.Content>

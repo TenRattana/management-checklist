@@ -3,13 +3,13 @@ import { useTheme } from '@/app/contexts/useTheme';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, TouchableOpacity, Platform, StyleSheet, Keyboard } from 'react-native';
-import { HelperText, IconButton, Menu, TextInput, Modal, Portal } from 'react-native-paper';
+import { HelperText, IconButton, Menu, TextInput, Modal, Portal, Icon } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Text from '../Text';
 import { DropdownProps } from '@/typing/tag';
 
-const Dropdown = React.memo(({ label, fetchNextPage, handleScroll, isFetching, items, open, search = true, setOpen, selectedValue, setSelectedValue, setDebouncedSearchQuery, error, searchQuery, errorMessage, lefticon, showLefticon, mode, }: DropdownProps) => {
+const Dropdown = React.memo(({ label, fetchNextPage, handleScroll, isFetching, items, open, search = true, setOpen, selectedValue, setSelectedValue, setDebouncedSearchQuery, error, searchQuery, errorMessage, lefticon, showLefticon, mode, disable }: DropdownProps) => {
     const [searchQuerys, setSearchQuery] = useState('');
     const [menuWidth, setMenuWidth] = useState(0);
     const masterdataStyles = useMasterdataStyles();
@@ -60,6 +60,7 @@ const Dropdown = React.memo(({ label, fetchNextPage, handleScroll, isFetching, i
             alignItems: 'center',
             borderBottomColor: 'gray',
             borderBottomWidth: 0.5,
+            opacity: disable ? 0.8 : 1
         },
         searchbar: {
             backgroundColor: theme.colors.background,
@@ -116,6 +117,7 @@ const Dropdown = React.memo(({ label, fetchNextPage, handleScroll, isFetching, i
                             setSelectedValue(item.value);
                             setOpen(false);
                         }}
+                        disabled={disable}
                         titleStyle={masterdataStyles.text}
                         style={{
                             paddingVertical: selectedValue === item.value ? 10 : 5,
@@ -153,7 +155,7 @@ const Dropdown = React.memo(({ label, fetchNextPage, handleScroll, isFetching, i
                     style={styles.menuStyle}
                     anchor={
                         <View onLayout={onLayout} ref={viewRef}>
-                            <TouchableOpacity style={styles.triggerButton} onPress={() => setOpen(true)}>
+                            <TouchableOpacity style={styles.triggerButton} onPress={() => setOpen(true)} disabled={disable}>
                                 {open && search ? (<></>) : <>
                                     {!showLefticon && (
                                         items.find((v) => v.value === selectedValue)?.icon ? (
@@ -169,10 +171,12 @@ const Dropdown = React.memo(({ label, fetchNextPage, handleScroll, isFetching, i
                                     <Text style={[masterdataStyles.text, { flex: 1 }]}>
                                         {selectedValue ? `${items.find((v) => v.value === selectedValue)?.label}` : `Select a ${label}`}
                                     </Text>
+
                                     {!showLefticon && selectedValue ? (
                                         <IconButton
                                             style={[masterdataStyles.icon, { right: 8, alignItems: 'flex-end' }]}
-                                            icon="window-close"
+                                            icon={disable ? "lock" : "window-close"}
+                                            iconColor={disable ? theme.colors.error : theme.colors.onBackground}
                                             size={spacing.large}
                                             onPress={() => {
                                                 setSelectedValue("");
@@ -200,7 +204,7 @@ const Dropdown = React.memo(({ label, fetchNextPage, handleScroll, isFetching, i
             ) : (
                 <>
                     <View onLayout={onLayout} ref={viewRef}>
-                        <TouchableOpacity style={styles.triggerButton} onPress={() => setOpen(true)}>
+                        <TouchableOpacity style={styles.triggerButton} onPress={() => setOpen(true)} disabled={disable}>
                             {open && search ? (<></>) : <>
                                 {!showLefticon && (
                                     items.find((v) => v.value === selectedValue)?.icon ? (
@@ -219,7 +223,8 @@ const Dropdown = React.memo(({ label, fetchNextPage, handleScroll, isFetching, i
                                 {!showLefticon && selectedValue ? (
                                     <IconButton
                                         style={[masterdataStyles.icon, { right: 8, alignItems: 'flex-end' }]}
-                                        icon="window-close"
+                                        icon={disable ? "lock" : "window-close"}
+                                        iconColor={disable ? theme.colors.error : theme.colors.onBackground}
                                         size={spacing.large}
                                         onPress={() => {
                                             setSelectedValue("");

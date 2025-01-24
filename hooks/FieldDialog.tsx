@@ -233,7 +233,8 @@ const useField = (editMode?: boolean, formState?: BaseFormState) => {
                             } else if (max) {
                                 return Yup.number()
                                     .typeError("The max value control must be a number.")
-                                    .max(max, 'Min length must be less than or equal to Max length');
+                                    .max(max, 'Min length must be less than or equal to Max length')
+                                    .nullable();
                             }
                         }
 
@@ -255,7 +256,8 @@ const useField = (editMode?: boolean, formState?: BaseFormState) => {
                             } else if (min) {
                                 return Yup.number()
                                     .typeError("The max value control must be a number.")
-                                    .min(min, 'Max length must be greater than or equal to Min length');
+                                    .min(min, 'Max length must be greater than or equal to Min length')
+                                    .nullable();
                             }
                         }
 

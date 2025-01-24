@@ -18,10 +18,7 @@ export interface FiledScan {
     value: any,
     shouldValidate?: boolean
   ) => Promise<void | FormikErrors<FormValues>>;
-  setTouched: (
-    touched: FormikTouched<FormValues>,
-    shouldValidate?: boolean
-  ) => Promise<void | FormikErrors<FormValues>>;
+  setFieldTouched: (field: string, isTouched?: boolean, shouldValidate?: boolean) => Promise<void | FormikErrors<FormValues>>
   touched: FormikTouched<FormValues>;
   values: FormValues;
   errors: FormikErrors<FormValues>;

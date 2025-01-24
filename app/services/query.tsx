@@ -92,7 +92,7 @@ export const saveMachine = async (data: {
     Prefix: any;
     MachineID: string;
     GMachineID: string;
-    MachineCode: string | null;
+    MachineCode: string;
     Building: string | null;
     Floor: string | null;
     Area: string | null;
@@ -493,22 +493,40 @@ export const SaveMatchFormMachine = async (data: {
 };
 
 // User manager
-export const fetchUsers = async (): Promise<Users[]> => {
-    const response = await axiosInstance.post("User_service.asmx/GetUsers");
-    return response.data.data ?? [];
-};
-
-export const fetchGroupUser = async (): Promise<GroupUsers[]> => {
-    const response = await axiosInstance.post('GroupUser_service.asmx/GetGroupUsers');
-    return response.data.data ?? [];
-};
-
-export const fetchUserPermission = async (): Promise<UsersPermission[]> => {
-    const response = await axiosInstance.post("User_service.asmx/GetUsersPermission");
+export const fetchUserLDAP = async (): Promise<Users[]> => {
+    const response = await axiosInstance.post("User_service.asmx/GetUserLDAP");
     return response.data.data ?? [];
 };
 
 export const saveUserPermission = async (data: { Prefix: any; UserID: string | undefined; UserName: string; GUserID: string; IsActive: boolean; }): Promise<{ message: string }> => {
     const response = await axiosInstance.post("User_service.asmx/SaveUser", data);
+    return response.data;
+};
+
+export const fetchUsers = async (): Promise<UsersPermission[]> => {
+    const response = await axiosInstance.post("User_service.asmx/GetUsers");
+    return response.data.data ?? [];
+};
+
+export const fetchGroupUsers = async (): Promise<GroupUsers[]> => {
+    const response = await axiosInstance.post('GroupUser_service.asmx/GetGroupUsers');
+    return response.data.data ?? [];
+};
+
+// Group Permission
+export const SaveGroupUser = async (data: {
+    GUserID: string;
+    GUserName: string;
+    isActive: boolean;
+}): Promise<{ message: string }> => {
+    const response = await axiosInstance.post("GroupUser_service.asmx/SaveGroupUser", data);
+    return response.data;
+};
+
+export const SavePermisson = async (data: {
+    GUserID: string;
+    Permissions: string;
+}): Promise<{ message: string }> => {
+    const response = await axiosInstance.post("Permisson_service.asmx/SavePermission", data);
     return response.data;
 };

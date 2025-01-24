@@ -1,12 +1,12 @@
-import { View, ViewStyle } from 'react-native';
+import { FlatList, View, ViewStyle } from 'react-native';
 import React, { useCallback, useMemo } from 'react';
 import { BaseFormState } from '@/typing/form';
 import { useRes } from '@/app/contexts/useRes';
-import { FieldProps, FastField } from 'formik';
+import { FieldProps, FastField, Field } from 'formik';
 import { Dynamic } from '@/components';
 import { FiledScan } from '@/typing/screens/Scan';
 
-const Formfield = React.memo(({ item, field, dataType, setFieldValue, setTouched, touched, values, errors }: FiledScan) => {
+const Formfield = React.memo(({ item, field, dataType, setFieldValue, setFieldTouched, touched, values, errors }: FiledScan) => {
     const { responsive } = useRes();
 
     const getType = useMemo(() => (field: BaseFormState) => {
@@ -21,13 +21,13 @@ const Formfield = React.memo(({ item, field, dataType, setFieldValue, setTouched
                 setFieldValue(field.MCListID, formattedValue);
             }
         }
-        setTouched({ ...touched, [field.MCListID]: true });
-    }, [getType, setFieldValue, setTouched, touched, values]);
+        setFieldTouched(field.MCListID, true);
+    }, [getType, setFieldValue, setFieldTouched, touched, values]);
 
     const handleChange = useCallback((fieldName: string, value: any) => {
         setFieldValue(fieldName, value);
-        setTouched({ ...touched, [fieldName]: true });
-    }, [setFieldValue, setTouched, touched]);
+        setFieldTouched(fieldName, true);
+    }, [setFieldValue, setFieldTouched, touched]);
 
     return field.map((field, fieldIndex) => {
         const columns = item.Columns ?? 1;
@@ -43,6 +43,7 @@ const Formfield = React.memo(({ item, field, dataType, setFieldValue, setTouched
         return (
             <FastField name={field.MCListID} key={`field-${fieldIndex}-${item.Columns}`}>
                 {({ field: fastFieldProps }: FieldProps) => {
+                    const hasError = Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name]);
                     return (
                         <View id="container-layout2" style={containerStyle} key={`dynamic-${fieldIndex}-${item.Columns}`}>
                             <Dynamic
@@ -50,7 +51,7 @@ const Formfield = React.memo(({ item, field, dataType, setFieldValue, setTouched
                                 values={String(fastFieldProps.value ?? "")}
                                 handleChange={handleChange}
                                 handleBlur={() => handleBlur(field)}
-                                error={Boolean(touched[fastFieldProps.name] && errors[fastFieldProps.name])}
+                                error={hasError}
                                 errorMessages={errors}
                                 number={field.CListName}
                                 type={getType(field)}
@@ -60,7 +61,7 @@ const Formfield = React.memo(({ item, field, dataType, setFieldValue, setTouched
                 }}
             </FastField>
         );
-    })
+    });
 });
 
 export default Formfield;

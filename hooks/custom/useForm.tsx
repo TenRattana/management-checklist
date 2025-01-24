@@ -233,6 +233,7 @@ const useForm = (route?: RouteParams) => {
 
         } catch (error) {
             handleError(error);
+            setFound(true)
         } finally {
             setIsLoadingForm(false);
         }

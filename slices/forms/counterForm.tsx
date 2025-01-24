@@ -8,6 +8,7 @@ import { CheckList, CheckListType } from "@/typing/screens/CheckList";
 const initialState: Form = {
   FormID: "",
   FormName: "",
+  FormNumber: "",
   Description: "",
   MachineID: "",
   MachineName: "",
@@ -70,6 +71,7 @@ const subFormSlice = createSlice({
       const updatedForm = {
         FormID: form?.FormID || "",
         FormName: form?.FormName || "",
+        FormNumber: form?.FormNumber || "",
         Description: form?.Description || "",
         MachineID: form?.MachineID || "",
         MachineName: form?.MachineName || "",
@@ -139,6 +141,11 @@ const subFormSlice = createSlice({
       const { form } = action.payload;
 
       state.Description = form || "";
+    },
+    updateFormNumber: (state, action: PayloadAction<{ form?: string }>) => {
+      const { form } = action.payload;
+
+      state.FormNumber = form || "";
     },
     setDragSubForm: (state, action: PayloadAction<{ data: Omit<BaseSubForm, 'DisplayOrder'>[] }>) => {
 
@@ -330,6 +337,7 @@ export const {
   setFormData,
   updateFormName,
   updateFormDescription,
+  updateFormNumber,
   setDragSubForm,
   setDragField,
   addSubForm,
