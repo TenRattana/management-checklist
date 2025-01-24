@@ -4,7 +4,7 @@ import RadioGroup from 'react-native-radio-buttons-group';
 import Text from '../Text';
 import useMasterdataStyles from '@/styles/common/masterdata';
 
-const RatingGrid = ({ Layout, GridLable, GridRadio }: { Layout: 'row' | 'column', GridLable: number, GridRadio: number }) => {
+const RadioGrid = ({ Layout, GridLable, GridRadio }: { Layout: 'row' | 'column', GridLable: number, GridRadio: number }) => {
     const masterdataStyles = useMasterdataStyles();
     const [selectedId, setSelectedId] = useState<{ [key: string]: any }>({});
 
@@ -79,4 +79,4 @@ const RatingGrid = ({ Layout, GridLable, GridRadio }: { Layout: 'row' | 'column'
     );
 };
 
-export default RatingGrid;
+export default RadioGrid;
