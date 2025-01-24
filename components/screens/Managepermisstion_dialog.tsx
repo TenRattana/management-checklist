@@ -13,6 +13,7 @@ import { useTheme } from "@/app/contexts/useTheme";
 import { useSelector } from "react-redux";
 import HeaderDialog from "./HeaderDialog";
 import { useRes } from "@/app/contexts/useRes";
+import { LoadingSpinner } from "../common";
 
 const validationSchema = Yup.object().shape({
     UserName: Yup.string().required("This user field is required"),
@@ -20,11 +21,29 @@ const validationSchema = Yup.object().shape({
     IsActive: Yup.boolean().required("This isactive field is required")
 });
 
+const LazyInfoGroupPermisson_dialog = lazy(() => import("@/components/screens/InfoGroupPermisson_dialog"));
+
+const CustomDialog = React.memo(({ visible, onDismiss, children }: { visible: boolean, onDismiss: () => void, children: any }) => {
+    const { responsive } = useRes();
+    const { theme } = useTheme();
+
+    return <Dialog
+        visible={visible}
+        onDismiss={() => onDismiss()}
+        style={{ zIndex: 3, width: responsive === "large" ? 500 : "60%", alignSelf: 'center', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 4, backgroundColor: theme.colors.background }}
+    >
+        {children}
+    </Dialog>
+});
+
 const Managepermisstion_dialog = React.memo(({ isVisible, setIsVisible, isEditing, initialValues, saveData, users, groupUser }: ManagepermissionDialogProps<InitialValuesManagepermission, Users, GroupUsers>) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
     const { spacing } = useRes()
     const state = useSelector((state: any) => state.prefix);
+    const [infoP, setInfoP] = useState(false)
+
+    const [selectedGroupUser, setSelectedGroupUser] = useState<string>("");
 
     const styles = StyleSheet.create({
         button: {
@@ -114,6 +133,20 @@ const Managepermisstion_dialog = React.memo(({ isVisible, setIsVisible, isEditin
                                                         error={form.touched.GUserID && Boolean(form.errors.GUserID)}
                                                         errorMessage={form.touched.GUserID ? form.errors.GUserID : ""}
                                                     />
+
+                                                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginVertical: 5, marginHorizontal: 10, marginBottom: 10 }}>
+                                                        <TouchableOpacity
+                                                            onPress={() => {
+                                                                setInfoP(true)
+                                                                setSelectedGroupUser(values.GUserID)
+                                                            }}
+                                                            style={styles.button}
+                                                        >
+                                                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
+                                                                Info
+                                                            </Text>
+                                                        </TouchableOpacity>
+                                                    </View>
                                                 </>
                                             )}
                                         </Field>
@@ -163,6 +196,23 @@ const Managepermisstion_dialog = React.memo(({ isVisible, setIsVisible, isEditin
                     )}
                 </Dialog.Content>
             </Dialog>
+
+            {infoP && (
+                <Portal>
+                    <CustomDialog visible={infoP} onDismiss={() => setInfoP(false)}>
+                        <Suspense fallback={<LoadingSpinner />}>
+                            <LazyInfoGroupPermisson_dialog
+                                setDialogAdd={() => setInfoP(false)}
+                                groupUsers={groupUser}
+                                mode={true}
+                                selected={selectedGroupUser}
+                                saveGroupUsers={() => { }}
+                                savePermisson={() => { }}
+                            />
+                        </Suspense>
+                    </CustomDialog>
+                </Portal>
+            )}
         </Portal >
     )
 })

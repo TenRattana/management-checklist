@@ -493,18 +493,8 @@ export const SaveMatchFormMachine = async (data: {
 };
 
 // User manager
-export const fetchUsers = async (): Promise<Users[]> => {
-    const response = await axiosInstance.post("User_service.asmx/GetUsers");
-    return response.data.data ?? [];
-};
-
-export const fetchGroupUser = async (): Promise<GroupUsers[]> => {
-    const response = await axiosInstance.post('GroupUser_service.asmx/GetGroupUsers');
-    return response.data.data ?? [];
-};
-
-export const fetchUserPermission = async (): Promise<UsersPermission[]> => {
-    const response = await axiosInstance.post("User_service.asmx/GetUsersPermission");
+export const fetchUserLDAP = async (): Promise<Users[]> => {
+    const response = await axiosInstance.post("User_service.asmx/GetUserLDAP");
     return response.data.data ?? [];
 };
 
@@ -513,18 +503,30 @@ export const saveUserPermission = async (data: { Prefix: any; UserID: string | u
     return response.data;
 };
 
+export const fetchUsers = async (): Promise<UsersPermission[]> => {
+    const response = await axiosInstance.post("User_service.asmx/GetUsers");
+    return response.data.data ?? [];
+};
+
+export const fetchGroupUsers = async (): Promise<GroupUsers[]> => {
+    const response = await axiosInstance.post('GroupUser_service.asmx/GetGroupUsers');
+    return response.data.data ?? [];
+};
+
 // Group Permission
-export const fetchGroupPermissons = async (): Promise<GroupUsers[]> => {
-    const response = await axiosInstance.post('GroupUser_service.asmx/GetGroupUsers');
-    return response.data.data ?? [];
+export const SaveGroupUser = async (data: {
+    GUserID: string;
+    GUserName: string;
+    isActive: boolean;
+}): Promise<{ message: string }> => {
+    const response = await axiosInstance.post("GroupUser_service.asmx/SaveGroupUser", data);
+    return response.data;
 };
 
-export const fetchPermissons = async (): Promise<GroupUsers[]> => {
-    const response = await axiosInstance.post('GroupUser_service.asmx/GetGroupUsers');
-    return response.data.data ?? [];
-};
-
-export const fetchGroupUserPermissons = async (): Promise<GroupUsers[]> => {
-    const response = await axiosInstance.post('GroupUser_service.asmx/GetGroupUsers');
-    return response.data.data ?? [];
+export const SavePermisson = async (data: {
+    GUserID: string;
+    Permissions: string;
+}): Promise<{ message: string }> => {
+    const response = await axiosInstance.post("Permisson_service.asmx/SavePermission", data);
+    return response.data;
 };

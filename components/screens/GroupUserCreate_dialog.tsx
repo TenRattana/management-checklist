@@ -15,15 +15,10 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The active field is required."),
 });
 
-const GroupUserCreate_dialog = React.memo(({ setIsVisible, saveData }: { setIsVisible: () => void, saveData: any }) => {
+const GroupUserCreate_dialog = React.memo(({ setIsVisible, saveData, initialValues }: { setIsVisible: () => void, saveData: any, initialValues: { GUserID?: string; GUserName: string; isActive: boolean; } }) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
     const { spacing } = useRes()
-
-    const [initialCheckList] = useState({
-        GUserName: "",
-        isActive: true
-    });
 
     const styles = StyleSheet.create({
         containerAction: {
@@ -53,10 +48,9 @@ const GroupUserCreate_dialog = React.memo(({ setIsVisible, saveData }: { setIsVi
             </Text>
 
             <Formik
-                initialValues={initialCheckList}
+                initialValues={initialValues}
                 validationSchema={validationSchema}
-                validateOnBlur={true}
-                validateOnChange={false}
+                validateOnBlur={false}
                 onSubmit={(values) => saveData(values)}
             >
                 {({ values, handleSubmit, setFieldValue }) => (
@@ -105,28 +99,41 @@ const GroupUserCreate_dialog = React.memo(({ setIsVisible, saveData }: { setIsVi
                             </View>
                         </View>
 
-                        <View style={[masterdataStyles.containerAction, { paddingVertical: 10, justifyContent: "flex-end" }]}>
+                        <View style={[masterdataStyles.containerAction, { paddingVertical: 10, justifyContent: "space-between" }]}>
                             <TouchableOpacity
                                 onPress={() => handleSubmit()}
-                                style={[styles.button, { backgroundColor: theme.colors.green }]}
+                                style={[styles.button, { backgroundColor: theme.colors.error }]}
                             >
                                 <Icon source="check" size={spacing.large} color={theme.colors.fff} />
 
                                 <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
-                                    Save
+                                    Delete
                                 </Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity
-                                onPress={() => setIsVisible()}
-                                style={[masterdataStyles.backMain, styles.button, { marginLeft: 10 }]}
-                            >
-                                <Icon source="close" size={spacing.large} color={theme.colors.fff} />
+                            <View style={{ flexDirection: 'row' }}>
+                                <TouchableOpacity
+                                    onPress={() => handleSubmit()}
+                                    style={[styles.button, { backgroundColor: theme.colors.green }]}
+                                >
+                                    <Icon source="check" size={spacing.large} color={theme.colors.fff} />
 
-                                <Text style={[masterdataStyles.text, masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
-                                    Cancel
-                                </Text>
-                            </TouchableOpacity>
+                                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
+                                        Save
+                                    </Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    onPress={() => setIsVisible()}
+                                    style={[masterdataStyles.backMain, styles.button, { marginLeft: 10 }]}
+                                >
+                                    <Icon source="close" size={spacing.large} color={theme.colors.fff} />
+
+                                    <Text style={[masterdataStyles.text, masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
+                                        Cancel
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </>
                 )}

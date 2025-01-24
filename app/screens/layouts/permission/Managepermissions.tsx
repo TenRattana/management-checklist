@@ -11,7 +11,7 @@ import { Users, GroupUsers, UsersPermission } from '@/typing/type'
 import { InitialValuesManagepermission } from '@/typing/value'
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
-import { fetchGroupUser, fetchUserPermission, fetchUsers, saveUserPermission } from "@/app/services";
+import { fetchGroupUsers, fetchUserLDAP, fetchUsers, SaveGroupUser, SavePermisson, saveUserPermission } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
@@ -34,6 +34,7 @@ const Managepermissions = React.memo(() => {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
+
   const [initialValues, setInitialValues] = useState<InitialValuesManagepermission>({
     UserID: "",
     UserName: "",
@@ -50,7 +51,7 @@ const Managepermissions = React.memo(() => {
 
   const { data: userPermission = [], isLoading } = useQuery<UsersPermission[], Error>(
     'userPermission',
-    fetchUserPermission,
+    fetchUsers,
     {
       refetchOnWindowFocus: false,
       refetchOnMount: false,
@@ -61,7 +62,7 @@ const Managepermissions = React.memo(() => {
 
   const { data: user = [] } = useQuery<Users[], Error>(
     'user',
-    fetchUsers,
+    fetchUserLDAP,
     {
       refetchOnWindowFocus: false,
       refetchOnMount: false,
@@ -71,7 +72,7 @@ const Managepermissions = React.memo(() => {
 
   const { data: groupUser = [] } = useQuery<GroupUsers[], Error>(
     'groupUser',
-    fetchGroupUser,
+    fetchGroupUsers,
     {
       refetchOnWindowFocus: false,
       refetchOnMount: false,
@@ -84,6 +85,7 @@ const Managepermissions = React.memo(() => {
       showSuccess(data.message);
       setIsVisible(false)
       queryClient.invalidateQueries('userPermission');
+      queryClient.invalidateQueries('groupUser');
     },
     onError: handleError,
   });
@@ -243,7 +245,42 @@ const Managepermissions = React.memo(() => {
   });
 
   const [infoPermisson, setInfoPermisson] = useState(false)
-  const ref = useRef("")
+
+  const mutationGU = useMutation(SaveGroupUser, {
+    onSuccess: (data) => {
+      showSuccess(data.message);
+      setIsVisible(false)
+      queryClient.invalidateQueries('groupUser');
+    },
+    onError: handleError,
+  });
+
+  const mutationPermisson = useMutation(SavePermisson, {
+    onSuccess: (data) => {
+      showSuccess(data.message);
+      setIsVisible(false)
+      queryClient.invalidateQueries('groupUser');
+    },
+    onError: handleError,
+  });
+
+  const saveGroupUsers = useCallback((values: { GUserID: string; GUserName: string; isActive: boolean; }) => {
+    const data = {
+      GUserID: values.GUserID ?? "",
+      GUserName: values.GUserName,
+      isActive: values.isActive
+    };
+    mutationGU.mutate(data);
+  }, [mutation]);
+
+  const savePermisson = useCallback((values: { GUserID: string, permissions: { PermissionID: number; PermissionName: string; PermissionStatus: boolean; } }) => {
+    const data = {
+      GUserID: values.GUserID,
+      Permissions: JSON.stringify(values.permissions)
+    }
+
+    mutationPermisson.mutate(data);
+  }, [mutationPermisson])
 
   return (
     <View id="container-managerpermission" style={styles.container}>
@@ -266,8 +303,8 @@ const Managepermissions = React.memo(() => {
             <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.UsersPermission}`}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={handelEditPermisson} style={{ marginHorizontal: 10, position: 'absolute', right: 30 }}>
-            <Text style={[masterdataStyles.text, masterdataStyles.textBold, masterdataStyles.textError]}>{`Edit Permisson`}</Text>
+          <TouchableOpacity onPress={handelEditPermisson} style={{ marginHorizontal: 10, position: 'absolute', right: 30, backgroundColor: theme.colors.error, padding: 10, borderRadius: 10 }}>
+            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>{`Edit Permisson`}</Text>
           </TouchableOpacity>
         </View>
 
@@ -295,6 +332,8 @@ const Managepermissions = React.memo(() => {
               <LazyInfoGroupPermisson_dialog
                 setDialogAdd={() => setInfoPermisson(false)}
                 groupUsers={groupUser}
+                saveGroupUsers={saveGroupUsers}
+                savePermisson={savePermisson}
               />
             </Suspense>
           </CustomDialog>
