@@ -23,7 +23,7 @@ const PickerDropdown = React.memo(({ open, setOpen, values, value, handelSetFilt
         container: {
             justifyContent: 'flex-end',
             flexDirection: 'row',
-            marginRight: 10,
+            marginRight: open ? 100 : 10,
         },
         menuContainer: {
             paddingRight: 10,
@@ -69,6 +69,16 @@ const PickerDropdown = React.memo(({ open, setOpen, values, value, handelSetFilt
                 </>}
                 style={{ marginTop: 10 }}
             >
+                {search && (
+                    <Searchbar
+                        placeholder={searchQuery || `Search ${label}`}
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                        style={styles.searchbar}
+                        inputStyle={masterdataStyles.text}
+                        autoFocus
+                    />)}
+
                 <FlatList
                     data={filteredValues}
                     renderItem={({ item }) => (
@@ -80,16 +90,6 @@ const PickerDropdown = React.memo(({ open, setOpen, values, value, handelSetFilt
                                 setOpen(false);
                             }}
                             titleStyle={masterdataStyles.text}
-                        />
-                    )}
-                    ListHeaderComponent={() => search && (
-                        <Searchbar
-                            placeholder={searchQuery || `Search ${label}`}
-                            value={searchQuery}
-                            onChangeText={setSearchQuery}
-                            style={styles.searchbar}
-                            inputStyle={masterdataStyles.text}
-                            autoFocus
                         />
                     )}
                     keyExtractor={(item) => `${item.value}`}
