@@ -25,7 +25,7 @@ const CustomDialog = React.memo(({ visible, onDismiss, children }: { visible: bo
     </Dialog>
 });
 
-const InfoGroupPermisson_dialog = React.memo(({ setDialogAdd, groupUsers, saveGroupUsers, savePermisson, selected, mode }: { setDialogAdd: () => void, groupUsers: GroupUsers[], saveGroupUsers: (v: any) => void, savePermisson: (v: any) => void, selected?: string, mode?: boolean }) => {
+const InfoGroupPermisson_dialog = React.memo(({ setDialogAdd, groupUsers, saveGroupUsers, savePermisson, selected, mode, deleteF }: { setDialogAdd: () => void, groupUsers: GroupUsers[], saveGroupUsers: (v: any) => void, savePermisson: (v: any) => void, selected?: string, mode?: boolean, deleteF: (value: string) => void }) => {
     const masterdataStyles = useMasterdataStyles();
     const { spacing } = useRes();
     const { theme } = useTheme();
@@ -130,6 +130,7 @@ const InfoGroupPermisson_dialog = React.memo(({ setDialogAdd, groupUsers, saveGr
                                 useEffect(() => {
                                     if (selectedGroupUser?.GUserID) {
                                         const select = groupUsers.find((item) => item.GUserID === selectedGroupUser?.GUserID)
+                                        console.log(select);
 
                                         setInitialValues({
                                             GUserID: select?.GUserID,
@@ -137,7 +138,7 @@ const InfoGroupPermisson_dialog = React.memo(({ setDialogAdd, groupUsers, saveGr
                                             isActive: select?.IsActive || false
                                         })
                                     }
-                                }, [groupUsers])
+                                }, [groupUsers, selectedGroupUser])
 
                                 return (
                                     <>
@@ -263,6 +264,9 @@ const InfoGroupPermisson_dialog = React.memo(({ setDialogAdd, groupUsers, saveGr
                             initialValues={initialValues}
                             setIsVisible={() => {
                                 setAddDialog(false);
+                            }}
+                            deleteF={(value: string) => {
+                                deleteF(value)
                             }}
                             saveData={(value: any) => {
                                 saveGroupUsers(value);

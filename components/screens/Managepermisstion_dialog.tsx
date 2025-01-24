@@ -206,6 +206,7 @@ const Managepermisstion_dialog = React.memo(({ isVisible, setIsVisible, isEditin
                                 groupUsers={groupUser}
                                 mode={true}
                                 selected={selectedGroupUser}
+                                deleteF={() => { }}
                                 saveGroupUsers={() => { }}
                                 savePermisson={() => { }}
                             />

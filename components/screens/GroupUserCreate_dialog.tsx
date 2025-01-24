@@ -15,7 +15,7 @@ const validationSchema = Yup.object().shape({
     isActive: Yup.boolean().required("The active field is required."),
 });
 
-const GroupUserCreate_dialog = React.memo(({ setIsVisible, saveData, initialValues }: { setIsVisible: () => void, saveData: any, initialValues: { GUserID?: string; GUserName: string; isActive: boolean; } }) => {
+const GroupUserCreate_dialog = React.memo(({ deleteF, setIsVisible, saveData, initialValues }: { setIsVisible: () => void, saveData: any, deleteF: (v: string) => void, initialValues: { GUserID?: string; GUserName: string; isActive: boolean; } }) => {
     const masterdataStyles = useMasterdataStyles()
     const { theme } = useTheme()
     const { spacing } = useRes()
@@ -101,7 +101,10 @@ const GroupUserCreate_dialog = React.memo(({ setIsVisible, saveData, initialValu
 
                         <View style={[masterdataStyles.containerAction, { paddingVertical: 10, justifyContent: "space-between" }]}>
                             <TouchableOpacity
-                                onPress={() => handleSubmit()}
+                                onPress={() => {
+                                    setIsVisible()
+                                    deleteF(String(values.GUserID))
+                                }}
                                 style={[styles.button, { backgroundColor: theme.colors.error }]}
                             >
                                 <Icon source="check" size={spacing.large} color={theme.colors.fff} />

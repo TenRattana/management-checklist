@@ -282,6 +282,16 @@ const Managepermissions = React.memo(() => {
     mutationPermisson.mutate(data);
   }, [mutationPermisson])
 
+  const deleteF = useCallback(async (value: string) => {
+    console.log(value);
+
+    if (value) {
+      const response = await axiosInstance.post("GroupUser_service.asmx/DeleteGroupUser", { GUserID: value });
+      showSuccess(String(response.data.message));
+      queryClient.invalidateQueries('groupUser');
+    }
+  }, [axiosInstance, showSuccess])
+
   return (
     <View id="container-managerpermission" style={styles.container}>
       <View id="container-search" style={masterdataStyles.containerSearch}>
@@ -334,6 +344,7 @@ const Managepermissions = React.memo(() => {
                 groupUsers={groupUser}
                 saveGroupUsers={saveGroupUsers}
                 savePermisson={savePermisson}
+                deleteF={deleteF}
               />
             </Suspense>
           </CustomDialog>
