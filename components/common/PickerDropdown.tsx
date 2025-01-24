@@ -1,6 +1,6 @@
 import { Platform, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import React, { useState, useMemo, useEffect } from 'react';
-import { IconButton, Menu, Searchbar, TextInput } from 'react-native-paper';
+import { Divider, IconButton, Menu, Searchbar, TextInput } from 'react-native-paper';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import useMasterdataStyles from '@/styles/common/masterdata';
 import { useRes } from '@/app/contexts/useRes';
@@ -67,7 +67,8 @@ const PickerDropdown = React.memo(({ open, setOpen, values, value, handelSetFilt
                         <IconButton icon="chevron-down" size={spacing.large} />
                     </TouchableOpacity>
                 </>}
-                style={{ marginTop: 10 }}
+                style={{ marginTop: 10, backgroundColor: theme.colors.background }}
+                contentStyle={{ backgroundColor: theme.colors.background }}
             >
                 {search && (
                     <Searchbar
@@ -78,7 +79,7 @@ const PickerDropdown = React.memo(({ open, setOpen, values, value, handelSetFilt
                         inputStyle={masterdataStyles.text}
                         autoFocus
                     />)}
-
+                <Divider />
                 <FlatList
                     data={filteredValues}
                     renderItem={({ item }) => (
