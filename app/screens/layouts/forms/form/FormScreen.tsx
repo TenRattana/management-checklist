@@ -80,15 +80,15 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
         }
     }, [route.params]);
 
+    const user = useSelector((state: any) => state.user)
+    const Edit = user.Permissions.includes("create_form")
+
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
             if (action === "changeIndex") {
                 navigate("Create_form", { formId: item });
             } else if (action === "preIndex") {
-                navigate('InputFormMachine', {
-                    machineId: "M00000086",
-                });
-                // navigate("Preview", { formId: item });
+                navigate("Preview", { formId: item });
             } else if (action === "copyIndex") {
                 navigate("Create_form", { formId: item, action: "copy" });
             } else {
@@ -107,7 +107,13 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
     }, [navigate]);
 
     const tableData = useMemo(() => {
-        return form.map((item) => [
+        return form.map((item) => !Edit ? [
+            item.FormNumber ?? "-",
+            item.FormName,
+            item.Description,
+            item.FormState ?? "-",
+            item.FormID,
+        ] : [
             item.Disables,
             item.Deletes,
             item.FormNumber ?? "-",
@@ -124,7 +130,13 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
 
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
-        Tablehead: [
+        Tablehead: !Edit ? [
+            { label: `${state.Form} Name`, align: "flex-start" },
+            { label: `${state.Form} Number`, align: "flex-start" },
+            { label: `${state.Form} Description`, align: "flex-start" },
+            { label: `${state.Form} Status`, align: "center" },
+            { label: "View", align: "center" },
+        ] : [
             { label: "", align: "flex-start" },
             { label: "", align: "flex-start" },
             { label: `${state.Form} Name`, align: "flex-start" },
@@ -137,8 +149,8 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
             { label: "View", align: "center" },
             { label: "Delete", align: "center" },
         ],
-        flexArr: [0, 0, 2, 2, 3, 1, 1, 1, 1, 1, 1],
-        actionIndex: [{ disables: 0, delete: 1, changeIndex: 7, copyIndex: 8, preIndex: 9, delOnlyIndex: 10 }],
+        flexArr: !Edit ? [2, 2, 3, 1, 1] : [0, 0, 2, 2, 3, 1, 1, 1, 1, 1, 1],
+        actionIndex: !Edit ? [{ preIndex: 4 }] : [{ disables: 0, delete: 1, changeIndex: 7, copyIndex: 8, preIndex: 9, delOnlyIndex: 10 }],
         showMessage: [2, 3],
         handleAction,
         searchQuery: debouncedSearchQuery,
@@ -220,9 +232,11 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
                         />
                     </View>
 
-                    <TouchableOpacity onPress={handleNewForm} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
-                        <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.Form}`}</Text>
-                    </TouchableOpacity>
+                    {Edit && (
+                        <TouchableOpacity onPress={handleNewForm} style={[masterdataStyles.backMain, masterdataStyles.buttonCreate]}>
+                            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.Form}`}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 <Suspense fallback={<LoadingSpinnerTable />}>

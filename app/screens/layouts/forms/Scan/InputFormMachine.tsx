@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from "react";
 import axiosInstance from "@/config/axios";
 import { Card, Divider } from "react-native-paper";
-import { FlatList, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { useTheme } from "@/app/contexts/useTheme";
 import { useToast } from "@/app/contexts/useToast";
 import { BaseSubForm, BaseFormState } from '@/typing/form';
@@ -20,13 +20,14 @@ import { useRes } from "@/app/contexts/useRes";
 import { FormValues } from "@/typing/screens/CreateForm";
 import ShimmerPlaceholder, { createShimmerPlaceholder } from 'react-native-shimmer-placeholder';
 import { LinearGradient } from 'expo-linear-gradient';
+import { FlatList } from "react-native-gesture-handler";
 
 const isValidDateFormatCustom = (value: string) => {
   const dateRegex = /^(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2})$/;
   return dateRegex.test(value);
 };
 
-const MemoizedFormfield = React.memo(({ dataType, item, field, values, setFieldValue, setTouched, errors, touched }: any) => {
+const MemoizedFormfield = React.memo(({ dataType, item, field, values, setFieldValue, setFieldTouched, errors, touched }: any) => {
   return (
     <Formfield
       dataType={dataType}
@@ -34,19 +35,18 @@ const MemoizedFormfield = React.memo(({ dataType, item, field, values, setFieldV
       field={field}
       values={values}
       setFieldValue={setFieldValue}
-      setTouched={setTouched}
+      setFieldTouched={setFieldTouched}
       errors={errors}
       touched={touched}
     />
   );
 });
 
+
 const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
   const { route } = props;
   const { dataType, found, isLoadingForm } = useForm(route);
   const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
-
-  console.log("InputFormMachine");
 
   const state = useSelector((state: any) => state.form);
   const user = useSelector((state: any) => state.user);
@@ -157,7 +157,7 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
   }
 
   return found ? state.FormID ? (
-    <AccessibleView name="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]} key={responsive}>
+    <View id="container-form-scan" style={[masterdataStyles.container, { paddingTop: 10, paddingLeft: 10 }]} key={responsive}>
       <Stack.Screen options={{ headerTitle: `${state.MachineName || "Machine Name"}` }} />
 
       {!isSubmitted ? (
@@ -167,7 +167,7 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
           validateOnBlur={false}
           onSubmit={handleSubmit}
         >
-          {({ errors, touched, setFieldValue, setTouched, values, dirty, isValid, handleSubmit }) => {
+          {({ errors, touched, setFieldValue, setFieldTouched, values, dirty, isValid, handleSubmit }) => {
 
             return (
               <FlatList
@@ -185,7 +185,7 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
                             field={item.Fields}
                             values={values}
                             setFieldValue={setFieldValue}
-                            setTouched={setTouched}
+                            setFieldTouched={setFieldTouched}
                             errors={errors}
                             touched={touched}
                           />
@@ -210,7 +210,7 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
                       <Text style={[masterdataStyles.description, { color: theme.colors.onBackground }]}>{state.FormNumber || "// F"}</Text>
                     </View>
 
-                    <AccessibleView name="form-action-scan" style={[masterdataStyles.containerAction]}>
+                    <View id="form-action-scan" style={[masterdataStyles.containerAction]}>
                       <TouchableOpacity
                         onPress={() => handleSubmit()}
                         style={[
@@ -222,7 +222,7 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
                       >
                         <Text style={[masterdataStyles.textBold, masterdataStyles.textFFF]}>Submit Form</Text>
                       </TouchableOpacity>
-                    </AccessibleView>
+                    </View>
                   </>
                 )}
                 contentContainerStyle={{ paddingBottom: 20 }}
@@ -245,7 +245,7 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
           </TouchableOpacity>
         </AccessibleView>
       )}
-    </AccessibleView>
+    </View>
   ) : <AccessibleView name="form-success" style={masterdataStyles.containerScccess}>
     <Text style={masterdataStyles.text}>Not Found!</Text>
     <TouchableOpacity
