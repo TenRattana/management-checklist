@@ -117,7 +117,7 @@ const Managepermisstion_dialog = React.memo(({ isVisible, setIsVisible, isEditin
                                                         title="Group User"
                                                         labels="GUserName"
                                                         values="GUserID"
-                                                        data={groupUser}
+                                                        data={groupUser.filter((item) => item.IsActive === true)}
                                                         value={field.value}
                                                         handleChange={(value) => {
                                                             const stringValue = (value as { value: string }).value;

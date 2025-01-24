@@ -283,8 +283,6 @@ const Managepermissions = React.memo(() => {
   }, [mutationPermisson])
 
   const deleteF = useCallback(async (value: string) => {
-    console.log(value);
-
     if (value) {
       const response = await axiosInstance.post("GroupUser_service.asmx/DeleteGroupUser", { GUserID: value });
       showSuccess(String(response.data.message));

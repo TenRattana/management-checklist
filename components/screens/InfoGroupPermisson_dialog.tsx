@@ -126,20 +126,6 @@ const InfoGroupPermisson_dialog = React.memo(({ setDialogAdd, groupUsers, saveGr
                             onSubmit={savePermisson}
                         >
                             {({ values, handleSubmit, setFieldValue }) => {
-
-                                useEffect(() => {
-                                    if (selectedGroupUser?.GUserID) {
-                                        const select = groupUsers.find((item) => item.GUserID === selectedGroupUser?.GUserID)
-                                        console.log(select);
-
-                                        setInitialValues({
-                                            GUserID: select?.GUserID,
-                                            GUserName: select?.GUserName || "",
-                                            isActive: select?.IsActive || false
-                                        })
-                                    }
-                                }, [groupUsers, selectedGroupUser])
-
                                 return (
                                     <>
                                         <Field name="GUserID" >
@@ -177,7 +163,16 @@ const InfoGroupPermisson_dialog = React.memo(({ setDialogAdd, groupUsers, saveGr
                                                     <View style={{ flexDirection: 'row', justifyContent: selectedGroupUser?.GUserID ? 'space-between' : 'flex-end', marginVertical: 5, marginHorizontal: 10, marginBottom: 10 }}>
                                                         {selectedGroupUser?.GUserID && (
                                                             <TouchableOpacity
-                                                                onPress={() => setAddDialog(true)}
+                                                                onPress={() => {
+                                                                    setAddDialog(true)
+                                                                    const select = groupUsers.find((item) => item.GUserID === selectedGroupUser?.GUserID)
+
+                                                                    setInitialValues({
+                                                                        GUserID: select?.GUserID,
+                                                                        GUserName: select?.GUserName || "",
+                                                                        isActive: select?.IsActive || false
+                                                                    })
+                                                                }}
                                                                 style={styles.button}
                                                             >
                                                                 <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
@@ -187,7 +182,14 @@ const InfoGroupPermisson_dialog = React.memo(({ setDialogAdd, groupUsers, saveGr
                                                         )}
 
                                                         <TouchableOpacity
-                                                            onPress={() => setAddDialog(true)}
+                                                            onPress={() => {
+                                                                setAddDialog(true)
+                                                                setInitialValues({
+                                                                    GUserID: "",
+                                                                    GUserName: "",
+                                                                    isActive: true
+                                                                })
+                                                            }}
                                                             style={styles.button}
                                                         >
                                                             <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>

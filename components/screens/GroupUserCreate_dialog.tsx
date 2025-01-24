@@ -99,20 +99,22 @@ const GroupUserCreate_dialog = React.memo(({ deleteF, setIsVisible, saveData, in
                             </View>
                         </View>
 
-                        <View style={[masterdataStyles.containerAction, { paddingVertical: 10, justifyContent: "space-between" }]}>
-                            <TouchableOpacity
-                                onPress={() => {
-                                    setIsVisible()
-                                    deleteF(String(values.GUserID))
-                                }}
-                                style={[styles.button, { backgroundColor: theme.colors.error }]}
-                            >
-                                <Icon source="check" size={spacing.large} color={theme.colors.fff} />
+                        <View style={[masterdataStyles.containerAction, { paddingVertical: 10, justifyContent: values.GUserID ? "space-between" : 'flex-end' }]}>
+                            {values.GUserID && (
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        setIsVisible()
+                                        deleteF(String(values.GUserID))
+                                    }}
+                                    style={[styles.button, { backgroundColor: theme.colors.error }]}
+                                >
+                                    <Icon source="check" size={spacing.large} color={theme.colors.fff} />
 
-                                <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
-                                    Delete
-                                </Text>
-                            </TouchableOpacity>
+                                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
+                                        Delete
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
 
                             <View style={{ flexDirection: 'row' }}>
                                 <TouchableOpacity
