@@ -24,7 +24,7 @@ const environment = process.env.EXPO_PUBLIC_API_URL || "development";
 
 export default {
   expo: {
-    homepage: "/PMChecklist_PD/",
+    // homepage: "/PMChecklist_PD/",
     name: "PMCheck List",
     platforms: ["ios", "android", "web"],
     slug: "pmchecklist",
@@ -135,7 +135,7 @@ export default {
     },
     experiments: {
       typedRoutes: true,
-      baseUrl: "/PMChecklist_PD",
+      // baseUrl: "/PMChecklist_PD",
     },
     jsEngine: "hermes",
   },
