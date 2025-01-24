@@ -38,7 +38,7 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker
-          .register('/PMChecklist/sw.js', { scope: '/PMChecklist/' })  
+          .register('/PMChecklist_PD/sw.js', { scope: '/PMChecklist_PD/' })  
           .then(registration => {
             console.log('Service Worker registered with scope:', registration.scope);
           })
