@@ -20,7 +20,7 @@ import { InitialValuesMachine, MachineDialogProps } from "@/typing/screens/Machi
 
 const validationSchema = Yup.object().shape({
     machineGroupId: Yup.string().required("The group machine field is required."),
-    machineCode: Yup.string().max(15, 'Machine code must not exceed 15 characters.'),
+    machineCode: Yup.string().required('The machine code field is required.'),
     machineName: Yup.string().required("The machine name field is required."),
     description: Yup.string().required("The description field is required."),
     isActive: Yup.boolean().required("The status field is required."),
