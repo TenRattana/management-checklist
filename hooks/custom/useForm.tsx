@@ -92,31 +92,36 @@ const createSubFormsAndFields = async (
 
     const DataInfo: Promise<any>[] = [];
 
-    DataInfo.push(axiosInstance.post("CheckList_service.asmx/GetCheckListInForm", { CListIDS: JSON.stringify(checkListIdAll) }));
-    DataInfo.push(axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptionInForm", { GCLOptionIDS: JSON.stringify(groupCheckListOptionIdAll) }));
+    checkListIdAll.length > 0 && DataInfo.push(axiosInstance.post("CheckList_service.asmx/GetCheckListInForm", { CListIDS: JSON.stringify(checkListIdAll) }));
+    groupCheckListOptionIdAll.length > 0 && DataInfo.push(axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptionInForm", { GCLOptionIDS: JSON.stringify(groupCheckListOptionIdAll) }));
 
     if (DataInfo.length > 0) {
         try {
             const results = await Promise.all(DataInfo);
-            const newItems = results[0]?.data?.data?.map((item: CheckList) => ({
-                ...item,
-                label: item.CListName || 'Unknown',
-                value: item.CListID || '',
-            })) || [];
 
-            const existingValues = new Set(itemsCheckList.map(item => item.value));
-            const uniqueItems = newItems.filter((item: { label: string, value: string } & CheckList) => !existingValues.has(item.value));
-            itemsCheckList.push(...uniqueItems);
+            if (results[0]?.data?.data?.length > 0) {
+                const newItems = results[0]?.data?.data?.map((item: CheckList) => ({
+                    ...item,
+                    label: item.CListName || 'Unknown',
+                    value: item.CListID || '',
+                })) || [];
 
-            const newItemsM = results[1]?.data?.data?.map((item: GroupCheckListOption) => ({
-                ...item,
-                label: item.GCLOptionName || 'Unknown',
-                value: item.GCLOptionID || '',
-            })) || [];
+                const existingValues = new Set(itemsCheckList.map(item => item.value));
+                const uniqueItems = newItems.filter((item: { label: string, value: string } & CheckList) => !existingValues.has(item.value));
+                itemsCheckList.push(...uniqueItems);
+            }
 
-            const existingValuesM = new Set(itemsGroupCheckListOption.map(item => item.value));
-            const uniqueItemsM = newItemsM.filter((item: { label: string, value: string } & GroupCheckListOption) => !existingValuesM.has(item.value));
-            itemsGroupCheckListOption.push(...uniqueItemsM);
+            if (results[1]?.data?.data?.length > 0) {
+                const newItemsM = results[1]?.data?.data?.map((item: GroupCheckListOption) => ({
+                    ...item,
+                    label: item.GCLOptionName || 'Unknown',
+                    value: item.GCLOptionID || '',
+                })) || [];
+
+                const existingValuesM = new Set(itemsGroupCheckListOption.map(item => item.value));
+                const uniqueItemsM = newItemsM.filter((item: { label: string, value: string } & GroupCheckListOption) => !existingValuesM.has(item.value));
+                itemsGroupCheckListOption.push(...uniqueItemsM);
+            }
 
         } catch (error) {
             console.error("Error occurred while fetching data:", error);
