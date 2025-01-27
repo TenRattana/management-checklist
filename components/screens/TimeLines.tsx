@@ -22,7 +22,6 @@ const Timelines = ({ filterStatus, filterTitle, computedTimeline }: TimelinesPro
     const { spacing } = useRes();
     const [dialogVisible, setDialogVisible] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState<any>(null);
-    const [isLoadingData, setIsLoadingData] = useState(true);
     const masterdataStyles = useMasterdataStyles();
 
     const initialTime = useMemo(() => {
@@ -38,7 +37,6 @@ const Timelines = ({ filterStatus, filterTitle, computedTimeline }: TimelinesPro
     useEffect(() => {
         if (computedTimeline.timeline.length) {
             setTimelineItems(computedTimeline.timeline);
-            setIsLoadingData(false);
         }
     }, [computedTimeline.timeline]);
 
@@ -97,10 +95,6 @@ const Timelines = ({ filterStatus, filterTitle, computedTimeline }: TimelinesPro
             />
         );
     }, [theme]);
-
-    if (isLoadingData) {
-        return <LoadingSpinner />;
-    }
 
     return (
         <>
