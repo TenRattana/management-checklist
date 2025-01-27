@@ -5,7 +5,7 @@ export interface Machine {
   MachineID: string;
   GMachineName?: string;
   FormID: string | null;
-  MachineCode: string | null;
+  MachineCode: string;
   MachineName: string;
   Description: string;
   Building: string | null;
