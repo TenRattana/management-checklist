@@ -1,19 +1,10 @@
 import axiosInstance from "@/config/axios";
-import { Permissions } from "@/typing/type";
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 
 export const fetchMenu = createAsyncThunk(
     "user/fetchMenu",
     async (data: string) => {
-        const response = await axiosInstance.post('Menu_service.asmx/GetMenus', { GUserID: data });
-        return response.data.data ?? [];
-    }
-);
-
-export const fetchPermission = createAsyncThunk(
-    "user/fetchPermission",
-    async (data: string) => {
-        const response = await axiosInstance.post('Menu_service.asmx/GetPermissions', { GUserID: data });
+        const response = await axiosInstance.post('Menu/GetMenus', { GUserID: data });
         return response.data.data ?? [];
     }
 );
@@ -39,6 +30,7 @@ export interface UserPayload {
     DepartMent: string;
     GUserID: string;
     GUserName: string;
+    Permission: string[];
 }
 
 const initialState: User = {
@@ -69,6 +61,7 @@ const middlewareStore = createSlice({
             state.GUserID = user.GUserID;
             state.GUserName = user.GUserName;
             state.IsAuthenticated = true;
+            state.Permissions = user.Permission;
         },
         logout: (state) => {
             return initialState;
@@ -86,16 +79,6 @@ const middlewareStore = createSlice({
             .addCase(fetchMenu.rejected, (state) => {
                 state.Screen = [];
             })
-            .addCase(fetchPermission.pending, (state) => {
-                state.Permissions = [];
-            })
-            .addCase(fetchPermission.fulfilled, (state, action) => {
-                state.Permissions = action.payload.map((permisson: Permissions) => permisson.PermissionName);
-                state.initialRoute = "Home"
-            })
-            .addCase(fetchPermission.rejected, (state) => {
-                state.Permissions = [];
-            });
     }
 });
 

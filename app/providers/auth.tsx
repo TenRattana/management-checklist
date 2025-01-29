@@ -4,12 +4,13 @@ import axiosInstance from '@/config/axios';
 import { AppProps } from '@/typing/type';
 import { useQuery } from 'react-query';
 import { useDispatch } from 'react-redux';
-import { setUser, setApp, fetchMenu, logout, UserPayload, fetchPermission } from "@/slices";
+import { setUser, setApp, fetchMenu, logout, UserPayload } from "@/slices";
 import { AppDispatch } from '@/stores';
 import { jwtDecode } from 'jwt-decode';
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AxiosHeaders, InternalAxiosRequestConfig } from "axios";
 import { ToastContext, ToastContextProps } from "@/app/providers/toastify";
+import { fetchAppConfig } from "../services";
 
 const useToast = (): ToastContextProps => {
   const context = useContext(ToastContext);
@@ -19,10 +20,10 @@ const useToast = (): ToastContextProps => {
   return context;
 };
 
-const fetchAppConfig = async (): Promise<AppProps> => {
-  const response = await axiosInstance.post('AppConfig_service.asmx/GetAppConfigs');
-  return response.data.data[0] ?? [];
-};
+// const fetchAppConfig = async (): Promise<AppProps> => {
+//   const response = await axiosInstance.get('GetAppConfig');
+//   return response.data.data[0] ?? [];
+// };
 export interface AuthContextType {
   loading: boolean;
   login: (username: string, password: string) => void;
@@ -36,25 +37,24 @@ interface AuthProviderProps {
 
 export const initializeApp = createAsyncThunk('app/initialize', async (payload: { UserData: UserPayload }, { dispatch }) => {
   dispatch(fetchMenu(payload.UserData.GUserID));
-  dispatch(fetchPermission(payload.UserData.GUserID));
   dispatch(setUser({ user: payload.UserData }));
 
   axiosInstance.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
       const userInfo = await getData('userToken');
       if (userInfo) {
-        const payload: any = jwtDecode(userInfo);
-        if (payload && payload.Full_Name) {
+        if (userInfo) {
           if (!(config.headers instanceof AxiosHeaders)) {
             config.headers = new AxiosHeaders(config.headers);
           }
-          config.headers.set('Authorization', payload.Full_Name);
+          config.headers.set('Authorization', `Bearer ${userInfo}`);
         }
       }
       return config;
     },
     (error) => Promise.reject(error)
   );
+  return
 });
 
 export const initializeLogout = createAsyncThunk('app/initialize', async (_, { dispatch }) => {
@@ -80,23 +80,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [UserData, setUserData] = useState<any>(undefined)
   const { handleError, showSuccess } = useToast();
-
-  const { data, isLoading: LoadingApp } = useQuery<AppProps, Error>(
-    'appConfig',
-    fetchAppConfig,
-    {
-      refetchOnWindowFocus: false,
-      keepPreviousData: true,
-      staleTime: 1000 * 60 * 5,
-      cacheTime: 1000 * 60 * 10,
-    }
-  );
-
-  useEffect(() => {
-    if (!LoadingApp && data) {
-      dispatch(setApp({ App: data }));
-    }
-  }, [LoadingApp, dispatch])
 
   useEffect(() => {
     let isMounted = true;
@@ -129,10 +112,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUserData(payload);
         }
       } else {
-        const response = await axiosInstance.post("User_service.asmx/GetAD", {
-          UserName,
-          Password,
-          TokenAuth,
+        const response = await axiosInstance.get("Ldap/AuthenticateUser", {
+          params: {
+            UserName,
+            Password,
+            TokenAuth
+          }
         });
 
         if (response.data && response.data.token) {
@@ -151,6 +136,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (UserData) {
       (async () => {
         await dispatch(initializeApp({ UserData }));
+        const dataApp = await fetchAppConfig();
+        dispatch(setApp({ App: dataApp[0] }));
         showSuccess("Login Success!");
         setLoading(false);
       })();
