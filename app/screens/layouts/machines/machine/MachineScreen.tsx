@@ -196,7 +196,7 @@ const MachineGroupScreen = React.memo(() => {
             { label: "Status", align: "center" },
             { label: "", align: "flex-end" },
         ],
-        flexArr: [0, 0, 2, 2, 2, 2, 1, 1, 1],
+        flexArr: [0, 0, 1, 2, 2, 2, 1, 1, 1],
         actionIndex: [{ disables: 0, delete: 1, editIndex: 8, delIndex: 9 }],
         handleAction,
         showMessage: 3,
