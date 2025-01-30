@@ -3,8 +3,14 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 
 export const fetchMenu = createAsyncThunk(
     "user/fetchMenu",
-    async (data: string) => {
-        const response = await axiosInstance.post('Menu/GetMenus', { GUserID: data });
+    async (GUserID: string) => {
+        console.log(GUserID);
+
+        const response = await axiosInstance.get("GetMenus", {
+            params: {
+                GUserID
+            }
+        });
         return response.data.data ?? [];
     }
 );

@@ -1,8 +1,6 @@
 import React, { createContext, useState, useEffect, ReactNode, useCallback, useMemo, useContext } from "react";
 import { getData, saveData, deleteData } from '@/app/services/storage';
 import axiosInstance from '@/config/axios';
-import { AppProps } from '@/typing/type';
-import { useQuery } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { setUser, setApp, fetchMenu, logout, UserPayload } from "@/slices";
 import { AppDispatch } from '@/stores';
@@ -19,11 +17,6 @@ const useToast = (): ToastContextProps => {
   }
   return context;
 };
-
-// const fetchAppConfig = async (): Promise<AppProps> => {
-//   const response = await axiosInstance.get('GetAppConfig');
-//   return response.data.data[0] ?? [];
-// };
 export interface AuthContextType {
   loading: boolean;
   login: (username: string, password: string) => void;
@@ -36,9 +29,6 @@ interface AuthProviderProps {
 }
 
 export const initializeApp = createAsyncThunk('app/initialize', async (payload: { UserData: UserPayload }, { dispatch }) => {
-  dispatch(fetchMenu(payload.UserData.GUserID));
-  dispatch(setUser({ user: payload.UserData }));
-
   axiosInstance.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
       const userInfo = await getData('userToken');
@@ -54,6 +44,12 @@ export const initializeApp = createAsyncThunk('app/initialize', async (payload: 
     },
     (error) => Promise.reject(error)
   );
+
+  console.log(payload.UserData);
+
+  dispatch(fetchMenu(payload.UserData.GUserID));
+  dispatch(setUser({ user: payload.UserData }));
+
   return
 });
 
@@ -112,7 +108,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUserData(payload);
         }
       } else {
-        const response = await axiosInstance.get("Ldap/AuthenticateUser", {
+        const response = await axiosInstance.get("AuthenticateUser", {
           params: {
             UserName,
             Password,
