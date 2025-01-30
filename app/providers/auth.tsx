@@ -10,6 +10,7 @@ import { jwtDecode } from 'jwt-decode';
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AxiosHeaders, InternalAxiosRequestConfig } from "axios";
 import { ToastContext, ToastContextProps } from "@/app/providers/toastify";
+import { fetchAppConfig } from "../services";
 
 const useToast = (): ToastContextProps => {
   const context = useContext(ToastContext);
@@ -19,10 +20,6 @@ const useToast = (): ToastContextProps => {
   return context;
 };
 
-const fetchAppConfig = async (): Promise<AppProps> => {
-  const response = await axiosInstance.post('AppConfig_service.asmx/GetAppConfigs');
-  return response.data.data[0] ?? [];
-};
 export interface AuthContextType {
   loading: boolean;
   login: (username: string, password: string) => void;
@@ -81,23 +78,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [UserData, setUserData] = useState<any>(undefined)
   const { handleError, showSuccess } = useToast();
 
-  const { data, isLoading: LoadingApp } = useQuery<AppProps, Error>(
-    'appConfig',
-    fetchAppConfig,
-    {
-      refetchOnWindowFocus: false,
-      keepPreviousData: true,
-      staleTime: 1000 * 60 * 5,
-      cacheTime: 1000 * 60 * 10,
-    }
-  );
-
-  useEffect(() => {
-    if (!LoadingApp && data) {
-      dispatch(setApp({ App: data }));
-    }
-  }, [LoadingApp, dispatch])
-
   useEffect(() => {
     let isMounted = true;
 
@@ -152,6 +132,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       (async () => {
         await dispatch(initializeApp({ UserData }));
         showSuccess("Login Success!");
+        const dataApp = await fetchAppConfig();
+        dispatch(setApp({ App: dataApp }));
         setLoading(false);
       })();
     }

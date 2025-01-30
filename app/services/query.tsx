@@ -1,5 +1,5 @@
 import axiosInstance from "@/config/axios";
-import { DataType, GroupUsers, TimeScheduleMachine, Users, UsersPermission } from "@/typing/type";
+import { AppProps, DataType, GroupUsers, TimeScheduleMachine, Users, UsersPermission } from "@/typing/type";
 import { Machine } from "@/typing/screens/Machine";
 import { GroupMachine } from "@/typing/screens/GroupMachine";
 import { GroupCheckListOption } from "@/typing/screens/GroupCheckList";
@@ -10,6 +10,12 @@ import { Form } from "@/typing/screens/Form";
 import { ExpectedResult } from "@/typing/screens/ExpectedResult";
 import { CheckList, GroupCheckListType } from "@/typing/screens/CheckList";
 import { TimeScemaScheduleProps } from "@/typing/screens/TimeSchedule";
+
+// App Config
+export const fetchAppConfig = async (): Promise<AppProps> => {
+    const response = await axiosInstance.post('AppConfig_service.asmx/GetAppConfigs');
+    return response.data.data[0] ?? [];
+};
 
 // Check List Type
 export const fetchCheckListType = async (): Promise<GroupCheckListType[]> => {
