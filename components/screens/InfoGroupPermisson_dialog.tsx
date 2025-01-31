@@ -201,7 +201,7 @@ const InfoGroupPermisson_dialog = React.memo(({ setDialogAdd, groupUsers, saveGr
                                             )}
                                         </Field>
 
-                                        <ScrollView style={{ marginHorizontal: 10 }} nestedScrollEnabled>
+                                        <ScrollView style={{ marginHorizontal: 10, flex: 1 }} nestedScrollEnabled>
                                             {values.permissions && values.permissions.length > 0 ? (
                                                 values.permissions.map((op, index) => (
                                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 5, paddingRight: 30 }} key={op.PermissionID}>
