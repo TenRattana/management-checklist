@@ -25,9 +25,9 @@ const environment = process.env.EXPO_PUBLIC_API_URL || "development";
 export default {
   expo: {
     // homepage: "/PMChecklist_PD/",
-    name: "PMCheck List",
+    name: "PMCheck List PD",
     platforms: ["ios", "android", "web"],
-    slug: "pmchecklist",
+    slug: "pmchecklist_pd",
     version: "1.0.0",
     sdkVersion: "51.0.0",
     orientation: "landscape",
