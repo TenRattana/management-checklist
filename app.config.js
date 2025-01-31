@@ -27,7 +27,7 @@ export default {
     // homepage: "/PMChecklist_PD/",
     name: "PMCheck List PD",
     platforms: ["ios", "android", "web"],
-    slug: "pmchecklist_pd",
+    slug: "pmchecklist",
     version: "1.0.0",
     sdkVersion: "51.0.0",
     orientation: "landscape",
