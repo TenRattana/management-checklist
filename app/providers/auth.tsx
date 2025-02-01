@@ -135,7 +135,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         await dispatch(initializeApp({ UserData }));
         showSuccess("Login Success!");
         const dataApp = await fetchAppConfig();
-        dispatch(setApp({ App: dataApp }));
+        dispatch(setApp({ App: dataApp[0] }));
         setLoading(false);
       })();
     }
