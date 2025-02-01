@@ -11,10 +11,10 @@ import { ExpectedResult } from "@/typing/screens/ExpectedResult";
 import { CheckList, GroupCheckListType } from "@/typing/screens/CheckList";
 import { TimeScemaScheduleProps } from "@/typing/screens/TimeSchedule";
 
-// App Config S
-export const fetchAppConfig = async (): Promise<AppProps> => {
-    const response = await axiosInstance.post('AppConfig_service.asmx/GetAppConfigs');
-    return response.data.data[0] ?? [];
+// App Config
+export const fetchAppConfig = async (): Promise<AppProps[]> => {
+    const response = await axiosInstance.get("GetAppConfig")
+    return response.data.data ?? [];
 };
 
 // Check List Type
