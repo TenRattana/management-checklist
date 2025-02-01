@@ -26,11 +26,11 @@ const DynamicForm = React.memo(({ field, values, handleChange, handleBlur, error
       const minLength = Number(ImportantList?.[0]?.MinLength) || undefined;
       const maxLength = Number(ImportantList?.[0]?.MaxLength) || Infinity;
 
-      if (minLength !== undefined && numericValue <= minLength) {
+      if (minLength !== undefined && numericValue < minLength) {
         setTextColor(theme.colors.yellow);
         setMessageMinOrMax("Min value control is overlength");
       }
-      else if (numericValue >= maxLength) {
+      else if (numericValue > maxLength) {
         setTextColor(theme.colors.error);
         setMessageMinOrMax("Max value control is overlength");
       }
