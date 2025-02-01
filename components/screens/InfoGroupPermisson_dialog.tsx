@@ -3,10 +3,10 @@ import { useTheme } from "@/app/contexts/useTheme";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { GroupUsers } from "@/typing/type";
 import { Field, Formik } from "formik";
-import React, { lazy, Suspense, useEffect, useState } from "react";
+import React, { lazy, Suspense, useState } from "react";
 import { View, StyleSheet, TouchableOpacity, ScrollView, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Dialog, Icon, IconButton, List, Switch, Text } from "react-native-paper";
+import { Card, Dialog, Icon, IconButton, List, Switch, Text } from "react-native-paper";
 import CustomDropdownSingle from "../CustomDropdownSingle";
 import { LoadingSpinner } from "../common";
 
@@ -57,8 +57,8 @@ const InfoGroupPermisson_dialog = React.memo(({ setDialogAdd, groupUsers, saveGr
         containerAction: {
             justifyContent: "flex-end",
             flexDirection: 'row',
-            paddingTop: 10,
-            paddingRight: 20
+            paddingRight: 20,
+            marginVertical: 10
         },
         dialog: {
             borderRadius: 10,
@@ -114,150 +114,153 @@ const InfoGroupPermisson_dialog = React.memo(({ setDialogAdd, groupUsers, saveGr
                         </ScrollView>
                     </View>
                 ) : (
-                    <View style={[styles.dialog, { maxHeight: Platform.OS === "web" ? 500 : '68%' }]}>
-                        <Formik
-                            initialValues={{
-                                permissions: selectedGroupUser ? selectedGroupUser.Permissons.map((perm) => ({
-                                    PermissionID: perm.PermissionID,
-                                    PermissionName: perm.PermissionName,
-                                    PermissionStatus: perm.PermissionStatus || false
-                                })) : []
-                            }}
-                            onSubmit={savePermisson}
-                        >
-                            {({ values, handleSubmit, setFieldValue }) => {
-                                return (
-                                    <>
-                                        <Field name="GUserID" >
-                                            {({ field, form }: any) => (
-                                                <>
-                                                    <CustomDropdownSingle
-                                                        title="Group User"
-                                                        labels="GUserName"
-                                                        values="GUserID"
-                                                        data={groupUsers}
-                                                        value={field.value}
-                                                        handleChange={(value) => {
-                                                            const stringValue = (value as { value: string }).value;
-                                                            form.setFieldValue(field.name, stringValue);
-                                                            setTimeout(() => {
-                                                                form.setFieldTouched(field.name, true);
-                                                                const selectedUser = groupUsers.find((user) => user.GUserID === stringValue);
-
-                                                                if (selectedUser) {
-                                                                    setSelectedGroupUser(selectedUser);
-                                                                    form.setFieldValue("permissions", selectedUser.Permissons.map((perm) => ({
-                                                                        PermissionID: perm.PermissionID,
-                                                                        PermissionName: perm.PermissionName,
-                                                                        PermissionStatus: perm.PermissionStatus || false
-                                                                    })));
-                                                                }
-                                                            }, 0);
-                                                        }}
-                                                        handleBlur={() => {
+                    <Formik
+                        initialValues={{
+                            permissions: selectedGroupUser ? selectedGroupUser.Permissons.map((perm) => ({
+                                PermissionID: perm.PermissionID,
+                                PermissionName: perm.PermissionName,
+                                PermissionStatus: perm.PermissionStatus || false
+                            })) : []
+                        }}
+                        onSubmit={savePermisson}
+                    >
+                        {({ values, handleSubmit, setFieldValue }) => {
+                            return (
+                                <>
+                                    <Field name="GUserID" >
+                                        {({ field, form }: any) => (
+                                            <>
+                                                <CustomDropdownSingle
+                                                    title="Group User"
+                                                    labels="GUserName"
+                                                    values="GUserID"
+                                                    data={groupUsers}
+                                                    value={field.value}
+                                                    handleChange={(value) => {
+                                                        const stringValue = (value as { value: string }).value;
+                                                        form.setFieldValue(field.name, stringValue);
+                                                        setTimeout(() => {
                                                             form.setFieldTouched(field.name, true);
-                                                        }}
-                                                        testId={`GUserID-managed`}
-                                                    />
+                                                            const selectedUser = groupUsers.find((user) => user.GUserID === stringValue);
 
-                                                    <View style={{ flexDirection: 'row', justifyContent: selectedGroupUser?.GUserID ? 'space-between' : 'flex-end', marginVertical: 5, marginHorizontal: 10, marginBottom: 10 }}>
-                                                        {selectedGroupUser?.GUserID && (
-                                                            <TouchableOpacity
-                                                                onPress={() => {
-                                                                    setAddDialog(true)
-                                                                    const select = groupUsers.find((item) => item.GUserID === selectedGroupUser?.GUserID)
+                                                            if (selectedUser) {
+                                                                setSelectedGroupUser(selectedUser);
+                                                                form.setFieldValue("permissions", selectedUser.Permissons.map((perm) => ({
+                                                                    PermissionID: perm.PermissionID,
+                                                                    PermissionName: perm.PermissionName,
+                                                                    PermissionStatus: perm.PermissionStatus || false
+                                                                })));
+                                                            }
+                                                        }, 0);
+                                                    }}
+                                                    handleBlur={() => {
+                                                        form.setFieldTouched(field.name, true);
+                                                    }}
+                                                    testId={`GUserID-managed`}
+                                                />
 
-                                                                    setInitialValues({
-                                                                        GUserID: select?.GUserID,
-                                                                        GUserName: select?.GUserName || "",
-                                                                        isActive: select?.IsActive || false
-                                                                    })
-                                                                }}
-                                                                style={styles.button}
-                                                            >
-                                                                <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
-                                                                    Edit
-                                                                </Text>
-                                                            </TouchableOpacity>
-                                                        )}
-
+                                                <View style={{ flexDirection: 'row', justifyContent: selectedGroupUser?.GUserID ? 'space-between' : 'flex-end', marginVertical: 5, marginHorizontal: 10, marginBottom: 10 }}>
+                                                    {selectedGroupUser?.GUserID && (
                                                         <TouchableOpacity
                                                             onPress={() => {
                                                                 setAddDialog(true)
+                                                                const select = groupUsers.find((item) => item.GUserID === selectedGroupUser?.GUserID)
+
                                                                 setInitialValues({
-                                                                    GUserID: "",
-                                                                    GUserName: "",
-                                                                    isActive: true
+                                                                    GUserID: select?.GUserID,
+                                                                    GUserName: select?.GUserName || "",
+                                                                    isActive: select?.IsActive || false
                                                                 })
                                                             }}
                                                             style={styles.button}
                                                         >
                                                             <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
-                                                                Add Group User
+                                                                Edit
                                                             </Text>
                                                         </TouchableOpacity>
-                                                    </View>
-                                                </>
-                                            )}
-                                        </Field>
+                                                    )}
 
-                                        <ScrollView style={{ marginHorizontal: 10 }} nestedScrollEnabled>
-                                            {values.permissions && values.permissions.length > 0 ? (
-                                                values.permissions.map((op, index) => (
-                                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 5, paddingRight: 30 }} key={op.PermissionID}>
-                                                        <List.Item
-                                                            title={op.PermissionName}
-                                                            style={styles.optionItem}
-                                                            descriptionStyle={{ fontSize: spacing.small }}
-                                                            titleStyle={{ fontSize: spacing.small }}
-                                                        />
-                                                        <Switch
-                                                            style={{ transform: [{ scale: 1.1 }], top: 2 }}
-                                                            color={theme.colors.inversePrimary}
-                                                            value={op.PermissionStatus}
-                                                            onValueChange={(v: boolean) => {
-                                                                setFieldValue(`permissions[${index}].PermissionStatus`, v);
-                                                            }}
-                                                            testID="IsActive-managed"
-                                                            id="IsActive-managed-sw"
-                                                        />
-                                                    </View>
-                                                ))
-                                            ) : (
-                                                <Text style={[masterdataStyles.text, { marginLeft: 10 }]}>No permissions available for this user.</Text>
-                                            )}
-                                        </ScrollView>
+                                                    <TouchableOpacity
+                                                        onPress={() => {
+                                                            setAddDialog(true)
+                                                            setInitialValues({
+                                                                GUserID: "",
+                                                                GUserName: "",
+                                                                isActive: true
+                                                            })
+                                                        }}
+                                                        style={styles.button}
+                                                    >
+                                                        <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>
+                                                            Add Group User
+                                                        </Text>
+                                                    </TouchableOpacity>
+                                                </View>
+                                            </>
+                                        )}
+                                    </Field>
 
-                                        <View style={[masterdataStyles.containerAction, styles.containerAction]}>
-                                            {values.permissions && values.permissions.length > 0 && (
-                                                <TouchableOpacity
-                                                    onPress={() => handleSubmit()}
-                                                    style={[styles.button, styles.buttonSubmit]}
-                                                >
-                                                    <Icon source="check" size={spacing.large} color={theme.colors.fff} />
-                                                    <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
-                                                        Update
-                                                    </Text>
-                                                </TouchableOpacity>
-                                            )}
+                                    <ScrollView
+                                        showsVerticalScrollIndicator={false}
+                                        style={{ maxHeight: Platform.OS === "web" ? 330 : '48%' }}
+                                        keyboardShouldPersistTaps="handled"
+                                        nestedScrollEnabled={true}
+                                    >
+                                        {values.permissions && values.permissions.length > 0 ? (
+                                            values.permissions.map((op, index) => (
+                                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 5, paddingRight: 30 }} key={op.PermissionID}>
+                                                    <List.Item
+                                                        title={op.PermissionName}
+                                                        style={styles.optionItem}
+                                                        descriptionStyle={{ fontSize: spacing.small }}
+                                                        titleStyle={{ fontSize: spacing.small }}
+                                                    />
+                                                    <Switch
+                                                        style={{ transform: [{ scale: 1.1 }], top: 2, flex: 1 }}
+                                                        color={theme.colors.inversePrimary}
+                                                        value={op.PermissionStatus}
+                                                        onValueChange={(v: boolean) => {
+                                                            setFieldValue(`permissions[${index}].PermissionStatus`, v);
+                                                        }}
+                                                        testID="IsActive-managed"
+                                                        id="IsActive-managed-sw"
+                                                    />
+                                                </View>
+                                            ))
+                                        ) : (
+                                            <Text style={[masterdataStyles.text, { marginLeft: 10 }]}>No permissions available for this user.</Text>
+                                        )}
+                                    </ScrollView>
 
+                                    <View style={[masterdataStyles.containerAction, styles.containerAction]}>
+                                        {values.permissions && values.permissions.length > 0 && (
                                             <TouchableOpacity
-                                                onPress={() => setDialogAdd()}
-                                                style={[styles.button, masterdataStyles.backMain, { marginLeft: 10, flexDirection: "row" }]}
+                                                onPress={() => handleSubmit()}
+                                                style={[styles.button, styles.buttonSubmit]}
                                             >
-                                                <Icon source="close" size={spacing.large} color={theme.colors.fff} />
-                                                <Text style={[masterdataStyles.text, masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
-                                                    Cancel
+                                                <Icon source="check" size={spacing.large} color={theme.colors.fff} />
+                                                <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
+                                                    Update
                                                 </Text>
                                             </TouchableOpacity>
-                                        </View>
-                                    </>
-                                );
-                            }}
-                        </Formik>
-                    </View >
+                                        )}
+
+                                        <TouchableOpacity
+                                            onPress={() => setDialogAdd()}
+                                            style={[styles.button, masterdataStyles.backMain, { marginLeft: 10, flexDirection: "row" }]}
+                                        >
+                                            <Icon source="close" size={spacing.large} color={theme.colors.fff} />
+                                            <Text style={[masterdataStyles.text, masterdataStyles.textFFF, masterdataStyles.textBold, { paddingLeft: 15 }]}>
+                                                Cancel
+                                            </Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </>
+                            );
+                        }}
+                    </Formik>
                 )}
-            </GestureHandlerRootView>
+            </GestureHandlerRootView >
 
             {addDialog && (
                 <CustomDialog visible={addDialog} onDismiss={() => setAddDialog(false)}>
@@ -277,7 +280,8 @@ const InfoGroupPermisson_dialog = React.memo(({ setDialogAdd, groupUsers, saveGr
                         />
                     </Suspense>
                 </CustomDialog>
-            )}
+            )
+            }
         </>
 
     );

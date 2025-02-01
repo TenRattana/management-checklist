@@ -33,11 +33,12 @@ export const initializeApp = createAsyncThunk('app/initialize', async (payload: 
     async (config: InternalAxiosRequestConfig) => {
       const userInfo = await getData('userToken');
       if (userInfo) {
-        if (userInfo) {
+        const payload: any = jwtDecode(userInfo);
+        if (payload && payload.Full_Name) {
           if (!(config.headers instanceof AxiosHeaders)) {
             config.headers = new AxiosHeaders(config.headers);
           }
-          config.headers.set('Authorization', `Bearer ${userInfo}`);
+          config.headers.set('Authorization', payload.Full_Name);
         }
       }
       return config;
@@ -132,9 +133,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (UserData) {
       (async () => {
         await dispatch(initializeApp({ UserData }));
-        const dataApp = await fetchAppConfig();
-        dispatch(setApp({ App: dataApp[0] }));
         showSuccess("Login Success!");
+        const dataApp = await fetchAppConfig();
+        dispatch(setApp({ App: dataApp }));
         setLoading(false);
       })();
     }
