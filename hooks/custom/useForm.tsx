@@ -92,8 +92,8 @@ const createSubFormsAndFields = async (
 
     const DataInfo: Promise<any>[] = [];
 
-    checkListIdAll.length > 0 && DataInfo.push(axiosInstance.post("CheckList_service.asmx/GetCheckListInForm", { CListIDS: JSON.stringify(checkListIdAll) }));
-    groupCheckListOptionIdAll.length > 0 && DataInfo.push(axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptionInForm", { GCLOptionIDS: JSON.stringify(groupCheckListOptionIdAll) }));
+    checkListIdAll.length > 0 && DataInfo.push(axiosInstance.post("CheckLists/GetCheckListInForm", { CListIDS: JSON.stringify(checkListIdAll) }));
+    groupCheckListOptionIdAll.length > 0 && DataInfo.push(axiosInstance.post("GroupCheckListOptions/GetGroupCheckListOptionInForm", { GCLOptionIDS: JSON.stringify(groupCheckListOptionIdAll) }));
 
     if (DataInfo.length > 0) {
         try {
@@ -162,10 +162,10 @@ const useForm = (route?: RouteParams) => {
         setIsLoading(true);
         try {
             const responses = await Promise.all([
-                axiosInstance.post("CheckList_service.asmx/SearchCheckLists", { Messages: "Empty Content" }),
-                axiosInstance.post("GroupCheckListOption_service.asmx/SearchGroupCheckLists", { Messages: "Empty Content Group" }),
-                axiosInstance.post("CheckListType_service.asmx/GetCheckListTypes"),
-                axiosInstance.post("DataType_service.asmx/GetDataTypes"),
+                axiosInstance.post("CheckLists/SearchCheckLists", { Messages: "Empty Content" }),
+                axiosInstance.post("GroupCheckListOptions/SearchGroupCheckLists", { Messages: "Empty Content Group" }),
+                axiosInstance.post("CheckListTypes/GetCheckListTypes"),
+                axiosInstance.post("DataTypes/GetDataTypes"),
             ]);
 
             setData({
@@ -187,13 +187,13 @@ const useForm = (route?: RouteParams) => {
         if (!dataLoaded) return;
         setIsLoadingForm(true)
         try {
-            const endpoint = mode ? "Form_service.asmx/ScanForm" : "Form_service.asmx/GetForm";
+            const endpoint = mode ? "Forms/ScanForm" : "Forms/GetForm";
             const response = await axiosInstance.post(endpoint, { [mode ? "MachineID" : "FormID"]: formId });
 
             let fetchedExpectedResult = [];
             if (tableId) {
                 const expectedResultResponse = await axiosInstance.post(
-                    "ExpectedResult_service.asmx/GetExpectedResult",
+                    "ExpectedResults/GetExpectedResult",
                     { TableID: tableId }
                 );
                 fetchedExpectedResult = expectedResultResponse.data?.data[0] || [];

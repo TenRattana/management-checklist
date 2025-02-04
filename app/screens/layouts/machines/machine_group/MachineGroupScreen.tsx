@@ -105,7 +105,7 @@ const MachineGroupScreen = React.memo(() => {
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
             if (action === "editIndex") {
-                const response = await axiosInstance.post("GroupMachine_service.asmx/GetGroupMachine", { GMachineID: item });
+                const response = await axiosInstance.post("GroupMachines/GetGroupMachine", { GMachineID: item });
                 const machineGroupData = response.data.data[0] ?? {};
                 setInitialValues({
                     machineGroupId: machineGroupData.GMachineID ?? "",
@@ -118,7 +118,7 @@ const MachineGroupScreen = React.memo(() => {
                 setIsVisible(true);
             } else {
                 const endpoint = action === "activeIndex" ? "ChangeGroupMachine" : "DeleteGroupMachine";
-                const response = await axiosInstance.post(`GroupMachine_service.asmx/${endpoint}`, { GMachineID: item });
+                const response = await axiosInstance.post(`GroupMachines/${endpoint}`, { GMachineID: item });
                 showSuccess(String(response.data.message));
                 queryClient.invalidateQueries('machineGroups');
             }

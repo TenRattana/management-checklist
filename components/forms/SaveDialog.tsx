@@ -33,7 +33,7 @@ const SaveDialog = React.memo(({ state, isVisible, setIsVisible }: SaveDialogPro
         };
 
         try {
-            const response = await axiosInstance.post("MatchCheckList_service.asmx/SaveFormCheckList", data);
+            const response = await axiosInstance.post("MatchCheckLists/SaveFormCheckList", data);
             messages = (String(response.data.message));
             showSuccess(messages);
             navigate("Form", { fet: true });

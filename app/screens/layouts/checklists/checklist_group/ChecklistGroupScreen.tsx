@@ -107,7 +107,7 @@ const ChecklistGroupScreen = React.memo(() => {
         try {
             if (action === "editIndex") {
                 const response = await axiosInstance.post(
-                    "GroupCheckListOption_service.asmx/GetGroupCheckListOption",
+                    "GroupCheckListOptions/GetGroupCheckListOption",
                     { GCLOptionID: item }
                 );
                 const groupCheckListOptionData = response.data.data[0] ?? {};
@@ -121,7 +121,7 @@ const ChecklistGroupScreen = React.memo(() => {
                 setIsEditing(true);
             } else {
                 const endpoint = action === "activeIndex" ? "ChangeGroupCheckListOption" : "DeleteGroupCheckListOption";
-                const response = await axiosInstance.post(`GroupCheckListOption_service.asmx/${endpoint}`, { GCLOptionID: item });
+                const response = await axiosInstance.post(`GroupCheckListOptions/${endpoint}`, { GCLOptionID: item });
                 showSuccess(String(response.data.message));
                 queryClient.invalidateQueries('groupCheckListOption');
             }

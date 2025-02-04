@@ -107,7 +107,7 @@ const CheckListOptionScreen = React.memo(() => {
         try {
             if (action === "editIndex") {
                 const response = await axiosInstance.post(
-                    "CheckListOption_service.asmx/GetCheckListOption",
+                    "CheckListOptions/GetCheckListOption",
                     {
                         CLOptionID: item,
                     }
@@ -123,7 +123,7 @@ const CheckListOptionScreen = React.memo(() => {
                 setIsEditing(true);
             } else {
                 const endpoint = action === "activeIndex" ? "ChangeCheckListOption" : "DeleteCheckListOption";
-                const response = await axiosInstance.post(`CheckListOption_service.asmx/${endpoint}`, { CLOptionID: item });
+                const response = await axiosInstance.post(`CheckListOptions/${endpoint}`, { CLOptionID: item });
                 showSuccess(String(response.data.message));
                 queryClient.invalidateQueries('checkListOption');
             }
