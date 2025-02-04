@@ -6,6 +6,8 @@ import { useRes } from '@/app/contexts/useRes'
 import Text from "../../Text";
 import PickerDropdown from "../../common/PickerDropdown";
 import { RenderItemHeadProps } from "@/typing/screens/CustomTable";
+import { Dropdown } from "@/components/common";
+import { useTheme } from "@/app/contexts/useTheme";
 
 type justifyContent = 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly' | undefined;
 
@@ -13,6 +15,7 @@ const CustomtableHead = React.memo(({ Tablehead, flexArr, handleSort, sortColumn
     handleDialog, ShowTitle, showFilterDate, filteredDate, Dates, handleLoadMore, isFetchingNextPage, hasNextPage, handlefilter, searchfilter }: RenderItemHeadProps) => {
     const masterdataStyles = useMasterdataStyles();
     const { fontSize, responsive, spacing } = useRes();
+    const { theme } = useTheme();
     const [open, setOpen] = useState(false);
     const [openDate, setOpenDate] = useState(false);
 
@@ -104,29 +107,33 @@ const CustomtableHead = React.memo(({ Tablehead, flexArr, handleSort, sortColumn
                     flexDirection: responsive === "small" ? 'column' : 'row',
                 }}>
                     {showFilterDate && (
-                        <PickerDropdown
-                            label="Date"
-                            handelSetFilter={(value: string) => filteredDate(value)}
-                            open={openDate}
-                            setOpen={(v: boolean) => setOpenDate(v)}
-                            value={Dates}
-                            values={filterDateOptions}
-                            key={`picker-date`}
-                        />
+                        <View style={{ width: 200 }}>
+                            <Dropdown
+                                label={`Date`}
+                                search
+                                open={openDate}
+                                setOpen={(v: boolean) => setOpenDate(v)}
+                                selectedValue={Dates}
+                                items={filterDateOptions}
+                                setSelectedValue={(value: string | null) => filteredDate(value)}
+                            />
+                        </View>
                     )}
 
                     {showFilter && (
-                        <PickerDropdown
-                            label={`${ShowTitle || "Title"}`}
-                            handelSetFilter={(value: string) => handelSetFilter(value)}
-                            open={open}
-                            setOpen={(v: boolean) => setOpen(v)}
-                            value={filter}
-                            values={showData || []}
-                            search
-                            handleScroll={handleScroll}
-                            key={`picker-data`}
-                        />
+                        <>
+                            <View style={{ width: open ? 500 : 250 }}>
+                                <Dropdown
+                                    label={`${ShowTitle || "Title"}`}
+                                    search
+                                    open={open}
+                                    setOpen={(v: boolean) => setOpen(v)}
+                                    selectedValue={filter}
+                                    items={showData || []}
+                                    setSelectedValue={(value: string | null) => handelSetFilter(value)}
+                                />
+                            </View>
+                        </>
                     )}
                 </View>
             </View >

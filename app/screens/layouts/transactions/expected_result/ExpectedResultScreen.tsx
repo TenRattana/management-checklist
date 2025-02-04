@@ -32,13 +32,13 @@ const ExpectedResultScreen = React.memo(() => {
         ({ pageParam = 0 }) => {
             return debouncedSearchQuery
                 ? fetchSearchExpectedResult(debouncedSearchQuery)
-                : fetchExpectedResults(pageParam, 50);
+                : fetchExpectedResults(pageParam, 100000);
         },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: true,
             getNextPageParam: (lastPage, allPages) => {
-                return lastPage.length === 50 ? allPages.length : undefined;
+                return lastPage.length === 100000 ? allPages.length : undefined;
             },
             enabled: true,
             onSuccess: (newData) => {
@@ -54,14 +54,14 @@ const ExpectedResultScreen = React.memo(() => {
         ({ pageParam = 0 }) => {
             return debouncedSearchQueryFilter
                 ? fetchSearchMachines(debouncedSearchQueryFilter)
-                : fetchMachines(pageParam, 50);
+                : fetchMachines(pageParam, 1000);
         },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: true,
             enabled: true,
             getNextPageParam: (lastPage, allPages) => {
-                return lastPage.length === 50 ? allPages.length : undefined;
+                return lastPage.length === 1000 ? allPages.length : undefined;
             },
             onSuccess: (newData) => {
                 const newItems = newData.pages.flat().filter((item) => item.IsActive).map((item) => ({

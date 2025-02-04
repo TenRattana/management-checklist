@@ -33,13 +33,13 @@ const ApprovedScreen = React.memo(() => {
         ({ pageParam = 0 }) => {
             return debouncedSearchQuery
                 ? fetchSearchApproved(debouncedSearchQuery)
-                : fetchApproved(pageParam, 50);
+                : fetchApproved(pageParam, 10000);
         },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: true,
             getNextPageParam: (lastPage, allPages) => {
-                return lastPage.length === 50 ? allPages.length : undefined;
+                return lastPage.length === 10000 ? allPages.length : undefined;
             },
             enabled: true,
             onSuccess: (newData) => {
@@ -56,14 +56,14 @@ const ApprovedScreen = React.memo(() => {
         ({ pageParam = 0 }) => {
             return debouncedSearchQueryFilter
                 ? fetchSearchMachines(debouncedSearchQueryFilter)
-                : fetchMachines(pageParam, 50);
+                : fetchMachines(pageParam, 10000);
         },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: true,
             enabled: true,
             getNextPageParam: (lastPage, allPages) => {
-                return lastPage.length === 50 ? allPages.length : undefined;
+                return lastPage.length === 10000 ? allPages.length : undefined;
             },
             onSuccess: (newData) => {
                 const newItems = newData.pages.flat().filter((item) => item.IsActive).map((item) => ({
