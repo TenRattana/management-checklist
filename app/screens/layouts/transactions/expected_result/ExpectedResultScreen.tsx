@@ -12,6 +12,7 @@ import { navigate } from "@/app/navigations/navigationUtils";
 import { useFocusEffect } from "expo-router";
 import { useSelector } from "react-redux";
 import { ExpectedResult } from "@/typing/screens/ExpectedResult";
+import AdvancedFilter from "@/components/common/AdvancedFilter";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
@@ -26,6 +27,7 @@ const ExpectedResultScreen = React.memo(() => {
     const { theme, darkMode } = useTheme();
     const [expectedResult, setExpectedResult] = useState<ExpectedResult[]>([])
     const masterdataStyles = useMasterdataStyles();
+    const [show, setShow] = useState(false)
 
     const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
         ['expectedResult', debouncedSearchQuery],
@@ -170,16 +172,16 @@ const ExpectedResultScreen = React.memo(() => {
         ],
         handleAction,
         showMessage: [0, 2],
-        detail: true,
-        detailKey: "TableID",
-        detailKeyrow: 6,
-        showDetailwithKey: ["MachineName", "FormNumber", "FormName", "UserName", "ApprovedName", "CreateDate", "ApprovedTime"],
-        detailData: expectedResult,
-        showFilterDate: true,
-        showFilter: true,
-        ShowTitle: "Machine",
-        showData: machines,
-        showColumn: "MachineName",
+        // detail: true,
+        // detailKey: "TableID",
+        // detailKeyrow: 6,
+        // showDetailwithKey: ["MachineName", "FormNumber", "FormName", "UserName", "ApprovedName", "CreateDate", "ApprovedTime"],
+        // detailData: expectedResult,
+        // showFilterDate: !show,
+        // showFilter: !show,
+        // ShowTitle: "Machine",
+        // showData: machines,
+        // showColumn: "MachineName",
         filterColumn: 0,
         setFilterDate: 5,
         searchQuery: debouncedSearchQuery,
@@ -233,6 +235,10 @@ const ExpectedResultScreen = React.memo(() => {
         },
     });
 
+    const toggleFilter = () => {
+        setShow(prev => !prev);
+    };
+
     return (
         <View id="container-checklist" style={styles.container}>
             <View id="container-search" style={masterdataStyles.containerSearch}>
@@ -248,6 +254,7 @@ const ExpectedResultScreen = React.memo(() => {
                             onChange={setSearchQuery}
                             testId="search-er"
                         />
+                        <AdvancedFilter show={show} toggleFilter={toggleFilter} />
                     </View>
                 </View>
 
