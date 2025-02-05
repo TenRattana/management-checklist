@@ -225,6 +225,8 @@ const ExpectedResultScreen = React.memo(() => {
         };
     }, [searchQuery]);
 
+    console.log(machineCodes);
+    
     const handleAction = useCallback(async (action?: string, item?: string) => {
         const data = expectedResult.find((v) => v.TableID === item);
 
@@ -542,7 +544,7 @@ const ExpectedResultScreen = React.memo(() => {
                                                     handelChangeFilter={handelChangeFilter}
                                                     Title="Machine_Code"
                                                     search={true}
-                                                    selectFilterOption={machineCodes}
+                                                    selectFilterOption={machines}
                                                     setVisible={handelChangeVisible}
                                                     fetchNextPage={fetchNextPageMG}
                                                     handleScroll={handleScrollMG}

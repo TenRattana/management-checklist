@@ -238,7 +238,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
 
 const Navigation: React.FC = React.memo(() => {
     const user = useSelector((state: any) => state.user);
-    const { theme, darkMode } = useTheme();
+
 
     const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
 
@@ -246,9 +246,7 @@ const Navigation: React.FC = React.memo(() => {
         if (cachedComponents.current[name]) {
             const Component = cachedComponents.current[name];
             return (props: any) => (
-                <Suspense fallback={<LoadingSpinner />}>
-                    <Component {...props} />
-                </Suspense>
+                <Component {...props} />
             );
         }
 
@@ -268,8 +266,7 @@ const Navigation: React.FC = React.memo(() => {
                 <PermissionDeny {...props} />
             </Suspense>
         );
-    }, []);
-
+    }, [components, cachedComponents]);
 
     return (
         <DrawerNav
