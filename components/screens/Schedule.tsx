@@ -122,3 +122,13 @@ export const convertToThaiDateTime = (
     ? `${day}-${month}-${year} ${hours}:${minutes}`
     : `${day}-${month}-${year}`;
 };
+
+export const convertToDateTime = (
+  dateString: string
+) => {
+  const [day, month, thaiYear] = dateString.split('-');
+
+  const gregorianYear = parseInt(thaiYear) - 543;
+
+  return `${gregorianYear}-${month}-${day}`;
+};

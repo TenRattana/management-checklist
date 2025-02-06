@@ -196,7 +196,7 @@ const MachineGroupScreen = React.memo(() => {
             item.IsActive,
             item.MachineID,
         ]);
-    }, [machines, debouncedSearchQuery]);
+    }, [machines]);
 
     const handleNewData = useCallback(() => {
         setInitialValues({

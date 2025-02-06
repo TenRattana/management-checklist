@@ -10,6 +10,7 @@ import { Form } from "@/typing/screens/Form";
 import { ExpectedResult } from "@/typing/screens/ExpectedResult";
 import { CheckList, GroupCheckListType } from "@/typing/screens/CheckList";
 import { TimeScemaScheduleProps } from "@/typing/screens/TimeSchedule";
+import { convertToDate, convertToDateTime } from "@/components/screens/Schedule";
 
 // App Config S
 export const fetchAppConfig = async (): Promise<AppProps> => {
@@ -393,6 +394,25 @@ export const fetchExpectedResults = async (
         const response = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResults", {
             page: currentPage,
             pageSize: pageSize,
+        });
+        return response.data.data ?? [];
+    } catch (error) {
+        console.error("Error fetching :", error);
+        throw new Error('Failed to fetch');
+    }
+};
+
+export const fetchExpectedResultsWithTime = async (
+    StartTime: string,
+    EndTime: string,
+): Promise<ExpectedResult[]> => {
+    try {
+        const start = StartTime && convertToDateTime(StartTime)
+        const end = EndTime && convertToDateTime(EndTime)
+
+        const response = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResultsWithTime", {
+            StartTime: start,
+            EndTime: end,
         });
         return response.data.data ?? [];
     } catch (error) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
+import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense, useRef } from "react";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from '@/app/contexts/useToast';
 import { LoadingSpinner, LoadingSpinnerTable, Searchbar, Text } from "@/components";
@@ -6,7 +6,7 @@ import { Button, Card, IconButton, Portal } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { QueryClient, useInfiniteQuery, useQueryClient } from 'react-query';
 import { Platform, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import { fetchExpectedResults, fetchForms, fetchMachines, fetchSearchExpectedResult, fetchSearchFomrs, fetchSearchMachines, fetchUsers } from "@/app/services";
+import { fetchExpectedResults, fetchExpectedResultsWithTime, fetchForms, fetchMachines, fetchSearchExpectedResult, fetchSearchFomrs, fetchSearchMachines, fetchUsers } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 import { navigate } from "@/app/navigations/navigationUtils";
 import { useFocusEffect } from "expo-router";
@@ -14,6 +14,9 @@ import { useSelector } from "react-redux";
 import { ExpectedResult } from "@/typing/screens/ExpectedResult";
 import AdvancedFilter from "@/components/common/AdvancedFilter";
 import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
+import DialogTimeCustom from "@/components/common/DialogTimeCustom";
+import { getCurrentTime } from "@/config/timezoneUtils";
+import { convertToDate, convertToThaiDateTime } from "@/components/screens/Schedule";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
@@ -22,11 +25,12 @@ const filterDateOptions = [
     { label: "Today", value: "Today" },
     { label: "This week", value: "This week" },
     { label: "This month", value: "This month" },
+    { label: "Custom", value: "Custom" }
 ];
 
 const filterApproved = [
     { label: "Select all", value: "" },
-    { label: "Approved", value: "+" },
+    { label: "Approved", value: "✔️" },
     { label: "Automatic", value: "-" },
 ];
 
@@ -42,24 +46,24 @@ const ExpectedResultScreen = React.memo(() => {
     const [expectedResult, setExpectedResult] = useState<ExpectedResult[]>([])
     const masterdataStyles = useMasterdataStyles();
     const [show, setShow] = useState(false)
-    const [selectFilter, setSelectFilter] = useState<{ Date: string | null, Machine: string | null, User: string | null, Status: string | null, Form: string | null, Machine_Code: string | null, FormNumber: string | null }>({
-        Date: null, Form: null, Machine: null, Machine_Code: null, Status: null, User: null, FormNumber: null
+    const [selectFilter, setSelectFilter] = useState<{ Date: string, Machine: string, User: string, Status: string, Form: string, Machine_Code: string, FormNumber: string }>({
+        Date: "", Form: "", Machine: "", Machine_Code: "", Status: "", User: "", FormNumber: ""
     });
     const [visible, setVisible] = useState<{ Date: boolean, Machine: boolean, User: boolean, Status: boolean, Form: boolean, Machine_Code: boolean, FormNumber: boolean }>({ Date: false, Form: false, Machine: false, Machine_Code: false, Status: false, User: false, FormNumber: false });
 
-    const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
-        ['expectedResult', debouncedSearchQuery],
-        ({ pageParam = 0 }) => {
-            return debouncedSearchQuery
-                ? fetchSearchExpectedResult(debouncedSearchQuery)
-                : fetchExpectedResults(pageParam, 100000);
+    const [visibleTime, setVisibleTime] = useState(false)
+    const [startTime, setStartTime] = useState("");
+    const [endTime, setEndTime] = useState("");
+    const defaults = useRef("");
+
+    const { remove } = useInfiniteQuery(
+        ['expectedResult', startTime, endTime, defaults.current],
+        () => {
+            return fetchExpectedResultsWithTime(startTime || defaults.current, endTime);
         },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: true,
-            getNextPageParam: (lastPage, allPages) => {
-                return lastPage.length === 100000 ? allPages.length : undefined;
-            },
             enabled: true,
             onSuccess: (newData) => {
                 const newItems = newData.pages.flat()
@@ -104,11 +108,13 @@ const ExpectedResultScreen = React.memo(() => {
                 });
 
                 setMachineCodes((prevItems) => {
-                    const newItemsSet = new Set(prevItems.map((item: any) => item.value));
-                    const mergedItems = prevItems.concat(
-                        newItemCodes.filter((item: { label: string, value: string }) => !newItemsSet.has(item.value))
-                    );
-                    return mergedItems;
+                    const allItemCodes = [...prevItems, ...newItemCodes];
+
+                    const uniqueItemCodes = Array.from(new Set(allItemCodes.map((item) => item.value)))
+                        .map((value) => allItemCodes.find((item) => item.value === value))
+                        .filter((item) => item !== undefined);
+
+                    return uniqueItemCodes;
                 });
             },
         }
@@ -165,7 +171,7 @@ const ExpectedResultScreen = React.memo(() => {
     const [debouncedSearchQueryFilterUser, setDebouncedSearchQueryFilterUser] = useState<string>("");
 
     const [users, setUsers] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
-    const { data: user, isFetching: isFetchingU, fetchNextPage: fetchNextPageU, hasNextPage: hasNextPageU } = useInfiniteQuery(
+    const { } = useInfiniteQuery(
         ['user', debouncedSearchQueryFilter],
         () => {
             return fetchUsers();
@@ -184,11 +190,13 @@ const ExpectedResultScreen = React.memo(() => {
                 }));
 
                 setUsers((prevItems) => {
-                    const newItemsSet = new Set(prevItems.map((item: any) => item.value));
-                    const mergedItems = prevItems.concat(
-                        newItems.filter((item: { label: string, value: string }) => !newItemsSet.has(item.value))
-                    );
-                    return mergedItems;
+                    const allItemCodes = [...prevItems, ...newItems];
+
+                    const uniqueItemCodes = Array.from(new Set(allItemCodes.map((item) => item.value)))
+                        .map((value) => allItemCodes.find((item) => item.value === value))
+                        .filter((item) => item !== undefined);
+
+                    return uniqueItemCodes;
                 });
             },
         }
@@ -196,18 +204,18 @@ const ExpectedResultScreen = React.memo(() => {
 
     useFocusEffect(
         useCallback(() => {
+            var deM = getCurrentTime();
+            deM.setMonth(getCurrentTime().getMonth() - 3);
+            deM.setDate(1);
+            defaults.current = convertToThaiDateTime(new Date(deM).toISOString())
+            setStartTime(defaults.current)
+
             return () => {
                 remove()
                 setExpectedResult([])
             };
-        }, [remove])
+        }, [remove, setStartTime, getCurrentTime, convertToThaiDateTime])
     );
-
-    const handlePaginationChange = useCallback(() => {
-        if (hasNextPage && !isFetching) {
-            fetchNextPage();
-        }
-    }, [hasNextPage, isFetching, fetchNextPage]);
 
     const handlefilter = useCallback((search?: string | null) => {
         if (search) {
@@ -225,8 +233,6 @@ const ExpectedResultScreen = React.memo(() => {
         };
     }, [searchQuery]);
 
-    console.log(machineCodes);
-    
     const handleAction = useCallback(async (action?: string, item?: string) => {
         const data = expectedResult.find((v) => v.TableID === item);
 
@@ -244,7 +250,7 @@ const ExpectedResultScreen = React.memo(() => {
         }
     }, [handleError, expectedResult, navigate]);
 
-    const convertToThaiDateTime = (dateString: string) => {
+    const convertToThaiDateTimes = (dateString: string) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, "0");
         const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -257,12 +263,13 @@ const ExpectedResultScreen = React.memo(() => {
 
     const tableData = useMemo(() => {
         return expectedResult.map((item) => [
+            item.MachineCode,
             item.MachineName,
             item.FormNumber,
             item.FormName,
             item.UserName || "-",
             item.ApprovedName ? "✔️" : "-",
-            convertToThaiDateTime(item.CreateDate),
+            convertToThaiDateTimes(item.CreateDate),
             item.TableID,
         ]);
     }, [expectedResult, debouncedSearchQuery]);
@@ -273,19 +280,19 @@ const ExpectedResultScreen = React.memo(() => {
             //     return false;
             // }
 
-            if (selectFilter.Machine && row[0] !== selectFilter.Machine) {
+            if (selectFilter.Machine && row[1] !== selectFilter.Machine) {
                 return false;
             }
 
-            if (selectFilter.User && row[3] !== selectFilter.User) {
+            if (selectFilter.User && row[4] !== selectFilter.User) {
                 return false;
             }
 
-            // if (selectFilter.Status && row[4] !== selectFilter.Status) {
-            //     return false;
-            // }
+            if (selectFilter.Status && row[5] !== selectFilter.Status) {
+                return false;
+            }
 
-            if (selectFilter.Form && row[2] !== selectFilter.Form) {
+            if (selectFilter.Form && row[3] !== selectFilter.Form) {
                 return false;
             }
 
@@ -293,7 +300,7 @@ const ExpectedResultScreen = React.memo(() => {
                 return false;
             }
 
-            if (selectFilter.FormNumber && row[1] !== selectFilter.FormNumber) {
+            if (selectFilter.FormNumber && row[2] !== selectFilter.FormNumber) {
                 return false;
             }
 
@@ -301,38 +308,31 @@ const ExpectedResultScreen = React.memo(() => {
         });
     }, [tableData, selectFilter]);
 
-
     const customtableProps = useMemo(() => ({
         Tabledata: filteredTableData,
         Tablehead: [
+            { label: "M.Code", align: "flex-start" },
             { label: "Machine Name", align: "flex-start" },
-            { label: "Form Number", align: "flex-start" },
+            { label: "F.Number", align: "flex-start" },
             { label: "Form Name", align: "flex-start" },
             { label: "User", align: "flex-start" },
             { label: "Approve", align: "center" },
-            { label: "Time Submit", align: "flex-start" },
+            { label: "Time Submit", align: "center" },
             { label: "Preview", align: "center" },
         ],
-        flexArr: [2, 2, 3, 2, 1, 2, 1],
+        flexArr: [1.5, 2, 1, 2, 1, 0.5, 1.5, 1],
         actionIndex: [
             {
-                preIndex: 6,
+                preIndex: 7,
             },
         ],
         handleAction,
-        showMessage: [0, 2],
+        showMessage: [1, 3],
         detail: true,
         detailKey: "TableID",
-        detailKeyrow: 6,
-        showDetailwithKey: ["MachineName", "FormNumber", "FormName", "UserName", "ApprovedName", "CreateDate", "ApprovedTime"],
+        detailKeyrow: 7,
+        showDetailwithKey: ["MachineCode", "MachineName", "FormNumber", "FormName", "UserName", "ApprovedName", "CreateDate", "ApprovedTime"],
         detailData: expectedResult,
-        // showFilterDate: !show,
-        // showFilter: !show,
-        // ShowTitle: "Machine",
-        // showData: machines,
-        // showColumn: "MachineName",
-        filterColumn: 0,
-        setFilterDate: 5,
         searchQuery: debouncedSearchQuery,
         hasNextPage: hasNextPageMG,
         isFetchingNextPage: isFetchingMG,
@@ -408,7 +408,48 @@ const ExpectedResultScreen = React.memo(() => {
         setShow(prev => !prev);
     };
 
+    const getStartOfWeek = useCallback(() => {
+        const date = new Date();
+        const dayOfWeek = date.getDay();
+        const diff = date.getDate() - dayOfWeek;
+        date.setDate(diff);
+        date.setHours(0, 0, 0, 0);
+        return convertToThaiDateTime(date.toISOString());
+    }, []);
+
+    const getStartOfMonth = useCallback(() => {
+        const date = new Date();
+        date.setDate(1);
+        date.setHours(0, 0, 0, 0);
+        return convertToThaiDateTime(date.toISOString());
+    }, []);
+
+    const getToday = useCallback(() => {
+        const date = new Date();
+        date.setHours(0, 0, 0, 0);
+        return convertToThaiDateTime(date.toISOString());
+    }, []);
+
     const handelChangeFilter = useCallback((filed: string, value: string | null) => {
+        setVisibleTime(filed === "Date" && value === "Custom")
+        if (filed === "Date") {
+            switch (value) {
+                case "Today":
+                    setStartTime(getToday());
+                    setEndTime(getToday())
+                    break;
+                case "This week":
+                    setStartTime(getStartOfWeek());
+                    setEndTime(getToday())
+                    break;
+                case "This month":
+                    setStartTime(getStartOfMonth());
+                    setEndTime(getToday())
+                    break;
+                case "Custom":
+                default:
+            }
+        }
         setSelectFilter((prev) => ({ ...prev, [filed]: value }))
     }, [])
 
@@ -452,10 +493,32 @@ const ExpectedResultScreen = React.memo(() => {
             }
         }
     };
+    const scrollViewRef = useRef(null);
+    const [viewWidth, setViewWidth] = useState(0);
+
+    const handleLayout = (event: any) => {
+        const { width } = event.nativeEvent.layout;
+        setViewWidth(width);
+    };
 
     const handlefilterAD = useCallback(() => {
         console.log(selectFilter);
     }, [selectFilter])
+
+    const handleCloseDialog = useCallback(() => {
+        if (!startTime && !endTime) handelChangeFilter("Date", "")
+        setVisibleTime(false)
+    }, [startTime, endTime, handelChangeFilter])
+
+    const handleStartTimeChange = useCallback((value: string) => {
+        handelChangeFilter("Date", "Custom")
+        setStartTime(value)
+    }, [])
+
+    const handleEndTimeChange = useCallback((value: string) => {
+        handelChangeFilter("Date", "Custom")
+        setEndTime(value)
+    }, [])
 
     return (
         <View id="container-checklist" style={styles.container}>
@@ -483,13 +546,17 @@ const ExpectedResultScreen = React.memo(() => {
                         <Animated.View style={[styles.filterBox, animatedStyle]}>
                             <ScrollView horizontal contentContainerStyle={styles.scrollViewContainer}>
                                 <Portal>
-                                    <Card style={[styles.filterCard, { backgroundColor: theme.colors.background, borderRadius: 4 }]}>
+                                    <Card style={[styles.filterCard, { backgroundColor: theme.colors.background, borderRadius: 4 }]} ref={scrollViewRef} onLayout={handleLayout}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', alignItems: 'center' }}>
                                             <Text style={[masterdataStyles.text, masterdataStyles.textBold, { color: theme.colors.blue }]}>Filter Data</Text>
                                             <IconButton icon="close" size={20} iconColor={theme.colors.onBackground} onPress={toggleFilter} style={{ alignSelf: 'flex-end' }} />
                                         </View>
 
                                         <Card.Content style={{ width: responsive === "small" ? "100%" : 400, padding: 0, paddingBottom: 10 }}>
+                                            <View style={{ flexDirection: 'row', paddingVertical: 5 }}>
+                                                <Text style={masterdataStyles.text}>Filter Date : {startTime ? startTime : ""} - {endTime ? endTime : convertToThaiDateTime(new Date(getCurrentTime()).toISOString())}</Text>
+                                            </View>
+
                                             <View style={{ flexDirection: responsive === "small" ? 'column' : 'row' }}>
                                                 <AdvancedFilter
                                                     selectFilter={selectFilter.Date}
@@ -544,7 +611,7 @@ const ExpectedResultScreen = React.memo(() => {
                                                     handelChangeFilter={handelChangeFilter}
                                                     Title="Machine_Code"
                                                     search={true}
-                                                    selectFilterOption={machines}
+                                                    selectFilterOption={machineCodes}
                                                     setVisible={handelChangeVisible}
                                                     fetchNextPage={fetchNextPageMG}
                                                     handleScroll={handleScrollMG}
@@ -576,13 +643,8 @@ const ExpectedResultScreen = React.memo(() => {
                                                     setVisible={handelChangeVisible}
                                                     visible={visible.User}
                                                     lefticon={'account-search-outline'}
-                                                    width={responsive === "small" ? '100%' : '70%'}
+                                                    width={responsive === "small" ? '100%' : '100%'}
                                                 />
-                                                <View style={{ alignSelf: 'flex-end', flexBasis: '30%', padding: 10 }}>
-                                                    <Button mode="contained" onPress={() => handlefilterAD()} style={styles.applyButton}>
-                                                        Apply Filter
-                                                    </Button>
-                                                </View>
                                             </View>
                                         </Card.Content>
                                     </Card>
@@ -592,8 +654,21 @@ const ExpectedResultScreen = React.memo(() => {
                     )}
                 </View>
 
+                {show && (
+                    <DialogTimeCustom
+                        visible={visibleTime}
+                        handleCloseDialog={handleCloseDialog}
+                        handleStartTimeChanges={handleStartTimeChange}
+                        handleEndTimeChanges={handleEndTimeChange}
+                        startTime={startTime}
+                        endTime={endTime}
+                        setVisible={setVisibleTime}
+                        viewWidth={viewWidth}
+                    />
+                )}
+
                 <Suspense fallback={<LoadingSpinnerTable />}>
-                    <LazyCustomtable {...customtableProps} handlePaginationChange={handlePaginationChange} fetchNextPage={fetchNextPageMG} handlefilter={handlefilter} />
+                    <LazyCustomtable {...customtableProps} fetchNextPage={fetchNextPageMG} handlefilter={handlefilter} />
                 </Suspense>
             </Card.Content>
         </View>

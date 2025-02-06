@@ -3,6 +3,7 @@ export interface ExpectedResult {
   TableID: string;
   MachineID: string;
   MachineName: string;
+  MachineCode:string;
   UserID: string;
   UserName ?: string;
   ApprovedID: string;
