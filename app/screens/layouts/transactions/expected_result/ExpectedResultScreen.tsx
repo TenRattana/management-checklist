@@ -16,7 +16,7 @@ import AdvancedFilter from "@/components/common/AdvancedFilter";
 import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
 import DialogTimeCustom from "@/components/common/DialogTimeCustom";
 import { getCurrentTime } from "@/config/timezoneUtils";
-import { convertToDate, convertToThaiDateTime } from "@/components/screens/Schedule";
+import { convertToDate, convertToThaiDateTime, parseDateFromString } from "@/components/screens/Schedule";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 
@@ -57,16 +57,16 @@ const ExpectedResultScreen = React.memo(() => {
     const defaults = useRef("");
 
     const { remove } = useInfiniteQuery(
-        ['expectedResult', startTime, endTime, defaults.current],
+        ['expectedResult', defaults.current],
         () => {
-            return fetchExpectedResultsWithTime(startTime || defaults.current, endTime);
+            return fetchExpectedResultsWithTime(defaults.current);
         },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: true,
             enabled: true,
             onSuccess: (newData) => {
-                const newItems = newData.pages.flat()
+                const newItems = newData.pages.flat();
                 setExpectedResult(newItems);
             },
         }
@@ -276,9 +276,12 @@ const ExpectedResultScreen = React.memo(() => {
 
     const filteredTableData = useMemo(() => {
         return tableData.filter((row) => {
-            // if (selectFilter.Date && !row[5].includes(selectFilter.Date)) {
-            //     return false;
-            // }
+
+            if (selectFilter.Date && !row[6].includes(selectFilter.Date)) {
+                const rowDate = parseDateFromString(row[6] as string);
+                if (rowDate === null) return false;
+                return rowDate.toDateString() >= startTime.toDateString() && endTime.toDateString()
+            }
 
             if (selectFilter.Machine && row[1] !== selectFilter.Machine) {
                 return false;
@@ -512,6 +515,15 @@ const ExpectedResultScreen = React.memo(() => {
 
     const handleStartTimeChange = useCallback((value: string) => {
         handelChangeFilter("Date", "Custom")
+
+        const start = convertToDate(String(value))
+        const end = convertToDate(defaults.current);
+
+        if (start < end) {
+            defaults.current = startTime;
+            remove();
+        }
+
         setStartTime(value)
     }, [])
 
@@ -676,4 +688,3 @@ const ExpectedResultScreen = React.memo(() => {
 });
 
 export default ExpectedResultScreen;
-

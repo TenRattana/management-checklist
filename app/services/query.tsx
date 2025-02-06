@@ -404,15 +404,12 @@ export const fetchExpectedResults = async (
 
 export const fetchExpectedResultsWithTime = async (
     StartTime: string,
-    EndTime: string,
 ): Promise<ExpectedResult[]> => {
     try {
         const start = StartTime && convertToDateTime(StartTime)
-        const end = EndTime && convertToDateTime(EndTime)
 
         const response = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResultsWithTime", {
             StartTime: start,
-            EndTime: end,
         });
         return response.data.data ?? [];
     } catch (error) {

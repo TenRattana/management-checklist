@@ -132,3 +132,26 @@ export const convertToDateTime = (
 
   return `${gregorianYear}-${month}-${day}`;
 };
+
+export const parseDateFromString = (dateString: string): Date | null => {
+  const regex = /^(\d{2})\/(\d{2})\/(\d{4}) เวลา (\d{2}):(\d{2})$/;
+  const match = dateString.match(regex);
+
+  if (match) {
+    const day = match[1];
+    const month = match[2];
+    const year = match[3];
+    const hour = match[4];
+    const minute = match[5];
+
+    const gregorianYear = parseInt(year) - 543;
+
+    const validDateString = `${gregorianYear}-${month}-${day}T${hour}:${minute}:00`;
+
+    const date = new Date(validDateString);
+
+    return isNaN(date.getTime()) ? null : date;
+  }
+
+  return null;
+};
