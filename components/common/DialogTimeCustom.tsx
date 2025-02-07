@@ -140,7 +140,7 @@ const DialogTimeCustom = React.memo(({ visible, setVisible, startTime, endTime, 
                                             onChange={(date) => {
                                                 if (date) handleStartTimeChange(convertToThaiDateTime(new Date(date).toISOString()));
                                             }}
-                                            maxDate={new Date()}
+                                            maxDate={endTime ? convertToDate(String(endTime)) : getCurrentTime()}
                                             timeInputLabel="Start Time:"
                                             dateFormat="dd/MM/yyyy"
                                             wrapperClassName="custom-datepicker-wrapper"
@@ -188,6 +188,7 @@ const DialogTimeCustom = React.memo(({ visible, setVisible, startTime, endTime, 
                                             onChange={(date) => {
                                                 if (date) handleEndTimeChange(convertToThaiDateTime(new Date(date).toISOString()));
                                             }}
+                                            minDate={startTime ? convertToDate(String(startTime)) : undefined}
                                             maxDate={new Date()}
                                             timeInputLabel="End Time:"
                                             dateFormat="dd/MM/yyyy"

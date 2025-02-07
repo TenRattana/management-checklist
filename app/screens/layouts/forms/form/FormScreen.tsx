@@ -155,7 +155,7 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
         handleAction,
         searchQuery: debouncedSearchQuery,
         isFetching: isFetching
-    }), [tableData, searchQuery, handleAction, debouncedSearchQuery, state.Form, isFetching]);
+    }), [tableData, handleAction, debouncedSearchQuery, state.Form, isFetching]);
 
     const styles = StyleSheet.create({
         container: {

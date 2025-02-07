@@ -45,6 +45,7 @@ const ExpectedResultScreen = React.memo(() => {
     const { theme, darkMode } = useTheme();
     const [expectedResult, setExpectedResult] = useState<ExpectedResult[]>([])
     const masterdataStyles = useMasterdataStyles();
+
     const [show, setShow] = useState(false)
     const [selectFilter, setSelectFilter] = useState<{ Date: string, Machine: string, User: string, Status: string, Form: string, Machine_Code: string, FormNumber: string }>({
         Date: "", Form: "", Machine: "", Machine_Code: "", Status: "", User: "", FormNumber: ""
@@ -56,7 +57,7 @@ const ExpectedResultScreen = React.memo(() => {
     const [endTime, setEndTime] = useState("");
     const defaults = useRef("");
 
-    const { remove } = useInfiniteQuery(
+    const { isLoading, remove } = useInfiniteQuery(
         ['expectedResult', defaults.current],
         () => {
             return fetchExpectedResultsWithTime(defaults.current);
@@ -64,7 +65,7 @@ const ExpectedResultScreen = React.memo(() => {
         {
             refetchOnWindowFocus: false,
             refetchOnMount: true,
-            enabled: true,
+            enabled: !!defaults.current,
             onSuccess: (newData) => {
                 const newItems = newData.pages.flat();
                 setExpectedResult(newItems);
@@ -125,10 +126,10 @@ const ExpectedResultScreen = React.memo(() => {
     const [forms, setForms] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
     const [formNumbers, setFormNumbers] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
     const { data: form, isFetching: isFetchingF, fetchNextPage: fetchNextPageF, hasNextPage: hasNextPageF } = useInfiniteQuery(
-        ['form', debouncedSearchQueryFilter],
+        ['form', debouncedSearchQueryFilterForm],
         ({ pageParam = 0 }) => {
-            return debouncedSearchQueryFilter
-                ? fetchSearchFomrs(debouncedSearchQueryFilter)
+            return debouncedSearchQueryFilterForm
+                ? fetchSearchFomrs(debouncedSearchQueryFilterForm)
                 : fetchForms(pageParam, 1000);
         },
         {
@@ -168,11 +169,9 @@ const ExpectedResultScreen = React.memo(() => {
         }
     );
 
-    const [debouncedSearchQueryFilterUser, setDebouncedSearchQueryFilterUser] = useState<string>("");
-
     const [users, setUsers] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
     const { } = useInfiniteQuery(
-        ['user', debouncedSearchQueryFilter],
+        ['user'],
         () => {
             return fetchUsers();
         },
@@ -180,9 +179,6 @@ const ExpectedResultScreen = React.memo(() => {
             refetchOnWindowFocus: false,
             refetchOnMount: true,
             enabled: true,
-            getNextPageParam: (lastPage, allPages) => {
-                return lastPage.length === 1000 ? allPages.length : undefined;
-            },
             onSuccess: (newData) => {
                 const newItems = newData.pages.flat().filter((item) => item.IsActive).map((item) => ({
                     label: item.UserName || 'Unknown',
@@ -274,13 +270,18 @@ const ExpectedResultScreen = React.memo(() => {
         ]);
     }, [expectedResult, debouncedSearchQuery]);
 
-    const filteredTableData = useMemo(() => {
-        return tableData.filter((row) => {
+    const filterLoad = useRef(false)
 
-            if (selectFilter.Date && !row[6].includes(selectFilter.Date)) {
+    const filteredTableData = useMemo(() => {
+        const start = convertToDate(String(startTime))
+        const end = endTime ? convertToDate(String(endTime)) : getCurrentTime()
+
+        filterLoad.current = true
+
+        const filter = tableData.filter((row) => {
+            if (selectFilter.Date && (parseDateFromString(row[6] as string) !== null)) {
                 const rowDate = parseDateFromString(row[6] as string);
-                if (rowDate === null) return false;
-                return rowDate.toDateString() >= startTime.toDateString() && endTime.toDateString()
+                if (rowDate === null || rowDate < start || rowDate > end) return false;
             }
 
             if (selectFilter.Machine && row[1] !== selectFilter.Machine) {
@@ -309,7 +310,11 @@ const ExpectedResultScreen = React.memo(() => {
 
             return true;
         });
-    }, [tableData, selectFilter]);
+
+        filterLoad.current = false
+
+        return filter
+    }, [tableData, selectFilter, startTime, endTime]);
 
     const customtableProps = useMemo(() => ({
         Tabledata: filteredTableData,
@@ -337,10 +342,9 @@ const ExpectedResultScreen = React.memo(() => {
         showDetailwithKey: ["MachineCode", "MachineName", "FormNumber", "FormName", "UserName", "ApprovedName", "CreateDate", "ApprovedTime"],
         detailData: expectedResult,
         searchQuery: debouncedSearchQuery,
-        hasNextPage: hasNextPageMG,
-        isFetchingNextPage: isFetchingMG,
+        isFetching: filterLoad.current || isLoading,
         searchfilter: debouncedSearchQueryFilter
-    }), [filteredTableData, debouncedSearchQuery, handleAction, debouncedSearchQueryFilter, hasNextPageMG, isFetchingMG]);
+    }), [filteredTableData, debouncedSearchQuery, handleAction, debouncedSearchQueryFilter, isLoading, filterLoad]);
 
     const styles = StyleSheet.create({
         container: {
@@ -449,8 +453,12 @@ const ExpectedResultScreen = React.memo(() => {
                     setStartTime(getStartOfMonth());
                     setEndTime(getToday())
                     break;
-                case "Custom":
+                case "":
+                    setStartTime(defaults.current);
+                    setEndTime(getToday())
+                    break;
                 default:
+                    break;
             }
         }
         setSelectFilter((prev) => ({ ...prev, [filed]: value }))
@@ -520,7 +528,7 @@ const ExpectedResultScreen = React.memo(() => {
         const end = convertToDate(defaults.current);
 
         if (start < end) {
-            defaults.current = startTime;
+            defaults.current = value;
             remove();
         }
 
@@ -600,6 +608,8 @@ const ExpectedResultScreen = React.memo(() => {
                                                 fetchNextPage={fetchNextPageMG}
                                                 handleScroll={handleScrollMG}
                                                 setVisible={handelChangeVisible}
+                                                searchQuery={debouncedSearchQueryFilter}
+                                                setDebouncedSearchQuery={setDebouncedSearchQueryFilter}
                                                 visible={visible.Machine}
                                                 lefticon={'folder-search-outline'}
                                                 width={'100%'}
@@ -612,6 +622,8 @@ const ExpectedResultScreen = React.memo(() => {
                                                 selectFilterOption={forms}
                                                 fetchNextPage={fetchNextPageF}
                                                 handleScroll={handleScrollF}
+                                                searchQuery={debouncedSearchQueryFilterForm}
+                                                setDebouncedSearchQuery={setDebouncedSearchQueryFilterForm}
                                                 setVisible={handelChangeVisible}
                                                 visible={visible.Form}
                                                 lefticon={'feature-search-outline'}
@@ -627,6 +639,8 @@ const ExpectedResultScreen = React.memo(() => {
                                                     setVisible={handelChangeVisible}
                                                     fetchNextPage={fetchNextPageMG}
                                                     handleScroll={handleScrollMG}
+                                                    searchQuery={debouncedSearchQueryFilter}
+                                                    setDebouncedSearchQuery={setDebouncedSearchQueryFilter}
                                                     visible={visible.Machine_Code}
                                                     lefticon={'text-box-search-outline'}
                                                     width={responsive === "small" ? '100%' : '50%'}
@@ -640,6 +654,8 @@ const ExpectedResultScreen = React.memo(() => {
                                                     setVisible={handelChangeVisible}
                                                     fetchNextPage={fetchNextPageF}
                                                     handleScroll={handleScrollF}
+                                                    searchQuery={debouncedSearchQueryFilterForm}
+                                                    setDebouncedSearchQuery={setDebouncedSearchQueryFilterForm}
                                                     visible={visible.FormNumber}
                                                     lefticon={'text-box-search-outline'}
                                                     width={responsive === "small" ? '100%' : '50%'}
