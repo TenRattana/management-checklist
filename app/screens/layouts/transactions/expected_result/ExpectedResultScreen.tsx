@@ -57,6 +57,19 @@ const ExpectedResultScreen = React.memo(() => {
     const [endTime, setEndTime] = useState("");
     const defaults = useRef("");
 
+    const [machines, setMachine] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
+    const [machineCodes, setMachineCodes] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
+    const [forms, setForms] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
+    const [formNumbers, setFormNumbers] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
+    const [users, setUsers] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
+
+    const [debouncedSearchQueryFilterForm, setDebouncedSearchQueryFilterForm] = useState<string>("");
+
+    const filterLoad = useRef(false)
+    const queryClient = useQueryClient();
+    const scrollViewRef = useRef(null);
+    const [viewWidth, setViewWidth] = useState(0);
+
     const { isLoading, remove } = useInfiniteQuery(
         ['expectedResult', defaults.current],
         () => {
@@ -73,8 +86,6 @@ const ExpectedResultScreen = React.memo(() => {
         }
     );
 
-    const [machines, setMachine] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
-    const [machineCodes, setMachineCodes] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
     const { data: machine, isFetching: isFetchingMG, fetchNextPage: fetchNextPageMG, hasNextPage: hasNextPageMG } = useInfiniteQuery(
         ['machine', debouncedSearchQueryFilter],
         ({ pageParam = 0 }) => {
@@ -121,10 +132,6 @@ const ExpectedResultScreen = React.memo(() => {
         }
     );
 
-    const [debouncedSearchQueryFilterForm, setDebouncedSearchQueryFilterForm] = useState<string>("");
-
-    const [forms, setForms] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
-    const [formNumbers, setFormNumbers] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
     const { data: form, isFetching: isFetchingF, fetchNextPage: fetchNextPageF, hasNextPage: hasNextPageF } = useInfiniteQuery(
         ['form', debouncedSearchQueryFilterForm],
         ({ pageParam = 0 }) => {
@@ -169,7 +176,6 @@ const ExpectedResultScreen = React.memo(() => {
         }
     );
 
-    const [users, setUsers] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
     const { } = useInfiniteQuery(
         ['user'],
         () => {
@@ -268,9 +274,7 @@ const ExpectedResultScreen = React.memo(() => {
             convertToThaiDateTimes(item.CreateDate),
             item.TableID,
         ]);
-    }, [expectedResult, debouncedSearchQuery]);
-
-    const filterLoad = useRef(false)
+    }, [expectedResult]);
 
     const filteredTableData = useMemo(() => {
         const start = convertToDate(String(startTime))
@@ -343,8 +347,7 @@ const ExpectedResultScreen = React.memo(() => {
         detailData: expectedResult,
         searchQuery: debouncedSearchQuery,
         isFetching: filterLoad.current || isLoading,
-        searchfilter: debouncedSearchQueryFilter
-    }), [filteredTableData, debouncedSearchQuery, handleAction, debouncedSearchQueryFilter, isLoading, filterLoad]);
+    }), [filteredTableData, debouncedSearchQuery, handleAction, isLoading, filterLoad]);
 
     const styles = StyleSheet.create({
         container: {
@@ -410,7 +413,6 @@ const ExpectedResultScreen = React.memo(() => {
         },
     });
 
-
     const toggleFilter = () => {
         setShow(prev => !prev);
     };
@@ -475,12 +477,6 @@ const ExpectedResultScreen = React.memo(() => {
         };
     });
 
-    const queryClient = useQueryClient();
-
-    useEffect(() => {
-        queryClient.invalidateQueries("Machine")
-    }, []);
-
     const handleScrollMG = ({ nativeEvent }: any) => {
         if (nativeEvent && nativeEvent?.contentSize) {
             const contentHeight = nativeEvent?.contentSize.height;
@@ -504,17 +500,11 @@ const ExpectedResultScreen = React.memo(() => {
             }
         }
     };
-    const scrollViewRef = useRef(null);
-    const [viewWidth, setViewWidth] = useState(0);
 
     const handleLayout = (event: any) => {
         const { width } = event.nativeEvent.layout;
         setViewWidth(width);
     };
-
-    const handlefilterAD = useCallback(() => {
-        console.log(selectFilter);
-    }, [selectFilter])
 
     const handleCloseDialog = useCallback(() => {
         if (!startTime && !endTime) handelChangeFilter("Date", "")

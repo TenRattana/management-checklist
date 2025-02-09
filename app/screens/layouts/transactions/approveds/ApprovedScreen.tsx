@@ -41,6 +41,7 @@ const ApprovedScreen = React.memo(() => {
     const queryClient = useQueryClient();
     const [approved, setApproved] = useState<ExpectedResult[]>([])
     const state = useSelector((state: any) => state.prefix);
+    const user = useSelector((state: any) => state.user)
 
     const [show, setShow] = useState(false)
     const [selectFilter, setSelectFilter] = useState<{ Date: string, Machine: string, User: string, Status: string, Form: string, Machine_Code: string, FormNumber: string }>({
@@ -52,6 +53,17 @@ const ApprovedScreen = React.memo(() => {
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
     const defaults = useRef("");
+    const scrollViewRef = useRef(null);
+    const [viewWidth, setViewWidth] = useState(0);
+    const [machines, setMachine] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
+    const [machineCodes, setMachineCodes] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
+    const [debouncedSearchQueryFilterForm, setDebouncedSearchQueryFilterForm] = useState<string>("");
+
+    const [forms, setForms] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
+    const [formNumbers, setFormNumbers] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
+    const [users, setUsers] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
+    const Edit = user.Permissions.includes("edit_approved")
+    const filterLoad = useRef(false)
 
     const { isLoading, remove } = useInfiniteQuery(
         ['approved', defaults.current],
@@ -69,8 +81,6 @@ const ApprovedScreen = React.memo(() => {
         }
     );
 
-    const [machines, setMachine] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
-    const [machineCodes, setMachineCodes] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
     const { data: machine, isFetching: isFetchingMG, fetchNextPage: fetchNextPageMG, hasNextPage: hasNextPageMG } = useInfiniteQuery(
         ['machine', debouncedSearchQueryFilter],
         ({ pageParam = 0 }) => {
@@ -117,10 +127,6 @@ const ApprovedScreen = React.memo(() => {
         }
     );
 
-    const [debouncedSearchQueryFilterForm, setDebouncedSearchQueryFilterForm] = useState<string>("");
-
-    const [forms, setForms] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
-    const [formNumbers, setFormNumbers] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
     const { data: form, isFetching: isFetchingF, fetchNextPage: fetchNextPageF, hasNextPage: hasNextPageF } = useInfiniteQuery(
         ['form', debouncedSearchQueryFilterForm],
         ({ pageParam = 0 }) => {
@@ -165,7 +171,6 @@ const ApprovedScreen = React.memo(() => {
         }
     );
 
-    const [users, setUsers] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
     const { } = useInfiniteQuery(
         ['user'],
         () => {
@@ -215,8 +220,6 @@ const ApprovedScreen = React.memo(() => {
         }
     }, []);
 
-    const user = useSelector((state: any) => state.user)
-
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearchQuery(searchQuery);
@@ -259,8 +262,6 @@ const ApprovedScreen = React.memo(() => {
         setSelectedRows(value)
     }, [selectedRows])
 
-    const Edit = user.Permissions.includes("edit_approved")
-
     const convertToThaiDateTimes = (dateString: string) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, "0");
@@ -291,7 +292,7 @@ const ApprovedScreen = React.memo(() => {
             convertToThaiDateTimes(item.CreateDate),
             item.TableID,
         ]);
-    }, [Edit, approved, debouncedSearchQuery]);
+    }, [Edit, approved]);
 
     const mutation = useMutation(SaveApproved, {
         onSuccess: (data) => {
@@ -300,8 +301,6 @@ const ApprovedScreen = React.memo(() => {
         },
         onError: handleError,
     });
-
-    const filterLoad = useRef(false)
 
     const filteredTableData = useMemo(() => {
         const start = convertToDate(String(startTime))
@@ -404,8 +403,7 @@ const ApprovedScreen = React.memo(() => {
         selectedRows,
         setRow,
         isFetching: filterLoad.current || isLoading,
-        searchfilter: debouncedSearchQueryFilter
-    }), [filteredTableData, debouncedSearchQuery, handleAction, debouncedSearchQueryFilter, isLoading, setRow, selectedRows, filterLoad]);
+    }), [filteredTableData, debouncedSearchQuery, handleAction, isLoading, setRow, selectedRows, filterLoad]);
 
     const styles = StyleSheet.create({
         container: {
@@ -554,8 +552,6 @@ const ApprovedScreen = React.memo(() => {
             }
         }
     };
-    const scrollViewRef = useRef(null);
-    const [viewWidth, setViewWidth] = useState(0);
 
     const toggleFilter = () => {
         setShow(prev => !prev);
@@ -565,10 +561,6 @@ const ApprovedScreen = React.memo(() => {
         const { width } = event.nativeEvent.layout;
         setViewWidth(width);
     };
-
-    const handlefilterAD = useCallback(() => {
-        console.log(selectFilter);
-    }, [selectFilter])
 
     const handleCloseDialog = useCallback(() => {
         if (!startTime && !endTime) handelChangeFilter("Date", "")

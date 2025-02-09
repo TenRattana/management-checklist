@@ -145,8 +145,13 @@ const DialogTimeCustom = React.memo(({ visible, setVisible, startTime, endTime, 
                                             dateFormat="dd/MM/yyyy"
                                             wrapperClassName="custom-datepicker-wrapper"
                                             withPortal
+                                            todayButton="Today"
                                             fixedHeight
+                                            showYearDropdown
+                                            yearDropdownItemNumber={15}
+                                            scrollableYearDropdown
                                             showMonthDropdown
+                                            dropdownMode="select"
                                             inline
                                         />
                                     </View>
@@ -194,8 +199,13 @@ const DialogTimeCustom = React.memo(({ visible, setVisible, startTime, endTime, 
                                             dateFormat="dd/MM/yyyy"
                                             wrapperClassName="custom-datepicker-wrapper"
                                             withPortal
+                                            todayButton="Today"
                                             fixedHeight
+                                            showYearDropdown
+                                            yearDropdownItemNumber={15}
+                                            scrollableYearDropdown
                                             showMonthDropdown
+                                            dropdownMode="select"
                                             inline
                                         />
                                     </View>
