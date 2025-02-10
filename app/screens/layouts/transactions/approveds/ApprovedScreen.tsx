@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense, useRef } from "react";
 import { useToast } from '@/app/contexts/useToast';
 import { useRes } from '@/app/contexts/useRes';
-import { LoadingSpinner, LoadingSpinnerTable, Searchbar, Text } from "@/components";
+import { LoadingSpinnerTable, Searchbar, Text } from "@/components";
 import { Card, IconButton, Portal } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 import { Platform, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useSelector } from "react-redux";
-import { fetchApproved, fetchApprovedWithTime, fetchForms, fetchMachines, fetchSearchApproved, fetchSearchFomrs, fetchSearchMachines, fetchUsers, SaveApproved } from "@/app/services";
+import { fetchApprovedWithTime, fetchForms, fetchMachines, fetchSearchFomrs, fetchSearchMachines, fetchUsers, SaveApproved } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 import { navigate } from "@/app/navigations/navigationUtils";
 import { useFocusEffect } from "expo-router";
@@ -29,16 +29,17 @@ const filterDateOptions = [
 ];
 
 const ApprovedScreen = React.memo(() => {
-    const [searchQuery, setSearchQuery] = useState<string>("");
-    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
-    const [debouncedSearchQueryFilter, setDebouncedSearchQueryFilter] = useState<string>("");
-    const [selectedRows, setSelectedRows] = useState<string[]>([]);
-
     const masterdataStyles = useMasterdataStyles();
     const { showSuccess, handleError } = useToast();
     const { spacing, fontSize, responsive } = useRes();
     const { theme, darkMode } = useTheme();
     const queryClient = useQueryClient();
+
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
+    const [debouncedSearchQueryFilter, setDebouncedSearchQueryFilter] = useState<string>("");
+    const [selectedRows, setSelectedRows] = useState<string[]>([]);
+
     const [approved, setApproved] = useState<ExpectedResult[]>([])
     const state = useSelector((state: any) => state.prefix);
     const user = useSelector((state: any) => state.user)
@@ -81,7 +82,7 @@ const ApprovedScreen = React.memo(() => {
         }
     );
 
-    const { data: machine, isFetching: isFetchingMG, fetchNextPage: fetchNextPageMG, hasNextPage: hasNextPageMG } = useInfiniteQuery(
+    const { isFetching: isFetchingMG, fetchNextPage: fetchNextPageMG, hasNextPage: hasNextPageMG } = useInfiniteQuery(
         ['machine', debouncedSearchQueryFilter],
         ({ pageParam = 0 }) => {
             return debouncedSearchQueryFilter
@@ -127,7 +128,7 @@ const ApprovedScreen = React.memo(() => {
         }
     );
 
-    const { data: form, isFetching: isFetchingF, fetchNextPage: fetchNextPageF, hasNextPage: hasNextPageF } = useInfiniteQuery(
+    const { isFetching: isFetchingF, fetchNextPage: fetchNextPageF, hasNextPage: hasNextPageF } = useInfiniteQuery(
         ['form', debouncedSearchQueryFilterForm],
         ({ pageParam = 0 }) => {
             return debouncedSearchQueryFilterForm

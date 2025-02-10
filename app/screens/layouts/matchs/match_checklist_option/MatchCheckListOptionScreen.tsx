@@ -38,18 +38,18 @@ const MatchCheckListOptionScreen = React.memo(() => {
     const queryClient = useQueryClient();
     const [matchCheckListOption, setMatchCheckListOption] = useState<MatchCheckListOption[]>([])
 
-    const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
+    const { isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
         ['matchCheckListOption', debouncedSearchQuery],
         ({ pageParam = 0 }) => {
             return debouncedSearchQuery
                 ? fetchSearchMatchCheckListOptions(debouncedSearchQuery)
-                : fetchMatchCheckListOptions(pageParam, 50);
+                : fetchMatchCheckListOptions(pageParam, 1000);
         },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: true,
             getNextPageParam: (lastPage, allPages) => {
-                return lastPage.length === 50 ? allPages.length : undefined;
+                return lastPage.length === 1000 ? allPages.length : undefined;
             },
             enabled: true,
             onSuccess: (newData) => {
@@ -145,7 +145,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
             item.IsActive,
             item.MCLOptionID,
         ]);
-    }, [matchCheckListOption, debouncedSearchQuery]);
+    }, [matchCheckListOption]);
 
     const handleNewData = useCallback(() => {
         setInitialValues({

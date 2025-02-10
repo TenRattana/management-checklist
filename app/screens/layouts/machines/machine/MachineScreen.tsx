@@ -70,13 +70,13 @@ const MachineGroupScreen = React.memo(() => {
             ({ pageParam = 0 }) => {
                 return debouncedSearchQuery
                     ? fetchSearchMachines(debouncedSearchQuery)
-                    : fetchMachines(pageParam, 50);
+                    : fetchMachines(pageParam, 1000);
             },
             {
                 refetchOnWindowFocus: false,
                 refetchOnMount: true,
                 getNextPageParam: (lastPage, allPages) => {
-                    return lastPage.length === 50 ? allPages.length : undefined;
+                    return lastPage.length === 1000 ? allPages.length : undefined;
                 },
                 enabled: true,
                 onSuccess: (newData) => {
@@ -238,14 +238,7 @@ const MachineGroupScreen = React.memo(() => {
             searchQuery: debouncedSearchQuery,
             isFetching: isFetching,
         }),
-        [
-            tableData,
-            debouncedSearchQuery,
-            handleAction,
-            state.GroupMachine,
-            state.Machine,
-            isFetching,
-        ]
+        [tableData, debouncedSearchQuery, handleAction, state.GroupMachine, state.Machine, isFetching]
     );
 
     const styles = StyleSheet.create({

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from
 import { TouchableOpacity, StyleSheet, View, Platform } from "react-native";
 import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts/useToast";
-import { LoadingSpinner, LoadingSpinnerTable, Searchbar, Text } from "@/components";
+import { LoadingSpinnerTable, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useInfiniteQuery, useQueryClient } from 'react-query';
@@ -28,18 +28,18 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
     const queryClient = useQueryClient();
     const [form, setForm] = useState<Form[]>([])
 
-    const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
+    const { isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
         ['form', debouncedSearchQuery],
         ({ pageParam = 0 }) => {
             return debouncedSearchQuery
                 ? fetchSearchFomrs(debouncedSearchQuery)
-                : fetchForms(pageParam, 50);
+                : fetchForms(pageParam, 1000);
         },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: true,
             getNextPageParam: (lastPage, allPages) => {
-                return lastPage.length === 50 ? allPages.length : undefined;
+                return lastPage.length === 1000 ? allPages.length : undefined;
             },
             enabled: true,
             onSuccess: (newData) => {

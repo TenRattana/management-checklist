@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense, useRef } from "react";
 import { useRes } from "@/app/contexts/useRes";
 import { useToast } from '@/app/contexts/useToast';
-import { LoadingSpinner, LoadingSpinnerTable, Searchbar, Text } from "@/components";
-import { Button, Card, IconButton, Portal } from "react-native-paper";
+import { LoadingSpinnerTable, Searchbar, Text } from "@/components";
+import { Card, IconButton, Portal } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
-import { QueryClient, useInfiniteQuery, useQueryClient } from 'react-query';
+import { useInfiniteQuery } from 'react-query';
 import { Platform, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import { fetchExpectedResults, fetchExpectedResultsWithTime, fetchForms, fetchMachines, fetchSearchExpectedResult, fetchSearchFomrs, fetchSearchMachines, fetchUsers } from "@/app/services";
+import { fetchExpectedResultsWithTime, fetchForms, fetchMachines, fetchSearchFomrs, fetchSearchMachines, fetchUsers } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 import { navigate } from "@/app/navigations/navigationUtils";
 import { useFocusEffect } from "expo-router";
@@ -35,27 +35,33 @@ const filterApproved = [
 ];
 
 const ExpectedResultScreen = React.memo(() => {
-    const [searchQuery, setSearchQuery] = useState<string>("");
-    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
-    const [debouncedSearchQueryFilter, setDebouncedSearchQueryFilter] = useState<string>("");
-    const state = useSelector((state: any) => state.prefix);
-
+    const masterdataStyles = useMasterdataStyles();
     const { handleError } = useToast();
     const { spacing, fontSize, responsive } = useRes();
     const { theme, darkMode } = useTheme();
-    const [expectedResult, setExpectedResult] = useState<ExpectedResult[]>([])
-    const masterdataStyles = useMasterdataStyles();
+    const state = useSelector((state: any) => state.prefix);
 
+    const scrollViewRef = useRef(null);
+    const defaults = useRef("");
+
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
+    const [debouncedSearchQueryFilter, setDebouncedSearchQueryFilter] = useState<string>("");
+    const [debouncedSearchQueryFilterForm, setDebouncedSearchQueryFilterForm] = useState<string>("");
+
+    const [startTime, setStartTime] = useState("");
+    const [endTime, setEndTime] = useState("");
+
+    const filterLoad = useRef(false)
     const [show, setShow] = useState(false)
+    const [visible, setVisible] = useState<{ Date: boolean, Machine: boolean, User: boolean, Status: boolean, Form: boolean, Machine_Code: boolean, FormNumber: boolean }>({ Date: false, Form: false, Machine: false, Machine_Code: false, Status: false, User: false, FormNumber: false });
+    const [visibleTime, setVisibleTime] = useState(false)
+
+    const [expectedResult, setExpectedResult] = useState<ExpectedResult[]>([])
+
     const [selectFilter, setSelectFilter] = useState<{ Date: string, Machine: string, User: string, Status: string, Form: string, Machine_Code: string, FormNumber: string }>({
         Date: "", Form: "", Machine: "", Machine_Code: "", Status: "", User: "", FormNumber: ""
     });
-    const [visible, setVisible] = useState<{ Date: boolean, Machine: boolean, User: boolean, Status: boolean, Form: boolean, Machine_Code: boolean, FormNumber: boolean }>({ Date: false, Form: false, Machine: false, Machine_Code: false, Status: false, User: false, FormNumber: false });
-
-    const [visibleTime, setVisibleTime] = useState(false)
-    const [startTime, setStartTime] = useState("");
-    const [endTime, setEndTime] = useState("");
-    const defaults = useRef("");
 
     const [machines, setMachine] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
     const [machineCodes, setMachineCodes] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
@@ -63,11 +69,6 @@ const ExpectedResultScreen = React.memo(() => {
     const [formNumbers, setFormNumbers] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
     const [users, setUsers] = useState<{ label: string, value: string }[]>([{ label: "Show all", value: "" }]);
 
-    const [debouncedSearchQueryFilterForm, setDebouncedSearchQueryFilterForm] = useState<string>("");
-
-    const filterLoad = useRef(false)
-    const queryClient = useQueryClient();
-    const scrollViewRef = useRef(null);
     const [viewWidth, setViewWidth] = useState(0);
 
     const { isLoading, remove } = useInfiniteQuery(
@@ -86,7 +87,7 @@ const ExpectedResultScreen = React.memo(() => {
         }
     );
 
-    const { data: machine, isFetching: isFetchingMG, fetchNextPage: fetchNextPageMG, hasNextPage: hasNextPageMG } = useInfiniteQuery(
+    const { isFetching: isFetchingMG, fetchNextPage: fetchNextPageMG, hasNextPage: hasNextPageMG } = useInfiniteQuery(
         ['machine', debouncedSearchQueryFilter],
         ({ pageParam = 0 }) => {
             return debouncedSearchQueryFilter
@@ -132,7 +133,7 @@ const ExpectedResultScreen = React.memo(() => {
         }
     );
 
-    const { data: form, isFetching: isFetchingF, fetchNextPage: fetchNextPageF, hasNextPage: hasNextPageF } = useInfiniteQuery(
+    const { isFetching: isFetchingF, fetchNextPage: fetchNextPageF, hasNextPage: hasNextPageF } = useInfiniteQuery(
         ['form', debouncedSearchQueryFilterForm],
         ({ pageParam = 0 }) => {
             return debouncedSearchQueryFilterForm
