@@ -36,18 +36,18 @@ const CheckListScreen = React.memo(() => {
     const queryClient = useQueryClient();
     const [checkList, setCheckList] = useState<CheckList[]>([])
 
-    const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
+    const { isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
         ['checkList', debouncedSearchQuery],
         ({ pageParam = 0 }) => {
             return debouncedSearchQuery
                 ? fetchSearchCheckList(debouncedSearchQuery)
-                : fetchCheckList(pageParam, 50);
+                : fetchCheckList(pageParam, 1000);
         },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: true,
             getNextPageParam: (lastPage, allPages) => {
-                return lastPage.length === 50 ? allPages.length : undefined;
+                return lastPage.length === 1000 ? allPages.length : undefined;
             },
             enabled: true,
             onSuccess: (newData) => {

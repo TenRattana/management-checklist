@@ -247,9 +247,7 @@ const Navigation: React.FC = React.memo(() => {
         if (cachedComponents.current[name]) {
             const Component = cachedComponents.current[name];
             return (props: any) => (
-                <Suspense fallback={<LoadingSpinner />}>
-                    <Component {...props} />
-                </Suspense>
+                <Component {...props} />
             );
         }
 
@@ -269,8 +267,7 @@ const Navigation: React.FC = React.memo(() => {
                 <PermissionDeny {...props} />
             </Suspense>
         );
-    }, []);
-
+    }, [components, cachedComponents]);
 
     return (
         <DrawerNav

@@ -64,27 +64,26 @@ const MachineGroupScreen = React.memo(() => {
     const queryClient = useQueryClient();
     const [machines, setMachine] = useState<Machine[]>([]);
 
-    const { data, isFetching, fetchNextPage, hasNextPage, remove } =
-        useInfiniteQuery(
-            ["machines", debouncedSearchQuery],
-            ({ pageParam = 0 }) => {
-                return debouncedSearchQuery
-                    ? fetchSearchMachines(debouncedSearchQuery)
-                    : fetchMachines(pageParam, 50);
+    const { isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
+        ["machines", debouncedSearchQuery],
+        ({ pageParam = 0 }) => {
+            return debouncedSearchQuery
+                ? fetchSearchMachines(debouncedSearchQuery)
+                : fetchMachines(pageParam, 1000);
+        },
+        {
+            refetchOnWindowFocus: false,
+            refetchOnMount: true,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.length === 1000 ? allPages.length : undefined;
             },
-            {
-                refetchOnWindowFocus: false,
-                refetchOnMount: true,
-                getNextPageParam: (lastPage, allPages) => {
-                    return lastPage.length === 50 ? allPages.length : undefined;
-                },
-                enabled: true,
-                onSuccess: (newData) => {
-                    const newItems = newData.pages.flat();
-                    setMachine(newItems);
-                },
-            }
-        );
+            enabled: true,
+            onSuccess: (newData) => {
+                const newItems = newData.pages.flat();
+                setMachine(newItems);
+            },
+        }
+    );
 
     useFocusEffect(
         useCallback(() => {
@@ -196,7 +195,7 @@ const MachineGroupScreen = React.memo(() => {
             item.IsActive,
             item.MachineID,
         ]);
-    }, [machines, debouncedSearchQuery]);
+    }, [machines]);
 
     const handleNewData = useCallback(() => {
         setInitialValues({
@@ -238,14 +237,7 @@ const MachineGroupScreen = React.memo(() => {
             searchQuery: debouncedSearchQuery,
             isFetching: isFetching,
         }),
-        [
-            tableData,
-            debouncedSearchQuery,
-            handleAction,
-            state.GroupMachine,
-            state.Machine,
-            isFetching,
-        ]
+        [tableData, debouncedSearchQuery, handleAction, state.GroupMachine, state.Machine, isFetching]
     );
 
     const styles = StyleSheet.create({

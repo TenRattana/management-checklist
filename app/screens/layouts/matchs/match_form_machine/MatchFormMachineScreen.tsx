@@ -35,7 +35,7 @@ const MatchFormMachineScreen = React.memo(() => {
     const queryClient = useQueryClient();
     const [matchForm, setMatchForm] = useState<MatchForm[]>([])
 
-    const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
+    const { isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
         ['matchForm', debouncedSearchQuery],
         ({ pageParam = 0 }) => {
             return debouncedSearchQuery
@@ -142,7 +142,7 @@ const MatchFormMachineScreen = React.memo(() => {
             item.FormID,
             item.MachineID,
         ])
-    }, [matchForm, debouncedSearchQuery]);
+    }, [matchForm]);
 
     const handleNewData = useCallback(() => {
         setInitialValues({

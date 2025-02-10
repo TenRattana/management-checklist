@@ -6,6 +6,7 @@ import CustomtableData from "./table/CustomtableData";
 import { View } from "react-native";
 import { debounce, throttle } from "lodash";
 import { CustomTableProps } from "@/typing/screens/CustomTable";
+import { parseDateFromString } from "./screens/Schedule";
 
 const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, actionIndex, searchQuery, showMessage, selectedRows, setRow,
   showFilter, showData, showColumn, detail, detailData, detailKey, detailKeyrow, showDetailwithKey, ShowTitle, handlePaginationChange, isFetchingNextPage, hasNextPage, fetchNextPage,
@@ -32,29 +33,6 @@ const CustomTable = React.memo(({ Tabledata, Tablehead, flexArr, handleAction, a
       return sortConfig.direction === "ascending" ? (aValue < bValue ? -1 : 1) : (aValue > bValue ? -1 : 1);
     });
   }, [Tabledata, sortConfig]);
-
-  const parseDateFromString = (dateString: string): Date | null => {
-    const regex = /^(\d{2})\/(\d{2})\/(\d{4}) เวลา (\d{2}):(\d{2})$/;
-    const match = dateString.match(regex);
-
-    if (match) {
-      const day = match[1];
-      const month = match[2];
-      const year = match[3];
-      const hour = match[4];
-      const minute = match[5];
-
-      const gregorianYear = parseInt(year) - 543;
-
-      const validDateString = `${gregorianYear}-${month}-${day}T${hour}:${minute}:00`;
-
-      const date = new Date(validDateString);
-
-      return isNaN(date.getTime()) ? null : date;
-    }
-
-    return null;
-  };
 
   const filterDateHandler = (filter: string | null) => {
     const currentDate = new Date();

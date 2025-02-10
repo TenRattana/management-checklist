@@ -10,6 +10,8 @@ import { Form } from "@/typing/screens/Form";
 import { ExpectedResult } from "@/typing/screens/ExpectedResult";
 import { CheckList, GroupCheckListType } from "@/typing/screens/CheckList";
 import { TimeScemaScheduleProps } from "@/typing/screens/TimeSchedule";
+import { convertToDate, convertToDateTime, convertToThaiDateTime } from "@/components/screens/Schedule";
+import { getCurrentTime } from "@/config/timezoneUtils";
 
 // App Config
 export const fetchAppConfig = async (): Promise<AppProps[]> => {
@@ -401,6 +403,25 @@ export const fetchExpectedResults = async (
     }
 };
 
+export const fetchExpectedResultsWithTime = async (
+    StartTime: string,
+): Promise<ExpectedResult[]> => {
+    try {
+        const start = StartTime && convertToDateTime(StartTime)
+        const end = convertToThaiDateTime(new Date(getCurrentTime()).toISOString())
+
+
+        const response = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResultsWithTime", {
+            StartTime: start,
+            EndTime: end
+        });
+        return response.data.data ?? [];
+    } catch (error) {
+        console.error("Error fetching :", error);
+        throw new Error('Failed to fetch');
+    }
+};
+
 export const fetchSearchExpectedResult = async (
     debouncedSearchQuery: string
 ): Promise<ExpectedResult[]> => {
@@ -424,6 +445,25 @@ export const fetchApproved = async (
         const response = await axiosInstance.post("ExpectedResults/GetApproveds", {
             page: currentPage,
             pageSize: pageSize,
+        });
+        return response.data.data ?? [];
+    } catch (error) {
+        console.error("Error fetching :", error);
+        throw new Error('Failed to fetch');
+    }
+};
+
+export const fetchApprovedWithTime = async (
+    StartTime: string,
+): Promise<ExpectedResult[]> => {
+    try {
+        const start = StartTime && convertToDateTime(StartTime)
+        const end = convertToThaiDateTime(new Date(getCurrentTime()).toISOString())
+
+
+        const response = await axiosInstance.post("ExpectedResult_service.asmx/GetApproveWithTime", {
+            StartTime: start,
+            EndTime: end
         });
         return response.data.data ?? [];
     } catch (error) {

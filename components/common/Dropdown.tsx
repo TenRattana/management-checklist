@@ -168,27 +168,29 @@ const Dropdown = React.memo(({ label, fetchNextPage, handleScroll, isFetching, i
                                             />
                                         )
                                     )}
-                                    <Text style={[masterdataStyles.text, { flex: 1 }]}>
-                                        {selectedValue ? `${items.find((v) => v.value === selectedValue)?.label}` : `Select a ${label}`}
-                                    </Text>
+                                    <>
+                                        <Text style={[masterdataStyles.text, { flex: 1 }]}>
+                                            {selectedValue ? `${items.find((v) => v.value === selectedValue)?.label}` : `Select a ${label}`}
+                                        </Text>
 
-                                    {!showLefticon && selectedValue ? (
-                                        <IconButton
-                                            style={[masterdataStyles.icon, { right: 8, alignItems: 'flex-end' }]}
-                                            icon={disable ? "lock" : "window-close"}
-                                            iconColor={disable ? theme.colors.error : theme.colors.onBackground}
-                                            size={spacing.large}
-                                            onPress={() => {
-                                                setSelectedValue("");
-                                            }}
-                                        />
-                                    ) : (
-                                        <IconButton
-                                            style={[masterdataStyles.icon, { right: 8, alignItems: 'flex-end' }]}
-                                            icon="chevron-down"
-                                            size={spacing.large}
-                                        />
-                                    )}
+                                        {!showLefticon && selectedValue ? (
+                                            <IconButton
+                                                style={[masterdataStyles.icon, { alignItems: 'flex-end' }]}
+                                                icon={disable ? "lock" : "window-close"}
+                                                iconColor={disable ? theme.colors.error : theme.colors.onBackground}
+                                                size={spacing.large}
+                                                onPress={() => {
+                                                    setSelectedValue("");
+                                                }}
+                                            />
+                                        ) : (
+                                            <IconButton
+                                                style={[masterdataStyles.icon, { alignItems: 'flex-end' }]}
+                                                icon="chevron-down"
+                                                size={spacing.large}
+                                            />
+                                        )}
+                                    </>
                                 </>}
                             </TouchableOpacity>
                         </View>
@@ -217,26 +219,28 @@ const Dropdown = React.memo(({ label, fetchNextPage, handleScroll, isFetching, i
                                         />
                                     )
                                 )}
-                                <Text style={[masterdataStyles.text, { flex: 1 }]}>
-                                    {selectedValue ? `${items.find((v) => v.value === selectedValue)?.label}` : `Select a ${label}`}
-                                </Text>
-                                {!showLefticon && selectedValue ? (
-                                    <IconButton
-                                        style={[masterdataStyles.icon, { right: 8, alignItems: 'flex-end' }]}
-                                        icon={disable ? "lock" : "window-close"}
-                                        iconColor={disable ? theme.colors.error : theme.colors.onBackground}
-                                        size={spacing.large}
-                                        onPress={() => {
-                                            setSelectedValue("");
-                                        }}
-                                    />
-                                ) : (
-                                    <IconButton
-                                        style={[masterdataStyles.icon, { right: 8, alignItems: 'flex-end' }]}
-                                        icon="chevron-down"
-                                        size={spacing.large}
-                                    />
-                                )}
+                                <>
+                                    <Text style={[masterdataStyles.text, { flex: 1 }]}>
+                                        {selectedValue ? `${items.find((v) => v.value === selectedValue)?.label}` : `Select a ${label}`}
+                                    </Text>
+                                    {!showLefticon && selectedValue ? (
+                                        <IconButton
+                                            style={[masterdataStyles.icon, { alignItems: 'flex-end' }]}
+                                            icon={disable ? "lock" : "window-close"}
+                                            iconColor={disable ? theme.colors.error : theme.colors.onBackground}
+                                            size={spacing.large}
+                                            onPress={() => {
+                                                setSelectedValue("");
+                                            }}
+                                        />
+                                    ) : (
+                                        <IconButton
+                                            style={[masterdataStyles.icon, { alignItems: 'flex-end' }]}
+                                            icon="chevron-down"
+                                            size={spacing.large}
+                                        />
+                                    )}
+                                </>
                             </>}
                         </TouchableOpacity>
                     </View>

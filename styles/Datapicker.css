@@ -62,7 +62,7 @@
   background-color: #f0f0f0;
   border-bottom: 1px solid #aeaeae;
   border-top-left-radius: 0.3rem;
-  padding: 8px 0;
+  padding: 8px 10px;
   position: relative;
 }
 .react-datepicker__header--time {
@@ -172,7 +172,6 @@ h2.react-datepicker__current-month {
 }
 
 .react-datepicker__month-container {
-  float: left;
 }
 
 .react-datepicker__year {
@@ -341,10 +340,10 @@ h2.react-datepicker__current-month {
 .react-datepicker__time-name {
   color: #000;
   display: inline-block;
-  width: 2.5rem;
+  width: 2rem;
   line-height: 2rem;
   text-align: center;
-  margin: 0.166rem;
+  margin: 0.1rem;
 }
 
 .react-datepicker__day,
@@ -737,7 +736,7 @@ h2.react-datepicker__current-month {
 }
 .react-datepicker__portal .react-datepicker__current-month,
 .react-datepicker__portal .react-datepicker-time__header {
-  font-size: 1.44rem;
+  font-size: 1.0rem;
 }
 
 .react-datepicker__children-container {

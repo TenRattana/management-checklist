@@ -6,7 +6,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { useRes } from "@/app/contexts/useRes";
 import { SearchBarProps } from "@/typing/tag";
 
-const SearchBar = ({ value, onChange, placeholder, testId }: SearchBarProps) => {
+const SearchBar = React.memo(({ value, onChange, placeholder, testId }: SearchBarProps) => {
   const { theme, darkMode } = useTheme();
   const { responsive } = useRes();
   const masterdataStyles = useMasterdataStyles();
@@ -90,6 +90,6 @@ const SearchBar = ({ value, onChange, placeholder, testId }: SearchBarProps) => 
       </View>
     </View>
   );
-};
+});
 
-export default React.memo(SearchBar);
+export default SearchBar

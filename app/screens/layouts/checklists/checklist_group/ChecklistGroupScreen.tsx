@@ -41,13 +41,13 @@ const ChecklistGroupScreen = React.memo(() => {
         ({ pageParam = 0 }) => {
             return debouncedSearchQuery
                 ? fetchSearchGroupCheckListOption(debouncedSearchQuery)
-                : fetchGroupCheckListOption(pageParam, 50);
+                : fetchGroupCheckListOption(pageParam, 1000);
         },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: true,
             getNextPageParam: (lastPage, allPages) => {
-                return lastPage.length === 50 ? allPages.length : undefined;
+                return lastPage.length === 1000 ? allPages.length : undefined;
             },
             enabled: true,
             onSuccess: (newData) => {

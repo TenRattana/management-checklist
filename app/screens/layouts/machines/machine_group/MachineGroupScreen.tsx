@@ -36,18 +36,18 @@ const MachineGroupScreen = React.memo(() => {
     const queryClient = useQueryClient();
     const [machineGroup, setMachineGroup] = useState<GroupMachine[]>([]);
 
-    const { data, isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
+    const { isFetching, fetchNextPage, hasNextPage, remove } = useInfiniteQuery(
         ['machineGroups', debouncedSearchQuery],
         ({ pageParam = 0 }) => {
             return debouncedSearchQuery
                 ? fetchSearchMachineGroups(debouncedSearchQuery)
-                : fetchMachineGroups(pageParam, 50);
+                : fetchMachineGroups(pageParam, 1000);
         },
         {
             refetchOnWindowFocus: false,
             refetchOnMount: true,
             getNextPageParam: (lastPage, allPages) => {
-                return lastPage.length === 50 ? allPages.length : undefined;
+                return lastPage.length === 1000 ? allPages.length : undefined;
             },
             onSuccess: (newData) => {
                 const newItems = newData.pages.flat();

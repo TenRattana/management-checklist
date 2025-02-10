@@ -42,7 +42,7 @@ const TimescheduleScreen = React.memo(() => {
     const queryClient = useQueryClient();
     const [timeSchedule, setTimeSchedule] = useState<TimeScheduleProps[]>([])
 
-    const { data, isLoading, remove } = useQuery(
+    const { isLoading, remove } = useQuery(
         ['timeSchedule', debouncedSearchQuery],
         () => {
             return debouncedSearchQuery
@@ -136,7 +136,7 @@ const TimescheduleScreen = React.memo(() => {
             item.IsActive,
             item.ScheduleID
         ]) || [];
-    }, [timeSchedule, debouncedSearchQuery]);
+    }, [timeSchedule]);
 
     const handleNewData = useCallback(() => {
         setInitialValues({
@@ -174,7 +174,8 @@ const TimescheduleScreen = React.memo(() => {
         showDetailwithKey: ["MachineGroup", "Type_schedule", "TimelineItems"],
         detailData: timeSchedule,
         searchQuery: debouncedSearchQuery,
-    }), [tableData, debouncedSearchQuery, handleAction, timeSchedule]);
+        isFetching: isLoading
+    }), [tableData, debouncedSearchQuery, handleAction, timeSchedule, isLoading]);
 
     const styles = StyleSheet.create({
         container: {
