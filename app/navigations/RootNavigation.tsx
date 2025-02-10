@@ -10,18 +10,7 @@ import { View } from 'react-native';
 const RootNavigation = () => {
     const isLoggedIn = useSelector((state: any) => state.user.IsAuthenticated);
     const loadgin = useSelector((state: any) => state.user.loadgin);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        if (loadgin) {
-            setIsLoading(false); 
-        }
-    }, [loadgin]);
-
-    if (isLoading) {
-        return <LoadingSpinner />;
-    }
-
+   
     return (
         <NavigationContainer independent={true} ref={navigationRef}>
             {isLoggedIn ? (
