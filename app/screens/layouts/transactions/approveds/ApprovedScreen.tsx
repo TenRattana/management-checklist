@@ -129,7 +129,7 @@ const ApprovedScreen = React.memo(() => {
             } else if (action === "Approved") {
                 const UserData = {
                     UserID: user.UserID,
-                    UserName: user.Full_Name,
+                    UserName: user.UserName,
                     GUserID: user.GUserID,
                 }
 

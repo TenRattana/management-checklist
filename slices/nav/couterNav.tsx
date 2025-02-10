@@ -4,9 +4,8 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 export const fetchMenu = createAsyncThunk(
     "user/fetchMenu",
     async (GUserID: string) => {
-        console.log(GUserID);
 
-        const response = await axiosInstance.get("GetMenus", {
+        const response = await axiosInstance.get("Menu/GetMenus", {
             params: {
                 GUserID
             }
@@ -17,7 +16,7 @@ export const fetchMenu = createAsyncThunk(
 
 interface User {
     UserID: string;
-    Full_Name: string;
+    UserName: string;
     Position: string;
     DepartMent: string;
     GUserID: string;
@@ -31,7 +30,7 @@ interface User {
 
 export interface UserPayload {
     UserID: string;
-    Full_Name: string;
+    UserName: string;
     Position: string;
     DepartMent: string;
     GUserID: string;
@@ -40,7 +39,7 @@ export interface UserPayload {
 
 const initialState: User = {
     UserID: "",
-    Full_Name: "",
+    UserName: "",
     Position: "",
     DepartMent: "",
     GUserID: "",
@@ -60,7 +59,7 @@ const middlewareStore = createSlice({
             const { user } = action.payload;
 
             state.UserID = user.UserID;
-            state.Full_Name = user.Full_Name;
+            state.UserName = user.UserName;
             state.Position = user.Position;
             state.DepartMent = user.DepartMent;
             state.GUserID = user.GUserID;

@@ -1,6 +1,6 @@
+import { saveData } from "@/app/services/storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { Alert } from "react-native";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL || "https://default.api.com";
 
@@ -16,23 +16,20 @@ axiosInstance.interceptors.response.use(
     response => response,
     async (error) => {
         if (error.response && (error.response.status === 401 || error.response.status === 403 || error.response.status === 405)) {
-            const refreshToken = await AsyncStorage.getItem('refreshToken');
+            const RefreshToken = await AsyncStorage.getItem('refreshToken');
 
-            if (refreshToken) {
+            if (RefreshToken) {
                 try {
-                    const { data } = await axios.post(`${apiUrl}/auth/refresh-token`, { refreshToken });
+                    const { data } = await axiosInstance.get('Ldap/RefreshToken', { params: { RefreshToken } });
 
-                    await AsyncStorage.setItem('accessToken', data.accessToken);
+                    await saveData('refreshToken', data.RefreshToken);
+                    console.log(data.RefreshToken);
 
-                    error.config.headers['Authorization'] = `Bearer ${data.accessToken}`;
+                    error.config.headers['Authorization'] = `Bearer ${data.data.RefreshToken}`;
                     return axios(error.config);
-
                 } catch (refreshError) {
                     console.error('Error refreshing token:', refreshError);
-                    Alert.alert('Session Expired', 'Your session has expired. Please log in again.');
                 }
-            } else {
-                Alert.alert('Session Expired', 'Your session has expired. Please log in again.');
             }
         }
 

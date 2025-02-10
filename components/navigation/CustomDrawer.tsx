@@ -69,7 +69,7 @@ const CustomDrawerContent = React.memo((props: DrawerContentComponentProps) => {
 
             {user.Screen.map((screen: Menus) => {
                 if (screen.OrderNo) {
-                    if (screen.ParentMenu) {
+                    if (screen.ParentMenu.length > 0) {
                         return (
                             <MenuSection
                                 key={`item-${screen.MenuLabel}-nav-${screen.NavigationTo}`}

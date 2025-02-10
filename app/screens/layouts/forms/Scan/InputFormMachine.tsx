@@ -112,7 +112,7 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
 
     const userData = {
       UserID: user.UserID,
-      UserName: user.Full_Name,
+      UserName: user.UserName,
       GUserID: user.GUserID,
     };
 

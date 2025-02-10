@@ -42,7 +42,7 @@ const CustomMenu = React.memo(({ visible, onDismiss, onSettingsPress, onLogoutPr
     return (
         <View>
             <TouchableOpacity onPress={onShow} style={{ marginHorizontal: 10 }}>
-                <Avatar.Text size={35} label={getInitials(user.Full_Name)} style={styles.iconButton} />
+                <Avatar.Text size={35} label={getInitials(user.UserName)} style={styles.iconButton} />
             </TouchableOpacity>
 
             <Menu

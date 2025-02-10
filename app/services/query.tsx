@@ -13,7 +13,7 @@ import { TimeScemaScheduleProps } from "@/typing/screens/TimeSchedule";
 
 // App Config
 export const fetchAppConfig = async (): Promise<AppProps[]> => {
-    const response = await axiosInstance.get("GetAppConfig")
+    const response = await axiosInstance.get("AppConfig/GetAppConfig")
     return response.data.data ?? [];
 };
 
@@ -32,7 +32,7 @@ export const fetchDataType = async (): Promise<DataType[]> => {
 // Time Schedule
 export const fetchTimeSchedules = async (): Promise<TimeScemaScheduleProps[]> => {
     try {
-        const response = await axiosInstance.post("TimeSchedules/GetSchedules");
+        const response = await axiosInstance.get("TimeSchedules/GetSchedules");
         return response.data.data ?? [];
     } catch (error) {
         console.error("Error fetching :", error);

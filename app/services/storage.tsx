@@ -7,7 +7,7 @@ export async function saveData(key: string, TokenAuth: string) {
         if (Platform.OS === 'web') {
             await AsyncStorage.setItem(key, JSON.stringify(TokenAuth));
         } else {
-            await SecureStore.setItemAsync('userToken', TokenAuth);
+            await SecureStore.setItemAsync(key, TokenAuth);
         }
     } catch (error) {
         console.error('Failed to save token', error);
@@ -21,7 +21,7 @@ export async function getData(key: string) {
             const token = await AsyncStorage.getItem(key);
             return token != null ? JSON.parse(token) : null;
         } else {
-            token = await SecureStore.getItemAsync('userToken');
+            token = await SecureStore.getItemAsync(key);
         }
         return token;
     } catch (error) {
@@ -34,7 +34,7 @@ export async function deleteData(key: string) {
         if (Platform.OS === 'web') {
             await AsyncStorage.removeItem(key);
         } else {
-            await SecureStore.deleteItemAsync('userToken');
+            await SecureStore.deleteItemAsync(key);
         }
     } catch (error) {
         console.error('Failed to delete token', error);

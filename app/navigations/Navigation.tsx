@@ -50,7 +50,7 @@ const components: Record<ComponentNames, () => Promise<{ default: React.Componen
 const DrawerNav = React.memo(({ renderComponent, user }: any) => {
     const { theme, darkMode } = useTheme();
     const { showSuccess } = useToast();
-    const { fontSize, spacing, responsive } = useRes();
+    const { fontSize, responsive } = useRes();
     const state = useSelector((state: any) => state.prefix);
     const drawerWidth = fontSize === "small" ? 300 : fontSize === "medium" ? 350 : 400;
     const dispatch = useDispatch<AppDispatch>();
@@ -118,6 +118,8 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
         setDrawerVisible(!isDrawerVisible)
     };
 
+    console.log(user);
+
     return user.Screen.length > 0 && (
         <>
             {Platform.OS === "web" && responsive === "large" && (
@@ -172,7 +174,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                             color: theme.colors.fff,
                             marginRight: 15,
                         }}>
-                            {user.Full_Name}
+                            {user.UserName}
                         </Text>
                         <CustomMenu
                             visible={menuVisible}
@@ -212,7 +214,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                                 fontSize: 14,
                                 fontWeight: 'bold',
                                 color: theme.colors.fff,
-                            }}>{user.Full_Name}</Text>
+                            }}>{user.UserName}</Text>
                             <CustomMenu
                                 visible={menuVisible}
                                 onShow={toggleMenu}
@@ -238,7 +240,6 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
 
 const Navigation: React.FC = React.memo(() => {
     const user = useSelector((state: any) => state.user);
-    const { theme, darkMode } = useTheme();
 
     const cachedComponents = useRef<{ [key: string]: React.ComponentType<any> }>({});
 

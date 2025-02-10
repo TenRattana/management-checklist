@@ -5,7 +5,6 @@ import { navigationRef } from './navigationUtils';
 import { LoadingSpinner } from '@/components';
 import Navigation from './Navigation';
 import { LoginScreen } from '../screens';
-import { View } from 'react-native';
 
 const RootNavigation = () => {
     const isLoggedIn = useSelector((state: any) => state.user.IsAuthenticated);

@@ -32,21 +32,14 @@ export const initializeApp = createAsyncThunk('app/initialize', async (payload: 
   axiosInstance.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
       const userInfo = await getData('userToken');
+
       if (userInfo) {
-        const payload: any = jwtDecode(userInfo);
-        if (payload && payload.Full_Name) {
-          if (!(config.headers instanceof AxiosHeaders)) {
-            config.headers = new AxiosHeaders(config.headers);
-          }
-          config.headers.set('Authorization', payload.Full_Name);
-        }
+        config.headers.set('Authorization', `Bearer ${userInfo}`);
       }
       return config;
     },
     (error) => Promise.reject(error)
   );
-
-  console.log(payload.UserData);
 
   dispatch(fetchMenu(payload.UserData.GUserID));
   dispatch(setUser({ user: payload.UserData }));
@@ -109,7 +102,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUserData(payload);
         }
       } else {
-        const response = await axiosInstance.get("AuthenticateUser", {
+        const response = await axiosInstance.get("Ldap/AuthenticateUser", {
           params: {
             UserName,
             Password,
@@ -119,6 +112,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         if (response.data && response.data.token) {
           await saveData('userToken', response.data.token);
+          await saveData('refreshToken', response.data.token);
           const payload = jwtDecode(response.data.token);
           setUserData(payload);
         }
