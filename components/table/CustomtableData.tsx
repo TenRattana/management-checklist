@@ -1,18 +1,17 @@
-import React, { useState, Suspense } from "react";
+import React, { useState } from "react";
 import Text from "../Text";
 import { Dialogs, LoadingSpinner } from "../common";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { Easing, FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { FlatList } from "react-native-gesture-handler";
-import { StyleSheet, View } from "react-native";
-import ShimmerPlaceholder, { createShimmerPlaceholder } from 'react-native-shimmer-placeholder';
+import { View } from "react-native";
+import { createShimmerPlaceholder } from 'react-native-shimmer-placeholder';
 import { LinearGradient } from 'expo-linear-gradient';
 import { CustomtableDataProps } from "@/typing/screens/CustomTable";
+import RenderItem from "./Contents/RenderItem";
 
 FadeInUp.duration(300).easing(Easing.ease);
 FadeOutDown.duration(300).easing(Easing.ease);
-
-const LazyRenderItem = React.lazy(() => import('./Contents/RenderItem'));
 
 const CustomtableData = React.memo(({ Tablehead, flexArr, actionIndex, displayData, handleDialog, showMessage, selectedRows, toggleSelect, detail, detailKey, detailData, detailKeyrow, showDetailwithKey, handlePaginationChange, isFetching }: CustomtableDataProps) => {
     const masterdataStyles = useMasterdataStyles();
@@ -30,7 +29,7 @@ const CustomtableData = React.memo(({ Tablehead, flexArr, actionIndex, displayDa
             <FlatList
                 data={displayData}
                 renderItem={({ item, index }) =>
-                    <LazyRenderItem
+                    <RenderItem
                         item={item}
                         index={index}
                         Tablehead={Tablehead}
