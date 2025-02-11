@@ -10,7 +10,7 @@ import { Form } from "@/typing/screens/Form";
 import { ExpectedResult } from "@/typing/screens/ExpectedResult";
 import { CheckList, GroupCheckListType } from "@/typing/screens/CheckList";
 import { TimeScemaScheduleProps } from "@/typing/screens/TimeSchedule";
-import { convertToDate, convertToDateTime, convertToThaiDateTime } from "@/components/screens/Schedule";
+import { convertToDateTime, convertToThaiDateTime } from "@/components/screens/Schedule";
 import { getCurrentTime } from "@/config/timezoneUtils";
 
 // App Config
