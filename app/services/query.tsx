@@ -71,9 +71,11 @@ export const fetchMachines = async (
     pageSize: number,
 ): Promise<Machine[]> => {
     try {
-        const response = await axiosInstance.post("Machines/GetMachines", {
-            page: currentPage,
-            pageSize: pageSize,
+        const response = await axiosInstance.get("Machines/GetMachines", {
+            params: {
+                page: currentPage,
+                pageSize: pageSize,
+            }
         });
         return response.data.data ?? [];
     } catch (error) {
@@ -86,8 +88,10 @@ export const fetchSearchMachines = async (
     debouncedSearchQuery: string
 ): Promise<Machine[]> => {
     try {
-        const response = await axiosInstance.post("Machines/SearchMachines", {
-            Messages: debouncedSearchQuery
+        const response = await axiosInstance.get("Machines/SearchMachines", {
+            params: {
+                Messages: debouncedSearchQuery
+            }
         });
         return response.data.data ?? [];
     } catch (error) {
@@ -120,9 +124,11 @@ export const fetchMachineGroups = async (
     pageSize: number,
 ): Promise<GroupMachine[]> => {
     try {
-        const response = await axiosInstance.post("GroupMachines/GetGroupMachines", {
-            page: currentPage,
-            pageSize: pageSize,
+        const response = await axiosInstance.get("GroupMachines/GetGroupMachines", {
+            params: {
+                page: currentPage,
+                pageSize: pageSize,
+            }
         });
         return response.data.data ?? [];
     } catch (error) {
@@ -135,8 +141,8 @@ export const fetchSearchMachineGroups = async (
     debouncedSearchQuery: string
 ): Promise<GroupMachine[]> => {
     try {
-        const response = await axiosInstance.post("GroupMachines/SearchGroupMachines", {
-            Messages: debouncedSearchQuery
+        const response = await axiosInstance.get("GroupMachines/SearchGroupMachines", {
+            params: { Messages: debouncedSearchQuery }
         });
         return response.data.data ?? [];
     } catch (error) {

@@ -118,8 +118,6 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
         setDrawerVisible(!isDrawerVisible)
     };
 
-    console.log(user);
-
     return user.Screen.length > 0 && (
         <>
             {Platform.OS === "web" && responsive === "large" && (
