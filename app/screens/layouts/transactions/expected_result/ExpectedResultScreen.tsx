@@ -279,7 +279,7 @@ const ExpectedResultScreen = React.memo(() => {
 
     const filteredTableData = useMemo(() => {
         const start = convertToDate(String(startTime))
-        const end = endTime ? convertToDate(String(endTime)) : getCurrentTime()
+        const end = endTime ? convertToDate(String(endTime), true) : getCurrentTime()
 
         filterLoad.current = true
 

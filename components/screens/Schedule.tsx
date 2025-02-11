@@ -93,10 +93,10 @@ export const styles = StyleSheet.create({
   },
 });
 
-export const convertToDate = (thaiDate: string): Date => {
+export const convertToDate = (thaiDate: string, type?: boolean): Date => {
   const parts = thaiDate.split(" ");
   const [day, month, year] = parts[0].split("-");
-  const time = parts[1] || "00:00";
+  const time = parts[1] || type ? "23:59" : "00:00";
 
   const [hour, minute] = time.split(":");
 
