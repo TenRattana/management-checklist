@@ -15,7 +15,7 @@ import { getCurrentTime } from "@/config/timezoneUtils";
 
 // App Config
 export const fetchAppConfig = async (): Promise<AppProps[]> => {
-    const response = await axiosInstance.get("AppConfig/GetAppConfig")
+    const response = await axiosInstance.post("AppConfig/GetAppConfig")
     return response.data.data ?? [];
 };
 
@@ -34,7 +34,7 @@ export const fetchDataType = async (): Promise<DataType[]> => {
 // Time Schedule
 export const fetchTimeSchedules = async (): Promise<TimeScemaScheduleProps[]> => {
     try {
-        const response = await axiosInstance.get("TimeSchedules/GetSchedules");
+        const response = await axiosInstance.post("TimeSchedules/GetSchedules");
         return response.data.data ?? [];
     } catch (error) {
         console.error("Error fetching :", error);
@@ -71,12 +71,7 @@ export const fetchMachines = async (
     pageSize: number,
 ): Promise<Machine[]> => {
     try {
-        const response = await axiosInstance.get("Machines/GetMachines", {
-            params: {
-                page: currentPage,
-                pageSize: pageSize,
-            }
-        });
+        const response = await axiosInstance.post(`Machines/GetMachines/${currentPage}/${pageSize}`);
         return response.data.data ?? [];
     } catch (error) {
         console.error("Error fetching :", error);
@@ -88,11 +83,7 @@ export const fetchSearchMachines = async (
     debouncedSearchQuery: string
 ): Promise<Machine[]> => {
     try {
-        const response = await axiosInstance.get("Machines/SearchMachines", {
-            params: {
-                Messages: debouncedSearchQuery
-            }
-        });
+        const response = await axiosInstance.post(`Machines/SearchMachines/${debouncedSearchQuery}`);
         return response.data.data ?? [];
     } catch (error) {
         console.error("Error fetching :", error);
@@ -124,12 +115,7 @@ export const fetchMachineGroups = async (
     pageSize: number,
 ): Promise<GroupMachine[]> => {
     try {
-        const response = await axiosInstance.get("GroupMachines/GetGroupMachines", {
-            params: {
-                page: currentPage,
-                pageSize: pageSize,
-            }
-        });
+        const response = await axiosInstance.post(`GroupMachines/GetGroupMachines/${currentPage}/${pageSize}`);
         return response.data.data ?? [];
     } catch (error) {
         console.error("Error fetching :", error);
@@ -141,9 +127,7 @@ export const fetchSearchMachineGroups = async (
     debouncedSearchQuery: string
 ): Promise<GroupMachine[]> => {
     try {
-        const response = await axiosInstance.get("GroupMachines/SearchGroupMachines", {
-            params: { Messages: debouncedSearchQuery }
-        });
+        const response = await axiosInstance.post(`GroupMachines/SearchGroupMachines/${debouncedSearchQuery}`);
         return response.data.data ?? [];
     } catch (error) {
         console.error("Error fetching :", error);
