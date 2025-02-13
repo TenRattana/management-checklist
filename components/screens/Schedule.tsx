@@ -109,10 +109,11 @@ export const convertToDate = (thaiDate: string, type?: boolean): Date => {
 
 export const convertToThaiDateTime = (
   dateString: string,
-  showTime?: boolean
+  showTime?: boolean,
+  dayPlus?: boolean
 ) => {
   const date = new Date(dateString);
-  const day = String(date.getDate()).padStart(2, "0");
+  const day = String((dayPlus ? date.getDate() + 1 : date.getDate())).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear() + 543;
   const hours = String(date.getHours()).padStart(2, "0");
