@@ -408,8 +408,7 @@ export const fetchExpectedResultsWithTime = async (
 ): Promise<ExpectedResult[]> => {
     try {
         const start = StartTime && convertToDateTime(StartTime)
-        const end = convertToThaiDateTime(new Date(getCurrentTime()).toISOString())
-
+        const end = convertToDateTime(convertToThaiDateTime(new Date(getCurrentTime()).toISOString()))
 
         const response = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResultsWithTime", {
             StartTime: start,
@@ -458,8 +457,7 @@ export const fetchApprovedWithTime = async (
 ): Promise<ExpectedResult[]> => {
     try {
         const start = StartTime && convertToDateTime(StartTime)
-        const end = convertToThaiDateTime(new Date(getCurrentTime()).toISOString())
-
+        const end = convertToDateTime(convertToThaiDateTime(new Date(getCurrentTime()).toISOString()))
 
         const response = await axiosInstance.post("ExpectedResult_service.asmx/GetApproveWithTime", {
             StartTime: start,
