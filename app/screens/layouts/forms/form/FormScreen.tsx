@@ -131,16 +131,16 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: !Edit ? [
-            { label: `${state.Form} Name`, align: "flex-start" },
             { label: `${state.Form} Number`, align: "flex-start" },
+            { label: `${state.Form} Name`, align: "flex-start" },
             { label: `${state.Form} Description`, align: "flex-start" },
             { label: `${state.Form} Status`, align: "center" },
             { label: "View", align: "center" },
         ] : [
             { label: "", align: "flex-start" },
             { label: "", align: "flex-start" },
-            { label: `${state.Form} Name`, align: "flex-start" },
             { label: `${state.Form} Number`, align: "flex-start" },
+            { label: `${state.Form} Name`, align: "flex-start" },
             { label: `${state.Form} Description`, align: "flex-start" },
             { label: `${state.Form} Status`, align: "center" },
             { label: "Status", align: "center" },
