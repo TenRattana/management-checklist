@@ -145,7 +145,7 @@ const MachineGroupScreen = React.memo(() => {
             try {
                 if (action === "editIndex") {
                     const response = await axiosInstance.post(
-                        "Machine_service.asmx/GetMachine",
+                        "Machine/GetMachine",
                         { MachineID: item }
                     );
                     const machineData = response.data.data[0] ?? {};
@@ -170,7 +170,7 @@ const MachineGroupScreen = React.memo(() => {
                     const endpoint =
                         action === "activeIndex" ? "ChangeMachine" : "DeleteMachine";
                     const response = await axiosInstance.post(
-                        `Machine_service.asmx/${endpoint}`,
+                        `Machine/${endpoint}`,
                         { MachineID: item }
                     );
                     showSuccess(String(response.data.message));

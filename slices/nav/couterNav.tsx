@@ -1,26 +1,21 @@
 import axiosInstance from "@/config/axios";
-import { Permissions } from "@/typing/type";
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 
 export const fetchMenu = createAsyncThunk(
     "user/fetchMenu",
-    async (data: string) => {
-        const response = await axiosInstance.post('Menu_service.asmx/GetMenus', { GUserID: data });
-        return response.data.data ?? [];
-    }
-);
+    async (GUserID: string) => {
+        const data = {
+            GUserID
+        }
 
-export const fetchPermission = createAsyncThunk(
-    "user/fetchPermission",
-    async (data: string) => {
-        const response = await axiosInstance.post('Menu_service.asmx/GetPermissions', { GUserID: data });
+        const response = await axiosInstance.post("Menu/GetMenus", data);
         return response.data.data ?? [];
     }
 );
 
 interface User {
     UserID: string;
-    Full_Name: string;
+    UserName: string;
     Position: string;
     DepartMent: string;
     GUserID: string;
@@ -34,7 +29,7 @@ interface User {
 
 export interface UserPayload {
     UserID: string;
-    Full_Name: string;
+    UserName: string;
     Position: string;
     DepartMent: string;
     GUserID: string;
@@ -43,7 +38,7 @@ export interface UserPayload {
 
 const initialState: User = {
     UserID: "",
-    Full_Name: "",
+    UserName: "",
     Position: "",
     DepartMent: "",
     GUserID: "",
@@ -63,7 +58,7 @@ const middlewareStore = createSlice({
             const { user } = action.payload;
 
             state.UserID = user.UserID;
-            state.Full_Name = user.Full_Name;
+            state.UserName = user.UserName;
             state.Position = user.Position;
             state.DepartMent = user.DepartMent;
             state.GUserID = user.GUserID;
@@ -86,16 +81,6 @@ const middlewareStore = createSlice({
             .addCase(fetchMenu.rejected, (state) => {
                 state.Screen = [];
             })
-            .addCase(fetchPermission.pending, (state) => {
-                state.Permissions = [];
-            })
-            .addCase(fetchPermission.fulfilled, (state, action) => {
-                state.Permissions = action.payload.map((permisson: Permissions) => permisson.PermissionName);
-                state.initialRoute = "Home"
-            })
-            .addCase(fetchPermission.rejected, (state) => {
-                state.Permissions = [];
-            });
     }
 });
 

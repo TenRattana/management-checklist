@@ -93,7 +93,7 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
                 navigate("Create_form", { formId: item, action: "copy" });
             } else {
                 const endpoint = action === "activeIndex" ? "ChangeForm" : "DeleteForm";
-                const response = await axiosInstance.post(`Form_service.asmx/${endpoint}`, { FormID: item });
+                const response = await axiosInstance.post(`Form/${endpoint}`, { FormID: item });
                 showSuccess(String(response.data.message));
                 queryClient.invalidateQueries('form');
             }

@@ -112,7 +112,7 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
 
     const userData = {
       UserID: user.UserID,
-      UserName: user.Full_Name,
+      UserName: user.UserName,
       GUserID: user.GUserID,
     };
 
@@ -123,7 +123,7 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
     };
 
     try {
-      const response = await axiosInstance.post("ExpectedResult_service.asmx/SaveExpectedResult", data);
+      const response = await axiosInstance.post("ExpectedResult/SaveExpectedResult", data);
       showSuccess(String(response.data.message));
       setStatus(response.data.status);
       setIsSubmitted(true);

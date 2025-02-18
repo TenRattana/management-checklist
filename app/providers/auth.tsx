@@ -1,10 +1,8 @@
 import React, { createContext, useState, useEffect, ReactNode, useCallback, useMemo, useContext } from "react";
 import { getData, saveData, deleteData } from '@/app/services/storage';
 import axiosInstance from '@/config/axios';
-import { AppProps } from '@/typing/type';
-import { useQuery } from 'react-query';
 import { useDispatch } from 'react-redux';
-import { setUser, setApp, fetchMenu, logout, UserPayload, fetchPermission } from "@/slices";
+import { setUser, setApp, fetchMenu, logout, UserPayload } from "@/slices";
 import { AppDispatch } from '@/stores';
 import { jwtDecode } from 'jwt-decode';
 import { createAsyncThunk } from "@reduxjs/toolkit";
@@ -19,7 +17,6 @@ const useToast = (): ToastContextProps => {
   }
   return context;
 };
-
 export interface AuthContextType {
   loading: boolean;
   login: (username: string, password: string) => void;
@@ -32,26 +29,22 @@ interface AuthProviderProps {
 }
 
 export const initializeApp = createAsyncThunk('app/initialize', async (payload: { UserData: UserPayload }, { dispatch }) => {
-  dispatch(fetchMenu(payload.UserData.GUserID));
-  dispatch(fetchPermission(payload.UserData.GUserID));
-  dispatch(setUser({ user: payload.UserData }));
-
   axiosInstance.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
       const userInfo = await getData('userToken');
+
       if (userInfo) {
-        const payload: any = jwtDecode(userInfo);
-        if (payload && payload.Full_Name) {
-          if (!(config.headers instanceof AxiosHeaders)) {
-            config.headers = new AxiosHeaders(config.headers);
-          }
-          config.headers.set('Authorization', payload.Full_Name);
-        }
+        config.headers.set('Authorization', `Bearer ${userInfo}`);
       }
       return config;
     },
     (error) => Promise.reject(error)
   );
+
+  dispatch(fetchMenu(payload.UserData.GUserID));
+  dispatch(setUser({ user: payload.UserData }));
+
+  return
 });
 
 export const initializeLogout = createAsyncThunk('app/initialize', async (_, { dispatch }) => {
@@ -109,15 +102,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUserData(payload);
         }
       } else {
-        const response = await axiosInstance.post("User_service.asmx/GetAD", {
+        const response = await axiosInstance.post("Ldap/Login", {
           UserName,
           Password,
           TokenAuth,
         });
-
-        if (response.data && response.data.token) {
-          await saveData('userToken', response.data.token);
-          const payload = jwtDecode(response.data.token);
+        if (response.data && response.data.AccessToken) {
+          await saveData('userToken', response.data.AccessToken);
+          await saveData('refreshToken', response.data.AccessToken);
+          const payload = jwtDecode(response.data.AccessToken);
           setUserData(payload);
         }
       }

@@ -110,7 +110,7 @@ const MatchFormMachineScreen = React.memo(() => {
             } else if (action === "copyIndex") {
                 navigate("Create_form", { formId: item, action: "copy" });
             } else if (action === "editIndex") {
-                const response = await axiosInstance.post("MatchFormMachine_service.asmx/GetMatchFormMachine", {
+                const response = await axiosInstance.post("MatchFormMachine/GetMatchFormMachine", {
                     MachineID: item,
                 });
                 const machineData = response.data.data[0] ?? {};
@@ -124,7 +124,7 @@ const MatchFormMachineScreen = React.memo(() => {
                 setIsEditing(true);
             } else {
                 const endpoint = action === "activeIndex" ? "ChangeMatchFormMachine" : "DeleteMatchFormMachine";
-                const response = await axiosInstance.post(`MatchFormMachine_service.asmx/${endpoint}`, { MachineID: item });
+                const response = await axiosInstance.post(`MatchFormMachine/${endpoint}`, { MachineID: item });
                 showSuccess(String(response.data.message));
                 queryClient.invalidateQueries('matchForm');
             }

@@ -15,26 +15,26 @@ import { getCurrentTime } from "@/config/timezoneUtils";
 
 // App Config S
 export const fetchAppConfig = async (): Promise<AppProps> => {
-    const response = await axiosInstance.post('AppConfig_service.asmx/GetAppConfigs');
+    const response = await axiosInstance.post('AppConfig/GetAppConfigs');
     return response.data.data[0] ?? [];
 };
 
 // Check List Type
 export const fetchCheckListType = async (): Promise<GroupCheckListType[]> => {
-    const response = await axiosInstance.post("CheckListType_service.asmx/GetCheckListTypes")
+    const response = await axiosInstance.post("CheckListType/GetCheckListTypes")
     return response.data.data ?? [];
 };
 
 // Data Type
 export const fetchDataType = async (): Promise<DataType[]> => {
-    const response = await axiosInstance.post("DataType_service.asmx/GetDataTypes");
+    const response = await axiosInstance.post("DataType/GetDataTypes");
     return response.data.data ?? [];
 };
 
 // Time Schedule
 export const fetchTimeSchedules = async (): Promise<TimeScemaScheduleProps[]> => {
     try {
-        const response = await axiosInstance.post("TimeSchedule_service.asmx/GetSchedules");
+        const response = await axiosInstance.post("TimeSchedule/GetSchedules");
         return response.data.data ?? [];
     } catch (error) {
         console.error("Error fetching :", error);
@@ -46,7 +46,7 @@ export const fetchSearchTimeSchedules = async (
     debouncedSearchQuery: string
 ): Promise<TimeScemaScheduleProps[]> => {
     try {
-        const response = await axiosInstance.post("TimeSchedule_service.asmx/SearchTimeSchedule", {
+        const response = await axiosInstance.post("TimeSchedule/SearchTimeSchedule", {
             Messages: debouncedSearchQuery
         });
         return response.data.data ?? [];
@@ -57,12 +57,12 @@ export const fetchSearchTimeSchedules = async (
 }
 
 export const fetchTimeMachines = async (data: { ScheduleID: string }): Promise<TimeScheduleMachine[]> => {
-    const response = await axiosInstance.post("TimeSchedule_service.asmx/GetScheduleMachine", data);
+    const response = await axiosInstance.post("TimeSchedule/GetScheduleMachine", data);
     return response.data.data ?? [];
 };
 
 export const saveTimeSchedule = async (data: { Prefix: any; Schedule: string; }): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("TimeSchedule_service.asmx/SaveSchedule", data);
+    const response = await axiosInstance.post("TimeSchedule/SaveSchedule", data);
     return response.data;
 };
 // Machine
@@ -71,7 +71,7 @@ export const fetchMachines = async (
     pageSize: number,
 ): Promise<Machine[]> => {
     try {
-        const response = await axiosInstance.post("Machine_service.asmx/GetMachines", {
+        const response = await axiosInstance.post("Machine/GetMachines", {
             page: currentPage,
             pageSize: pageSize,
         });
@@ -86,7 +86,7 @@ export const fetchSearchMachines = async (
     debouncedSearchQuery: string
 ): Promise<Machine[]> => {
     try {
-        const response = await axiosInstance.post("Machine_service.asmx/SearchMachines", {
+        const response = await axiosInstance.post("Machine/SearchMachines", {
             Messages: debouncedSearchQuery
         });
         return response.data.data ?? [];
@@ -110,7 +110,7 @@ export const saveMachine = async (data: {
     Disables: boolean;
     FormID: string | null;
 }): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("Machine_service.asmx/SaveMachine", data);
+    const response = await axiosInstance.post("Machine/SaveMachine", data);
     return response.data;
 };
 
@@ -120,7 +120,7 @@ export const fetchMachineGroups = async (
     pageSize: number,
 ): Promise<GroupMachine[]> => {
     try {
-        const response = await axiosInstance.post("GroupMachine_service.asmx/GetGroupMachines", {
+        const response = await axiosInstance.post("GroupMachine/GetGroupMachines", {
             page: currentPage,
             pageSize: pageSize,
         });
@@ -135,7 +135,7 @@ export const fetchSearchMachineGroups = async (
     debouncedSearchQuery: string
 ): Promise<GroupMachine[]> => {
     try {
-        const response = await axiosInstance.post("GroupMachine_service.asmx/SearchGroupMachines", {
+        const response = await axiosInstance.post("GroupMachine/SearchGroupMachines", {
             Messages: debouncedSearchQuery
         });
         return response.data.data ?? [];
@@ -152,7 +152,7 @@ export const saveGroupMachine = async (data: {
     Description: string;
     IsActive: boolean;
 }): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("GroupMachine_service.asmx/SaveGroupMachine", data);
+    const response = await axiosInstance.post("GroupMachine/SaveGroupMachine", data);
     return response.data;
 };
 
@@ -162,7 +162,7 @@ export const fetchCheckList = async (
     pageSize: number,
 ): Promise<CheckList[]> => {
     try {
-        const response = await axiosInstance.post("CheckList_service.asmx/GetCheckLists", {
+        const response = await axiosInstance.post("CheckList/GetCheckLists", {
             page: currentPage,
             pageSize: pageSize,
         });
@@ -177,7 +177,7 @@ export const fetchSearchCheckList = async (
     debouncedSearchQuery: string
 ): Promise<CheckList[]> => {
     try {
-        const response = await axiosInstance.post("CheckList_service.asmx/SearchCheckLists", {
+        const response = await axiosInstance.post("CheckList/SearchCheckLists", {
             Messages: debouncedSearchQuery
         });
         return response.data.data ?? [];
@@ -194,7 +194,7 @@ export const saveCheckList = async (data: {
     IsActive: boolean;
     Disables: boolean;
 }): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("CheckList_service.asmx/SaveCheckList", data);
+    const response = await axiosInstance.post("CheckList/SaveCheckList", data);
     return response.data;
 };
 
@@ -204,7 +204,7 @@ export const fetchCheckListOption = async (
     pageSize: number,
 ): Promise<CheckListOption[]> => {
     try {
-        const response = await axiosInstance.post("CheckListOption_service.asmx/GetCheckListOptions", {
+        const response = await axiosInstance.post("CheckListOption/GetCheckListOptions", {
             page: currentPage,
             pageSize: pageSize,
         });
@@ -219,7 +219,7 @@ export const fetchSearchCheckListOption = async (
     debouncedSearchQuery: string
 ): Promise<CheckListOption[]> => {
     try {
-        const response = await axiosInstance.post("CheckListOption_service.asmx/SearchCheckListOptions", {
+        const response = await axiosInstance.post("CheckListOption/SearchCheckListOptions", {
             Messages: debouncedSearchQuery
         });
         return response.data.data ?? [];
@@ -236,7 +236,7 @@ export const saveCheckListOption = async (data: {
     IsActive: boolean;
     Disables: boolean;
 }): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("CheckListOption_service.asmx/SaveCheckListOption", data);
+    const response = await axiosInstance.post("CheckListOption/SaveCheckListOption", data);
     return response.data;
 };
 
@@ -246,7 +246,7 @@ export const fetchGroupCheckListOption = async (
     pageSize: number,
 ): Promise<GroupCheckListOption[]> => {
     try {
-        const response = await axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions", {
+        const response = await axiosInstance.post("GroupCheckListOption/GetGroupCheckListOptions", {
             page: currentPage,
             pageSize: pageSize,
         });
@@ -261,7 +261,7 @@ export const fetchSearchGroupCheckListOption = async (
     debouncedSearchQuery: string
 ): Promise<GroupCheckListOption[]> => {
     try {
-        const response = await axiosInstance.post("GroupCheckListOption_service.asmx/SearchGroupCheckLists", {
+        const response = await axiosInstance.post("GroupCheckListOption/SearchGroupCheckListOptions", {
             Messages: debouncedSearchQuery
         });
         return response.data.data ?? [];
@@ -278,7 +278,7 @@ export const saveGroupCheckListNoOption = async (data: {
     IsActive: boolean;
     Disables: boolean;
 }): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("GroupCheckListOption_service.asmx/SaveGroupCheckListOption", data);
+    const response = await axiosInstance.post("GroupCheckListOption/SaveGroupCheckListOption", data);
     return response.data;
 };
 
@@ -291,7 +291,7 @@ export const saveGroupCheckListOption = async (data: {
     Disables: boolean;
     Options: string
 }): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("GroupCheckListOption_service.asmx/SaveGroupCheckListAndOptionMatch", data);
+    const response = await axiosInstance.post("GroupCheckListOption/SaveGroupCheckListAndOptionMatch", data);
     return response.data;
 };
 
@@ -300,7 +300,7 @@ export const fetchGroupCheckList = async (
     pageSize: number,
 ): Promise<GroupCheckListOption[]> => {
     try {
-        const response = await axiosInstance.post("GroupCheckListOption_service.asmx/GetGroupCheckListOptions", {
+        const response = await axiosInstance.post("GroupCheckListOption/GetGroupCheckListOptions", {
             page: currentPage,
             pageSize: pageSize,
         });
@@ -317,7 +317,7 @@ export const fetchMatchCheckListOptions = async (
     pageSize: number,
 ): Promise<MatchCheckListOption[]> => {
     try {
-        const response = await axiosInstance.post("MatchCheckListOption_service.asmx/GetMatchCheckListOptions", {
+        const response = await axiosInstance.post("MatchCheckListOption/GetMatchCheckListOptions", {
             page: currentPage,
             pageSize: pageSize,
         });
@@ -332,7 +332,7 @@ export const fetchSearchMatchCheckListOptions = async (
     debouncedSearchQuery: string
 ): Promise<MatchCheckListOption[]> => {
     try {
-        const response = await axiosInstance.post("MatchCheckListOption_service.asmx/SearchMatchCheckListOptions", {
+        const response = await axiosInstance.post("MatchCheckListOption/SearchMatchCheckListOptions", {
             Messages: debouncedSearchQuery
         });
         return response.data.data ?? [];
@@ -351,7 +351,7 @@ export const saveMatchCheckListOptions = async (
         IsActive: boolean;
         Disables: boolean;
     }): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("MatchCheckListOption_service.asmx/SaveMatchCheckListOption", data);
+    const response = await axiosInstance.post("MatchCheckListOption/SaveMatchCheckListOption", data);
     return response.data;
 };
 
@@ -361,7 +361,7 @@ export const fetchForms = async (
     pageSize: number,
 ): Promise<Form[]> => {
     try {
-        const response = await axiosInstance.post("Form_service.asmx/GetForms", {
+        const response = await axiosInstance.post("Form/GetForms", {
             page: currentPage,
             pageSize: pageSize,
         });
@@ -376,7 +376,7 @@ export const fetchSearchFomrs = async (
     debouncedSearchQuery: string
 ): Promise<Form[]> => {
     try {
-        const response = await axiosInstance.post("Form_service.asmx/SearchFomrs", {
+        const response = await axiosInstance.post("Form/SearchFomrs", {
             Messages: debouncedSearchQuery
         });
         return response.data.data ?? [];
@@ -392,7 +392,7 @@ export const fetchExpectedResults = async (
     pageSize: number,
 ): Promise<ExpectedResult[]> => {
     try {
-        const response = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResults", {
+        const response = await axiosInstance.post("ExpectedResult/GetExpectedResults", {
             page: currentPage,
             pageSize: pageSize,
         });
@@ -410,7 +410,7 @@ export const fetchExpectedResultsWithTime = async (
         const start = StartTime && convertToDateTime(StartTime)
         const end = convertToDateTime(convertToThaiDateTime(new Date(getCurrentTime()).toISOString(), undefined, true))
 
-        const response = await axiosInstance.post("ExpectedResult_service.asmx/GetExpectedResultsWithTime", {
+        const response = await axiosInstance.post("ExpectedResult/GetExpectedResultsWithTime", {
             StartTime: start,
             EndTime: end
         });
@@ -425,7 +425,7 @@ export const fetchSearchExpectedResult = async (
     debouncedSearchQuery: string
 ): Promise<ExpectedResult[]> => {
     try {
-        const response = await axiosInstance.post("ExpectedResult_service.asmx/SearchExpectedResults", {
+        const response = await axiosInstance.post("ExpectedResult/SearchExpectedResults", {
             Messages: debouncedSearchQuery
         });
         return response.data.data ?? [];
@@ -441,7 +441,7 @@ export const fetchApproved = async (
     pageSize: number,
 ): Promise<ExpectedResult[]> => {
     try {
-        const response = await axiosInstance.post("ExpectedResult_service.asmx/GetApproveds", {
+        const response = await axiosInstance.post("ExpectedResult/GetApproveds", {
             page: currentPage,
             pageSize: pageSize,
         });
@@ -459,7 +459,7 @@ export const fetchApprovedWithTime = async (
         const start = StartTime && convertToDateTime(StartTime)
         const end = convertToDateTime(convertToThaiDateTime(new Date(getCurrentTime()).toISOString(), undefined, true))
 
-        const response = await axiosInstance.post("ExpectedResult_service.asmx/GetApproveWithTime", {
+        const response = await axiosInstance.post("ExpectedResult/GetApproveWithTime", {
             StartTime: start,
             EndTime: end
         });
@@ -474,7 +474,7 @@ export const fetchSearchApproved = async (
     debouncedSearchQuery: string
 ): Promise<ExpectedResult[]> => {
     try {
-        const response = await axiosInstance.post("ExpectedResult_service.asmx/SearchApproveds", {
+        const response = await axiosInstance.post("ExpectedResult/SearchApproveds", {
             Messages: debouncedSearchQuery
         });
         return response.data.data ?? [];
@@ -491,7 +491,7 @@ export const SaveApproved = async (data: {
         GUserID: any;
     }
 }): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("ExpectedResult_service.asmx/SaveApproved", { TableID: JSON.stringify(data.TableID), UserInfo: JSON.stringify(data.UserData) });
+    const response = await axiosInstance.post("ExpectedResult/SaveApproved", { TableID: JSON.stringify(data.TableID), UserInfo: JSON.stringify(data.UserData) });
     return response.data;
 };
 
@@ -501,7 +501,7 @@ export const fetchMatchFormMchines = async (
     pageSize: number,
 ): Promise<MatchForm[]> => {
     try {
-        const response = await axiosInstance.post("MatchFormMachine_service.asmx/GetMatchFormMachines", {
+        const response = await axiosInstance.post("MatchFormMachine/GetMatchFormMachines", {
             page: currentPage,
             pageSize: pageSize,
         });
@@ -516,7 +516,7 @@ export const fetchSearchMatchFormMchine = async (
     debouncedSearchQuery: string
 ): Promise<MatchForm[]> => {
     try {
-        const response = await axiosInstance.post("MatchFormMachine_service.asmx/SearchMatchCheckListOptions", {
+        const response = await axiosInstance.post("MatchFormMachine/SearchMatchCheckListOptions", {
             Messages: debouncedSearchQuery
         });
         return response.data.data ?? [];
@@ -532,28 +532,28 @@ export const SaveMatchFormMachine = async (data: {
     FormID: string;
     Mode: string;
 }): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("MatchFormMachine_service.asmx/SaveMatchFormMachine", data);
+    const response = await axiosInstance.post("MatchFormMachine/SaveMatchFormMachine", data);
     return response.data;
 };
 
 // User manager
 export const fetchUserLDAP = async (): Promise<Users[]> => {
-    const response = await axiosInstance.post("User_service.asmx/GetUserLDAP");
+    const response = await axiosInstance.post("Ldap/GetUserLdaps");
     return response.data.data ?? [];
 };
 
 export const saveUserPermission = async (data: { Prefix: any; UserID: string | undefined; UserName: string; GUserID: string; IsActive: boolean; }): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("User_service.asmx/SaveUser", data);
+    const response = await axiosInstance.post("User/SaveUser", data);
     return response.data;
 };
 
 export const fetchUsers = async (): Promise<UsersPermission[]> => {
-    const response = await axiosInstance.post("User_service.asmx/GetUsers");
+    const response = await axiosInstance.post("User/GetUsers");
     return response.data.data ?? [];
 };
 
 export const fetchGroupUsers = async (): Promise<GroupUsers[]> => {
-    const response = await axiosInstance.post('GroupUser_service.asmx/GetGroupUsers');
+    const response = await axiosInstance.post('GroupUser/GetGroupUsers');
     return response.data.data ?? [];
 };
 
@@ -563,7 +563,7 @@ export const SaveGroupUser = async (data: {
     GUserName: string;
     isActive: boolean;
 }): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("GroupUser_service.asmx/SaveGroupUser", data);
+    const response = await axiosInstance.post("GroupUser/SaveGroupUser", data);
     return response.data;
 };
 
@@ -571,6 +571,6 @@ export const SavePermisson = async (data: {
     GUserID: string;
     Permissions: string;
 }): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("Permisson_service.asmx/SavePermission", data);
+    const response = await axiosInstance.post("Permisson/SavePermission", data);
     return response.data;
 };

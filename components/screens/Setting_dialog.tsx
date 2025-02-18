@@ -47,7 +47,7 @@ import { SettingProps } from '@/typing/screens/Setting';
 const { height } = Dimensions.get('window');
 
 const saveAppconfig = async (data: AppProps): Promise<{ message: string }> => {
-    const response = await axiosInstance.post("AppConfig_service.asmx/SaveAppConfig", data);
+    const response = await axiosInstance.post("AppConfig/SaveAppConfig", data);
     return response.data;
 };
 

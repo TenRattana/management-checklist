@@ -98,7 +98,7 @@ const TimescheduleScreen = React.memo(() => {
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
             if (action === "editIndex") {
-                const response = await axiosInstance.post("TimeSchedule_service.asmx/GetSchedule", { ScheduleID: item });
+                const response = await axiosInstance.post("TimeSchedule/GetSchedule", { ScheduleID: item });
                 const timeschedule = response.data.data[0] ?? [];
                 const option = timeschedule.MachineGroup?.map((v: { GMachineID: string }) => v.GMachineID) || [];
 
@@ -118,8 +118,8 @@ const TimescheduleScreen = React.memo(() => {
                 setIsEditing(true);
                 setIsVisible(true);
             } else {
-                const endpoint = action === "activeIndex" ? "PointTimeSchedules" : "DeleteTimeSchedule";
-                const response = await axiosInstance.post(`TimeSchedule_service.asmx/${endpoint}`, { ScheduleID: item });
+                const endpoint = action === "activeIndex" ? "ChangeSchedule" : "DeleteSchedule";
+                const response = await axiosInstance.post(`TimeSchedule/${endpoint}`, { ScheduleID: item });
                 showSuccess(String(response.data.message));
                 queryClient.invalidateQueries('timeSchedule');
             }
@@ -171,7 +171,7 @@ const TimescheduleScreen = React.memo(() => {
         detail: true,
         detailKey: "ScheduleID",
         detailKeyrow: 4,
-        showDetailwithKey: ["MachineGroup", "Type_schedule", "TimelineItems"],
+        showDetailwithKey: ["GroupMachines", "Type_schedule", "TimelineItems"],
         detailData: timeSchedule,
         searchQuery: debouncedSearchQuery,
         isFetching: isLoading

@@ -1,6 +1,6 @@
 export interface Log {
-  start: string | null;
-  stop: string | null;
+  Start: string | null;
+  Stop: string | null;
 }
 
 export interface GMachine {

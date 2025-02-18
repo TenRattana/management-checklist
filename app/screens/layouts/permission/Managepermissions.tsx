@@ -115,7 +115,7 @@ const Managepermissions = React.memo(() => {
   const handleAction = useCallback(async (action?: string, item?: string) => {
     try {
       if (action === "editIndex") {
-        const response = await axiosInstance.post("User_service.asmx/GetUser", {
+        const response = await axiosInstance.post("User/GetUser", {
           UserID: item,
         });
         const userData = response.data.data[0] ?? {};
@@ -129,7 +129,7 @@ const Managepermissions = React.memo(() => {
         setIsEditing(true);
       } else {
         const endpoint = action === "activeIndex" ? "ChangeUser" : "DeleteUser";
-        const response = await axiosInstance.post(`User_service.asmx/${endpoint}`, { UserID: item });
+        const response = await axiosInstance.post(`User/${endpoint}`, { UserID: item });
         showSuccess(String(response.data.message));
         queryClient.invalidateQueries('machineGroups');
       }
@@ -284,7 +284,7 @@ const Managepermissions = React.memo(() => {
 
   const deleteF = useCallback(async (value: string) => {
     if (value) {
-      const response = await axiosInstance.post("GroupUser_service.asmx/DeleteGroupUser", { GUserID: value });
+      const response = await axiosInstance.post("GroupUser/DeleteGroupUser", { GUserID: value });
       showSuccess(String(response.data.message));
       queryClient.invalidateQueries('groupUser');
     }

@@ -28,10 +28,10 @@ export interface TimeScemaScheduleProps {
 
 export interface TimelineItem {
     ScheduleID: string;
-    date: string;
-    name: string;
-    time: string;
-    status: boolean;
+    Date: string;
+    Name: string;
+    Time: string;
+    Status: boolean;
 }
 
 type ScheduleType = 'Daily' | 'Weekly' | 'Custom';

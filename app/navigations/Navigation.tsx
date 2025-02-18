@@ -172,7 +172,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                             color: theme.colors.fff,
                             marginRight: 15,
                         }}>
-                            {user.Full_Name}
+                            {user.UserName}
                         </Text>
                         <CustomMenu
                             visible={menuVisible}
@@ -212,7 +212,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                                 fontSize: 14,
                                 fontWeight: 'bold',
                                 color: theme.colors.fff,
-                            }}>{user.Full_Name}</Text>
+                            }}>{user.UserName}</Text>
                             <CustomMenu
                                 visible={menuVisible}
                                 onShow={toggleMenu}

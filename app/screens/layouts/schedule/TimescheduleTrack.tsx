@@ -9,7 +9,7 @@ import { useTheme } from '@/app/contexts/useTheme';
 import { TimeTrack } from '@/typing/screens/TimeTrack';
 
 const fetchTimeTrack = async (): Promise<TimeTrack[]> => {
-  const response = await axiosInstance.post("TimeSchedule_service.asmx/GetScheduleTracks");
+  const response = await axiosInstance.post("TimeTrack/GetScheduleTracks");
   return response.data.data ?? [];
 };
 
@@ -92,8 +92,8 @@ const TimescheduleTrack = React.memo(() => {
     return selectedSchedule.Track?.map((log, index) => [
       `Detail ${index + 1}`,
       selectedSchedule.ScheduleName,
-      convertToThaiDateTime(log.start),
-      convertToThaiDateTime(log.stop),
+      convertToThaiDateTime(log.Start),
+      convertToThaiDateTime(log.Stop),
     ]) || [];
   }, [timeTrack, selectedTrack]);
 
@@ -103,7 +103,7 @@ const TimescheduleTrack = React.memo(() => {
       { label: "", align: "flex-start" },
       { label: "Schedule Name", align: "flex-start" },
       { label: "Start", align: "flex-start" },
-      { label: "End", align: "flex-start" },
+      { label: "Stop", align: "flex-start" },
     ],
     flexArr: [1, 2, 2, 2],
     actionIndex: [{}],

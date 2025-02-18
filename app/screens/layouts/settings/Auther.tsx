@@ -38,7 +38,7 @@ const Auther = React.memo((user: any) => {
             <AccessibleView name="setting-mode" style={[masterdataStyles.settingItem]}>
                 <View style={styles.userInfoRow}>
                     <Text style={[masterdataStyles.text, masterdataStyles.textBold]}>User Name : </Text>
-                    <Text style={masterdataStyles.text}>{state.Full_Name}</Text>
+                    <Text style={masterdataStyles.text}>{state.UserName}</Text>
                 </View>
             </AccessibleView>
             <Divider style={styles.divider} />

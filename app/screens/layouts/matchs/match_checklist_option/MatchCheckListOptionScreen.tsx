@@ -110,7 +110,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
         try {
             if (action === "editIndex") {
 
-                const response = await axiosInstance.post("MatchCheckListOption_service.asmx/GetMatchCheckListOption", { MCLOptionID: item });
+                const response = await axiosInstance.post("MatchCheckListOption/GetMatchCheckListOption", { MCLOptionID: item });
                 const matchCheckListOption = response.data.data[0] ?? {};
                 const option = matchCheckListOption.CheckListOptions?.map((v: { CLOptionID: string }) => v.CLOptionID) || [];
 
@@ -127,7 +127,7 @@ const MatchCheckListOptionScreen = React.memo(() => {
                 setIsVisible(true);
             } else {
                 const endpoint = action === "activeIndex" ? "ChangeMatchCheckListOption" : "DeleteMatchCheckListOption";
-                const response = await axiosInstance.post(`MatchCheckListOption_service.asmx/${endpoint}`, { MCLOptionID: item });
+                const response = await axiosInstance.post(`MatchCheckListOption/${endpoint}`, { MCLOptionID: item });
                 showSuccess(String(response.data.message));
                 queryClient.invalidateQueries('matchCheckListOption');
             }
