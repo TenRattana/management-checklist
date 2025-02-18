@@ -165,7 +165,7 @@ const MachineGroupScreen = React.memo(() => {
                     setIsVisible(true);
                 } else {
                     const endpoint = action === "activeIndex" ? "ChangeMachine" : "DeleteMachine";
-                    const response = await axiosInstance.post(`Machines/${endpoint}/${item}`);
+                    const response = await axiosInstance.post(`Machines/${endpoint}`, { MachineID: item });
                     showSuccess(String(response.data.message));
                     queryClient.invalidateQueries("machines");
                 }

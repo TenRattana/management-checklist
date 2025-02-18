@@ -45,81 +45,81 @@ export const convertSchedule = (schedule: TimeScemaScheduleProps[]): { timeline:
     };
 
     schedule?.forEach((item) => {
-        item.TimelineItems?.forEach(({ date, name, time, ScheduleID, status }) => {
+        item.TimelineItems?.forEach(({ Date, Name, Time, ScheduleID, Status }) => {
 
             const now = moment(getCurrentTime());
 
-            if (date.startsWith('Weekly')) {
-                const weekday = date.match(/\((.*?)\)/)?.[1];
+            if (Date.startsWith('Weekly')) {
+                const weekday = Date.match(/\((.*?)\)/)?.[1];
                 if (!weekday) return;
 
                 let day = startOfYear.clone().day(weekday);
                 if (day.isBefore(startOfYear)) day.add(7, 'days');
 
                 while (day.isBetween(startOfYear, endOfYear, 'days', '[]')) {
-                    const [startTime, endTime] = time.split(' - ');
+                    const [startTime, endTime] = Time.split(' - ');
                     const start = optimizeMoment(day, startTime);
                     const end = optimizeMoment(day, endTime);
                     const intime = now.isBetween(moment(start), moment(end), undefined, '[]');
 
                     timeline.push({
                         ScheduleID,
-                        title: name,
+                        title: Name,
                         start,
                         end,
-                        summary: `${date} (${time})`,
+                        summary: `${Date} (${Time})`,
                         color: getColorForType('Weekly'),
                         type: 'Weekly',
-                        status,
-                        statustype: status ? (intime ? 'running' : now.isAfter(end) ? 'end' : 'wait') : 'stop',
+                        status: Status,
+                        statustype: Status ? (intime ? 'running' : now.isAfter(end) ? 'end' : 'wait') : 'stop',
                     });
 
                     addMarkedDate(day.format('YYYY-MM-DD'), 'Weekly');
                     day.add(7, 'days');
                 }
-            } else if (date === 'Recurring Daily') {
+            } else if (Date === 'Recurring Daily') {
                 for (let day = startOfYear.clone(); day.isBefore(endOfYear); day.add(1, 'day')) {
-                    const [startTime, endTime] = time.split(' - ');
+                    const [startTime, endTime] = Time.split(' - ');
                     const start = optimizeMoment(day, startTime);
                     const end = optimizeMoment(day, endTime);
                     const intime = now.isBetween(moment(start), moment(end), undefined, '[]');
 
                     timeline.push({
                         ScheduleID,
-                        title: name,
+                        title: Name,
                         start,
                         end,
-                        summary: `${date} (${time})`,
+                        summary: `${Date} (${Time})`,
                         color: getColorForType('Daily'),
                         type: 'Daily',
-                        status,
-                        statustype: status ? (intime ? 'running' : now.isAfter(end) ? 'end' : 'wait') : 'stop',
+                        status: Status,
+                        statustype: Status ? (intime ? 'running' : now.isAfter(end) ? 'end' : 'wait') : 'stop',
                     });
 
                     addMarkedDate(day.format('YYYY-MM-DD'), 'Daily');
                 }
-            } else if (date.startsWith('Custom')) {
-                const eventDate = moment(date.match(/\((.*?)\)/)?.[1], 'DD-MM-YYYY');
+            } else if (Date.startsWith('Custom')) {
+                const eventDate = moment(Date.match(/\((.*?)\)/)?.[1], 'DD-MM-YYYY');
                 if (!eventDate.isValid()) return;
 
                 for (let year = startOfYear.year(); year <= endOfYear.year(); year++) {
                     const gregorianDate = eventDate.clone().year(year);
 
-                    const [startTime, endTime] = time.split(' - ');
+                    const [startTime, endTime] = Time.split(' - ');
                     const start = optimizeMoment(gregorianDate, startTime);
                     const end = optimizeMoment(gregorianDate, endTime);
                     const intime = now.isBetween(moment(start), moment(end), undefined, '[]');
 
                     timeline.push({
                         ScheduleID,
-                        title: name,
+                        title: Name,
                         start,
                         end,
-                        summary: `Schedule Custom : (${time})`,
+                        summary: `Schedule Custom : (${Time})`,
                         color: getColorForType('Custom'),
                         type: 'Custom',
-                        status,
-                        statustype: status ? (intime ? 'running' : now.isAfter(end) ? 'end' : 'wait') : 'stop',
+                        status: Status,
+                        statustype: Status ? (intime ? 'running' : now.isAfter(end) ? 'end' : 'wait') : 'stop',
                     });
 
                     addMarkedDate(gregorianDate.format('YYYY-MM-DD'), 'Custom');

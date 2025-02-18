@@ -102,18 +102,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUserData(payload);
         }
       } else {
-        const response = await axiosInstance.get("Ldap/AuthenticateUser", {
-          params: {
-            UserName,
-            Password,
-            TokenAuth
-          }
-        });
 
-        if (response.data && response.data.token) {
-          await saveData('userToken', response.data.token);
-          await saveData('refreshToken', response.data.token);
-          const payload = jwtDecode(response.data.token);
+        const data = {
+          UserName,
+          Password
+        }
+
+        const response = await axiosInstance.post("Ldap/Login", data);
+        if (response.data && response.data.AccessToken) {
+          await saveData('userToken', response.data.AccessToken);
+          await saveData('refreshToken', response.data.AccessToken);
+          const payload = jwtDecode(response.data.AccessToken);
           setUserData(payload);
         }
       }
@@ -129,7 +128,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         await dispatch(initializeApp({ UserData }));
         showSuccess("Login Success!");
         const dataApp = await fetchAppConfig();
-        dispatch(setApp({ App: dataApp[0] }));
+        dispatch(setApp({ App: dataApp }));
         setLoading(false);
       })();
     }
