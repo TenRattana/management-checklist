@@ -149,7 +149,7 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
             { label: "View", align: "center" },
             { label: "Delete", align: "center" },
         ],
-        flexArr: !Edit ? [2, 2, 3, 1, 1] : [0, 0, 2, 2, 3, 1, 1, 1, 1, 1, 1],
+        flexArr: !Edit ? [1.5, 2, 3, 1, 1] : [0, 0, 1.5, 2.5, 3, 1, 1, 1, 1, 1, 1],
         actionIndex: !Edit ? [{ preIndex: 4 }] : [{ disables: 0, delete: 1, changeIndex: 7, copyIndex: 8, preIndex: 9, delOnlyIndex: 10 }],
         showMessage: [2, 3],
         handleAction,

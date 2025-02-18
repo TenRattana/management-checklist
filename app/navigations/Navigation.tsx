@@ -196,7 +196,7 @@ const DrawerNav = React.memo(({ renderComponent, user }: any) => {
                         display: Platform.OS === 'web' && responsive === "large" && isDrawerVisible ? 'flex' : Platform.OS !== 'web' || responsive !== "large" ? 'flex' : 'none'
                     },
                     drawerType: Platform.OS === 'web' && responsive === "large" ? 'permanent' : 'front',
-                    headerTitle: state.AppName || '',
+                    headerTitle: state.AppName ?? 'PMChecklist',
                     headerTitleStyle: {
                         fontSize: 14,
                         fontWeight: 'bold',
