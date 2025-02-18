@@ -131,16 +131,16 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
     const customtableProps = useMemo(() => ({
         Tabledata: tableData,
         Tablehead: !Edit ? [
-            { label: `${state.Form} Name`, align: "flex-start" },
             { label: `${state.Form} Number`, align: "flex-start" },
+            { label: `${state.Form} Name`, align: "flex-start" },
             { label: `${state.Form} Description`, align: "flex-start" },
             { label: `${state.Form} Status`, align: "center" },
             { label: "View", align: "center" },
         ] : [
             { label: "", align: "flex-start" },
             { label: "", align: "flex-start" },
-            { label: `${state.Form} Name`, align: "flex-start" },
             { label: `${state.Form} Number`, align: "flex-start" },
+            { label: `${state.Form} Name`, align: "flex-start" },
             { label: `${state.Form} Description`, align: "flex-start" },
             { label: `${state.Form} Status`, align: "center" },
             { label: "Status", align: "center" },
@@ -149,7 +149,7 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
             { label: "View", align: "center" },
             { label: "Delete", align: "center" },
         ],
-        flexArr: !Edit ? [2, 2, 3, 1, 1] : [0, 0, 2, 2, 3, 1, 1, 1, 1, 1, 1],
+        flexArr: !Edit ? [1.5, 2, 3, 1, 1] : [0, 0, 1.5, 2.5, 3, 1, 1, 1, 1, 1, 1],
         actionIndex: !Edit ? [{ preIndex: 4 }] : [{ disables: 0, delete: 1, changeIndex: 7, copyIndex: 8, preIndex: 9, delOnlyIndex: 10 }],
         showMessage: [2, 3],
         handleAction,
