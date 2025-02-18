@@ -9,7 +9,7 @@ import { useTheme } from '@/app/contexts/useTheme';
 import { TimeTrack } from '@/typing/screens/TimeTrack';
 
 const fetchTimeTrack = async (): Promise<TimeTrack[]> => {
-  const response = await axiosInstance.post("TimeSchedules/GetScheduleTracks");
+  const response = await axiosInstance.post("TimeTrack/GetScheduleTracks");
   return response.data.data ?? [];
 };
 

@@ -144,7 +144,7 @@ const MachineGroupScreen = React.memo(() => {
         async (action?: string, item?: string) => {
             try {
                 if (action === "editIndex") {
-                    const response = await axiosInstance.post(`Machines/GetMachine/${item}`);
+                    const response = await axiosInstance.post('Machine/GetMachine', { MachineID: item });
                     const machineData = response.data.data[0] ?? {};
                     setInitialValues({
                         machineId: machineData.MachineID ?? "",
@@ -165,7 +165,7 @@ const MachineGroupScreen = React.memo(() => {
                     setIsVisible(true);
                 } else {
                     const endpoint = action === "activeIndex" ? "ChangeMachine" : "DeleteMachine";
-                    const response = await axiosInstance.post(`Machines/${endpoint}`, { MachineID: item });
+                    const response = await axiosInstance.post(`Machine/${endpoint}`, { MachineID: item });
                     showSuccess(String(response.data.message));
                     queryClient.invalidateQueries("machines");
                 }

@@ -103,7 +103,7 @@ const CheckListScreen = React.memo(() => {
     const handleAction = useCallback(async (action?: string, item?: string) => {
         try {
             if (action === "editIndex") {
-                const response = await axiosInstance.post("CheckLists/GetCheckList", { CListID: item });
+                const response = await axiosInstance.post("CheckList/GetCheckList", { CListID: item });
                 const checkListData = response.data.data[0] ?? {};
                 setInitialValues({
                     checkListId: checkListData.CListID ?? "",
@@ -115,7 +115,7 @@ const CheckListScreen = React.memo(() => {
                 setIsVisible(true);
             } else {
                 const endpoint = action === "activeIndex" ? "ChangeCheckList" : "DeleteCheckList";
-                const response = await axiosInstance.post(`CheckLists/${endpoint}`, { CListID: item });
+                const response = await axiosInstance.post(`CheckList/${endpoint}`, { CListID: item });
                 showSuccess(String(response.data.message));
                 queryClient.invalidateQueries('checkList');
             }
