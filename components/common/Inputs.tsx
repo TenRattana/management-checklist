@@ -40,7 +40,7 @@ const Inputs = React.memo(({ placeholder, label, error, errorMessage, value, han
           value && !exp && !secureTextEntry ? (
             <TextInput.Icon
               icon="window-close"
-              onPress={() => handleChange(undefined)}
+              onPress={() => handleChange("")}
               size={spacing.large}
             />
           ) : secureTextEntry ? (
