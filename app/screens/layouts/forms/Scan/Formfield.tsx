@@ -14,7 +14,7 @@ const Formfield = React.memo(({ item, field, dataType, setFieldValue, setFieldTo
     }, [dataType]);
 
     const handleBlur = useCallback((field: BaseFormState) => {
-        if (getType(field) === "Number") {
+        if (getType(field) === "Number" && values[field.MCListID] !== "") {
             const numericValue = Number(values[field.MCListID]);
             if (!isNaN(numericValue) && Number(field.DTypeValue) > 0) {
                 const formattedValue = numericValue.toFixed(Number(field.DTypeValue));

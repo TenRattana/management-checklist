@@ -166,8 +166,8 @@ const useField = (editMode?: boolean, formState?: BaseFormState) => {
     const checkListTypes = useMemo(
         () =>
             checkListType
-                .filter(group => group.CheckList)
-                .flatMap(group => group.CheckList)
+                .filter(group => group.CheckListTypes)
+                .flatMap(group => group.CheckListTypes)
                 .filter((checkList): checkList is CheckListType => checkList !== undefined),
         [checkListType]
     );

@@ -34,6 +34,7 @@ export interface UserPayload {
     DepartMent: string;
     GUserID: string;
     GUserName: string;
+    Permissions: string[];
 }
 
 const initialState: User = {
@@ -63,6 +64,7 @@ const middlewareStore = createSlice({
             state.DepartMent = user.DepartMent;
             state.GUserID = user.GUserID;
             state.GUserName = user.GUserName;
+            state.Permissions = user.Permissions;
             state.IsAuthenticated = true;
         },
         logout: (state) => {

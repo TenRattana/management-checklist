@@ -52,8 +52,8 @@ const CreateFormScreen = React.memo(({ route }: CreateFormProps) => {
     const checkLists = useMemo(
         () =>
             checkListType
-                .filter(group => group.CheckList)
-                .flatMap(group => group.CheckList)
+                .filter(group => group.CheckListTypes)
+                .flatMap(group => group.CheckListTypes)
                 .filter((checkList): checkList is CheckListType => checkList !== undefined),
         [checkListType]
     );
@@ -335,7 +335,7 @@ const CreateFormScreen = React.memo(({ route }: CreateFormProps) => {
 
                                                     <Divider bold style={[{ marginVertical: 10, marginHorizontal: 20 }]} />
 
-                                                    <MemoDraggableItem data={item?.CheckList || []} key={`drag-${index}`} onDrop={handleDrop} />
+                                                    <MemoDraggableItem data={item?.CheckListTypes || []} key={`drag-${index}`} onDrop={handleDrop} />
                                                 </View>
                                             </View>
                                         )

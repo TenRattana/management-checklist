@@ -163,7 +163,7 @@ const useForm = (route?: RouteParams) => {
         try {
             const responses = await Promise.all([
                 axiosInstance.post("CheckList/SearchCheckLists", { Messages: "Empty Content" }),
-                axiosInstance.post("GroupCheckListOption/SearchGroupCheckLists", { Messages: "Empty Content Group" }),
+                axiosInstance.post("GroupCheckListOption/SearchGroupCheckListOptions", { Messages: "Empty Content Group" }),
                 axiosInstance.post("CheckListType/GetCheckListTypes"),
                 axiosInstance.post("DataType/GetDataTypes"),
             ]);
@@ -207,8 +207,8 @@ const useForm = (route?: RouteParams) => {
                 );
 
                 const checkListType = data.checkListType
-                    .filter(group => group.CheckList !== null)
-                    .flatMap(group => group.CheckList)
+                    .filter(group => group.CheckListTypes !== null)
+                    .flatMap(group => group.CheckListTypes)
                     .filter((checkList): checkList is CheckListType => checkList !== undefined);
 
                 dispatch(

@@ -20,7 +20,7 @@ export interface GroupCheckListType {
   GTypeID: string;
   GTypeName: string;
   IsActive: boolean;
-  CheckList?: CheckListType[];
+  CheckListTypes?: CheckListType[];
 }
 
 export interface CheckListDialogProps<V extends Values> extends BaseDialogProps<V> {}

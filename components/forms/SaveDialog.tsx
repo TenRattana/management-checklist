@@ -28,12 +28,12 @@ const SaveDialog = React.memo(({ state, isVisible, setIsVisible }: SaveDialogPro
         const data = {
             PrefixForm: prefix.PF_Form,
             PrefixSForm: prefix.PF_SubForm,
-            SubFormData: JSON.stringify(state.subForms),
-            FormData: JSON.stringify(form),
+            SubForms: state.subForms,
+            Forms: form
         };
 
         try {
-            const response = await axiosInstance.post("MatchCheckList/SaveFormCheckList", data);
+            const response = await axiosInstance.post("Form/SaveForm", data);
             messages = (String(response.data.message));
             showSuccess(messages);
             navigate("Form", { fet: true });

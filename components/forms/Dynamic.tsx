@@ -15,12 +15,18 @@ const DynamicForm = React.memo(({ field, values, handleChange, handleBlur, error
   const { theme } = useTheme();
   const { fontSize } = useRes();
   const { groupCheckListOption } = useField();
-
   const [textColor, setTextColor] = useState(theme.colors.onBackground);
   const [messageminOrmax, setMessageMinOrMax] = useState("");
 
   useEffect(() => {
-    if (Important && type === "Number" && values !== "") {
+    if (Important && type === "Number") {
+
+      if (values === "") {
+        setTextColor(theme.colors.onBackground);
+        setMessageMinOrMax("");
+        return;
+      }
+
       const numericValue = Number(values);
 
       const minLength = Number(ImportantList?.[0]?.MinLength) || undefined;
@@ -95,7 +101,9 @@ const DynamicForm = React.memo(({ field, values, handleChange, handleBlur, error
           <Radios
             option={option}
             hint={error ? errorMessages?.[MCListID] as string || "" : ""}
-            handleChange={(v) => handleChange(MCListID, v)}
+            handleChange={(v) => {
+              handleChange(MCListID, v === values ? null : v)
+            }}
             handleBlur={handleBlur}
             value={values}
             testId={`radio-${CListName}-${SFormID}-${MCListID}`}

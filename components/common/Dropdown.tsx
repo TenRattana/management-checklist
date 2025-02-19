@@ -128,15 +128,14 @@ const Dropdown = React.memo(({ label, fetchNextPage, handleScroll, isFetching, i
                             justifyContent: 'flex-start',
                             flexDirection: 'row',
                             alignItems: 'center',
-                            maxWidth: '100%',
+                            maxWidth: '100%'
+                            // maxWidth: menuWidth,
                         }}
                     />
                 )
             }}
             keyExtractor={(item) => `${item.value}`}
-            style={{
-                maxHeight: Platform.OS === "web" ? (hp('70%') - mx) : mx, maxWidth: Platform.OS === "web" ? menuWidth : '100%', flex: Platform.OS === "web" ? 1 : undefined
-            }}
+            style={{ maxHeight: Platform.OS === "web" ? (hp('70%') - mx) : mx, maxWidth: Platform.OS === "web" ? menuWidth : '100%', flex: Platform.OS === "web" ? 1 : undefined }}
             ListEmptyComponent={() => (
                 <View style={styles.emptyComponent}>
                     <Text style={masterdataStyles.text}>No options available</Text>
