@@ -4,7 +4,7 @@ import axiosInstance from "@/config/axios";
 import { useToast } from "@/app/contexts/useToast";
 import { useRes } from "@/app/contexts/useRes";
 import { LoadingSpinner, Searchbar, Text } from "@/components";
-import { Card, Dialog, Portal } from "react-native-paper";
+import { Card, Dialog, Icon, IconButton, Portal } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Managepermisstion_dialog from "@/components/screens/Managepermisstion_dialog";
 import { Users, GroupUsers, UsersPermission } from '@/typing/type'
@@ -13,6 +13,7 @@ import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
 import { fetchGroupUsers, fetchUserLDAP, fetchUsers, SaveGroupUser, SavePermisson, saveUserPermission } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
+import Animated, { FadeInLeft, FadeOutRight } from "react-native-reanimated";
 
 const LazyCustomtable = lazy(() => import("@/components").then(module => ({ default: module.Customtable })));
 const LazyInfoGroupPermisson_dialog = lazy(() => import("@/components/screens/InfoGroupPermisson_dialog"));
@@ -311,9 +312,7 @@ const Managepermissions = React.memo(() => {
             <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold, styles.functionname]}>{`Create ${state.UsersPermission}`}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={handelEditPermisson} style={{ marginHorizontal: 10, position: 'absolute', right: 30, backgroundColor: theme.colors.error, padding: 10, borderRadius: 10 }}>
-            <Text style={[masterdataStyles.textFFF, masterdataStyles.textBold]}>{`Edit Permisson`}</Text>
-          </TouchableOpacity>
+          <IconButton icon={"pencil-circle"} size={30} iconColor={theme.colors.error} onPress={handelEditPermisson} style={{ alignSelf: 'flex-end' }} />
         </View>
 
         <Suspense fallback={<LoadingSpinner />}>

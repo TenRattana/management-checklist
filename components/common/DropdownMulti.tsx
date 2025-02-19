@@ -128,7 +128,7 @@ const DropdownMulti = React.memo(({ label, fetchNextPage, handleScroll, isFetchi
                         style={{
                             paddingVertical: isSelected.has(item.value) ? 10 : 5,
                             paddingHorizontal: 15,
-                            borderBottomWidth: 1,
+                            borderBottomWidth: 0.5,
                             backgroundColor: isSelected.has(item.value) ? theme.colors.drag : undefined,
                             borderBottomColor: isSelected.has(item.value) ? theme.colors.onBackground : '#d0d0d0',
                             justifyContent: 'flex-start',

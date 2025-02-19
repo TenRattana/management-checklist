@@ -46,7 +46,7 @@ export interface GroupUsers {
   GUserID: string;
   GUserName: string;
   IsActive: boolean;
-  Permissons: GroupPermisson[]
+  Permissions: GroupPermisson[]
 }
 
 export interface Prefixs {
