@@ -34,13 +34,13 @@ const DialogTimeCustom = React.memo(({ visible, setVisible, startTime, endTime, 
     const handleStartTimeChange = (selectedDate: any) => {
         const currentDate = selectedDate || startTime;
         setShowStartTimePicker(false);
-        handleStartTimeChanges(currentDate);
+        handleStartTimeChanges(convertToThaiDateTime(new Date(currentDate).toISOString()));
     };
 
     const handleEndTimeChange = (selectedDate: any) => {
         const currentDate = selectedDate || endTime;
         setShowEndTimePicker(false);
-        handleEndTimeChanges(currentDate);
+        handleEndTimeChanges(convertToThaiDateTime(new Date(currentDate).toISOString()));
     };
 
     const handleApplyFilters = () => {
@@ -74,7 +74,7 @@ const DialogTimeCustom = React.memo(({ visible, setVisible, startTime, endTime, 
             paddingRight: 10,
             paddingVertical: 10,
             borderRadius: 8,
-            top: -20,
+            top: Platform.OS === "web" ? -20 : 20,
             backgroundColor: theme.colors.background,
             ...Platform.select({
                 ios: {
@@ -99,7 +99,6 @@ const DialogTimeCustom = React.memo(({ visible, setVisible, startTime, endTime, 
         },
         buttonContainer: {
             marginTop: 10,
-            flex: 1,
             flexDirection: 'row',
         },
     });
@@ -110,7 +109,7 @@ const DialogTimeCustom = React.memo(({ visible, setVisible, startTime, endTime, 
         <View style={styles.modalOverlay}>
             <TouchableOpacity
                 onPress={() => setVisible(!visible)}
-                style={{ width: 20, flex: 1, justifyContent: 'center', marginHorizontal: 10, alignContent: 'center', alignSelf: 'center' }}>
+                style={{ width: 20, justifyContent: 'center', marginHorizontal: 10, alignContent: 'center', alignSelf: 'center' }}>
                 <Icon source={visible ? 'chevron-double-right' : 'chevron-double-left'} size={20} color={theme.colors.error} />
             </TouchableOpacity>
 
@@ -138,7 +137,7 @@ const DialogTimeCustom = React.memo(({ visible, setVisible, startTime, endTime, 
                                         <DatePicker
                                             selected={startTime ? convertToDate(String(startTime)) : getCurrentTime()}
                                             onChange={(date) => {
-                                                if (date) handleStartTimeChange(convertToThaiDateTime(new Date(date).toISOString()));
+                                                if (date) handleStartTimeChange(date);
                                             }}
                                             maxDate={endTime ? convertToDate(String(endTime)) : getCurrentTime()}
                                             timeInputLabel="Start Time:"
@@ -160,14 +159,15 @@ const DialogTimeCustom = React.memo(({ visible, setVisible, startTime, endTime, 
 
                         ) : (
                             <>
-                                <TouchableOpacity style={[masterdataStyles.button, { backgroundColor: theme.colors.green, marginRight: 5, flexDirection: "row" }]} onPress={showStartTimePickerHandler}>
-                                    <Text style={masterdataStyles.text}>Start Time</Text>
+                                <TouchableOpacity style={[masterdataStyles.button, { backgroundColor: theme.colors.green, width: '70%', paddingHorizontal: 0, marginHorizontal: 0 }]} onPress={showStartTimePickerHandler}>
+                                    <Text style={[masterdataStyles.textFFF, { flex: 1 }]}>Start Time</Text>
                                 </TouchableOpacity>
 
                                 <DateTimePickerModal
                                     isVisible={showStartTimePicker}
                                     mode="date"
                                     date={startTime ? convertToDate(String(startTime)) : getCurrentTime()}
+                                    maximumDate={endTime ? convertToDate(String(endTime)) : getCurrentTime()}
                                     onConfirm={handleStartTimeChange}
                                     onCancel={() => setShowStartTimePicker(false)}
                                 />
@@ -191,7 +191,7 @@ const DialogTimeCustom = React.memo(({ visible, setVisible, startTime, endTime, 
                                         <DatePicker
                                             selected={endTime ? convertToDate(String(endTime)) : getCurrentTime()}
                                             onChange={(date) => {
-                                                if (date) handleEndTimeChange(convertToThaiDateTime(new Date(date).toISOString()));
+                                                if (date) handleEndTimeChange(date);
                                             }}
                                             minDate={startTime ? convertToDate(String(startTime)) : undefined}
                                             maxDate={new Date()}
@@ -221,6 +221,8 @@ const DialogTimeCustom = React.memo(({ visible, setVisible, startTime, endTime, 
                                 <DateTimePickerModal
                                     isVisible={showEndTimePicker}
                                     mode="date"
+                                    minimumDate={startTime ? convertToDate(String(startTime)) : undefined}
+                                    maximumDate={new Date()}
                                     date={endTime ? convertToDate(String(endTime)) : getCurrentTime()}
                                     onConfirm={handleEndTimeChange}
                                     onCancel={() => setShowEndTimePicker(false)}

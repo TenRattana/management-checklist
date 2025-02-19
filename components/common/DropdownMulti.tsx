@@ -128,19 +128,19 @@ const DropdownMulti = React.memo(({ label, fetchNextPage, handleScroll, isFetchi
                         style={{
                             paddingVertical: isSelected.has(item.value) ? 10 : 5,
                             paddingHorizontal: 15,
-                            borderBottomWidth: 1,
+                            borderBottomWidth: 0.5,
                             backgroundColor: isSelected.has(item.value) ? theme.colors.drag : undefined,
                             borderBottomColor: isSelected.has(item.value) ? theme.colors.onBackground : '#d0d0d0',
                             justifyContent: 'flex-start',
                             flexDirection: 'row',
                             alignItems: 'center',
-                            maxWidth: menuWidth,
+                            maxWidth: '100%'
                         }}
                     />
                 )
             }}
             keyExtractor={(item) => `${item.value}`}
-            style={{ maxHeight: Platform.OS === "web" ? (hp('70%') - mx) : mx, maxWidth: menuWidth }}
+            style={{ maxHeight: Platform.OS === "web" ? (hp('70%') - mx) : mx, maxWidth: Platform.OS === "web" ? menuWidth : '100%', flex: Platform.OS === "web" ? 1 : undefined }}
             ListEmptyComponent={() => (
                 <View style={styles.emptyComponent}>
                     <Text style={masterdataStyles.text}>No options available</Text>

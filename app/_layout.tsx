@@ -3,7 +3,7 @@ import AppProviders from "@/components/Appprovider";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import useAppInitialization from '@/hooks/useAppInitialization';
 import { LoadingSpinner } from '@/components';
-import { StatusBar } from 'react-native';
+import { KeyboardAvoidingView, LogBox, Platform, StatusBar } from 'react-native';
 
 const RootNavigation = React.lazy(() => import('./navigations/RootNavigation'))
 const ErrorBoundary = React.lazy(() => import('@/hooks/ErrorBoundary'))
@@ -15,13 +15,17 @@ const RootLayout = () => {
         return <LoadingSpinner />;
     }
 
+    LogBox.ignoreAllLogs();
+
     return (
         <ErrorBoundary>
             <GestureHandlerRootView>
                 <Suspense fallback={<LoadingSpinner />}>
                     <AppProviders>
                         <StatusBar hidden={false} translucent barStyle="light-content" />
-                        <RootNavigation />
+                        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS !== 'web' ? 'height' : undefined}>
+                            <RootNavigation />
+                        </KeyboardAvoidingView>
                     </AppProviders>
                 </Suspense>
             </GestureHandlerRootView>

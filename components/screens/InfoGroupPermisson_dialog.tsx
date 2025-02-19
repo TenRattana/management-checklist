@@ -116,7 +116,7 @@ const InfoGroupPermisson_dialog = React.memo(({ setDialogAdd, groupUsers, saveGr
                 ) : (
                     <Formik
                         initialValues={{
-                            permissions: selectedGroupUser ? selectedGroupUser.Permissons.map((perm) => ({
+                            GUserID: "", permissions: selectedGroupUser ? selectedGroupUser.Permissons.map((perm) => ({
                                 PermissionID: perm.PermissionID,
                                 PermissionName: perm.PermissionName,
                                 PermissionStatus: perm.PermissionStatus || false
@@ -206,7 +206,7 @@ const InfoGroupPermisson_dialog = React.memo(({ setDialogAdd, groupUsers, saveGr
                                         keyboardShouldPersistTaps="handled"
                                         nestedScrollEnabled={true}
                                     >
-                                        {values.permissions && values.permissions.length > 0 ? (
+                                        {values.GUserID && values.permissions && values.permissions.length > 0 ? (
                                             values.permissions.map((op, index) => (
                                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 5, paddingRight: 30 }} key={op.PermissionID}>
                                                     <List.Item
@@ -216,7 +216,7 @@ const InfoGroupPermisson_dialog = React.memo(({ setDialogAdd, groupUsers, saveGr
                                                         titleStyle={{ fontSize: spacing.small }}
                                                     />
                                                     <Switch
-                                                        style={{ transform: [{ scale: 1.1 }], top: 2, flex: 1 }}
+                                                        style={{ transform: [{ scale: 1.1 }], top: 2 }}
                                                         color={theme.colors.inversePrimary}
                                                         value={op.PermissionStatus}
                                                         onValueChange={(v: boolean) => {
