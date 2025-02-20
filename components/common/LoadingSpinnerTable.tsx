@@ -7,8 +7,8 @@ const LoadingSpinnerTable = () => {
   const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
   return (
-    <View style={{ flex: 1, marginTop: 5, marginHorizontal: 10 }}>
-      <ShimmerPlaceholder style={{ marginTop: 20, marginHorizontal: 10, height: '95%', width: '98%', borderRadius: 10 }} width={800} />
+    <View style={{ flex: 1 }}>
+      <ShimmerPlaceholder style={{ marginTop: 15, marginHorizontal: 10, height: 35, width: '98%', borderRadius: 50 }} width={800} />
     </View>
   );
 };
