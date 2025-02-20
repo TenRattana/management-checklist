@@ -34,9 +34,9 @@ const Formfield = React.memo(({ item, field, dataType, setFieldValue, setFieldTo
 
         const containerStyle: ViewStyle = {
             width: responsive === "small" ? "100%" : `${98 / columns}%`,
-            flexShrink: 1,
-            flexGrow: field.Rowcolumn || 1,
-            flexBasis: responsive === "small" ? "100%" : `${100 / (columns / (field.Rowcolumn || 1))}%`,
+            // flexShrink: 1,
+            flex: 1,
+            flexBasis: responsive === "small" ? "100%" : `${100 / (columns / ((field.Rowcolumn || 1) > columns ? columns : field.Rowcolumn || 1))}%`,
             padding: 5,
         };
 
