@@ -372,11 +372,11 @@ export const fetchForms = async (
     }
 };
 
-export const fetchSearchFomrs = async (
+export const fetchSearchForms = async (
     debouncedSearchQuery: string
 ): Promise<Form[]> => {
     try {
-        const response = await axiosInstance.post("Form/SearchFomrs", {
+        const response = await axiosInstance.post("Form/SearchForms", {
             Messages: debouncedSearchQuery
         });
         return response.data.data ?? [];

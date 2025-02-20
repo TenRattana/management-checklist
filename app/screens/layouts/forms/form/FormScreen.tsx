@@ -6,7 +6,7 @@ import { LoadingSpinnerTable, Searchbar, Text } from "@/components";
 import { Card } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useInfiniteQuery, useQueryClient } from 'react-query';
-import { fetchForms, fetchSearchFomrs } from "@/app/services";
+import { fetchForms, fetchSearchForms } from "@/app/services";
 import { useRes } from "@/app/contexts/useRes";
 import { useTheme } from "@/app/contexts/useTheme";
 import { navigate } from "@/app/navigations/navigationUtils";
@@ -32,7 +32,7 @@ const FormScreen = React.memo(({ route }: FormScreenProps) => {
         ['form', debouncedSearchQuery],
         ({ pageParam = 0 }) => {
             return debouncedSearchQuery
-                ? fetchSearchFomrs(debouncedSearchQuery)
+                ? fetchSearchForms(debouncedSearchQuery)
                 : fetchForms(pageParam, 1000);
         },
         {
