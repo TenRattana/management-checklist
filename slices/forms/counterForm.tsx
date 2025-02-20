@@ -99,7 +99,7 @@ const subFormSlice = createSlice({
       updatedForm.subForms.forEach(sub => {
         const matchingFields = BaseFormState.filter(form => form.SFormID === sub.SFormID);
 
-        sub.Fields = matchingFields.map((field, index) => ({
+        sub.MatchCheckLists = matchingFields.map((field, index) => ({
           ...field,
           DisplayOrder: field.DisplayOrder || index,
           CListName: mode && sub.Number ? `${index + 1}. ${checkListMap.get(field.CListID) || ""}` : checkListMap.get(field.CListID) || "" || field.CListName,
@@ -173,7 +173,7 @@ const subFormSlice = createSlice({
             DisplayOrder: index,
           }));
 
-          sub.Fields = updatedFields;
+          sub.MatchCheckLists = updatedFields;
         }
       });
     },
@@ -230,13 +230,13 @@ const subFormSlice = createSlice({
         if (sub.SFormID === formData.SFormID) {
           const addField = {
             ...formData,
-            DisplayOrder: (sub.Fields?.length || 0) + 1,
+            DisplayOrder: (sub.MatchCheckLists?.length || 0) + 1,
             CListName: checkList.find((v) => v.CListID === formData.CListID)?.CListName,
             CTypeName: checkListType.find((v) => v.CTypeID === formData.CTypeID)?.CTypeName,
             DTypeName: dataType.find(v => v.DTypeID === formData.DTypeID)?.DTypeName
           };
 
-          const updatedFields = [...(sub.Fields || []), addField];
+          const updatedFields = [...(sub.MatchCheckLists || []), addField];
           const sortedFields = sortFields(updatedFields);
 
           return {
@@ -264,7 +264,7 @@ const subFormSlice = createSlice({
 
       state.subForms = state.subForms.map((sub) => {
         if (sub.SFormID === formData.SFormID) {
-          const updatedFields = sub.Fields?.map((field) => {
+          const updatedFields = sub.MatchCheckLists?.map((field) => {
             if (field.MCListID === formData.MCListID) {
               return {
                 ...formData,
@@ -297,7 +297,7 @@ const subFormSlice = createSlice({
         if (subForm.SFormID === SFormID) {
           return {
             ...subForm,
-            Fields: subForm.Fields?.filter((f) => f.MCListID !== MCListID),
+            Fields: subForm.MatchCheckLists?.filter((f) => f.MCListID !== MCListID),
           };
         }
         return subForm;
@@ -315,10 +315,10 @@ const subFormSlice = createSlice({
         if (sub.SFormID === currentField.SFormID) {
           const addField = {
             ...currentField,
-            DisplayOrder: (sub.Fields?.length || 0) + 1,
+            DisplayOrder: (sub.MatchCheckLists?.length || 0) + 1,
           };
 
-          const updatedFields = [...(sub.Fields || []), addField];
+          const updatedFields = [...(sub.MatchCheckLists || []), addField];
           const sortedFields = sortFields(updatedFields);
 
           return {

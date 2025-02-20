@@ -60,7 +60,7 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
   const validationSchema = useMemo(() => {
     const shape: Record<string, any> = {};
     state.subForms.forEach((subForm: BaseSubForm) => {
-      subForm.Fields.forEach((field: BaseFormState) => {
+      subForm.MatchCheckLists.forEach((field: BaseFormState) => {
         const dataTypeName = dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName;
         let validator;
 
@@ -104,7 +104,7 @@ const InputFormMachine = React.memo((props: PreviewProps<ScanParams>) => {
     const updatedSubForms = state.subForms.map((subForm: BaseSubForm) => ({
       ...subForm,
       MachineID: state.MachineID,
-      Fields: subForm?.Fields?.map((field: BaseFormState) => ({
+      Fields: subForm?.MatchCheckLists?.map((field: BaseFormState) => ({
         ...field,
         EResult: values[field.MCListID] || "",
       })),

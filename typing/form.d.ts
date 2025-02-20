@@ -34,7 +34,7 @@ export interface BaseSubForm {
   Columns?: number;
   DisplayOrder?: number;
   MachineID: string;
-  Fields: BaseFormState[];
+  MatchCheckLists: BaseFormState[];
   Open?: boolean;
 }
 

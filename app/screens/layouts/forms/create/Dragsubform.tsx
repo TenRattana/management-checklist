@@ -43,7 +43,7 @@ const Dragsubform = React.memo(({ checkLists }: DragsubformProps) => {
         FormID: "",
         Number: false,
         MachineID: "",
-        Fields: [],
+        MatchCheckLists: [],
     });
     const [editMode, setEditMode] = useState(false);
 
@@ -70,7 +70,7 @@ const Dragsubform = React.memo(({ checkLists }: DragsubformProps) => {
                 FormID: "",
                 Number: false,
                 MachineID: "",
-                Fields: [],
+                MatchCheckLists: [],
             }
         );
     }, []);
@@ -144,7 +144,7 @@ const Dragsubform = React.memo(({ checkLists }: DragsubformProps) => {
                 {item.Open && (
                     <Animated.View entering={FadeIn} exiting={FadeOut}>
                         <Dragfield
-                            data={item.Fields ?? []}
+                            data={item.MatchCheckLists ?? []}
                             SFormID={item.SFormID}
                             Columns={item.Columns}
                             dispatch={dispatch}

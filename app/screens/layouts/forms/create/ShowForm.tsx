@@ -76,7 +76,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
         if (state.subForms) {
             const initialValues: { [key: string]: any } = {};
             state.subForms.forEach((subForm: BaseSubForm) => {
-                subForm.Fields.forEach((field: BaseFormState) => {
+                subForm.MatchCheckLists.forEach((field: BaseFormState) => {
                     initialValues[field.MCListID] = field.EResult ?? "";
                 });
             });
@@ -107,7 +107,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                                 validateOnChange={false}
                                 onSubmit={(value) => { }}
                                 enableReinitialize={true}
-                                key={JSON.stringify({ SFormID: subForm.SFormID, Column: subForm.Columns, fields: subForm.Fields })}
+                                key={JSON.stringify({ SFormID: subForm.SFormID, Column: subForm.Columns, fields: subForm.MatchCheckLists })}
                             >
                                 {({ errors, touched, setFieldValue, setTouched, setFieldError, values }) => {
                                     incrementCount(false);
@@ -125,7 +125,7 @@ const Preview = React.memo(forwardRef<any, any>((props, ref) => {
                                             </TouchableOpacity>
 
                                             <Card.Content style={masterdataStyles.subFormContainer}>
-                                                {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
+                                                {subForm.MatchCheckLists?.map((field: BaseFormState, fieldIndex: number) => {
                                                     const columns = subForm.Columns ?? 1;
                                                     const ChheckList = subForm.Number ? `${countRef.current}. ${field.CListName}` : field.CListName;
                                                     incrementCount(subForm.Number);

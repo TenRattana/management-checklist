@@ -42,7 +42,7 @@ const createSubFormsAndFields = async (
             Number: Boolean(subFormItem.Number ?? false),
             DisplayOrder: subFormItem.DisplayOrder,
             MachineID: subFormItem.MachineID,
-            Fields: []
+            MatchCheckLists: []
         };
         subForms.push(subForm);
 

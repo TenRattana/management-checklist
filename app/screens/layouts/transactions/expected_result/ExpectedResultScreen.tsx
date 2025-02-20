@@ -6,7 +6,7 @@ import { Card, IconButton, Portal } from "react-native-paper";
 import useMasterdataStyles from "@/styles/common/masterdata";
 import { useInfiniteQuery } from 'react-query';
 import { Platform, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import { fetchExpectedResultsWithTime, fetchForms, fetchMachines, fetchSearchFomrs, fetchSearchMachines, fetchUsers } from "@/app/services";
+import { fetchExpectedResultsWithTime, fetchForms, fetchMachines, fetchSearchForms, fetchSearchMachines, fetchUsers } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 import { navigate } from "@/app/navigations/navigationUtils";
 import { useFocusEffect } from "expo-router";
@@ -121,13 +121,13 @@ const ExpectedResultScreen = React.memo(() => {
                 });
 
                 setMachineCodes((prevItems) => {
-                    const allItemCodes = [...prevItems, ...newItemCodes];
+                    const allItems = [...prevItems, ...newItems];
 
-                    const uniqueItemCodes = Array.from(new Set(allItemCodes.map((item) => item.value)))
-                        .map((value) => allItemCodes.find((item) => item.value === value))
-                        .filter((item) => item !== undefined);
+                    const uniqueItems = Array.from(new Set(allItems.map(item => item.value)))
+                        .map(value => allItems.find(item => item.value === value))
+                        .filter((item): item is { label: string; value: string } => item !== undefined);
 
-                    return uniqueItemCodes;
+                    return uniqueItems;
                 });
             },
         }
@@ -137,7 +137,7 @@ const ExpectedResultScreen = React.memo(() => {
         ['form', debouncedSearchQueryFilterForm],
         ({ pageParam = 0 }) => {
             return debouncedSearchQueryFilterForm
-                ? fetchSearchFomrs(debouncedSearchQueryFilterForm)
+                ? fetchSearchForms(debouncedSearchQueryFilterForm)
                 : fetchForms(pageParam, 1000);
         },
         {
@@ -187,19 +187,21 @@ const ExpectedResultScreen = React.memo(() => {
             refetchOnMount: true,
             enabled: true,
             onSuccess: (newData) => {
-                const newItems = newData.pages.flat().filter((item) => item.IsActive).map((item) => ({
-                    label: item.UserName || 'Unknown',
-                    value: item.UserName || '',
-                }));
+                const newItems = newData.pages.flat()
+                    .filter((item) => item.IsActive)
+                    .map((item) => ({
+                        label: item.UserName || 'Unknown',
+                        value: item.UserName || '',
+                    }));
 
                 setUsers((prevItems) => {
-                    const allItemCodes = [...prevItems, ...newItems];
+                    const allItems = [...prevItems, ...newItems];
 
-                    const uniqueItemCodes = Array.from(new Set(allItemCodes.map((item) => item.value)))
-                        .map((value) => allItemCodes.find((item) => item.value === value))
-                        .filter((item) => item !== undefined);
+                    const uniqueItems = Array.from(new Set(allItems.map(item => item.value)))
+                        .map(value => allItems.find(item => item.value === value))
+                        .filter((item): item is { label: string; value: string } => item !== undefined);
 
-                    return uniqueItemCodes;
+                    return uniqueItems;
                 });
             },
         }

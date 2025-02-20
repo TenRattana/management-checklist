@@ -6,7 +6,7 @@ import * as Yup from 'yup'
 import useMasterdataStyles from "@/styles/common/masterdata";
 import Text from "@/components/Text";
 import Dropdown from "../common/Dropdown";
-import { fetchForms, fetchMachines, fetchSearchFomrs, fetchSearchMachines } from "@/app/services";
+import { fetchForms, fetchMachines, fetchSearchForms, fetchSearchMachines } from "@/app/services";
 import { useInfiniteQuery, useQueryClient } from "react-query";
 import { useRes } from "@/app/contexts/useRes";
 import { useTheme } from "@/app/contexts/useTheme";
@@ -62,7 +62,7 @@ const Match_form_machine_dialog = React.memo(({ isVisible, setIsVisible, isEditi
         ['form', debouncedSearchQueryForm],
         ({ pageParam = 0 }) => {
             return debouncedSearchQueryForm
-                ? fetchSearchFomrs(debouncedSearchQueryForm)
+                ? fetchSearchForms(debouncedSearchQueryForm)
                 : fetchForms(pageParam, 100);
         },
         {

@@ -7,7 +7,7 @@ import useMasterdataStyles from "@/styles/common/masterdata";
 import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 import { Platform, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useSelector } from "react-redux";
-import { fetchApprovedWithTime, fetchForms, fetchMachines, fetchSearchFomrs, fetchSearchMachines, fetchUsers, SaveApproved } from "@/app/services";
+import { fetchApprovedWithTime, fetchForms, fetchMachines, fetchSearchForms, fetchSearchMachines, fetchUsers, SaveApproved } from "@/app/services";
 import { useTheme } from "@/app/contexts/useTheme";
 import { navigate } from "@/app/navigations/navigationUtils";
 import { useFocusEffect } from "expo-router";
@@ -116,13 +116,13 @@ const ApprovedScreen = React.memo(() => {
                 });
 
                 setMachineCodes((prevItems) => {
-                    const allItemCodes = [...prevItems, ...newItemCodes];
+                    const allItems = [...prevItems, ...newItems];
 
-                    const uniqueItemCodes = Array.from(new Set(allItemCodes.map((item) => item.value)))
-                        .map((value) => allItemCodes.find((item) => item.value === value))
-                        .filter((item) => item !== undefined);
+                    const uniqueItems = Array.from(new Set(allItems.map(item => item.value)))
+                        .map(value => allItems.find(item => item.value === value))
+                        .filter((item): item is { label: string; value: string } => item !== undefined);
 
-                    return uniqueItemCodes;
+                    return uniqueItems;
                 });
             },
         }
@@ -132,7 +132,7 @@ const ApprovedScreen = React.memo(() => {
         ['form', debouncedSearchQueryFilterForm],
         ({ pageParam = 0 }) => {
             return debouncedSearchQueryFilterForm
-                ? fetchSearchFomrs(debouncedSearchQueryFilterForm)
+                ? fetchSearchForms(debouncedSearchQueryFilterForm)
                 : fetchForms(pageParam, 1000);
         },
         {
@@ -188,13 +188,13 @@ const ApprovedScreen = React.memo(() => {
                 }));
 
                 setUsers((prevItems) => {
-                    const allItemCodes = [...prevItems, ...newItems];
+                    const allItems = [...prevItems, ...newItems];
 
-                    const uniqueItemCodes = Array.from(new Set(allItemCodes.map((item) => item.value)))
-                        .map((value) => allItemCodes.find((item) => item.value === value))
-                        .filter((item) => item !== undefined);
+                    const uniqueItems = Array.from(new Set(allItems.map(item => item.value)))
+                        .map(value => allItems.find(item => item.value === value))
+                        .filter((item): item is { label: string; value: string } => item !== undefined);
 
-                    return uniqueItemCodes;
+                    return uniqueItems;
                 });
             },
         }

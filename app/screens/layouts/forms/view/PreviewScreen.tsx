@@ -32,7 +32,7 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
     const validationSchema = useMemo(() => {
         const shape: Record<string, any> = {};
         state.subForms.forEach((subForm: BaseSubForm) => {
-            subForm.Fields.forEach((field: BaseFormState) => {
+            subForm.MatchCheckLists.forEach((field: BaseFormState) => {
                 const dataTypeName = dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName;
                 let validator;
 
@@ -75,7 +75,7 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
         if (state.subForms) {
             const initialValues: { [key: string]: any } = {};
             state.subForms.forEach((subForm: BaseSubForm) => {
-                subForm.Fields.forEach((field: BaseFormState) => {
+                subForm.MatchCheckLists.forEach((field: BaseFormState) => {
                     initialValues[field.MCListID] = field.EResult ?? "";
                 });
             });
@@ -143,7 +143,7 @@ const PreviewScreen = React.memo(forwardRef<any, any>((props, ref) => {
                                             titleStyle={masterdataStyles.cardTitle}
                                         />
                                         <Card.Content style={[masterdataStyles.subFormContainer]}>
-                                            {subForm.Fields?.map((field: BaseFormState, fieldIndex: number) => {
+                                            {subForm.MatchCheckLists?.map((field: BaseFormState, fieldIndex: number) => {
                                                 const columns = subForm.Columns ?? 1;
 
                                                 const containerStyle: ViewStyle = {

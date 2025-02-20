@@ -90,7 +90,7 @@ const CreateFormScreen = React.memo(({ route }: CreateFormProps) => {
     const validationSchemaShow = useMemo(() => {
         const shape: Record<string, any> = {};
         state.subForms.forEach((subForm: BaseSubForm) => {
-            subForm.Fields.forEach((field: BaseFormState) => {
+            subForm.MatchCheckLists.forEach((field: BaseFormState) => {
                 const dataTypeName = dataType.find(item => item.DTypeID === field.DTypeID)?.DTypeName;
                 let validator;
 
@@ -132,7 +132,7 @@ const CreateFormScreen = React.memo(({ route }: CreateFormProps) => {
         const selectedDataType = dataType.find((v: DataType) => item.CTypeTitle === "Number Answer" ? v.DTypeName === "Number" : item.CTypeTitle === "Time/Date" ? v.DTypeName === "Date" : v.DTypeName === "String") || dataType?.[0];
 
         if (item.CTypeName === "SubForm") {
-            const subForm = { SFormID: "", SFormName: "New Setion", Columns: 1, Fields: [], Number: false, FormID: state.FormID || "", MachineID: state.MachineID || "" }
+            const subForm = { SFormID: "", SFormName: "New Setion", Columns: 1, MatchCheckLists: [], Number: false, FormID: state.FormID || "", MachineID: state.MachineID || "" }
             runOnJS(dispatch)(addSubForm({ subForm: subForm }));
         } else if (cardIndex >= 0) {
             const targetSubForm = state.subForms[cardIndex];
@@ -180,7 +180,7 @@ const CreateFormScreen = React.memo(({ route }: CreateFormProps) => {
     const MemoDraggableItem = React.memo(DraggableItem)
     const MemoSaveDialog = React.memo(SaveDialog)
 
-    const [currentSub, setCurrentSub] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", Number: false, MachineID: "", Fields: [] });
+    const [currentSub, setCurrentSub] = useState<BaseSubForm>({ SFormID: "", SFormName: "", FormID: "", Number: false, MachineID: "", MatchCheckLists: [] });
     const [currentField, setCurrentField] = useState<BaseFormState>({
         MCListID: "", CListID: "", GCLOptionID: "", CTypeID: "", DTypeID: "", SFormID: "",
         Required: false, Important: false, ImportantList: [], EResult: "", CListName: "", DTypeValue: undefined,
